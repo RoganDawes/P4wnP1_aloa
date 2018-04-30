@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package P4wnP1_grpc;
+
+service P4WNP1 {
+  rpc GetGadgetSettings (Empty) returns (GadgetSettings) {}
+  rpc SetGadgetSettings (GadgetSettings) returns (Error) {}
+  rpc GetLEDSettings (Empty) returns (LEDSettings) {}
+  rpc SetLEDSettings (LEDSettings) returns (Error) {}
+  rpc StopGadget (Empty) returns (Error) {}
+  rpc StartGadget (Empty) returns (Error) {}
+}
+
+message LEDSettings {
+	uint32 blink_count = 1;
+}
+
+message GadgetSettingsEthernet {
+	string host_addr = 1;
+	string dev_addr = 2;
+}
+
+message GadgetSettings {
+	string vid = 1;
+	string pid = 2;
+	string manufacturer = 3;
+	string product = 4;
+	string serial = 5;
+	bool use_CDC_ECM = 6;
+	bool use_RNDIS = 7;
+	bool use_HID_KEYBOARD = 8;
+	bool use_HID_MOUSE = 9;
+	bool use_HID_RAW = 10;
+	bool use_UMS = 11;
+	bool use_SERIAL = 12;
+	GadgetSettingsEthernet rndis_settings = 13;
+	GadgetSettingsEthernet cdc_ecm_settings = 14;
+	
+}
+
+message WiFiSettings {
+	bool diasabled = 1;
+	string reg = 2;				//Regulatory domain per ISO/IEC 3166-1 alpha2
+	enum Mode {
+		AP = 0;					//acts as access point
+		STA = 1;				//acts as station for an existing access point
+		STA_FAILOVER_AP = 2;	//acts as station, if connection to the given AP isn't possible spawns an own AP
+	}
+	Mode mode = 3;
+	string ap_ssid = 4;			//SSID of AP to spawn
+	enum APAuthMode {
+		WPA2_PSK = 0;			//AP uses WPA2 pre-shared key
+		OPEN = 1;				//Open System Authentication (no authentication)
+	}
+	APAuthMode auth_mode = 5;
+	uint32 ap_channel = 6;
+	string ap_psk = 7;			//pre-shared key if auth_mode == WPA2_PSK
+	bool ap_hide_ssid = 8;		//if true, SSID gets hidden for spawned AP
+	
+	string client_ssid = 9;
+	string client_psk = 10;
+	
+	bool disable_nexmon = 11;	//if true, legacy driver / firmware is used instead of nexmon
+}
+
+message Error {
+	int32 err = 1;
+}
+
+message Empty {}
