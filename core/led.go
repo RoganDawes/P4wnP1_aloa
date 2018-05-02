@@ -1,11 +1,11 @@
-//package led
-package main
+package core
 
 import(
 	"os"
 	"log"
 	"io/ioutil"
 	"time"
+	"sync/atomic"
 
 	pb "../proto"
 )
@@ -21,7 +21,11 @@ const (
 	LED_DELAY_PAUSE = 500 * time.Millisecond
 )
 
-func initLed(led_on bool) (error) {
+var (
+	blink_count uint32 = 0
+)
+
+func InitLed(led_on bool) (error) {
 	//set trigger of LED to manual
 	log.Println("Setting LED to manual trigger ...")
 	ioutil.WriteFile(LED_TRIGGER_PATH, []byte(LED_TRIGGER_MANUAL), os.ModePerm)
@@ -32,35 +36,34 @@ func initLed(led_on bool) (error) {
 		log.Println("Setting LED to OFF ...")
 		ioutil.WriteFile(LED_BRIGHTNESS_PATH, []byte(LED_OFF), os.ModePerm)
 	}
+	atomic.StoreUint32(&blink_count, 0)
+	
+	go led_loop()
+	
 	return nil
 }
 
 func led_loop() {
-	blink_count := 10
+	
 	for {
-		for i := 0; i <= blink_count; i++ {
+		for i := uint32(0); i < atomic.LoadUint32(&blink_count); i++ {
 			ioutil.WriteFile(LED_BRIGHTNESS_PATH, []byte(LED_ON), os.ModePerm)
 			time.Sleep(LED_DELAY_ON)
-			ioutil.WriteFile(LED_BRIGHTNESS_PATH, []byte(LED_OFF), os.ModePerm)
-			time.Sleep(LED_DELAY_OFF)
+			
+			//Don't turn off led if blink_count >= 255 (solid)
+			if 255 > atomic.LoadUint32(&blink_count) {
+				ioutil.WriteFile(LED_BRIGHTNESS_PATH, []byte(LED_OFF), os.ModePerm)
+				time.Sleep(LED_DELAY_OFF)
+			}
 		}
 		time.Sleep(LED_DELAY_PAUSE)
 	}
 }
 
 func setLed(s pb.LEDSettings) (error) {
+	log.Printf("setLED called with %+v", s)
 	
+	atomic.StoreUint32(&blink_count, s.BlinkCount)
 	
 	return nil
-}
-
-func main() {
-	initLed(false)
-	
-	log.Println("testing led")
-	settings := pb.LEDSettings{}
-	setLed(settings)
-	
-	go led_loop()
-	time.Sleep(10 * time.Second)
 }
