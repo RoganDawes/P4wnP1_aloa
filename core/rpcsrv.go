@@ -15,28 +15,18 @@ import (
 type server struct{}
 
 //Attach handler function implementing the "GetGadgetSettings" interface to server
-func (s *server) GetGadgetSettings(context.Context, *pb.Empty) (*pb.GadgetSettings, error) {
-	usbset := &pb.GadgetSettings{
-		Pid:              "0x1337",
-		Vid:              "0x1222",
-		Manufacturer:     "MaMe82",
-		Serial:           "deadbeef13371337",
-		Product:          "P4wnP1 by MaMe82",
-		Use_RNDIS:        false,
-		Use_CDC_ECM:      true,
-		Use_HID_KEYBOARD: false,
-		Use_HID_MOUSE:    false,
-		Use_HID_RAW:      false,
-		Use_UMS:          false,
-		Use_SERIAL:       false,
+func (s *server) GetGadgetSettings(context.Context, *pb.Empty) (usbset *pb.GadgetSettings, err error) {
+	usbset, err = ParseGadgetState(USB_GADGET_NAME)
 
-		RndisSettings:  &pb.GadgetSettingsEthernet{HostAddr: "11:22:33:44:55:66", DevAddr: "66:55:44:33:22:11"},
-		CdcEcmSettings: &pb.GadgetSettingsEthernet{HostAddr: "11:22:33:54:76:98", DevAddr: "66:55:44:98:76:54"},
+	if err == nil {
+		j_usbset, _ := json.Marshal(usbset)
+		log.Printf("Gadget settings requested %v", string(j_usbset))
+	} else {
+		log.Printf("Error parsing current gadget config: %v", err)
 	}
-	j_usbset, _ := json.Marshal(usbset)
-	log.Printf("Gadget settings requested %v", string(j_usbset))
 
-	return usbset, nil
+
+	return usbset, err
 }
 
 //Attach handler function implementing the "SetGadgetSettings" interface to server
@@ -68,7 +58,7 @@ func (s *server) SetLEDSettings(ctx context.Context, ledSettings *pb.LEDSettings
 func StartRpcServer(host string, port string) {
 	listen_address := host + ":" + port
 	//Open TCP listener
-	log.Printf("P4wnP1 RPC server lsitening on " + listen_address)
+	log.Printf("P4wnP1 RPC server listening on " + listen_address)
 	lis, err := net.Listen("tcp", listen_address)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

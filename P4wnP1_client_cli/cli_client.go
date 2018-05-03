@@ -9,10 +9,12 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	pb "../proto"
+	"reflect"
 )
 
 func main() {
 	//Parse cli flags, should be replaced with cobra
+	getUsbGadgetConf := flag.Bool("get_gadget_state", false, "Retrieves the current USB gadget state")
 	blinkCountPtr := flag.Int("blink", -1, "LED blink count (0 = LED off, 255 = LED solid, 1..254 blink n times)")
 	var rpcHostPtr string
 	var rpcPortPtr string
@@ -36,9 +38,19 @@ func main() {
 	defer cancel()
 
 	if *blinkCountPtr >= 0 {
-		c.SetLEDSettings(ctx, &pb.LEDSettings{ BlinkCount: uint32(*blinkCountPtr) })
+		_, err1 := c.SetLEDSettings(ctx, &pb.LEDSettings{BlinkCount: uint32(*blinkCountPtr)})
+		if err1 != nil {
+			log.Printf("Error setting LED blink count %d: %v", *blinkCountPtr, err1)
+		}
 	}
 
+	if *getUsbGadgetConf {
+		r, err := c.GetGadgetSettings(ctx, &pb.Empty{})
+		if err != nil {
+			log.Fatalf("could not get GadgetSettings: %v", err)
+		}
+		log.Printf("USB Settings %s: %+v", reflect.TypeOf(*r), *r)
+	}
 	
 	/*
 	r, err := c.GetGadgetSettings(ctx, &pb.Empty{})

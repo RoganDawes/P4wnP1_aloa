@@ -9,14 +9,16 @@ import (
 	"strings"
 
 	pb "../proto"
+	"time"
+	"fmt"
 )
 
 const (
+	USB_GADGET_NAME = "mame82_gadget"
 	USB_GADGET_DIR_BASE      = "/sys/kernel/config/usb_gadget"
-	USB_GADGET_DIR           = USB_GADGET_DIR_BASE + "/mame82_gadget"
-	USB_DEFAULT_SERIAL       = "deadbeefdeadbeef"
-	USB_DEFAULT_MANUFACTURER = "MaMe82"
-	USB_DEFAULT_PRODUCT      = "P4wnP1 by MaMe82"
+	USB_GADGET_DIR           = USB_GADGET_DIR_BASE + "/" + USB_GADGET_NAME
+
+	USB_ETHERNET_BRIDGE_NAME = "usbeth"
 
 	USB_bcdDevice = "0x0100" //Version 1.00
 	USB_bcdUSB    = "0x0200" //mode: USB 2.0
@@ -68,6 +70,47 @@ const (
 	USB_FUNCTION_HID_RAW_report_desc   = "\x06\x00\xff\t\x01\xa1\x01\t\x01\x15\x00&\xff\x00u\x08\x95@\x81\x02\t\x02\x15\x00&\xff\x00u\x08\x95@\x91\x02\xc0"
 	USB_FUNCTION_HID_RAW_name          = "hid.raw"
 )
+
+func addUSBEthernetBridge() {
+	//Create the bridge
+	CreateBridge(USB_ETHERNET_BRIDGE_NAME)
+
+	//add the interfaces
+	if err := AddInterfaceToBridgeIfExistent(USB_ETHERNET_BRIDGE_NAME, "usb0"); err != nil {
+		log.Println(err)
+	}
+	if err := AddInterfaceToBridgeIfExistent(USB_ETHERNET_BRIDGE_NAME, "usb1"); err != nil {
+		log.Println(err)
+	}
+
+	//enable the bridge
+	NetworkLinkUp(USB_ETHERNET_BRIDGE_NAME)
+}
+
+func deleteUSBEthernetBridge() {
+	//we ignore error results
+	DeleteBridge(USB_ETHERNET_BRIDGE_NAME)
+}
+
+/*
+Polls for presence of "usb0" / "usb1" till one of both is active or timeout is reached
+ */
+
+func pollForUSBEthrnet(timeout time.Duration) error {
+	for startTime := time.Now(); time.Since(startTime) < timeout; {
+		if present, _ := CheckInterfaceExistence("usb0"); present {
+			return nil
+		}
+		if present, _ := CheckInterfaceExistence("usb1"); present {
+			return nil
+		}
+
+		//Take a breath
+		time.Sleep(100*time.Millisecond)
+		fmt.Print(".")
+	}
+	return errors.New(fmt.Sprintf("Timeout %v reached before usb0 or usb1 cam up"))
+}
 
 func InitDefaultGadgetSettings() error {
 	return InitGadget(CreateDefaultGadgetSettings())
@@ -123,7 +166,125 @@ func CheckLibComposite() error {
 	return err
 }
 
+func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) {
+	err = nil
+	result = &pb.GadgetSettings{}
+	result.CdcEcmSettings = &pb.GadgetSettingsEthernet{}
+	result.RndisSettings = &pb.GadgetSettingsEthernet{}
+
+	//gadget_root := "./test"
+	gadget_dir := USB_GADGET_DIR_BASE + "/" + gadgetName
+
+	//check if root exists, return error otherwise
+	if _, err = os.Stat(gadget_dir); os.IsNotExist(err) {
+		err = errors.New(fmt.Sprintf("Gadget %s doesn't exist", gadgetName))
+		result = nil
+		return
+	}
+
+	if res, err := ioutil.ReadFile(gadget_dir + "/idVendor"); err != nil {
+		err1 := errors.New(fmt.Sprintf("Gadget %s error reading Vid", gadgetName))
+		return nil, err1
+	} else {
+		result.Vid = strings.TrimSuffix(string(res), "\n")
+	}
+
+	if res, err := ioutil.ReadFile(gadget_dir + "/idProduct"); err != nil {
+		err1 := errors.New(fmt.Sprintf("Gadget %s error reading Pid", gadgetName))
+		return nil, err1
+	} else {
+		result.Pid = strings.TrimSuffix(string(res), "\n")
+	}
+
+	if res, err := ioutil.ReadFile(gadget_dir + "/strings/0x409/serialnumber"); err != nil {
+		err1 := errors.New(fmt.Sprintf("Gadget %s error reading Serial", gadgetName))
+		return nil, err1
+	} else {
+		result.Serial = strings.TrimSuffix(string(res), "\n")
+	}
+
+	if res, err := ioutil.ReadFile(gadget_dir + "/strings/0x409/manufacturer"); err != nil {
+		err1 := errors.New(fmt.Sprintf("Gadget %s error reading Manufacturer", gadgetName))
+		return nil, err1
+	} else {
+		result.Manufacturer = strings.TrimSuffix(string(res), "\n")
+	}
+
+	if res, err := ioutil.ReadFile(gadget_dir + "/strings/0x409/product"); err != nil {
+		err1 := errors.New(fmt.Sprintf("Gadget %s error reading Product", gadgetName))
+		return nil, err1
+	} else {
+		result.Product = strings.TrimSuffix(string(res), "\n")
+	}
+
+	//Check enabled functions in configuration
+
+	//USB RNDIS
+	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/rndis.usb0"); !os.IsNotExist(err1) {
+		result.Use_RNDIS = true
+
+		if res, err := ioutil.ReadFile(gadget_dir + "/functions/rndis.usb0/host_addr"); err != nil {
+			err1 := errors.New(fmt.Sprintf("Gadget %s error reading RNDIS host_addr", gadgetName))
+			return nil, err1
+		} else {
+			result.RndisSettings.HostAddr = strings.TrimSuffix(string(res), "\000\n")
+		}
+
+		if res, err := ioutil.ReadFile(gadget_dir + "/functions/rndis.usb0/dev_addr"); err != nil {
+			err1 := errors.New(fmt.Sprintf("Gadget %s error reading RNDIS dev_addr", gadgetName))
+			return nil, err1
+		} else {
+			result.RndisSettings.DevAddr = strings.TrimSuffix(string(res), "\000\n")
+		}
+	}
+
+	//USB CDC ECM
+	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/ecm.usb1"); !os.IsNotExist(err1) {
+		result.Use_CDC_ECM = true
+
+		if res, err := ioutil.ReadFile(gadget_dir + "/functions/ecm.usb1/host_addr"); err != nil {
+			err1 := errors.New(fmt.Sprintf("Gadget %s error reading CDC ECM host_addr", gadgetName))
+			return nil, err1
+		} else {
+			result.CdcEcmSettings.HostAddr = strings.TrimSuffix(string(res), "\000\n")
+		}
+
+		if res, err := ioutil.ReadFile(gadget_dir + "/functions/ecm.usb1/dev_addr"); err != nil {
+			err1 := errors.New(fmt.Sprintf("Gadget %s error reading CDC ECM dev_addr", gadgetName))
+			return nil, err1
+		} else {
+			result.CdcEcmSettings.DevAddr = strings.TrimSuffix(string(res), "\000\n")
+		}
+
+	}
+
+	//USB serial
+	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/acm.GS0"); !os.IsNotExist(err1) {
+		result.Use_SERIAL = true
+	}
+
+	//USB HID Keyboard
+	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/"+USB_FUNCTION_HID_KEYBOARD_name); !os.IsNotExist(err1) {
+		result.Use_HID_KEYBOARD = true
+	}
+
+	//USB HID Mouse
+	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/"+USB_FUNCTION_HID_MOUSE_name); !os.IsNotExist(err1) {
+		result.Use_HID_KEYBOARD = true
+	}
+
+	//USB HID RAW
+	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/"+USB_FUNCTION_HID_RAW_name); !os.IsNotExist(err1) {
+		result.Use_HID_RAW = true
+	}
+
+	return
+
+}
+
 func InitGadget(settings pb.GadgetSettings) error {
+	var usesUSBEthernet bool
+
 	//gadget_root := "./test"
 	gadget_root := USB_GADGET_DIR_BASE
 
@@ -136,6 +297,8 @@ func InitGadget(settings pb.GadgetSettings) error {
 
 	//create gadget folder
 	os.Mkdir(USB_GADGET_DIR, os.ModePerm)
+	log.Printf("Creating composite gadget '%s'", USB_GADGET_NAME)
+
 	//set vendor ID, product ID
 	ioutil.WriteFile(USB_GADGET_DIR+"/idVendor", []byte(settings.Vid), os.ModePerm)
 	ioutil.WriteFile(USB_GADGET_DIR+"/idProduct", []byte(settings.Pid), os.ModePerm)
@@ -163,6 +326,8 @@ func InitGadget(settings pb.GadgetSettings) error {
 
 	// RNDIS has to be the first interface on Composite device for Windows (first function initialized)
 	if settings.Use_RNDIS {
+		log.Printf("... creating USB RNDIS function")
+		usesUSBEthernet = true
 		os.Mkdir(USB_GADGET_DIR+"/functions/rndis.usb0", os.ModePerm) //create RNDIS function
 		ioutil.WriteFile(USB_GADGET_DIR+"/functions/rndis.usb0/host_addr", []byte(settings.RndisSettings.HostAddr), os.ModePerm)
 		ioutil.WriteFile(USB_GADGET_DIR+"/functions/rndis.usb0/dev_addr", []byte(settings.RndisSettings.DevAddr), os.ModePerm)
@@ -205,6 +370,8 @@ func InitGadget(settings pb.GadgetSettings) error {
 	}
 
 	if settings.Use_CDC_ECM {
+		log.Printf("... creating USB CDC ECM function")
+		usesUSBEthernet = true
 		os.Mkdir(USB_GADGET_DIR+"/functions/ecm.usb1", os.ModePerm) //create CDC ECM function
 		ioutil.WriteFile(USB_GADGET_DIR+"/functions/ecm.usb1/host_addr", []byte(settings.CdcEcmSettings.HostAddr), os.ModePerm)
 		ioutil.WriteFile(USB_GADGET_DIR+"/functions/ecm.usb1/dev_addr", []byte(settings.CdcEcmSettings.DevAddr), os.ModePerm)
@@ -217,6 +384,7 @@ func InitGadget(settings pb.GadgetSettings) error {
 	}
 
 	if settings.Use_SERIAL {
+		log.Printf("... creating USB serial function")
 		os.Mkdir(USB_GADGET_DIR+"/functions/acm.GS0", os.ModePerm) //create ACM function
 
 		//activate function by symlinking to config 1
@@ -228,6 +396,7 @@ func InitGadget(settings pb.GadgetSettings) error {
 	}
 
 	if settings.Use_HID_KEYBOARD {
+		log.Printf("... creating USB HID Keyboard function")
 		funcdir := USB_GADGET_DIR + "/functions/" + USB_FUNCTION_HID_KEYBOARD_name
 		os.Mkdir(funcdir, os.ModePerm) //create HID function for keyboard
 
@@ -243,6 +412,7 @@ func InitGadget(settings pb.GadgetSettings) error {
 	}
 
 	if settings.Use_HID_MOUSE {
+		log.Printf("... creating USB HID Mouse function")
 		funcdir := USB_GADGET_DIR + "/functions/" + USB_FUNCTION_HID_MOUSE_name
 		os.Mkdir(funcdir, os.ModePerm) //create HID function for mouse
 
@@ -258,6 +428,7 @@ func InitGadget(settings pb.GadgetSettings) error {
 	}
 
 	if settings.Use_HID_RAW {
+		log.Printf("... creating USB HID Generic device function")
 		funcdir := USB_GADGET_DIR + "/functions/" + USB_FUNCTION_HID_RAW_name
 		os.Mkdir(funcdir, os.ModePerm) //create HID function for mouse
 
@@ -283,6 +454,23 @@ func InitGadget(settings pb.GadgetSettings) error {
 	udc_name := files[0].Name()
 	ioutil.WriteFile(USB_GADGET_DIR+"/UDC", []byte(udc_name), os.ModePerm)
 
+
+	deleteUSBEthernetBridge() //delete former used bridge, if there's any
+	//In case USB ethernet is uesd (RNDIS or CDC ECM), we add a bridge interface
+	if usesUSBEthernet {
+		//wait till "usb0" or "usb1" comes up
+		err = pollForUSBEthrnet(10*time.Second)
+		if err == nil {
+			//add USBEthernet bridge including the usb interfaces
+			log.Printf("... creating network bridge for USB ethernet devices")
+			addUSBEthernetBridge()
+		} else {
+			return err
+		}
+
+	}
+
+	log.Printf("... done")
 	return nil
 }
 
