@@ -8,7 +8,8 @@ import (
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	pb "../proto"
+	pb "./proto"
+	"./cli_cmd"
 	"reflect"
 )
 
@@ -62,4 +63,6 @@ func main() {
 	log.Printf("Set LED to blink count 3")
 	c.SetLEDSettings(ctx, &pb.LEDSettings{ BlinkCount: 3})
 	*/
+
+	cli_cmd.Execute()
 }
