@@ -84,6 +84,7 @@ func ValidateGadgetSetting(gs pb.GadgetSettings) error {
 	- check EP consumption to be not more than 7 (ECM 2 EP, RNDIS 2 EP, HID Mouse 1 EP, HID Keyboard 1 EP, HID Raw 1 EP, Serial 2 EP ??, UMS ??)
 	- check serial, product, Manufacturer to not be empty
 	- check Pid, Vid with regex (Note: we don't check if Vid+Pid have been used for another composite function setup, yet)
+	- If the gadget is enabled, at least one function has to be enabled
 	 */
 
 	return nil
@@ -305,7 +306,7 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 
 	//USB HID Mouse
 	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/"+USB_FUNCTION_HID_MOUSE_name); !os.IsNotExist(err1) {
-		result.Use_HID_KEYBOARD = true
+		result.Use_HID_MOUSE = true
 	}
 
 	//USB HID RAW
@@ -507,7 +508,7 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 
 	deleteUSBEthernetBridge() //delete former used bridge, if there's any
 	//In case USB ethernet is uesd (RNDIS or CDC ECM), we add a bridge interface
-	if usesUSBEthernet {
+	if usesUSBEthernet && settings.Enabled {
 		//wait till "usb0" or "usb1" comes up
 		err := pollForUSBEthernet(10*time.Second)
 		if err == nil {

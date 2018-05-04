@@ -51,5 +51,5 @@ func init() {
 	ledCmd.AddCommand(ledGetCmd)
 	ledCmd.AddCommand(ledSetCmd)
 
-	ledSetCmd.Flags().Uint32Var(&blink_count,"blink", 0,"Set blink count (0: Off, 1..254: blink n times, >254: On)")
+	ledSetCmd.Flags().Uint32VarP(&blink_count,"blink", "b", 0,"Set blink count (0: Off, 1..254: blink n times, >254: On)")
 }

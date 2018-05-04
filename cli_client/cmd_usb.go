@@ -11,6 +11,7 @@ import (
 //Empty settings used to store cobra flags
 var (
 	//tmpGadgetSettings = pb.GadgetSettings{CdcEcmSettings:&pb.GadgetSettingsEthernet{},RndisSettings:&pb.GadgetSettingsEthernet{}}
+	tmpNoAutoDeploy = false
 	tmpDisableGadget bool = false
 	tmpUseHIDKeyboard uint8 = 0
 	tmpUseHIDMouse uint8 = 0
@@ -165,6 +166,17 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Printf("New USB Gadget Settings:\n%s", spew.Sdump(gs))
+
+	//if "auto deploy" isn't disabled, we deploy the gadget immediately to ConfigFS
+	if !tmpNoAutoDeploy {
+		fmt.Println("Auto-deploy the new settings...")
+		if gs, err := ClientDeployGadgetSettings(StrRemoteHost, StrRemotePort); err != nil {
+			fmt.Printf("Error deploying Gadget Settings: %v\nReverted to:\n%s", err, spew.Sdump(gs))
+		} else {
+			fmt.Printf("Successfully deployed:\n%s", spew.Sdump(gs))
+		}
+	}
+
 	return
 }
 
@@ -202,14 +214,15 @@ func init() {
 	usbGetCmd.AddCommand(usbGetDeployedCmd)
 	usbSetCmd.AddCommand(usbSetDeployeCmd)
 
-	usbSetCmd.Flags().BoolVarP(&tmpDisableGadget, "disabled","d", false, "If this option is set, the gadget stays inactive after deployment (not bound to UDC)")
-	usbSetCmd.Flags().Uint8VarP(&tmpUseRNDIS, "rndis", "n",0,"Use the RNDIS gadget function (0: disable, 1..n: enable)")
+	usbSetCmd.Flags().BoolVarP(&tmpNoAutoDeploy, "no-deploy","n", false, "If this flag is set, the gadget isn't deployed automatically (allows further changes before deployment)")
+	usbSetCmd.Flags().BoolVarP(&tmpDisableGadget, "disabled","d", false, "If this flag is set, the gadget stays inactive after deployment (not bound to UDC)")
+	usbSetCmd.Flags().Uint8VarP(&tmpUseRNDIS, "rndis", "r",0,"Use the RNDIS gadget function (0: disable, 1..n: enable)")
 	usbSetCmd.Flags().Uint8VarP(&tmpUseECM, "cdc-ecm", "e",0,"Use the CDC ECM gadget function (0: disable, 1..n: enable)")
 	usbSetCmd.Flags().Uint8VarP(&tmpUseSerial, "serial", "s",0,"Use the SERIAL gadget function (0: disable, 1..n: enable)")
 
 	usbSetCmd.Flags().Uint8VarP(&tmpUseHIDKeyboard, "hid-keyboard", "k",0,"Use the HID KEYBOARD gadget function (0: disable, 1..n: enable)")
 	usbSetCmd.Flags().Uint8VarP(&tmpUseHIDMouse, "hid-mouse", "m",0,"Use the HID MOUSE gadget function (0: disable, 1..n: enable)")
-	usbSetCmd.Flags().Uint8VarP(&tmpUseHIDRaw, "hid-raw", "r",0,"Use the HID RAW gadget function (0: disable, 1..n: enable)")
+	usbSetCmd.Flags().Uint8VarP(&tmpUseHIDRaw, "hid-raw", "g",0,"Use the HID RAW gadget function (0: disable, 1..n: enable)")
 
 	usbSetCmd.Flags().Uint8VarP(&tmpUseUMS, "ums", "u",0,"Use the USB MAss Storage gadget function (0: disable, 1..n: enable)")
 }
