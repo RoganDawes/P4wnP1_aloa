@@ -17,10 +17,10 @@ func ClientConnectServer(rpcHost string, rpcPort string) (
 	err error) {
 	// Set up a connection to the server.
 	address := rpcHost + ":" + rpcPort
-	log.Printf("Connecting %s ...", address)
+	//log.Printf("Connecting %s ...", address)
 	connection, err = grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err)
 	}
 	//defer conn.Close()
 
@@ -31,6 +31,52 @@ func ClientConnectServer(rpcHost string, rpcPort string) (
 	//defer cancel()
 
 	err = nil
+	return
+}
+
+func ClientGetLED(host string, port string) (ls *pb.LEDSettings, err error) {
+	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
+	if err != nil {
+		return
+	}
+
+	ls, err = client.GetLEDSettings(ctx, &pb.Empty{})
+	if err != nil {
+		log.Printf("Error getting LED blink count: %v", err)
+	}
+
+	ClientDisconnectServer(cancel, conn)
+	return
+}
+
+func ClientGetGadgetSettings(host string, port string) (gs *pb.GadgetSettings, err error) {
+	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
+	if err != nil {
+		return
+	}
+
+	gs, err = client.GetGadgetSettings(ctx, &pb.Empty{})
+	if err != nil {
+		log.Printf("Error getting USB Gadget Settings count: %+v", err)
+	}
+
+	ClientDisconnectServer(cancel, conn)
+	return
+}
+
+
+func ClientSetGadgetSettings(host string, port string, gs pb.GadgetSettings) (err error) {
+	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
+	if err != nil {
+		return
+	}
+
+	_, err = client.SetGadgetSettings(ctx, &gs)
+	if err != nil {
+		log.Printf("Error setting GadgetSettings %d: %+v", gs, err)
+	}
+
+	ClientDisconnectServer(cancel, conn)
 	return
 }
 

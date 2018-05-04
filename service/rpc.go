@@ -57,7 +57,9 @@ func (s *server) SetGadgetSettings(ctx context.Context, gs *pb.GadgetSettings) (
 }
 
 func (s *server) GetLEDSettings(context.Context, *pb.Empty) (res *pb.LEDSettings, err error) {
-	return GetLed()
+	res, err = GetLed()
+	log.Printf("GetLEDSettings, result: %+v", res)
+	return
 }
 
 func (s *server) SetLEDSettings(ctx context.Context, ls *pb.LEDSettings) (*pb.Empty, error) {

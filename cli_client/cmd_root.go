@@ -19,13 +19,8 @@ var rootCmd = &cobra.Command{
 	Long: `The cli_client tool could be used to configure P4wnP1
 from the command line. The tool relies on RPC so it could be used 
 remotely.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
