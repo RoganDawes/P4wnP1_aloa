@@ -30,6 +30,10 @@ func (s *server) GetDeployedGadgetSetting(ctx context.Context, e *pb.Empty) (gs 
 
 func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetSettings, err error) {
 	gs_backup,_ := ParseGadgetState(USB_GADGET_NAME)
+
+	//ToDo: Former gadgets are destroyed without testing if there're changes, this should be aborted if GadgetSettingsState == GetDeployedGadgetSettings()
+	DestroyGadget(USB_GADGET_NAME)
+
 	errg := DeployGadgetSettings(GadgetSettingsState)
 	err = nil
 	if errg != nil {

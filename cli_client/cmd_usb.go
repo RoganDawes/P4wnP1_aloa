@@ -5,11 +5,13 @@ import (
 	"github.com/spf13/cobra"
 	"log"
 
+	"github.com/davecgh/go-spew/spew"
 )
 
 //Empty settings used to store cobra flags
 var (
 	//tmpGadgetSettings = pb.GadgetSettings{CdcEcmSettings:&pb.GadgetSettingsEthernet{},RndisSettings:&pb.GadgetSettingsEthernet{}}
+	tmpDisableGadget bool = false
 	tmpUseHIDKeyboard uint8 = 0
 	tmpUseHIDMouse uint8 = 0
 	tmpUseHIDRaw uint8 = 0
@@ -19,6 +21,12 @@ var (
 	tmpUseUMS uint8 = 0
 )
 
+func init(){
+	//Configure spew for struct deep printing (disable using printer interface for gRPC structs)
+	spew.Config.Indent="\t"
+	spew.Config.DisableMethods = true
+	spew.Config.DisablePointerAddresses = true
+}
 
 // usbCmd represents the usb command
 var usbCmd = &cobra.Command{
@@ -31,6 +39,20 @@ var usbGetCmd = &cobra.Command{
 	Short: "Get USB Gadget settings",
 	Long: ``,
 	Run: cobraUsbGet,
+}
+
+var usbGetDeployedCmd = &cobra.Command{
+	Use:   "deployed",
+	Short: "Get deployed USB Gadget settings (the currently running configuration for the kernel module)",
+	Long: ``,
+	Run: cobraUsbGetDeployed,
+}
+
+var usbSetDeployeCmd = &cobra.Command{
+	Use:   "deploy",
+	Short: "Deployed the USB Gadget settings (as running configuration for the kernel module)",
+	Long: ``,
+	Run: cobraUsbDeploySettings,
 }
 
 var usbSetCmd = &cobra.Command{
@@ -47,7 +69,15 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Printf("USB Gadget Settings retreived: %+v\n", gs)
+	fmt.Printf("Old USB Gadget Settings:\n%s", spew.Sdump(gs))
+
+	if tmpDisableGadget {
+		fmt.Println("Gadget set to disabled (won't get bound to UDC after deployment)")
+		gs.Enabled = false
+	} else {
+		fmt.Println("Gadget set to enabled (will be usable after deployment)")
+		gs.Enabled = true
+	}
 
 	if (cmd.Flags().Lookup("rndis").Changed) {
 		if tmpUseRNDIS == 0 {
@@ -60,7 +90,7 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 	}
 
 	if (cmd.Flags().Lookup("cdc-ecm").Changed) {
-		if tmpUseRNDIS == 0 {
+		if tmpUseECM == 0 {
 			fmt.Println("Disabeling CDC ECM")
 			gs.Use_CDC_ECM = false
 		} else {
@@ -70,7 +100,7 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 	}
 
 	if (cmd.Flags().Lookup("serial").Changed) {
-		if tmpUseRNDIS == 0 {
+		if tmpUseSerial == 0 {
 			fmt.Println("Disabeling Serial")
 			gs.Use_SERIAL = false
 		} else {
@@ -80,7 +110,7 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 	}
 
 	if (cmd.Flags().Lookup("hid-keyboard").Changed) {
-		if tmpUseRNDIS == 0 {
+		if tmpUseHIDKeyboard == 0 {
 			fmt.Println("Disabeling HID keyboard")
 			gs.Use_HID_KEYBOARD = false
 		} else {
@@ -89,8 +119,38 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	if (cmd.Flags().Lookup("hid-mouse").Changed) {
+		if tmpUseHIDMouse == 0 {
+			fmt.Println("Disabeling HID mouse")
+			gs.Use_HID_MOUSE = false
+		} else {
+			fmt.Println("Enabeling HID mouse")
+			gs.Use_HID_MOUSE = true
+		}
+	}
 
-	//ToDo: Implement the rest (HID, UMS etc.)
+	if (cmd.Flags().Lookup("hid-raw").Changed) {
+		if tmpUseHIDRaw == 0 {
+			fmt.Println("Disabeling HID raw device")
+			gs.Use_HID_RAW = false
+		} else {
+			fmt.Println("Enabeling HID raw device")
+			gs.Use_HID_RAW = true
+		}
+	}
+
+	if (cmd.Flags().Lookup("ums").Changed) {
+		if tmpUseUMS == 0 {
+			fmt.Println("Disabeling USB Mass Storage")
+			gs.Use_UMS = false
+		} else {
+			fmt.Println("Enabeling USB Mass Storage")
+			gs.Use_UMS = true
+		}
+	}
+
+
+	//ToDo: Implement detailed UMS settings
 
 	//Try to set the change config
 	err = ClientSetGadgetSettings(StrRemoteHost, StrRemotePort, *gs)
@@ -104,13 +164,32 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Printf("USB Gadget Settings set: %+v\n", gs)
+	fmt.Printf("New USB Gadget Settings:\n%s", spew.Sdump(gs))
 	return
 }
 
 func cobraUsbGet(cmd *cobra.Command, args []string) {
 	if gs, err := ClientGetGadgetSettings(StrRemoteHost, StrRemotePort); err == nil {
-		fmt.Printf("USB Gadget Settings: %+v\n", gs)
+		fmt.Printf("USB Gadget Settings:\n%s", spew.Sdump(gs))
+	} else {
+		log.Println(err)
+	}
+}
+
+func cobraUsbDeploySettings(cmd *cobra.Command, args []string) {
+
+	if gs, err := ClientDeployGadgetSettings(StrRemoteHost, StrRemotePort); err != nil {
+		fmt.Printf("Error deploying Gadget Settings: %v\nReverted to:\n%s", err, spew.Sdump(gs))
+	} else {
+		fmt.Printf("Successfully deployed:\n%s", spew.Sdump(gs))
+	}
+
+}
+
+
+func cobraUsbGetDeployed(cmd *cobra.Command, args []string) {
+	if gs, err := ClientGetDeployedGadgetSettings(StrRemoteHost, StrRemotePort); err == nil {
+		fmt.Printf("Deployed USB Gadget Settings:\n%s", spew.Sdump(gs))
 	} else {
 		log.Println(err)
 	}
@@ -120,18 +199,10 @@ func init() {
 	rootCmd.AddCommand(usbCmd)
 	usbCmd.AddCommand(usbGetCmd)
 	usbCmd.AddCommand(usbSetCmd)
+	usbGetCmd.AddCommand(usbGetDeployedCmd)
+	usbSetCmd.AddCommand(usbSetDeployeCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// usbCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// usbCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
-
+	usbSetCmd.Flags().BoolVarP(&tmpDisableGadget, "disabled","d", false, "If this option is set, the gadget stays inactive after deployment (not bound to UDC)")
 	usbSetCmd.Flags().Uint8VarP(&tmpUseRNDIS, "rndis", "n",0,"Use the RNDIS gadget function (0: disable, 1..n: enable)")
 	usbSetCmd.Flags().Uint8VarP(&tmpUseECM, "cdc-ecm", "e",0,"Use the CDC ECM gadget function (0: disable, 1..n: enable)")
 	usbSetCmd.Flags().Uint8VarP(&tmpUseSerial, "serial", "s",0,"Use the SERIAL gadget function (0: disable, 1..n: enable)")

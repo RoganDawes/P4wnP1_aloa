@@ -57,6 +57,40 @@ func ClientGetGadgetSettings(host string, port string) (gs *pb.GadgetSettings, e
 
 	gs, err = client.GetGadgetSettings(ctx, &pb.Empty{})
 	if err != nil {
+		log.Printf("Error getting USB Gadget Settings: %+v", err)
+	}
+
+	ClientDisconnectServer(cancel, conn)
+	return
+}
+
+func ClientDeployGadgetSettings(host string, port string) (gs *pb.GadgetSettings, err error) {
+	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
+	if err != nil {
+		return
+	}
+	defer ClientDisconnectServer(cancel, conn)
+
+	gs, err = client.DeployGadgetSetting(ctx, &pb.Empty{})
+	if err != nil {
+		log.Printf("Error deploying current USB Gadget Settings: %+v", err)
+		//We have an error case, thus gs isn't submitted by the gRPC server (even if the value is provided)
+		//in case of an error `gs`should reflect the Gadget Settings which are deployed, now that deployment of the
+		//new settings failed. So we fetch the result manually
+		gs, _ = client.GetDeployedGadgetSetting(ctx, &pb.Empty{}) //We ignore a new error this time, if it occures `gs` will be nil
+	}
+
+	return
+}
+
+func ClientGetDeployedGadgetSettings(host string, port string) (gs *pb.GadgetSettings, err error) {
+	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
+	if err != nil {
+		return
+	}
+
+	gs, err = client.GetDeployedGadgetSetting(ctx, &pb.Empty{})
+	if err != nil {
 		log.Printf("Error getting USB Gadget Settings count: %+v", err)
 	}
 

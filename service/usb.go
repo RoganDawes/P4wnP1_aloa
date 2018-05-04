@@ -79,7 +79,7 @@ var (
 
 func ValidateGadgetSetting(gs pb.GadgetSettings) error {
 	/* ToDo: validations
-	- check host_addr/dev_addr of RNDIS + CDC ECM to be valid MAC adresses via regex
+	- check host_addr/dev_addr of RNDIS + CDC ECM to be valid MAC addresses via regex
 	- check host_addr/dev_addr of RNDIS + CDC ECM for duplicates
 	- check EP consumption to be not more than 7 (ECM 2 EP, RNDIS 2 EP, HID Mouse 1 EP, HID Keyboard 1 EP, HID Raw 1 EP, Serial 2 EP ??, UMS ??)
 	- check serial, product, Manufacturer to not be empty
@@ -200,8 +200,6 @@ func getUDCName() (string, error) {
 func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) {
 	err = nil
 	result = &pb.GadgetSettings{}
-	result.CdcEcmSettings = &pb.GadgetSettingsEthernet{}
-	result.RndisSettings = &pb.GadgetSettingsEthernet{}
 
 	//gadget_root := "./test"
 	gadget_dir := USB_GADGET_DIR_BASE + "/" + gadgetName
@@ -256,6 +254,8 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/rndis.usb0"); !os.IsNotExist(err1) {
 		result.Use_RNDIS = true
 
+		result.RndisSettings = &pb.GadgetSettingsEthernet{}
+
 		if res, err := ioutil.ReadFile(gadget_dir + "/functions/rndis.usb0/host_addr"); err != nil {
 			err1 := errors.New(fmt.Sprintf("Gadget %s error reading RNDIS host_addr", gadgetName))
 			return nil, err1
@@ -274,6 +274,8 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 	//USB CDC ECM
 	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/ecm.usb1"); !os.IsNotExist(err1) {
 		result.Use_CDC_ECM = true
+
+		result.CdcEcmSettings = &pb.GadgetSettingsEthernet{}
 
 		if res, err := ioutil.ReadFile(gadget_dir + "/functions/ecm.usb1/host_addr"); err != nil {
 			err1 := errors.New(fmt.Sprintf("Gadget %s error reading CDC ECM host_addr", gadgetName))
@@ -319,6 +321,7 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 		return nil, err1
 	} else {
 		udc_name_set := strings.TrimSuffix(string(res), "\n")
+		log.Printf("UDC test: udc_name_set %s, udc_name %s", udc_name_set, udc_name)
 		if udc_name == udc_name_set {
 			result.Enabled = true
 		}
@@ -343,7 +346,7 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 
 	//create gadget folder
 	os.Mkdir(USB_GADGET_DIR, os.ModePerm)
-	log.Printf("Creating composite gadget '%s'", USB_GADGET_NAME)
+	log.Printf("Creating composite gadget '%s'\nSettings:\n%+v", USB_GADGET_NAME, settings)
 
 	//set vendor ID, product ID
 	ioutil.WriteFile(USB_GADGET_DIR+"/idVendor", []byte(settings.Vid), os.ModePerm)
@@ -495,7 +498,10 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 		if err != nil {
 			return err
 		}
-		ioutil.WriteFile(USB_GADGET_DIR+"/UDC", []byte(udc_name), os.ModePerm)
+		log.Printf("Enabeling gadget for UDC: %s\n", udc_name)
+		if err = ioutil.WriteFile(USB_GADGET_DIR+"/UDC", []byte(udc_name), os.ModePerm); err != nil {
+			return err
+		}
 	}
 
 
