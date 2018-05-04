@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"./core"
+	"./service"
 )
 
 func main() {
@@ -15,24 +15,26 @@ func main() {
 	}
 	*/
 
+	//ToDo: Check for root privs
+
 	var err error
-	err = core.CheckLibComposite()
+	err = service.CheckLibComposite()
 	if err != nil {
 		log.Fatalf("Couldn't load libcomposite: %v", err)
 	}
 
-	err = core.DestroyAllGadgets()
+	err = service.DestroyAllGadgets()
 	if err != nil {
 		log.Fatalf("Error while rolling back existing USB gadgets: %v", err)
 	}
 
-	err = core.InitDefaultGadgetSettings()
+	err = service.InitDefaultGadgetSettings()
 	if err != nil {
 		log.Fatalf("Error while setting up the default gadget: %v", err)
 	}
 
 
-	core.InitLed(false) //Set LED to manual triger
+	service.InitLed(false) //Set LED to manual triger
 	//core.StartRpcServer("127.0.0.1", "50051") //start gRPC service
-	core.StartRpcServer("", "50051") //start gRPC service
+	service.StartRpcServer("", "50051") //start gRPC service
 }
