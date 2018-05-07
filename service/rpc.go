@@ -15,6 +15,12 @@ import (
 
 type server struct {}
 
+func (s *server) MountUMSFile(ctx context.Context, gsu *pb.GadgetSettingsUMS) (*pb.Empty, error) {
+	log.Printf("Trying to mount iamge `%s` to UMS ...", gsu.File)
+	err := MountUMSFile(gsu.File)
+	return nil, err
+}
+
 func (s *server) GetDeployedGadgetSetting(ctx context.Context, e *pb.Empty) (gs *pb.GadgetSettings, err error) {
 	gs, err = ParseGadgetState(USB_GADGET_NAME)
 
@@ -72,60 +78,6 @@ func (s *server) SetLEDSettings(ctx context.Context, ls *pb.LEDSettings) (*pb.Em
 	return &pb.Empty{}, nil
 }
 
-func (s *server) StopGadget(context.Context, *pb.Empty) (*pb.Empty, error) {
-	panic("implement me")
-}
-
-func (s *server) StartGadget(context.Context, *pb.Empty) (*pb.Empty, error) {
-	panic("implement me")
-}
-
-/*
-//Attach handler function implementing the "GetGadgetSettings" interface to server
-func (s *server) GetGadgetSettings(context.Context, *pb.Empty) (usbset *pb.GadgetSettings, err error) {
-	usbset, err = ParseGadgetState(USB_GADGET_NAME)
-
-	if err == nil {
-		j_usbset, _ := json.Marshal(usbset)
-		log.Printf("Gadget settings requested %v", string(j_usbset))
-	} else {
-		log.Printf("Error parsing current gadget config: %v", err)
-	}
-
-
-	return usbset, err
-}
-
-
-
-//Attach handler function implementing the "SetGadgetSettings" interface to server
-
-
-func (s *server) SetGadgetSettings(context.Context, *pb.GadgetSettings) (*pb.Error, error) {
-	return &pb.Error{Err: 0}, nil
-}
-
-//Attach handler function implementing the "StartGadget" interface to server
-func (s *server) StartGadget(context.Context, *pb.Empty) (*pb.Error, error) {
-	return &pb.Error{Err: 0}, nil
-}
-
-//Attach handler function implementing the "StopGadget" interface to server
-func (s *server) StopGadget(context.Context, *pb.Empty) (*pb.Error, error) {
-	return &pb.Error{Err: 0}, nil
-}
-
-func (s *server) GetLEDSettings(context.Context, *pb.Empty) (*pb.LEDSettings, error) {
-	led_settings := &pb.LEDSettings{}
-	return led_settings, nil
-}
-
-func (s *server) SetLEDSettings(ctx context.Context, ledSettings *pb.LEDSettings) (rpcerr *pb.Error, err error) {
-	log.Printf("SetLEDSettings %+v", ledSettings)
-	setLed(*ledSettings)
-	return &pb.Error{Err: 0}, nil
-}
-*/
 
 func StartRpcServer(host string, port string) {
 	listen_address := host + ":" + port

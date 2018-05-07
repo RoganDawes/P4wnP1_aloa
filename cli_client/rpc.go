@@ -36,40 +36,38 @@ func ClientConnectServer(rpcHost string, rpcPort string) (
 
 func ClientGetLED(host string, port string) (ls *pb.LEDSettings, err error) {
 	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
-	if err != nil {
-		return
-	}
+	defer conn.Close()
+	defer cancel()
+	if err != nil { return }
 
 	ls, err = client.GetLEDSettings(ctx, &pb.Empty{})
 	if err != nil {
 		log.Printf("Error getting LED blink count: %v", err)
 	}
 
-	ClientDisconnectServer(cancel, conn)
 	return
 }
 
 func ClientGetGadgetSettings(host string, port string) (gs *pb.GadgetSettings, err error) {
 	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
-	if err != nil {
-		return
-	}
+	defer conn.Close()
+	defer cancel()
+	if err != nil { return 	}
 
 	gs, err = client.GetGadgetSettings(ctx, &pb.Empty{})
 	if err != nil {
 		log.Printf("Error getting USB Gadget Settings: %+v", err)
 	}
 
-	ClientDisconnectServer(cancel, conn)
 	return
 }
 
 func ClientDeployGadgetSettings(host string, port string) (gs *pb.GadgetSettings, err error) {
 	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
-	if err != nil {
-		return
-	}
-	defer ClientDisconnectServer(cancel, conn)
+	defer conn.Close()
+	defer cancel()
+	if err != nil { return 	}
+
 
 	gs, err = client.DeployGadgetSetting(ctx, &pb.Empty{})
 	if err != nil {
@@ -85,52 +83,54 @@ func ClientDeployGadgetSettings(host string, port string) (gs *pb.GadgetSettings
 
 func ClientGetDeployedGadgetSettings(host string, port string) (gs *pb.GadgetSettings, err error) {
 	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
-	if err != nil {
-		return
-	}
+	defer conn.Close()
+	defer cancel()
+	if err != nil {	return }
 
 	gs, err = client.GetDeployedGadgetSetting(ctx, &pb.Empty{})
 	if err != nil {
 		log.Printf("Error getting USB Gadget Settings count: %+v", err)
 	}
 
-	ClientDisconnectServer(cancel, conn)
 	return
 }
 
 
 func ClientSetGadgetSettings(host string, port string, gs pb.GadgetSettings) (err error) {
 	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
-	if err != nil {
-		return
-	}
+	defer conn.Close()
+	defer cancel()
+	if err != nil { return }
 
 	_, err = client.SetGadgetSettings(ctx, &gs)
+	//Only forward the error
+	/*
 	if err != nil {
 		log.Printf("Error setting GadgetSettings %d: %+v", gs, err)
 	}
-
-	ClientDisconnectServer(cancel, conn)
+	*/
 	return
 }
 
 func ClientSetLED(host string, port string, ls pb.LEDSettings) (err error) {
 	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
-	if err != nil {
-		return
-	}
+	defer conn.Close()
+	defer cancel()
+	if err != nil { return }
 
 	_, err = client.SetLEDSettings(ctx, &ls)
 	if err != nil {
 		log.Printf("Error setting LED blink count %d: %v", ls.BlinkCount, err)
 	}
 
-	ClientDisconnectServer(cancel, conn)
+
 	return
 }
 
+/*
 func ClientDisconnectServer(cancel context.CancelFunc, connection *grpc.ClientConn) error {
 	defer connection.Close()
 	defer cancel()
 	return nil
 }
+*/

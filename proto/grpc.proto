@@ -9,17 +9,11 @@ service P4WNP1 {
 	rpc SetGadgetSettings (GadgetSettings) returns (GadgetSettings) {}
 	rpc GetLEDSettings (Empty) returns (LEDSettings) {}
 	rpc SetLEDSettings (LEDSettings) returns (Empty) {}
-	rpc StopGadget (Empty) returns (Empty) {}
-	rpc StartGadget (Empty) returns (Empty) {}
+	rpc MountUMSFile (GadgetSettingsUMS) returns (Empty) {}
 }
 
 message LEDSettings {
 	uint32 blink_count = 1;
-}
-
-message GadgetSettingsEthernet {
-	string host_addr = 1;
-	string dev_addr = 2;
 }
 
 message GadgetSettings {
@@ -38,7 +32,17 @@ message GadgetSettings {
 	bool use_SERIAL = 13;
 	GadgetSettingsEthernet rndis_settings = 14;
 	GadgetSettingsEthernet cdc_ecm_settings = 15;
+	GadgetSettingsUMS ums_settings = 16;
+}
 
+message GadgetSettingsEthernet {
+	string host_addr = 1;
+	string dev_addr = 2;
+}
+
+message GadgetSettingsUMS {
+	bool cdrom = 1;
+	string file = 2;
 }
 
 message WiFiSettings {

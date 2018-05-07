@@ -11,9 +11,19 @@ import (
 	pb "../proto"
 	"time"
 	"fmt"
+	"net"
 )
 
 const (
+	USB_EP_USAGE_HID_RAW = 1
+	USB_EP_USAGE_HID_KEYBOARD = 1
+	USB_EP_USAGE_HID_MOUSE = 1
+	USB_EP_USAGE_RNDIS = 2
+	USB_EP_USAGE_CDC_ECM = 2
+	USB_EP_USAGE_CDC_SERIAL = 2 //ToDo: check, taken from docs
+	USB_EP_USAGE_UMS = 2 //ToDo check, taken from docs
+	USB_EP_USAGE_MAX = 7
+
 	USB_GADGET_NAME = "mame82_gadget"
 	USB_GADGET_DIR_BASE      = "/sys/kernel/config/usb_gadget"
 	USB_GADGET_DIR           = USB_GADGET_DIR_BASE + "/" + USB_GADGET_NAME
@@ -31,23 +41,12 @@ const (
 	USB_CONFIGURATION_MaxPower     = "250"
 	USB_CONFIGURATION_bmAttributes = "0x80" //should be 0x03 for USB_OTG_SRP | USB_OTG_HNP
 
-	/*
-		//RNDIS function constants
-		USB_FUNCTION_RNDIS_DEFAULT_host_addr = "42:63:65:12:34:56"
-		USB_FUNCTION_RNDIS_DEFAULT_dev_addr  = "42:63:65:56:34:12"
-	*/
 	//OS descriptors for RNDIS composite function on Windows
 	USB_FUNCTION_RNDIS_os_desc_use                         = "1"
 	USB_FUNCTION_RNDIS_os_desc_b_vendor_code               = "0xbc"
 	USB_FUNCTION_RNDIS_os_desc_qw_sign                     = "MSFT100"
 	USB_FUNCTION_RNDIS_os_desc_interface_compatible_id     = "RNDIS"
 	USB_FUNCTION_RNDIS_os_desc_interface_sub_compatible_id = "5162001"
-
-	/*
-		//CDC ECM function constants
-		USB_FUNCTION_CDC_ECM_DEFAULT_host_addr = "42:63:66:12:34:56"
-		USB_FUNCTION_CDC_ECM_DEFAULT_dev_addr  = "42:63:66:56:34:12"
-	*/
 
 	//HID function, keyboard constants
 	USB_FUNCTION_HID_KEYBOARD_protocol      = "1"
@@ -73,19 +72,51 @@ const (
 )
 
 var (
-	DefaultGadgetSettings pb.GadgetSettings = GetDefaultGadgetSettings()
-	GadgetSettingsState pb.GadgetSettings = GetDefaultGadgetSettings()
+	defaultGadgetSettings pb.GadgetSettings = GetDefaultGadgetSettings() //ToDo: Read defaults from external file, failover to hardcoded on validation fail (consumin to many EPs)
+	GadgetSettingsState   pb.GadgetSettings = GetDefaultGadgetSettings()
 )
 
 func ValidateGadgetSetting(gs pb.GadgetSettings) error {
 	/* ToDo: validations
-	- check host_addr/dev_addr of RNDIS + CDC ECM to be valid MAC addresses via regex
+	- Done: check host_addr/dev_addr of RNDIS + CDC ECM to be valid MAC addresses via regex
 	- check host_addr/dev_addr of RNDIS + CDC ECM for duplicates
-	- check EP consumption to be not more than 7 (ECM 2 EP, RNDIS 2 EP, HID Mouse 1 EP, HID Keyboard 1 EP, HID Raw 1 EP, Serial 2 EP ??, UMS ??)
+	- check EP consumption to be not more than 7 (ECM 2 EP, RNDIS 2 EP, HID Mouse 1 EP, HID Keyboard 1 EP, HID Raw 1 EP, Serial 2 EP ??, UMS 2 EP ?)
 	- check serial, product, Manufacturer to not be empty
 	- check Pid, Vid with regex (Note: we don't check if Vid+Pid have been used for another composite function setup, yet)
 	- If the gadget is enabled, at least one function has to be enabled
 	 */
+
+	log.Println("Validating gadget settings ...")
+
+	if gs.Use_RNDIS {
+		_, err := net.ParseMAC(gs.RndisSettings.DevAddr)
+		if err != nil { return errors.New(fmt.Sprintf("Validation Error RNDIS DeviceAddress: %v", err))}
+
+		_, err = net.ParseMAC(gs.RndisSettings.HostAddr)
+		if err != nil { return errors.New(fmt.Sprintf("Validation Error RNDIS HostAddress: %v", err))}
+	}
+
+	if gs.Use_CDC_ECM {
+		_, err := net.ParseMAC(gs.CdcEcmSettings.DevAddr)
+		if err != nil { return errors.New(fmt.Sprintf("Validation Error CDC ECM DeviceAddress: %v", err))}
+
+		_, err = net.ParseMAC(gs.CdcEcmSettings.HostAddr)
+		if err != nil { return errors.New(fmt.Sprintf("Validation Error CDC ECM HostAddress: %v", err))}
+	}
+
+	//check endpoint consumption
+	sum_ep := 0
+	if gs.Use_RNDIS { sum_ep += USB_EP_USAGE_RNDIS }
+	if gs.Use_CDC_ECM { sum_ep += USB_EP_USAGE_CDC_ECM }
+	if gs.Use_UMS { sum_ep += USB_EP_USAGE_UMS }
+	if gs.Use_HID_MOUSE { sum_ep += USB_EP_USAGE_HID_MOUSE }
+	if gs.Use_HID_RAW { sum_ep += USB_EP_USAGE_HID_RAW }
+	if gs.Use_HID_KEYBOARD { sum_ep += USB_EP_USAGE_HID_KEYBOARD }
+	if gs.Use_SERIAL { sum_ep+= USB_EP_USAGE_CDC_SERIAL }
+
+	strConsumption := fmt.Sprintf("Gadget Settings consume %v out of %v available USB Endpoints\n", sum_ep, USB_EP_USAGE_MAX)
+	log.Print(strConsumption)
+	if sum_ep > USB_EP_USAGE_MAX { return errors.New(strConsumption)}
 
 	return nil
 }
@@ -132,7 +163,7 @@ func pollForUSBEthernet(timeout time.Duration) error {
 }
 
 func InitDefaultGadgetSettings() error {
-	return DeployGadgetSettings(DefaultGadgetSettings)
+	return DeployGadgetSettings(defaultGadgetSettings)
 }
 
 func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
@@ -158,12 +189,16 @@ func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
 			HostAddr: "42:63:66:12:34:56",
 			DevAddr:  "42:63:66:56:34:12",
 		},
+		UmsSettings: &pb.GadgetSettingsUMS{
+			File:"", //we don't supply an image file, which is no problem as it could be applied later on (removable media)
+			Cdrom:false, //By default we don't emulate a CD drive, but a flashdrive
+		},
 	}
 
 	return res
 }
 
-//depends on `bash`, `grep` and `lsmod` binary
+//depends on `lsmod` binary
 func CheckLibComposite() error {
 	log.Printf("Checking for libcomposite...")
 	out, err := exec.Command("lsmod").Output()
@@ -309,9 +344,33 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 		result.Use_HID_MOUSE = true
 	}
 
-	//USB HID RAW
+	//USB HID Raw
 	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/"+USB_FUNCTION_HID_RAW_name); !os.IsNotExist(err1) {
 		result.Use_HID_RAW = true
+	}
+
+	//USB Mass Storage
+	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/mass_storage.ms1"); !os.IsNotExist(err1) {
+		result.Use_UMS = true
+		result.UmsSettings = &pb.GadgetSettingsUMS{}
+
+		//Check if running as CD-Rom
+		if res, err := ioutil.ReadFile(gadget_dir + "/functions/mass_storage.ms1/lun.0/cdrom"); err != nil {
+			err1 := errors.New(fmt.Sprintf("Gadget %s error reading USB Mass Storage cdrom emulation state", gadgetName))
+			return nil, err1
+		} else {
+			if strings.HasPrefix(string(res), "1") {
+				result.UmsSettings.Cdrom = true
+			} //else branche unneeded, as false is default
+		}
+
+		//Check name of backing file
+		if res, err := ioutil.ReadFile(gadget_dir + "/functions/mass_storage.ms1/lun.0/file"); err != nil {
+			err1 := errors.New(fmt.Sprintf("Gadget %s error reading USB Mass Storage image file setting", gadgetName))
+			return nil, err1
+		} else {
+			result.UmsSettings.File = strings.TrimSuffix(string(res), "\000\n")
+		}
 	}
 
 	//check if UDC is set (Gadget enabled)
@@ -322,7 +381,7 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 		return nil, err1
 	} else {
 		udc_name_set := strings.TrimSuffix(string(res), "\n")
-		log.Printf("UDC test: udc_name_set %s, udc_name %s", udc_name_set, udc_name)
+		//log.Printf("UDC test: udc_name_set %s, udc_name %s", udc_name_set, udc_name)
 		if udc_name == udc_name_set {
 			result.Enabled = true
 		}
@@ -330,6 +389,17 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 
 	return
 
+}
+
+// This command is working on the active gadget directly, so changes aren't refelcted back
+// to the GadgetSettingsState
+func MountUMSFile(filename string) error {
+	funcdir := USB_GADGET_DIR + "/functions/mass_storage.ms1"
+	err := ioutil.WriteFile(funcdir+"/lun.0/file", []byte(filename), os.ModePerm)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Settings backing file for USB Mass Storage failed: %v", err))
+	}
+	return nil
 }
 
 func DeployGadgetSettings(settings pb.GadgetSettings) error {
@@ -488,6 +558,33 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 		ioutil.WriteFile(funcdir+"/report_desc", []byte(USB_FUNCTION_HID_RAW_report_desc), os.ModePerm)
 
 		err := os.Symlink(funcdir, USB_GADGET_DIR+"/configs/c.1/"+USB_FUNCTION_HID_RAW_name)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+
+	if settings.Use_UMS {
+		log.Printf("... creating USB Mass Storage device function")
+		funcdir := USB_GADGET_DIR + "/functions/mass_storage.ms1"
+		os.Mkdir(funcdir, os.ModePerm) //create HID function for mouse
+
+		ioutil.WriteFile(funcdir+"/stall", []byte("1"), os.ModePerm) // Allow bulk Endpoints
+		if settings.UmsSettings.Cdrom {
+			ioutil.WriteFile(funcdir+"/lun.0/cdrom", []byte("1"), os.ModePerm) // CD-Rom
+		} else {
+			ioutil.WriteFile(funcdir+"/lun.0/cdrom", []byte("0"), os.ModePerm) // Writable flashdrive
+		}
+
+		ioutil.WriteFile(funcdir+"/lun.0/ro", []byte("0"), os.ModePerm) // Don't restrict to read-only (is implied by cdrom=1 if needed, but causes issues on backend FS if enabled)
+
+		// enable Force Unit Access (FUA) to make Windows write synchronously
+		// this is slow, but unplugging the stick without unmounting works
+		ioutil.WriteFile(funcdir+"/lun.0/nofua", []byte("0"), os.ModePerm) // Don't restrict to read-only (is implied by cdrom=1 if needed, but causes issues on backend FS if enabled)
+
+		//Provide the backing image
+		ioutil.WriteFile(funcdir+"/lun.0/file", []byte(settings.UmsSettings.File), os.ModePerm) // Set backing file (or block device) for USB Mass Storage
+
+		err := os.Symlink(funcdir, USB_GADGET_DIR+"/configs/c.1/"+"mass_storage.ms1")
 		if err != nil {
 			log.Println(err)
 		}

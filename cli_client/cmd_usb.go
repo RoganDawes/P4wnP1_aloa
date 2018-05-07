@@ -6,20 +6,24 @@ import (
 	"log"
 
 	"github.com/davecgh/go-spew/spew"
+	"google.golang.org/grpc/status"
 )
 
 //Empty settings used to store cobra flags
 var (
 	//tmpGadgetSettings = pb.GadgetSettings{CdcEcmSettings:&pb.GadgetSettingsEthernet{},RndisSettings:&pb.GadgetSettingsEthernet{}}
-	tmpNoAutoDeploy = false
-	tmpDisableGadget bool = false
-	tmpUseHIDKeyboard uint8 = 0
-	tmpUseHIDMouse uint8 = 0
-	tmpUseHIDRaw uint8 = 0
-	tmpUseRNDIS uint8 = 0
-	tmpUseECM uint8 = 0
-	tmpUseSerial uint8 = 0
-	tmpUseUMS uint8 = 0
+	tmpNoAutoDeploy          = false
+	tmpDisableGadget  bool   = false
+	tmpUseHIDKeyboard uint8  = 0
+	tmpUseHIDMouse    uint8  = 0
+	tmpUseHIDRaw      uint8  = 0
+	tmpUseRNDIS       uint8  = 0
+	tmpUseECM         uint8  = 0
+	tmpUseSerial      uint8  = 0
+	tmpUseUMS         uint8  = 0
+	tmpUMSFile        string = ""
+	tmpUMSCdromMode   bool   = false
+
 )
 
 func init(){
@@ -73,10 +77,10 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 	fmt.Printf("Old USB Gadget Settings:\n%s", spew.Sdump(gs))
 
 	if tmpDisableGadget {
-		fmt.Println("Gadget set to disabled (won't get bound to UDC after deployment)")
+		fmt.Println("Setting gadget to disabled (won't get bound to UDC after deployment)")
 		gs.Enabled = false
 	} else {
-		fmt.Println("Gadget set to enabled (will be usable after deployment)")
+		fmt.Println("Setting gadget to enabled (will be usable after deployment)")
 		gs.Enabled = true
 	}
 
@@ -140,6 +144,7 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	//ToDo: Implement detailed UMS settings
 	if (cmd.Flags().Lookup("ums").Changed) {
 		if tmpUseUMS == 0 {
 			fmt.Println("Disabeling USB Mass Storage")
@@ -147,16 +152,30 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 		} else {
 			fmt.Println("Enabeling USB Mass Storage")
 			gs.Use_UMS = true
+
+			gs.UmsSettings.Cdrom = tmpUMSCdromMode
+			if tmpUMSCdromMode {
+				fmt.Println("Setting USB Mass Storage to CD-Rom mode")
+			} else {
+				fmt.Println("Setting USB Mass Storage to flash drive mode")
+			}
+
+			if cmd.Flags().Lookup("ums-file").Changed {
+				fmt.Printf("Serving USB Mass Storage from '%s'\n", tmpUMSFile)
+				gs.UmsSettings.File = tmpUMSFile
+			}
 		}
 	}
 
 
-	//ToDo: Implement detailed UMS settings
+
 
 	//Try to set the change config
+	//ToDo: Adopt parsing of Error Message to other gRPC calls
 	err = ClientSetGadgetSettings(StrRemoteHost, StrRemotePort, *gs)
 	if err != nil {
-		log.Printf("Error setting new gadget settings: %v\n", err)
+		log.Printf("Error setting new gadget settings: %v\n", status.Convert(err).Message())
+		return
 	}
 
 	gs, err = ClientGetGadgetSettings(StrRemoteHost, StrRemotePort)
@@ -224,5 +243,8 @@ func init() {
 	usbSetCmd.Flags().Uint8VarP(&tmpUseHIDMouse, "hid-mouse", "m",0,"Use the HID MOUSE gadget function (0: disable, 1..n: enable)")
 	usbSetCmd.Flags().Uint8VarP(&tmpUseHIDRaw, "hid-raw", "g",0,"Use the HID RAW gadget function (0: disable, 1..n: enable)")
 
-	usbSetCmd.Flags().Uint8VarP(&tmpUseUMS, "ums", "u",0,"Use the USB MAss Storage gadget function (0: disable, 1..n: enable)")
+	usbSetCmd.Flags().Uint8VarP(&tmpUseUMS, "ums", "u",0,"Use the USB Mass Storage gadget function (0: disable, 1..n: enable)")
+
+	usbSetCmd.Flags().BoolVar(&tmpUMSCdromMode, "ums-cdrom", false, "If this flag is set, UMS emulates a CD-Rom instead of a flashdrive (ignored, if UMS disabled)")
+	usbSetCmd.Flags().StringVar(&tmpUMSFile, "ums-file", "", "Path to the image or block device backing UMS (ignored, if UMS disabled)")
 }
