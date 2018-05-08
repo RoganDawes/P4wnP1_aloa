@@ -6,8 +6,12 @@ import (
 	"log"
 )
 
-func CreateBridge(name string) error {
+func CreateBridge(name string) (err error) {
 	return netlink.CreateBridge(name, false)
+}
+
+func setInterfaceMac(name string, mac string) error {
+	return netlink.SetMacAddress(name, mac)
 }
 
 func DeleteBridge(name string) error {

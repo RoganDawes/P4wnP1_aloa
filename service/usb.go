@@ -29,6 +29,7 @@ const (
 	USB_GADGET_DIR           = USB_GADGET_DIR_BASE + "/" + USB_GADGET_NAME
 
 	USB_ETHERNET_BRIDGE_NAME = "usbeth"
+	USB_ETHERNET_BRIDGE_MAC = "24:22:26:12:14:16"
 
 	USB_bcdDevice = "0x0100" //Version 1.00
 	USB_bcdUSB    = "0x0200" //mode: USB 2.0
@@ -124,6 +125,7 @@ func ValidateGadgetSetting(gs pb.GadgetSettings) error {
 func addUSBEthernetBridge() {
 	//Create the bridge
 	CreateBridge(USB_ETHERNET_BRIDGE_NAME)
+	setInterfaceMac(USB_ETHERNET_BRIDGE_NAME, USB_ETHERNET_BRIDGE_MAC)
 
 	//add the interfaces
 	if err := AddInterfaceToBridgeIfExistent(USB_ETHERNET_BRIDGE_NAME, "usb0"); err != nil {

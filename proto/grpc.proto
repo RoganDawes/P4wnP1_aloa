@@ -12,10 +12,13 @@ service P4WNP1 {
 	rpc MountUMSFile (GadgetSettingsUMS) returns (Empty) {}
 }
 
+/* LED */
 message LEDSettings {
 	uint32 blink_count = 1;
 }
+/* End LED */
 
+/* USB Gadget */
 message GadgetSettings {
 	bool enabled = 1;
 	string vid = 2;
@@ -44,7 +47,49 @@ message GadgetSettingsUMS {
 	bool cdrom = 1;
 	string file = 2;
 }
+/* End USB Gadget */
 
+/* DHCP */
+message DHCPServerSettings {
+	uint32 listenPort = 1;		//if a port other thaan 0 is provided, a DNS server is bound to this port in addition to DHCP
+	string listenInterface = 2;
+	string leaseFile = 3;
+	bool notAuthoritative = 4;
+	bool doNotBindInterface = 5; //if true, DHCP server binds to 0.0.0.0, no matter which interface is given (no restart needed on interface up/down)
+	string callbackScript = 6; //Script executes when lease is added/deleted `scriptname <add|del> <MAC> <IP> <HOSTNAME>`
+
+	repeated DHCPServerRange ranges = 7;
+    //repeated DHCPServerOption options = 8;
+    map<uint32, string> options = 8; //Replaced by map (dealing with key duplicates is ONLY PARTIALY handled by proto3), See RFC 2132 for details of available options
+	repeated DHCPServerStaticHost staticHosts = 9;
+}
+
+//Could be used for IPv4 or IPv6 (refer dnsmasq docs), nor field for prefix length (default is 64)
+message DHCPServerRange {
+	string rangeLower = 1; //Lowest IP of DHCP range
+	string rangeUpper = 2; //Highest IP of DHCP range
+	string leaseTime = 3;
+}
+
+
+//Used for static leases
+message DHCPServerStaticHost {
+	string mac = 1;
+	string ip = 2;
+}
+
+/*
+//See RFC 2132 for details of available options
+//Note: dnsmasq default option have to be disabled explicitly if not needed, by setting an empty value (1, 3, 6, 12, 28)
+message DHCPServerOption {
+	uint32 option = 1;
+	string value = 3;
+}
+*/
+
+/* End DHCP */
+
+/* WiFi */
 message WiFiSettings {
 	bool diasabled = 1;
 	string reg = 2;				//Regulatory domain per ISO/IEC 3166-1 alpha2
@@ -69,6 +114,6 @@ message WiFiSettings {
 
 	bool disable_nexmon = 11;	//if true, legacy driver / firmware is used instead of nexmon
 }
-
+/* End WiFI */
 
 message Empty {}
