@@ -49,6 +49,19 @@ message GadgetSettingsUMS {
 }
 /* End USB Gadget */
 
+message EthernetInterfaceSettings {
+	string name = 1;
+	enum Mode {
+		MANUAL = 0;
+		DHCP_CLIENT = 1;
+		DHCP_SERVER = 2;
+	}
+	Mode mode = 2;
+	string ipAddress4 = 3;
+	string netmask4 = 4;
+	DHCPServerSettings dhcpServerSettings = 5;
+}
+
 /* DHCP */
 message DHCPServerSettings {
 	uint32 listenPort = 1;		//if a port other thaan 0 is provided, a DNS server is bound to this port in addition to DHCP
@@ -77,15 +90,6 @@ message DHCPServerStaticHost {
 	string mac = 1;
 	string ip = 2;
 }
-
-/*
-//See RFC 2132 for details of available options
-//Note: dnsmasq default option have to be disabled explicitly if not needed, by setting an empty value (1, 3, 6, 12, 28)
-message DHCPServerOption {
-	uint32 option = 1;
-	string value = 3;
-}
-*/
 
 /* End DHCP */
 
