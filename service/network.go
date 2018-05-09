@@ -1,7 +1,8 @@
 package service
 
 import (
-	"github.com/docker/libcontainer/netlink"
+	//"github.com/docker/libcontainer/netlink"
+	"../netlink"
 	"net"
 	"log"
 	"io/ioutil"
@@ -31,6 +32,8 @@ func IpNetFromIPv4AndNetmask(ipv4 string, netmask string) (*net.IPNet, error) {
 
 	return &net.IPNet{IP: netw, Mask: mask}, nil
 }
+
+
 
 func CreateBridge(name string) (err error) {
 	return netlink.CreateBridge(name, false)
@@ -104,8 +107,21 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 		ipNet, err := IpNetFromIPv4AndNetmask(settings.IpAddress4, settings.Netmask4)
 		if err != nil { return err }
 
+		//Flush old IPs
+		netlink.NetworkLinkFlush(iface)
 		//set IP
+		log.Printf("Setting Interface %s to IP %s\n", iface.Name, settings.IpAddress4)
 		netlink.NetworkLinkAddIp(iface, net.ParseIP(settings.IpAddress4), ipNet)
+
+		//ToDo: Disabling doesn't work in gadget settings, but from test.go
+		if settings.Enabled {
+			log.Printf("Setting Interface %s to UP\n", iface.Name)
+			err = netlink.NetworkLinkUp(iface)
+		} else {
+			log.Printf("Setting Interface %s to DOWN\n", iface.Name)
+			err = netlink.NetworkLinkDown(iface)
+		}
+		if err != nil { return err }
 	}
 
 	return nil

@@ -33,9 +33,10 @@ message GadgetSettings {
 	bool use_HID_RAW = 11;
 	bool use_UMS = 12;
 	bool use_SERIAL = 13;
-	GadgetSettingsEthernet rndis_settings = 14;
-	GadgetSettingsEthernet cdc_ecm_settings = 15;
+	GadgetSettingsEthernet rndis_settings = 14; //Only applicable if RNDIS on
+	GadgetSettingsEthernet cdc_ecm_settings = 15; //Only applicable if CDC ECM on
 	GadgetSettingsUMS ums_settings = 16;
+	EthernetInterfaceSettings ethernet_settings = 17; //only applicable if RNDIS or CDC ECM on
 }
 
 message GadgetSettingsEthernet {
@@ -59,7 +60,8 @@ message EthernetInterfaceSettings {
 	Mode mode = 2;
 	string ipAddress4 = 3;
 	string netmask4 = 4;
-	DHCPServerSettings dhcpServerSettings = 5;
+	bool enabled = 5;
+	DHCPServerSettings dhcpServerSettings = 6;
 }
 
 /* DHCP */

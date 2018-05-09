@@ -172,37 +172,7 @@ func InitDefaultGadgetSettings() error {
 	return DeployGadgetSettings(defaultGadgetSettings)
 }
 
-func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
-	res = pb.GadgetSettings{
-		Enabled:          false,
-		Vid:              "0x1d6b",
-		Pid:              "0x1337",
-		Manufacturer:     "MaMe82",
-		Product:          "P4wnP1 by MaMe82",
-		Serial:           "deadbeef1337",
-		Use_CDC_ECM:      false,
-		Use_RNDIS:        false,
-		Use_HID_KEYBOARD: false,
-		Use_HID_MOUSE:    false,
-		Use_HID_RAW:      false,
-		Use_UMS:          false,
-		Use_SERIAL:       false,
-		RndisSettings: &pb.GadgetSettingsEthernet{
-			HostAddr: "42:63:65:12:34:56",
-			DevAddr:  "42:63:65:56:34:12",
-		},
-		CdcEcmSettings: &pb.GadgetSettingsEthernet{
-			HostAddr: "42:63:66:12:34:56",
-			DevAddr:  "42:63:66:56:34:12",
-		},
-		UmsSettings: &pb.GadgetSettingsUMS{
-			File:"", //we don't supply an image file, which is no problem as it could be applied later on (removable media)
-			Cdrom:false, //By default we don't emulate a CD drive, but a flashdrive
-		},
-	}
 
-	return res
-}
 
 //depends on `lsmod` binary
 func CheckLibComposite() error {
@@ -622,6 +592,14 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 			return err
 		}
 
+
+		//Configure bridge interface
+		if settings.EthernetSettings == nil {
+			err = errors.New("Gadget has Ethernet enabled, but no Ethernet settings provided")
+			log.Println(err)
+			return err
+		}
+		ConfigureInterface(settings.EthernetSettings)
 	}
 
 	log.Printf("... done")
