@@ -39,6 +39,12 @@ func GetDefaultDHCPConfigUSB() (settings *pb.DHCPServerSettings) {
 	return
 }
 
+func GetDefaultLEDSettings() (res pb.LEDSettings) {
+	return pb.LEDSettings{
+		BlinkCount: 254,
+	}
+}
+
 func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
 	res = pb.GadgetSettings{
 		Enabled:          false,
@@ -66,7 +72,6 @@ func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
 			File:"", //we don't supply an image file, which is no problem as it could be applied later on (removable media)
 			Cdrom:false, //By default we don't emulate a CD drive, but a flashdrive
 		},
-		EthernetSettings: GetDefaultNetworkSettingsUSB(),
 	}
 
 	return res

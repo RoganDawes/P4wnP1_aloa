@@ -13,6 +13,17 @@ import (
 	"errors"
 )
 
+
+func InitDefaultNetworkSettings() (err error) {
+	//ToDo: declare managed interfaces to not check from hand
+	usbEthActive,_ := CheckInterfaceExistence(USB_ETHERNET_BRIDGE_NAME)
+	if usbEthActive {
+		err = ConfigureInterface(GetDefaultNetworkSettingsUSB())
+		if err != nil { return }
+	}
+	return
+}
+
 func ParseIPv4Mask(maskstr string) (net.IPMask, error) {
 	mask := net.ParseIP(maskstr)
 	if mask == nil { return nil, errors.New("Couldn't parse netmask") }

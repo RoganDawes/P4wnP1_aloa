@@ -15,6 +15,17 @@ import (
 
 type server struct {}
 
+func (s *server) DeployEthernetInterfaceSettings(ctx context.Context, es *pb.EthernetInterfaceSettings) (empty *pb.Empty, err error) {
+	log.Printf("Trying to deploy ethernet interface settings %v", es)
+
+	empty = &pb.Empty{}
+	err = ConfigureInterface(es)
+	if err != nil {
+		log.Printf("Error deploying ethernet interface settings %v", err)
+	}
+	return
+}
+
 func (s *server) MountUMSFile(ctx context.Context, gsu *pb.GadgetSettingsUMS) (*pb.Empty, error) {
 	log.Printf("Trying to mount iamge `%s` to UMS ...", gsu.File)
 	err := MountUMSFile(gsu.File)

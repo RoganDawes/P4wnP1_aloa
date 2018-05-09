@@ -127,6 +127,17 @@ func ClientSetLED(host string, port string, ls pb.LEDSettings) (err error) {
 	return
 }
 
+func ClientDeployEthernetInterfaceSettings(host string, port string, settings *pb.EthernetInterfaceSettings) (err error) {
+	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
+	defer conn.Close()
+	defer cancel()
+	if err != nil { return }
+
+	_, err = client.DeployEthernetInterfaceSettings(ctx, settings)
+	return
+
+}
+
 /*
 func ClientDisconnectServer(cancel context.CancelFunc, connection *grpc.ClientConn) error {
 	defer connection.Close()

@@ -71,3 +71,7 @@ func SetLed(s pb.LEDSettings) (error) {
 func GetLed() (res *pb.LEDSettings, err error) {
 	return &pb.LEDSettings{BlinkCount: atomic.LoadUint32(&blink_count)}, nil
 }
+
+func InitDefaultLEDSettings() {
+	SetLed(GetDefaultLEDSettings())
+}

@@ -10,6 +10,8 @@ service P4WNP1 {
 	rpc GetLEDSettings (Empty) returns (LEDSettings) {}
 	rpc SetLEDSettings (LEDSettings) returns (Empty) {}
 	rpc MountUMSFile (GadgetSettingsUMS) returns (Empty) {}
+
+	rpc DeployEthernetInterfaceSettings(EthernetInterfaceSettings) returns (Empty) {}
 }
 
 /* LED */
@@ -36,7 +38,7 @@ message GadgetSettings {
 	GadgetSettingsEthernet rndis_settings = 14; //Only applicable if RNDIS on
 	GadgetSettingsEthernet cdc_ecm_settings = 15; //Only applicable if CDC ECM on
 	GadgetSettingsUMS ums_settings = 16;
-	EthernetInterfaceSettings ethernet_settings = 17; //only applicable if RNDIS or CDC ECM on
+	//EthernetInterfaceSettings ethernet_settings = 17; //only applicable if RNDIS or CDC ECM on
 }
 
 message GadgetSettingsEthernet {

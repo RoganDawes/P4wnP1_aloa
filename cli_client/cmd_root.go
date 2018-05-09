@@ -14,7 +14,7 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "cli_client",
+	Use:   "P4wnP1_cli",
 	Short: "P4wnP1 (remote) CLI configuration",
 	Long: `The cli_client tool could be used to configure P4wnP1
 from the command line. The tool relies on RPC so it could be used 

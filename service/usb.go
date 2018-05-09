@@ -73,8 +73,7 @@ const (
 )
 
 var (
-	defaultGadgetSettings pb.GadgetSettings = GetDefaultGadgetSettings() //ToDo: Read defaults from external file, failover to hardcoded on validation fail (consumin to many EPs)
-	GadgetSettingsState   pb.GadgetSettings = GetDefaultGadgetSettings()
+	 GadgetSettingsState  pb.GadgetSettings = pb.GadgetSettings{}
 )
 
 func ValidateGadgetSetting(gs pb.GadgetSettings) error {
@@ -168,8 +167,11 @@ func pollForUSBEthernet(timeout time.Duration) error {
 	return errors.New(fmt.Sprintf("Timeout %v reached before usb0 or usb1 cam up"))
 }
 
-func InitDefaultGadgetSettings() error {
-	return DeployGadgetSettings(defaultGadgetSettings)
+func InitDefaultGadgetSettings() (err error) {
+	err = DeployGadgetSettings(GetDefaultGadgetSettings())
+	if err != nil { return }
+	GadgetSettingsState = GetDefaultGadgetSettings() //populate settings state with same values
+	return nil
 }
 
 
@@ -592,14 +594,6 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 			return err
 		}
 
-
-		//Configure bridge interface
-		if settings.EthernetSettings == nil {
-			err = errors.New("Gadget has Ethernet enabled, but no Ethernet settings provided")
-			log.Println(err)
-			return err
-		}
-		ConfigureInterface(settings.EthernetSettings)
 	}
 
 	log.Printf("... done")

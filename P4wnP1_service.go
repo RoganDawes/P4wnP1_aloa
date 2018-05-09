@@ -33,8 +33,12 @@ func main() {
 		log.Fatalf("Error while setting up the default gadget: %v", err)
 	}
 
+	err = service.InitDefaultNetworkSettings()
+	if err != nil {
+		log.Fatalf("Error while applying default network settings: %v", err)
+	}
 
-	service.InitLed(false) //Set LED to manual triger
-	//core.StartRpcServer("127.0.0.1", "50051") //start gRPC service
+	service.InitLed(false) //Set LED to manual trigger
+	service.InitDefaultLEDSettings()
 	service.StartRpcServer("", "50051") //start gRPC service
 }
