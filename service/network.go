@@ -110,6 +110,9 @@ func AddInterfaceToBridgeIfExistent(bridgeName string, ifName string) (err error
 		return err
 	}
 	log.Printf("Interface %s added to bridge %s", ifName, bridgeName)
+
+	//enable interface
+	NetworkLinkUp(ifName)
 	return nil
 }
 

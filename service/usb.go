@@ -164,7 +164,7 @@ func pollForUSBEthernet(timeout time.Duration) error {
 		time.Sleep(100*time.Millisecond)
 		fmt.Print(".")
 	}
-	return errors.New(fmt.Sprintf("Timeout %v reached before usb0 or usb1 cam up"))
+	return errors.New(fmt.Sprintf("Timeout %v reached before usb0 or usb1 became ready"))
 }
 
 func InitDefaultGadgetSettings() (err error) {

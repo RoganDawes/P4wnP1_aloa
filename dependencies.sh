@@ -28,3 +28,4 @@ sudo pip install pycrypto # already present on stretch
 sudo pip install pydispatcher
 
 
+sudo update-rc.d dhcpcd disable
