@@ -128,6 +128,7 @@ func ClientSetLED(host string, port string, ls pb.LEDSettings) (err error) {
 }
 
 func ClientDeployEthernetInterfaceSettings(host string, port string, settings *pb.EthernetInterfaceSettings) (err error) {
+	//ToDo: set longer context deadline
 	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
 	defer conn.Close()
 	defer cancel()

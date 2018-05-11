@@ -29,7 +29,11 @@ func pidFileDHCPClient(nameIface string) string {
 }
 
 func leaseFileDHCPSrv(s *pb.DHCPServerSettings) (lf string) {
-	return fmt.Sprintf("/tmp/dnsmasq_%s.leases", s.ListenInterface) //default lease file
+	return NameLeaseFileDHCPSrv(s.ListenInterface) //default lease file
+}
+
+func NameLeaseFileDHCPSrv(nameIface string) (lf string) {
+	return fmt.Sprintf("/tmp/dnsmasq_%s.leases", nameIface)
 }
 
 
@@ -214,6 +218,7 @@ func DHCPCreateConfigFile(s *pb.DHCPServerSettings, filename string) (err error)
 	file_content, err := DHCPCreateConfigFileString(s)
 	if err != nil {return}
 	err = ioutil.WriteFile(filename, []byte(file_content), os.ModePerm)
+	//ToDo: test config with `dnsmasq -C configfile --test`
 	return
 }
 
@@ -232,7 +237,15 @@ func DHCPCreateConfigFileString(s *pb.DHCPServerSettings) (config string, err er
 
 	//Iterate over Ranges
 	for _, pRange := range s.Ranges {
-		config += fmt.Sprintf("dhcp-range=%s,%s,%s\n", pRange.RangeLower, pRange.RangeUpper, pRange.LeaseTime)
+		//ToDo: regex check for leaseTime
+		//ToDo: check rangeLower + rangeUpper to be valid IP addresses
+		if len(pRange.LeaseTime) > 0 {
+			config += fmt.Sprintf("dhcp-range=%s,%s,%s\n", pRange.RangeLower, pRange.RangeUpper, pRange.LeaseTime)
+		} else {
+			//default to 5 minute lease
+			config += fmt.Sprintf("dhcp-range=%s,%s,5m\n", pRange.RangeLower, pRange.RangeUpper)
+		}
+
 	}
 
 	//Iterate over options
@@ -253,6 +266,7 @@ func DHCPCreateConfigFileString(s *pb.DHCPServerSettings) (config string, err er
 	}
 	config += fmt.Sprintf("log-dhcp\n") //extensive logging by default
 	if (!s.NotAuthoritative) { config += fmt.Sprintf("dhcp-authoritative\n") }
+
 
 	return
 }
