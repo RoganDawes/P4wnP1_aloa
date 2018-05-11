@@ -21,3 +21,17 @@ P4wnP1_cli NET set server -i usbeth -a 172.16.0.1 -m 255.255.255.252 -r "172.16.
 
 # Start a DHCP Client for interface wlan0
 P4wnP1_cli NET set client -i wlan0
+# Configure usbeth manually (no DHCP server or client on this interface)
+P4wnP1_cli NET set manual -i usbeth -a 172.16.0.1 -m 255.255.255.252
+
+# Set LED to blink one time in a loop
+P4wnP1_cli LED set -b 1
+# Set LED to blink 10 times in a loop
+P4wnP1_cli LED set -b 10
+# Set LED to solid
+P4wnP1_cli LED set -b 255
+# Set LED to off
+P4wnP1_cli LED set -b 0
+
+
+
