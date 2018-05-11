@@ -7,19 +7,28 @@ import (
 func GetDefaultNetworkSettingsUSB() (*pb.EthernetInterfaceSettings) {
 	//configure 172.24.0.1/255.255.255.252 for usbeth
 	ifSettings := &pb.EthernetInterfaceSettings {
-		Enabled:            false,
+		Enabled:            true,
 		Name:               USB_ETHERNET_BRIDGE_NAME,
 		IpAddress4:         "172.16.0.1",
 		Netmask4:           "255.255.255.252",
-		Mode:               pb.EthernetInterfaceSettings_MANUAL,
+		Mode:               pb.EthernetInterfaceSettings_DHCP_SERVER,
 		DhcpServerSettings: GetDefaultDHCPConfigUSB(),
+	}
+	return ifSettings
+}
+
+func GetDefaultNetworkSettingsWiFi() (*pb.EthernetInterfaceSettings) {
+	ifSettings := &pb.EthernetInterfaceSettings {
+		Enabled:            true,
+		Name:               "wlan0",
+		Mode:               pb.EthernetInterfaceSettings_DHCP_CLIENT,
 	}
 	return ifSettings
 }
 
 func GetDefaultDHCPConfigUSB() (settings *pb.DHCPServerSettings) {
 	settings = &pb.DHCPServerSettings{
-		CallbackScript:     "/bin/evilscript",
+		//CallbackScript:     "/bin/evilscript",
 		DoNotBindInterface: false, //only bind to given interface
 		ListenInterface:    USB_ETHERNET_BRIDGE_NAME,
 		LeaseFile:          "/tmp/dnsmasq_" + USB_ETHERNET_BRIDGE_NAME + ".leases",
@@ -47,14 +56,14 @@ func GetDefaultLEDSettings() (res pb.LEDSettings) {
 
 func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
 	res = pb.GadgetSettings{
-		Enabled:          false,
+		Enabled:          true,
 		Vid:              "0x1d6b",
 		Pid:              "0x1337",
 		Manufacturer:     "MaMe82",
 		Product:          "P4wnP1 by MaMe82",
 		Serial:           "deadbeef1337",
 		Use_CDC_ECM:      false,
-		Use_RNDIS:        false,
+		Use_RNDIS:        true,
 		Use_HID_KEYBOARD: false,
 		Use_HID_MOUSE:    false,
 		Use_HID_RAW:      false,

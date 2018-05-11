@@ -21,6 +21,12 @@ func InitDefaultNetworkSettings() (err error) {
 		err = ConfigureInterface(GetDefaultNetworkSettingsUSB())
 		if err != nil { return }
 	}
+
+	wifiEthActive, _ := CheckInterfaceExistence("wlan0")
+	if wifiEthActive {
+		err = ConfigureInterface(GetDefaultNetworkSettingsWiFi())
+		if err != nil { return }
+	}
 	return
 }
 
@@ -112,6 +118,12 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 	iface, err := net.InterfaceByName(settings.Name)
 	if err != nil {	return err }
 
+	//stop DHCP server / client if still running
+	running, _, err := IsDHCPServerRunning(settings.Name)
+	if (err == nil) && running {StopDHCPServer(settings.Name)}
+	running, _, err = IsDHCPClientRunning(settings.Name)
+	if (err == nil) && running {StopDHCPClient(settings.Name)}
+
 	switch settings.Mode {
 	case pb.EthernetInterfaceSettings_MANUAL:
 		//Generate net
@@ -124,7 +136,6 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 		log.Printf("Setting Interface %s to IP %s\n", iface.Name, settings.IpAddress4)
 		netlink.NetworkLinkAddIp(iface, net.ParseIP(settings.IpAddress4), ipNet)
 
-		//ToDo: Disabling doesn't work in gadget settings, but from test.go
 		if settings.Enabled {
 			log.Printf("Setting Interface %s to UP\n", iface.Name)
 			err = netlink.NetworkLinkUp(iface)
@@ -133,6 +144,47 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 			err = netlink.NetworkLinkDown(iface)
 		}
 		if err != nil { return err }
+	case pb.EthernetInterfaceSettings_DHCP_SERVER:
+		//Generate net
+		ipNet, err := IpNetFromIPv4AndNetmask(settings.IpAddress4, settings.Netmask4)
+		if err != nil { return err }
+
+		//Flush old IPs
+		netlink.NetworkLinkFlush(iface)
+		//set IP
+		log.Printf("Setting Interface %s to IP %s\n", iface.Name, settings.IpAddress4)
+		netlink.NetworkLinkAddIp(iface, net.ParseIP(settings.IpAddress4), ipNet)
+
+		if settings.Enabled {
+			log.Printf("Setting Interface %s to UP\n", iface.Name)
+			err = netlink.NetworkLinkUp(iface)
+
+			//check DhcpServerSettings
+			if settings.DhcpServerSettings == nil {
+				err = errors.New(fmt.Sprintf("Ethernet configuration for interface %s is set to DHCP Server mode, but doesn't provide DhcpServerSettings", settings.Name))
+				log.Println(err)
+				return err
+			}
+			ifName := settings.Name
+			confName := NameConfigFileDHCPSrv(ifName)
+			err = DHCPCreateConfigFile(settings.DhcpServerSettings, confName)
+			if err != nil {return err}
+			//stop already running DHCPServers for the interface
+			StopDHCPServer(ifName)
+			//start the DHCP server
+			err = StartDHCPServer(ifName, confName)
+			if err != nil {return err}
+		} else {
+			log.Printf("Setting Interface %s to DOWN\n", iface.Name)
+			err = netlink.NetworkLinkDown(iface)
+		}
+		if err != nil { return err }
+	case pb.EthernetInterfaceSettings_DHCP_CLIENT:
+		netlink.NetworkLinkFlush(iface)
+		if settings.Enabled {
+			StartDHCPClient(settings.Name)
+		}
+
 	}
 
 	return nil
