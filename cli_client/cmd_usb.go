@@ -144,7 +144,6 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	//ToDo: Implement detailed UMS settings
 	if (cmd.Flags().Lookup("ums").Changed) {
 		if tmpUseUMS == 0 {
 			fmt.Println("Disabeling USB Mass Storage")
@@ -171,9 +170,9 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 
 
 	//Try to set the change config
-	//ToDo: Adopt parsing of Error Message to other gRPC calls
 	err = ClientSetGadgetSettings(StrRemoteHost, StrRemotePort, *gs)
 	if err != nil {
+		//ToDo: Adopt parsing of Error Message to other gRPC calls
 		log.Printf("Error setting new gadget settings: %v\n", status.Convert(err).Message())
 		return
 	}

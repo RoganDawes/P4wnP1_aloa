@@ -40,5 +40,5 @@ func main() {
 
 	service.InitLed(false) //Set LED to manual trigger
 	service.InitDefaultLEDSettings()
-	service.StartRpcServer("", "50051") //start gRPC service
+	service.StartRpcServerAndWeb("0.0.0.0", "50051") //start gRPC service
 }

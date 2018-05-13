@@ -11,6 +11,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
+
+	"net/http"
+	"strings"
+	"path"
+	"time"
 )
 
 type server struct {}
@@ -107,4 +113,102 @@ func StartRpcServer(host string, port string) {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
+}
+
+func folderReader(fn http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		if strings.HasSuffix(req.URL.Path, "/") {
+			// Use contents of index.html for directory, if present.
+			req.URL.Path = path.Join(req.URL.Path, "index.html")
+		}
+		fn.ServeHTTP(w, req)
+	}
+}
+
+func StartRpcWebServer(host string, port string) {
+	//Create gRPC Server
+	s := grpc.NewServer()
+	pb.RegisterP4WNP1Server(s, &server{})
+
+	//grpc_web_srv := grpcweb.WrapServer(s, grpcweb.WithWebsockets(true)) //Wrap server to improbable grpc-web with websockets
+	grpc_web_srv := grpcweb.WrapServer(s) //Wrap server to improbable grpc-web with websockets
+
+	/*
+	http_handler := func(resp http.ResponseWriter, req *http.Request) {
+		if req.ProtoMajor == 2 && strings.Contains(req.Header.Get("Content-Type"), "application/grpc") ||
+			websocket.IsWebSocketUpgrade(req) {
+			grpc_web_srv.ServeHTTP(resp, req)
+		} else {
+			//No gRPC request
+			folderReader(http.FileServer(http.Dir("/home/pi/P4wnP1_go"))).ServeHTTP(resp, req)
+		}
+	}
+	*/
+
+	http_handler := func(resp http.ResponseWriter, req *http.Request) {
+		grpc_web_srv.ServeHTTP(resp, req)
+	}
+
+	listen_address := host + ":" + port
+	http_srv := &http.Server{
+		Addr: listen_address,
+		Handler: http.HandlerFunc(http_handler),
+		//ReadHeaderTimeout: 5*time.Second,
+		//IdleTimeout: 120*time.Second,
+	}
+
+
+	//Open TCP listener
+	log.Printf("P4wnP1 gRPC-web server listening on " + listen_address)
+	log.Fatal(http_srv.ListenAndServe())
+}
+
+func StartRpcServerAndWeb(host string, port string) {
+	listen_address := host + ":" + port
+	webserver_path := "/home/pi/P4wnP1_go/www" //ToDo: Change this to an absolute path which could be used after installation
+
+	//Create gRPC Server
+	s := grpc.NewServer()
+	pb.RegisterP4WNP1Server(s, &server{})
+
+	//Wrap the server into a gRPC-web server
+	grpc_web_srv := grpcweb.WrapServer(s) //Wrap server to improbable grpc-web with websockets
+	//define a handler for a HTTP web server using the gRPC-web proxy
+	http_gRPC_web_handler := func(resp http.ResponseWriter, req *http.Request) {
+		if strings.Contains(req.Header.Get("Content-Type"), "application/grpc") || req.Method == "OPTIONS" {
+			fmt.Printf("gRPC-web req:\n %v\n", req)
+			grpc_web_srv.ServeHTTP(resp, req) // if content type indicates grpc or REQUEST METHOD IS OPTIONS (pre-flight) serve gRPC-web
+		} else {
+			fmt.Printf("legacy web req:\n %v\n", req)
+			http.FileServer(http.Dir((webserver_path))).ServeHTTP(resp, req)
+		}
+	}
+
+	//Open TCP listener
+	log.Printf("P4wnP1 gRPC server listening on " + listen_address)
+	lis, err := net.Listen("tcp", listen_address)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	// run gRPC server in go routine
+	go func() {
+		if err := s.Serve(lis); err != nil {
+			log.Fatalf("Failed to serve: %v", err)
+		}
+	}()
+
+	//Setup our HTTP server
+	http_srv := &http.Server{
+		Addr: host + ":80", //listen on port 80 with webservice
+		Handler: http.HandlerFunc(http_gRPC_web_handler),
+		ReadHeaderTimeout: 5*time.Second,
+		IdleTimeout: 120*time.Second,
+	}
+	log.Printf("P4wnP1 gRPC-web server listening on " + http_srv.Addr)
+	err_http := http_srv.ListenAndServe()
+	if err_http != nil {
+		log.Fatal(err)
+	}
+
 }

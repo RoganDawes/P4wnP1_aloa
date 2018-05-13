@@ -6,3 +6,6 @@ export PATH=$PATH:/usr/local/go/bin # put into ~/.profile
 echo export PATH=$PATH:/usr/local/go/bin >> ~/.profile
 sudo bash -c 'echo export PATH=\$PATH:/usr/local/go/bin >> ~/.profile'
 go get google.golang.org/grpc
+
+go get -u github.com/improbable-eng/grpc-web/go/grpcweb
+go get -u github.com/gorilla/websocket
