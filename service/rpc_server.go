@@ -21,6 +21,16 @@ import (
 
 type server struct {}
 
+func (s *server) DeployWifiSettings(ctx context.Context, ws *pb.WiFiSettings) (empty *pb.Empty, err error) {
+	log.Printf("Trying to deploy WiFi settings %v", ws)
+	empty = &pb.Empty{}
+	err = DeployWifiSettings(ws)
+	if err != nil {
+		log.Printf("Error deploying WiFi settings settings %v", err)
+	}
+	return
+}
+
 func (s *server) DeployEthernetInterfaceSettings(ctx context.Context, es *pb.EthernetInterfaceSettings) (empty *pb.Empty, err error) {
 	log.Printf("Trying to deploy ethernet interface settings %v", es)
 

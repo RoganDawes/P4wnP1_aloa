@@ -12,6 +12,8 @@ service P4WNP1 {
 	rpc MountUMSFile (GadgetSettingsUMS) returns (Empty) {}
 
 	rpc DeployEthernetInterfaceSettings(EthernetInterfaceSettings) returns (Empty) {}
+
+	rpc DeployWifiSettings(WiFiSettings) returns (Empty) {}
 }
 
 /* LED */
@@ -99,28 +101,33 @@ message DHCPServerStaticHost {
 
 /* WiFi */
 message WiFiSettings {
-	bool diasabled = 1;
-	string reg = 2;				//Regulatory domain per ISO/IEC 3166-1 alpha2
 	enum Mode {
 		AP = 0;					//acts as access point
 		STA = 1;				//acts as station for an existing access point
 		STA_FAILOVER_AP = 2;	//acts as station, if connection to the given AP isn't possible spawns an own AP
 	}
-	Mode mode = 3;
-	string ap_ssid = 4;			//SSID of AP to spawn
+
 	enum APAuthMode {
 		WPA2_PSK = 0;			//AP uses WPA2 pre-shared key
 		OPEN = 1;				//Open System Authentication (no authentication)
 	}
-	APAuthMode auth_mode = 5;
-	uint32 ap_channel = 6;
-	string ap_psk = 7;			//pre-shared key if auth_mode == WPA2_PSK
+
+	bool disabled = 1;
+	string reg = 2;				//Regulatory domain per ISO/IEC 3166-1 alpha2
+	Mode mode = 3;
+	APAuthMode auth_mode = 4;
+	uint32 ap_channel = 5;
+
+	BSSCfg BssCfgAP = 6;		//SSID of AP to spawn + PSK if needed
+	BSSCfg BssCfgClient = 7;	//SSID of Infra to join + PSK if needed
 	bool ap_hide_ssid = 8;		//if true, SSID gets hidden for spawned AP
 
-	string client_ssid = 9;
-	string client_psk = 10;
+	bool disable_nexmon = 10;	//if true, legacy driver / firmware is used instead of nexmon
+}
 
-	bool disable_nexmon = 11;	//if true, legacy driver / firmware is used instead of nexmon
+message BSSCfg {
+	string SSID = 1;
+	string PSK = 2;
 }
 /* End WiFI */
 

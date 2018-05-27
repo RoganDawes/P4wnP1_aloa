@@ -53,7 +53,8 @@ func StartDHCPClient(nameIface string) (err error) {
 
 
 	//We use the run command and allow dhcpcd to daemonize
-	proc := exec.Command("/sbin/dhcpcd", nameIface)
+
+	proc := exec.Command("/sbin/dhcpcd", "-C", "wpa_supplicant", nameIface) //we avoid starting wpa_supplicant along with the dhcp client
 	dhcpcd_out, err := proc.CombinedOutput()
 	//err = proc.Run()
 	if err != nil { return err}
@@ -133,8 +134,8 @@ func StartDHCPServer(nameIface string, configPath string) (err error)  {
 	}
 
 	//Check if there's already a DHCP server running for the given interface
-	running, _, err_r := IsDHCPServerRunning(nameIface)
-	if err != nil { return errors.New(fmt.Sprintf("Error fetching state of DHCP server: %v\n", err_r)) }
+	running, _, err := IsDHCPServerRunning(nameIface)
+	if err != nil { return errors.New(fmt.Sprintf("Error fetching state of DHCP server: %v\n", err)) }
 	if running {return errors.New(fmt.Sprintf("Error starting DHCP server for interface '%s', there is already a DHCP server running\n", nameIface))}
 
 	//We use the run command and allow dnsmasq to daemonize

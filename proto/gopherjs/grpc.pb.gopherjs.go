@@ -17,6 +17,7 @@
 		DHCPServerRange
 		DHCPServerStaticHost
 		WiFiSettings
+		BSSCfg
 		Empty
 */
 package P4wnP1_grpc
@@ -1150,25 +1151,23 @@ func (m *DHCPServerStaticHost) Unmarshal(rawBytes []byte) (*DHCPServerStaticHost
 
 // WiFi
 type WiFiSettings struct {
-	Diasabled     bool
+	Disabled      bool
 	Reg           string
 	Mode          WiFiSettings_Mode
-	ApSsid        string
 	AuthMode      WiFiSettings_APAuthMode
 	ApChannel     uint32
-	ApPsk         string
+	BssCfgAP      *BSSCfg
+	BssCfgClient  *BSSCfg
 	ApHideSsid    bool
-	ClientSsid    string
-	ClientPsk     string
 	DisableNexmon bool
 }
 
-// GetDiasabled gets the Diasabled of the WiFiSettings.
-func (m *WiFiSettings) GetDiasabled() (x bool) {
+// GetDisabled gets the Disabled of the WiFiSettings.
+func (m *WiFiSettings) GetDisabled() (x bool) {
 	if m == nil {
 		return x
 	}
-	return m.Diasabled
+	return m.Disabled
 }
 
 // GetReg gets the Reg of the WiFiSettings.
@@ -1187,14 +1186,6 @@ func (m *WiFiSettings) GetMode() (x WiFiSettings_Mode) {
 	return m.Mode
 }
 
-// GetApSsid gets the ApSsid of the WiFiSettings.
-func (m *WiFiSettings) GetApSsid() (x string) {
-	if m == nil {
-		return x
-	}
-	return m.ApSsid
-}
-
 // GetAuthMode gets the AuthMode of the WiFiSettings.
 func (m *WiFiSettings) GetAuthMode() (x WiFiSettings_APAuthMode) {
 	if m == nil {
@@ -1211,12 +1202,20 @@ func (m *WiFiSettings) GetApChannel() (x uint32) {
 	return m.ApChannel
 }
 
-// GetApPsk gets the ApPsk of the WiFiSettings.
-func (m *WiFiSettings) GetApPsk() (x string) {
+// GetBssCfgAP gets the BssCfgAP of the WiFiSettings.
+func (m *WiFiSettings) GetBssCfgAP() (x *BSSCfg) {
 	if m == nil {
 		return x
 	}
-	return m.ApPsk
+	return m.BssCfgAP
+}
+
+// GetBssCfgClient gets the BssCfgClient of the WiFiSettings.
+func (m *WiFiSettings) GetBssCfgClient() (x *BSSCfg) {
+	if m == nil {
+		return x
+	}
+	return m.BssCfgClient
 }
 
 // GetApHideSsid gets the ApHideSsid of the WiFiSettings.
@@ -1225,22 +1224,6 @@ func (m *WiFiSettings) GetApHideSsid() (x bool) {
 		return x
 	}
 	return m.ApHideSsid
-}
-
-// GetClientSsid gets the ClientSsid of the WiFiSettings.
-func (m *WiFiSettings) GetClientSsid() (x string) {
-	if m == nil {
-		return x
-	}
-	return m.ClientSsid
-}
-
-// GetClientPsk gets the ClientPsk of the WiFiSettings.
-func (m *WiFiSettings) GetClientPsk() (x string) {
-	if m == nil {
-		return x
-	}
-	return m.ClientPsk
 }
 
 // GetDisableNexmon gets the DisableNexmon of the WiFiSettings.
@@ -1257,8 +1240,8 @@ func (m *WiFiSettings) MarshalToWriter(writer jspb.Writer) {
 		return
 	}
 
-	if m.Diasabled {
-		writer.WriteBool(1, m.Diasabled)
+	if m.Disabled {
+		writer.WriteBool(1, m.Disabled)
 	}
 
 	if len(m.Reg) > 0 {
@@ -1269,36 +1252,32 @@ func (m *WiFiSettings) MarshalToWriter(writer jspb.Writer) {
 		writer.WriteEnum(3, int(m.Mode))
 	}
 
-	if len(m.ApSsid) > 0 {
-		writer.WriteString(4, m.ApSsid)
-	}
-
 	if int(m.AuthMode) != 0 {
-		writer.WriteEnum(5, int(m.AuthMode))
+		writer.WriteEnum(4, int(m.AuthMode))
 	}
 
 	if m.ApChannel != 0 {
-		writer.WriteUint32(6, m.ApChannel)
+		writer.WriteUint32(5, m.ApChannel)
 	}
 
-	if len(m.ApPsk) > 0 {
-		writer.WriteString(7, m.ApPsk)
+	if m.BssCfgAP != nil {
+		writer.WriteMessage(6, func() {
+			m.BssCfgAP.MarshalToWriter(writer)
+		})
+	}
+
+	if m.BssCfgClient != nil {
+		writer.WriteMessage(7, func() {
+			m.BssCfgClient.MarshalToWriter(writer)
+		})
 	}
 
 	if m.ApHideSsid {
 		writer.WriteBool(8, m.ApHideSsid)
 	}
 
-	if len(m.ClientSsid) > 0 {
-		writer.WriteString(9, m.ClientSsid)
-	}
-
-	if len(m.ClientPsk) > 0 {
-		writer.WriteString(10, m.ClientPsk)
-	}
-
 	if m.DisableNexmon {
-		writer.WriteBool(11, m.DisableNexmon)
+		writer.WriteBool(10, m.DisableNexmon)
 	}
 
 	return
@@ -1320,26 +1299,26 @@ func (m *WiFiSettings) UnmarshalFromReader(reader jspb.Reader) *WiFiSettings {
 
 		switch reader.GetFieldNumber() {
 		case 1:
-			m.Diasabled = reader.ReadBool()
+			m.Disabled = reader.ReadBool()
 		case 2:
 			m.Reg = reader.ReadString()
 		case 3:
 			m.Mode = WiFiSettings_Mode(reader.ReadEnum())
 		case 4:
-			m.ApSsid = reader.ReadString()
-		case 5:
 			m.AuthMode = WiFiSettings_APAuthMode(reader.ReadEnum())
-		case 6:
+		case 5:
 			m.ApChannel = reader.ReadUint32()
+		case 6:
+			reader.ReadMessage(func() {
+				m.BssCfgAP = m.BssCfgAP.UnmarshalFromReader(reader)
+			})
 		case 7:
-			m.ApPsk = reader.ReadString()
+			reader.ReadMessage(func() {
+				m.BssCfgClient = m.BssCfgClient.UnmarshalFromReader(reader)
+			})
 		case 8:
 			m.ApHideSsid = reader.ReadBool()
-		case 9:
-			m.ClientSsid = reader.ReadString()
 		case 10:
-			m.ClientPsk = reader.ReadString()
-		case 11:
 			m.DisableNexmon = reader.ReadBool()
 		default:
 			reader.SkipField()
@@ -1351,6 +1330,84 @@ func (m *WiFiSettings) UnmarshalFromReader(reader jspb.Reader) *WiFiSettings {
 
 // Unmarshal unmarshals a WiFiSettings from a slice of bytes.
 func (m *WiFiSettings) Unmarshal(rawBytes []byte) (*WiFiSettings, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type BSSCfg struct {
+	SSID string
+	PSK  string
+}
+
+// GetSSID gets the SSID of the BSSCfg.
+func (m *BSSCfg) GetSSID() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.SSID
+}
+
+// GetPSK gets the PSK of the BSSCfg.
+func (m *BSSCfg) GetPSK() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.PSK
+}
+
+// MarshalToWriter marshals BSSCfg to the provided writer.
+func (m *BSSCfg) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.SSID) > 0 {
+		writer.WriteString(1, m.SSID)
+	}
+
+	if len(m.PSK) > 0 {
+		writer.WriteString(2, m.PSK)
+	}
+
+	return
+}
+
+// Marshal marshals BSSCfg to a slice of bytes.
+func (m *BSSCfg) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a BSSCfg from the provided reader.
+func (m *BSSCfg) UnmarshalFromReader(reader jspb.Reader) *BSSCfg {
+	for reader.Next() {
+		if m == nil {
+			m = &BSSCfg{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.SSID = reader.ReadString()
+		case 2:
+			m.PSK = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a BSSCfg from a slice of bytes.
+func (m *BSSCfg) Unmarshal(rawBytes []byte) (*BSSCfg, error) {
 	reader := jspb.NewReader(rawBytes)
 
 	m = m.UnmarshalFromReader(reader)
@@ -1429,6 +1486,7 @@ type P4WNP1Client interface {
 	SetLEDSettings(ctx context.Context, in *LEDSettings, opts ...grpcweb.CallOption) (*Empty, error)
 	MountUMSFile(ctx context.Context, in *GadgetSettingsUMS, opts ...grpcweb.CallOption) (*Empty, error)
 	DeployEthernetInterfaceSettings(ctx context.Context, in *EthernetInterfaceSettings, opts ...grpcweb.CallOption) (*Empty, error)
+	DeployWifiSettings(ctx context.Context, in *WiFiSettings, opts ...grpcweb.CallOption) (*Empty, error)
 }
 
 type p4WNP1Client struct {
@@ -1507,6 +1565,15 @@ func (c *p4WNP1Client) MountUMSFile(ctx context.Context, in *GadgetSettingsUMS, 
 
 func (c *p4WNP1Client) DeployEthernetInterfaceSettings(ctx context.Context, in *EthernetInterfaceSettings, opts ...grpcweb.CallOption) (*Empty, error) {
 	resp, err := c.client.RPCCall(ctx, "DeployEthernetInterfaceSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployWifiSettings(ctx context.Context, in *WiFiSettings, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployWifiSettings", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}

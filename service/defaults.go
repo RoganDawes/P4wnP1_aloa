@@ -21,7 +21,9 @@ func GetDefaultNetworkSettingsWiFi() (*pb.EthernetInterfaceSettings) {
 	ifSettings := &pb.EthernetInterfaceSettings {
 		Enabled:            true,
 		Name:               "wlan0",
-		Mode:               pb.EthernetInterfaceSettings_DHCP_CLIENT,
+		Mode:               pb.EthernetInterfaceSettings_MANUAL,
+		IpAddress4:         "172.24.0.1",
+		Netmask4:           "255.255.255.252",
 	}
 	return ifSettings
 }
@@ -58,13 +60,13 @@ func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
 	res = pb.GadgetSettings{
 		Enabled:          true,
 		Vid:              "0x1d6b",
-		Pid:              "0x1337",
+		Pid:              "0x1347",
 		Manufacturer:     "MaMe82",
 		Product:          "P4wnP1 by MaMe82",
 		Serial:           "deadbeef1337",
 		Use_CDC_ECM:      false,
 		Use_RNDIS:        true,
-		Use_HID_KEYBOARD: false,
+		Use_HID_KEYBOARD: true,
 		Use_HID_MOUSE:    false,
 		Use_HID_RAW:      false,
 		Use_UMS:          false,
@@ -84,4 +86,22 @@ func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
 	}
 
 	return res
+}
+
+func GetDefaultWiFiSettings() (res *pb.WiFiSettings) {
+	res = &pb.WiFiSettings{
+		Mode: pb.WiFiSettings_AP,
+		AuthMode: pb.WiFiSettings_WPA2_PSK,
+		Disabled: false,
+		Reg: "US",
+		ApChannel: 6,
+		ApHideSsid: false,
+		BssCfgAP: &pb.BSSCfg{
+			SSID: "P4wnP1",
+			PSK: "MaMe82-P4wnP1",
+		},
+		DisableNexmon: true,
+		BssCfgClient: nil, //not needed
+	}
+	return
 }
