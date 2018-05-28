@@ -1,0 +1,4 @@
+- global dnsmasq service needs to be stopped, in order to avoid overwriting resolv.conf with configuration of local loopback interface (nameserver 127.0.0.1)
+- global dhcpcd service needs to be stopped
+- gloabel hostapd service needs to be stopped
+- global wpa_supplicant service needs to be stopped

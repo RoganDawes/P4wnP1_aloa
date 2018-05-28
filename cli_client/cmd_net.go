@@ -33,7 +33,6 @@ func init(){
 }
 */
 
-// usbCmd represents the usb command
 var netCmd = &cobra.Command{
 	Use:   "NET",
 	Short: "Configure Network settings of ethernet interfaces (including USB ethernet if enabled)",
@@ -147,10 +146,13 @@ func createManualSettings(iface string, ip4 string, mask4 string, disabled bool)
 
 func parseDhcpServerOptions(strOptions []string) (options map[uint32]string, err error) {
 	options = map[uint32]string{}
+
 	for _, strOpt := range strOptions {
 		splOpt := strings.SplitN(strOpt,":", 2)
 		if len(splOpt) == 0 {
-			return nil,errors.New(fmt.Sprintf("Invalid DHCP option: %s\nOption format is \"<DHCPOptionNumber>:[DHCPOptionValue]\"", strOpt))
+			//return nil,errors.New(fmt.Sprintf("Invalid DHCP option: %s\nOption format is \"<DHCPOptionNumber>:[DHCPOptionValue]\"", strOpt))
+			//ignore empty options
+			continue
 		}
 		optNum, err := strconv.Atoi(splOpt[0])
 		if err != nil || optNum < 0 {
@@ -174,10 +176,14 @@ func parseDhcpServerOptions(strOptions []string) (options map[uint32]string, err
 
 func parseDhcpServerRanges(strRanges []string) (ranges []*pb.DHCPServerRange, err error) {
 	ranges = []*pb.DHCPServerRange{}
+	if len(strRanges) == 0 {
+		return nil,errors.New(fmt.Sprintf("Missing DHCP range: At least one range should be provided to allow assigning IP addresses to clients\n"))
+	}
+
 	for _,strRange := range strRanges {
 		splRange := strings.Split(strRange, "|")
 		if len(splRange) != 3 && len(splRange) != 2 {
-			return nil,errors.New(fmt.Sprintf("Invalid DHCP range: %s\nOption format is \"<first IPv4>|<last IPv4>[|leaseTime]\"", strRange))
+			return nil,errors.New(fmt.Sprintf("Invalid DHCP range: %s\nformat is \"<first IPv4>|<last IPv4>[|leaseTime]\"", strRange))
 		}
 
 		if net.ParseIP(splRange[0]) == nil {
@@ -277,6 +283,6 @@ func init() {
 	netSetManualCmd.Flags().StringVarP(&tmpStrNetmask4, "netmask","m", "", "The IPv4 netmask to use for the interface")
 	netSetDHCPServerCmd.Flags().StringVarP(&tmpStrAddress4, "address","a", "", "The IPv4 address to use for the interface")
 	netSetDHCPServerCmd.Flags().StringVarP(&tmpStrNetmask4, "netmask","m", "", "The IPv4 netmask to use for the interface")
-	netSetDHCPServerCmd.Flags().StringSliceVarP(&tmpDHCPSrvRanges, "range", "r",[]string{""}, "A DHCP Server range in form \"<lowest IPv4>|<highest IPv4>[|lease time]\" (the flag could be used multiple times)")
-	netSetDHCPServerCmd.Flags().StringSliceVarP(&tmpDHCPSrvOptions, "option", "o",[]string{""}, "A DHCP Server option in form \"<option number>:<value1|value2>\" (Option values have to be separated by '|' not by ','. The flag could be used multiple times)")
+	netSetDHCPServerCmd.Flags().StringSliceVarP(&tmpDHCPSrvRanges, "range", "r",[]string{}, "A DHCP Server range in form \"<lowest IPv4>|<highest IPv4>[|lease time]\" (the flag could be used multiple times)")
+	netSetDHCPServerCmd.Flags().StringSliceVarP(&tmpDHCPSrvOptions, "option", "o",[]string{}, "A DHCP Server option in form \"<option number>:<value1|value2>\" (Option values have to be separated by '|' not by ','. The flag could be used multiple times)")
 }

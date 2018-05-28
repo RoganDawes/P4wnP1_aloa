@@ -29,3 +29,4 @@ sudo pip install pydispatcher
 
 
 sudo update-rc.d dhcpcd disable
+sudo update-rc.d dnsmasq disable

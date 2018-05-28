@@ -14,6 +14,8 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+	"bufio"
+	"io"
 )
 
 const (
@@ -30,6 +32,10 @@ const (
 	WiFiAuthMode_WPA_PSK
 	WiFiAuthMode_WPA2_PSK
 	WiFiAuthMode_UNSUPPORTED
+)
+
+const (
+	WPA_SUPPLICANT_CONNECT_TIMEOUT = time.Second * 10
 )
 
 type BSS struct {
@@ -127,7 +133,7 @@ func DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
 			err = WifiCreateWpaSupplicantConfigFile(ws.BssCfgClient.SSID, ws.BssCfgClient.PSK, confFileWpaSupplicant(wifi_if_name))
 			if err != nil { return err }
 			//ToDo: proper error handling, in case connection not possible
-			err = wifiStartWpaSupplicant(wifi_if_name)
+			err = wifiStartWpaSupplicant2(wifi_if_name, WPA_SUPPLICANT_CONNECT_TIMEOUT)
 			if err != nil { return err }
 		}
 
@@ -203,6 +209,8 @@ func wifiCreateWpaSupplicantConfString(ssid string, psk string) (config string, 
 		return "",errors.New(fmt.Sprintf("Error craeting wpa_supplicant.conf for SSID '%s' with PSK '%s': %s", ssid, psk, string(cres)))
 	}
 	config = string(cres)
+	config = "ctrl_interface=/run/wpa_supplicant\n" + config
+
 
 	return
 }
@@ -307,7 +315,9 @@ func wifiStartHostapd(nameIface string) (err error) {
 	//We use the run command and allow hostapd to daemonize
 	proc := exec.Command("/usr/sbin/hostapd", "-B", "-P", pidFileHostapd(nameIface), "-f", logFileHostapd(nameIface), confpath)
 	err = proc.Run()
-	if err != nil { return err}
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error starting hostapd '%v'", err))
+	}
 
 
 	log.Printf("... hostapd for interface '%s' started\n", nameIface)
@@ -358,11 +368,11 @@ func wifiStartWpaSupplicant(nameIface string) (err error) {
 
 	confpath := confFileWpaSupplicant(nameIface)
 
-	//stop hostapd if already running
+	//stop wpa_supplicant if already running
 	wifiStopWpaSupplicant(nameIface)
 
 
-	//We use the run command and allow hostapd to daemonize
+	//We use the run command and allow wpa_supplicant to daemonize
 	//wpa_supplicant -P /tmp/wpa_supplicant.pid -i wlan0 -c /tmp/wpa_supplicant.conf -B
 	proc := exec.Command("/sbin/wpa_supplicant", "-B", "-P", pidFileWpaSupplicant(nameIface), "-f", logFileWpaSupplicant(nameIface), "-c", confpath, "-i", nameIface)
 	err = proc.Run()
@@ -370,6 +380,101 @@ func wifiStartWpaSupplicant(nameIface string) (err error) {
 
 
 	log.Printf("... wpa_supplicant for interface '%s' started\n", nameIface)
+	return nil
+}
+
+func wifiWpaSupplicantOutParser(chanResult chan string, reader *bufio.Reader) {
+	log.Println("... Start monitoring wpa_supplicant output")
+
+	for {
+		line, _, err := reader.ReadLine()
+		if err != nil {
+			//in case wpa_supplicant is killed, we should land here, which ends the goroutine
+			if err != io.EOF {
+				log.Printf("Can't read wpa_supplicant output: %s\n", err)
+			}
+
+			break
+		}
+		strLine := string(line)
+
+		//fmt.Printf("Read:\n%s\n", strLine)
+
+		switch {
+		case strings.Contains(strLine, "WRONG_KEY"):
+			log.Printf("Seems the provided PSK doesn't match\n")
+			chanResult <- "WRONG_KEY"
+			break
+		case strings.Contains(strLine, "CTRL-EVENT-CONNECTED"):
+			log.Printf("Connected to target network\n")
+			chanResult <- "CONNECTED"
+			break // stop loop
+		}
+	}
+	log.Println("... stopped monitoring wpa_supplicant output")
+}
+
+func wifiStartWpaSupplicant2(nameIface string, timeout time.Duration) (err error) {
+	log.Printf("Starting wpa_supplicant for interface '%s'...\n", nameIface)
+
+	//check if interface is valid
+	if_exists,_ := CheckInterfaceExistence(nameIface)
+	if !if_exists {
+		return errors.New(fmt.Sprintf("The given interface '%s' doesn't exist", nameIface))
+	}
+
+	if !wifiWpaSupplicantAvailable() {
+		return errors.New("wpa_supplicant seems to be missing, please install it")
+	}
+
+	confpath := confFileWpaSupplicant(nameIface)
+
+	//stop wpa_supplicant if already running
+	wifiStopWpaSupplicant(nameIface)
+
+
+	//we monitor output of wpa_supplicant till we are connected, fail due to wrong PSK or timeout is reached
+	proc := exec.Command("/sbin/wpa_supplicant",  "-P", pidFileWpaSupplicant(nameIface), "-c", confpath, "-i", nameIface)
+
+	wpa_stdout, err := proc.StdoutPipe()
+	if err != nil { return err}
+
+	err = proc.Start()
+	if err != nil { return err}
+
+	//result channel
+	wpa_res := make(chan string, 1)
+	//start output parser
+	wpa_stdout_reader := bufio.NewReader(wpa_stdout)
+
+	go wifiWpaSupplicantOutParser(wpa_res, wpa_stdout_reader)
+
+	//analyse output
+	select {
+		case res := <-wpa_res:
+			if strings.Contains(res, "CONNECTED") {
+				//We could return success and keep wpa_supplicant running
+				log.Println("... connected to given WiFi network, wpa_supplicant running")
+				return nil
+			}
+			if strings.Contains(res, "WRONG_KEY") {
+				//we stop wpa_supplicant and return err
+				log.Println("... seems the wrong PSK wwas provided for the given WiFi network, stopping wpa_supplicant ...")
+				//wifiStopWpaSupplicant(nameIface)
+				log.Println("... killing wpa_supplicant")
+				proc.Process.Kill()
+				return errors.New("Wrong PSK")
+			}
+		case <- time.After(timeout):
+			//we stop wpa_supplicant and return err
+			log.Println("... wpa_supplicant reached timeout without beeing able to connect to given network")
+			log.Println("... killing wpa_supplicant")
+			//wifiStopWpaSupplicant(nameIface)
+			proc.Process.Kill()
+			return errors.New("TIMEOUT REACHED")
+	}
+
+
 	return nil
 }
 
