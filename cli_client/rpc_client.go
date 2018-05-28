@@ -128,13 +128,22 @@ func ClientSetLED(host string, port string, ls pb.LEDSettings) (err error) {
 }
 
 func ClientDeployEthernetInterfaceSettings(host string, port string, settings *pb.EthernetInterfaceSettings) (err error) {
-	//ToDo: set longer context deadline
-	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
-	defer conn.Close()
-	defer cancel()
-	if err != nil { return }
+	// Set up a connection to the server.
+	address := host + ":" + port
+	//log.Printf("Connecting %s ...", address)
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err)
+	}
+	defer connection.Close()
 
-	_, err = client.DeployEthernetInterfaceSettings(ctx, settings)
+	rpcClient := pb.NewP4WNP1Client(connection)
+
+	// Contact the server
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
+	defer cancel()
+
+	_, err = rpcClient.DeployEthernetInterfaceSettings(ctx, settings)
 	return
 
 }

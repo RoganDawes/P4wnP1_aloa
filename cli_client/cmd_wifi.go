@@ -92,23 +92,35 @@ func cobraWifiSetAP(cmd *cobra.Command, args []string) {
 }
 
 func cobraWifiSetSta(cmd *cobra.Command, args []string) {
+	settings, err := createWifiStaSettings(tmpWifiStrReg, tmpWifiSSID, tmpWifiPSK, tmpWifiDisableNexmon, tmpWifiDisabled)
 
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+
+		os.Exit(-1) //exit with error
+		return
+	}
+
+
+	fmt.Printf("Deploying WiFi inteface settings:\n\t%v\n", settings)
+
+	err = ClientDeployWifiSettings(StrRemoteHost, StrRemotePort, settings)
+	if err != nil {
+		fmt.Println(status.Convert(err).Message())
+		os.Exit(-1) //exit with error
+	}
 	return
 }
 
-func createWifiAPSettings(channel uint8, reg string, strSSID string, strPSK string, hideSsid bool, nexmon bool, disabled bool) (settings *pb.WiFiSettings, err error) {
-
-
+func createWifiAPSettings(channel uint8, reg string, strSSID string, strPSK string, hideSsid bool, nonexmon bool, disabled bool) (settings *pb.WiFiSettings, err error) {
 	if channel < 1 || channel > 14 {
 		return nil,errors.New(fmt.Sprintf("Only 2.4GHz channels between 1 and 14 are supported, but '%d' was given\n", channel))
 	}
-
 
 	if len(reg) != 2 {
 		return nil,errors.New(fmt.Sprintf("Regulatory domain has to consist of two uppercase letters (ISO/IEC 3166-1 alpha2), but '%s' was given\n", reg))
 	}
 	reg = strings.ToUpper(reg)
-
 
 	if len(strSSID) < 1 || len(strSSID) > 32 {
 		return nil,errors.New(fmt.Sprintf("SSID has to consist of 1 to 32 ASCII letters (even if hidden), but '%s' was given\n", strSSID))
@@ -129,18 +141,50 @@ func createWifiAPSettings(channel uint8, reg string, strSSID string, strPSK stri
 			SSID: strSSID,
 			PSK: strPSK,
 		},
-		DisableNexmon: !nexmon,
-		BssCfgClient: nil, //not needed
+		DisableNexmon: nonexmon,
+		BssCfgClient:  nil, //not needed
 	}
 
 	if len(strPSK) > 0 {
 		settings.AuthMode = pb.WiFiSettings_WPA2_PSK //if PSK is given use WPA2
 	}
 
-
 	return settings, err
 }
 
+func createWifiStaSettings(reg string, strSSID string, strPSK string, nonexmon bool, disabled bool) (settings *pb.WiFiSettings, err error) {
+	if len(reg) != 2 {
+		return nil,errors.New(fmt.Sprintf("Regulatory domain has to consist of two uppercase letters (ISO/IEC 3166-1 alpha2), but '%s' was given\n", reg))
+	}
+	reg = strings.ToUpper(reg)
+
+	if len(strSSID) < 1 || len(strSSID) > 32 {
+		return nil,errors.New(fmt.Sprintf("SSID has to consist of 1 to 32 ASCII letters (even if hidden), but '%s' was given\n", strSSID))
+	}
+
+	if len(strPSK) > 0 && len(strPSK) < 8 {
+		return nil,errors.New(fmt.Sprintf("A non-empty PSK implies WPA2 and has to have a minimum of 8 characters, but given PSK has '%d' charactres\n", len(strPSK)))
+	}
+
+	settings = &pb.WiFiSettings{
+		Mode: pb.WiFiSettings_STA,
+		AuthMode: pb.WiFiSettings_OPEN,
+		Disabled: disabled,
+		Reg: reg,
+		BssCfgClient: &pb.BSSCfg{
+			SSID: strSSID,
+			PSK: strPSK,
+		},
+		DisableNexmon: nonexmon,
+		BssCfgAP:      nil, //not needed
+	}
+
+	if len(strPSK) > 0 {
+		settings.AuthMode = pb.WiFiSettings_WPA2_PSK //if PSK is given use WPA2
+	}
+
+	return settings, err
+}
 
 func init() {
 	rootCmd.AddCommand(wifiCmd)

@@ -120,9 +120,12 @@ func StopDHCPClient(nameIface string) (err error) {
 	fmt.Printf("Dhcpcd out for %s:\n%s", nameIface, dhcpcd_out)
 
 
+
 	log.Printf("... DHCP client for interface '%s' stopped\n", nameIface)
 	return nil
 }
+
+
 
 func StartDHCPServer(nameIface string, configPath string) (err error)  {
 	log.Printf("Starting DHCP server for interface '%s' with config '%s'...\n", nameIface, configPath)
@@ -211,6 +214,9 @@ func StopDHCPServer(nameIface string) (err error)  {
 
 	//Delete PID file
 	os.Remove(pidFileDHCPSrv(nameIface))
+
+	//Deleting leaseFile
+	os.Remove(NameLeaseFileDHCPSrv(nameIface))
 	return nil
 }
 

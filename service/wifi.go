@@ -16,6 +16,7 @@ import (
 	"time"
 	"bufio"
 	"io"
+	"regexp"
 )
 
 const (
@@ -35,7 +36,7 @@ const (
 )
 
 const (
-	WPA_SUPPLICANT_CONNECT_TIMEOUT = time.Second * 10
+	WPA_SUPPLICANT_CONNECT_TIMEOUT = time.Second * 20
 )
 
 type BSS struct {
@@ -133,7 +134,7 @@ func DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
 			err = WifiCreateWpaSupplicantConfigFile(ws.BssCfgClient.SSID, ws.BssCfgClient.PSK, confFileWpaSupplicant(wifi_if_name))
 			if err != nil { return err }
 			//ToDo: proper error handling, in case connection not possible
-			err = wifiStartWpaSupplicant2(wifi_if_name, WPA_SUPPLICANT_CONNECT_TIMEOUT)
+			err = wifiStartWpaSupplicant(wifi_if_name, WPA_SUPPLICANT_CONNECT_TIMEOUT)
 			if err != nil { return err }
 		}
 
@@ -353,35 +354,6 @@ func wifiStopHostapd(nameIface string) (err error) {
 	return nil
 }
 
-func wifiStartWpaSupplicant(nameIface string) (err error) {
-	log.Printf("Starting wpa_supplicant for interface '%s'...\n", nameIface)
-
-	//check if interface is valid
-	if_exists,_ := CheckInterfaceExistence(nameIface)
-	if !if_exists {
-		return errors.New(fmt.Sprintf("The given interface '%s' doesn't exist", nameIface))
-	}
-
-	if !wifiWpaSupplicantAvailable() {
-		return errors.New("wpa_supplicant seems to be missing, please install it")
-	}
-
-	confpath := confFileWpaSupplicant(nameIface)
-
-	//stop wpa_supplicant if already running
-	wifiStopWpaSupplicant(nameIface)
-
-
-	//We use the run command and allow wpa_supplicant to daemonize
-	//wpa_supplicant -P /tmp/wpa_supplicant.pid -i wlan0 -c /tmp/wpa_supplicant.conf -B
-	proc := exec.Command("/sbin/wpa_supplicant", "-B", "-P", pidFileWpaSupplicant(nameIface), "-f", logFileWpaSupplicant(nameIface), "-c", confpath, "-i", nameIface)
-	err = proc.Run()
-	if err != nil { return err}
-
-
-	log.Printf("... wpa_supplicant for interface '%s' started\n", nameIface)
-	return nil
-}
 
 func wifiWpaSupplicantOutParser(chanResult chan string, reader *bufio.Reader) {
 	log.Println("... Start monitoring wpa_supplicant output")
@@ -414,7 +386,7 @@ func wifiWpaSupplicantOutParser(chanResult chan string, reader *bufio.Reader) {
 	log.Println("... stopped monitoring wpa_supplicant output")
 }
 
-func wifiStartWpaSupplicant2(nameIface string, timeout time.Duration) (err error) {
+func wifiStartWpaSupplicant(nameIface string, timeout time.Duration) (err error) {
 	log.Printf("Starting wpa_supplicant for interface '%s'...\n", nameIface)
 
 	//check if interface is valid
@@ -434,6 +406,7 @@ func wifiStartWpaSupplicant2(nameIface string, timeout time.Duration) (err error
 
 
 	//we monitor output of wpa_supplicant till we are connected, fail due to wrong PSK or timeout is reached
+	//Note: PID file creation doesn't work when not started as daemon, so we do it manually, later on
 	proc := exec.Command("/sbin/wpa_supplicant",  "-P", pidFileWpaSupplicant(nameIface), "-c", confpath, "-i", nameIface)
 
 	wpa_stdout, err := proc.StdoutPipe()
@@ -441,6 +414,9 @@ func wifiStartWpaSupplicant2(nameIface string, timeout time.Duration) (err error
 
 	err = proc.Start()
 	if err != nil { return err}
+
+	//Create PID file by hand, as we're not running wpa_supplicant in daemon mode
+	err = ioutil.WriteFile(pidFileWpaSupplicant(nameIface), []byte(fmt.Sprintf("%d", proc.Process.Pid)), os.ModePerm)
 
 	//result channel
 	wpa_res := make(chan string, 1)
@@ -467,7 +443,7 @@ func wifiStartWpaSupplicant2(nameIface string, timeout time.Duration) (err error
 			}
 		case <- time.After(timeout):
 			//we stop wpa_supplicant and return err
-			log.Println("... wpa_supplicant reached timeout without beeing able to connect to given network")
+			log.Printf("... wpa_supplicant reached timeout of '%v' without beeing able to connect to given network\n", timeout)
 			log.Println("... killing wpa_supplicant")
 			//wifiStopWpaSupplicant(nameIface)
 			proc.Process.Kill()
@@ -594,4 +570,105 @@ func wifiIsWpaSupplicantRunning(nameIface string) (running bool, pid int, err er
 	default:
 		return false, pid, err_kill
 	}
+}
+
+
+//ToDo: Create netlink based implementation (not relying on 'iw'): low priority
+func ParseIwScan(scanresult string) (bsslist []BSS, err error) {
+	//fmt.Printf("Parsing:\n%s\n", scanresult)
+
+	//split into BSS sections
+	rp := regexp.MustCompile("(?msU)^BSS.*")
+	strBSSList := rp.Split(scanresult, -1)
+	if len(strBSSList) < 1 {
+		return nil, errors.New("Error parsing iw scan result") //splitting should always result in one element at least
+	}
+
+	bsslist = []BSS{}
+
+	rp_bssid := regexp.MustCompile("[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}")
+	rp_freq := regexp.MustCompile("(?m)freq:\\s*([0-9]{4})")
+	rp_ssid := regexp.MustCompile("(?m)SSID:\\s*(.*)\n")
+	rp_beacon_intv := regexp.MustCompile("(?m)beacon interval:\\s*([0-9]*)TU")
+
+	rp_WEP := regexp.MustCompile("(?m)WEP:")
+	rp_WPA := regexp.MustCompile("(?m)WPA:")
+	rp_WPA2 := regexp.MustCompile("(?m)RSN:")
+	rp_PSK := regexp.MustCompile("(?m)Authentication suites: PSK") //ToDo: check if PSK occurs under respective IE (RSN or WPA, when either is chosen)
+
+	//signal: -75.00 dBm
+	rp_signal := regexp.MustCompile("(?m)signal:\\s*(-?[0-9]*\\.[0-9]*)")
+	for idx, strBSS := range strBSSList[1:] {
+		currentBSS := BSS{}
+		//fmt.Printf("BSS %d\n================\n%s\n", idx, strBSS)
+		fmt.Printf("BSS %d\n================\n", idx)
+
+		//BSSID (should be in first line)
+		strBSSID := rp_bssid.FindString(strBSS)
+		fmt.Printf("BSSID: %s\n", strBSSID)
+		currentBSS.BSSID, err = net.ParseMAC(strBSSID)
+		if err != nil { return nil,err}
+
+		//freq
+		strFreq_sub := rp_freq.FindStringSubmatch(strBSS)
+		strFreq := "0"
+		if len(strFreq_sub) > 1 { strFreq = strFreq_sub[1]}
+		fmt.Printf("Freq: %s\n", strFreq)
+		tmpI64, err := strconv.ParseInt(strFreq, 10,32)
+		if err != nil { return nil, err }
+		currentBSS.Frequency = int(tmpI64)
+
+		//ssid
+		strSsid_sub := rp_ssid.FindStringSubmatch(strBSS)
+		strSSID := ""
+		if len(strSsid_sub) > 1 { strSSID = strSsid_sub[1]}
+		fmt.Printf("SSID: '%s'\n", strSSID)
+		currentBSS.SSID = strSSID
+
+		//beacon interval
+		strBI_sub := rp_beacon_intv.FindStringSubmatch(strBSS)
+		strBI := "100"
+		if len(strBI_sub) > 1 { strBI = strBI_sub[1]}
+		fmt.Printf("Beacon Interval: %s\n", strBI)
+		tmpI64, err = strconv.ParseInt(strBI, 10,32)
+		if err != nil { return nil, err }
+		currentBSS.BeaconInterval = time.Microsecond * time.Duration(tmpI64 * 1024) //1TU = 1024 microseconds (not 1000)
+
+		//auth type
+		//assume OPEN
+		//if "WEP: is present assume UNSUPPORTED
+		//if "WPA:" is present assume WPA (overwrite WEP/UNSUPPORTED)
+		//if "RSN:" is present assume WPA2 (overwrite WPA/UNSUPPORTED)
+		//in case of WPA/WPA2 check for presence of "Authentication suites: PSK" to assure PSK support, otherwise assume unsupported (no EAP/CHAP support for now)
+		currentBSS.AuthMode = WiFiAuthMode_OPEN
+		if rp_WEP.MatchString(strBSS) {currentBSS.AuthMode = WiFiAuthMode_UNSUPPORTED}
+		if rp_WPA.MatchString(strBSS) {currentBSS.AuthMode = WiFiAuthMode_WPA_PSK}
+		if rp_WPA2.MatchString(strBSS) {currentBSS.AuthMode = WiFiAuthMode_WPA2_PSK}
+		if currentBSS.AuthMode == WiFiAuthMode_WPA_PSK || currentBSS.AuthMode == WiFiAuthMode_WPA2_PSK {
+			if !rp_PSK.MatchString(strBSS) {currentBSS.AuthMode = WiFiAuthMode_UNSUPPORTED}
+		}
+		switch currentBSS.AuthMode {
+		case WiFiAuthMode_UNSUPPORTED:
+			fmt.Println("AuthMode: UNSUPPORTED")
+		case WiFiAuthMode_OPEN:
+			fmt.Println("AuthMode: OPEN")
+		case WiFiAuthMode_WPA_PSK:
+			fmt.Println("AuthMode: WPA PSK")
+		case WiFiAuthMode_WPA2_PSK:
+			fmt.Println("AuthMode: WPA2 PSK")
+		}
+
+		//signal
+		strSignal_sub := rp_signal.FindStringSubmatch(strBSS)
+		strSignal := "0.0"
+		if len(strSignal_sub) > 1 { strSignal = strSignal_sub[1]}
+		tmpFloat, err := strconv.ParseFloat(strSignal, 32)
+		if err != nil { return nil, err }
+		currentBSS.Signal = float32(tmpFloat)
+		fmt.Printf("Signal: %s dBm\n", strSignal)
+
+		bsslist = append(bsslist, currentBSS)
+	}
+
+	return bsslist,nil
 }
