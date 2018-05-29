@@ -321,10 +321,10 @@ const (
 )
 
 var (
-	UsbKeyToString = generateKey2Str()
-	String2UsbKey = generateStr2Key()
+	UsbKeyToString    = generateKey2Str()
+	StringToUsbKey    = generateStr2Key()
 	UsbModKeyToString = generateMod2Str()
-	String2UsbModKey = generateStr2Mod()
+	StringToUsbModKey = generateStr2Mod()
 )
 
 func generateMod2Str() (m2s map[uint8]string) {
