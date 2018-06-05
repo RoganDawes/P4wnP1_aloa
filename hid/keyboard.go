@@ -28,6 +28,21 @@ type HIDKeyboard struct {
 	KeyDelayJitter int
 }
 
+func New(devicePath string, resourcePath string) (keyboard *HIDKeyboard, err error) {
+	keyboard = &HIDKeyboard{}
+	keyboard.DevicePath = devicePath
+	keyboard.KeyDelay = 0
+	keyboard.KeyDelayJitter = 0
+
+	//ToDo: Load whole language map folder, for now single layout testing
+	err = keyboard.LoadLanguageMapFromFile(resourcePath + "/DE_ASCII.json")
+	if err != nil {return nil, err}
+
+
+
+	return
+}
+
 func (kbd *HIDKeyboard) LoadLanguageMapFromFile(filepath string) (err error) {
 	//if this is the first map loaded, set as active Map
 	kbdmap, err := LoadKeyboardLanguageMapFromFile(filepath)
