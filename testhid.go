@@ -57,6 +57,16 @@ func main() {
 	*/
 
 	hidCtl, err := hid.NewHIDController("/dev/hidg0", "keymaps", "")
+	if err != nil {panic(err)}
+
+	_,err = hidCtl.Keyboard.TmapKeyStringToReports("INS")
+	if err != nil {panic(err)}
+	_,err = hidCtl.Keyboard.TmapKeyStringToReports("F1")
+	if err != nil {panic(err)}
+	_,err = hidCtl.Keyboard.TmapKeyStringToReports("F13")
+	if err != nil {panic(err)}
+	_,err = hidCtl.Keyboard.TmapKeyStringToReports(" F3 ")
+	if err != nil {panic(err)}
 
 	fmt.Println("Initial sleep to test if we capture LED state changes from the past, as soon as we start waiting (needed at boot)")
 	time.Sleep(3 * time.Second)
