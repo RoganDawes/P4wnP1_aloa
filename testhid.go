@@ -80,8 +80,6 @@ func main() {
 	}
 
 
-	//keyboard, err := hid.NewKeyboard("/dev/hidg0", "keymaps")
-	if err != nil { fmt.Println(err)}
 	hidCtl.Keyboard.KeyDelay = 100
 //	hidCtl.Keyboard.KeyDelayJitter = 200
 	fmt.Printf("Available language maps:\n%v\n",hidCtl.Keyboard.ListLanguageMapNames())

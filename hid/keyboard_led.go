@@ -32,6 +32,7 @@ type HIDKeyboardLEDStateWatcher struct {
 	listeners *listenersmap
 	listenerNonZeroCondLock *sync.Mutex
 	listenerNonZeroCond *sync.Cond
+	hasInitialSate bool
 }
 
 type listenersmap struct {
@@ -147,6 +148,25 @@ func (watcher *HIDKeyboardLEDStateWatcher) dispatchListeners(state byte) {
 		watcher.ledState.Kana = nKana
 		ledsChanged.Kana = true
 		hasChanged = true
+	}
+
+	if !watcher.hasInitialSate {
+		//This is the first led state reported, so former state is undefined and we consider everything as a change
+		watcher.ledState.NumLock = nNum
+		watcher.ledState.CapsLock = nCaps
+		watcher.ledState.ScrollLock = nScroll
+		watcher.ledState.Compose = nCompose
+		watcher.ledState.Kana = nKana
+
+		ledsChanged.NumLock = true
+		ledsChanged.CapsLock = true
+		ledsChanged.ScrollLock = true
+		ledsChanged.Compose = true
+		ledsChanged.Kana = true
+
+		hasChanged = true
+
+		watcher.hasInitialSate = true //don't do this again
 	}
 
 	//check if we have listeners ready to remove
