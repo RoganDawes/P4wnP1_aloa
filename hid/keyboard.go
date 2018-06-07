@@ -14,6 +14,7 @@ import (
 
 var (
 	KeyboardReportEmpty = NewKeyboardOutReport(0)
+	ErrTimeout = errors.New("Timeout reached")
 )
 
 func init() {
@@ -21,14 +22,18 @@ func init() {
 }
 
 type HIDKeyboard struct {
-	DevicePath string
+	DevicePath           string
 	ActiveLanguageLayout *HIDKeyboardLanguageMap
-	LanguageMaps map[string]*HIDKeyboardLanguageMap //available language maps
-	KeyDelay int
-	KeyDelayJitter int
+	LanguageMaps         map[string]*HIDKeyboardLanguageMap //available language maps
+	LEDWatcher           *HIDKeyboardLEDStateWatcher
+	KeyDelay             int
+	KeyDelayJitter       int
 }
 
-func New(devicePath string, resourcePath string) (keyboard *HIDKeyboard, err error) {
+
+
+
+func NewKeyboard(devicePath string, resourcePath string) (keyboard *HIDKeyboard, err error) {
 	keyboard = &HIDKeyboard{}
 	keyboard.DevicePath = devicePath
 	keyboard.KeyDelay = 0
@@ -38,10 +43,13 @@ func New(devicePath string, resourcePath string) (keyboard *HIDKeyboard, err err
 	err = keyboard.LoadLanguageMapFromFile(resourcePath + "/DE_ASCII.json")
 	if err != nil {return nil, err}
 
-
+	//Init LED sate
+	keyboard.LEDWatcher, err = newHIDKeyboardLEDStateWatcher(devicePath)
+	if err != nil {return nil, err}
 
 	return
 }
+
 
 func (kbd *HIDKeyboard) LoadLanguageMapFromFile(filepath string) (err error) {
 	//if this is the first map loaded, set as active Map
@@ -120,6 +128,8 @@ func (kbd *HIDKeyboard) PressKeyCombo(reports []KeyboardOutReport) (err error) {
 
 	return nil
 }
+
+
 
 type HIDKeyboardLanguageMap struct {
 	Name string

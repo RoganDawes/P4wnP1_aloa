@@ -5,6 +5,7 @@ import(
 
 	"log"
 	"fmt"
+	"time"
 )
 
 func Test() {
@@ -55,18 +56,118 @@ func main() {
 	fmt.Println(testmap)
 	*/
 
-	keyboard := hid.HIDKeyboard{}
-	keyboard.DevicePath = "/dev/hidg0"
-	keyboard.KeyDelay = 100
-	keyboard.KeyDelayJitter = 200
-	keyboard.LoadLanguageMapFromFile("keymaps/DE_ASCII.json")
-	fmt.Printf("Available language maps:\n%v\n",keyboard.ListLanguageMapNames())
+	hidCtl, err := hid.NewHIDController("/dev/hidg0", "keymaps", "")
 
-	err := keyboard.SetActiveLanguageMap("DE")
+	//Test single trigger on any LED
+	fmt.Println("Waiting for any LED state change for 15 seconds")
+	trigger, err := hidCtl.Keyboard.WaitLEDStateChange(hid.MaskAny, 15*time.Second)
+	if err != nil {
+		fmt.Printf("Waiting aborted with error: %v\n", err)
+	} else {
+		fmt.Printf("Triggered by %+v\n", trigger)
+	}
+
+
+
+
+	//Test single trigger on NUMLOCK LED (ignore CAPSLOCK, SCROLLLOCK etc.)
+	fmt.Println("Waiting for NUMLOCK LED state change for 15 seconds")
+	trigger, err = hidCtl.Keyboard.WaitLEDStateChange(hid.MaskNumLock, 15*time.Second)
+	if err != nil {
+		fmt.Printf("Waiting aborted with error: %v\n", err)
+	} else {
+		fmt.Printf("Triggered by %+v\n", trigger)
+	}
+
+
+	//keyboard, err := hid.NewKeyboard("/dev/hidg0", "keymaps")
+	if err != nil { fmt.Println(err)}
+	hidCtl.Keyboard.KeyDelay = 100
+//	hidCtl.Keyboard.KeyDelayJitter = 200
+	fmt.Printf("Available language maps:\n%v\n",hidCtl.Keyboard.ListLanguageMapNames())
+
+	err = hidCtl.Keyboard.SetActiveLanguageMap("DE")
 	if err != nil { fmt.Println(err)}
 
-	ascii := " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
-	special := "§°üÜöÖäÄµ€ß¹²³⁴⁵⁶⁷⁸⁹⁰¼½¬„“¢«»æſðđŋħĸł’¶ŧ←↓→øþ"
-	err = keyboard.SendString("Test:" + ascii + "\t" + special)
+//	ascii := " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+//	special := "§°üÜöÖäÄµ€ß¹²³⁴⁵⁶⁷⁸⁹⁰¼½¬„“¢«»æſðđŋħĸł’¶ŧ←↓→øþ"
+//	err = keyboard.SendString("Test:" + ascii + "\t" + special)
 	if err != nil { fmt.Println(err)}
+
+	script := `
+		kString(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~");
+		kString("\n")
+		kString("Waiting 500ms ...\n");
+		delay(500)
+		kString("... done\n");
+		kString("§°üÜöÖäÄµ€ß¹²³⁴⁵⁶⁷⁸⁹⁰¼½¬„“¢«»æſðđŋħĸł’¶ŧ←↓→øþ");
+		kString("\n")
+		
+		console.log("Log message from JS"); 
+	`
+
+	hidCtl.RunScriptAsync(script)
+
+	fmt.Println("Running script ...")
+	val,err := hidCtl.RunScript(script)
+	if err != nil {log.Fatal(err)}
+	fmt.Printf("Running script finished with result: %v ...\n", val)
+
+	script2 := `
+		for (i=0; i<10; i++)
+		{
+			console.log("Run " + i + ":");
+			console.log("JS sleeping 1000ms");
+			delay(1000);
+		}
+	`
+	script3 := `
+		for (i=0; i<30; i++)
+		{
+			console.log("JS script 3 Run " + i);
+			delay(500);
+		}
+	`
+
+	id, avm,_ := hidCtl.RunScriptAsync(script2)
+	fmt.Printf("Satrted ASYNC VM %d ...\n", id)
+
+
+	time.Sleep(1500 * time.Millisecond)
+	id2 ,avm2, _ := hidCtl.RunScriptAsync(script3)
+	fmt.Printf("Slept 1500 ms, started VM %d ...\n", id2)
+	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id, avm.IsWorking())
+	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id2, avm2.IsWorking())
+
+	time.Sleep(1500 * time.Millisecond)
+	fmt.Printf("Slept 1500 ms, cancelling VM %d and start waiting for VM %d...\n", id2, id)
+	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id, avm.IsWorking())
+	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id2, avm2.IsWorking())
+	fmt.Printf("List of currently working VMs: %v\n", hidCtl.CurrentlyWorkingVmIDs())
+	//avm2.Cancel()
+	hidCtl.CancelAsyncScript(id2)
+
+	//Waiting for canceled script
+	_,err = avm2.WaitResult()
+	if err != nil {
+		fmt.Printf("Script 2 resulted in error: %v\n", err)
+	}
+
+
+	//Try to reuse avm2
+	fmt.Println("Restarting script 3 on second VM")
+	time.Sleep(2000 * time.Millisecond)
+	avm2.RunAsync(script3)
+
+	//Cancel all
+	hidCtl.CancelAllVMs()
+
+	val,err = avm.WaitResult()
+
+	if err != nil {log.Fatal(err)}
+	fmt.Printf("Running Script ASYNC finished with result: %v ...\n", val)
+	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id, avm.IsWorking())
+	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id2, avm2.IsWorking())
+
+
 }

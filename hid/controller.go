@@ -117,14 +117,14 @@ func (avm *AsyncOttoVM) Cancel() error {
 
 type HIDController struct {
 	Keyboard *HIDKeyboard
-	vmPool [MAX_VM]*AsyncOttoVM
+	vmPool [MAX_VM]*AsyncOttoVM //ToDo: check if this could be changed to sync.Pool
 	vmMaster *otto.Otto
 }
 
 func NewHIDController(keyboardDevicePath string, keyboardMapPath string, mouseDevicePath string) (ctl *HIDController, err error) {
 	ctl = &HIDController{}
 	//init keyboard
-	ctl.Keyboard, err = New(keyboardDevicePath, keyboardMapPath)
+	ctl.Keyboard, err = NewKeyboard(keyboardDevicePath, keyboardMapPath)
 	if err != nil { return nil, err	}
 
 	//init master otto vm
@@ -141,15 +141,15 @@ func NewHIDController(keyboardDevicePath string, keyboardMapPath string, mouseDe
 }
 
 func (ctl *HIDController) NextUnusedVM() (idx int, vm *AsyncOttoVM, err error) {
-	//ToDo: check which vm is free to use
 	//iterate over pool
 	for idx,avm := range ctl.vmPool {
 		if !avm.IsWorking() {
+			//return first non-working vm
 			return idx, avm, nil //free to be used
 		}
 	}
 
-	return 0, nil, errors.New("New free JavaScript VM available in pool")
+	return 0, nil, errors.New("No free JavaScript VM available in pool")
 }
 
 func (ctl *HIDController) RunScript(script string) (val otto.Value, err error) {
