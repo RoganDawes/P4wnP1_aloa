@@ -4,7 +4,6 @@ import (
 	"sync"
 	"os"
 	"time"
-	"fmt"
 )
 
 
@@ -17,7 +16,6 @@ const (
 	MaskAny = MaskNumLock | MaskCapsLock | MaskScrollLock | MaskCompose | MaskKana
 )
 
-
 type HIDLEDState struct {
 	NumLock bool
 	CapsLock bool
@@ -26,12 +24,20 @@ type HIDLEDState struct {
 	Kana bool
 }
 
+func (s *HIDLEDState) fillState(stateByte byte) {
+	if stateByte & MaskNumLock > 0 { s.NumLock = true  }
+	if stateByte & MaskCapsLock > 0 { s.CapsLock = true }
+	if stateByte & MaskScrollLock > 0 { s.ScrollLock = true }
+	if stateByte & MaskCompose > 0 { s.Compose = true }
+	if stateByte & MaskKana > 0 { s.Kana = true }
+	return
+}
+
+
 type HIDKeyboardLEDStateWatcher struct {
-	ledState *HIDLEDState
-	listeners2 sync.Map
-	listeners *listenersmap
-	listenerNonZeroCondLock *sync.Mutex
-	listenerNonZeroCond *sync.Cond
+	ledState *HIDLEDState //global LED state
+	listeners *listenersmap //map of registered listeners
+	listenerNonZeroCond *sync.Cond //condition to signaling in case at least one listener is present (dispatcher blocks if no listener is registered and receiving latest state changes)
 	hasInitialSate bool
 }
 
@@ -47,19 +53,18 @@ type HIDKeyboardLEDListener struct {
 }
 
 
-func newHIDKeyboardLEDStateWatcher(devicePath string) (ledState *HIDKeyboardLEDStateWatcher,err error) {
-	llock := &sync.Mutex{}
-	ledState = &HIDKeyboardLEDStateWatcher{
+func newHIDKeyboardLEDStateWatcher(devicePath string) (watcher *HIDKeyboardLEDStateWatcher,err error) {
+	//llock := &sync.Mutex{}
+	watcher = &HIDKeyboardLEDStateWatcher{
 		ledState: &HIDLEDState{},
 		listeners: &listenersmap{m: make(map[*HIDKeyboardLEDListener]*HIDKeyboardLEDListener)},
-		listenerNonZeroCondLock: llock,
-		listenerNonZeroCond: &sync.Cond{L:llock},
+		listenerNonZeroCond: &sync.Cond{L:&sync.Mutex{}},
 	}
 
 	//start go routine reading LED output reports from keyboard device
 	//ToDo: this should happen only once
 
-	go ledState.start(devicePath)
+	go watcher.start(devicePath)
 
 	return
 }
@@ -71,16 +76,16 @@ func (watcher *HIDKeyboardLEDStateWatcher) CreateAndAddNewListener() (l *HIDKeyb
 	}
 	watcher.listeners.Lock()
 	watcher.listeners.m[l] = l
-	watcher.listenerNonZeroCondLock.Lock()
+	watcher.listenerNonZeroCond.L.Lock()
 	watcher.listenerNonZeroCond.Broadcast()
-	watcher.listenerNonZeroCondLock.Unlock()
+	watcher.listenerNonZeroCond.L.Unlock()
 	watcher.listeners.Unlock()
 	return
 }
 
 func (watcher *HIDKeyboardLEDStateWatcher) removeListener(l *HIDKeyboardLEDListener) {
-	l.isMarkedForDeletion = true //mark listener for deletion
-	//clear remaining channel data to unlock producer (dispatchListeners loop)
+	l.isMarkedForDeletion = true //mark listener for deletion to avoid that dispatcher write to channel
+	//consume remaining channel data to unlock dispatchListeners loop
 L:
 	for {
 		select {
@@ -91,6 +96,13 @@ L:
 		}
 
 	}
+
+	//lock listener map and delete listener
+	watcher.listeners.Lock()
+	delete(watcher.listeners.m, l)
+	watcher.listeners.Unlock()
+
+
 	close(l.changedLeds) //close channel (ther should be no further read access)
 
 }
@@ -114,49 +126,45 @@ func (watcher *HIDKeyboardLEDStateWatcher) start(devicePath string) {
 
 func (watcher *HIDKeyboardLEDStateWatcher) dispatchListeners(state byte) {
 	//log.Printf("New LED state %x\n", state)
-	var nNum, nCaps, nScroll, nCompose, nKana bool
+	newState := HIDLEDState{}
+	newState.fillState(state)
 
-	if state &MaskNumLock > 0 { nNum = true }
-	if state &MaskCapsLock > 0 { nCaps = true }
-	if state &MaskScrollLock > 0 { nScroll = true }
-	if state &MaskCompose > 0 { nCompose = true }
-	if state &MaskKana > 0 { nKana = true }
 
 	hasChanged := false
 	ledsChanged := HIDLEDState{}
-	if nNum != watcher.ledState.NumLock {
-		watcher.ledState.NumLock = nNum
+	if newState.NumLock != watcher.ledState.NumLock {
+		watcher.ledState.NumLock = newState.NumLock
 		ledsChanged.NumLock = true
 		hasChanged = true
 	}
-	if nCaps != watcher.ledState.CapsLock {
-		watcher.ledState.CapsLock = nCaps
+	if newState.CapsLock != watcher.ledState.CapsLock {
+		watcher.ledState.CapsLock = newState.CapsLock
 		ledsChanged.CapsLock = true
 		hasChanged = true
 	}
-	if nScroll != watcher.ledState.ScrollLock {
-		watcher.ledState.ScrollLock = nScroll
+	if newState.ScrollLock != watcher.ledState.ScrollLock {
+		watcher.ledState.ScrollLock = newState.ScrollLock
 		ledsChanged.ScrollLock = true
 		hasChanged = true
 	}
-	if nCompose != watcher.ledState.Compose {
-		watcher.ledState.Compose = nCompose
+	if newState.Compose != watcher.ledState.Compose {
+		watcher.ledState.Compose = newState.Compose
 		ledsChanged.Compose = true
 		hasChanged = true
 	}
-	if nKana != watcher.ledState.Kana {
-		watcher.ledState.Kana = nKana
+	if newState.Kana != watcher.ledState.Kana {
+		watcher.ledState.Kana = newState.Kana
 		ledsChanged.Kana = true
 		hasChanged = true
 	}
 
 	if !watcher.hasInitialSate {
 		//This is the first led state reported, so former state is undefined and we consider everything as a change
-		watcher.ledState.NumLock = nNum
-		watcher.ledState.CapsLock = nCaps
-		watcher.ledState.ScrollLock = nScroll
-		watcher.ledState.Compose = nCompose
-		watcher.ledState.Kana = nKana
+		watcher.ledState.NumLock = newState.NumLock
+		watcher.ledState.CapsLock = newState.CapsLock
+		watcher.ledState.ScrollLock = newState.ScrollLock
+		watcher.ledState.Compose = newState.Compose
+		watcher.ledState.Kana = newState.Kana
 
 		ledsChanged.NumLock = true
 		ledsChanged.CapsLock = true
@@ -169,31 +177,20 @@ func (watcher *HIDKeyboardLEDStateWatcher) dispatchListeners(state byte) {
 		watcher.hasInitialSate = true //don't do this again
 	}
 
-	//check if we have listeners ready to remove
-	rmList := make([]*HIDKeyboardLEDListener,0)
-	for l,_ := range watcher.listeners.m {
-		if l.isMarkedForDeletion {
-			//add to remove list
-			rmList = append(rmList, l)
-		}
-	}
-	//remove listeners from map, which have been found ready to remove
-	watcher.listeners.Lock()
-	for _,l := range rmList { delete(watcher.listeners.m, l) }
-	watcher.listeners.Unlock()
-
-	//check if we have listeners left to consume the produced dispatchListeners, blocking wait otherwise
-	for len(watcher.listeners.m) == 0 {
-		//fmt.Println("Waiting for new LED Listener ...")
-		watcher.listenerNonZeroCondLock.Lock()
-		watcher.listenerNonZeroCond.Wait() //wait till at least one listener is present
-		watcher.listenerNonZeroCondLock.Unlock()
-		//fmt.Println("... done waiting , at least one LED state listener registered!")
-	}
 
 
 	//Inform listeners about change
 	if hasChanged {
+		//check if we have listeners left to consume the produced dispatchListeners, blocking wait otherwise
+		for len(watcher.listeners.m) == 0 {
+			//fmt.Println("Waiting for new LED Listener ...")
+			watcher.listenerNonZeroCond.L.Lock()
+			watcher.listenerNonZeroCond.Wait() //wait till at least one listener is present
+			watcher.listenerNonZeroCond.L.Unlock()
+			//fmt.Println("... done waiting , at least one LED state listener registered!")
+		}
+
+
 		//log.Printf("INFORMING LISTENERS Changed elements %+v for new LED sate: %+v\n", ledsChanged, watcher.ledState)
 		watcher.listeners.Lock()
 
@@ -209,6 +206,7 @@ func (watcher *HIDKeyboardLEDStateWatcher) dispatchListeners(state byte) {
 		watcher.listeners.Unlock()
 		//log.Println("...END INFORMING LISTENERS")
 	}
+	//If there's no change, we ignore the new state
 }
 
 /*
@@ -217,9 +215,6 @@ intendedChange: Mask values combined with logical or, to indicate which LEDs are
 return value changed: Mask values combined with logical or, indicating which LED actually changed in order to stop waiting
  */
 func (kbd *HIDKeyboard) WaitLEDStateChange(intendedChange byte, timeout time.Duration) (changed *HIDLEDState,err error) {
-
-	//ToDo: If neW LED state is 0 (single LED on and is turned off) any doesn't trigger
-
 	//register state change listener
 	l := kbd.LEDWatcher.CreateAndAddNewListener()
 	defer kbd.LEDWatcher.removeListener(l)
@@ -240,7 +235,7 @@ func (kbd *HIDKeyboard) WaitLEDStateChange(intendedChange byte, timeout time.Dur
 		select {
 		case ledsChanged := <- l.changedLeds:
 			//we have a state change, check relevance
-			fmt.Printf("LEDListener received state change on following LEDs %+v\n", ledsChanged)
+			//fmt.Printf("LEDListener received state change on following LEDs %+v\n", ledsChanged)
 			hasRelevantChange := false
 			relevantChanges := &HIDLEDState{}
 
@@ -270,11 +265,9 @@ func (kbd *HIDKeyboard) WaitLEDStateChange(intendedChange byte, timeout time.Dur
 				//fmt.Printf("LEDListener: the following changes have been relevant %+v\n", relevantChanges)
 				return relevantChanges, nil
 			}
-			//If here, there was a LED state change, but not one we want to use for triggering
+			//If here, there was a LED state change, but not one we want to use for triggering (continue outer loop, consuming channel data)
 		case <- time.After(remaining):
 			return nil, ErrTimeout
 		}
 	}
-
-	//return 0,nil
 }
