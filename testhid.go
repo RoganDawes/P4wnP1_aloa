@@ -58,9 +58,23 @@ func main() {
 
 	hidCtl, err := hid.NewHIDController("/dev/hidg0", "keymaps", "")
 
+	fmt.Println("Initial sleep to test if we capture LED state changes from the past, as soon as we start waiting (needed at boot)")
+	time.Sleep(3 * time.Second)
+
+	//ToDo: Test multiple waits in separate goroutines
+
+	//Test repeat single trigger on any LED
+	fmt.Println("Waiting for any repeted LED state change (5 times frequently), wait timeout after 20 seconds...")
+	trigger, err := hidCtl.Keyboard.WaitLEDStateChangeRepeated(hid.MaskAny, 5, time.Millisecond*500, 20*time.Second)
+	if err != nil {
+		fmt.Printf("Waiting aborted with error: %v\n", err)
+	} else {
+		fmt.Printf("Triggered by %+v\n", trigger)
+	}
+
 	//Test single trigger on any LED
-	fmt.Println("Waiting for any LED state change for 15 seconds")
-	trigger, err := hidCtl.Keyboard.WaitLEDStateChange(hid.MaskAny, 15*time.Second)
+	fmt.Println("Waiting for any LED single state change, timeout after 15 seconds")
+	trigger, err = hidCtl.Keyboard.WaitLEDStateChange(hid.MaskAny, 15*time.Second)
 	if err != nil {
 		fmt.Printf("Waiting aborted with error: %v\n", err)
 	} else {
@@ -71,8 +85,17 @@ func main() {
 
 
 	//Test single trigger on NUMLOCK LED (ignore CAPSLOCK, SCROLLLOCK etc.)
-	fmt.Println("Waiting for NUMLOCK LED state change for 15 seconds")
+	fmt.Println("Waiting for NUMLOCK LED state change, timeout after 15 seconds")
 	trigger, err = hidCtl.Keyboard.WaitLEDStateChange(hid.MaskNumLock, 15*time.Second)
+	if err != nil {
+		fmt.Printf("Waiting aborted with error: %v\n", err)
+	} else {
+		fmt.Printf("Triggered by %+v\n", trigger)
+	}
+
+	//Test single trigger on NUMLOCK LED (ignore CAPSLOCK, SCROLLLOCK etc.)
+	fmt.Println("Waiting for CAPSLOCK LED state change for 15 seconds")
+	trigger, err = hidCtl.Keyboard.WaitLEDStateChange(hid.MaskCapsLock, 15*time.Second)
 	if err != nil {
 		fmt.Printf("Waiting aborted with error: %v\n", err)
 	} else {
