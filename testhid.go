@@ -109,7 +109,7 @@ func TestMultiLEDTrigges(hidCtl *hid.HIDController, triggerMask byte) {
 	}
 }
 
-func TestCongruentLEDTrigges(hidCtl *hid.HIDController) {
+func TestConcurrentLEDTrigges(hidCtl *hid.HIDController) {
 	go TestMultiLEDTrigges(hidCtl, hid.MaskNumLock)
 	go TestMultiLEDTrigges(hidCtl, hid.MaskCapsLock)
 	go TestMultiLEDTrigges(hidCtl, hid.MaskCapsLock | hid.MaskScrollLock)
@@ -147,8 +147,41 @@ func main() {
 	//TestComboPress(hidCtl)
 	//TestLEDTriggers(hidCtl)
 	//TestStringTyping(hidCtl)
-	TestCongruentLEDTrigges(hidCtl)
+	//TestConcurrentLEDTrigges(hidCtl)
 
+	testcript := `
+		console.log("HID Script test for P4wnP1 rework");	//Print to internal console
+		layout("US"); 										//Switch to US keyboard layout
+		type("Some ASCII test text QWERTZ\n")				//Type text to target ('\n' translates to RETURN key)		
+
+		delay(200); 										//sleep 200 milliseconds
+		
+		waitLED(NUM | SCROLL, 2); 							//Wait for NumLock or ScrollLock LED change, abort after 2 seconds
+
+		layout("DE"); 										//Switch to German keyboard layout
+		type("Non ASCII: üÜöÖäÄ");							//Type non ASCII
+		press("ENTER");										//Introduce linebreak by pressing RETURN directly
+		press("RETURN");									//Alias
+
+		counter = 4;										//set a var ...
+		type("Pressing <ALT>+<TAB> "+ counter +" times\n");	//... and type it, along with a string
+		for (var i=0; i<counter; i++) {
+			press("ALT TAB");
+			delay(500)
+		}
+
+		//Test LED change based branching
+		result = waitLED(NUM | CAPS);						//Wait for change on NUM or CAPS LED only, without timeout, store result
+		console.log("Result: " + JSON.stringify(result));	//Log result object as JSON to internal console
+		if (result.NUM) {									//Branch depending on result of LED change 
+			type("NUMLock LED changed\n");
+		} else {
+			type("Seems CAPSLock LED changed\n");			
+		}
+	`
+
+	_,err = hidCtl.RunScript(testcript)
+	if err != nil {panic(err)}
 
 
 	/*

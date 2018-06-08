@@ -218,28 +218,54 @@ func (ctl *HIDController) CancelAllBackgroundJobs() error {
 
 //Function declarations for master VM
 //ToDo: Global mutex for VM callbacks (or better for atomar part of Keyboard.StringToPressKeySequence)
-func (ctl *HIDController) jsKbdWriteString(call otto.FunctionCall) (res otto.Value) {
+func (ctl *HIDController) jsType(call otto.FunctionCall) (res otto.Value) {
 	arg0 := call.Argument(0)
 	//fmt.Printf("JS type() called with: `%s` (%s)\n", arg0, arg0)
 
 	if !arg0.IsString() {
-		log.Printf("JavaScript: Wrong argument for `type`. `type` accepts a single String argument. Error location:  %v\n", call.CallerLocation())
+		log.Printf("HIDScript type: Wrong argument, 'type' accepts a single argument of type string. Error location:  %v\n", call.CallerLocation())
 		return
 	}
 
 	outStr,err := arg0.ToString()
 	if err != nil {
-		log.Printf("type error: couldn't convert `%s` to UTF-8 string\n", arg0)
+		log.Printf("HIDScript type: couldn't convert '%s' to UTF-8 string\n", arg0)
 		return
 	}
-	log.Printf("Typing `%s` on HID keyboard device `%s`\n", outStr, ctl.Keyboard.DevicePath)
+	log.Printf("HIDScript type: Typing '%s ...' on HID keyboard device '%s'\n", outStr[:15], ctl.Keyboard.DevicePath)
 	err = ctl.Keyboard.StringToPressKeySequence(outStr)
 	if err != nil {
-		log.Printf("type error: Couldn't type out `%s` on %v\n", outStr, ctl.Keyboard.DevicePath)
+		log.Printf("HIDScript type: Couldn't type out `%s` on %v\n", outStr, ctl.Keyboard.DevicePath)
 		return
 	}
 	return
 }
+
+func (ctl *HIDController) jsLayout(call otto.FunctionCall) (res otto.Value) {
+	arg0 := call.Argument(0)
+	//fmt.Printf("JS type() called with: `%s` (%s)\n", arg0, arg0)
+
+	if !arg0.IsString() {
+		log.Printf("HIDScript layout: Wrong argument, 'layout' accepts a single argument of type string. Error location:  %v\n", call.CallerLocation())
+		return
+	}
+
+	layoutName,err := arg0.ToString()
+	if err != nil {
+		//shouldn't happen
+		log.Printf("HIDScript layout: couldn't convert '%s' to string\n", arg0)
+		return
+	}
+
+	log.Printf("HIDScript layout: Setting layout to '%s'\n", layoutName)
+	err = ctl.Keyboard.SetActiveLanguageMap(layoutName)
+	if err != nil {
+		log.Printf("HIDScript layout: Couldn't set layout `%s`: %v\n", layoutName, err)
+		return
+	}
+	return
+}
+
 
 func (ctl *HIDController) jsDelay(call otto.FunctionCall) (res otto.Value) {
 
@@ -247,17 +273,17 @@ func (ctl *HIDController) jsDelay(call otto.FunctionCall) (res otto.Value) {
 	//fmt.Printf("JS delay() called with: `%s` (%s)\n", arg0, arg0)
 
 	if !arg0.IsNumber() {
-		log.Printf("JavaScript: Wrong argument for `delay`. `delay` accepts a single Number argument. Error location:  %v\n", call.CallerLocation())
+		log.Printf("HIDScript delay: Wrong argument, delay accepts a single argument ot type number. Error location:  %v\n", call.CallerLocation())
 		return
 	}
 
 	fDelay,err := arg0.ToFloat()
 	if err != nil {
-		log.Printf("Javascript `delay` error: couldn't convert `%v` to float\n", arg0)
+		log.Printf("HIDScript delay: Error couldn't convert `%v` to float\n", arg0)
 		return
 	}
 	delay := int(fDelay)
-	log.Printf("HID script, sleeping `%v` milliseconds\n", delay)
+	log.Printf("HIDScript delay: Sleeping `%v` milliseconds\n", delay)
 	time.Sleep(time.Millisecond * time.Duration(int(delay)))
 
 	return
@@ -270,19 +296,19 @@ func (ctl *HIDController) jsPress(call otto.FunctionCall) (res otto.Value) {
 	//fmt.Printf("JS delay() called with: `%s` (%s)\n", arg0, arg0)
 
 	if !arg0.IsString() {
-		log.Printf("JavaScript: Wrong argument for 'press'. 'press' accepts a single argument of type string.\n\tError location:  %v\n", call.CallerLocation())
+		log.Printf("HIDScript press: Wrong argument for 'press'. 'press' accepts a single argument of type string.\n\tError location:  %v\n", call.CallerLocation())
 		return
 	}
 
 	comboStr,err := arg0.ToString()
 	if err != nil {
-		log.Printf("Javascript 'press' error: couldn't convert '%v' to string\n", arg0)
+		log.Printf("HIDScript press: Error couldn't convert '%v' to string\n", arg0)
 		return
 	}
-	log.Printf("Pressing combo '%s'\n", comboStr)
+	log.Printf("HIDScript press: Pressing combo '%s'\n", comboStr)
 	err = ctl.Keyboard.StringToPressKeyCombo(comboStr)
 	if err != nil {
-		log.Printf("Javascript `delay` error: couldn't convert `%v` to string\n", arg0)
+		log.Printf("HIDScript press: Error couldn't convert `%v` to string\n", arg0)
 		oErr,vErr := otto.ToValue(err)
 		if vErr == nil { return oErr}
 		return
@@ -290,15 +316,86 @@ func (ctl *HIDController) jsPress(call otto.FunctionCall) (res otto.Value) {
 	return
 }
 
+func (ctl *HIDController) jsWaitLED(call otto.FunctionCall) (res otto.Value) {
+	//arg0 has to be of type number, representing an LED MASK
+	//arg1 is optional and represents the timeout in seconds, in case it isn't present, we set timeout to a year (=infinite in our context ;-))
+	arg0 := call.Argument(0)
+	arg1 := call.Argument(1)
+	log.Printf("HIDScript: Called WaitLED(%v, %v)\n", arg0, arg1)
+	maskInt, err := arg0.ToInteger()
+	if err != nil || !arg0.IsNumber() || !(maskInt >= 0 && maskInt <= MaskAny) {
+		//We don't mention KANA and COMPOSE in the error message
+		log.Printf("HIDScript WaitLED: First argument for `waitLED` has to be a bitmask representing LEDs (NUM | CAPS | SCROLL | ANY).\nError location:  %v\n", call.CallerLocation())
+		return
+	}
+
+	mask := byte(maskInt)
+	//fmt.Printf("Mask: %d\n", mask )
+
+	timeout := time.Hour * 24 * 365
+	switch {
+	case arg1.IsUndefined():
+		log.Printf("HIDScript WaitLED: No timeout given setting to a year\n")
+	case arg1.IsNumber():
+//		log.Printf("Timeout given: %v\n", arg1)
+		timeoutInt, err := arg1.ToInteger()
+		if err != nil || timeoutInt < 0 {
+			log.Printf("HIDScript WaitLED: Second argument for `waitLED` is the timeout in seconds and has to be given as positive interger, but '%d' was given!\n", arg1)
+			return
+		}
+		timeout = time.Duration(timeoutInt) * time.Second
+	default:
+		log.Printf("HIDScript WaitLED: Second argument for `waitLED` is the timeout in seconds and has to be given as interger or omitted for infinite timeout\n")
+		return
+	}
+
+	changed,err := ctl.Keyboard.WaitLEDStateChange(mask, timeout)
+	//fmt.Printf("Changed %+v\n", changed)
+
+	res,_ = call.Otto.ToValue(struct{
+		TIMEOUT bool
+		NUM bool
+		CAPS bool
+		SCROLL bool
+		COMPOSE bool
+		KANA bool
+	}{
+		TIMEOUT: err == ErrTimeout,
+		NUM: err == nil && changed.NumLock,
+		CAPS: err == nil && changed.CapsLock,
+		SCROLL: err == nil && changed.ScrollLock,
+		COMPOSE: err == nil && changed.Compose,
+		KANA: err == nil && changed.Kana,
+	})
+	return
+}
 
 
 func (ctl *HIDController) initMasterVM() (err error) {
 	ctl.vmMaster = otto.New()
-	err = ctl.vmMaster.Set("type", ctl.jsKbdWriteString)
+	err = ctl.vmMaster.Set("NUM", MaskNumLock)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("CAPS", MaskCapsLock)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("SCROLL", MaskScrollLock)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("COMPOSE", MaskCompose)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("KANA", MaskKana)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("ANY", MaskAny)
+	if err != nil { return err }
+
+
+	err = ctl.vmMaster.Set("type", ctl.jsType)
 	if err != nil { return err }
 	err = ctl.vmMaster.Set("delay", ctl.jsDelay)
 	if err != nil { return err }
 	err = ctl.vmMaster.Set("press", ctl.jsPress)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("waitLED", ctl.jsWaitLED)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("layout", ctl.jsLayout)
 	if err != nil { return err }
 	return nil
 }
