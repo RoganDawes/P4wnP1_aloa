@@ -11,6 +11,7 @@ import (
 	"time"
 	"math/rand"
 	"regexp"
+	"path/filepath"
 )
 
 var (
@@ -46,10 +47,8 @@ func NewKeyboard(devicePath string, resourcePath string) (keyboard *HIDKeyboard,
 	keyboard.KeyDelay = 0
 	keyboard.KeyDelayJitter = 0
 
-	//ToDo: Load whole language map folder, for now single layout testing
-	err = keyboard.LoadLanguageMapFromFile(resourcePath + "/common.json")
-	if err != nil {return nil, err}
-	err = keyboard.LoadLanguageMapFromFile(resourcePath + "/DE_ASCII.json")
+	//Load available language maps
+	err = keyboard.LoadLanguageMapDir(resourcePath)
 	if err != nil {return nil, err}
 
 	//Init LED sate
@@ -59,10 +58,86 @@ func NewKeyboard(devicePath string, resourcePath string) (keyboard *HIDKeyboard,
 	return
 }
 
+func (kbd *HIDKeyboard) LoadLanguageMapDir(dirpath string) (err error) {
+	folder,err := filepath.Abs(dirpath)
+	if err != nil { return err }
+	var mapFiles []string
+	err = filepath.Walk(string(folder),  func(path string, info os.FileInfo, err error) error {
+		if err != nil { return err } // prevent panic due to access failures
+		if !info.IsDir() && (strings.ToLower(filepath.Ext(info.Name())) == ".json") {
+			fp := path
+			abs,pErr := filepath.Abs(fp)
+			if pErr == nil {
+				mapFiles = append(mapFiles, abs)
+			} else {
+				//print warning
+				log.Printf("Ignoring map file '%s', retrieving absolute path failed!\n", fp)
+			}
+		}
+		return nil
+	})
+	if err != nil { return err }
+
+	//mapFiles contains all absolute path of files with extension ".json"
+	var commonMAP *HIDKeyboardLanguageMap
+	for _,mapFile := range mapFiles {
+		kbdmap, lErr := loadKeyboardLanguageMapFromFile(mapFile)
+		if lErr != nil {
+			//Warn on error
+			log.Printf("Skipping language map file '%s' due to load error: %v\n", mapFile, lErr)
+			continue
+		}
+		if strings.ToUpper(kbdmap.Name) == "COMMON" {
+			//this is the map with common keys
+			//mapping in this file will be reflected to all other maps, in case the ARE NOT ALREADY PRESENT
+			commonMAP = kbdmap
+		} else {
+			if kbd.LanguageMaps == nil {
+				kbd.LanguageMaps = make(map[string]*HIDKeyboardLanguageMap)
+			}
+			kbd.LanguageMaps[strings.ToUpper(kbdmap.Name)] = kbdmap
+
+			if kbd.ActiveLanguageLayout == nil && kbdmap.Name != "COMMON" {
+				kbd.ActiveLanguageLayout = kbdmap
+			}
+		}
+	}
+
+	// If no language maps beside "COMMON" have been loaded, return error
+	if len(kbd.LanguageMaps) == 0 {
+		if commonMAP == nil {
+			return errors.New("Couldn't load any language map")
+		} else {
+			return errors.New("Couldn't load any language map, beside 'COMMON' map")
+		}
+
+	}
+
+	// At this point, all map files not named "COMMON" should be added to kbd.LanguageMaps
+	// In case a map with name "COMMON" was found, it should be stored in commonMap
+	// If commonMap was found, the contained mappings are added to the other language maps,
+	// in case the dedicated mapping doesn't exist already. F.e. the mapping for "F1" is only
+	// needed in map "COMMON" and added to all other maps, except they specify the "F1" mapping
+	// themselves.
+	if commonMAP != nil {
+		//iterate over all common mappings
+		for name,reports := range commonMAP.Mapping {
+			//iterate over all loaded maps
+			for _,lMap := range kbd.LanguageMaps {
+				//check if the mapping isn't already present and add it if needed
+				if _,alreadyPresent := lMap.Mapping[name]; !alreadyPresent {
+					lMap.Mapping[name] = reports
+				}
+			}
+		}
+	}
+
+	return
+}
 
 func (kbd *HIDKeyboard) LoadLanguageMapFromFile(filepath string) (err error) {
 	//if this is the first map loaded, set as active Map
-	kbdmap, err := LoadKeyboardLanguageMapFromFile(filepath)
+	kbdmap, err := loadKeyboardLanguageMapFromFile(filepath)
 	if err != nil { return err }
 
 	if kbd.LanguageMaps == nil {
@@ -70,9 +145,10 @@ func (kbd *HIDKeyboard) LoadLanguageMapFromFile(filepath string) (err error) {
 	}
 	kbd.LanguageMaps[strings.ToUpper(kbdmap.Name)] = kbdmap
 
-	if kbd.ActiveLanguageLayout == nil {
+	if kbd.ActiveLanguageLayout == nil && kbdmap.Name != "COMMON" {
 		kbd.ActiveLanguageLayout = kbdmap
 	}
+
 
 	return nil
 }
@@ -97,10 +173,56 @@ func (kbd *HIDKeyboard) SetActiveLanguageMap(name string) (err error) {
 	return nil
 }
 
-func (kbd *HIDKeyboard) SendString(str string) (err error) {
+func (kbd *HIDKeyboard) StringToPressKeyCombo(comboStr string) (err error) {
+	report,err := kbd.StringToKeyCombo(comboStr)
+	if err != nil { return err }
+	seq := []KeyboardOutReport{*report} //convert to single report sequence
+	err = kbd.PressKeySequence(seq)
+	return
+}
+
+
+func (kbd *HIDKeyboard) StringToKeyCombo(comboStr string) (result *KeyboardOutReport, err error) {
 	//ToDo: Check if keyboard device file exists
 	if kbd.ActiveLanguageLayout == nil {
-		return errors.New("No language mapping active, couldn't send string!")
+		return nil,errors.New("No language mapping active, couldn't send key combo!")
+	}
+
+	//split key sequence describe by string into single key names
+	keyNames := rpSplit.Split(comboStr, -1)
+	if len(keyNames) == 0 {
+		return nil,errors.New("No keys to press")
+	}
+	if len(keyNames) == 1 && len(keyNames[0]) == 0 {
+		return nil,errors.New("No keys to press")
+	}
+
+	//fmt.Printf("KeyNames %d: %+v\n", len(keyNames), keyNames)
+
+	//try to convert splitted keynames to reports
+	comboReports := make([]*KeyboardOutReport,0)
+	for _,keyname := range keyNames {
+		if len(keyname) == 0 { continue } //ignore empty keynames
+		report,err := kbd.mapKeyNameToReport(keyname)
+		if err == nil {
+			//fmt.Printf("Keyname '%s' mapped to report %+v\n", keyname, report)
+			comboReports = append(comboReports, report)
+		} else {
+			return nil,errors.New(fmt.Sprintf("Couldn't build key combo '%s' because of mapping error in keyname '%s': %v", comboStr, keyname, err))
+		}
+	}
+
+	//fmt.Printf("Combo reports for '%s': %+v\n", comboStr, comboReports)
+
+	//combine reports
+	result,err = combineReports(comboReports)
+	return
+}
+
+func (kbd *HIDKeyboard) StringToPressKeySequence(str string) (err error) {
+	//ToDo: Check if keyboard device file exists
+	if kbd.ActiveLanguageLayout == nil {
+		return errors.New("No language mapping active, couldn't send key sequence!")
 	}
 	for _,runeVal := range str {
 		strRune := string(runeVal)
@@ -120,54 +242,101 @@ func (kbd *HIDKeyboard) SendString(str string) (err error) {
 	return nil
 }
 
-// mapKeyStringToReports tries to translate a key expressed by a string description to a SINGLE
+// mapKeyNameToReport tries to translate a key expressed by a string description to a SINGLE
 // report (with respect to the chosen language map), which could be sent to a keyboard device.
 // Most printable characters like 'a' or 'A' could be represented by a single rune (f.e. `a` or `A`).
-// mapKeyStringToReports translates uppercase alphabetical keys [A-Z] to the respective lower case,
+// The parameter `keyName` is of type string (instead of rune) because there're keys which
+// couldn't be described with a single rune, for example: 'F1', 'ESCAPE' ...
+//
+// mapKeyNameToReport translates uppercase alphabetical keys [A-Z] to the respective lower case,
 // before trying to map, in order to avoid fetching reports with [SHIFT] modifiers (this assures
 // that 'A' gets mapped to the USB key KEY_A, not to the USB key KEY_A combined with the [SHIFT]
 // modifier).
-// The parameter `keyDescription` is of type string (instead of rune) because there're keys which
-// couldn't be described with a single rune, for example: 'F1', 'ESCAPE' ...
 //
-// mapKeyStringToReports could return a report, containing only modifiers (f.e. if
-// keyDescription = 'CTRL'). Such reports could be used to build KeyCombos, by mixing them together.
+// There're result reports containing only modifiers (f.e. if keyName = 'CTRL'). Such reports could be used
+// to build KeyCombos, by mixing them together.
 //
-// The language maps could contain mappings, containing multiple reports, as they sometime represent
-// printable runes consisting of a sequence of multiple keys (f.e. `^` in the German layout maps
-// to a report slice of the key for [^] followed by the key [SPACE], which is needed to print the character).
-// mapKeyStringToReports returns ONLY THE FIRST REPORT of such slices, as this is closer to the representation.
-// Additionally, single reports could be combimned into a key-combo, which wouldn't be possible with a ordered
-// sequence of reports.
-func (kbd *HIDKeyboard) TmapKeyStringToReports(keyDescription string) (report *KeyboardOutReport,err error) {
-	// Assure keyDescription contains no spaces, else error
-	r := rpSplit.Split(keyDescription, -1)
+// The language maps consist mappings from UTF-8 runes to reports sequences and keyNames to single reports.
+// Examples for sequences are mostly printable runes which are built from multiple sequential key presses
+// (mostly started with DEAD KEYS) like the `^` rune on a german keyboard layout, which has to be created by
+// pressing [^] followed by [SPACE].
+// The purpose of mapKeyNameToReport is to resolve the given keyname to A SINGLE REPORT, thus report sequences
+// are truncated to the first report only, before returned. This is the trade-off between assuring to return a
+// single report per keyname versus managing separated mapping files for rune-mapping and key-mapping.
+func (kbd *HIDKeyboard) mapKeyNameToReport(keyName string) (report *KeyboardOutReport,err error) {
+	// Assure keyName contains no spaces, else error
+	r := rpSplit.Split(keyName, -1)
 	if len(r) > 1 {
-		return nil, errors.New("keyDescription mustn't contain spaces")
+		return nil, errors.New(fmt.Sprintf("Error mapping keyName '%s', unallowed contains spaces!", keyName))
 	}
-	keyDescription = strings.ToUpper(r[0]) //reassign trimmed, upper case version
+	keyName = strings.ToUpper(r[0]) //reassign trimmed, upper case version
 
 
-	// If keyDescription consists of a single upper case letter, translate to lowercase
-	if rpSingleUpperLetter.MatchString(keyDescription) { keyDescription = strings.ToLower(keyDescription)}
+	// If keyName consists of a single upper case letter, translate to lowercase
+	if rpSingleUpperLetter.MatchString(keyName) { keyName = strings.ToLower(keyName)}
 
-	// Try to find a matching mapping in 1) current language map, followed by 2) common map (the latter
-	// holds mappings like 'F1', 'CTRL' etc which are more or less language independent. The common
-	// map is only accessed, if there was no successful mapping in the chosen language map (priority
-	// as more specialized)
-	c,ok := kbd.LanguageMaps["COMMON"]
-	if !ok { return nil,errors.New("Keyboardmap 'common' not found")}
-	common := c.Mapping
-
-	reports := common[keyDescription]
-	if len(reports) > 1 {
-		//store first report as result
-		report = &reports[0]
+	// Try to find a matching mapping in current language map
+	if kbd.ActiveLanguageLayout == nil {
+		return nil, errors.New("No language mapping selected")
 	}
-
-	fmt.Printf("Descr '%s': %+v\n", keyDescription, )
-	return
+	if reports,found := kbd.ActiveLanguageLayout.Mapping[keyName]; found {
+		//report(s) found, return only first one
+		if len(reports) > 0 {
+			return &reports[0], nil
+		} else {
+			return nil, errors.New(fmt.Sprintf("Mapping for key '%s' found in language map named '%s', but mapping is empty!", keyName, kbd.ActiveLanguageLayout.Name))
+		}
+	} else {
+		return nil, errors.New(fmt.Sprintf("Couldn't find mapping for key '%s' in language map named '%s'!", keyName, kbd.ActiveLanguageLayout.Name))
+	}
 }
+
+// combineReports combines a slice of output reports into a single report (for key combinations).
+// The following rules apply:
+// 1) Modifiers are combined with logical or
+// 2) Unique keys are filled into the keys array, one-by-one
+// 3) Duplicated keys are ignore
+// 4) Only the first 6 keys are regarded (without duplicates), the rest is ignored
+func combineReports(reports []*KeyboardOutReport) (result *KeyboardOutReport, err error) {
+	r := KeyboardOutReport{}
+	keys := make(map[byte]bool)
+	keyCount := 0
+	maxKeys := 6
+
+	ADDREPORTLOOP:
+	for _,report := range reports {
+		//Add modifiers
+		r.Modifiers |= report.Modifiers
+
+		// add keys to map
+		// Note: This could be interrupted in the middle of a report if too many keys are contained, while the
+		// modifiers of this report are already applied. This is a corner case, we don't take care of (happens f.e.
+		// if the first report contains 2 keys and the second one 6 keys with modifiers)
+		for _,key := range report.Keys {
+			if key != 0 { //Ignore "no key"
+				if !keys[key] {
+					keys[key] = true
+					keyCount++
+					if keyCount >= maxKeys {
+						break ADDREPORTLOOP
+					}
+				}
+			}
+		}
+	}
+
+	//keys should contain maxKeys at max
+	keyCount = 0
+	for k,_ := range keys {
+		r.Keys[keyCount] = k
+		keyCount++
+		if keyCount >= maxKeys { break }
+	}
+
+	return &r, nil
+}
+
+
 
 // PressKeySequence writes the output reports given in `reports` to the keyboard device in sequential
 // order. A all empty report is automatically appended in order to release all keys after finishing
@@ -224,7 +393,7 @@ func (klm *HIDKeyboardLanguageMap) StoreToFile(filePath string) (err error) {
 	return ioutil.WriteFile(filePath, mapJson, os.ModePerm)
 }
 
-func LoadKeyboardLanguageMapFromFile(filePath string) (result *HIDKeyboardLanguageMap, err error) {
+func loadKeyboardLanguageMapFromFile(filePath string) (result *HIDKeyboardLanguageMap, err error) {
 	result = &HIDKeyboardLanguageMap{}
 	mapJson, err := ioutil.ReadFile(filePath)
 	if err != nil { return nil,err }
@@ -314,6 +483,15 @@ func (kr *KeyboardOutReport) UnmarshalJSON(b []byte) error {
 
 
 	return nil
+}
+
+func (kr KeyboardOutReport) String() string {
+	bytes,err := kr.MarshalJSON()
+	if err == nil {
+		return string(bytes)
+	} else {
+		return fmt.Sprintf("%+v", kr) //ToDo: check if this works or calls a loop
+	}
 }
 
 

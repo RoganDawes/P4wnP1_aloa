@@ -68,8 +68,24 @@
             "NUM": [{"Modifiers": [], "Keys": ["KEY_NUMLOCK"]}],
             "CAPSLOCK": [{"Modifiers": [], "Keys": ["KEY_CAPSLOCK"]}],
             "CAPS": [{"Modifiers": [], "Keys": ["KEY_CAPSLOCK"]}],
+            "TABULATOR": [{"Modifiers": [], "Keys": ["KEY_TAB"]}],
+            "TAB": [{"Modifiers": [], "Keys": ["KEY_TAB"]}],
 
             "COMPOSE": [{"Modifiers": [], "Keys": ["KEY_COMPOSE"]}],
-            "102ND": [{"Modifiers": [], "Keys": ["KEY_102ND"]}]
-	}
+            "102ND": [{"Modifiers": [], "Keys": ["KEY_102ND"]}],
+
+            "F13": [{"Modifiers": [], "Keys": ["KEY_F13"]}],
+            "F14": [{"Modifiers": [], "Keys": ["KEY_F14"]}],
+            "F15": [{"Modifiers": [], "Keys": ["KEY_F15"]}],
+            "F16": [{"Modifiers": [], "Keys": ["KEY_F16"]}],
+            "F17": [{"Modifiers": [], "Keys": ["KEY_F17"]}],
+            "F18": [{"Modifiers": [], "Keys": ["KEY_F18"]}],
+            "F19": [{"Modifiers": [], "Keys": ["KEY_F19"]}],
+            "F20": [{"Modifiers": [], "Keys": ["KEY_F20"]}],
+            "F21": [{"Modifiers": [], "Keys": ["KEY_F21"]}],
+            "F22": [{"Modifiers": [], "Keys": ["KEY_F22"]}],
+            "F23": [{"Modifiers": [], "Keys": ["KEY_F23"]}],
+            "F24": [{"Modifiers": [], "Keys": ["KEY_F24"]}]
+
+    }
 }

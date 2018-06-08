@@ -51,7 +51,7 @@ func main() {
 	err := mapDeASCII.StoreToFile("/tmp/DE_ASCII.json")
 	if err != nil { log.Fatal(err)}
 
-	testmap, err := hid.LoadKeyboardLanguageMapFromFile("keymaps/DE_ASCII.json")
+	testmap, err := hid.loadKeyboardLanguageMapFromFile("keymaps/DE_ASCII.json")
 	if err != nil { log.Fatal(err)}
 	fmt.Println(testmap)
 	*/
@@ -59,16 +59,25 @@ func main() {
 	hidCtl, err := hid.NewHIDController("/dev/hidg0", "keymaps", "")
 	if err != nil {panic(err)}
 
-	_,err = hidCtl.Keyboard.TmapKeyStringToReports("INS")
-	if err != nil {panic(err)}
-	_,err = hidCtl.Keyboard.TmapKeyStringToReports("F1")
-	if err != nil {panic(err)}
-	_,err = hidCtl.Keyboard.TmapKeyStringToReports("F13")
-	if err != nil {panic(err)}
-	_,err = hidCtl.Keyboard.TmapKeyStringToReports(" F3 ")
-	if err != nil {panic(err)}
+	testcombos := []string {"SHIFT 1", "ENTER", "ALT TAB", "ALT TABULATOR", "  WIN ", "GUI "}
+	for _,comboStr := range testcombos {
+		fmt.Printf("Pressing combo '%s'\n", comboStr)
+		err := hidCtl.Keyboard.StringToPressKeyCombo(comboStr)
+		if err == nil {
+			fmt.Printf("... '%s' pressed sleeping 2s\n", comboStr)
+			time.Sleep(2000 * time.Millisecond)
+		} else {
+			fmt.Printf("Error pressing combo '%s': %v\n", comboStr, err)
+		}
+	}
+
+	fmt.Printf("Chosen keyboard language mapping '%s'\n", hidCtl.Keyboard.ActiveLanguageLayout.Name)
+
+
 
 	fmt.Println("Initial sleep to test if we capture LED state changes from the past, as soon as we start waiting (needed at boot)")
+
+
 	time.Sleep(3 * time.Second)
 
 	//ToDo: Test multiple waits in separate goroutines
@@ -122,17 +131,22 @@ func main() {
 
 //	ascii := " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
 //	special := "§°üÜöÖäÄµ€ß¹²³⁴⁵⁶⁷⁸⁹⁰¼½¬„“¢«»æſðđŋħĸł’¶ŧ←↓→øþ"
-//	err = keyboard.SendString("Test:" + ascii + "\t" + special)
+//	err = keyboard.StringToPressKeySequence("Test:" + ascii + "\t" + special)
 	if err != nil { fmt.Println(err)}
 
 	script := `
-		kString(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~");
-		kString("\n")
-		kString("Waiting 500ms ...\n");
+		for (i=0; i<10; i++) {
+			press("CAPS")
+			delay(500)
+		}
+
+		type(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~");
+		type("\n")
+		type("Waiting 500ms ...\n");
 		delay(500)
-		kString("... done\n");
-		kString("§°üÜöÖäÄµ€ß¹²³⁴⁵⁶⁷⁸⁹⁰¼½¬„“¢«»æſðđŋħĸł’¶ŧ←↓→øþ");
-		kString("\n")
+		type("... done\n");
+		type("§°üÜöÖäÄµ€ß¹²³⁴⁵⁶⁷⁸⁹⁰¼½¬„“¢«»æſðđŋħĸł’¶ŧ←↓→øþ");
+		type("\n")
 		
 		console.log("Log message from JS"); 
 	`
