@@ -57,10 +57,9 @@ func TestLEDTriggers(hidCtl *hid.HIDController) {
 	fmt.Println("Initial sleep to test if we capture LED state changes from the past, as soon as we start waiting (needed at boot)")
 	time.Sleep(3 * time.Second)
 
-	//ToDo: Test multiple waits in separate goroutines
 
-	//Test repeat single trigger on any LED
-	fmt.Println("Waiting for any repeted LED state change (5 times frequently), wait timeout after 20 seconds...")
+	//Test repeat trigger on any LED
+	fmt.Println("Waiting for any repeated LED state change (5 times frequently), wait timeout after 20 seconds...")
 	trigger, err := hidCtl.Keyboard.WaitLEDStateChangeRepeated(hid.MaskAny, 5, time.Millisecond*500, 20*time.Second)
 	if err != nil {
 		fmt.Printf("Waiting aborted with error: %v\n", err)
@@ -99,6 +98,28 @@ func TestLEDTriggers(hidCtl *hid.HIDController) {
 	}
 }
 
+func TestMultiLEDTrigges(hidCtl *hid.HIDController, triggerMask byte) {
+	//Test repeat trigger on given LED
+	fmt.Printf("Waiting for repeated LED state change (5 times frequently) of mask %v, wait timeout after 20 seconds...\n", triggerMask)
+	trigger, err := hidCtl.Keyboard.WaitLEDStateChangeRepeated(triggerMask, 5, time.Millisecond*500, 20*time.Second)
+	if err != nil {
+		fmt.Printf("Waiting aborted with error: %v\n", err)
+	} else {
+		fmt.Printf("Triggered by %+v\n", trigger)
+	}
+}
+
+func TestCongruentLEDTrigges(hidCtl *hid.HIDController) {
+	go TestMultiLEDTrigges(hidCtl, hid.MaskNumLock)
+	go TestMultiLEDTrigges(hidCtl, hid.MaskCapsLock)
+	go TestMultiLEDTrigges(hidCtl, hid.MaskCapsLock | hid.MaskScrollLock)
+	time.Sleep(2*time.Second)
+	go TestMultiLEDTrigges(hidCtl, hid.MaskAny)
+	TestMultiLEDTrigges(hidCtl, hid.MaskKana)
+
+}
+
+
 func TestStringTyping(hidCtl *hid.HIDController) {
 	fmt.Println("Typing:")
 	fmt.Println(StringAscii)
@@ -117,7 +138,7 @@ func main() {
 	//	hidCtl.Keyboard.KeyDelayJitter = 200
 
 	fmt.Printf("Available language maps:\n%v\n",hidCtl.Keyboard.ListLanguageMapNames())
-	err = hidCtl.Keyboard.SetActiveLanguageMap("US") //first loaded language map is set by default
+	err = hidCtl.Keyboard.SetActiveLanguageMap("DE") //first loaded language map is set by default
 	if err != nil { fmt.Println(err)}
 	fmt.Printf("Chosen keyboard language mapping '%s'\n", hidCtl.Keyboard.ActiveLanguageLayout.Name)
 
@@ -125,7 +146,10 @@ func main() {
 
 	//TestComboPress(hidCtl)
 	//TestLEDTriggers(hidCtl)
-	TestStringTyping(hidCtl)
+	//TestStringTyping(hidCtl)
+	TestCongruentLEDTrigges(hidCtl)
+
+
 
 	/*
 
