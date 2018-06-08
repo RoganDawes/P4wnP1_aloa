@@ -161,7 +161,7 @@ func (ctl *HIDController) RunScript(script string) (val otto.Value, err error) {
 	return
 }
 
-func (ctl *HIDController) RunScriptAsync(script string) (avmId int, avm *AsyncOttoVM, err error) {
+func (ctl *HIDController) StartScriptAsBackgroundJob(script string) (avmId int, avm *AsyncOttoVM, err error) {
 	//fetch next free vm from pool
 	avmId,avm,err = ctl.NextUnusedVM()
 	if err != nil { return 0, nil, err }
@@ -172,21 +172,21 @@ func (ctl *HIDController) RunScriptAsync(script string) (avmId int, avm *AsyncOt
 	return
 }
 
-func (ctl *HIDController) CancelAsyncScript(avmId int) (err error) {
-	if avmId < 0 || avmId >= MAX_VM {
+func (ctl *HIDController) CancelBackgroundJob(jobId int) (err error) {
+	if jobId < 0 || jobId >= MAX_VM {
 		return errors.New("Invalid Id for AsyncOttoVM")
 	}
-	return ctl.vmPool[avmId].Cancel()
+	return ctl.vmPool[jobId].Cancel()
 }
 
-func (ctl *HIDController) WaitAsyncScriptResult(avmId int) (otto.Value, error) {
+func (ctl *HIDController) WaitBackgroundJobResult(avmId int) (otto.Value, error) {
 	if avmId < 0 || avmId >= MAX_VM {
 		return otto.Value{}, errors.New("Invalid Id for AsyncOttoVM")
 	}
 	return ctl.vmPool[avmId].WaitResult()
 }
 
-func (ctl *HIDController) CurrentlyWorkingVmIDs() (res []int) {
+func (ctl *HIDController) GetRunningBackgroundJobs() (res []int) {
 	res = make([]int,0)
 	for i := 0; i< MAX_VM; i++ {
 		if ctl.vmPool[i].IsWorking() {
@@ -197,7 +197,7 @@ func (ctl *HIDController) CurrentlyWorkingVmIDs() (res []int) {
 }
 
 
-func (ctl *HIDController) CurrentlyWorkingVMs() (res []*AsyncOttoVM) {
+func (ctl *HIDController) currentlyWorkingVMs() (res []*AsyncOttoVM) {
 	res = make([]*AsyncOttoVM,0)
 	for i := 0; i< MAX_VM; i++ {
 		if ctl.vmPool[i].IsWorking() {
@@ -207,7 +207,7 @@ func (ctl *HIDController) CurrentlyWorkingVMs() (res []*AsyncOttoVM) {
 	return
 }
 
-func (ctl *HIDController) CancelAllVMs() error {
+func (ctl *HIDController) CancelAllBackgroundJobs() error {
 	for i := 0; i< MAX_VM; i++ {
 		if ctl.vmPool[i].IsWorking() {
 			ctl.vmPool[i].Cancel()

@@ -8,32 +8,13 @@ import(
 	"time"
 )
 
-func Test() {
-	filepath := "/dev/hidg0"
+var (
+	StringAscii = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+	StringSpecial1 = "§°üÜöÖäÄµ€ß¹²³⁴⁵⁶⁷⁸⁹⁰¼½¬„“¢«»æſðđŋħĸł’¶ŧ←↓→øþ"
 
-	kbdRepEmpty := hid.NewKeyboardOutReport(0)
-	kbdRep_a := hid.NewKeyboardOutReport(0, hid.HID_KEY_A)
-	kbdRep_A := hid.NewKeyboardOutReport(hid.HID_MOD_KEY_LEFT_SHIFT, hid.HID_KEY_A)
+)
 
-	err := kbdRepEmpty.WriteTo(filepath)
-	if err != nil {log.Fatal(err)}
-	err = kbdRep_a.WriteTo(filepath)
-	if err != nil {log.Fatal(err)}
-	err = kbdRepEmpty.WriteTo(filepath)
-	if err != nil {log.Fatal(err)}
-	err = kbdRep_A.WriteTo(filepath)
-	if err != nil {log.Fatal(err)}
-	err = kbdRepEmpty.WriteTo(filepath)
-	if err != nil {log.Fatal(err)}
-	err = kbdRep_A.WriteTo(filepath)
-	if err != nil {log.Fatal(err)}
-	err = kbdRepEmpty.WriteTo(filepath)
-	if err != nil {log.Fatal(err)}
-}
-
-
-func main() {
-	/*
+func TestMapCreation() {
 	//Define test keyboard map
 	mapDeASCII := hid.HIDKeyboardLanguageMap{
 		Name: "DE",
@@ -51,14 +32,14 @@ func main() {
 	err := mapDeASCII.StoreToFile("/tmp/DE_ASCII.json")
 	if err != nil { log.Fatal(err)}
 
+	/*
 	testmap, err := hid.loadKeyboardLanguageMapFromFile("keymaps/DE_ASCII.json")
 	if err != nil { log.Fatal(err)}
 	fmt.Println(testmap)
 	*/
+}
 
-	hidCtl, err := hid.NewHIDController("/dev/hidg0", "keymaps", "")
-	if err != nil {panic(err)}
-
+func TestComboPress(hidCtl *hid.HIDController) {
 	testcombos := []string {"SHIFT 1", "ENTER", "ALT TAB", "ALT TABULATOR", "  WIN ", "GUI "}
 	for _,comboStr := range testcombos {
 		fmt.Printf("Pressing combo '%s'\n", comboStr)
@@ -70,14 +51,10 @@ func main() {
 			fmt.Printf("Error pressing combo '%s': %v\n", comboStr, err)
 		}
 	}
+}
 
-	fmt.Printf("Chosen keyboard language mapping '%s'\n", hidCtl.Keyboard.ActiveLanguageLayout.Name)
-
-
-
+func TestLEDTriggers(hidCtl *hid.HIDController) {
 	fmt.Println("Initial sleep to test if we capture LED state changes from the past, as soon as we start waiting (needed at boot)")
-
-
 	time.Sleep(3 * time.Second)
 
 	//ToDo: Test multiple waits in separate goroutines
@@ -120,19 +97,37 @@ func main() {
 	} else {
 		fmt.Printf("Triggered by %+v\n", trigger)
 	}
+}
 
+func TestStringTyping(hidCtl *hid.HIDController) {
+	fmt.Println("Typing:")
+	fmt.Println(StringAscii)
+	//err := hidCtl.Keyboard.StringToPressKeySequence("Test:" + StringAscii + "\t" + StringSpecial1)
+	err := hidCtl.Keyboard.StringToPressKeySequence(StringAscii)
+	if err != nil { fmt.Println(err)}
+}
 
+func main() {
+	/*
+	*/
+
+	hidCtl, err := hid.NewHIDController("/dev/hidg0", "keymaps", "")
+	if err != nil {panic(err)}
 	hidCtl.Keyboard.KeyDelay = 100
-//	hidCtl.Keyboard.KeyDelayJitter = 200
+	//	hidCtl.Keyboard.KeyDelayJitter = 200
+
 	fmt.Printf("Available language maps:\n%v\n",hidCtl.Keyboard.ListLanguageMapNames())
-
-	err = hidCtl.Keyboard.SetActiveLanguageMap("DE")
+	err = hidCtl.Keyboard.SetActiveLanguageMap("US") //first loaded language map is set by default
 	if err != nil { fmt.Println(err)}
+	fmt.Printf("Chosen keyboard language mapping '%s'\n", hidCtl.Keyboard.ActiveLanguageLayout.Name)
 
-//	ascii := " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
-//	special := "§°üÜöÖäÄµ€ß¹²³⁴⁵⁶⁷⁸⁹⁰¼½¬„“¢«»æſðđŋħĸł’¶ŧ←↓→øþ"
-//	err = keyboard.StringToPressKeySequence("Test:" + ascii + "\t" + special)
-	if err != nil { fmt.Println(err)}
+	/* tests */
+
+	//TestComboPress(hidCtl)
+	//TestLEDTriggers(hidCtl)
+	TestStringTyping(hidCtl)
+
+	/*
 
 	script := `
 		for (i=0; i<10; i++) {
@@ -151,7 +146,7 @@ func main() {
 		console.log("Log message from JS"); 
 	`
 
-	hidCtl.RunScriptAsync(script)
+	hidCtl.StartScriptAsBackgroundJob(script)
 
 	fmt.Println("Running script ...")
 	val,err := hidCtl.RunScript(script)
@@ -174,12 +169,12 @@ func main() {
 		}
 	`
 
-	id, avm,_ := hidCtl.RunScriptAsync(script2)
+	id, avm,_ := hidCtl.StartScriptAsBackgroundJob(script2)
 	fmt.Printf("Satrted ASYNC VM %d ...\n", id)
 
 
 	time.Sleep(1500 * time.Millisecond)
-	id2 ,avm2, _ := hidCtl.RunScriptAsync(script3)
+	id2 ,avm2, _ := hidCtl.StartScriptAsBackgroundJob(script3)
 	fmt.Printf("Slept 1500 ms, started VM %d ...\n", id2)
 	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id, avm.IsWorking())
 	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id2, avm2.IsWorking())
@@ -188,9 +183,9 @@ func main() {
 	fmt.Printf("Slept 1500 ms, cancelling VM %d and start waiting for VM %d...\n", id2, id)
 	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id, avm.IsWorking())
 	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id2, avm2.IsWorking())
-	fmt.Printf("List of currently working VMs: %v\n", hidCtl.CurrentlyWorkingVmIDs())
+	fmt.Printf("List of currently working VMs: %v\n", hidCtl.GetRunningBackgroundJobs())
 	//avm2.Cancel()
-	hidCtl.CancelAsyncScript(id2)
+	hidCtl.CancelBackgroundJob(id2)
 
 	//Waiting for canceled script
 	_,err = avm2.WaitResult()
@@ -205,7 +200,7 @@ func main() {
 	avm2.RunAsync(script3)
 
 	//Cancel all
-	hidCtl.CancelAllVMs()
+	hidCtl.CancelAllBackgroundJobs()
 
 	val,err = avm.WaitResult()
 
@@ -214,5 +209,5 @@ func main() {
 	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id, avm.IsWorking())
 	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id2, avm2.IsWorking())
 
-
+	*/
 }
