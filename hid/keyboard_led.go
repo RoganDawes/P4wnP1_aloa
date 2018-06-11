@@ -4,6 +4,7 @@ import (
 	"sync"
 	"os"
 	"time"
+	"log"
 )
 
 
@@ -290,6 +291,7 @@ func (kbd *HIDKeyboard) WaitLEDStateChangeRepeated(intendedChange byte, repeatCo
 //			fmt.Printf("LEDs changed:     %v\n", ledsChanged)
 //			fmt.Printf("Changes relevant: %v\n", relevantChanges)
 
+
 			if relevantChanges.AnyOn() {
 				now := time.Now()
 				//log.Printf("Duration: NUM %v, CAPS %v, SCROLL %v, COMPOSE %v, KANA %v\n", now.Sub(lastNum), now.Sub(lastCaps), now.Sub(lastScroll), now.Sub(lastCompose), now.Sub(lastKana))
@@ -335,6 +337,8 @@ func (kbd *HIDKeyboard) WaitLEDStateChangeRepeated(intendedChange byte, repeatCo
 					}
 					lastKana = now
 				}
+
+				log.Printf("\tRelevant LED changes after applying mask (interval %v) NUM: %v CAPS: %v SCROLL: %v COMPOSE: %v KANA: %v\n", minRepeatDelay, countNum, countCaps, countScroll, countCompose, countKana)
 
 				//log.Printf("Counters: NUM %d, CAPS %d, SCROLL %d, COMPOSE %d, KANA %d\n", countNum, countCaps, countScroll, countCompose, countKana)
 

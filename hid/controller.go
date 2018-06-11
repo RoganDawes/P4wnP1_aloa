@@ -370,6 +370,103 @@ func (ctl *HIDController) jsWaitLED(call otto.FunctionCall) (res otto.Value) {
 	return
 }
 
+func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Value) {
+	//arg0 has to be of type number, representing an LED MASK
+	//arg1 repeat delay (number float)
+	//arg2 repeat count (number integer)
+	//arg3 is optional and represents the timeout in seconds, in case it isn't present, we set timeout to a year (=infinite in our context ;-))
+	arg0 := call.Argument(0) //trigger mask
+	arg1 := call.Argument(1) //minimum repeat count till trigger
+	arg2 := call.Argument(2) //maximum interval between LED changes of same LED, to be considered as repeat
+	arg3 := call.Argument(3) //timeout
+	log.Printf("HIDScript: Called WaitLEDRepeat(%v, %v, %v, %v)\n", arg0, arg1, arg2, arg3)
+
+	//arg0: Typecheck trigger mask
+	maskInt, err := arg0.ToInteger()
+	if err != nil || !arg0.IsNumber() || !(maskInt >= 0 && maskInt <= MaskAny) {
+		//We don't mention KANA and COMPOSE in the error message
+		log.Printf("HIDScript WaitLEDRepeat: First argument for `waitLED` has to be a bitmask representing LEDs (NUM | CAPS | SCROLL | ANY).\nError location:  %v\n", call.CallerLocation())
+		return
+	}
+	mask := byte(maskInt)
+
+	//arg1: repeat count (positive int > 0)
+	repeatCount := 3 //default (first LED change is usually too slow to count, thus we need 4 changes and ultimately end up initial LED state)
+	switch {
+	case arg1.IsUndefined():
+		log.Printf("HIDScript WaitLEDRepeat: No repeat count given, defaulting to '%v' led changes\n", repeatCount)
+	case arg1.IsNumber():
+		repeatInt, err := arg1.ToInteger()
+		if err != nil || repeatInt < 1 {
+			log.Printf("HIDScript WaitLEDRepeat: Second argument for `waitLEDRepeat` is the repeat count and has to be provided as positive interger, but '%d' was given!\n", arg1)
+			return
+		}
+		repeatCount = int(repeatInt)
+	default:
+		log.Printf("HIDScript WaitLEDRepeat: Second argument for `waitLEDRepeat` is the repeat count and has to be provided as positive interger or omitted for default of '%v'\n", repeatCount)
+		return
+	}
+
+
+	//arg2: //maximum interval between LED changes of same LED in milliseconds, to be considered as repeat
+	maxInterval := 800 * time.Millisecond //default 800 ms
+	switch {
+	case arg2.IsUndefined():
+		log.Printf("HIDScript WaitLEDRepeat: No maximum interval given (time allowed between LED changes, to be considered as repeat). Using default of %v\n", maxInterval)
+	case arg2.IsNumber():
+		//		log.Printf("Timeout given: %v\n", arg1)
+		maxIntervalInt, err := arg2.ToInteger()
+		if err != nil || maxInterval < 0 {
+			log.Printf("HIDScript WaitLEDRepeat: Third argument for `waitLEDRepeat` is the maximum interval between LED changes in milliseconds and has to be provided as positive interger, but '%d' was given!\n", arg1)
+			return
+		}
+		maxInterval = time.Duration(maxIntervalInt) * time.Millisecond
+	default:
+		log.Printf("HIDScript WaitLEDRepeat: Third argument for `waitLEDRepeat` is the maximum interval between LED changes in milliseconds and has to be provided as positive interger or omitted to default to '%d'\n", maxInterval)
+		return
+	}
+
+
+	//arg3: Typecheck timeout (positive integer or undefined)
+	timeout := time.Hour * 24 * 365
+	switch {
+	case arg3.IsUndefined():
+		log.Printf("HIDScript WaitLEDRepeat: No timeout given setting to a year\n")
+	case arg3.IsNumber():
+		//		log.Printf("Timeout given: %v\n", arg1)
+		timeoutInt, err := arg3.ToInteger()
+		if err != nil || timeoutInt < 0 {
+			log.Printf("HIDScript WaitLEDRepeat: Second argument for `waitLED` is the timeout in seconds and has to be given as positive interger, but '%d' was given!\n", arg1)
+			return
+		}
+		timeout = time.Duration(timeoutInt) * time.Second
+	default:
+		log.Printf("HIDScript WaitLEDRepeat: Second argument for `waitLED` is the timeout in seconds and has to be given as interger or omitted for infinite timeout\n")
+		return
+	}
+
+	log.Printf("HIDScript: Waiting for repeated LED change. Mask for considered LEDs: %v, Minimum repeat count: %v, Maximum repeat delay: %v, Timeout: %v\n", mask, repeatCount, maxInterval, timeout)
+	changed,err := ctl.Keyboard.WaitLEDStateChangeRepeated(mask, repeatCount, maxInterval, timeout)
+	//fmt.Printf("Changed %+v\n", changed)
+
+	res,_ = call.Otto.ToValue(struct{
+		TIMEOUT bool
+		NUM bool
+		CAPS bool
+		SCROLL bool
+		COMPOSE bool
+		KANA bool
+	}{
+		TIMEOUT: err == ErrTimeout,
+		NUM: err == nil && changed.NumLock,
+		CAPS: err == nil && changed.CapsLock,
+		SCROLL: err == nil && changed.ScrollLock,
+		COMPOSE: err == nil && changed.Compose,
+		KANA: err == nil && changed.Kana,
+	})
+	return
+}
+
 
 func (ctl *HIDController) initMasterVM() (err error) {
 	ctl.vmMaster = otto.New()
@@ -394,6 +491,8 @@ func (ctl *HIDController) initMasterVM() (err error) {
 	err = ctl.vmMaster.Set("press", ctl.jsPress)
 	if err != nil { return err }
 	err = ctl.vmMaster.Set("waitLED", ctl.jsWaitLED)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("waitLEDRepeat", ctl.jsWaitLEDRepeat)
 	if err != nil { return err }
 	err = ctl.vmMaster.Set("layout", ctl.jsLayout)
 	if err != nil { return err }

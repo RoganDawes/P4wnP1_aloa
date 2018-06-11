@@ -155,7 +155,17 @@ func main() {
 		type("Some ASCII test text QWERTZ\n")				//Type text to target ('\n' translates to RETURN key)		
 
 		delay(200); 										//sleep 200 milliseconds
+
+		//waitLEDRepeat test
+		var mask = NUM | SCROLL;
+		var repeatCount = 5;
+		var repeatIntervalMs = 800;
+		var timeout = 20;
 		
+		//result = waitLEDRepeat(mask, repeatCount, repeatIntervalMs, timeout)
+		result = waitLEDRepeat(mask, repeatCount)
+		console.log("Result: " + JSON.stringify(result));	//Log result object as JSON to internal console
+
 		waitLED(NUM | SCROLL, 2); 							//Wait for NumLock or ScrollLock LED change, abort after 2 seconds
 
 		layout("DE"); 										//Switch to German keyboard layout
