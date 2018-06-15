@@ -6,6 +6,8 @@ import(
 	"log"
 	"fmt"
 	"time"
+	"math"
+	"io/ioutil"
 )
 
 var (
@@ -128,29 +130,35 @@ func TestStringTyping(hidCtl *hid.HIDController) {
 	if err != nil { fmt.Println(err)}
 }
 
-func main() {
-	/*
-	*/
-
-	hidCtl, err := hid.NewHIDController("/dev/hidg0", "keymaps", "")
-	if err != nil {panic(err)}
-	hidCtl.Keyboard.KeyDelay = 100
-	//	hidCtl.Keyboard.KeyDelayJitter = 200
-
-	fmt.Printf("Available language maps:\n%v\n",hidCtl.Keyboard.ListLanguageMapNames())
-	err = hidCtl.Keyboard.SetActiveLanguageMap("DE") //first loaded language map is set by default
-	if err != nil { fmt.Println(err)}
-	fmt.Printf("Chosen keyboard language mapping '%s'\n", hidCtl.Keyboard.ActiveLanguageLayout.Name)
-
-	/* tests */
-
-	//TestComboPress(hidCtl)
-	//TestLEDTriggers(hidCtl)
-	//TestStringTyping(hidCtl)
-	//TestConcurrentLEDTrigges(hidCtl)
+func TestCombinedScript(hidCtl *hid.HIDController) (err error) {
 
 	testcript := `
+		
 		console.log("HID Script test for P4wnP1 rework");	//Print to internal console
+		for (var i = 0; i<5; i++) {
+			move(128, 0);
+			delay(500);
+			move(0, -100.1);
+			delay(500);
+			move(-100, 0);
+			delay(500);
+			move(0, 100);
+			delay(500);
+		}
+
+		console.log("HID Script test for P4wnP1 rework");	//Print to internal console
+		for (var i = 0; i<5; i++) {
+			moveTo(0.0, 0.0);
+			delay(500);
+			moveTo(0.8, 0.0);
+			delay(500);
+			moveTo(0.8, 0.8);
+			delay(500);
+			moveTo(0.8, 0.8);
+			delay(500);
+		}
+		waitLED(ANY)
+		
 		layout("US"); 										//Switch to US keyboard layout
 		type("Some ASCII test text QWERTZ\n")				//Type text to target ('\n' translates to RETURN key)		
 
@@ -193,6 +201,92 @@ func main() {
 	_,err = hidCtl.RunScript(testcript)
 	if err != nil {panic(err)}
 
+	return
+}
+
+
+func TestMouseNoScript(hidCtl *hid.HIDController) (err error) {
+	hidCtl.Mouse.MoveStepped(100,0)
+	hidCtl.Mouse.MoveStepped(0,-100)
+	hidCtl.Mouse.MoveStepped(0,100)
+
+	time.Sleep(2*time.Second)
+
+	hidCtl.Mouse.SetButtons(true, false, false)
+	for alpha := 0.0; alpha < 8*math.Pi; alpha+=(math.Pi/180) {
+		cos := int16(math.Cos(6.0*alpha) * 5)
+		sin := int16(math.Sin(alpha) * 5)
+
+		hidCtl.Mouse.MoveStepped(sin,cos)
+	}
+	hidCtl.Mouse.SetButtons(false, false, false)
+
+	return nil
+}
+
+func TestMouseCircle(hidCtl *hid.HIDController) {
+	scriptMouse := `
+		//circular mouse movement with rotating vector
+		turns = 2
+		degree = Math.PI/180.0
+		scale = 4
+		for (var alpha = 0; alpha < 2 * Math.PI * turns; alpha += degree) {
+			vecx = Math.cos(alpha) * scale
+			vecy = Math.sin(alpha) * scale
+
+			moveStepped(vecx, vecy);
+		}
+	`
+
+	_,err := hidCtl.RunScript(scriptMouse)
+	if err != nil { panic(err)}
+}
+
+func main() {
+	/*
+	*/
+
+
+
+	/*
+	for x:=0; x<50; x++ {
+		err := mouse.MoveTo(-12,int16(x))
+		if err != nil { panic(err) }
+		time.Sleep(100 * time.Millisecond)
+	}
+	*/
+
+
+	hidCtl, err := hid.NewHIDController("/dev/hidg0", "keymaps", "/dev/hidg1")
+	if err != nil {panic(err)}
+	hidCtl.Keyboard.KeyDelay = 100
+	//	hidCtl.Keyboard.KeyDelayJitter = 200
+
+
+	fmt.Printf("Available language maps:\n%v\n",hidCtl.Keyboard.ListLanguageMapNames())
+	err = hidCtl.Keyboard.SetActiveLanguageMap("DE") //first loaded language map is set by default
+	if err != nil { fmt.Println(err)}
+	fmt.Printf("Chosen keyboard language mapping '%s'\n", hidCtl.Keyboard.ActiveLanguageLayout.Name)
+
+	/* tests */
+
+	//TestComboPress(hidCtl)
+	//TestLEDTriggers(hidCtl)
+	//TestStringTyping(hidCtl)
+	//TestConcurrentLEDTrigges(hidCtl)
+	//TestMouseNoScript(hidCtl)
+	//TestCombinedScript(hidCtl)
+	//TestMouseCircle(hidCtl)
+
+
+	//try to load script file
+	filepath := "./hidtest1.js"
+	if scriptFile, err := ioutil.ReadFile(filepath); err != nil {
+		log.Printf("Couldn't load HIDScript testfile: %s\n", filepath)
+	} else {
+		_,err = hidCtl.RunScript(string(scriptFile))
+		if err != nil { panic(err)}
+	}
 
 	/*
 

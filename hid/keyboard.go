@@ -42,6 +42,8 @@ type HIDKeyboard struct {
 
 
 func NewKeyboard(devicePath string, resourcePath string) (keyboard *HIDKeyboard, err error) {
+	//ToDo: check existence of deviceFile (+ is writable)
+
 	keyboard = &HIDKeyboard{}
 	keyboard.DevicePath = devicePath
 	keyboard.KeyDelay = 0

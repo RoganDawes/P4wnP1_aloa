@@ -67,7 +67,7 @@ func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
 		Use_CDC_ECM:      false,
 		Use_RNDIS:        true,
 		Use_HID_KEYBOARD: true,
-		Use_HID_MOUSE:    false,
+		Use_HID_MOUSE:    true,
 		Use_HID_RAW:      false,
 		Use_UMS:          false,
 		Use_SERIAL:       false,

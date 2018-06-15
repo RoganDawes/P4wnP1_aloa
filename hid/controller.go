@@ -11,6 +11,7 @@ import (
 
 const (
 	MAX_VM = 8
+
 )
 
 var halt = errors.New("Stahp")
@@ -117,15 +118,28 @@ func (avm *AsyncOttoVM) Cancel() error {
 
 type HIDController struct {
 	Keyboard *HIDKeyboard
+	Mouse *Mouse
 	vmPool [MAX_VM]*AsyncOttoVM //ToDo: check if this could be changed to sync.Pool
 	vmMaster *otto.Otto
 }
 
 func NewHIDController(keyboardDevicePath string, keyboardMapPath string, mouseDevicePath string) (ctl *HIDController, err error) {
 	ctl = &HIDController{}
+
+	//Note: to disable mouse/keyboard support, the respective device path has to have zero length
+
 	//init keyboard
-	ctl.Keyboard, err = NewKeyboard(keyboardDevicePath, keyboardMapPath)
-	if err != nil { return nil, err	}
+	if len(keyboardDevicePath) > 0 {
+		ctl.Keyboard, err = NewKeyboard(keyboardDevicePath, keyboardMapPath)
+		if err != nil { return nil, err	}
+	}
+
+	//init Mouse
+	if len(mouseDevicePath) > 0 {
+		ctl.Mouse,err = NewMouse(mouseDevicePath)
+		if err != nil { return nil, err	}
+	}
+
 
 	//init master otto vm
 
@@ -266,6 +280,26 @@ func (ctl *HIDController) jsLayout(call otto.FunctionCall) (res otto.Value) {
 	return
 }
 
+func (ctl *HIDController) jsTypingSpeed(call otto.FunctionCall) (res otto.Value) {
+	typeDelay := call.Argument(0) //delay between keypresses in milliseconds
+	typeJitter := call.Argument(0) //additional random jitter between keypresses, maximum in milliseconds
+
+	if delay,err:= typeDelay.ToInteger();err != nil || delay < 0 {
+		log.Printf("HIDScript typingSpeed: First argument has to be positive integer, representing the delay between key presses in milliseconds\n")
+		return
+	} else {
+		//ToDo: this isn't thread safe at all, additionally it influences type speed of every other running Script
+		ctl.Keyboard.KeyDelay = int(delay)
+	}
+	if jitter,err:= typeJitter.ToInteger();err != nil || jitter < 0 {
+		log.Printf("HIDScript typingSpeed: Second argument has to be positive integer, representing the maximum of an additional random jitter in milliseconds\n")
+		return
+	} else {
+		//ToDo: this isn't thread safe at all, additionally it influences type speed of every other running Script
+		ctl.Keyboard.KeyDelayJitter = int(jitter)
+	}
+	return
+}
 
 func (ctl *HIDController) jsDelay(call otto.FunctionCall) (res otto.Value) {
 
@@ -467,6 +501,132 @@ func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Valu
 	return
 }
 
+// Move mouse relative in given mouse units (-127 to +127 per axis)
+func (ctl *HIDController) jsMove(call otto.FunctionCall) (res otto.Value) {
+	argx := call.Argument(0)
+	argy := call.Argument(1)
+	log.Printf("HIDScript: Called move(%v, %v)\n", argx, argy)
+
+	var x,y int
+	if lx,err:= argx.ToInteger();err != nil || lx < -127 || lx > 127 {
+		log.Printf("HIDScript move: First argument has to be integer between -127 and +127 describing relative mouse movement on x-axis\n")
+		return
+	} else { x = int(lx) }
+	if ly,err:= argy.ToInteger();err != nil || ly < -127 || ly > 127 {
+		log.Printf("HIDScript move: Second argument has to be integer between -127 and +127 describing relative mouse movement on y-axis\n")
+		return
+	} else { y = int(ly) }
+	x8 := int8(x)
+	y8 := int8(y)
+	ctl.Mouse.Move(x8,y8)
+	return
+}
+
+// Move mouse relative in across given distance in mouse units, devide into substeps of 1 DPI per step (parameters uint6 -32768 to +32767 per axis)
+func (ctl *HIDController) jsMoveStepped(call otto.FunctionCall) (res otto.Value) {
+	argx := call.Argument(0)
+	argy := call.Argument(1)
+//	log.Printf("HIDScript: Called moveStepped(%v, %v)\n", argx, argy)
+
+	var x,y int
+	if lx,err:= argx.ToInteger();err != nil || lx < -32768 || lx > 32767 {
+		log.Printf("HIDScript moveStepped: First argument has to be integer between -32768 and +32767 describing relative mouse movement on x-axis\n")
+		return
+	} else { x = int(lx) }
+	if ly,err:= argy.ToInteger();err != nil || ly < -32768 || ly > 32767 {
+		log.Printf("HIDScript moveStepped: Second argument has to be integer between -32768 and +32767 describing relative mouse movement on y-axis\n")
+		return
+	} else { y = int(ly) }
+	x16 := int16(x)
+	y16 := int16(y)
+	ctl.Mouse.MoveStepped(x16,y16)
+	return
+}
+
+
+// Move mouse to absolute position (-1.0 to +1.0 per axis)
+func (ctl *HIDController) jsMoveTo(call otto.FunctionCall) (res otto.Value) {
+	argx := call.Argument(0)
+	argy := call.Argument(1)
+	log.Printf("HIDScript: Called moveTo(%v, %v)\n", argx, argy)
+
+	var x,y float64
+	if lx,err:= argx.ToFloat();err != nil || lx < -1.0 || lx > 1.0 {
+		log.Printf("HIDScript move: First argument has to be a float between -1.0 and +1.0 describing relative mouse movement on x-axis\n")
+		return
+	} else { x = float64(lx) }
+	if ly,err:= argy.ToFloat();err != nil || ly < -1.0 || ly > 1.0 {
+		log.Printf("HIDScript move: Second argument has to be a float between -1.0 and +1.0 describing relative mouse movement on y-axis\n")
+		return
+	} else { y = float64(ly) }
+	ctl.Mouse.MoveTo(x,y)
+	return
+}
+
+func (ctl *HIDController) jsButton(call otto.FunctionCall) (res otto.Value) {
+	//arg0 has to be of type number, representing a bitmask for BUTTON1..3
+	arg0 := call.Argument(0)
+	log.Printf("HIDScript: Called button(%v)\n", arg0)
+	maskInt, err := arg0.ToInteger()
+	maskByte := byte(maskInt)
+	if err != nil || !arg0.IsNumber() || maskInt != int64(maskByte) || !(maskByte >= 0 && maskByte <= BUTTON3) {
+		log.Printf("HIDScript button: Argument has to be a bitmask representing Buttons (BT1 || BT2 || BT3).\nError location:  %v\n", call.CallerLocation())
+		return
+	}
+
+
+	var bt [3]bool
+	if maskByte & BUTTON1 > 0 { bt[0] = true}
+	if maskByte & BUTTON2 > 0 { bt[1] = true}
+	if maskByte & BUTTON3 > 0 { bt[2] = true}
+	err = ctl.Mouse.SetButtons(bt[0], bt[1], bt[2])
+
+	return
+}
+
+func (ctl *HIDController) jsClick(call otto.FunctionCall) (res otto.Value) {
+	//arg0 has to be of type number, representing a bitmask for BUTTON1..3
+	arg0 := call.Argument(0)
+	log.Printf("HIDScript: Called click(%v)\n", arg0)
+	maskInt, err := arg0.ToInteger()
+	maskByte := byte(maskInt)
+	if err != nil || !arg0.IsNumber() || maskInt != int64(maskByte) || !(maskByte >= 0 && maskByte <= BUTTON3) {
+		log.Printf("HIDScript click: Argument has to be a bitmask representing Buttons (BT1 || BT2 || BT3).\nError location:  %v\n", call.CallerLocation())
+		return
+	}
+
+
+	var bt [3]bool
+	if maskByte & BUTTON1 > 0 { bt[0] = true}
+	if maskByte & BUTTON2 > 0 { bt[1] = true}
+	if maskByte & BUTTON3 > 0 { bt[2] = true}
+	err = ctl.Mouse.Click(bt[0], bt[1], bt[2])
+
+	return
+}
+
+func (ctl *HIDController) jsDoubleClick(call otto.FunctionCall) (res otto.Value) {
+	//arg0 has to be of type number, representing a bitmask for BUTTON1..3
+	arg0 := call.Argument(0)
+	log.Printf("HIDScript: Called doubleClick(%v)\n", arg0)
+	maskInt, err := arg0.ToInteger()
+	maskByte := byte(maskInt)
+	if err != nil || !arg0.IsNumber() || maskInt != int64(maskByte) || !(maskByte >= 0 && maskByte <= BUTTON3) {
+		log.Printf("HIDScript doubleClick: Argument has to be a bitmask representing Buttons (BT1 || BT2 || BT3).\nError location:  %v\n", call.CallerLocation())
+		return
+	}
+
+
+	var bt [3]bool
+	if maskByte & BUTTON1 > 0 { bt[0] = true}
+	if maskByte & BUTTON2 > 0 { bt[1] = true}
+	if maskByte & BUTTON3 > 0 { bt[2] = true}
+	err = ctl.Mouse.DoubleClick(bt[0], bt[1], bt[2])
+
+	return
+}
+
+
 
 func (ctl *HIDController) initMasterVM() (err error) {
 	ctl.vmMaster = otto.New()
@@ -483,6 +643,18 @@ func (ctl *HIDController) initMasterVM() (err error) {
 	err = ctl.vmMaster.Set("ANY", MaskAny)
 	if err != nil { return err }
 
+	err = ctl.vmMaster.Set("BT1", BUTTON1)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("BT2", BUTTON2)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("BT3", BUTTON3)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("BTNONE", 0)
+	if err != nil { return err }
+
+
+	err = ctl.vmMaster.Set("typingSpeed", ctl.jsTypingSpeed) //This function influences all scripts
+	if err != nil { return err }
 
 	err = ctl.vmMaster.Set("type", ctl.jsType)
 	if err != nil { return err }
@@ -495,6 +667,20 @@ func (ctl *HIDController) initMasterVM() (err error) {
 	err = ctl.vmMaster.Set("waitLEDRepeat", ctl.jsWaitLEDRepeat)
 	if err != nil { return err }
 	err = ctl.vmMaster.Set("layout", ctl.jsLayout)
+	if err != nil { return err }
+
+	err = ctl.vmMaster.Set("move", ctl.jsMove)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("moveStepped", ctl.jsMoveStepped)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("moveTo", ctl.jsMoveTo)
+	if err != nil { return err }
+
+	err = ctl.vmMaster.Set("button", ctl.jsButton)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("click", ctl.jsClick)
+	if err != nil { return err }
+	err = ctl.vmMaster.Set("doubleClick", ctl.jsDoubleClick)
 	if err != nil { return err }
 	return nil
 }
