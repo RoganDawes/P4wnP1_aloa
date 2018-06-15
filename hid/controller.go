@@ -4,7 +4,6 @@ import (
 	"github.com/robertkrimen/otto"
 	"log"
 	"time"
-	"sync"
 	"errors"
 )
 
@@ -18,25 +17,19 @@ var halt = errors.New("Stahp")
 
 type AsyncOttoVM struct {
 	vm           *otto.Otto
-	ResultErr    error
+	ResultErr    *error
 	ResultValue  otto.Value
+	Finished chan bool
 	isWorking    bool
-	runningAsync bool
-	mutex        *sync.Mutex
-	finCond      *sync.Cond
 }
 
 func NewAsyncOttoVM(vm *otto.Otto) *AsyncOttoVM {
-	mutex := &sync.Mutex{}
 	vm.Interrupt = make(chan func(), 1) //set Interrupt channel
 	return &AsyncOttoVM{
-		mutex:        mutex,
 		isWorking:    false,
-		runningAsync: false,
-		ResultErr:    nil,
 		ResultValue:  otto.Value{},
+		Finished: make(chan bool,1), //buffer of 1 as we don't want to block on setting the finished signal
 		vm:           vm,
-		finCond:      sync.NewCond(mutex),
 	}
 }
 
@@ -45,24 +38,31 @@ func NewAsyncOttoVMClone(vm *otto.Otto) *AsyncOttoVM {
 }
 
 func (avm *AsyncOttoVM) Run(src interface{}) (val otto.Value, res error) {
-	avm.setIsWorking(true)
-	avm.runningAsync = false
-	val,res= avm.vm.Run(src)
-	avm.setIsWorking(false)
-	return
+	res = avm.RunAsync(src)
+	if res != nil { return }
+
+	return avm.WaitResult()
 }
 
 func (avm *AsyncOttoVM) RunAsync(src interface{}) (error) {
 	go func(avm *AsyncOttoVM) {
 		avm.setIsWorking(true)
-		avm.runningAsync = true
+//		avm.runningAsync = true
 
 		defer func() {
 			if caught := recover(); caught != nil {
 				if caught == halt {
-					avm.ResultErr =  errors.New("VM execution cancelled")
+					nErr := errors.New("VM execution cancelled")
+					avm.ResultErr = &nErr
+
 					avm.isWorking = false
 					avm.setIsWorking(false)
+
+					//destroy reference to Otto
+					avm.vm = nil
+
+					//signal finished
+					avm.Finished <- true
 					return
 				}
 				panic(caught) //re-raise panic, as it isn't `halt`
@@ -70,7 +70,19 @@ func (avm *AsyncOttoVM) RunAsync(src interface{}) (error) {
 			avm.setIsWorking(false)
 		}()
 
-		avm.ResultValue, avm.ResultErr = avm.vm.Run(src)
+//		fmt.Println("Running vm")
+		tmpValue, tmpErr := avm.vm.Run(src)
+//		if tmpErr == nil {
+//			fmt.Println("Run ended")
+//		} else {
+//			fmt.Printf("Run ended with error: %v\n", tmpErr)
+//		}
+		avm.ResultValue = tmpValue //stroe value first, to have it accessible when error is retrieved from channel
+		avm.ResultErr = &tmpErr
+		avm.Finished <- true
+//		fmt.Println("Stored vm result")
+
+
 
 		//avm.setIsWorking(false)
 	}(avm)
@@ -79,12 +91,6 @@ func (avm *AsyncOttoVM) RunAsync(src interface{}) (error) {
 
 func (avm *AsyncOttoVM) setIsWorking(isWorking bool) {
 	avm.isWorking = isWorking
-	avm.mutex.Lock()
-	if !isWorking {
-		avm.finCond.Broadcast()
-	}
-	avm.mutex.Unlock()
-
 }
 
 func (avm *AsyncOttoVM) IsWorking() (res bool) {
@@ -93,20 +99,34 @@ func (avm *AsyncOttoVM) IsWorking() (res bool) {
 }
 
 func (avm *AsyncOttoVM) WaitResult()  (val otto.Value, err error) {
+
+	//Always run async
+	/*
 	if !avm.runningAsync {
 		return otto.Value{},errors.New("AsyncVM isn't running an async script from which a result could be received")
 	}
-	avm.mutex.Lock()
-	avm.finCond.Wait()
-	avm.mutex.Unlock()
-	avm.runningAsync = false
-	return avm.ResultValue, avm.ResultErr
+	*/
+
+	if avm.vm == nil {
+		return val,errors.New("Async vm isn't valid anymore")
+	}
+
+	//wait for finished signal
+	<- avm.Finished
+
+	//destroy reference to vm
+	avm.vm = nil
+	return avm.ResultValue, *avm.ResultErr
 }
 
 func (avm *AsyncOttoVM) Cancel() error {
-	if !avm.runningAsync {
-		return errors.New("AsyncVM isn't running an async script which could be cancelled")
+	if avm.vm == nil {
+		return errors.New("Async vm isn't valid anymore")
 	}
+
+	// Note: in between here, there's a small race condition, if avm.vm is set to nil
+	// after the check above (f.e. the vm returns an result and thus the pointer is set to nil,
+	// right after the check)
 
 	//interrupt vm
 	avm.vm.Interrupt <- func() {
@@ -159,6 +179,11 @@ func (ctl *HIDController) NextUnusedVM() (idx int, vm *AsyncOttoVM, err error) {
 	for idx,avm := range ctl.vmPool {
 		if !avm.IsWorking() {
 			//return first non-working vm
+
+			//set job ID as JID
+			avm.vm.Set("JID", idx)
+
+
 			return idx, avm, nil //free to be used
 		}
 	}
