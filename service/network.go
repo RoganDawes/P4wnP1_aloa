@@ -13,21 +13,23 @@ import (
 	"errors"
 )
 
+var (
+	StoredNetworkSetting map[string]*pb.EthernetInterfaceSettings = make(map[string]*pb.EthernetInterfaceSettings)
+)
 
-func InitDefaultNetworkSettings() (err error) {
-	//ToDo: declare managed interfaces to not check from hand
-	usbEthActive,_ := CheckInterfaceExistence(USB_ETHERNET_BRIDGE_NAME)
-	if usbEthActive {
-		err = ConfigureInterface(GetDefaultNetworkSettingsUSB())
-		if err != nil { return }
-	}
+func init() {
+	//preinitialize Default settings for "wlan0" and USB_ETHERNET_BRIDGE_NAME ("usbeth")
+	StoredNetworkSetting[USB_ETHERNET_BRIDGE_NAME] = GetDefaultNetworkSettingsUSB()
+	StoredNetworkSetting["wlan0"] = GetDefaultNetworkSettingsWiFi()
+}
 
-	wifiEthActive, _ := CheckInterfaceExistence("wlan0")
-	if wifiEthActive {
-		err = ConfigureInterface(GetDefaultNetworkSettingsWiFi())
-		if err != nil { return }
+func ReInitNetworkInterface(ifName string) (err error) {
+	if settings, existing := StoredNetworkSetting[ifName]; existing {
+		log.Printf("Redeploying stored Network settings for interface '%s' ...\n", ifName)
+		return ConfigureInterface(settings)
+	} else {
+		return errors.New(fmt.Sprintf("No stored interface settings found for '%s'\n", ifName))
 	}
-	return
 }
 
 func ParseIPv4Mask(maskstr string) (net.IPMask, error) {
@@ -189,6 +191,9 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 		}
 
 	}
+
+	//Store latest settings
+	StoredNetworkSetting[settings.Name] = settings
 
 	return nil
 }

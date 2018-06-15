@@ -168,7 +168,7 @@ func pollForUSBEthernet(timeout time.Duration) error {
 }
 
 func InitDefaultGadgetSettings() (err error) {
-	err = DeployGadgetSettings(GetDefaultGadgetSettings())
+	err = DeployGadgetSettings(GetDefaultGadgetSettings()) //Deploy default settings to ConfigFS
 	if err != nil { return }
 	GadgetSettingsState = GetDefaultGadgetSettings() //populate settings state with same values
 	return nil
@@ -590,6 +590,8 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 			//add USBEthernet bridge including the usb interfaces
 			log.Printf("... creating network bridge for USB ethernet devices")
 			addUSBEthernetBridge()
+			log.Printf("... checking for stored network interface settings for USB ethernet")
+			ReInitNetworkInterface(USB_ETHERNET_BRIDGE_NAME)
 		} else {
 			return err
 		}

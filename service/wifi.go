@@ -142,7 +142,8 @@ func DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
 
 	}
 
-	log.Printf("... WiFi settings deployed successfully\n")
+	log.Printf("... WiFi settings deployed successfully, checking for stored interface configuration...\n")
+	ReInitNetworkInterface(ifName)
 	return nil
 }
 

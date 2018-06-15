@@ -33,10 +33,9 @@ func main() {
 		log.Fatalf("Error while setting up the default gadget: %v", err)
 	}
 
-	err = service.InitDefaultNetworkSettings()
-	if err != nil {
-		log.Fatalf("Error while applying default network settings: %v", err)
-	}
+
+	service.DeployWifiSettings(service.GetDefaultWiFiSettings())
+
 
 	service.InitLed(false) //Set LED to manual trigger
 	service.InitDefaultLEDSettings()
