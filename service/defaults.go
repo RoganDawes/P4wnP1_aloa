@@ -21,9 +21,10 @@ func GetDefaultNetworkSettingsWiFi() (*pb.EthernetInterfaceSettings) {
 	ifSettings := &pb.EthernetInterfaceSettings {
 		Enabled:            true,
 		Name:               "wlan0",
-		Mode:               pb.EthernetInterfaceSettings_MANUAL,
+		Mode:               pb.EthernetInterfaceSettings_DHCP_SERVER,
 		IpAddress4:         "172.24.0.1",
-		Netmask4:           "255.255.255.252",
+		Netmask4:           "255.255.255.0",
+		DhcpServerSettings: GetDefaultDHCPConfigWiFi(),
 	}
 	return ifSettings
 }
@@ -45,6 +46,25 @@ func GetDefaultDHCPConfigUSB() (settings *pb.DHCPServerSettings) {
 			3:   "", //Disable option: Router
 			6:   "", //Disable option: DNS
 			//252: "http://172.16.0.1/wpad.dat",
+		},
+	}
+	return
+}
+
+func GetDefaultDHCPConfigWiFi() (settings *pb.DHCPServerSettings) {
+	settings = &pb.DHCPServerSettings{
+		//CallbackScript:     "/bin/evilscript",
+		DoNotBindInterface: false, //only bind to given interface
+		ListenInterface:    "wlan0",
+		LeaseFile:          "/tmp/dnsmasq_wlan0.leases",
+		ListenPort:         0,     //No DNS, DHCP only
+		NotAuthoritative:   false, //be authoritative
+		Ranges: []*pb.DHCPServerRange{
+			&pb.DHCPServerRange{RangeLower: "172.24.0.2", RangeUpper: "172.24.0.20", LeaseTime: "5m"},
+		},
+		Options: map[uint32]string{
+			3:   "", //Disable option: Router
+			6:   "", //Disable option: DNS
 		},
 	}
 	return

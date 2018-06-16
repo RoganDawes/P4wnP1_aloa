@@ -1,3 +1,4 @@
+
 package hid
 
 import (
@@ -5,6 +6,7 @@ import (
 	"log"
 	"time"
 	"errors"
+	"fmt"
 )
 
 
@@ -13,7 +15,11 @@ const (
 
 )
 
-var halt = errors.New("Stahp")
+var (
+	halt = errors.New("Stahp")
+	ErrAbort = errors.New("Event listening aborted")
+	ErrNotAllowed = errors.New("Calling not allowed (currently disabled)")
+)
 
 type AsyncOttoVM struct {
 	vm           *otto.Otto
@@ -72,12 +78,7 @@ func (avm *AsyncOttoVM) RunAsync(src interface{}) (error) {
 
 //		fmt.Println("Running vm")
 		tmpValue, tmpErr := avm.vm.Run(src)
-//		if tmpErr == nil {
-//			fmt.Println("Run ended")
-//		} else {
-//			fmt.Printf("Run ended with error: %v\n", tmpErr)
-//		}
-		avm.ResultValue = tmpValue //stroe value first, to have it accessible when error is retrieved from channel
+		avm.ResultValue = tmpValue //store value first, to have it accessible when error is retrieved from channel
 		avm.ResultErr = &tmpErr
 		avm.Finished <- true
 //		fmt.Println("Stored vm result")
@@ -256,7 +257,6 @@ func (ctl *HIDController) CancelAllBackgroundJobs() error {
 }
 
 //Function declarations for master VM
-//ToDo: Global mutex for VM callbacks (or better for atomar part of Keyboard.StringToPressKeySequence)
 func (ctl *HIDController) jsType(call otto.FunctionCall) (res otto.Value) {
 	arg0 := call.Argument(0)
 	//fmt.Printf("JS type() called with: `%s` (%s)\n", arg0, arg0)
@@ -411,7 +411,11 @@ func (ctl *HIDController) jsWaitLED(call otto.FunctionCall) (res otto.Value) {
 	changed,err := ctl.Keyboard.WaitLEDStateChange(mask, timeout)
 	//fmt.Printf("Changed %+v\n", changed)
 
+	errStr := ""
+	if err != nil {errStr = fmt.Sprintf("%v",err)}
 	res,_ = call.Otto.ToValue(struct{
+		ERROR bool
+		ERRORTEXT string
 		TIMEOUT bool
 		NUM bool
 		CAPS bool
@@ -419,6 +423,8 @@ func (ctl *HIDController) jsWaitLED(call otto.FunctionCall) (res otto.Value) {
 		COMPOSE bool
 		KANA bool
 	}{
+		ERROR: err != nil,
+		ERRORTEXT: errStr,
 		TIMEOUT: err == ErrTimeout,
 		NUM: err == nil && changed.NumLock,
 		CAPS: err == nil && changed.CapsLock,
@@ -508,7 +514,11 @@ func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Valu
 	changed,err := ctl.Keyboard.WaitLEDStateChangeRepeated(mask, repeatCount, maxInterval, timeout)
 	//fmt.Printf("Changed %+v\n", changed)
 
+	errStr := ""
+	if err != nil {errStr = fmt.Sprintf("%v",err)}
 	res,_ = call.Otto.ToValue(struct{
+		ERROR bool
+		ERRORTEXT string
 		TIMEOUT bool
 		NUM bool
 		CAPS bool
@@ -516,6 +526,8 @@ func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Valu
 		COMPOSE bool
 		KANA bool
 	}{
+		ERROR: err != nil,
+		ERRORTEXT: errStr,
 		TIMEOUT: err == ErrTimeout,
 		NUM: err == nil && changed.NumLock,
 		CAPS: err == nil && changed.CapsLock,

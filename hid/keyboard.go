@@ -12,6 +12,7 @@ import (
 	"math/rand"
 	"regexp"
 	"path/filepath"
+	"sync"
 )
 
 var (
@@ -30,10 +31,11 @@ func init() {
 }
 
 type HIDKeyboard struct {
+	lock *sync.Mutex
 	DevicePath           string
 	ActiveLanguageLayout *HIDKeyboardLanguageMap
 	LanguageMaps         map[string]*HIDKeyboardLanguageMap //available language maps
-	LEDWatcher           *HIDKeyboardLEDStateWatcher
+	LEDWatcher           *KeyboardLEDStateWatcher
 	KeyDelay             int
 	KeyDelayJitter       int
 }
@@ -44,21 +46,28 @@ type HIDKeyboard struct {
 func NewKeyboard(devicePath string, resourcePath string) (keyboard *HIDKeyboard, err error) {
 	//ToDo: check existence of deviceFile (+ is writable)
 
-	keyboard = &HIDKeyboard{}
-	keyboard.DevicePath = devicePath
-	keyboard.KeyDelay = 0
-	keyboard.KeyDelayJitter = 0
+	keyboard = &HIDKeyboard{
+		lock: &sync.Mutex{},
+		DevicePath: devicePath,
+		KeyDelay: 0,
+		KeyDelayJitter: 0,
+	}
 
 	//Load available language maps
 	err = keyboard.LoadLanguageMapDir(resourcePath)
 	if err != nil {return nil, err}
 
 	//Init LED sate
-	keyboard.LEDWatcher, err = newHIDKeyboardLEDStateWatcher(devicePath)
+	keyboard.LEDWatcher, err = NewLEDStateWatcher(devicePath)
 	if err != nil {return nil, err}
 
 	return
 }
+
+func (kbd *HIDKeyboard) Close() {
+	kbd.LEDWatcher.Stop()
+}
+
 
 func (kbd *HIDKeyboard) LoadLanguageMapDir(dirpath string) (err error) {
 	folder,err := filepath.Abs(dirpath)
@@ -222,6 +231,7 @@ func (kbd *HIDKeyboard) StringToKeyCombo(comboStr string) (result *KeyboardOutRe
 }
 
 func (kbd *HIDKeyboard) StringToPressKeySequence(str string) (err error) {
+
 	//ToDo: Check if keyboard device file exists
 	if kbd.ActiveLanguageLayout == nil {
 		return errors.New("No language mapping active, couldn't send key sequence!")
@@ -362,6 +372,14 @@ func combineReports(reports []*KeyboardOutReport) (result *KeyboardOutReport, er
 //
 // A key combination, in contrast to a sequence, combines several keys in a single report (f.e. CTRL+ALT+A)
 func (kbd *HIDKeyboard) PressKeySequence(reports []KeyboardOutReport) (err error) {
+	//Synchronize the whole sequence output, as this is considered atomar.
+	// f.e. This is used to type out character which are brought up a sequence consisting of
+	// [some deadkey + modifiers, some normal key + modifier, zero report for key release]
+	// if another key is pressed right after the deadkey, by a different go routine, we end
+	// up with unpredictable output
+	kbd.lock.Lock()
+	defer kbd.lock.Unlock()
+
 	//iterate over reports and send them
 	for _,rep := range reports {
 		err = rep.WriteTo(kbd.DevicePath)

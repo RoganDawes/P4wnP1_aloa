@@ -111,7 +111,7 @@ func TestMultiLEDTrigges(hidCtl *hid.HIDController, triggerMask byte) {
 	}
 }
 
-func TestConcurrentLEDTrigges(hidCtl *hid.HIDController) {
+func TestConcurrentLEDTriggers(hidCtl *hid.HIDController) {
 	go TestMultiLEDTrigges(hidCtl, hid.MaskNumLock)
 	go TestMultiLEDTrigges(hidCtl, hid.MaskCapsLock)
 	go TestMultiLEDTrigges(hidCtl, hid.MaskCapsLock | hid.MaskScrollLock)
@@ -258,6 +258,11 @@ func main() {
 
 
 	hidCtl, err := hid.NewHIDController("/dev/hidg0", "keymaps", "/dev/hidg1")
+
+//	hidCtl.StartScriptAsBackgroundJob("waitLED(ANY)")
+//	time.Sleep(1*time.Second)
+//	hidCtl, err = hid.NewHIDController("/dev/hidg0", "keymaps", "/dev/hidg1")
+
 	if err != nil {panic(err)}
 	hidCtl.Keyboard.KeyDelay = 100
 	//	hidCtl.Keyboard.KeyDelayJitter = 200
@@ -270,14 +275,49 @@ func main() {
 
 	/* tests */
 
+
+
 	//TestComboPress(hidCtl)
 	//TestLEDTriggers(hidCtl)
 	//TestStringTyping(hidCtl)
-	//TestConcurrentLEDTrigges(hidCtl)
+	//TestConcurrentLEDTriggers(hidCtl)
 	//TestMouseNoScript(hidCtl)
 	//TestCombinedScript(hidCtl)
 	//TestMouseCircle(hidCtl)
 
+
+	/*
+	go func() {
+		time.Sleep(3*time.Second)
+		fmt.Printf("=======================\nClosing LED watcher\n======================\n")
+		hidCtl.Keyboard.Close()
+	}()
+
+	scriptConcurrent := `
+		console.log("Starting script with job ID: " + JID);
+		delay(1000);
+		console.log("Script with job ID: " + JID + " finished");
+		res = waitLEDRepeat(ANY,5);
+		console.log("****Finished Waiting for LED " + JSON.stringify(res));
+	`
+
+
+	for i:=0; i<25; i++ {
+		fmt.Printf("Starting background script, run : %d\n",i)
+		_,_,errBG := hidCtl.StartScriptAsBackgroundJob(scriptConcurrent)
+		if errBG != nil { fmt.Printf("Error: %v\n", errBG)}
+		time.Sleep(500 * time.Millisecond)
+
+	}
+
+
+	time.Sleep(2*time.Second)
+	_,err = hidCtl.RunScript(scriptConcurrent)
+	if err != nil {
+		panic(err)
+	}
+
+	*/
 
 	//try to load script file
 	filepath := "./hidtest1.js"
