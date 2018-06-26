@@ -1,0 +1,19 @@
+CLI
+- add config caps for missing USB settings (serial, vid, pid ...)
+- add functionality to issue HIDScripts
+    - Default: HID RunScript(script src) --> returns JOB ID
+    - HID FetchScriptResult(job ID) --> waits for script to finsish and returns result
+
+BOOT
+- deploy a default boot payload (Post Run in systemd service ??, config via /etc/P4wnP1/settings)
+
+USB
+- DONE: add functionality to fetch target devices for HID (e.g. keyboard could be at /dev/hidg0..n depending on USB config)
+- init HIDController
+
+HID
+- add additional keyboard layouts (not for first release)
+
+WIFI
+- implement connection to OPEN-AUTH network as STA
+- implement nexmon firmware support (not for first release)

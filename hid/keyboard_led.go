@@ -270,7 +270,7 @@ func (w *KeyboardLEDStateWatcher) dispatchLoop() {
 				w.listeners.Unlock()
 		}
 	}
-	//fmt.Println("***Stopped LED dispatcher")
+	fmt.Println("***Stopped LED dispatcher")
 }
 
 type KeyboardLEDStateListener struct {

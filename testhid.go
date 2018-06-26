@@ -7,6 +7,13 @@ import(
 	"fmt"
 	"time"
 	"math"
+	"os"
+	"runtime/trace"
+	"os/signal"
+	"syscall"
+	_ "net/http/pprof"
+	"net/http"
+	"runtime"
 	"io/ioutil"
 )
 
@@ -243,8 +250,18 @@ func TestMouseCircle(hidCtl *hid.HIDController) {
 }
 
 func main() {
-	/*
-	*/
+	f, err := os.Create("trace.out")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	err = trace.Start(f)
+	if err != nil {
+		panic(err)
+	}
+	defer trace.Stop()
+
 
 
 
@@ -256,12 +273,75 @@ func main() {
 	}
 	*/
 
+	//Test for memory leaks
+	hidCtlTests := make([]*hid.HIDController,0)
+	for i:=0; i<10;i++ {
+		//create new controller
+		fmt.Printf("****Creating HIDController %d\n", i)
+		hidCtlTest,_ := hid.NewHIDController("/dev/hidg0", "keymaps", "/dev/hidg1")
+
+		//run script which utilizes LED read
+		fmt.Printf("****Starting async LED reading script for HIDController %d\n", i)
+		script := "waitLEDRepeat(ANY);"
+		hidCtlTest.StartScriptAsBackgroundJob(script)
+		hidCtlTest.StartScriptAsBackgroundJob(script)
+		hidCtlTest.StartScriptAsBackgroundJob(script)
+		hidCtlTest.StartScriptAsBackgroundJob(script)
+
+		time.Sleep(time.Second)
+
+		//add to slice
+		hidCtlTests = append(hidCtlTests, hidCtlTest)
+
+
+	}
+
+	/*
+	for i,hidCtlTest := range hidCtlTests {
+		fmt.Printf("****Aborting HIDController %d\n", i)
+		//hidCtlTest.Stop()
+		hidCtlTests[i] = nil //destroy ref to allow GC
+		if i < 5 { time.Sleep(time.Second) }
+		runtime.GC()
+	}
+	*/
+	hidCtlTests = make([]*hid.HIDController,0)
+
+	runtime.GC()
+	for i:=0; i<10;i++ {
+		//create new controller
+		fmt.Printf("****Creating HIDController %d\n", i)
+		hidCtlTest,_ := hid.NewHIDController("/dev/hidg0", "keymaps", "/dev/hidg1")
+
+		//run script which utilizes LED read
+		fmt.Printf("****Starting async LED reading script for HIDController %d\n", i)
+		script := "waitLEDRepeat(ANY);"
+		hidCtlTest.StartScriptAsBackgroundJob(script)
+		hidCtlTest.StartScriptAsBackgroundJob(script)
+		hidCtlTest.StartScriptAsBackgroundJob(script)
+		hidCtlTest.StartScriptAsBackgroundJob(script)
+
+		time.Sleep(time.Second)
+
+		//add to slice
+		hidCtlTests = append(hidCtlTests, hidCtlTest)
+
+
+	}
+
+	/*
+	for i,hidCtlTest := range hidCtlTests {
+		fmt.Printf("****Aborting HIDController %d\n", i)
+		//hidCtlTest.Stop()
+		hidCtlTests[i] = nil //destroy ref to allow GC
+		if i < 5 { time.Sleep(time.Second) }
+		runtime.GC()
+	}
+	*/
+
 
 	hidCtl, err := hid.NewHIDController("/dev/hidg0", "keymaps", "/dev/hidg1")
 
-//	hidCtl.StartScriptAsBackgroundJob("waitLED(ANY)")
-//	time.Sleep(1*time.Second)
-//	hidCtl, err = hid.NewHIDController("/dev/hidg0", "keymaps", "/dev/hidg1")
 
 	if err != nil {panic(err)}
 	hidCtl.Keyboard.KeyDelay = 100
@@ -273,10 +353,7 @@ func main() {
 	if err != nil { fmt.Println(err)}
 	fmt.Printf("Chosen keyboard language mapping '%s'\n", hidCtl.Keyboard.ActiveLanguageLayout.Name)
 
-	/* tests */
-
-
-
+	// tests
 	//TestComboPress(hidCtl)
 	//TestLEDTriggers(hidCtl)
 	//TestStringTyping(hidCtl)
@@ -285,39 +362,6 @@ func main() {
 	//TestCombinedScript(hidCtl)
 	//TestMouseCircle(hidCtl)
 
-
-	/*
-	go func() {
-		time.Sleep(3*time.Second)
-		fmt.Printf("=======================\nClosing LED watcher\n======================\n")
-		hidCtl.Keyboard.Close()
-	}()
-
-	scriptConcurrent := `
-		console.log("Starting script with job ID: " + JID);
-		delay(1000);
-		console.log("Script with job ID: " + JID + " finished");
-		res = waitLEDRepeat(ANY,5);
-		console.log("****Finished Waiting for LED " + JSON.stringify(res));
-	`
-
-
-	for i:=0; i<25; i++ {
-		fmt.Printf("Starting background script, run : %d\n",i)
-		_,_,errBG := hidCtl.StartScriptAsBackgroundJob(scriptConcurrent)
-		if errBG != nil { fmt.Printf("Error: %v\n", errBG)}
-		time.Sleep(500 * time.Millisecond)
-
-	}
-
-
-	time.Sleep(2*time.Second)
-	_,err = hidCtl.RunScript(scriptConcurrent)
-	if err != nil {
-		panic(err)
-	}
-
-	*/
 
 	//try to load script file
 	filepath := "./hidtest1.js"
@@ -328,87 +372,16 @@ func main() {
 		if err != nil { panic(err)}
 	}
 
-	/*
-
-	script := `
-		for (i=0; i<10; i++) {
-			press("CAPS")
-			delay(500)
-		}
-
-		type(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~");
-		type("\n")
-		type("Waiting 500ms ...\n");
-		delay(500)
-		type("... done\n");
-		type("§°üÜöÖäÄµ€ß¹²³⁴⁵⁶⁷⁸⁹⁰¼½¬„“¢«»æſðđŋħĸł’¶ŧ←↓→øþ");
-		type("\n")
-		
-		console.log("Log message from JS"); 
-	`
-
-	hidCtl.StartScriptAsBackgroundJob(script)
-
-	fmt.Println("Running script ...")
-	val,err := hidCtl.RunScript(script)
-	if err != nil {log.Fatal(err)}
-	fmt.Printf("Running script finished with result: %v ...\n", val)
-
-	script2 := `
-		for (i=0; i<10; i++)
-		{
-			console.log("Run " + i + ":");
-			console.log("JS sleeping 1000ms");
-			delay(1000);
-		}
-	`
-	script3 := `
-		for (i=0; i<30; i++)
-		{
-			console.log("JS script 3 Run " + i);
-			delay(500);
-		}
-	`
-
-	id, avm,_ := hidCtl.StartScriptAsBackgroundJob(script2)
-	fmt.Printf("Satrted ASYNC VM %d ...\n", id)
 
 
-	time.Sleep(1500 * time.Millisecond)
-	id2 ,avm2, _ := hidCtl.StartScriptAsBackgroundJob(script3)
-	fmt.Printf("Slept 1500 ms, started VM %d ...\n", id2)
-	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id, avm.IsWorking())
-	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id2, avm2.IsWorking())
+	go http.ListenAndServe(":8080", nil)
 
-	time.Sleep(1500 * time.Millisecond)
-	fmt.Printf("Slept 1500 ms, cancelling VM %d and start waiting for VM %d...\n", id2, id)
-	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id, avm.IsWorking())
-	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id2, avm2.IsWorking())
-	fmt.Printf("List of currently working VMs: %v\n", hidCtl.GetRunningBackgroundJobs())
-	//avm2.Cancel()
-	hidCtl.CancelBackgroundJob(id2)
-
-	//Waiting for canceled script
-	_,err = avm2.WaitResult()
-	if err != nil {
-		fmt.Printf("Script 2 resulted in error: %v\n", err)
-	}
-
-
-	//Try to reuse avm2
-	fmt.Println("Restarting script 3 on second VM")
-	time.Sleep(2000 * time.Millisecond)
-	avm2.RunAsync(script3)
-
-	//Cancel all
-	hidCtl.CancelAllBackgroundJobs()
-
-	val,err = avm.WaitResult()
-
-	if err != nil {log.Fatal(err)}
-	fmt.Printf("Running Script ASYNC finished with result: %v ...\n", val)
-	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id, avm.IsWorking())
-	fmt.Printf("AsyncVM state isWorking of id %d: %v\n", id2, avm2.IsWorking())
-
-	*/
+	//use a channel to wait for SIGTERM or SIGINT
+	fmt.Println("Waiting for keyboard interrupt")
+	sig := make(chan os.Signal)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	s := <-sig
+	log.Printf("Signal (%v) received, closing ...\n", s)
+	return
+	//log.Fatalf("Signal (%v) received, closing \"Let Me In\" rebind DNS server\n", s)
 }

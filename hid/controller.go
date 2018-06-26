@@ -2,10 +2,10 @@
 package hid
 
 import (
+	"errors"
 	"github.com/robertkrimen/otto"
 	"log"
 	"time"
-	"errors"
 	"fmt"
 )
 
@@ -16,128 +16,33 @@ const (
 )
 
 var (
+	hidControllerReuse *HIDController
+
 	halt = errors.New("Stahp")
 	ErrAbort = errors.New("Event listening aborted")
 	ErrNotAllowed = errors.New("Calling not allowed (currently disabled)")
 )
 
-type AsyncOttoVM struct {
-	vm           *otto.Otto
-	ResultErr    *error
-	ResultValue  otto.Value
-	Finished chan bool
-	isWorking    bool
-}
-
-func NewAsyncOttoVM(vm *otto.Otto) *AsyncOttoVM {
-	vm.Interrupt = make(chan func(), 1) //set Interrupt channel
-	return &AsyncOttoVM{
-		isWorking:    false,
-		ResultValue:  otto.Value{},
-		Finished: make(chan bool,1), //buffer of 1 as we don't want to block on setting the finished signal
-		vm:           vm,
-	}
-}
-
-func NewAsyncOttoVMClone(vm *otto.Otto) *AsyncOttoVM {
-	return NewAsyncOttoVM(vm.Copy())
-}
-
-func (avm *AsyncOttoVM) Run(src interface{}) (val otto.Value, res error) {
-	res = avm.RunAsync(src)
-	if res != nil { return }
-
-	return avm.WaitResult()
-}
-
-func (avm *AsyncOttoVM) RunAsync(src interface{}) (error) {
-	go func(avm *AsyncOttoVM) {
-		avm.setIsWorking(true)
-//		avm.runningAsync = true
-
-		defer func() {
-			if caught := recover(); caught != nil {
-				if caught == halt {
-					nErr := errors.New("VM execution cancelled")
-					avm.ResultErr = &nErr
-
-					avm.isWorking = false
-					avm.setIsWorking(false)
-
-					//destroy reference to Otto
-					avm.vm = nil
-
-					//signal finished
-					avm.Finished <- true
-					return
-				}
-				panic(caught) //re-raise panic, as it isn't `halt`
-			}
-			avm.setIsWorking(false)
-		}()
-
-//		fmt.Println("Running vm")
-		tmpValue, tmpErr := avm.vm.Run(src)
-		avm.ResultValue = tmpValue //store value first, to have it accessible when error is retrieved from channel
-		avm.ResultErr = &tmpErr
-		avm.Finished <- true
-//		fmt.Println("Stored vm result")
+// Note: The HID Controller uses multiple otto.Otto VMs
+// The HIDController object can't be used, once the USB stack re-initializes, as the HID keyboard and mouse
+// depend on the device file currently in use. Thus I started multiple attempts to cleanly destroy the otto VMs
+// in order to allow creating a new HIDController object. This didn't succeed, as no matter what I tried, the
+// (no more used and referenced) otto VMs leak memory. To cope with that, the max amount of concurrent existing
+// otto VMs is limited to MAX_VM. The VMs (clone from a master VM, providing all the functionality) have to be
+// reused. This again means, the HIDController object exists during the whole runtime and needs a method to be
+// reconfigured. The cause of a reconfiguration is a change in the HID functions, leading to the need of using
+// different device files for keyboard / mouse communication (f.e. a setup with keyboard + mouse has /dev/hidg0
+// and /dev/hidg1, while a changed setup with mouse or keyboard only use /dev/hidg0 for the respective device -
+// there wouldn't exist a /dev/hidg1).
+// In order to reuse the HIDController, there has to be some kind of Reset() method, fulfilling the following tasks:
+// 	- init a new HIDKeyboard if necessary, based on the new devicepath
+// 		- the HIDkeyboard uses a KeyboardLEDStateWatcher, which constantly reads the device file (receives USB HID
+// 		output reports) and thus needs to be stopped and reinitialized
+//	- init a new Mouse if necessary, there should be no problem overwriting the former Mouse object and let the GC
+// 	do its work
+//	- interrupt all script currently running on the ottoVMs
 
 
-
-		//avm.setIsWorking(false)
-	}(avm)
-	return nil
-}
-
-func (avm *AsyncOttoVM) setIsWorking(isWorking bool) {
-	avm.isWorking = isWorking
-}
-
-func (avm *AsyncOttoVM) IsWorking() (res bool) {
-	res = avm.isWorking
-	return
-}
-
-func (avm *AsyncOttoVM) WaitResult()  (val otto.Value, err error) {
-
-	//Always run async
-	/*
-	if !avm.runningAsync {
-		return otto.Value{},errors.New("AsyncVM isn't running an async script from which a result could be received")
-	}
-	*/
-
-	if avm.vm == nil {
-		return val,errors.New("Async vm isn't valid anymore")
-	}
-
-	//wait for finished signal
-	<- avm.Finished
-
-	//destroy reference to vm
-	avm.vm = nil
-	return avm.ResultValue, *avm.ResultErr
-}
-
-func (avm *AsyncOttoVM) Cancel() error {
-	if avm.vm == nil {
-		return errors.New("Async vm isn't valid anymore")
-	}
-
-	// Note: in between here, there's a small race condition, if avm.vm is set to nil
-	// after the check above (f.e. the vm returns an result and thus the pointer is set to nil,
-	// right after the check)
-
-	//interrupt vm
-	avm.vm.Interrupt <- func() {
-		panic(halt)
-	}
-
-
-
-	return nil
-}
 
 type HIDController struct {
 	Keyboard *HIDKeyboard
@@ -147,52 +52,73 @@ type HIDController struct {
 }
 
 func NewHIDController(keyboardDevicePath string, keyboardMapPath string, mouseDevicePath string) (ctl *HIDController, err error) {
-	ctl = &HIDController{}
+	if hidControllerReuse == nil {
+		hidControllerReuse = &HIDController{}
+
+		hidControllerReuse.initMasterVM()
+		//clone VM to pool
+		for  i:=0; i< len(hidControllerReuse.vmPool); i++ {
+			hidControllerReuse.vmPool[i] = NewAsyncOttoVMClone(hidControllerReuse.vmMaster)
+		}
+	} else {
+		// an old HIDController object is reused and has to be cleaned
+
+
+
+		//stop the old LED reader if present
+		// !! Keyboard.Close() has to be called before sending IRQ to VMs (there're JS function which register
+		// blocking callbacks to the Keyboard's LED reader, which would hinder the VM interrupt in triggering)
+		if hidControllerReuse.Keyboard != nil {
+	fmt.Println("***CLOSE KBD AND LED STATE LISTENER DUE TO CONTROLLER REUSE")
+			hidControllerReuse.Keyboard.Close() //interrupts go routines reading from device file and lets LEDStateListeners die
+	fmt.Println("***DONE CLOSING KBD AND LED STATE LISTENER DUE TO CONTROLLER REUSE")
+			hidControllerReuse.Keyboard = nil
+		}
+
+		// Interrupt all VMs already running
+		fmt.Println("***CANCEL BG JOBS DUE TO CONTROLLER REUSE")
+		hidControllerReuse.CancelAllBackgroundJobs()
+
+		hidControllerReuse.Mouse = nil
+	}
+
+
 
 	//Note: to disable mouse/keyboard support, the respective device path has to have zero length
 
 	//init keyboard
 	if len(keyboardDevicePath) > 0 {
-		ctl.Keyboard, err = NewKeyboard(keyboardDevicePath, keyboardMapPath)
+		hidControllerReuse.Keyboard, err = NewKeyboard(keyboardDevicePath, keyboardMapPath)
 		if err != nil { return nil, err	}
 	}
 
 	//init Mouse
 	if len(mouseDevicePath) > 0 {
-		ctl.Mouse,err = NewMouse(mouseDevicePath)
+		hidControllerReuse.Mouse,err = NewMouse(mouseDevicePath)
 		if err != nil { return nil, err	}
 	}
 
 
 	//init master otto vm (vm.Copy() seems to be prone to memory leak, so we build them by hand)
 
+
+
 	/*
-	ctl.initMasterVM()
-
-	//clone VM to pool
-	for  i:=0; i< len(ctl.vmPool); i++ {
-		ctl.vmPool[i] = NewAsyncOttoVMClone(ctl.vmMaster)
-	}
-	*/
-
 	for  i:=0; i< len(ctl.vmPool); i++ {
 		vm := otto.New()
 		ctl.initVM(vm)
 		ctl.vmPool[i] = NewAsyncOttoVM(vm)
 	}
+	*/
 
-	return
+	return hidControllerReuse, nil
 }
 
+/*
 func (ctl *HIDController) Stop() error {
 	//cancel LED reader (interrupts listeners, scripts using the listener, because of commands like "waitLED" continue running, but the respective command fails)
 	ctl.Keyboard.Close()
 
-	/*
-	// The NewAsyncOttoVMClone() function uses the otto.Copy(9 method which seems to initialize some maps for cloning,
-	// resulting in a memory leak (objectClone function in object_class.go). Thus we reinit the "masterVm" to allow GC
-	ctl.initMasterVM()
-	*/
 
 	//Cancel all VMs which are still running scripts
 	ctl.CancelAllBackgroundJobs()
@@ -204,6 +130,7 @@ func (ctl *HIDController) Stop() error {
 
 	return nil
 }
+*/
 
 func (ctl *HIDController) NextUnusedVM() (idx int, vm *AsyncOttoVM, err error) {
 	//iterate over pool
@@ -279,6 +206,8 @@ func (ctl *HIDController) currentlyWorkingVMs() (res []*AsyncOttoVM) {
 
 func (ctl *HIDController) CancelAllBackgroundJobs() error {
 	for i := 0; i< MAX_VM; i++ {
+		fmt.Printf("CANCELLING VM %d: %+v\n",i, ctl.vmPool[i])
+
 		if ctl.vmPool[i].IsWorking() {
 			ctl.vmPool[i].Cancel()
 		}
