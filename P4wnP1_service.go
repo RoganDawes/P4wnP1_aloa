@@ -39,5 +39,11 @@ func main() {
 
 	service.InitLed(false) //Set LED to manual trigger
 	service.InitDefaultLEDSettings()
+
+	log.Printf("Keyboard devFile: %s\n", service.HidDevPath[service.USB_FUNCTION_HID_KEYBOARD_name])
+	log.Printf("Mouse devFile: %s\n", service.HidDevPath[service.USB_FUNCTION_HID_MOUSE_name])
+	log.Printf("HID RAW devFile: %s\n", service.HidDevPath[service.USB_FUNCTION_HID_RAW_name])
+
+
 	service.StartRpcServerAndWeb("0.0.0.0", "50051") //start gRPC service
 }

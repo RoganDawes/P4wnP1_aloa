@@ -259,17 +259,6 @@ func wifiCreateHostapdConfString(ws *pb.WiFiSettings) (config string, err error)
 	return
 }
 
-func WifiTest() {
-	fmt.Println("Hostapd settings:")
-	conf, err := wifiCreateHostapdConfString(GetDefaultWiFiSettings())
-	if err == nil {
-		fmt.Println(conf)
-	} else {
-		fmt.Printf("Error creating hostapd config: %v\n", err)
-	}
-
-	fmt.Println("End of hostapd settings:")
-}
 
 func hostapdCreateConfigFile(s *pb.WiFiSettings, filename string) (err error) {
 	log.Printf("Creating hostapd configuration file at '%s'\n", filename)

@@ -12,6 +12,7 @@ import (
 	"time"
 	"fmt"
 	"net"
+	"regexp"
 )
 
 const (
@@ -73,7 +74,9 @@ const (
 )
 
 var (
-	 GadgetSettingsState  pb.GadgetSettings = pb.GadgetSettings{}
+	GadgetSettingsState pb.GadgetSettings = pb.GadgetSettings{}
+	rp_usbHidDevName                      = regexp.MustCompile("(?m)DEVNAME=(.*)\n")
+	HidDevPath                            = make(map[string]string) //stores device path for HID devices
 )
 
 func ValidateGadgetSetting(gs pb.GadgetSettings) error {
@@ -568,6 +571,12 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 		}
 	}
 
+
+	//clear device path for HID devices
+	HidDevPath[USB_FUNCTION_HID_KEYBOARD_name] = ""
+	HidDevPath[USB_FUNCTION_HID_MOUSE_name] = ""
+	HidDevPath[USB_FUNCTION_HID_RAW_name] = ""
+
 	//get UDC driver name and bind to gadget
 	if settings.Enabled {
 		udc_name, err := getUDCName()
@@ -578,7 +587,14 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 		if err = ioutil.WriteFile(USB_GADGET_DIR+"/UDC", []byte(udc_name), os.ModePerm); err != nil {
 			return err
 		}
+
+		//update device path'
+		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_KEYBOARD_name); errF == nil  { HidDevPath[USB_FUNCTION_HID_KEYBOARD_name] = devPath }
+		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_MOUSE_name); errF == nil  { HidDevPath[USB_FUNCTION_HID_MOUSE_name] = devPath }
+		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_RAW_name); errF == nil  { HidDevPath[USB_FUNCTION_HID_RAW_name] = devPath }
 	}
+
+
 
 
 	deleteUSBEthernetBridge() //delete former used bridge, if there's any
@@ -600,6 +616,32 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 
 	log.Printf("... done")
 	return nil
+}
+
+func enumDevicePath(funcName string) (devPath string, err error){
+	//cat /sys/dev/char/$(cat /sys/kernel/config/usb_gadget/mame82_gadget/functions/hid.mouse/dev)/uevent | grep DEVNAME
+	devfile := USB_GADGET_DIR + "/functions/" + funcName + "/dev"
+
+	var udevNode string
+	if res, err := ioutil.ReadFile(devfile); err != nil {
+		err1 := errors.New(fmt.Sprintf("Gadget error reading udevname for %s\n", funcName))
+		return "", err1
+	} else {
+		udevNode = strings.TrimSuffix(string(res), "\n")
+	}
+
+
+	ueventPath := fmt.Sprintf("/sys/dev/char/%s/uevent", udevNode)
+	if ueventContent, err := ioutil.ReadFile(ueventPath); err != nil {
+		err1 := errors.New(fmt.Sprintf("Gadget error reading uevent file '%s' for %s\n", ueventPath, funcName))
+		return "", err1
+	} else {
+
+		strDevNameSub := rp_usbHidDevName.FindStringSubmatch(string(ueventContent))
+		if len(strDevNameSub) > 1 { devPath = "/dev/" + strDevNameSub[1]}
+	}
+
+	return
 }
 
 func DestroyAllGadgets() error {
