@@ -134,6 +134,8 @@ func (avm *AsyncOttoVM) Cancel() error {
 		panic(halt)
 	}
 
+
+
 	return nil
 }
 
@@ -162,17 +164,45 @@ func NewHIDController(keyboardDevicePath string, keyboardMapPath string, mouseDe
 	}
 
 
-	//init master otto vm
+	//init master otto vm (vm.Copy() seems to be prone to memory leak, so we build them by hand)
 
+	/*
 	ctl.initMasterVM()
 
 	//clone VM to pool
 	for  i:=0; i< len(ctl.vmPool); i++ {
 		ctl.vmPool[i] = NewAsyncOttoVMClone(ctl.vmMaster)
 	}
+	*/
 
+	for  i:=0; i< len(ctl.vmPool); i++ {
+		vm := otto.New()
+		ctl.initVM(vm)
+		ctl.vmPool[i] = NewAsyncOttoVM(vm)
+	}
 
 	return
+}
+
+func (ctl *HIDController) Stop() error {
+	//cancel LED reader (interrupts listeners, scripts using the listener, because of commands like "waitLED" continue running, but the respective command fails)
+	ctl.Keyboard.Close()
+
+	/*
+	// The NewAsyncOttoVMClone() function uses the otto.Copy(9 method which seems to initialize some maps for cloning,
+	// resulting in a memory leak (objectClone function in object_class.go). Thus we reinit the "masterVm" to allow GC
+	ctl.initMasterVM()
+	*/
+
+	//Cancel all VMs which are still running scripts
+	ctl.CancelAllBackgroundJobs()
+
+	//close interrupt channels
+	for i := 0; i< MAX_VM; i++ {
+		close(ctl.vmPool[i].vm.Interrupt)
+	}
+
+	return nil
 }
 
 func (ctl *HIDController) NextUnusedVM() (idx int, vm *AsyncOttoVM, err error) {
@@ -664,60 +694,65 @@ func (ctl *HIDController) jsDoubleClick(call otto.FunctionCall) (res otto.Value)
 }
 
 
-
 func (ctl *HIDController) initMasterVM() (err error) {
 	ctl.vmMaster = otto.New()
-	err = ctl.vmMaster.Set("NUM", MaskNumLock)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("CAPS", MaskCapsLock)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("SCROLL", MaskScrollLock)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("COMPOSE", MaskCompose)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("KANA", MaskKana)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("ANY", MaskAny)
-	if err != nil { return err }
-
-	err = ctl.vmMaster.Set("BT1", BUTTON1)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("BT2", BUTTON2)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("BT3", BUTTON3)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("BTNONE", 0)
-	if err != nil { return err }
+	ctl.initVM(ctl.vmMaster)
+	return nil
+}
 
 
-	err = ctl.vmMaster.Set("typingSpeed", ctl.jsTypingSpeed) //This function influences all scripts
+func (ctl *HIDController) initVM(vm *otto.Otto) (err error) {
+	err = vm.Set("NUM", MaskNumLock)
+	if err != nil { return err }
+	err = vm.Set("CAPS", MaskCapsLock)
+	if err != nil { return err }
+	err = vm.Set("SCROLL", MaskScrollLock)
+	if err != nil { return err }
+	err = vm.Set("COMPOSE", MaskCompose)
+	if err != nil { return err }
+	err = vm.Set("KANA", MaskKana)
+	if err != nil { return err }
+	err = vm.Set("ANY", MaskAny)
 	if err != nil { return err }
 
-	err = ctl.vmMaster.Set("type", ctl.jsType)
+	err = vm.Set("BT1", BUTTON1)
 	if err != nil { return err }
-	err = ctl.vmMaster.Set("delay", ctl.jsDelay)
+	err = vm.Set("BT2", BUTTON2)
 	if err != nil { return err }
-	err = ctl.vmMaster.Set("press", ctl.jsPress)
+	err = vm.Set("BT3", BUTTON3)
 	if err != nil { return err }
-	err = ctl.vmMaster.Set("waitLED", ctl.jsWaitLED)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("waitLEDRepeat", ctl.jsWaitLEDRepeat)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("layout", ctl.jsLayout)
+	err = vm.Set("BTNONE", 0)
 	if err != nil { return err }
 
-	err = ctl.vmMaster.Set("move", ctl.jsMove)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("moveStepped", ctl.jsMoveStepped)
-	if err != nil { return err }
-	err = ctl.vmMaster.Set("moveTo", ctl.jsMoveTo)
+
+	err = vm.Set("typingSpeed", ctl.jsTypingSpeed) //This function influences all scripts
 	if err != nil { return err }
 
-	err = ctl.vmMaster.Set("button", ctl.jsButton)
+	err = vm.Set("type", ctl.jsType)
 	if err != nil { return err }
-	err = ctl.vmMaster.Set("click", ctl.jsClick)
+	err = vm.Set("delay", ctl.jsDelay)
 	if err != nil { return err }
-	err = ctl.vmMaster.Set("doubleClick", ctl.jsDoubleClick)
+	err = vm.Set("press", ctl.jsPress)
+	if err != nil { return err }
+	err = vm.Set("waitLED", ctl.jsWaitLED)
+	if err != nil { return err }
+	err = vm.Set("waitLEDRepeat", ctl.jsWaitLEDRepeat)
+	if err != nil { return err }
+	err = vm.Set("layout", ctl.jsLayout)
+	if err != nil { return err }
+
+	err = vm.Set("move", ctl.jsMove)
+	if err != nil { return err }
+	err = vm.Set("moveStepped", ctl.jsMoveStepped)
+	if err != nil { return err }
+	err = vm.Set("moveTo", ctl.jsMoveTo)
+	if err != nil { return err }
+
+	err = vm.Set("button", ctl.jsButton)
+	if err != nil { return err }
+	err = vm.Set("click", ctl.jsClick)
+	if err != nil { return err }
+	err = vm.Set("doubleClick", ctl.jsDoubleClick)
 	if err != nil { return err }
 	return nil
 }

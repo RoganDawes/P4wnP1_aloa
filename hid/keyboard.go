@@ -429,13 +429,13 @@ type KeyboardOutReport struct {
 
 
 func (kr *KeyboardOutReport) UnmarshalJSON(b []byte) error {
-	var o interface{}
+	var o map[string]interface{}
 	if err := json.Unmarshal(b,&o); err != nil {
 		return err
 	}
 
-	m := o.(map[string]interface{})
-	for k,v := range m {
+
+	for k,v := range o {
 		//log.Printf("key: %v, val %v (%T)\n", k, v, v)
 
 		switch strings.ToLower(k) {
