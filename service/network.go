@@ -176,6 +176,21 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 			if err != nil {return err}
 			//stop already running DHCPServers for the interface
 			StopDHCPServer(ifName)
+
+			//special case: if the interface name is USB_ETHERNET_BRIDGE_NAME, we delete the old lease file
+			// the flushing of still running leases is needed, as after USB reinit, RNDIS hosts aren't guaranteed to
+			// receive the sam MAC, which would effectivly block reusing of a lease for the same IP (a problem, as in
+			// typical DHCP server configurations for USB Ethernet, the same remote IP should be offered every time)
+			if settings.Name == USB_ETHERNET_BRIDGE_NAME {
+				log.Printf("Reconfiguration of USB Ethernert interface as DHCP server, trying to delete old lease file ...\n")
+				errD := os.Remove(settings.DhcpServerSettings.LeaseFile)
+				if errD == nil {
+					log.Println(" ... old lease file deleted successfull")
+				} else {
+					log.Printf(" ... old lease couldn't be deleted (Fetching a new DHCP lease could take a while on USB ethernet)!\n\tReason: %v\n", errD)
+				}
+			}
+
 			//start the DHCP server
 			err = StartDHCPServer(ifName, confName)
 			if err != nil {return err}

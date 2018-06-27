@@ -8,6 +8,8 @@ install:
 	cp P4wnP1_service /usr/local/bin/
 	cp P4wnP1_cli /usr/local/bin/
 	cp P4wnP1.service /etc/systemd/system/P4wnP1.service
+	mkdir /usr/local/P4wnP1
+	cp -R keymaps /usr/local/P4wnP1/
 	# reinit service daemon
 	systemctl daemon-reload
 	# enable service
@@ -23,5 +25,6 @@ remove:
 	rm -f /usr/local/bin/P4wnP1_service
 	rm -f /usr/local/bin/P4wnP1_cli
 	rm -f /etc/systemd/system/P4wnP1.service
+	rm -R /usr/local/P4wnP1/
 	# reinit service daemon
 	systemctl daemon-reload

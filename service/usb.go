@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"net"
 	"regexp"
+	"../hid"
 )
 
 const (
@@ -71,12 +72,15 @@ const (
 	USB_FUNCTION_HID_RAW_report_desc   = "\x06\x00\xff\t\x01\xa1\x01\t\x01\x15\x00&\xff\x00u\x08\x95@\x81\x02\t\x02\x15\x00&\xff\x00u\x08\x95@\x91\x02\xc0"
 	USB_FUNCTION_HID_RAW_name          = "hid.raw"
 
+	USB_KEYBOARD_LANGUAGE_MAP_PATH = "/usr/local/P4wnP1/keymaps"
+
 )
 
 var (
 	GadgetSettingsState pb.GadgetSettings = pb.GadgetSettings{}
 	rp_usbHidDevName                      = regexp.MustCompile("(?m)DEVNAME=(.*)\n")
 	HidDevPath                            = make(map[string]string) //stores device path for HID devices
+	HidCtl *hid.HIDController
 )
 
 func ValidateGadgetSetting(gs pb.GadgetSettings) error {
@@ -592,6 +596,24 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_KEYBOARD_name); errF == nil  { HidDevPath[USB_FUNCTION_HID_KEYBOARD_name] = devPath }
 		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_MOUSE_name); errF == nil  { HidDevPath[USB_FUNCTION_HID_MOUSE_name] = devPath }
 		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_RAW_name); errF == nil  { HidDevPath[USB_FUNCTION_HID_RAW_name] = devPath }
+
+		//if Keyboard or Mouse are deployed, grab a HIDController Instance else set it to nil (the old HIDController object won't be destroyed)
+		if settings.Use_HID_KEYBOARD || settings.Use_HID_MOUSE {
+			devPathKeyboard := HidDevPath[USB_FUNCTION_HID_KEYBOARD_name]
+			devPathMouse := HidDevPath[USB_FUNCTION_HID_MOUSE_name]
+
+			var errH error
+			HidCtl, errH = hid.NewHIDController(devPathKeyboard, USB_KEYBOARD_LANGUAGE_MAP_PATH, devPathMouse)
+			if errH != nil {
+				log.Printf("ERROR: Couldn't bring up an instance of HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s'\nReason: %v\n", devPathKeyboard, devPathMouse, USB_KEYBOARD_LANGUAGE_MAP_PATH, errH)
+			} else {
+				log.Printf("HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s' initialized\n", devPathKeyboard, devPathMouse, USB_KEYBOARD_LANGUAGE_MAP_PATH)
+			}
+		} else {
+			if HidCtl != nil { HidCtl.Abort() }
+			HidCtl = nil
+			log.Printf("HIDController for keyboard / mouse disabled\n")
+		}
 	}
 
 
@@ -666,6 +688,10 @@ func DestroyAllGadgets() error {
 			log.Println(err) //don't return, continue with next
 		}
 	}
+
+	if HidCtl != nil { HidCtl.Abort() }
+	HidCtl = nil
+	log.Printf("HIDController for keyboard / mouse disabled\n")
 
 	return nil
 }

@@ -13,6 +13,8 @@ USB
 
 HID
 - add additional keyboard layouts (not for first release)
+- DONE: fix absolute mouse movement
+- DONE: avoid memory leak on reinit of HIDController
 
 WIFI
 - implement connection to OPEN-AUTH network as STA

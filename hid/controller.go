@@ -63,22 +63,8 @@ func NewHIDController(keyboardDevicePath string, keyboardMapPath string, mouseDe
 	} else {
 		// an old HIDController object is reused and has to be cleaned
 
-
-
-		//stop the old LED reader if present
-		// !! Keyboard.Close() has to be called before sending IRQ to VMs (there're JS function which register
-		// blocking callbacks to the Keyboard's LED reader, which would hinder the VM interrupt in triggering)
-		if hidControllerReuse.Keyboard != nil {
-	fmt.Println("***CLOSE KBD AND LED STATE LISTENER DUE TO CONTROLLER REUSE")
-			hidControllerReuse.Keyboard.Close() //interrupts go routines reading from device file and lets LEDStateListeners die
-	fmt.Println("***DONE CLOSING KBD AND LED STATE LISTENER DUE TO CONTROLLER REUSE")
-			hidControllerReuse.Keyboard = nil
-		}
-
-		// Interrupt all VMs already running
-		fmt.Println("***CANCEL BG JOBS DUE TO CONTROLLER REUSE")
-		hidControllerReuse.CancelAllBackgroundJobs()
-
+		hidControllerReuse.Abort()
+		hidControllerReuse.Keyboard = nil
 		hidControllerReuse.Mouse = nil
 	}
 
@@ -98,39 +84,20 @@ func NewHIDController(keyboardDevicePath string, keyboardMapPath string, mouseDe
 		if err != nil { return nil, err	}
 	}
 
-
-	//init master otto vm (vm.Copy() seems to be prone to memory leak, so we build them by hand)
-
-
-
-	/*
-	for  i:=0; i< len(ctl.vmPool); i++ {
-		vm := otto.New()
-		ctl.initVM(vm)
-		ctl.vmPool[i] = NewAsyncOttoVM(vm)
-	}
-	*/
-
 	return hidControllerReuse, nil
 }
 
-/*
-func (ctl *HIDController) Stop() error {
-	//cancel LED reader (interrupts listeners, scripts using the listener, because of commands like "waitLED" continue running, but the respective command fails)
-	ctl.Keyboard.Close()
-
-
-	//Cancel all VMs which are still running scripts
-	ctl.CancelAllBackgroundJobs()
-
-	//close interrupt channels
-	for i := 0; i< MAX_VM; i++ {
-		close(ctl.vmPool[i].vm.Interrupt)
+func (ctl *HIDController) Abort()  {
+	// stop the old LED reader if present
+	// !! Keyboard.Close() has to be called before sending IRQ to VMs (there're JS function which register
+	// blocking callbacks to the Keyboard's LED reader, which would hinder the VM interrupt in triggering)
+	if hidControllerReuse.Keyboard != nil {
+		hidControllerReuse.Keyboard.Close() //interrupts go routines reading from device file and lets LEDStateListeners die
 	}
 
-	return nil
+	// Interrupt all VMs already running
+	hidControllerReuse.CancelAllBackgroundJobs()
 }
-*/
 
 func (ctl *HIDController) NextUnusedVM() (idx int, vm *AsyncOttoVM, err error) {
 	//iterate over pool
@@ -230,7 +197,13 @@ func (ctl *HIDController) jsType(call otto.FunctionCall) (res otto.Value) {
 		log.Printf("HIDScript type: couldn't convert '%s' to UTF-8 string\n", arg0)
 		return
 	}
-	log.Printf("HIDScript type: Typing '%s ...' on HID keyboard device '%s'\n", outStr[:15], ctl.Keyboard.DevicePath)
+	var partial string
+	if len(outStr) > 15 {
+		partial = outStr[:15]
+	} else {
+		partial = outStr
+	}
+	log.Printf("HIDScript type: Typing '%s ...' on HID keyboard device '%s'\n", partial, ctl.Keyboard.DevicePath)
 	err = ctl.Keyboard.StringToPressKeySequence(outStr)
 	if err != nil {
 		log.Printf("HIDScript type: Couldn't type out `%s` on %v\n", outStr, ctl.Keyboard.DevicePath)
@@ -358,12 +331,12 @@ func (ctl *HIDController) jsWaitLED(call otto.FunctionCall) (res otto.Value) {
 //		log.Printf("Timeout given: %v\n", arg1)
 		timeoutInt, err := arg1.ToInteger()
 		if err != nil || timeoutInt < 0 {
-			log.Printf("HIDScript WaitLED: Second argument for `waitLED` is the timeout in seconds and has to be given as positive interger, but '%d' was given!\n", arg1)
+			log.Printf("HIDScript WaitLED: Second argument for `waitLED` is the timeout in milliseconds and has to be given as positive interger, but '%d' was given!\n", arg1)
 			return
 		}
-		timeout = time.Duration(timeoutInt) * time.Second
+		timeout = time.Duration(timeoutInt) * time.Millisecond
 	default:
-		log.Printf("HIDScript WaitLED: Second argument for `waitLED` is the timeout in seconds and has to be given as interger or omitted for infinite timeout\n")
+		log.Printf("HIDScript WaitLED: Second argument for `waitLED` is the timeout in milliseconds and has to be given as interger or omitted for infinite timeout\n")
 		return
 	}
 
@@ -460,12 +433,12 @@ func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Valu
 		//		log.Printf("Timeout given: %v\n", arg1)
 		timeoutInt, err := arg3.ToInteger()
 		if err != nil || timeoutInt < 0 {
-			log.Printf("HIDScript WaitLEDRepeat: Second argument for `waitLED` is the timeout in seconds and has to be given as positive interger, but '%d' was given!\n", arg1)
+			log.Printf("HIDScript WaitLEDRepeat: Second argument for `waitLED` is the timeout in milliseconds and has to be given as positive interger, but '%d' was given!\n", arg1)
 			return
 		}
-		timeout = time.Duration(timeoutInt) * time.Second
+		timeout = time.Duration(timeoutInt) * time.Millisecond
 	default:
-		log.Printf("HIDScript WaitLEDRepeat: Second argument for `waitLED` is the timeout in seconds and has to be given as interger or omitted for infinite timeout\n")
+		log.Printf("HIDScript WaitLEDRepeat: Second argument for `waitLED` is the timeout in milliseconds and has to be given as interger or omitted for infinite timeout\n")
 		return
 	}
 

@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"math"
+	"time"
+	"fmt"
 )
 
 const (
@@ -35,7 +37,7 @@ func NewMouse(devicePath string) (mouse *Mouse, err error) {
 func (m *Mouse) writeReportToFile(file string) error {
 	report, err := generateMouseReport(m.lastChangeWasAbsolute, m.buttons, m.axis)
 	if err != nil { return err }
-	//fmt.Printf("Writing %+v to %s\n", report, file)
+	fmt.Printf("Writing %+v to %s\n", report, file)
 	return ioutil.WriteFile(file, report, os.ModePerm) //Serialize Report and write to specified file
 }
 
@@ -55,6 +57,7 @@ func (m* Mouse) SetButtons(bt1,bt2,bt3 bool) (err error) {
 	}
 
 	if change {
+		m.lastChangeWasAbsolute = false
 		m.axis[0] = 0 //No (repeated) movement on button change
 		m.axis[1] = 0 //No (repeated) movement on button change
 		return m.writeReportToFile(m.devicePath)
@@ -73,6 +76,7 @@ func (m* Mouse) Click(bt1,bt2,bt3 bool) (err error) {
 
 func (m* Mouse) DoubleClick(bt1,bt2,bt3 bool) (err error) {
 	m.Click(bt1,bt2,bt3)
+	time.Sleep(100 * time.Millisecond) // delay between clicks
 	m.Click(bt1,bt2,bt3)
 	return
 }
@@ -86,10 +90,10 @@ func (m* Mouse) Move(x,y int8) (err error) {
 
 
 func scaleAbs(fVal float64) int {
-	ival := int(float64(0xFFFF) * fVal)
-	ival -= 32768
+	ival := int(float64(0x7FFF) * fVal)
+	//ival -= 32768
 	if ival < -32768 { ival = -32768 }
-	if ival < 32767 { ival = 32767 }
+	if ival > 32767 { ival = 32767 }
 	return ival
 }
 

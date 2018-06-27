@@ -39,12 +39,8 @@ func (avm AsyncOttoVM) IsWorking() bool {
 }
 
 func (avm *AsyncOttoVM) Run(src interface{}) (val otto.Value, res error) {
-	fmt.Printf("BLOCKING RUN start state: %+v Finished: %d\n",avm, len(avm.Finished))
-
 	res = avm.RunAsync(src)
 	if res != nil { return }
-	fmt.Printf("BLOCKING RUN before wait state: %+v Finished: %d\n",avm, len(avm.Finished))
-	defer fmt.Printf("BLOCKING RUN after wait state: %+v Finished: %d\n",avm, len(avm.Finished))
 	return avm.WaitResult()
 }
 
@@ -53,7 +49,6 @@ func (avm *AsyncOttoVM) RunAsync(src interface{}) (error) {
 	avm.isWorking = true
 	// ToDo: This has to replaced by real job control, to preserve results in case waitResult() is called late (results have to be stored per job, not per VM)
 	for len(avm.Finished) > 0 {
-		fmt.Println("CONSUMING FINISH EVENT BEFORE VM REUSE")
 		<-avm.Finished
 	} // We consume old finish events (there was no call to waitResult() up to that point)
 	avm.ResultErr = nil
@@ -64,11 +59,8 @@ func (avm *AsyncOttoVM) RunAsync(src interface{}) (error) {
 
 
 		defer func() {
-fmt.Println("STARTING DEFER FUNC")
-
 			if caught := recover(); caught != nil {
 				if caught == halt {
-fmt.Println("VM CANCELED")
 					nErr := errors.New("VM execution cancelled")
 					avm.ResultErr = &nErr
 
@@ -142,21 +134,11 @@ func (avm *AsyncOttoVM) Cancel() error {
 			avm.vm.Interrupt <- func() {
 				panic(halt)
 			}
-			fmt.Printf("WAITING FOR RESULT TO BE SURE CANCEL WORKED: %+v\n", avm)
-
-		} else {
-			fmt.Println("VM ALREADY INTERRUPTED")
 		}
 
 		//consume result
 		avm.WaitResult()
-	} else {
-		fmt.Println("VM NOT WORKING, NO NEED TO CANCEL")
 	}
-
-
-
-
 
 	return nil
 }
