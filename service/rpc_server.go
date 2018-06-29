@@ -17,9 +17,97 @@ import (
 	"strings"
 	"path"
 	"time"
+
+	"../common"
+	"os"
+	"io/ioutil"
+)
+
+var (
+	rpcErrNoHid = errors.New("HIDScript engine disabled, as current USB configuration has mouse and keyboard disable")
 )
 
 type server struct {}
+
+func (s *server) FSWriteFile(ctx context.Context, req *pb.WriteFileRequest) (empty *pb.Empty, err error) {
+	return &pb.Empty{}, common.WriteFile(req.Path, req.MustNotExist, req.Append, req.Data)
+
+}
+
+func (s *server) FSReadFile(ctx context.Context, req *pb.ReadFileRequest) (resp *pb.ReadFileResponse, err error) {
+	n,err := common.ReadFile(req.Path, req.Start, req.Data)
+	resp = &pb.ReadFileResponse{ReadCount: int64(n)}
+	return
+}
+
+func (s *server) FSGetFileInfo(ctx context.Context, req *pb.FileInfoRequest) (resp *pb.FileInfoResponse, err error) {
+	fi, err := os.Stat(req.Path)
+	resp = &pb.FileInfoResponse{}
+	if err != nil { return }
+	resp.Name = fi.Name()
+	resp.IsDir = fi.IsDir()
+	resp.Mode = uint32(fi.Mode())
+	resp.ModTime = fi.ModTime().Unix()
+	resp.Size = fi.Size()
+	return
+}
+
+func (s *server) FSCreateTempDirOrFile(ctx context.Context, req *pb.TempDirOrFileRequest) (resp *pb.TempDirOrFileResponse, err error) {
+	resp = &pb.TempDirOrFileResponse{}
+	if req.OnlyFolder {
+		name, err := ioutil.TempDir(req.Dir, req.Prefix)
+		if err != nil { return resp, err }
+		resp.ResultPath = name
+		return resp, err
+	} else {
+		f,err := ioutil.TempFile(req.Dir, req.Prefix)
+		if err != nil { return resp,err }
+		defer f.Close()
+		resp.ResultPath = f.Name()
+		return resp, err
+	}
+}
+
+func (s *server) HIDRCancelScriptJob(ctx context.Context, job *pb.HIDScriptJob) (empty *pb.Empty, err error) {
+	empty = &pb.Empty{}
+	if HidCtl == nil { return empty, rpcErrNoHid}
+
+	return
+}
+
+func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptRequest) (scriptRes *pb.HIDScriptResult, err error) {
+	if HidCtl == nil { return nil, rpcErrNoHid}
+
+	if scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath); err != nil {
+		return nil, errors.New(fmt.Sprintf("Couldn't load HIDScript '%s': %v\n", scriptReq.ScriptPath, err))
+	} else {
+		scriptVal,err := HidCtl.RunScript(string(scriptFile))
+		if err != nil { return nil,err }
+		val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
+		jsonVal,err := json.Marshal(val)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Script seems to have succeeded but result couldn't be converted to JSON: %v\n", err))
+		}
+		scriptRes = &pb.HIDScriptResult{
+			IsFinished: true,
+			Job: &pb.HIDScriptJob{Id:0},
+			ResultJson: string(jsonVal),
+		}
+		return scriptRes,nil
+	}
+}
+
+func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptRequest) (job *pb.HIDScriptJob, err error) {
+	if HidCtl == nil { return nil, rpcErrNoHid}
+
+	return
+}
+
+func (s *server) HIDRGetScriptJobResult(ctx context.Context,job *pb.HIDScriptJob) (scriptRes *pb.HIDScriptResult, err error) {
+	if HidCtl == nil { return nil, rpcErrNoHid}
+
+	return
+}
 
 func (s *server) DeployWifiSettings(ctx context.Context, ws *pb.WiFiSettings) (empty *pb.Empty, err error) {
 	log.Printf("Trying to deploy WiFi settings %v", ws)

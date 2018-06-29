@@ -7,7 +7,12 @@ import (
 	pb "../proto"
 	"time"
 	"golang.org/x/net/context"
+	"os"
+	"fmt"
+	"io"
 )
+
+
 
 func ClientConnectServer(rpcHost string, rpcPort string) (
 	connection *grpc.ClientConn,
@@ -32,6 +37,91 @@ func ClientConnectServer(rpcHost string, rpcPort string) (
 
 	err = nil
 	return
+}
+
+func ClientCreateTempDir(host string, port string, dir string, prefix string) (resultPath string, err error) {
+	return clientCreateTempDirOfFile(host,port,dir,prefix,true)
+}
+
+func ClientCreateTempFile(host string, port string, dir string, prefix string) (resultPath string, err error) {
+	return clientCreateTempDirOfFile(host,port,dir,prefix,false)
+}
+
+func clientCreateTempDirOfFile(host string, port string, dir string, prefix string, dirOnlyNoFile bool) (resultPath string, err error) {
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {return}
+	defer connection.Close()
+	client := pb.NewP4WNP1Client(connection)
+	resp, err := client.FSCreateTempDirOrFile(
+		context.Background(),
+		&pb.TempDirOrFileRequest{
+			Prefix: prefix,
+			Dir: dir,
+			OnlyFolder: dirOnlyNoFile,
+		})
+	if err != nil {return}
+	resultPath = resp.ResultPath
+	return
+}
+
+func ClientUploadFileFromSrcPath(host string, port string, srcPath string, destPath string, forceOverwrite bool) (err error) {
+	//open local file for reading
+	flag := os.O_RDONLY
+	f, err := os.OpenFile(srcPath, flag, os.ModePerm)
+	if err != nil { return err }
+	defer f.Close()
+
+	return  ClientUploadFile(host,port,f,destPath,forceOverwrite)
+}
+
+func ClientUploadFile(host string, port string, src io.Reader, destPath string, forceOverwrite bool) (err error) {
+
+	// open gRPC Client
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {return}
+	defer connection.Close()
+	client := pb.NewP4WNP1Client(connection)
+
+	//try to create remote file
+	_, err = client.FSWriteFile(
+		context.Background(),
+		&pb.WriteFileRequest{
+			Path: destPath,
+			Data: []byte{}, //empty chunk
+			Append: false,
+			MustNotExist: !forceOverwrite,
+		})
+	if err != nil {return}
+
+	fmt.Printf("Start appending to %s\n", destPath)
+
+	// start appending chunks read from source file to remote file (Remote file is closed and opened every time, but
+	// this avoids client to server streaming, which would be hard to implement for gRPC-web
+	chunksize := 1024
+	buf := make([]byte,chunksize)
+	pos := int64(0)
+	for {
+		n,rErr := src.Read(buf)
+		if rErr != nil {
+			if rErr == io.EOF { break } else { return rErr }
+		}
+
+		sendData := buf[:n]
+		client.FSWriteFile(
+			context.Background(),
+			&pb.WriteFileRequest{
+				Path: destPath,
+				Data: sendData,
+				Append: true,
+				MustNotExist: false,
+			})
+
+		pos += int64(n)
+	}
+
+	return nil
 }
 
 func ClientGetLED(host string, port string) (ls *pb.LEDSettings, err error) {
@@ -170,10 +260,38 @@ func ClientDeployWifiSettings(host string, port string, settings *pb.WiFiSetting
 	return err
 }
 
-/*
-func ClientDisconnectServer(cancel context.CancelFunc, connection *grpc.ClientConn) error {
+func ClientHIDRunScript(host string, port string, scriptPath string) (scriptRes *pb.HIDScriptResult, err error) {
+	scriptReq := &pb.HIDScriptRequest{
+		ScriptPath: scriptPath,
+	}
+
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err) }
 	defer connection.Close()
-	defer cancel()
-	return nil
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+//	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
+//	defer cancel()
+
+	scriptRes,err = rpcClient.HIDRunScript(context.Background(), scriptReq)
+	return
 }
-*/
+
+func ClientHIDRunScriptJob(host string, port string, scriptPath string) (sctipJob *pb.HIDScriptJob, err error) {
+	scriptReq := &pb.HIDScriptRequest{
+		ScriptPath: scriptPath,
+	}
+
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err) }
+	defer connection.Close()
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
+	defer cancel()
+
+	sctipJob,err = rpcClient.HIDRunScriptJob(ctx, scriptReq)
+	return
+}

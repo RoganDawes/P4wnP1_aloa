@@ -14,6 +14,72 @@ service P4WNP1 {
 	rpc DeployEthernetInterfaceSettings(EthernetInterfaceSettings) returns (Empty) {}
 
 	rpc DeployWifiSettings(WiFiSettings) returns (Empty) {}
+
+	rpc HIDRunScript(HIDScriptRequest) returns (HIDScriptResult) {}
+	rpc HIDRunScriptJob(HIDScriptRequest) returns (HIDScriptJob) {}
+	rpc HIDRGetScriptJobResult(HIDScriptJob) returns (HIDScriptResult) {}
+	rpc HIDRCancelScriptJob(HIDScriptJob) returns (Empty) {}
+
+	rpc FSWriteFile(WriteFileRequest) returns (Empty) {}
+	rpc FSReadFile(ReadFileRequest) returns (ReadFileResponse) {}
+	rpc FSGetFileInfo(FileInfoRequest) returns (FileInfoResponse) {}
+	rpc FSCreateTempDirOrFile(TempDirOrFileRequest) returns (TempDirOrFileResponse) {}
+}
+
+/* File System */
+message TempDirOrFileRequest {
+	string dir = 1;
+	string prefix = 2;
+	bool onlyFolder = 3;
+}
+
+message TempDirOrFileResponse {
+	string resultPath = 1;
+}
+
+message ReadFileRequest {
+	string path = 1;
+	int64 start = 2;
+	bytes data = 3;
+}
+
+message ReadFileResponse {
+	int64 readCount = 1;
+}
+
+message WriteFileRequest {
+	string path = 1;
+	bool append = 2;
+	bool mustNotExist = 3;
+	bytes data = 4;
+}
+
+message FileInfoRequest {
+	string path = 1;
+}
+
+message FileInfoResponse {
+	string name = 1;
+	int64 size = 2;
+	uint32 mode = 3;
+	int64 modTime = 4; //unused
+	bool isDir = 5;
+}
+
+/* HID */
+message HIDScriptRequest {
+	string scriptPath = 1; //for scripts hosted on the device
+}
+
+message HIDScriptJob {
+	uint32 id = 1;
+}
+
+message HIDScriptResult {
+	HIDScriptJob job = 1;
+	bool isFinished = 2;
+	string resultJson = 3;
+	//string logOutput = 4; //will be used to retrieve log output of unfinished scripts, better implemented in dedicated method with stream
 }
 
 /* LED */

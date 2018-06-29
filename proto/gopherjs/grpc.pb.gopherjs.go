@@ -8,6 +8,16 @@
 		grpc.proto
 
 	It has these top-level messages:
+		TempDirOrFileRequest
+		TempDirOrFileResponse
+		ReadFileRequest
+		ReadFileResponse
+		WriteFileRequest
+		FileInfoRequest
+		FileInfoResponse
+		HIDScriptRequest
+		HIDScriptJob
+		HIDScriptResult
 		LEDSettings
 		GadgetSettings
 		GadgetSettingsEthernet
@@ -98,6 +108,837 @@ var WiFiSettings_APAuthMode_value = map[string]int{
 
 func (x WiFiSettings_APAuthMode) String() string {
 	return WiFiSettings_APAuthMode_name[int(x)]
+}
+
+// File System
+type TempDirOrFileRequest struct {
+	Dir        string
+	Prefix     string
+	OnlyFolder bool
+}
+
+// GetDir gets the Dir of the TempDirOrFileRequest.
+func (m *TempDirOrFileRequest) GetDir() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Dir
+}
+
+// GetPrefix gets the Prefix of the TempDirOrFileRequest.
+func (m *TempDirOrFileRequest) GetPrefix() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Prefix
+}
+
+// GetOnlyFolder gets the OnlyFolder of the TempDirOrFileRequest.
+func (m *TempDirOrFileRequest) GetOnlyFolder() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.OnlyFolder
+}
+
+// MarshalToWriter marshals TempDirOrFileRequest to the provided writer.
+func (m *TempDirOrFileRequest) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.Dir) > 0 {
+		writer.WriteString(1, m.Dir)
+	}
+
+	if len(m.Prefix) > 0 {
+		writer.WriteString(2, m.Prefix)
+	}
+
+	if m.OnlyFolder {
+		writer.WriteBool(3, m.OnlyFolder)
+	}
+
+	return
+}
+
+// Marshal marshals TempDirOrFileRequest to a slice of bytes.
+func (m *TempDirOrFileRequest) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TempDirOrFileRequest from the provided reader.
+func (m *TempDirOrFileRequest) UnmarshalFromReader(reader jspb.Reader) *TempDirOrFileRequest {
+	for reader.Next() {
+		if m == nil {
+			m = &TempDirOrFileRequest{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Dir = reader.ReadString()
+		case 2:
+			m.Prefix = reader.ReadString()
+		case 3:
+			m.OnlyFolder = reader.ReadBool()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TempDirOrFileRequest from a slice of bytes.
+func (m *TempDirOrFileRequest) Unmarshal(rawBytes []byte) (*TempDirOrFileRequest, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TempDirOrFileResponse struct {
+	ResultPath string
+}
+
+// GetResultPath gets the ResultPath of the TempDirOrFileResponse.
+func (m *TempDirOrFileResponse) GetResultPath() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.ResultPath
+}
+
+// MarshalToWriter marshals TempDirOrFileResponse to the provided writer.
+func (m *TempDirOrFileResponse) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.ResultPath) > 0 {
+		writer.WriteString(1, m.ResultPath)
+	}
+
+	return
+}
+
+// Marshal marshals TempDirOrFileResponse to a slice of bytes.
+func (m *TempDirOrFileResponse) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TempDirOrFileResponse from the provided reader.
+func (m *TempDirOrFileResponse) UnmarshalFromReader(reader jspb.Reader) *TempDirOrFileResponse {
+	for reader.Next() {
+		if m == nil {
+			m = &TempDirOrFileResponse{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.ResultPath = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TempDirOrFileResponse from a slice of bytes.
+func (m *TempDirOrFileResponse) Unmarshal(rawBytes []byte) (*TempDirOrFileResponse, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type ReadFileRequest struct {
+	Path  string
+	Start int64
+	Data  []byte
+}
+
+// GetPath gets the Path of the ReadFileRequest.
+func (m *ReadFileRequest) GetPath() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Path
+}
+
+// GetStart gets the Start of the ReadFileRequest.
+func (m *ReadFileRequest) GetStart() (x int64) {
+	if m == nil {
+		return x
+	}
+	return m.Start
+}
+
+// GetData gets the Data of the ReadFileRequest.
+func (m *ReadFileRequest) GetData() (x []byte) {
+	if m == nil {
+		return x
+	}
+	return m.Data
+}
+
+// MarshalToWriter marshals ReadFileRequest to the provided writer.
+func (m *ReadFileRequest) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.Path) > 0 {
+		writer.WriteString(1, m.Path)
+	}
+
+	if m.Start != 0 {
+		writer.WriteInt64(2, m.Start)
+	}
+
+	if len(m.Data) > 0 {
+		writer.WriteBytes(3, m.Data)
+	}
+
+	return
+}
+
+// Marshal marshals ReadFileRequest to a slice of bytes.
+func (m *ReadFileRequest) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a ReadFileRequest from the provided reader.
+func (m *ReadFileRequest) UnmarshalFromReader(reader jspb.Reader) *ReadFileRequest {
+	for reader.Next() {
+		if m == nil {
+			m = &ReadFileRequest{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Path = reader.ReadString()
+		case 2:
+			m.Start = reader.ReadInt64()
+		case 3:
+			m.Data = reader.ReadBytes()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a ReadFileRequest from a slice of bytes.
+func (m *ReadFileRequest) Unmarshal(rawBytes []byte) (*ReadFileRequest, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type ReadFileResponse struct {
+	ReadCount int64
+}
+
+// GetReadCount gets the ReadCount of the ReadFileResponse.
+func (m *ReadFileResponse) GetReadCount() (x int64) {
+	if m == nil {
+		return x
+	}
+	return m.ReadCount
+}
+
+// MarshalToWriter marshals ReadFileResponse to the provided writer.
+func (m *ReadFileResponse) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if m.ReadCount != 0 {
+		writer.WriteInt64(1, m.ReadCount)
+	}
+
+	return
+}
+
+// Marshal marshals ReadFileResponse to a slice of bytes.
+func (m *ReadFileResponse) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a ReadFileResponse from the provided reader.
+func (m *ReadFileResponse) UnmarshalFromReader(reader jspb.Reader) *ReadFileResponse {
+	for reader.Next() {
+		if m == nil {
+			m = &ReadFileResponse{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.ReadCount = reader.ReadInt64()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a ReadFileResponse from a slice of bytes.
+func (m *ReadFileResponse) Unmarshal(rawBytes []byte) (*ReadFileResponse, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type WriteFileRequest struct {
+	Path         string
+	Append       bool
+	MustNotExist bool
+	Data         []byte
+}
+
+// GetPath gets the Path of the WriteFileRequest.
+func (m *WriteFileRequest) GetPath() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Path
+}
+
+// GetAppend gets the Append of the WriteFileRequest.
+func (m *WriteFileRequest) GetAppend() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Append
+}
+
+// GetMustNotExist gets the MustNotExist of the WriteFileRequest.
+func (m *WriteFileRequest) GetMustNotExist() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.MustNotExist
+}
+
+// GetData gets the Data of the WriteFileRequest.
+func (m *WriteFileRequest) GetData() (x []byte) {
+	if m == nil {
+		return x
+	}
+	return m.Data
+}
+
+// MarshalToWriter marshals WriteFileRequest to the provided writer.
+func (m *WriteFileRequest) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.Path) > 0 {
+		writer.WriteString(1, m.Path)
+	}
+
+	if m.Append {
+		writer.WriteBool(2, m.Append)
+	}
+
+	if m.MustNotExist {
+		writer.WriteBool(3, m.MustNotExist)
+	}
+
+	if len(m.Data) > 0 {
+		writer.WriteBytes(4, m.Data)
+	}
+
+	return
+}
+
+// Marshal marshals WriteFileRequest to a slice of bytes.
+func (m *WriteFileRequest) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a WriteFileRequest from the provided reader.
+func (m *WriteFileRequest) UnmarshalFromReader(reader jspb.Reader) *WriteFileRequest {
+	for reader.Next() {
+		if m == nil {
+			m = &WriteFileRequest{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Path = reader.ReadString()
+		case 2:
+			m.Append = reader.ReadBool()
+		case 3:
+			m.MustNotExist = reader.ReadBool()
+		case 4:
+			m.Data = reader.ReadBytes()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a WriteFileRequest from a slice of bytes.
+func (m *WriteFileRequest) Unmarshal(rawBytes []byte) (*WriteFileRequest, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type FileInfoRequest struct {
+	Path string
+}
+
+// GetPath gets the Path of the FileInfoRequest.
+func (m *FileInfoRequest) GetPath() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Path
+}
+
+// MarshalToWriter marshals FileInfoRequest to the provided writer.
+func (m *FileInfoRequest) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.Path) > 0 {
+		writer.WriteString(1, m.Path)
+	}
+
+	return
+}
+
+// Marshal marshals FileInfoRequest to a slice of bytes.
+func (m *FileInfoRequest) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a FileInfoRequest from the provided reader.
+func (m *FileInfoRequest) UnmarshalFromReader(reader jspb.Reader) *FileInfoRequest {
+	for reader.Next() {
+		if m == nil {
+			m = &FileInfoRequest{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Path = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a FileInfoRequest from a slice of bytes.
+func (m *FileInfoRequest) Unmarshal(rawBytes []byte) (*FileInfoRequest, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type FileInfoResponse struct {
+	Name    string
+	Size    int64
+	Mode    uint32
+	ModTime int64
+	IsDir   bool
+}
+
+// GetName gets the Name of the FileInfoResponse.
+func (m *FileInfoResponse) GetName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Name
+}
+
+// GetSize gets the Size of the FileInfoResponse.
+func (m *FileInfoResponse) GetSize() (x int64) {
+	if m == nil {
+		return x
+	}
+	return m.Size
+}
+
+// GetMode gets the Mode of the FileInfoResponse.
+func (m *FileInfoResponse) GetMode() (x uint32) {
+	if m == nil {
+		return x
+	}
+	return m.Mode
+}
+
+// GetModTime gets the ModTime of the FileInfoResponse.
+func (m *FileInfoResponse) GetModTime() (x int64) {
+	if m == nil {
+		return x
+	}
+	return m.ModTime
+}
+
+// GetIsDir gets the IsDir of the FileInfoResponse.
+func (m *FileInfoResponse) GetIsDir() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.IsDir
+}
+
+// MarshalToWriter marshals FileInfoResponse to the provided writer.
+func (m *FileInfoResponse) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.Name) > 0 {
+		writer.WriteString(1, m.Name)
+	}
+
+	if m.Size != 0 {
+		writer.WriteInt64(2, m.Size)
+	}
+
+	if m.Mode != 0 {
+		writer.WriteUint32(3, m.Mode)
+	}
+
+	if m.ModTime != 0 {
+		writer.WriteInt64(4, m.ModTime)
+	}
+
+	if m.IsDir {
+		writer.WriteBool(5, m.IsDir)
+	}
+
+	return
+}
+
+// Marshal marshals FileInfoResponse to a slice of bytes.
+func (m *FileInfoResponse) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a FileInfoResponse from the provided reader.
+func (m *FileInfoResponse) UnmarshalFromReader(reader jspb.Reader) *FileInfoResponse {
+	for reader.Next() {
+		if m == nil {
+			m = &FileInfoResponse{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Name = reader.ReadString()
+		case 2:
+			m.Size = reader.ReadInt64()
+		case 3:
+			m.Mode = reader.ReadUint32()
+		case 4:
+			m.ModTime = reader.ReadInt64()
+		case 5:
+			m.IsDir = reader.ReadBool()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a FileInfoResponse from a slice of bytes.
+func (m *FileInfoResponse) Unmarshal(rawBytes []byte) (*FileInfoResponse, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+// HID
+type HIDScriptRequest struct {
+	ScriptPath string
+}
+
+// GetScriptPath gets the ScriptPath of the HIDScriptRequest.
+func (m *HIDScriptRequest) GetScriptPath() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.ScriptPath
+}
+
+// MarshalToWriter marshals HIDScriptRequest to the provided writer.
+func (m *HIDScriptRequest) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.ScriptPath) > 0 {
+		writer.WriteString(1, m.ScriptPath)
+	}
+
+	return
+}
+
+// Marshal marshals HIDScriptRequest to a slice of bytes.
+func (m *HIDScriptRequest) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a HIDScriptRequest from the provided reader.
+func (m *HIDScriptRequest) UnmarshalFromReader(reader jspb.Reader) *HIDScriptRequest {
+	for reader.Next() {
+		if m == nil {
+			m = &HIDScriptRequest{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.ScriptPath = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a HIDScriptRequest from a slice of bytes.
+func (m *HIDScriptRequest) Unmarshal(rawBytes []byte) (*HIDScriptRequest, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type HIDScriptJob struct {
+	Id uint32
+}
+
+// GetId gets the Id of the HIDScriptJob.
+func (m *HIDScriptJob) GetId() (x uint32) {
+	if m == nil {
+		return x
+	}
+	return m.Id
+}
+
+// MarshalToWriter marshals HIDScriptJob to the provided writer.
+func (m *HIDScriptJob) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if m.Id != 0 {
+		writer.WriteUint32(1, m.Id)
+	}
+
+	return
+}
+
+// Marshal marshals HIDScriptJob to a slice of bytes.
+func (m *HIDScriptJob) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a HIDScriptJob from the provided reader.
+func (m *HIDScriptJob) UnmarshalFromReader(reader jspb.Reader) *HIDScriptJob {
+	for reader.Next() {
+		if m == nil {
+			m = &HIDScriptJob{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Id = reader.ReadUint32()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a HIDScriptJob from a slice of bytes.
+func (m *HIDScriptJob) Unmarshal(rawBytes []byte) (*HIDScriptJob, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type HIDScriptResult struct {
+	Job        *HIDScriptJob
+	IsFinished bool
+	ResultJson string
+}
+
+// GetJob gets the Job of the HIDScriptResult.
+func (m *HIDScriptResult) GetJob() (x *HIDScriptJob) {
+	if m == nil {
+		return x
+	}
+	return m.Job
+}
+
+// GetIsFinished gets the IsFinished of the HIDScriptResult.
+func (m *HIDScriptResult) GetIsFinished() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.IsFinished
+}
+
+// GetResultJson gets the ResultJson of the HIDScriptResult.
+func (m *HIDScriptResult) GetResultJson() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.ResultJson
+}
+
+// MarshalToWriter marshals HIDScriptResult to the provided writer.
+func (m *HIDScriptResult) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if m.Job != nil {
+		writer.WriteMessage(1, func() {
+			m.Job.MarshalToWriter(writer)
+		})
+	}
+
+	if m.IsFinished {
+		writer.WriteBool(2, m.IsFinished)
+	}
+
+	if len(m.ResultJson) > 0 {
+		writer.WriteString(3, m.ResultJson)
+	}
+
+	return
+}
+
+// Marshal marshals HIDScriptResult to a slice of bytes.
+func (m *HIDScriptResult) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a HIDScriptResult from the provided reader.
+func (m *HIDScriptResult) UnmarshalFromReader(reader jspb.Reader) *HIDScriptResult {
+	for reader.Next() {
+		if m == nil {
+			m = &HIDScriptResult{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			reader.ReadMessage(func() {
+				m.Job = m.Job.UnmarshalFromReader(reader)
+			})
+		case 2:
+			m.IsFinished = reader.ReadBool()
+		case 3:
+			m.ResultJson = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a HIDScriptResult from a slice of bytes.
+func (m *HIDScriptResult) Unmarshal(rawBytes []byte) (*HIDScriptResult, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
 
 // LED
@@ -1487,6 +2328,14 @@ type P4WNP1Client interface {
 	MountUMSFile(ctx context.Context, in *GadgetSettingsUMS, opts ...grpcweb.CallOption) (*Empty, error)
 	DeployEthernetInterfaceSettings(ctx context.Context, in *EthernetInterfaceSettings, opts ...grpcweb.CallOption) (*Empty, error)
 	DeployWifiSettings(ctx context.Context, in *WiFiSettings, opts ...grpcweb.CallOption) (*Empty, error)
+	HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error)
+	HIDRunScriptJob(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptJob, error)
+	HIDRGetScriptJobResult(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*HIDScriptResult, error)
+	HIDRCancelScriptJob(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*Empty, error)
+	FSWriteFile(ctx context.Context, in *WriteFileRequest, opts ...grpcweb.CallOption) (*Empty, error)
+	FSReadFile(ctx context.Context, in *ReadFileRequest, opts ...grpcweb.CallOption) (*ReadFileResponse, error)
+	FSGetFileInfo(ctx context.Context, in *FileInfoRequest, opts ...grpcweb.CallOption) (*FileInfoResponse, error)
+	FSCreateTempDirOrFile(ctx context.Context, in *TempDirOrFileRequest, opts ...grpcweb.CallOption) (*TempDirOrFileResponse, error)
 }
 
 type p4WNP1Client struct {
@@ -1579,4 +2428,76 @@ func (c *p4WNP1Client) DeployWifiSettings(ctx context.Context, in *WiFiSettings,
 	}
 
 	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error) {
+	resp, err := c.client.RPCCall(ctx, "HIDRunScript", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(HIDScriptResult).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) HIDRunScriptJob(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptJob, error) {
+	resp, err := c.client.RPCCall(ctx, "HIDRunScriptJob", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(HIDScriptJob).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) HIDRGetScriptJobResult(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*HIDScriptResult, error) {
+	resp, err := c.client.RPCCall(ctx, "HIDRGetScriptJobResult", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(HIDScriptResult).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) HIDRCancelScriptJob(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "HIDRCancelScriptJob", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) FSWriteFile(ctx context.Context, in *WriteFileRequest, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "FSWriteFile", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) FSReadFile(ctx context.Context, in *ReadFileRequest, opts ...grpcweb.CallOption) (*ReadFileResponse, error) {
+	resp, err := c.client.RPCCall(ctx, "FSReadFile", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(ReadFileResponse).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) FSGetFileInfo(ctx context.Context, in *FileInfoRequest, opts ...grpcweb.CallOption) (*FileInfoResponse, error) {
+	resp, err := c.client.RPCCall(ctx, "FSGetFileInfo", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(FileInfoResponse).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) FSCreateTempDirOrFile(ctx context.Context, in *TempDirOrFileRequest, opts ...grpcweb.CallOption) (*TempDirOrFileResponse, error) {
+	resp, err := c.client.RPCCall(ctx, "FSCreateTempDirOrFile", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(TempDirOrFileResponse).Unmarshal(resp)
 }
