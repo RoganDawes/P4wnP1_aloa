@@ -6,7 +6,6 @@ import (
 	"os"
 	"math"
 	"time"
-	"fmt"
 )
 
 const (
@@ -37,7 +36,7 @@ func NewMouse(devicePath string) (mouse *Mouse, err error) {
 func (m *Mouse) writeReportToFile(file string) error {
 	report, err := generateMouseReport(m.lastChangeWasAbsolute, m.buttons, m.axis)
 	if err != nil { return err }
-	fmt.Printf("Writing %+v to %s\n", report, file)
+	//fmt.Printf("Writing %+v to %s\n", report, file)
 	return ioutil.WriteFile(file, report, os.ModePerm) //Serialize Report and write to specified file
 }
 

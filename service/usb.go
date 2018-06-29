@@ -14,6 +14,7 @@ import (
 	"net"
 	"regexp"
 	"../hid"
+	"context"
 )
 
 const (
@@ -603,7 +604,7 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 			devPathMouse := HidDevPath[USB_FUNCTION_HID_MOUSE_name]
 
 			var errH error
-			HidCtl, errH = hid.NewHIDController(devPathKeyboard, USB_KEYBOARD_LANGUAGE_MAP_PATH, devPathMouse)
+			HidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, USB_KEYBOARD_LANGUAGE_MAP_PATH, devPathMouse)
 			if errH != nil {
 				log.Printf("ERROR: Couldn't bring up an instance of HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s'\nReason: %v\n", devPathKeyboard, devPathMouse, USB_KEYBOARD_LANGUAGE_MAP_PATH, errH)
 			} else {

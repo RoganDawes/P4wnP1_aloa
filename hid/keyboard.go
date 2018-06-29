@@ -13,6 +13,7 @@ import (
 	"regexp"
 	"path/filepath"
 	"sync"
+	"context"
 )
 
 var (
@@ -38,19 +39,25 @@ type HIDKeyboard struct {
 	LEDWatcher           *KeyboardLEDStateWatcher
 	KeyDelay             int
 	KeyDelayJitter       int
+	ctx context.Context
+	cancel context.CancelFunc
 }
 
 
 
 
-func NewKeyboard(devicePath string, resourcePath string) (keyboard *HIDKeyboard, err error) {
+func NewKeyboard(ctx context.Context, devicePath string, resourcePath string) (keyboard *HIDKeyboard, err error) {
 	//ToDo: check existence of deviceFile (+ is writable)
+
+	ctx,cancel := context.WithCancel(ctx)
 
 	keyboard = &HIDKeyboard{
 		lock: &sync.Mutex{},
 		DevicePath: devicePath,
 		KeyDelay: 0,
 		KeyDelayJitter: 0,
+		ctx: ctx,
+		cancel: cancel,
 	}
 
 	//Load available language maps
@@ -58,7 +65,7 @@ func NewKeyboard(devicePath string, resourcePath string) (keyboard *HIDKeyboard,
 	if err != nil {return nil, err}
 
 	//Init LED sate
-	keyboard.LEDWatcher, err = NewLEDStateWatcher(devicePath)
+	keyboard.LEDWatcher, err = NewLEDStateWatcher(ctx, devicePath)
 	if err != nil {return nil, err}
 
 	return

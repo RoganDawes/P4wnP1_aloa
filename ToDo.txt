@@ -16,6 +16,11 @@ HID
 - add additional keyboard layouts (not for first release)
 - DONE: fix absolute mouse movement
 - DONE: avoid memory leak on reinit of HIDController
+- DONE: implement job management
+- DONE: implement context for cancellation and cancellation propagation
+- blocking JavaScript to go callbacks (waitLED, delay, waitLEDRepeated) have to be job-context aware to allow
+interruption (the Interrupt channel of Otto only triggers after a blocking callback is evaluated, thus this callbacks have
+to be interrupted themselves)
 
 WIFI
 - implement connection to OPEN-AUTH network as STA
@@ -23,4 +28,4 @@ WIFI
 
 TO FIX:
 - debug out of HIDScript puts way to much CPU load on journaling daemon (floods logs)
-
+- allow gRPC server to abort Running HID scripts on context.DONE

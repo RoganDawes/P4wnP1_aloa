@@ -14,6 +14,7 @@ import(
 	_ "net/http/pprof"
 	"net/http"
 	"runtime"
+	"context"
 	"io/ioutil"
 )
 
@@ -205,7 +206,7 @@ func TestCombinedScript(hidCtl *hid.HIDController) (err error) {
 		}
 	`
 
-	_,err = hidCtl.RunScript(testcript)
+	_,err = hidCtl.RunScript(context.Background(),testcript)
 	if err != nil {panic(err)}
 
 	return
@@ -245,8 +246,44 @@ func TestMouseCircle(hidCtl *hid.HIDController) {
 		}
 	`
 
-	_,err := hidCtl.RunScript(scriptMouse)
+	_,err := hidCtl.RunScript(context.Background(),scriptMouse)
 	if err != nil { panic(err)}
+}
+
+
+// To profile for memory leaks and test clean cancellation of already running scripts on controller re-init
+func TestControllerReInit() {
+	//Test for memory leaks
+	hidCtlTests := make([]*hid.HIDController,0)
+	for i:=0; i<10;i++ {
+		//create new controller
+		fmt.Printf("****Creating HIDController %d\n", i)
+		hidCtlTest,_ := hid.NewHIDController(context.Background(),"/dev/hidg0", "keymaps", "/dev/hidg1")
+
+		//run script which utilizes LED read
+		fmt.Printf("****Starting async LED reading script for HIDController %d\n", i)
+		//script := "waitLEDRepeat(ANY);"
+		script := "console.log('...started');delay(3000);console.log('...ended');"
+		ctx := context.Background()
+		for i:=0;i<4;i++ {
+			job,err := hidCtlTest.StartScriptAsBackgroundJob(ctx, script)
+			if err != nil {
+				fmt.Printf("Error starting new job: %v\n",err)
+			} else {
+				fmt.Printf("New job started: %+v\n",job)
+			}
+		}
+
+
+		time.Sleep(time.Second)
+
+		//add to slice
+		hidCtlTests = append(hidCtlTests, hidCtlTest)
+
+
+	}
+	hidCtlTests = make([]*hid.HIDController,0)
+	runtime.GC()
 }
 
 func main() {
@@ -264,83 +301,11 @@ func main() {
 
 
 
-
-	/*
-	for x:=0; x<50; x++ {
-		err := mouse.MoveTo(-12,int16(x))
-		if err != nil { panic(err) }
-		time.Sleep(100 * time.Millisecond)
-	}
-	*/
-
-	//Test for memory leaks
-	hidCtlTests := make([]*hid.HIDController,0)
-	for i:=0; i<10;i++ {
-		//create new controller
-		fmt.Printf("****Creating HIDController %d\n", i)
-		hidCtlTest,_ := hid.NewHIDController("/dev/hidg0", "keymaps", "/dev/hidg1")
-
-		//run script which utilizes LED read
-		fmt.Printf("****Starting async LED reading script for HIDController %d\n", i)
-		script := "waitLEDRepeat(ANY);"
-		hidCtlTest.StartScriptAsBackgroundJob(script)
-		hidCtlTest.StartScriptAsBackgroundJob(script)
-		hidCtlTest.StartScriptAsBackgroundJob(script)
-		hidCtlTest.StartScriptAsBackgroundJob(script)
-
-		time.Sleep(time.Second)
-
-		//add to slice
-		hidCtlTests = append(hidCtlTests, hidCtlTest)
+	//TestControllerReInit()
 
 
-	}
 
-	/*
-	for i,hidCtlTest := range hidCtlTests {
-		fmt.Printf("****Aborting HIDController %d\n", i)
-		//hidCtlTest.Stop()
-		hidCtlTests[i] = nil //destroy ref to allow GC
-		if i < 5 { time.Sleep(time.Second) }
-		runtime.GC()
-	}
-	*/
-	hidCtlTests = make([]*hid.HIDController,0)
-
-	runtime.GC()
-	for i:=0; i<10;i++ {
-		//create new controller
-		fmt.Printf("****Creating HIDController %d\n", i)
-		hidCtlTest,_ := hid.NewHIDController("/dev/hidg0", "keymaps", "/dev/hidg1")
-
-		//run script which utilizes LED read
-		fmt.Printf("****Starting async LED reading script for HIDController %d\n", i)
-		script := "waitLEDRepeat(ANY);"
-		hidCtlTest.StartScriptAsBackgroundJob(script)
-		hidCtlTest.StartScriptAsBackgroundJob(script)
-		hidCtlTest.StartScriptAsBackgroundJob(script)
-		hidCtlTest.StartScriptAsBackgroundJob(script)
-
-		time.Sleep(time.Second)
-
-		//add to slice
-		hidCtlTests = append(hidCtlTests, hidCtlTest)
-
-
-	}
-
-	/*
-	for i,hidCtlTest := range hidCtlTests {
-		fmt.Printf("****Aborting HIDController %d\n", i)
-		//hidCtlTest.Stop()
-		hidCtlTests[i] = nil //destroy ref to allow GC
-		if i < 5 { time.Sleep(time.Second) }
-		runtime.GC()
-	}
-	*/
-
-
-	hidCtl, err := hid.NewHIDController("/dev/hidg0", "keymaps", "/dev/hidg1")
+	hidCtl, err := hid.NewHIDController(context.Background(),"/dev/hidg0", "keymaps", "/dev/hidg1")
 
 
 	if err != nil {panic(err)}
@@ -363,12 +328,48 @@ func main() {
 	//TestMouseCircle(hidCtl)
 
 
+	//add bg jobs waiting for LED
+	jobList := make([]int,0)
+	fmt.Println("Adding sleeping jobs with 5 seconds timeout context")
+	ctxT,_ := context.WithTimeout(context.Background(), time.Second * 2)
+	script := "console.log('START ' + JID + ' on VM ' + VMID);delay(5000);console.log(JID + ' returned from 5s blocking delay');"
+	startTime := time.Now()
+	for i:=1; i<4; i++ {
+		job,err := hidCtl.StartScriptAsBackgroundJob(ctxT,script)
+		if err != nil {
+			fmt.Printf("Failed adding background job: %v\n", err)
+		} else {
+			// ad job to slice
+			jobList = append(jobList, job.Id)
+		}
+	}
+	//Wait for all jobs to finish
+	fmt.Printf("Waiting for Job results for IDs: %+v\n", jobList)
+	for _,jid := range jobList {
+		job,err := hidCtl.GetBackgroundJobByID(jid)
+		if err != nil {
+			fmt.Printf("Job with ID %d not found, skipping...\n", jid)
+			continue
+		} else {
+			fmt.Printf("Waiting for finish of job with ID %d \n", jid)
+			jRes,jErr := hidCtl.WaitBackgroundJobResult(job)
+			fmt.Printf("JID: %d, Result: %+v, Err: %v\n", jid, jRes, jErr)
+		}
+	}
+	fmt.Printf("All results received after %v\n", time.Since(startTime))
+
+
+
+
+
+
+
 	//try to load script file
 	filepath := "./hidtest1.js"
 	if scriptFile, err := ioutil.ReadFile(filepath); err != nil {
 		log.Printf("Couldn't load HIDScript testfile: %s\n", filepath)
 	} else {
-		_,err = hidCtl.RunScript(string(scriptFile))
+		_,err = hidCtl.RunScript(context.Background(),string(scriptFile))
 		if err != nil { panic(err)}
 	}
 

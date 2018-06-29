@@ -81,7 +81,8 @@ func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptReques
 	if scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath); err != nil {
 		return nil, errors.New(fmt.Sprintf("Couldn't load HIDScript '%s': %v\n", scriptReq.ScriptPath, err))
 	} else {
-		scriptVal,err := HidCtl.RunScript(string(scriptFile))
+		//ToDo: check influence of request context
+		scriptVal,err := HidCtl.RunScript(ctx, string(scriptFile))
 		if err != nil { return nil,err }
 		val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
 		jsonVal,err := json.Marshal(val)

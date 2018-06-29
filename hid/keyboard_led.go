@@ -6,6 +6,7 @@ import (
 	"time"
 	"log"
 	"fmt"
+	"context"
 )
 
 var (
@@ -68,21 +69,22 @@ type lockableListenerMap struct {
 }
 
 type KeyboardLEDStateWatcher struct {
-	ledState *HIDLEDState //latest global LED state
-	listeners *lockableListenerMap //map of registered listeners
-	ledStateFile *os.File
-	hasInitialSate bool //marks if the initial state is define (gets true after first LED state ha been read)
+	ledState        *HIDLEDState //latest global LED state
+	listeners       *lockableListenerMap //map of registered listeners
+	ledStateFile    *os.File
+	hasInitialState bool //marks if the initial state is define (gets true after first LED state ha been read)
 
 	//listener which should be registered are put into a zero length channel, to allow blocking till a listener is added
 	//in case there isn't already a listener (avoid reading LED states, without having a single listener consuming them)
-	listenersToAdd chan *KeyboardLEDStateListener
+	listenersToAdd     chan *KeyboardLEDStateListener
 	readerToDispatcher chan HIDLEDState
-	interrupt chan struct{}
-	isUsable bool
+	ctx                context.Context
+	cancelFunc         context.CancelFunc
+	isUsable           bool
 }
 
 
-func NewLEDStateWatcher(devFilePath string) (res *KeyboardLEDStateWatcher,err error) {
+func NewLEDStateWatcher(ctx context.Context, devFilePath string) (res *KeyboardLEDStateWatcher,err error) {
 	//try to open the devFile
 	devFile, err := os.Open(devFilePath)
 	if err != nil { return }
@@ -91,20 +93,21 @@ func NewLEDStateWatcher(devFilePath string) (res *KeyboardLEDStateWatcher,err er
 		privateCurrentKeyboardLEDWatcher.Stop()
 	}
 
-
+	ctx,cancel := context.WithCancel(ctx)
 
 	res = &KeyboardLEDStateWatcher{
-		ledState: &HIDLEDState{},
-		hasInitialSate: false,
-		ledStateFile: devFile,
+		ledState:        &HIDLEDState{},
+		hasInitialState: false,
+		ledStateFile:    devFile,
 		listeners: &lockableListenerMap{
 			m: make(map[*KeyboardLEDStateListener]bool),
 		},
 		// Buffer at least one listener, to avoid blocking when one is added, the channel is only used to block the
 		// dispatchLoop, in case there's no registered listener (by reading from the listenerToAdd chanel
-		listenersToAdd: make(chan *KeyboardLEDStateListener,1),
+		listenersToAdd:     make(chan *KeyboardLEDStateListener,1),
 		readerToDispatcher: make(chan HIDLEDState), //communicates new LED states to from file reader loop to dispatcher loop, blocks till consumed
-		interrupt: make(chan struct{},1), // used to interrupt reader and dispatcher loop
+		ctx:                ctx,
+		cancelFunc:         cancel,
 
 
 
@@ -130,7 +133,7 @@ func (w *KeyboardLEDStateWatcher) RetrieveNewListener() (l *KeyboardLEDStateList
 	l = &KeyboardLEDStateListener{
 		isMarkedForDeletion: false,
 		changedLeds: make(chan HIDLEDState),
-		interrupt: make(chan struct{}),
+		//interrupt: make(chan struct{}),
 		ledWatcher: w,
 	}
 
@@ -168,8 +171,8 @@ func (w *KeyboardLEDStateWatcher) readLoop() {
 			//mark watcher as unusable
 			w.isUsable = false
 
-			//interrupt the dispatcher loop, by closing the interrupt channel
-			close(w.interrupt)
+			//interrupt the dispatcher loop, by cancelling the context
+			w.cancelFunc()
 
 			break
 		}
@@ -196,9 +199,9 @@ func (w *KeyboardLEDStateWatcher) dispatchLoop() {
 
 				//Translate received LED state to state change (if first received state, everything is considered as change
 				ledStateChange := w.ledState.Changes(newState)
-				if w.hasInitialSate == false {
+				if w.hasInitialState == false {
 					ledStateChange.fillState(MaskAny)
-					w.hasInitialSate = true
+					w.hasInitialState = true
 				}
 
 				//Store new LED state
@@ -250,7 +253,7 @@ func (w *KeyboardLEDStateWatcher) dispatchLoop() {
 					delete(w.listeners.m, l)
 				}
 				w.listeners.Unlock()
-			case <- w.interrupt:
+			case <- w.ctx.Done():
 				//inform all listeners about the interrupt
 				w.listeners.Lock()
 
@@ -276,7 +279,7 @@ func (w *KeyboardLEDStateWatcher) dispatchLoop() {
 type KeyboardLEDStateListener struct {
 	ledWatcher          *KeyboardLEDStateWatcher //the parent LEDWatcher, containing global ledState
 	changedLeds         chan HIDLEDState //changedLeds represents the LEDs which change since last report as bitfield (MaskNumLock, MaskCapsLock ...)  the actual state has to be fetched from the respective field of the ledWatcher.ledState
-	interrupt			chan struct{}
+	//interrupt			chan struct{}
 	isMarkedForDeletion bool
 }
 
@@ -296,7 +299,7 @@ func (l *KeyboardLEDStateListener) Unregister() {
 	}
 
 	//close channels
-	close(l.interrupt)
+	//close(l.interrupt)
 	close(l.changedLeds)
 }
 
@@ -340,7 +343,7 @@ func (kbd *HIDKeyboard) WaitLEDStateChange(intendedChange byte, timeout time.Dur
 				return &relevantChanges, nil
 			}
 			//If here, there was a LED state change, but not one we want to use for triggering (continue outer loop, consuming channel data)
-		case <-l.interrupt:
+		case <-l.ledWatcher.ctx.Done():
 			return nil, ErrAbort
 		case <- time.After(remaining):
 			return nil, ErrTimeout
@@ -449,7 +452,7 @@ func (kbd *HIDKeyboard) WaitLEDStateChangeRepeated(intendedChange byte, repeatCo
 				//return &relevantChanges, nil
 			}
 			//If here, there was a LED state change, but not one we want to use for triggering (continue outer loop, consuming channel data)
-		case <-l.interrupt:
+		case <-l.ledWatcher.ctx.Done():
 			return nil, ErrAbort
 		case <- time.After(remaining):
 			return nil, ErrTimeout

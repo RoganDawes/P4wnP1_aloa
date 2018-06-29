@@ -4,9 +4,11 @@ package hid
 import (
 	"errors"
 	"github.com/robertkrimen/otto"
+	"fmt"
+	"context"
+	"sync"
 	"log"
 	"time"
-	"fmt"
 )
 
 
@@ -16,6 +18,9 @@ const (
 )
 
 var (
+	globalJobList = make(map[*AsyncOttoJob]bool)
+	globalJobListMutex = sync.Mutex{}
+
 	hidControllerReuse *HIDController
 
 	halt = errors.New("Stahp")
@@ -49,9 +54,12 @@ type HIDController struct {
 	Mouse *Mouse
 	vmPool [MAX_VM]*AsyncOttoVM //ToDo: check if this could be changed to sync.Pool
 	vmMaster *otto.Otto
+	ctx context.Context
+	cancel context.CancelFunc
 }
 
-func NewHIDController(keyboardDevicePath string, keyboardMapPath string, mouseDevicePath string) (ctl *HIDController, err error) {
+func NewHIDController(ctx context.Context, keyboardDevicePath string, keyboardMapPath string, mouseDevicePath string) (ctl *HIDController, err error) {
+	//ToDo: check if hidcontroller could work with a context whith cancellation, which then could be cancelled on reuse of the object
 	if hidControllerReuse == nil {
 		hidControllerReuse = &HIDController{}
 
@@ -69,12 +77,15 @@ func NewHIDController(keyboardDevicePath string, keyboardMapPath string, mouseDe
 	}
 
 
+	ctx,cancel := context.WithCancel(ctx)
+	hidControllerReuse.ctx = ctx
+	hidControllerReuse.cancel = cancel
 
 	//Note: to disable mouse/keyboard support, the respective device path has to have zero length
 
 	//init keyboard
 	if len(keyboardDevicePath) > 0 {
-		hidControllerReuse.Keyboard, err = NewKeyboard(keyboardDevicePath, keyboardMapPath)
+		hidControllerReuse.Keyboard, err = NewKeyboard(ctx, keyboardDevicePath, keyboardMapPath)
 		if err != nil { return nil, err	}
 	}
 
@@ -95,91 +106,97 @@ func (ctl *HIDController) Abort()  {
 		hidControllerReuse.Keyboard.Close() //interrupts go routines reading from device file and lets LEDStateListeners die
 	}
 
+
 	// Interrupt all VMs already running
+	//hidControllerReuse.CancelAllBackgroundJobs()
 	hidControllerReuse.CancelAllBackgroundJobs()
 }
 
-func (ctl *HIDController) NextUnusedVM() (idx int, vm *AsyncOttoVM, err error) {
+func (ctl *HIDController) NextUnusedVM() (vm *AsyncOttoVM, err error) {
 	//iterate over pool
-	for idx,avm := range ctl.vmPool {
+	for _,avm := range ctl.vmPool {
 		if !avm.IsWorking() {
 			//return first non-working vm
-
-			//set job ID as JID
-			avm.vm.Set("JID", idx)
-
-
-			return idx, avm, nil //free to be used
+			return avm, nil //free to be used
 		}
 	}
 
-	return 0, nil, errors.New("No free JavaScript VM available in pool")
+	return nil, errors.New("No free JavaScript VM available in pool")
 }
 
-func (ctl *HIDController) RunScript(script string) (val otto.Value, err error) {
+func (ctl *HIDController) RunScript(ctx context.Context, script string) (val otto.Value, err error) {
 	//fetch next free vm from pool
-	_,avm,err := ctl.NextUnusedVM()
+	avm,err := ctl.NextUnusedVM()
 	if err != nil { return otto.Value{}, err }
 
-	val, err = avm.Run(script)
+	val, err = avm.Run(ctx, script)
 	return
 }
 
-func (ctl *HIDController) StartScriptAsBackgroundJob(script string) (avmId int, avm *AsyncOttoVM, err error) {
+func (ctl *HIDController) GetBackgroundJobByID(id int) (job *AsyncOttoJob, err error) {
+	globalJobListMutex.Lock()
+	for j,_ := range globalJobList {
+		if j.Id == id {
+			job = j
+			break
+		}
+	}
+	globalJobListMutex.Unlock()
+
+	if job == nil {
+		return nil, errors.New(fmt.Sprintf("Job with ID %d not found in list of background jobs\n", id))
+	} else {
+		return job,nil
+	}
+}
+
+func (ctl *HIDController) StartScriptAsBackgroundJob(ctx context.Context,script string) (job *AsyncOttoJob, err error) {
 	//fetch next free vm from pool
-	avmId,avm,err = ctl.NextUnusedVM()
-	if err != nil { return 0, nil, err }
+	avm,err := ctl.NextUnusedVM()
+	if err != nil { return nil, err }
 
 	//try to run script async
-	err = avm.RunAsync(script)
-	if err != nil { return 0, nil, err }
+	job,err = avm.RunAsync(ctx,script)
+	if err != nil { return nil, err }
+
+	//add job to global list
+	globalJobListMutex.Lock()
+	globalJobList[job] = true
+	globalJobListMutex.Unlock()
+
 	return
 }
 
-func (ctl *HIDController) CancelBackgroundJob(jobId int) (err error) {
-	if jobId < 0 || jobId >= MAX_VM {
-		return errors.New("Invalid Id for AsyncOttoVM")
+func (ctl *HIDController) WaitBackgroundJobResult(job *AsyncOttoJob) (val otto.Value, err error) {
+	globalJobListMutex.Lock()
+	if !globalJobList[job] {
+		err = errors.New(fmt.Sprintf("Tried to retrieve results of job with id %d failed, because it is not in the list of background jobs", job.Id))
 	}
-	return ctl.vmPool[jobId].Cancel()
-}
+	globalJobListMutex.Unlock()
+	if err != nil {return}
 
-func (ctl *HIDController) WaitBackgroundJobResult(avmId int) (otto.Value, error) {
-	if avmId < 0 || avmId >= MAX_VM {
-		return otto.Value{}, errors.New("Invalid Id for AsyncOttoVM")
-	}
-	return ctl.vmPool[avmId].WaitResult()
-}
+	val,err = job.WaitResult() //Blocking result wait
 
-func (ctl *HIDController) GetRunningBackgroundJobs() (res []int) {
-	res = make([]int,0)
-	for i := 0; i< MAX_VM; i++ {
-		if ctl.vmPool[i].IsWorking() {
-			res = append(res, i)
-		}
-	}
+	//remove job from global list after result has been retrieved
+	globalJobListMutex.Lock()
+	delete(globalJobList,job)
+	globalJobListMutex.Unlock()
+
 	return
 }
 
 
-func (ctl *HIDController) currentlyWorkingVMs() (res []*AsyncOttoVM) {
-	res = make([]*AsyncOttoVM,0)
-	for i := 0; i< MAX_VM; i++ {
-		if ctl.vmPool[i].IsWorking() {
-			res = append(res, ctl.vmPool[i])
-		}
+func (ctl *HIDController) CancelAllBackgroundJobs() {
+	globalJobListMutex.Lock()
+	oldList := globalJobList
+	// cancel known jobs
+	for job,_ := range oldList {
+		fmt.Printf("Cancelling Job %d\n", job.Id)
+		job.Cancel()
 	}
-	return
-}
+	globalJobList = make(map[*AsyncOttoJob]bool) //Create new empty list
+	globalJobListMutex.Unlock()
 
-func (ctl *HIDController) CancelAllBackgroundJobs() error {
-	for i := 0; i< MAX_VM; i++ {
-		fmt.Printf("CANCELLING VM %d: %+v\n",i, ctl.vmPool[i])
-
-		if ctl.vmPool[i].IsWorking() {
-			ctl.vmPool[i].Cancel()
-		}
-	}
-	return nil
 }
 
 //Function declarations for master VM
