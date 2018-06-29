@@ -58,9 +58,6 @@ func (job *AsyncOttoJob) ResultJsonString() (string, error) {
 
 type AsyncOttoVM struct {
 	vm           *otto.Otto
-	ResultErr    *error
-	ResultValue  otto.Value
-	Finished chan bool
 	isWorking    bool
 	sync.Mutex
 	Id int
@@ -70,8 +67,6 @@ func NewAsyncOttoVM(vm *otto.Otto) *AsyncOttoVM {
 	vm.Interrupt = make(chan func(), 1) //set Interrupt channel
 	res := &AsyncOttoVM{
 		isWorking:   false,
-		ResultValue: otto.Value{},
-		Finished:    make(chan bool,1), //buffer of 1 as we don't want to block on setting the finished signal
 		vm:          vm,
 		Id:          vmNum,
 	}
@@ -125,7 +120,7 @@ func (avm *AsyncOttoVM) RunAsync(ctx context.Context, src interface{}) (job *Asy
 			if job.executingVM != nil {
 				job.executingVM.vm.Interrupt  <- func() {
 					log.Printf("VM %d EXECUTED INTERRUPT FUNCTION\n", avm.Id)
-					panic(halt)
+					panic(haltirq)
 				}
 			}
 		}
@@ -136,14 +131,14 @@ func (avm *AsyncOttoVM) RunAsync(ctx context.Context, src interface{}) (job *Asy
 			defer avm.SetWorking(false)
 			if caught := recover(); caught != nil {
 				fmt.Printf("VM %d CAUGHT INTERRUPT, ENDING JOB %d\n", avm.Id, job.Id)
-				if caught == halt {
+				if caught == haltirq {
 					job.ResultErr = errors.New(fmt.Sprintf("Execution of job %d on VM %d interrupted\n", job.Id, avm.Id))
 
 					// signal Job finished
 					job.SetFinished()
 					return
 				}
-				panic(caught) //re-raise panic, as it isn't `halt`
+				panic(caught) //re-raise panic, as it isn't `haltirq`
 			}
 			return
 		}()

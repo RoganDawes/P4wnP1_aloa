@@ -70,7 +70,7 @@ func TestLEDTriggers(hidCtl *hid.HIDController) {
 
 	//Test repeat trigger on any LED
 	fmt.Println("Waiting for any repeated LED state change (5 times frequently), wait timeout after 20 seconds...")
-	trigger, err := hidCtl.Keyboard.WaitLEDStateChangeRepeated(hid.MaskAny, 5, time.Millisecond*500, 20*time.Second)
+	trigger, err := hidCtl.Keyboard.WaitLEDStateChangeRepeated(context.Background(), hid.MaskAny, 5, time.Millisecond*500, 20*time.Second)
 	if err != nil {
 		fmt.Printf("Waiting aborted with error: %v\n", err)
 	} else {
@@ -79,7 +79,7 @@ func TestLEDTriggers(hidCtl *hid.HIDController) {
 
 	//Test single trigger on any LED
 	fmt.Println("Waiting for any LED single state change, timeout after 15 seconds")
-	trigger, err = hidCtl.Keyboard.WaitLEDStateChange(hid.MaskAny, 15*time.Second)
+	trigger, err = hidCtl.Keyboard.WaitLEDStateChange(context.Background(),hid.MaskAny, 15*time.Second)
 	if err != nil {
 		fmt.Printf("Waiting aborted with error: %v\n", err)
 	} else {
@@ -91,7 +91,7 @@ func TestLEDTriggers(hidCtl *hid.HIDController) {
 
 	//Test single trigger on NUMLOCK LED (ignore CAPSLOCK, SCROLLLOCK etc.)
 	fmt.Println("Waiting for NUMLOCK LED state change, timeout after 15 seconds")
-	trigger, err = hidCtl.Keyboard.WaitLEDStateChange(hid.MaskNumLock, 15*time.Second)
+	trigger, err = hidCtl.Keyboard.WaitLEDStateChange(context.Background(),hid.MaskNumLock, 15*time.Second)
 	if err != nil {
 		fmt.Printf("Waiting aborted with error: %v\n", err)
 	} else {
@@ -100,7 +100,7 @@ func TestLEDTriggers(hidCtl *hid.HIDController) {
 
 	//Test single trigger on NUMLOCK LED (ignore CAPSLOCK, SCROLLLOCK etc.)
 	fmt.Println("Waiting for CAPSLOCK LED state change for 15 seconds")
-	trigger, err = hidCtl.Keyboard.WaitLEDStateChange(hid.MaskCapsLock, 15*time.Second)
+	trigger, err = hidCtl.Keyboard.WaitLEDStateChange(context.Background(), hid.MaskCapsLock, 15*time.Second)
 	if err != nil {
 		fmt.Printf("Waiting aborted with error: %v\n", err)
 	} else {
@@ -111,7 +111,7 @@ func TestLEDTriggers(hidCtl *hid.HIDController) {
 func TestMultiLEDTrigges(hidCtl *hid.HIDController, triggerMask byte) {
 	//Test repeat trigger on given LED
 	fmt.Printf("Waiting for repeated LED state change (5 times frequently) of mask %v, wait timeout after 20 seconds...\n", triggerMask)
-	trigger, err := hidCtl.Keyboard.WaitLEDStateChangeRepeated(triggerMask, 5, time.Millisecond*500, 20*time.Second)
+	trigger, err := hidCtl.Keyboard.WaitLEDStateChangeRepeated(context.Background(),triggerMask, 5, time.Millisecond*500, 20*time.Second)
 	if err != nil {
 		fmt.Printf("Waiting aborted with error: %v\n", err)
 	} else {
@@ -332,7 +332,8 @@ func main() {
 	jobList := make([]int,0)
 	fmt.Println("Adding sleeping jobs with 5 seconds timeout context")
 	ctxT,_ := context.WithTimeout(context.Background(), time.Second * 2)
-	script := "console.log('START ' + JID + ' on VM ' + VMID);delay(5000);console.log(JID + ' returned from 5s blocking delay');"
+	//script := "console.log('START ' + JID + ' on VM ' + VMID);delay(5000);console.log(JID + ' returned from 5s blocking delay');"
+	script := "console.log('START ' + JID + ' on VM ' + VMID);waitLEDRepeat(ANY,5000);console.log(JID + ' returned from 5s blocking delay');"
 	startTime := time.Now()
 	for i:=1; i<4; i++ {
 		job,err := hidCtl.StartScriptAsBackgroundJob(ctxT,script)

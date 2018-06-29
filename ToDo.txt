@@ -18,9 +18,8 @@ HID
 - DONE: avoid memory leak on reinit of HIDController
 - DONE: implement job management
 - DONE: implement context for cancellation and cancellation propagation
-- blocking JavaScript to go callbacks (waitLED, delay, waitLEDRepeated) have to be job-context aware to allow
-interruption (the Interrupt channel of Otto only triggers after a blocking callback is evaluated, thus this callbacks have
-to be interrupted themselves)
+- DONE: blocking JavaScript to go callbacks (waitLED, delay, waitLEDRepeated) have to consume the otto.Otto.Interrupt channel
+to be able to be aborted when Otto is interrupted
 
 WIFI
 - implement connection to OPEN-AUTH network as STA

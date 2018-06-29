@@ -23,8 +23,9 @@ var (
 
 	hidControllerReuse *HIDController
 
-	halt = errors.New("Stahp")
-	ErrAbort = errors.New("Event listening aborted")
+	haltirq       = errors.New("Stahp")
+	ErrAbort      = errors.New("Event listening aborted")
+	ErrIrq        = errors.New("Aborted due to interrupt request")
 	ErrNotAllowed = errors.New("Calling not allowed (currently disabled)")
 )
 
@@ -276,7 +277,6 @@ func (ctl *HIDController) jsTypingSpeed(call otto.FunctionCall) (res otto.Value)
 }
 
 func (ctl *HIDController) jsDelay(call otto.FunctionCall) (res otto.Value) {
-
 	arg0 := call.Argument(0)
 	//fmt.Printf("JS delay() called with: `%s` (%s)\n", arg0, arg0)
 
@@ -292,8 +292,14 @@ func (ctl *HIDController) jsDelay(call otto.FunctionCall) (res otto.Value) {
 	}
 	delay := int(fDelay)
 	log.Printf("HIDScript delay: Sleeping `%v` milliseconds\n", delay)
-	time.Sleep(time.Millisecond * time.Duration(int(delay)))
+	//time.Sleep(time.Millisecond * time.Duration(int(delay)))
 
+	select {
+		case <- time.After(time.Millisecond * time.Duration(int(delay))):
+			return
+		case irq := <-call.Otto.Interrupt:
+			irq()
+	}
 	return
 }
 
@@ -357,8 +363,19 @@ func (ctl *HIDController) jsWaitLED(call otto.FunctionCall) (res otto.Value) {
 		return
 	}
 
-	changed,err := ctl.Keyboard.WaitLEDStateChange(mask, timeout)
-	//fmt.Printf("Changed %+v\n", changed)
+	irqCtx, cancel := context.WithCancel(context.Background())
+	go func(cancel context.CancelFunc, vm *otto.Otto) {
+		select {
+		case /*irq :=*/ <- vm.Interrupt:
+			cancel() //cancel context used by LED state change
+			//irq() // call irq handler
+		}
+	}(cancel,call.Otto)
+
+	changed,err := ctl.Keyboard.WaitLEDStateChange(irqCtx, mask, timeout)
+	if err == ErrIrq {
+		panic(haltirq)
+	}
 
 	errStr := ""
 	if err != nil {errStr = fmt.Sprintf("%v",err)}
@@ -459,9 +476,21 @@ func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Valu
 		return
 	}
 
+	irqCtx, cancel := context.WithCancel(context.Background())
+	go func(cancel context.CancelFunc, vm *otto.Otto) {
+		select {
+		case /*irq :=*/ <- vm.Interrupt:
+			cancel() //cancel context used by LED state change
+			//irq() // call irq handler
+		}
+	}(cancel,call.Otto)
+
+
 	log.Printf("HIDScript: Waiting for repeated LED change. Mask for considered LEDs: %v, Minimum repeat count: %v, Maximum repeat delay: %v, Timeout: %v\n", mask, repeatCount, maxInterval, timeout)
-	changed,err := ctl.Keyboard.WaitLEDStateChangeRepeated(mask, repeatCount, maxInterval, timeout)
-	//fmt.Printf("Changed %+v\n", changed)
+	changed,err := ctl.Keyboard.WaitLEDStateChangeRepeated(irqCtx, mask, repeatCount, maxInterval, timeout)
+	if err == ErrIrq {
+		panic(haltirq)
+	}
 
 	errStr := ""
 	if err != nil {errStr = fmt.Sprintf("%v",err)}

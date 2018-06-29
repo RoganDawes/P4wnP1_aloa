@@ -308,7 +308,7 @@ Waits for single LED state change
 intendedChange: Mask values combined with logical or, to indicate which LEDs are allowed to trigger MaskNu
 return value changed: Mask values combined with logical or, indicating which LED actually changed in order to stop waiting
  */
-func (kbd *HIDKeyboard) WaitLEDStateChange(intendedChange byte, timeout time.Duration) (changed *HIDLEDState,err error) {
+func (kbd *HIDKeyboard) WaitLEDStateChange(ctxIrq context.Context, intendedChange byte, timeout time.Duration) (changed *HIDLEDState,err error) {
 	//register state change listener
 	l,err := kbd.LEDWatcher.RetrieveNewListener()
 	if err!= nil { return nil,err }
@@ -345,13 +345,15 @@ func (kbd *HIDKeyboard) WaitLEDStateChange(intendedChange byte, timeout time.Dur
 			//If here, there was a LED state change, but not one we want to use for triggering (continue outer loop, consuming channel data)
 		case <-l.ledWatcher.ctx.Done():
 			return nil, ErrAbort
+		case <-ctxIrq.Done():
+			return nil, ErrIrq
 		case <- time.After(remaining):
 			return nil, ErrTimeout
 		}
 	}
 }
 
-func (kbd *HIDKeyboard) WaitLEDStateChangeRepeated(intendedChange byte, repeatCount int, minRepeatDelay time.Duration, timeout time.Duration) (changed *HIDLEDState,err error) {
+func (kbd *HIDKeyboard) WaitLEDStateChangeRepeated(ctxIrq context.Context, intendedChange byte, repeatCount int, minRepeatDelay time.Duration, timeout time.Duration) (changed *HIDLEDState,err error) {
 	//register state change listener
 	l,err := kbd.LEDWatcher.RetrieveNewListener()
 	if err!= nil { return nil,err }
@@ -454,6 +456,8 @@ func (kbd *HIDKeyboard) WaitLEDStateChangeRepeated(intendedChange byte, repeatCo
 			//If here, there was a LED state change, but not one we want to use for triggering (continue outer loop, consuming channel data)
 		case <-l.ledWatcher.ctx.Done():
 			return nil, ErrAbort
+		case <-ctxIrq.Done():
+			return nil, ErrIrq
 		case <- time.After(remaining):
 			return nil, ErrTimeout
 		}
