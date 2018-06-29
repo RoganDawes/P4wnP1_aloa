@@ -53,14 +53,14 @@ var (
 type HIDController struct {
 	Keyboard *HIDKeyboard
 	Mouse *Mouse
-	vmPool [MAX_VM]*AsyncOttoVM //ToDo: check if this could be changed to sync.Pool
+	vmPool [MAX_VM]*AsyncOttoVM
 	vmMaster *otto.Otto
 	ctx context.Context
 	cancel context.CancelFunc
 }
 
 func NewHIDController(ctx context.Context, keyboardDevicePath string, keyboardMapPath string, mouseDevicePath string) (ctl *HIDController, err error) {
-	//ToDo: check if hidcontroller could work with a context whith cancellation, which then could be cancelled on reuse of the object
+	//ToDo: check if hidcontroller could work with a context with cancellation, which then could be cancelled on reuse of the object
 	if hidControllerReuse == nil {
 		hidControllerReuse = &HIDController{}
 
@@ -126,11 +126,19 @@ func (ctl *HIDController) NextUnusedVM() (vm *AsyncOttoVM, err error) {
 }
 
 func (ctl *HIDController) RunScript(ctx context.Context, script string) (val otto.Value, err error) {
+	/*
 	//fetch next free vm from pool
 	avm,err := ctl.NextUnusedVM()
 	if err != nil { return otto.Value{}, err }
 
 	val, err = avm.Run(ctx, script)
+	*/
+
+	// use backround job and wait, to force keeping track of job in joblist, in case the result is never fetched due to
+	// remote CLI abort after running endless script (wouldn't cancel the script)
+	job,err := ctl.StartScriptAsBackgroundJob(ctx, script)
+	if err != nil { return val,err }
+	val,err = ctl.WaitBackgroundJobResult(ctx, job)
 	return
 }
 
@@ -168,13 +176,22 @@ func (ctl *HIDController) StartScriptAsBackgroundJob(ctx context.Context,script 
 	return
 }
 
-func (ctl *HIDController) WaitBackgroundJobResult(job *AsyncOttoJob) (val otto.Value, err error) {
+func (ctl *HIDController) WaitBackgroundJobResult(ctx context.Context, job *AsyncOttoJob) (val otto.Value, err error) {
 	globalJobListMutex.Lock()
 	if !globalJobList[job] {
 		err = errors.New(fmt.Sprintf("Tried to retrieve results of job with id %d failed, because it is not in the list of background jobs", job.Id))
 	}
 	globalJobListMutex.Unlock()
 	if err != nil {return}
+
+	//cancel job when provided context is done
+	// ToDo: do profiling to check if this go routine stays open, in case ctx is never done
+	go func(ctx context.Context, job *AsyncOttoJob) {
+		select {
+		case <- ctx.Done():
+			job.Cancel()
+		}
+	}(ctx,job)
 
 	val,err = job.WaitResult() //Blocking result wait
 
@@ -291,8 +308,7 @@ func (ctl *HIDController) jsDelay(call otto.FunctionCall) (res otto.Value) {
 		return
 	}
 	delay := int(fDelay)
-	log.Printf("HIDScript delay: Sleeping `%v` milliseconds\n", delay)
-	//time.Sleep(time.Millisecond * time.Duration(int(delay)))
+//	log.Printf("HIDScript delay: Sleeping `%v` milliseconds\n", delay)
 
 	select {
 		case <- time.After(time.Millisecond * time.Duration(int(delay))):
@@ -686,7 +702,7 @@ func (ctl *HIDController) initVM(vm *otto.Otto) (err error) {
 	if err != nil { return err }
 	err = vm.Set("waitLEDRepeat", ctl.jsWaitLEDRepeat)
 	if err != nil { return err }
-	err = vm.Set("layout", ctl.jsLayout)
+	err = vm.Set("layout", ctl.jsLayout) // this influences all scripts
 	if err != nil { return err }
 
 	err = vm.Set("move", ctl.jsMove)

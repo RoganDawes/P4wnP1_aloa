@@ -68,10 +68,15 @@ func (s *server) FSCreateTempDirOrFile(ctx context.Context, req *pb.TempDirOrFil
 	}
 }
 
-func (s *server) HIDRCancelScriptJob(ctx context.Context, job *pb.HIDScriptJob) (empty *pb.Empty, err error) {
+func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) (empty *pb.Empty, err error) {
 	empty = &pb.Empty{}
 	if HidCtl == nil { return empty, rpcErrNoHid}
 
+	// Try to find script
+	job,err := HidCtl.GetBackgroundJobByID(int(sJob.Id))
+	if err != nil { return empty, err }
+
+	job.Cancel()
 	return
 }
 
@@ -81,8 +86,10 @@ func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptReques
 	if scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath); err != nil {
 		return nil, errors.New(fmt.Sprintf("Couldn't load HIDScript '%s': %v\n", scriptReq.ScriptPath, err))
 	} else {
-		//ToDo: check influence of request context
-		scriptVal,err := HidCtl.RunScript(ctx, string(scriptFile))
+		jobCtx := context.Background()
+		// ToDo: we don't retrieve the cancelFunc which should be called to free resources. Solution: use withCancel context and call cancel by go routine on timeout
+		if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
+		scriptVal,err := HidCtl.RunScript(jobCtx, string(scriptFile))
 		if err != nil { return nil,err }
 		val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
 		jsonVal,err := json.Marshal(val)
@@ -98,15 +105,49 @@ func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptReques
 	}
 }
 
-func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptRequest) (job *pb.HIDScriptJob, err error) {
+func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptRequest) (rJob *pb.HIDScriptJob, err error) {
 	if HidCtl == nil { return nil, rpcErrNoHid}
 
+	if scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath); err != nil {
+		return nil, errors.New(fmt.Sprintf("Couldn't load HIDScript '%s': %v\n", scriptReq.ScriptPath, err))
+	} else {
+		//Note: Don't use the gRPC context, it would cancel after this call and thus interrupt the job immediately
+		jobCtx := context.Background()
+		// ToDo: we don't retrieve the cancelFunc which should be called to free resources. Solution: use withCancel context and call cancel by go routine on timeout
+		if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
+		job,err := HidCtl.StartScriptAsBackgroundJob(jobCtx, string(scriptFile))
+		if err != nil { return nil,err }
+
+		rJob = &pb.HIDScriptJob{
+			Id: uint32(job.Id),
+		}
+		return rJob,nil
+	}
 	return
 }
 
-func (s *server) HIDRGetScriptJobResult(ctx context.Context,job *pb.HIDScriptJob) (scriptRes *pb.HIDScriptResult, err error) {
+func (s *server) HIDGetScriptJobResult(ctx context.Context, sJob *pb.HIDScriptJob) (scriptRes *pb.HIDScriptResult, err error) {
 	if HidCtl == nil { return nil, rpcErrNoHid}
 
+	// Try to find script
+	job,err := HidCtl.GetBackgroundJobByID(int(sJob.Id))
+	if err != nil { return scriptRes, err }
+
+
+	//ToDo: check impact/behavior, because ctx is provided by gRPC server
+	scriptVal,err := HidCtl.WaitBackgroundJobResult(ctx, job)
+	if err != nil { return nil,err }
+	val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
+	jsonVal,err := json.Marshal(val)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Script seems to have succeeded but result couldn't be converted to JSON: %v\n", err))
+	}
+	scriptRes = &pb.HIDScriptResult{
+		IsFinished: true,
+		Job: &pb.HIDScriptJob{Id:0},
+		ResultJson: string(jsonVal),
+	}
+	return scriptRes,nil
 	return
 }
 

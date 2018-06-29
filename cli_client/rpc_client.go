@@ -260,9 +260,10 @@ func ClientDeployWifiSettings(host string, port string, settings *pb.WiFiSetting
 	return err
 }
 
-func ClientHIDRunScript(host string, port string, scriptPath string) (scriptRes *pb.HIDScriptResult, err error) {
+func ClientHIDRunScript(host string, port string, scriptPath string, timeoutSeconds uint32) (scriptRes *pb.HIDScriptResult, err error) {
 	scriptReq := &pb.HIDScriptRequest{
 		ScriptPath: scriptPath,
+		TimeoutSeconds: timeoutSeconds,
 	}
 
 	address := host + ":" + port
@@ -278,9 +279,10 @@ func ClientHIDRunScript(host string, port string, scriptPath string) (scriptRes 
 	return
 }
 
-func ClientHIDRunScriptJob(host string, port string, scriptPath string) (sctipJob *pb.HIDScriptJob, err error) {
+func ClientHIDRunScriptJob(host string, port string, scriptPath string, timeoutSeconds uint32) (scriptJob *pb.HIDScriptJob, err error) {
 	scriptReq := &pb.HIDScriptRequest{
 		ScriptPath: scriptPath,
+		TimeoutSeconds: timeoutSeconds,
 	}
 
 	address := host + ":" + port
@@ -292,6 +294,43 @@ func ClientHIDRunScriptJob(host string, port string, scriptPath string) (sctipJo
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
 	defer cancel()
 
-	sctipJob,err = rpcClient.HIDRunScriptJob(ctx, scriptReq)
+	scriptJob,err = rpcClient.HIDRunScriptJob(ctx, scriptReq)
+	return
+}
+
+func ClientHIDCancelScriptJob(host string, port string, jobID uint32) (err error) {
+	cancelReq := &pb.HIDScriptJob{
+		Id: jobID,
+	}
+
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err) }
+	defer connection.Close()
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
+	defer cancel()
+
+	_,err = rpcClient.HIDCancelScriptJob(ctx, cancelReq)
+	return
+}
+
+
+func ClientHIDGetScriptJobResult(host string, port string, jobID uint32) (scriptRes *pb.HIDScriptResult, err error) {
+	req := &pb.HIDScriptJob{
+		Id: jobID,
+	}
+
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err) }
+	defer connection.Close()
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+	//	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
+	//	defer cancel()
+
+	scriptRes,err = rpcClient.HIDGetScriptJobResult(context.Background(), req)
 	return
 }

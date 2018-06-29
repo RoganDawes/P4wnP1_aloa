@@ -9,12 +9,13 @@ import (
 	"os"
 	"errors"
 	"log"
+	"strconv"
 )
 
 var (
 	tmpHidCommands = ""
 	tmpRunFromServerPath = ""
-	tmpHidTimeout = -1 // values < 0 = endless
+	tmpHidTimeout = uint32(0) // values < 0 = endless
 )
 
 var hidCmd = &cobra.Command{
@@ -34,6 +35,12 @@ var hidJobCmd = &cobra.Command{
 	Short: "Run a HID Script as background job",
 	Long:"Run a background script provided from standard input, commandline parameter or by path to script file on P4wnP1",
 	Run: cobraHidJob,
+}
+
+var hidJobCancelCmd = &cobra.Command{
+	Use:   "cancel",
+	Short: "Cancel background job given by its ID",
+	Run: cobraHidJobCancel,
 }
 
 // Decision on how to run scripts (terms "local"/"remote" from perspective of gRPC server):
@@ -174,8 +181,7 @@ func cobraHidRun(cmd *cobra.Command, args []string) {
 	serverScriptFilePath, err := parseHIDRunScripCmd(cmd,args)
 	if err != nil { log.Fatal(err)}
 
-	//ToDo: retrieve result and print it
-	res,err := ClientHIDRunScript(StrRemoteHost, StrRemotePort, serverScriptFilePath)
+	res,err := ClientHIDRunScript(StrRemoteHost, StrRemotePort, serverScriptFilePath, tmpHidTimeout)
 	if err != nil { log.Fatal(err) }
 
 	fmt.Println(res.ResultJson)
@@ -184,26 +190,25 @@ func cobraHidRun(cmd *cobra.Command, args []string) {
 
 
 func cobraHidJob(cmd *cobra.Command, args []string) {
-	parseHIDRunScripCmd(cmd,args)
-	/*
-	settings, err := createWifiAPSettings(tmpWifiStrChannel, tmpWifiStrReg, tmpWifiSSID, tmpWifiPSK, tmpWifiHideSSID, tmpWifiDisableNexmon, tmpWifiDisabled)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-
-		os.Exit(-1) //exit with error
-		return
-	}
+	serverScriptFilePath, err := parseHIDRunScripCmd(cmd,args)
+	if err != nil { log.Fatal(err)}
 
 
-	fmt.Printf("Deploying WiFi inteface settings:\n\t%v\n", settings)
+	job,err := ClientHIDRunScriptJob(StrRemoteHost, StrRemotePort, serverScriptFilePath, tmpHidTimeout)
+	if err != nil { log.Fatal(err) }
 
-	err = ClientDeployWifiSettings(StrRemoteHost, StrRemotePort, settings)
-	if err != nil {
-		fmt.Println(status.Convert(err).Message())
-		os.Exit(-1) //exit with error
-	}
+	fmt.Printf("Job ID: %d\n", job.Id)
+	return
+}
 
-*/
+func cobraHidJobCancel(cmd *cobra.Command, args []string) {
+	if len(args) < 1 { log.Fatal("Job ID to cancel has to be given as argument\n")}
+	jobID,err := strconv.ParseUint(args[0], 10, 32)
+	if err != nil { log.Fatalf("Error parsing job ID '%s' ton integer\n", args[0])}
+
+	err = ClientHIDCancelScriptJob(StrRemoteHost, StrRemotePort, uint32(jobID))
+	if err != nil { log.Fatal(err) }
+
 	return
 }
 
@@ -213,12 +218,13 @@ func init() {
 	rootCmd.AddCommand(hidCmd)
 	hidCmd.AddCommand(hidRunCmd)
 	hidCmd.AddCommand(hidJobCmd)
+	hidJobCmd.AddCommand(hidJobCancelCmd)
 
 	hidRunCmd.Flags().StringVarP(&tmpHidCommands, "commands","c", "", "HIDScript commands to run, given as string")
 	hidRunCmd.Flags().StringVarP(&tmpRunFromServerPath, "server-path","r", "", "Load HIDScript from given path on P4wnP1 server")
-	hidRunCmd.Flags().IntVarP(&tmpHidTimeout, "timeout","t", -1, "Abort waiting for HIDScript result after this timeout (seconds)")
+	hidRunCmd.Flags().Uint32VarP(&tmpHidTimeout, "timeout","t", 0, "Interrupt HIDScript after this timeout (seconds)")
 
 	hidJobCmd.Flags().StringVarP(&tmpHidCommands, "commands","c", "", "HIDScript commands to run, given as string")
 	hidJobCmd.Flags().StringVarP(&tmpRunFromServerPath, "server-path","r", "", "Load HIDScript from given path on P4wnP1 server")
-
+	hidJobCmd.Flags().Uint32VarP(&tmpHidTimeout, "timeout","t", 0, "Interrupt HIDScript after this timeout (seconds)")
 }

@@ -1,30 +1,55 @@
 CLI
 - add config caps for missing USB settings (serial, vid, pid ...)
-- PARTIALY: add functionality to issue HIDScripts
-	- run async scripts
-	- proper job management and cancelation
-	- retrieve log output of scripts
+- DONE: add functionality to issue HIDScripts
+	- DEONE: run async scripts
+	- DONE: proper job management and cancelation
+- retrieve log output of scripts - !LOGGING HAS TO BE REWORKED COMPLETELY, TONS OF DEBUG OUT RIGHT NOW, MIXED
+USE OF STDOUT/STDERR!!
+- function to retrieve running HIDScript background jobs + function to interrupt all jobs
 
 BOOT
-- deploy a default boot payload (Post Run in systemd service ??, config via /etc/P4wnP1/settings)
+- deploy a default boot payload/configuration (Post Run in systemd service ??, config via /etc/P4wnP1/settings)
 
 USB
 - DONE: add functionality to fetch target devices for HID (e.g. keyboard could be at /dev/hidg0..n depending on USB config)
-- init HIDController
+- DONE: init HIDController
 
 HID
 - add additional keyboard layouts (not for first release)
+- add function to retrieve LED state (currently changes only)
 - DONE: fix absolute mouse movement
-- DONE: avoid memory leak on reinit of HIDController
+- DONE: avoid memory leak on re-init of HIDController (re-use of memory leaking VMs + limited VM pool size, to keep
+impact reasonable)
 - DONE: implement job management
 - DONE: implement context for cancellation and cancellation propagation
-- DONE: blocking JavaScript to go callbacks (waitLED, delay, waitLEDRepeated) have to consume the otto.Otto.Interrupt channel
-to be able to be aborted when Otto is interrupted
+- DONE: interrupt blocking JavaScript to Go callbacks (waitLED, delay, waitLEDRepeated) by consuming VM IRQ channel
 
 WIFI
 - implement connection to OPEN-AUTH network as STA
 - implement nexmon firmware support (not for first release)
 
+BLUETOOTH:
+- configuration cpabilities for BNEP/NAP on server, keep in mind BLE use cases (idea of stand-alone proxy)
+- gRPC implementation
+- CLI client support
+
+FILESYSTEM (not for first release)
+- remote pwd, cd, download, upload (up and download already implemented for HID script transfer)
+
+DOCUMENTATION (not on first release ... yes, I know, anyway)
+- HIDScript docu (basically ES5 with some additional commands)
+- CLI docu (let's rely on the built-in help screens, for now. They need to be reworked themselves)
+- folder structure of resources/configuration files
+- language map format
+--> Lesson learned: Documenting, by providing example payloads didn't worked out for the P4wnP1 community (nearly no
+external payload contributions)
+
+OTHER:
+- extend installer to movee HIDScripts to a fixed absolute path
+
 TO FIX:
 - debug out of HIDScript puts way to much CPU load on journaling daemon (floods logs)
-- allow gRPC server to abort Running HID scripts on context.DONE
+- allow gRPC server to abort Running HID scripts on context.Done() -> possible, testing needed
+- jobs aren't deleted from global job list, unless result is fetched with waitResult. This affects interrupted
+jobs (f.e. timeout) and jobs run as background job --> cancelled jobs need a way to communicate back to the controller,
+that they could be deleted (Solution: goroutine listening for context.Done() per job in controller)

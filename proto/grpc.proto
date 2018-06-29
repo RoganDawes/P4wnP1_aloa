@@ -17,8 +17,8 @@ service P4WNP1 {
 
 	rpc HIDRunScript(HIDScriptRequest) returns (HIDScriptResult) {}
 	rpc HIDRunScriptJob(HIDScriptRequest) returns (HIDScriptJob) {}
-	rpc HIDRGetScriptJobResult(HIDScriptJob) returns (HIDScriptResult) {}
-	rpc HIDRCancelScriptJob(HIDScriptJob) returns (Empty) {}
+	rpc HIDGetScriptJobResult(HIDScriptJob) returns (HIDScriptResult) {}
+	rpc HIDCancelScriptJob(HIDScriptJob) returns (Empty) {}
 
 	rpc FSWriteFile(WriteFileRequest) returns (Empty) {}
 	rpc FSReadFile(ReadFileRequest) returns (ReadFileResponse) {}
@@ -68,7 +68,8 @@ message FileInfoResponse {
 
 /* HID */
 message HIDScriptRequest {
-	string scriptPath = 1; //for scripts hosted on the device
+	string scriptPath = 1;
+	uint32 timeoutSeconds = 2; //a timeout > 0 interrupts the HIDScript when reached, meassurement in seconds
 }
 
 message HIDScriptJob {
