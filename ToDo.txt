@@ -1,8 +1,9 @@
 CLI
 - add config caps for missing USB settings (serial, vid, pid ...)
-- add functionality to issue HIDScripts
-    - Default: HID RunScript(script src) --> returns JOB ID
-    - HID FetchScriptResult(job ID) --> waits for script to finsish and returns result
+- PARTIALY: add functionality to issue HIDScripts
+	- run async scripts
+	- proper job management and cancelation
+	- retrieve log output of scripts
 
 BOOT
 - deploy a default boot payload (Post Run in systemd service ??, config via /etc/P4wnP1/settings)
@@ -19,3 +20,7 @@ HID
 WIFI
 - implement connection to OPEN-AUTH network as STA
 - implement nexmon firmware support (not for first release)
+
+TO FIX:
+- debug out of HIDScript puts way to much CPU load on journaling daemon (floods logs)
+
