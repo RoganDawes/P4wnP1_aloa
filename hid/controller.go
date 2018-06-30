@@ -173,6 +173,21 @@ func (ctl *HIDController) StartScriptAsBackgroundJob(ctx context.Context,script 
 	globalJobList[job] = true
 	globalJobListMutex.Unlock()
 
+	//ad go routine which monitors context of the job, to remove it from global list, once done or interrupted
+	go func() {
+		fmt.Printf("StartScriptAsBackgroundJob: started finish watcher for job %d\n",job.Id)
+		select {
+		case <- job.ctx.Done():
+			fmt.Printf("StartScriptAsBackgroundJob: Job %d finished or interrupted, removing from global list\n",job.Id)
+
+			//remove job from global list after result has been retrieved
+			globalJobListMutex.Lock()
+			delete(globalJobList,job)
+			globalJobListMutex.Unlock()
+
+		}
+	}()
+
 	return
 }
 
@@ -194,11 +209,6 @@ func (ctl *HIDController) WaitBackgroundJobResult(ctx context.Context, job *Asyn
 	}(ctx,job)
 
 	val,err = job.WaitResult() //Blocking result wait
-
-	//remove job from global list after result has been retrieved
-	globalJobListMutex.Lock()
-	delete(globalJobList,job)
-	globalJobListMutex.Unlock()
 
 	return
 }
@@ -346,14 +356,15 @@ func (ctl *HIDController) jsPress(call otto.FunctionCall) (res otto.Value) {
 	return
 }
 
+
 func (ctl *HIDController) jsWaitLED(call otto.FunctionCall) (res otto.Value) {
 	//arg0 has to be of type number, representing an LED MASK
 	//arg1 is optional and represents the timeout in seconds, in case it isn't present, we set timeout to a year (=infinite in our context ;-))
 	arg0 := call.Argument(0)
 	arg1 := call.Argument(1)
-	log.Printf("HIDScript: Called WaitLED(%v, %v)\n", arg0, arg1)
+//	log.Printf("HIDScript: Called WaitLED(%v, %v)\n", arg0, arg1)
 	maskInt, err := arg0.ToInteger()
-	if err != nil || !arg0.IsNumber() || !(maskInt >= 0 && maskInt <= MaskAny) {
+	if err != nil || !arg0.IsNumber() || !(maskInt >= 0 && maskInt <= MaskAnyOrNone) {
 		//We don't mention KANA and COMPOSE in the error message
 		log.Printf("HIDScript WaitLED: First argument for `waitLED` has to be a bitmask representing LEDs (NUM | CAPS | SCROLL | ANY).\nError location:  %v\n", call.CallerLocation())
 		return
@@ -379,16 +390,8 @@ func (ctl *HIDController) jsWaitLED(call otto.FunctionCall) (res otto.Value) {
 		return
 	}
 
-	irqCtx, cancel := context.WithCancel(context.Background())
-	go func(cancel context.CancelFunc, vm *otto.Otto) {
-		select {
-		case /*irq :=*/ <- vm.Interrupt:
-			cancel() //cancel context used by LED state change
-			//irq() // call irq handler
-		}
-	}(cancel,call.Otto)
 
-	changed,err := ctl.Keyboard.WaitLEDStateChange(irqCtx, mask, timeout)
+	changed,err := ctl.Keyboard.WaitLEDStateChange(call.Otto.Interrupt, mask, timeout)
 	if err == ErrIrq {
 		panic(haltirq)
 	}
@@ -430,7 +433,7 @@ func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Valu
 
 	//arg0: Typecheck trigger mask
 	maskInt, err := arg0.ToInteger()
-	if err != nil || !arg0.IsNumber() || !(maskInt >= 0 && maskInt <= MaskAny) {
+	if err != nil || !arg0.IsNumber() || !(maskInt >= 0 && maskInt <= MaskAnyOrNone) {
 		//We don't mention KANA and COMPOSE in the error message
 		log.Printf("HIDScript WaitLEDRepeat: First argument for `waitLED` has to be a bitmask representing LEDs (NUM | CAPS | SCROLL | ANY).\nError location:  %v\n", call.CallerLocation())
 		return
@@ -492,18 +495,9 @@ func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Valu
 		return
 	}
 
-	irqCtx, cancel := context.WithCancel(context.Background())
-	go func(cancel context.CancelFunc, vm *otto.Otto) {
-		select {
-		case /*irq :=*/ <- vm.Interrupt:
-			cancel() //cancel context used by LED state change
-			//irq() // call irq handler
-		}
-	}(cancel,call.Otto)
-
 
 	log.Printf("HIDScript: Waiting for repeated LED change. Mask for considered LEDs: %v, Minimum repeat count: %v, Maximum repeat delay: %v, Timeout: %v\n", mask, repeatCount, maxInterval, timeout)
-	changed,err := ctl.Keyboard.WaitLEDStateChangeRepeated(irqCtx, mask, repeatCount, maxInterval, timeout)
+	changed,err := ctl.Keyboard.WaitLEDStateChangeRepeated(call.Otto.Interrupt, mask, repeatCount, maxInterval, timeout)
 	if err == ErrIrq {
 		panic(haltirq)
 	}
@@ -677,6 +671,8 @@ func (ctl *HIDController) initVM(vm *otto.Otto) (err error) {
 	err = vm.Set("KANA", MaskKana)
 	if err != nil { return err }
 	err = vm.Set("ANY", MaskAny)
+	if err != nil { return err }
+	err = vm.Set("ANY_OR_NONE", MaskAnyOrNone) //special masking, report back LED state updates with no change (re-attachment of Keyboard on Win/Linux)
 	if err != nil { return err }
 
 	err = vm.Set("BT1", BUTTON1)

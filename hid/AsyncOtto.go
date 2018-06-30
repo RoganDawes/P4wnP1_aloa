@@ -34,6 +34,9 @@ func (job *AsyncOttoJob) Result() interface{} {
 func (job *AsyncOttoJob) SetFinished() {
 	job.executingVM = nil //avoid accessing the vm from this job again
 	job.isFinished = true
+	// we call the cancelFunc, this would only issue an interrupt to the vm, in case the VM would still be set executingVM, but assures ctx.Done listener could react
+	// to the finished Job
+	job.Cancel()
 	close(job.finishedNotify)
 }
 
@@ -118,10 +121,13 @@ func (avm *AsyncOttoVM) RunAsync(ctx context.Context, src interface{}) (job *Asy
 		select {
 		case <-job.ctx.Done():
 			if job.executingVM != nil {
+				fmt.Printf("Job %d received IRQ, sending to VM%d\n", job.Id, avm.Id)
 				job.executingVM.vm.Interrupt  <- func() {
 					log.Printf("VM %d EXECUTED INTERRUPT FUNCTION\n", avm.Id)
 					panic(haltirq)
 				}
+			} else {
+				fmt.Printf("Job %d received IRQ, NOT sending to VM as not attached to any\n", job.Id)
 			}
 		}
 	}(avm)

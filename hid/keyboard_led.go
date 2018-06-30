@@ -20,7 +20,9 @@ const (
 	MaskScrollLock = 1 << 2
 	MaskCompose    = 1 << 3
 	MaskKana       = 1 << 4
+	MaskNone       = 1 << 7 //not really a mask, indicates no change
 	MaskAny = MaskNumLock | MaskCapsLock | MaskScrollLock | MaskCompose | MaskKana
+	MaskAnyOrNone = MaskNumLock | MaskCapsLock | MaskScrollLock | MaskCompose | MaskKana | MaskNone
 )
 
 type HIDLEDState struct {
@@ -194,11 +196,13 @@ func (w *KeyboardLEDStateWatcher) dispatchLoop() {
 	for {
 		select {
 			case newState:= <- w.readerToDispatcher:
-				fmt.Printf("**** HANDLING new LED state\n")
+				//fmt.Printf("**** HANDLING new LED state\n")
+				//fmt.Printf("Old state: %+v\nNew state:%+v\n", w.ledState, newState)
 
 
 				//Translate received LED state to state change (if first received state, everything is considered as change
 				ledStateChange := w.ledState.Changes(newState)
+				//fmt.Printf("Changed state: %+v\n", ledStateChange)
 				if w.hasInitialState == false {
 					ledStateChange.fillState(MaskAny)
 					w.hasInitialState = true
@@ -208,7 +212,7 @@ func (w *KeyboardLEDStateWatcher) dispatchLoop() {
 				w.ledState = &newState //Note: as this method blocks, in case there's no LED state listener, global LED state is only update in case a listener is registered
 
 				// check if there's at least one listener, if not block till a new one is registered
-				// Blocking, in case there's no listener, doesn't allgin to the usual approach of event driven
+				// Blocking, in case there's no listener, doesn't align to the usual approach of event driven
 				//
 				if len(w.listeners.m) == 0 {
 					//fmt.Println("Waiting fo at least one listener")
@@ -308,7 +312,7 @@ Waits for single LED state change
 intendedChange: Mask values combined with logical or, to indicate which LEDs are allowed to trigger MaskNu
 return value changed: Mask values combined with logical or, indicating which LED actually changed in order to stop waiting
  */
-func (kbd *HIDKeyboard) WaitLEDStateChange(ctxIrq context.Context, intendedChange byte, timeout time.Duration) (changed *HIDLEDState,err error) {
+func (kbd *HIDKeyboard) WaitLEDStateChange(irqFunc <-chan func(), intendedChange byte, timeout time.Duration) (changed *HIDLEDState,err error) {
 	//register state change listener
 	l,err := kbd.LEDWatcher.RetrieveNewListener()
 	if err!= nil { return nil,err }
@@ -322,6 +326,7 @@ func (kbd *HIDKeyboard) WaitLEDStateChange(ctxIrq context.Context, intendedChang
 	intendedChangeStruct.fillState(intendedChange)
 
 	for {
+		fmt.Println("LED change loop...")
 		//calculate remaining timeout (error out if already reached
 		passedBy := time.Since(startTime)
 		if passedBy > timeout {
@@ -342,10 +347,22 @@ func (kbd *HIDKeyboard) WaitLEDStateChange(ctxIrq context.Context, intendedChang
 				//fmt.Printf("LEDListener: the following changes have been relevant %+v\n", relevantChanges)
 				return &relevantChanges, nil
 			}
+
+			// special case - MaskNone is enabled we report back an LED change, even if nothing changed
+			// this could be used to trigger on Keyboard re-attachment on Windows/som Linox distros, as a new
+			// LED state is reported everytime the keyboard is attached, even if it doesn't differ from the old one
+			if intendedChange & MaskNone > 0 {
+				//fmt.Printf("LEDListener: no changes, reporting back anyway %+v\n", relevantChanges)
+				return &relevantChanges, nil
+			}
+
 			//If here, there was a LED state change, but not one we want to use for triggering (continue outer loop, consuming channel data)
 		case <-l.ledWatcher.ctx.Done():
+			fmt.Println("...LEDWatcher aborted")
 			return nil, ErrAbort
-		case <-ctxIrq.Done():
+		case irq:=<-irqFunc:
+			fmt.Println("...WaitLEDStateChange received Irq")
+			irq()
 			return nil, ErrIrq
 		case <- time.After(remaining):
 			return nil, ErrTimeout
@@ -353,7 +370,7 @@ func (kbd *HIDKeyboard) WaitLEDStateChange(ctxIrq context.Context, intendedChang
 	}
 }
 
-func (kbd *HIDKeyboard) WaitLEDStateChangeRepeated(ctxIrq context.Context, intendedChange byte, repeatCount int, minRepeatDelay time.Duration, timeout time.Duration) (changed *HIDLEDState,err error) {
+func (kbd *HIDKeyboard) WaitLEDStateChangeRepeated(irqFunc <-chan func(), intendedChange byte, repeatCount int, minRepeatDelay time.Duration, timeout time.Duration) (changed *HIDLEDState,err error) {
 	//register state change listener
 	l,err := kbd.LEDWatcher.RetrieveNewListener()
 	if err!= nil { return nil,err }
@@ -436,9 +453,8 @@ func (kbd *HIDKeyboard) WaitLEDStateChangeRepeated(ctxIrq context.Context, inten
 					lastKana = now
 				}
 
-				log.Printf("\tRelevant LED changes after applying mask (interval %v) NUM: %v CAPS: %v SCROLL: %v COMPOSE: %v KANA: %v\n", minRepeatDelay, countNum, countCaps, countScroll, countCompose, countKana)
+				//log.Printf("\tRelevant LED changes after applying mask (interval %v) NUM: %v CAPS: %v SCROLL: %v COMPOSE: %v KANA: %v\n", minRepeatDelay, countNum, countCaps, countScroll, countCompose, countKana)
 
-				//log.Printf("Counters: NUM %d, CAPS %d, SCROLL %d, COMPOSE %d, KANA %d\n", countNum, countCaps, countScroll, countCompose, countKana)
 
 				//check counters
 				result := &HIDLEDState{}
@@ -456,7 +472,8 @@ func (kbd *HIDKeyboard) WaitLEDStateChangeRepeated(ctxIrq context.Context, inten
 			//If here, there was a LED state change, but not one we want to use for triggering (continue outer loop, consuming channel data)
 		case <-l.ledWatcher.ctx.Done():
 			return nil, ErrAbort
-		case <-ctxIrq.Done():
+		case irq:=<-irqFunc:
+			irq()
 			return nil, ErrIrq
 		case <- time.After(remaining):
 			return nil, ErrTimeout

@@ -83,12 +83,17 @@ func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) 
 func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptRequest) (scriptRes *pb.HIDScriptResult, err error) {
 	if HidCtl == nil { return nil, rpcErrNoHid}
 
+
+
 	if scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath); err != nil {
 		return nil, errors.New(fmt.Sprintf("Couldn't load HIDScript '%s': %v\n", scriptReq.ScriptPath, err))
 	} else {
-		jobCtx := context.Background()
+		//jobCtx := context.Background()
+		jobCtx := ctx //we want to interrupt the script if the gRPC client cancels
 		// ToDo: we don't retrieve the cancelFunc which should be called to free resources. Solution: use withCancel context and call cancel by go routine on timeout
 		if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
+
+
 		scriptVal,err := HidCtl.RunScript(jobCtx, string(scriptFile))
 		if err != nil { return nil,err }
 		val,_ := scriptVal.Export() //Convert to Go representation, error is always nil

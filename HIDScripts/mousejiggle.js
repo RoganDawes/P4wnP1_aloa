@@ -1,4 +1,4 @@
-//Creds to Rogan Dawes
+// Creds to Rogan Dawes, MouseJiggler idea was part of USaBUSe
 //
 // Moves the mouse slightly from time, to simulate user activity (supress screensaver/lockscreen)
 // Meant to run as background job
