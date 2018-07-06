@@ -27,6 +27,8 @@ var (
 	ErrAbort      = errors.New("Event listening aborted")
 	ErrIrq        = errors.New("Aborted due to interrupt request")
 	ErrNotAllowed = errors.New("Calling not allowed (currently disabled)")
+	ErrNoKeyboard = errors.New("Using HID keyboard not allowed (currently disabled)")
+	ErrNoMouse = errors.New("Using HID mouse not allowed (currently disabled)")
 )
 
 // Note: The HID Controller uses multiple otto.Otto VMs
@@ -242,6 +244,7 @@ func (ctl *HIDController) GetAllBackgroundJobs() (jobs []uint32, err error) {
 
 //Function declarations for master VM
 func (ctl *HIDController) jsType(call otto.FunctionCall) (res otto.Value) {
+	if ctl.Keyboard == nil { log.Println(ErrNoKeyboard);  oErr,_ := otto.ToValue(ErrNoKeyboard); return oErr }
 	arg0 := call.Argument(0)
 	//fmt.Printf("JS type() called with: `%s` (%s)\n", arg0, arg0)
 
@@ -271,6 +274,7 @@ func (ctl *HIDController) jsType(call otto.FunctionCall) (res otto.Value) {
 }
 
 func (ctl *HIDController) jsLayout(call otto.FunctionCall) (res otto.Value) {
+	if ctl.Keyboard == nil { log.Println(ErrNoKeyboard);  oErr,_ := otto.ToValue(ErrNoKeyboard); return oErr }
 	arg0 := call.Argument(0)
 	//fmt.Printf("JS type() called with: `%s` (%s)\n", arg0, arg0)
 
@@ -296,6 +300,7 @@ func (ctl *HIDController) jsLayout(call otto.FunctionCall) (res otto.Value) {
 }
 
 func (ctl *HIDController) jsTypingSpeed(call otto.FunctionCall) (res otto.Value) {
+	if ctl.Keyboard == nil { log.Println(ErrNoKeyboard);  oErr,_ := otto.ToValue(ErrNoKeyboard); return oErr }
 	typeDelay := call.Argument(0) //delay between keypresses in milliseconds
 	typeJitter := call.Argument(0) //additional random jitter between keypresses, maximum in milliseconds
 
@@ -344,7 +349,7 @@ func (ctl *HIDController) jsDelay(call otto.FunctionCall) (res otto.Value) {
 
 //for pressing key combos
 func (ctl *HIDController) jsPress(call otto.FunctionCall) (res otto.Value) {
-
+	if ctl.Keyboard == nil { log.Println(ErrNoKeyboard);  oErr,_ := otto.ToValue(ErrNoKeyboard); return oErr }
 	arg0 := call.Argument(0)
 	//fmt.Printf("JS delay() called with: `%s` (%s)\n", arg0, arg0)
 
@@ -403,11 +408,14 @@ func (ctl *HIDController) jsWaitLED(call otto.FunctionCall) (res otto.Value) {
 		return
 	}
 
-
-	changed,err := ctl.Keyboard.WaitLEDStateChange(call.Otto.Interrupt, mask, timeout)
-	if err == ErrIrq {
-		panic(haltirq)
+	var changed *HIDLEDState
+	if ctl.Keyboard == nil { err = ErrNoKeyboard } else {
+		changed,err = ctl.Keyboard.WaitLEDStateChange(call.Otto.Interrupt, mask, timeout)
+		if err == ErrIrq {
+			panic(haltirq)
+		}
 	}
+
 
 	errStr := ""
 	if err != nil {errStr = fmt.Sprintf("%v",err)}
@@ -509,11 +517,16 @@ func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Valu
 	}
 
 
-	log.Printf("HIDScript: Waiting for repeated LED change. Mask for considered LEDs: %v, Minimum repeat count: %v, Maximum repeat delay: %v, Timeout: %v\n", mask, repeatCount, maxInterval, timeout)
-	changed,err := ctl.Keyboard.WaitLEDStateChangeRepeated(call.Otto.Interrupt, mask, repeatCount, maxInterval, timeout)
-	if err == ErrIrq {
-		panic(haltirq)
+	var changed *HIDLEDState
+	if ctl.Keyboard == nil { err = ErrNoKeyboard } else {
+		log.Printf("HIDScript: Waiting for repeated LED change. Mask for considered LEDs: %v, Minimum repeat count: %v, Maximum repeat delay: %v, Timeout: %v\n", mask, repeatCount, maxInterval, timeout)
+		changed,err = ctl.Keyboard.WaitLEDStateChangeRepeated(call.Otto.Interrupt, mask, repeatCount, maxInterval, timeout)
+		if err == ErrIrq {
+			panic(haltirq)
+		}
 	}
+
+
 
 	errStr := ""
 	if err != nil {errStr = fmt.Sprintf("%v",err)}
@@ -541,6 +554,8 @@ func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Valu
 
 // Move mouse relative in given mouse units (-127 to +127 per axis)
 func (ctl *HIDController) jsMove(call otto.FunctionCall) (res otto.Value) {
+	if ctl.Mouse == nil { log.Println(ErrNoMouse); return }
+
 	argx := call.Argument(0)
 	argy := call.Argument(1)
 	log.Printf("HIDScript: Called move(%v, %v)\n", argx, argy)
@@ -562,6 +577,7 @@ func (ctl *HIDController) jsMove(call otto.FunctionCall) (res otto.Value) {
 
 // Move mouse relative in across given distance in mouse units, devide into substeps of 1 DPI per step (parameters uint6 -32768 to +32767 per axis)
 func (ctl *HIDController) jsMoveStepped(call otto.FunctionCall) (res otto.Value) {
+	if ctl.Mouse == nil { log.Println(ErrNoMouse); return }
 	argx := call.Argument(0)
 	argy := call.Argument(1)
 //	log.Printf("HIDScript: Called moveStepped(%v, %v)\n", argx, argy)
@@ -584,6 +600,7 @@ func (ctl *HIDController) jsMoveStepped(call otto.FunctionCall) (res otto.Value)
 
 // Move mouse to absolute position (-1.0 to +1.0 per axis)
 func (ctl *HIDController) jsMoveTo(call otto.FunctionCall) (res otto.Value) {
+	if ctl.Mouse == nil { log.Println(ErrNoMouse); return }
 	argx := call.Argument(0)
 	argy := call.Argument(1)
 	log.Printf("HIDScript: Called moveTo(%v, %v)\n", argx, argy)
@@ -602,6 +619,7 @@ func (ctl *HIDController) jsMoveTo(call otto.FunctionCall) (res otto.Value) {
 }
 
 func (ctl *HIDController) jsButton(call otto.FunctionCall) (res otto.Value) {
+	if ctl.Mouse == nil { log.Println(ErrNoMouse); return }
 	//arg0 has to be of type number, representing a bitmask for BUTTON1..3
 	arg0 := call.Argument(0)
 	log.Printf("HIDScript: Called button(%v)\n", arg0)
@@ -623,6 +641,7 @@ func (ctl *HIDController) jsButton(call otto.FunctionCall) (res otto.Value) {
 }
 
 func (ctl *HIDController) jsClick(call otto.FunctionCall) (res otto.Value) {
+	if ctl.Mouse == nil { log.Println(ErrNoMouse); return }
 	//arg0 has to be of type number, representing a bitmask for BUTTON1..3
 	arg0 := call.Argument(0)
 	log.Printf("HIDScript: Called click(%v)\n", arg0)
@@ -644,6 +663,8 @@ func (ctl *HIDController) jsClick(call otto.FunctionCall) (res otto.Value) {
 }
 
 func (ctl *HIDController) jsDoubleClick(call otto.FunctionCall) (res otto.Value) {
+	if ctl.Mouse == nil { log.Println(ErrNoMouse); return }
+
 	//arg0 has to be of type number, representing a bitmask for BUTTON1..3
 	arg0 := call.Argument(0)
 	log.Printf("HIDScript: Called doubleClick(%v)\n", arg0)
