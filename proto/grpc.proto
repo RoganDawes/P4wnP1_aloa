@@ -19,6 +19,8 @@ service P4WNP1 {
 	rpc HIDRunScriptJob(HIDScriptRequest) returns (HIDScriptJob) {}
 	rpc HIDGetScriptJobResult(HIDScriptJob) returns (HIDScriptResult) {}
 	rpc HIDCancelScriptJob(HIDScriptJob) returns (Empty) {}
+	rpc HIDGetRunningScriptJobs(Empty) returns (HIDScriptJobList) {}
+	rpc HIDCancelAllScriptJobs(Empty) returns (Empty) {}
 
 	rpc FSWriteFile(WriteFileRequest) returns (Empty) {}
 	rpc FSReadFile(ReadFileRequest) returns (ReadFileResponse) {}
@@ -74,6 +76,10 @@ message HIDScriptRequest {
 
 message HIDScriptJob {
 	uint32 id = 1;
+}
+
+message HIDScriptJobList {
+	repeated uint32 ids = 1;
 }
 
 message HIDScriptResult {

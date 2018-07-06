@@ -29,11 +29,11 @@ func main() {
 
 	gs, err := client.GetDeployedGadgetSetting(ctx, &pb.Empty{})
 	if err == nil {
-		str:=fmt.Sprintf("Gs: %v\n", gs)
+		str:=fmt.Sprintf("Gs: %+v\n", gs)
 		fmt.Println(str)
 		div_cont:= dom.GetWindow().Document().GetElementByID("content").(*dom.HTMLDivElement)
 		new_div := dom.GetWindow().Document().CreateElement("div").(*dom.HTMLDivElement)
-		new_div.SetTextContent("Result of GetDeployedGadgetSetting gRPC-web call: " + str)
+		new_div.SetTextContent(fmt.Sprintf("Result of GetDeployedGadgetSetting gRPC-web call:\n%s ",str))
 		div_cont.AppendChild(new_div)
 	} else {
 		fmt.Printf("Error rpc call: %v\n", err)

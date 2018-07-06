@@ -10,6 +10,7 @@ install:
 	cp P4wnP1.service /etc/systemd/system/P4wnP1.service
 	mkdir /usr/local/P4wnP1
 	cp -R keymaps /usr/local/P4wnP1/
+	cp -R scripts /usr/local/P4wnP1/
 	# reinit service daemon
 	systemctl daemon-reload
 	# enable service

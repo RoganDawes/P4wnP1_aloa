@@ -68,6 +68,27 @@ func (s *server) FSCreateTempDirOrFile(ctx context.Context, req *pb.TempDirOrFil
 	}
 }
 
+func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) (jobs *pb.HIDScriptJobList, err error) {
+	if HidCtl == nil { return nil, rpcErrNoHid}
+
+	retJobs,err := HidCtl.GetAllBackgroundJobs()
+	if err != nil { return nil, err }
+	jobs = &pb.HIDScriptJobList{}
+	jobs.Ids = retJobs
+	return
+}
+
+func (s *server) HIDCancelAllScriptJobs(ctx context.Context, rEmpty *pb.Empty) (empty *pb.Empty, err error) {
+	empty = &pb.Empty{}
+	if HidCtl == nil { return empty, rpcErrNoHid}
+
+	// Try to find script
+	HidCtl.CancelAllBackgroundJobs()
+	return
+}
+
+
+
 func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) (empty *pb.Empty, err error) {
 	empty = &pb.Empty{}
 	if HidCtl == nil { return empty, rpcErrNoHid}
@@ -308,30 +329,20 @@ func StartRpcWebServer(host string, port string) {
 	log.Fatal(http_srv.ListenAndServe())
 }
 
-func StartRpcServerAndWeb(host string, port string) {
-	listen_address := host + ":" + port
-	webserver_path := "/home/pi/P4wnP1_go/www" //ToDo: Change this to an absolute path which could be used after installation
+func StartRpcServerAndWeb(host string, gRPCPort string, webPort string, absWebRoot string) () {
+	//ToDo: Return servers/TCP listener to allow closing from caller
+	listen_address_grpc := host + ":" + gRPCPort
+	listen_address_web := host + ":" + webPort
+
 
 	//Create gRPC Server
 	s := grpc.NewServer()
 	pb.RegisterP4WNP1Server(s, &server{})
 
-	//Wrap the server into a gRPC-web server
-	grpc_web_srv := grpcweb.WrapServer(s) //Wrap server to improbable grpc-web with websockets
-	//define a handler for a HTTP web server using the gRPC-web proxy
-	http_gRPC_web_handler := func(resp http.ResponseWriter, req *http.Request) {
-		if strings.Contains(req.Header.Get("Content-Type"), "application/grpc") || req.Method == "OPTIONS" {
-			fmt.Printf("gRPC-web req:\n %v\n", req)
-			grpc_web_srv.ServeHTTP(resp, req) // if content type indicates grpc or REQUEST METHOD IS OPTIONS (pre-flight) serve gRPC-web
-		} else {
-			fmt.Printf("legacy web req:\n %v\n", req)
-			http.FileServer(http.Dir((webserver_path))).ServeHTTP(resp, req)
-		}
-	}
+
 
 	//Open TCP listener
-	log.Printf("P4wnP1 gRPC server listening on " + listen_address)
-	lis, err := net.Listen("tcp", listen_address)
+	lis, err := net.Listen("tcp", listen_address_grpc)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -342,18 +353,33 @@ func StartRpcServerAndWeb(host string, port string) {
 			log.Fatalf("Failed to serve: %v", err)
 		}
 	}()
+	log.Printf("P4wnP1 gRPC server listening on " + listen_address_grpc)
 
+
+	//Wrap the server into a gRPC-web server
+	grpc_web_srv := grpcweb.WrapServer(s) //Wrap server to improbable grpc-web with websockets
+	//define a handler for a HTTP web server using the gRPC-web proxy
+	http_gRPC_web_handler := func(resp http.ResponseWriter, req *http.Request) {
+		if strings.Contains(req.Header.Get("Content-Type"), "application/grpc") || req.Method == "OPTIONS" {
+			fmt.Printf("gRPC-web req:\n %v\n", req)
+			grpc_web_srv.ServeHTTP(resp, req) // if content type indicates grpc or REQUEST METHOD IS OPTIONS (pre-flight) serve gRPC-web
+		} else {
+			fmt.Printf("legacy web req:\n %v\n", req)
+			http.FileServer(http.Dir((absWebRoot))).ServeHTTP(resp, req)
+		}
+	}
 	//Setup our HTTP server
 	http_srv := &http.Server{
-		Addr: host + ":80", //listen on port 80 with webservice
+		Addr: listen_address_web, //listen on port 80 with webservice
 		Handler: http.HandlerFunc(http_gRPC_web_handler),
 		ReadHeaderTimeout: 5*time.Second,
 		IdleTimeout: 120*time.Second,
 	}
-	log.Printf("P4wnP1 gRPC-web server listening on " + http_srv.Addr)
-	err_http := http_srv.ListenAndServe()
-	if err_http != nil {
-		log.Fatal(err)
-	}
 
+	go func() {
+		if err_http := http_srv.ListenAndServe(); err_http != nil {
+			log.Fatal(err)
+		}
+	}()
+	log.Printf("P4wnP1 gRPC-web server listening on " + http_srv.Addr)
 }

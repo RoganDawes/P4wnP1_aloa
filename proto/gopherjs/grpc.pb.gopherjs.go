@@ -17,6 +17,7 @@
 		FileInfoResponse
 		HIDScriptRequest
 		HIDScriptJob
+		HIDScriptJobList
 		HIDScriptResult
 		LEDSettings
 		GadgetSettings
@@ -848,6 +849,69 @@ func (m *HIDScriptJob) UnmarshalFromReader(reader jspb.Reader) *HIDScriptJob {
 
 // Unmarshal unmarshals a HIDScriptJob from a slice of bytes.
 func (m *HIDScriptJob) Unmarshal(rawBytes []byte) (*HIDScriptJob, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type HIDScriptJobList struct {
+	Ids []uint32
+}
+
+// GetIds gets the Ids of the HIDScriptJobList.
+func (m *HIDScriptJobList) GetIds() (x []uint32) {
+	if m == nil {
+		return x
+	}
+	return m.Ids
+}
+
+// MarshalToWriter marshals HIDScriptJobList to the provided writer.
+func (m *HIDScriptJobList) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.Ids) > 0 {
+		writer.WriteUint32Slice(1, m.Ids)
+	}
+
+	return
+}
+
+// Marshal marshals HIDScriptJobList to a slice of bytes.
+func (m *HIDScriptJobList) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a HIDScriptJobList from the provided reader.
+func (m *HIDScriptJobList) UnmarshalFromReader(reader jspb.Reader) *HIDScriptJobList {
+	for reader.Next() {
+		if m == nil {
+			m = &HIDScriptJobList{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Ids = reader.ReadUint32Slice()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a HIDScriptJobList from a slice of bytes.
+func (m *HIDScriptJobList) Unmarshal(rawBytes []byte) (*HIDScriptJobList, error) {
 	reader := jspb.NewReader(rawBytes)
 
 	m = m.UnmarshalFromReader(reader)
@@ -2347,6 +2411,8 @@ type P4WNP1Client interface {
 	HIDRunScriptJob(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptJob, error)
 	HIDGetScriptJobResult(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*HIDScriptResult, error)
 	HIDCancelScriptJob(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*Empty, error)
+	HIDGetRunningScriptJobs(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*HIDScriptJobList, error)
+	HIDCancelAllScriptJobs(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*Empty, error)
 	FSWriteFile(ctx context.Context, in *WriteFileRequest, opts ...grpcweb.CallOption) (*Empty, error)
 	FSReadFile(ctx context.Context, in *ReadFileRequest, opts ...grpcweb.CallOption) (*ReadFileResponse, error)
 	FSGetFileInfo(ctx context.Context, in *FileInfoRequest, opts ...grpcweb.CallOption) (*FileInfoResponse, error)
@@ -2474,6 +2540,24 @@ func (c *p4WNP1Client) HIDGetScriptJobResult(ctx context.Context, in *HIDScriptJ
 
 func (c *p4WNP1Client) HIDCancelScriptJob(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*Empty, error) {
 	resp, err := c.client.RPCCall(ctx, "HIDCancelScriptJob", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) HIDGetRunningScriptJobs(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*HIDScriptJobList, error) {
+	resp, err := c.client.RPCCall(ctx, "HIDGetRunningScriptJobs", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(HIDScriptJobList).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) HIDCancelAllScriptJobs(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "HIDCancelAllScriptJobs", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}

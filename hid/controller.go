@@ -227,6 +227,19 @@ func (ctl *HIDController) CancelAllBackgroundJobs() {
 
 }
 
+
+func (ctl *HIDController) GetAllBackgroundJobs() (jobs []uint32, err error) {
+	globalJobListMutex.Lock()
+
+	for job,_ := range globalJobList {
+		jobs = append(jobs, uint32(job.Id))
+	}
+
+	globalJobListMutex.Unlock()
+	return jobs, nil
+}
+
+
 //Function declarations for master VM
 func (ctl *HIDController) jsType(call otto.FunctionCall) (res otto.Value) {
 	arg0 := call.Argument(0)

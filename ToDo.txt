@@ -8,7 +8,8 @@ USE OF STDOUT/STDERR!!
 - function to retrieve running HIDScript background jobs + function to interrupt all jobs
 
 BOOT
-- deploy a default boot payload/configuration (Post Run in systemd service ??, config via /etc/P4wnP1/settings)
+- WON'T BE IMPLEMENTED: deploy a default boot payload/configuration (Post Run in systemd service ??, config via /etc/P4wnP1/settings)
+- DONE: start a default bash script on service start, doing initial configuration by utilizing the CLI client
 
 USB
 - DONE: add functionality to fetch target devices for HID (e.g. keyboard could be at /dev/hidg0..n depending on USB config)
@@ -43,6 +44,10 @@ DOCUMENTATION (not on first release ... yes, I know, anyway)
 - language map format
 --> Lesson learned: Documenting, by providing example payloads didn't worked out for the P4wnP1 community (nearly no
 external payload contributions)
+
+LOGGING:
+- consistent logging (no mix between STDOUT/STDERR)
+- reduce logging of gadget setting changes (only if settings are deployed)
 
 OTHER:
 - extend installer to movee HIDScripts to a fixed absolute path

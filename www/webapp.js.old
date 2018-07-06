@@ -31998,7 +31998,7 @@ $packages["main"] = (function() {
 		/* */ if ($interfaceIsEqual(err, $ifaceNil)) { $s = 9; continue; }
 		/* */ $s = 10; continue;
 		/* if ($interfaceIsEqual(err, $ifaceNil)) { */ case 9:
-			_r$9 = fmt.Sprintf("Gs: %+v\n", new sliceType([gs])); /* */ $s = 12; case 12: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
+			_r$9 = fmt.Sprintf("Gs: %v\n", new sliceType([gs])); /* */ $s = 12; case 12: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
 			str = _r$9;
 			_r$10 = fmt.Println(new sliceType([new $String(str)])); /* */ $s = 13; case 13: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
 			_r$10;
@@ -32008,7 +32008,7 @@ $packages["main"] = (function() {
 			_r$13 = dom.GetWindow().Document(); /* */ $s = 16; case 16: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
 			_r$14 = _r$13.CreateElement("div"); /* */ $s = 17; case 17: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
 			new_div = $assertType(_r$14, ptrType);
-			_r$15 = fmt.Sprintf("Result of GetDeployedGadgetSetting gRPC-web call:\n%s ", new sliceType([new $String(str)])); /* */ $s = 18; case 18: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
+			_r$15 = fmt.Sprintf("Result of GetDeployedGadgetSetting gRPC-web call:<br>%+v ", new sliceType([new $String(str)])); /* */ $s = 18; case 18: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
 			$r = new_div.BasicHTMLElement.BasicElement.BasicNode.SetTextContent(_r$15); /* */ $s = 19; case 19: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$r = div_cont.BasicHTMLElement.BasicElement.BasicNode.AppendChild(new_div); /* */ $s = 20; case 20: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$s = 11; continue;

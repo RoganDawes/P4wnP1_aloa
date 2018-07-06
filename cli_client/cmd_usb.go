@@ -99,7 +99,7 @@ func cobraUsbSet(cmd *cobra.Command, args []string) {
 			fmt.Println("Disabeling CDC ECM")
 			gs.Use_CDC_ECM = false
 		} else {
-			fmt.Println("Enabeling RNDIS")
+			fmt.Println("Enabeling CDC ECM")
 			gs.Use_CDC_ECM = true
 		}
 	}

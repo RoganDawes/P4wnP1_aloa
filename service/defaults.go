@@ -76,18 +76,19 @@ func GetDefaultLEDSettings() (res pb.LEDSettings) {
 	}
 }
 
+// Note: If no single function is enabled, the gadget mustn't be enabled itself in order to be deployable
 func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
 	res = pb.GadgetSettings{
-		Enabled:          true,
+		Enabled:          false,
 		Vid:              "0x1d6b",
 		Pid:              "0x1347",
 		Manufacturer:     "MaMe82",
 		Product:          "P4wnP1 by MaMe82",
 		Serial:           "deadbeef1337",
 		Use_CDC_ECM:      false,
-		Use_RNDIS:        true,
-		Use_HID_KEYBOARD: true,
-		Use_HID_MOUSE:    true,
+		Use_RNDIS:        false,
+		Use_HID_KEYBOARD: false,
+		Use_HID_MOUSE:    false,
 		Use_HID_RAW:      false,
 		Use_UMS:          false,
 		Use_SERIAL:       false,
