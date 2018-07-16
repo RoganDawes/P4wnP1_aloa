@@ -51,6 +51,7 @@ LOGGING:
 
 OTHER:
 - extend installer to movee HIDScripts to a fixed absolute path
+- proper error extraction from gRPC calls
 
 TO FIX:
 - debug out of HIDScript puts way to much CPU load on journaling daemon (floods logs)

@@ -1,0 +1,150 @@
+/*
+    <label class="toggle-switch">
+        <input type="checkbox">
+        <div>
+            <span class="on">On</span>
+            <span class="off">Off</span>
+        </div>
+        <span class="toggle-switch-slider"></span>
+    </label>
+
+*/
+
+
+.toggle-switch {
+    position: relative;
+    display: block;
+    width: 80px;
+    height: 30px;
+    background-color: gray;
+    background: linear-gradient(to top, #f4f4f4, #9e9e9e 20%);
+    border-radius: 99999px;
+    /* box-shadow: h-offset v-offset blur spread color inset initial inherit */
+    box-shadow: 0 2px 0 0 #FFFFFF, 0 -2px 0 0 #f4f4f4; /* 2px offset gray to top, white to bottom */
+}
+
+
+.toggle-switch input[type="checkbox"]  {
+    display: none;
+}
+
+
+.toggle-switch div {
+    top: 50%;
+    left: 50%;
+    width: 80%;
+    height: 60%;
+    border-radius: 99999px;
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    position: absolute;
+    background-color: #707070;
+    box-shadow: inset 0 0 10px 0 rgba(0, 0, 0, 0.7);
+}
+
+.toggle-switch input[type="checkbox"]:checked ~ div {
+    /* box-shadow: h-offset v-offset blur spread color inset initial inherit */
+    box-shadow: inset 0 0 9px 0 rgba(0, 100, 0, 0.8),0 0 11px 1px rgb(150,255,0);
+    background-color: rgb(150,250,0);
+}
+
+.toggle-switch input[type="checkbox"] ~ .toggle-switch-slider {
+    display: block;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    background: linear-gradient(to top, #9e9e9e 20%, #f4f4f4);
+    border-radius: 50%;
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.7);
+    top: 0;
+    left: 0;
+    /*
+    transition: all 0.3s ease-in 0s;
+    */
+    transition: .25s;
+}
+
+.toggle-switch input[type="checkbox"] ~ .toggle-switch-slider:after {
+    content: "";
+    display: block;
+    left: 15%;
+    top: 15%;
+    width: 70%;
+    height: 70%;
+    border-radius: 50%;
+    position: absolute;
+    background: linear-gradient(to top, #f4f4f4, #9e9e9e);
+    /*
+    z-index: 1;
+     */
+
+
+}
+
+
+.toggle-switch input[type="checkbox"]:checked ~ .toggle-switch-slider {
+    -moz-transform: translate(-100%, 0);
+    -ms-transform: translate(-100%, 0);
+    -webkit-transform: translate(-100%, 0);
+    transform: translate(-100%, 0);
+
+
+    left: 100%;
+
+}
+
+
+.toggle-switch div > .on,.off {
+
+
+
+
+    position: absolute;
+
+
+    /*
+    background-color: #34A7C1;
+     */
+
+    top: 50%;
+    text-transform: uppercase;
+
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    font-size: 0.8em;
+    font-weight: 600;
+    z-index: 2;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    letter-spacing: 1px;
+
+
+    transition: .25s;
+}
+
+
+.on {
+    left: 10%;
+    color: transparent;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0);
+}
+
+.toggle-switch input[type="checkbox"]:checked ~ div > .on {
+    color: rgb(0,154,0);
+    text-shadow: 0px 1px 0px rgba(27,76,37, 0.5);
+}
+
+.off {
+    right: 10%;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.toggle-switch input[type="checkbox"]:checked + div > .off {
+    color: transparent;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0);
+}
+
+
