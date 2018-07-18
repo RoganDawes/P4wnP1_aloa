@@ -7,9 +7,9 @@ import (
 	"time"
 
 	pb "../proto/gopherjs"
-	dom "honnef.co/go/js/dom"
-	"github.com/oskca/gopherjs-vue"
+	"honnef.co/go/js/dom"
 	"github.com/gopherjs/gopherjs/js"
+	"github.com/HuckRidgeSW/hvue"
 )
 
 var (
@@ -32,6 +32,10 @@ func GetBaseURL() string {
 	return url
 }
 
+type appController struct {
+	*js.Object
+}
+
 func main() {
 	println(GetBaseURL())
 
@@ -52,8 +56,23 @@ func main() {
 	}
 
 
-	vue.NewComponent(New, template).Register("usb-settings")
-	vm := vue.New("#app", new(controller))
+/*
+	InitCompTabs().Register("tabs")
+	InitCompTab().Register("tab")
+*/
+
+	InitCompEthernetAddresses2()
+	InitCompToggleSwitch()
+	InitCompUSBSettings()
+	InitCompTab()
+	InitCompTabs()
+	hvue.NewVM(hvue.El("#app"))
+
+/*
+	vm := vue.New("#app", new(appController))
+
+
 	js.Global.Set("vm", vm)
 	println("vm:", vm)
+*/
 }

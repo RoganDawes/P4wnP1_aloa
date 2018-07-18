@@ -3,10 +3,10 @@ package main
 import (
 	"github.com/gopherjs/gopherjs/js"
 	pb "../proto/gopherjs"
-	"fmt"
 	"time"
 	"context"
 	"google.golang.org/grpc/status"
+	"github.com/HuckRidgeSW/hvue"
 )
 
 
@@ -74,6 +74,8 @@ func (vGS VGadgetSettings) toGS() (gs *pb.GadgetSettings) {
 }
 
 func (vGS *VGadgetSettings) fromGS(gs *pb.GadgetSettings) {
+	println(gs)
+
 	vGS.Enabled = gs.Enabled
 	vGS.Vid = gs.Vid
 	vGS.Pid = gs.Pid
@@ -114,14 +116,17 @@ func (vGS *VGadgetSettings) fromGS(gs *pb.GadgetSettings) {
 }
 
 // Note: internalize wouldn't work on this, as the nested structs don't translate back
-type Com struct {
+type CompUSBSettingsData struct {
 	*js.Object
 
 	GadgetSettings *VGadgetSettings `js:"gadgetSettings"`
+	DeployPending bool `js:"deployPending"`
+	CdcEcmDetails bool `js:"cdcEcmDetails"`
+	RndisDetails bool `js:"rndisDetails"`
 }
 
 
-func (c *Com) UodateToDeployedGadgetSettings() {
+func (c *CompUSBSettingsData) UpdateToDeployedGadgetSettings(vm *hvue.VM) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
 	println("Trying to fetch deployed GadgetSettings")
 
@@ -129,9 +134,8 @@ func (c *Com) UodateToDeployedGadgetSettings() {
 		ctx,cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
 
-		fmt.Printf("Before client + request\n")
 		deployedGs, err := pb.NewP4WNP1Client(serverAddr).GetDeployedGadgetSetting(ctx, &pb.Empty{})
-		if err != nil { fmt.Println(err); return }
+		if err != nil { println(err); return }
 
 		newGs := &VGadgetSettings{
 			Object: js.Global.Get("Object").New(),
@@ -141,14 +145,13 @@ func (c *Com) UodateToDeployedGadgetSettings() {
 	}()
 }
 
-func (c *Com) ApplyGadgetSettings() {
-	//gs := vue.GetVM(c).Get("gadgetSettings")
-	println("Trying to deploy GadgetSettings: " + fmt.Sprintf("%+v",c.GadgetSettings.toGS()))
-
+func (c *CompUSBSettingsData) ApplyGadgetSettings(vm *hvue.VM) {
+	//println("Trying to deploy GadgetSettings: " + fmt.Sprintf("%+v",c.GadgetSettings.toGS()))
+	println("Trying to deploy GadgetSettings...")
 	gs:=c.GadgetSettings.toGS()
 	go func() {
-		//ToDo: set apply button to inactive
-		//ToDo: defer set apply button to active
+		c.DeployPending = true
+		defer func() {c.DeployPending = false}()
 
 		ctx,cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
@@ -156,14 +159,14 @@ func (c *Com) ApplyGadgetSettings() {
 		client := pb.NewP4WNP1Client(serverAddr)
 
 		//Set gadget settings
-		settedGs, err := client.SetGadgetSettings(ctx, gs)
+		_, err := client.SetGadgetSettings(ctx, gs)
 		if err != nil {
 			js.Global.Call("alert", "Error setting given gadget settings: " + status.Convert(err).Message())
-			fmt.Println(err)
-			c.UodateToDeployedGadgetSettings()
+			println(err)
+			c.UpdateToDeployedGadgetSettings(vm)
 			return
 		}
-		println(fmt.Sprintf("The following GadgetSettings have been set: %+v", settedGs))
+		println("New GadgetSettings have been set")
 
 
 
@@ -171,11 +174,11 @@ func (c *Com) ApplyGadgetSettings() {
 		deployedGs,err := client.DeployGadgetSetting(ctx, &pb.Empty{})
 		if err != nil {
 			js.Global.Call("alert", "Error deploying gadget settings: " + status.Convert(err).Message())
-			fmt.Println(err)
-			c.UodateToDeployedGadgetSettings()
+			println(err)
+			c.UpdateToDeployedGadgetSettings(vm)
 			return
 		}
-		println(fmt.Sprintf("The following GadgetSettings have been deployed: %+v", deployedGs))
+		println("New GadgetSettings have been deployed")
 
 		js.Global.Call("alert", "New USB gadget settings deployed ")
 
@@ -188,51 +191,48 @@ func (c *Com) ApplyGadgetSettings() {
 
 }
 
+func InitCompUSBSettings() {
 
+	hvue.NewComponent(
+		"usb-settings",
+		hvue.Template(compUSBSettingsTemplate),
+		hvue.DataFunc(newCompUSBSettingsData),
+		hvue.MethodsOf(&CompUSBSettingsData{}),
+	)
+}
 
-func New() interface{} {
+func newCompUSBSettingsData(vm *hvue.VM) interface{} {
 
-	cc := &Com{
+	cc := &CompUSBSettingsData{
 		Object: js.Global.Get("Object").New(),
 	}
 
 	cc.GadgetSettings = &VGadgetSettings{
 		Object: js.Global.Get("Object").New(),
 	}
+	cc.GadgetSettings.fromGS(&pb.GadgetSettings{}) //start with empty settings, but create nested structs
 
 
-	cc.UodateToDeployedGadgetSettings()
-
-
-
-	fmt.Printf("Client: %+v\n", Client)
-	fmt.Printf("cc.gadgetSettings: %+v\n", cc.GadgetSettings)
-	fmt.Printf("GS.Vid: %+v\n", GS.Vid)
-	fmt.Printf("cc.gadgetSettings.Vid: %+v\n", cc.GadgetSettings.Vid)
+	cc.UpdateToDeployedGadgetSettings(vm)
+	cc.DeployPending = false
+	cc.RndisDetails = false
+	cc.CdcEcmDetails = false
 
 	return cc
 }
 
-type controller struct {
-	*js.Object
-}
+
 
 const (
-	template = `
+	compUSBSettingsTemplate = `
 	<div>
 	<table>
-		<tr> <td>USB gadget settings</td><td><button @click="ApplyGadgetSettings">Apply</button></td> </tr>
+		<tr> <td>USB gadget settings</td><td><button @click="ApplyGadgetSettings" :disabled="deployPending">Apply</button></td> </tr>
 
 		<tr>
 			<td>Gadget enabled</td>
 			<td>
-
-			<label class="toggle-switch">
-        	<input type="checkbox" v-model="gadgetSettings.Enabled">
-        	<div><span class="on">On</span><span class="off">Off</span></div>
-        	<span class="toggle-switch-slider"></span>
-    		</label>
-
+			<toggle-switch v-model="gadgetSettings.Enabled"></toggle-switch>
 			</td>
 		</tr>
 
@@ -246,88 +246,71 @@ const (
 		<tr>
 			<td>CDC ECM</td>
 			<td>
-
-			<label class="toggle-switch">
-	        	<input type="checkbox" v-model="gadgetSettings.Use_CDC_ECM">
-    	    	<div><span class="on">On</span><span class="off">Off</span></div>
-        		<span class="toggle-switch-slider"></span>
-    		</label>
-
-
+			<toggle-switch v-model="gadgetSettings.Use_CDC_ECM"></toggle-switch>
 			</td>
 		</tr>
+		<tr v-if="gadgetSettings.Use_CDC_ECM">
+		<td></td>
+		<td>
+			<ethernet-addresses v-bind:settings="gadgetSettings.CdcEcmSettings" @hostAddrChange="gadgetSettings.CdcEcmSettings.HostAddr=$event" @devAddrChange="gadgetSettings.CdcEcmSettings.DevAddr=$event"></ethernet-addresses>
+		</td>
+		</tr>
+
 		<tr>
 			<td>RNDIS</td>
 			<td>
 
-			<label class="toggle-switch">
-	        	<input type="checkbox" v-model="gadgetSettings.Use_RNDIS">
-    	    	<div><span class="on">On</span><span class="off">Off</span></div>
-        		<span class="toggle-switch-slider"></span>
-    		</label>
+			<toggle-switch v-model="gadgetSettings.Use_RNDIS"></toggle-switch>
+			<td></td>
+			<input type="checkbox" v-if="gadgetSettings.Use_RNDIS" v-model="rndisDetails">
 
 			</td>
 		</tr>
+
+		<tr v-if="rndisDetails">
+		<td></td>
+		<td>
+			<ethernet-addresses v-bind:settings="gadgetSettings.RndisSettings" @hostAddrChange="gadgetSettings.RndisSettings.HostAddr=$event" @devAddrChange="gadgetSettings.RndisSettings.DevAddr=$event"></ethernet-addresses>
+		</td>
+		</tr>
+
 		<tr>
 			<td>HID Keyboard</td>
 			<td>
 
-			<label class="toggle-switch">
-	        	<input type="checkbox" v-model="gadgetSettings.Use_HID_KEYBOARD">
-    	    	<div><span class="on">On</span><span class="off">Off</span></div>
-        		<span class="toggle-switch-slider"></span>
-    		</label>
+			<toggle-switch v-model="gadgetSettings.Use_HID_KEYBOARD"></toggle-switch>
+
 		
 			</td>
 		</tr>
 		<tr>
 			<td>HID Mouse</td>
 			<td>
-
-			<label class="toggle-switch">
-	        	<input type="checkbox" v-model="gadgetSettings.Use_HID_MOUSE">
-    	    	<div><span class="on">On</span><span class="off">Off</span></div>
-        		<span class="toggle-switch-slider"></span>
-    		</label>
-
+			<toggle-switch v-model="gadgetSettings.Use_HID_MOUSE"></toggle-switch>
 
 			</td>
 		</tr>
 		<tr>
 			<td>HID Raw</td>
 			<td>
-			<label class="toggle-switch">
-	        	<input type="checkbox" v-model="gadgetSettings.Use_HID_RAW">
-    	    	<div><span class="on">On</span><span class="off">Off</span></div>
-        		<span class="toggle-switch-slider"></span>
-    		</label>
-
+			<toggle-switch v-model="gadgetSettings.Use_HID_RAW"></toggle-switch>
 			</td>
 		</tr>
 		<tr>
 			<td>Serial</td>
 			<td>
-			<label class="toggle-switch">
-	        	<input type="checkbox" v-model="gadgetSettings.Use_SERIAL">
-    	    	<div><span class="on">On</span><span class="off">Off</span></div>
-        		<span class="toggle-switch-slider"></span>
-    		</label>
-
+			<toggle-switch v-model="gadgetSettings.Use_SERIAL"></toggle-switch>
 			</td>
 		</tr>
 		<tr>
 			<td>Mass Storage</td>
 			<td>
-			<label class="toggle-switch">
-	        	<input type="checkbox" v-model="gadgetSettings.Use_UMS">
-    	    	<div><span class="on">On</span><span class="off">Off</span></div>
-        		<span class="toggle-switch-slider"></span>
-    		</label>
-
+			<toggle-switch v-model="gadgetSettings.Use_UMS"></toggle-switch>
 			</td>
 		</tr>
 
 	</table>
+	</div>
 `
 )
 

@@ -1,15 +1,47 @@
-/*
-    <label class="toggle-switch">
-        <input type="checkbox">
-        <div>
-            <span class="on">On</span>
-            <span class="off">Off</span>
-        </div>
-        <span class="toggle-switch-slider"></span>
-    </label>
 
-*/
+html {
+    height: 100%;
+}
 
+body {
+    font-family: "Open Sans", sans-serif;
+    font-size: 1em;
+    line-height: 1.6;
+    background: linear-gradient(45deg, #9e9e9e, #c4c4c4 66%, #9e9e9e);
+}
+
+input {
+    /*border-radius: 99999px;*/
+    background-color: #707070;
+    background: linear-gradient(to top, #9e9e9e, #f4f4f4);
+    height: 30px;
+    box-shadow: inset 0 0 10px 0 rgba(0, 0, 0, 0.7);
+
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    font-size: 0.9em;
+    font-weight: 600;
+
+}
+
+button {
+    border-radius: 99999px;
+    background-color: #707070;
+    background: linear-gradient(to bottom, #f4f4f4, #9e9e9e);
+
+    height: 30px;
+    width: 100px;
+
+    text-transform: uppercase;
+    font-size: 0.9em;
+    font-weight: 800;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    letter-spacing: 1px;
+
+}
 
 .toggle-switch {
     position: relative;
@@ -20,7 +52,8 @@
     background: linear-gradient(to top, #f4f4f4, #9e9e9e 20%);
     border-radius: 99999px;
     /* box-shadow: h-offset v-offset blur spread color inset initial inherit */
-    box-shadow: 0 2px 0 0 #FFFFFF, 0 -2px 0 0 #f4f4f4; /* 2px offset gray to top, white to bottom */
+    box-shadow: 1px 1px 1px 0 #3f3f3f, -1px -1px 1px 0 #ffffff; /* 2px offset gray to top, white to bottom */
+    cursor: pointer;
 }
 
 
@@ -134,7 +167,7 @@
 
 .toggle-switch input[type="checkbox"]:checked ~ div > .on {
     color: rgb(0,154,0);
-    text-shadow: 0px 1px 0px rgba(27,76,37, 0.5);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .off {
@@ -148,3 +181,57 @@
 }
 
 
+/* NAV BAR */
+.nav {
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+.nav::after, .nav::before {
+    display: table;
+    content: " ";
+    clear: both;
+}
+.nav-tabs {
+    margin-bottom: 15px;
+}
+.nav-tabs::after {
+    content:"";
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, #f4f4f4 20%, #3f3f3f00);
+    clear:both;
+}
+.nav-tabs > li {
+    float: left;
+    margin-bottom: -2px;
+}
+.nav > li {
+    position: relative;
+    display: block;
+}
+.nav > li > a {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+}
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover {
+    /* color: #555; */
+    cursor: default;
+    background: linear-gradient(to bottom, #f4f4f4, #9e9e9e);
+    box-shadow: inset 1px 1px 1px 0 #ffffff,inset -1px 1px 1px 0 #3f3f3f;
+    border-bottom-width: 0;
+}
+.nav-tabs > li > a {
+    margin-right: 2px;
+    line-height: 1.42857143;
+    border-radius: 15px 15px 0 0;
+    background: linear-gradient(to top, #f4f4f4, #9e9e9e);
+    box-shadow: inset 1px 1px 1px 0 #3f3f3f,inset -1px 1px 1px 0 #ffffff;
+    color: black;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    font-weight: 800;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+}
