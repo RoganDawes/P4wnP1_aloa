@@ -188,7 +188,6 @@ func (c *CompUSBSettingsData) ApplyGadgetSettings(vm *hvue.VM) {
 		newGs.fromGS(deployedGs)
 		c.GadgetSettings = newGs
 	}()
-
 }
 
 func InitCompUSBSettings() {
@@ -225,92 +224,75 @@ func newCompUSBSettingsData(vm *hvue.VM) interface{} {
 
 const (
 	compUSBSettingsTemplate = `
-	<div>
+<div>
 	<table>
-		<tr> <td>USB gadget settings</td><td><button @click="ApplyGadgetSettings" :disabled="deployPending">Apply</button></td> </tr>
-
+		<tr>
+			<td>USB gadget settings</td>
+			<td><button @click="ApplyGadgetSettings" :disabled="deployPending">Apply</button></td>
+		</tr>
 		<tr>
 			<td>Gadget enabled</td>
-			<td>
-			<toggle-switch v-model="gadgetSettings.Enabled"></toggle-switch>
-			</td>
+			<td><toggle-switch v-model="gadgetSettings.Enabled"></toggle-switch></td>
 		</tr>
-
-		
-		<tr> <td>Vendor ID</td><td><input v-model="gadgetSettings.Vid"/></td> </tr>
-		<tr> <td>Product ID</td><td><input v-model="gadgetSettings.Pid"/></td> </tr>
-		<tr> <td>Manufacturer Name</td><td><input v-model="gadgetSettings.Manufacturer"/></td> </tr>
-		<tr> <td>Product Name</td><td><input v-model="gadgetSettings.Product"/></td> </tr>
-		<tr> <td>Serial number</td><td><input v-model="gadgetSettings.Serial"/></td> </tr>
-
+		<tr>
+			<td>Vendor ID</td>
+			<td><input v-model="gadgetSettings.Vid"/></td>
+		</tr>
+		<tr>
+			<td>Product ID</td>
+			<td><input v-model="gadgetSettings.Pid"/></td> 
+		</tr>
+		<tr>
+			<td>Manufacturer Name</td>
+			<td><input v-model="gadgetSettings.Manufacturer"/></td>
+		</tr>
+		<tr>
+			<td>Product Name</td>
+			<td><input v-model="gadgetSettings.Product"/></td>
+		</tr>
+		<tr>
+			<td>Serial number</td>
+			<td><input v-model="gadgetSettings.Serial"/></td>
+		</tr>
 		<tr>
 			<td>CDC ECM</td>
-			<td>
-			<toggle-switch v-model="gadgetSettings.Use_CDC_ECM"></toggle-switch>
-			</td>
+			<td><toggle-switch v-model="gadgetSettings.Use_CDC_ECM"></toggle-switch></td>
 		</tr>
 		<tr v-if="gadgetSettings.Use_CDC_ECM">
-		<td></td>
-		<td>
-			<ethernet-addresses v-bind:settings="gadgetSettings.CdcEcmSettings" @hostAddrChange="gadgetSettings.CdcEcmSettings.HostAddr=$event" @devAddrChange="gadgetSettings.CdcEcmSettings.DevAddr=$event"></ethernet-addresses>
-		</td>
+			<td></td>
+			<td><ethernet-addresses v-bind:settings="gadgetSettings.CdcEcmSettings" @hostAddrChange="gadgetSettings.CdcEcmSettings.HostAddr=$event" @devAddrChange="gadgetSettings.CdcEcmSettings.DevAddr=$event"></ethernet-addresses></td>
 		</tr>
-
 		<tr>
 			<td>RNDIS</td>
-			<td>
-
-			<toggle-switch v-model="gadgetSettings.Use_RNDIS"></toggle-switch>
-			<td></td>
-			<input type="checkbox" v-if="gadgetSettings.Use_RNDIS" v-model="rndisDetails">
-
-			</td>
+			<td><toggle-switch v-model="gadgetSettings.Use_RNDIS"></toggle-switch></td>
+			<td><input type="checkbox" v-if="gadgetSettings.Use_RNDIS" v-model="rndisDetails"></td>
 		</tr>
-
 		<tr v-if="rndisDetails">
-		<td></td>
-		<td>
-			<ethernet-addresses v-bind:settings="gadgetSettings.RndisSettings" @hostAddrChange="gadgetSettings.RndisSettings.HostAddr=$event" @devAddrChange="gadgetSettings.RndisSettings.DevAddr=$event"></ethernet-addresses>
-		</td>
+			<td></td>
+			<td><ethernet-addresses v-bind:settings="gadgetSettings.RndisSettings" @hostAddrChange="gadgetSettings.RndisSettings.HostAddr=$event" @devAddrChange="gadgetSettings.RndisSettings.DevAddr=$event"></ethernet-addresses></td>
 		</tr>
-
 		<tr>
 			<td>HID Keyboard</td>
-			<td>
-
-			<toggle-switch v-model="gadgetSettings.Use_HID_KEYBOARD"></toggle-switch>
-
-		
-			</td>
+			<td><toggle-switch v-model="gadgetSettings.Use_HID_KEYBOARD"></toggle-switch></td>
 		</tr>
 		<tr>
 			<td>HID Mouse</td>
-			<td>
-			<toggle-switch v-model="gadgetSettings.Use_HID_MOUSE"></toggle-switch>
-
-			</td>
+			<td><toggle-switch v-model="gadgetSettings.Use_HID_MOUSE"></toggle-switch></td>
 		</tr>
 		<tr>
 			<td>HID Raw</td>
-			<td>
-			<toggle-switch v-model="gadgetSettings.Use_HID_RAW"></toggle-switch>
-			</td>
+			<td><toggle-switch v-model="gadgetSettings.Use_HID_RAW"></toggle-switch></td>
 		</tr>
 		<tr>
 			<td>Serial</td>
-			<td>
-			<toggle-switch v-model="gadgetSettings.Use_SERIAL"></toggle-switch>
-			</td>
+			<td><toggle-switch v-model="gadgetSettings.Use_SERIAL"></toggle-switch></td>
 		</tr>
 		<tr>
 			<td>Mass Storage</td>
-			<td>
-			<toggle-switch v-model="gadgetSettings.Use_UMS"></toggle-switch>
-			</td>
+			<td><toggle-switch v-model="gadgetSettings.Use_UMS"></toggle-switch></td>
 		</tr>
-
 	</table>
-	</div>
+</div>
 `
 )
 

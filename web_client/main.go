@@ -55,24 +55,30 @@ func main() {
 		fmt.Printf("Error rpc call: %v\n", err)
 	}
 
-
-/*
-	InitCompTabs().Register("tabs")
-	InitCompTab().Register("tab")
-*/
-
 	InitCompEthernetAddresses2()
 	InitCompToggleSwitch()
 	InitCompUSBSettings()
 	InitCompTab()
 	InitCompTabs()
-	hvue.NewVM(hvue.El("#app"))
+	InitCompCodeEditor()
+	InitCompHIDScript()
+	vm := hvue.NewVM(
+		hvue.El("#app"),
+		//add "testString" to data
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := struct{
+				*js.Object
+				TestString string `js:"testString"`
+			}{Object: O()}
+			data.TestString = "type('hello');"
+			return &data
+		}),
+		//add console to app as computed property, to allow debug output on vue events
+		hvue.Computed(
+			"console",
+			func(vm *hvue.VM) interface{} {
+			return js.Global.Get("console")
+		}))
+	js.Global.Set("vm",vm)
 
-/*
-	vm := vue.New("#app", new(appController))
-
-
-	js.Global.Set("vm", vm)
-	println("vm:", vm)
-*/
 }

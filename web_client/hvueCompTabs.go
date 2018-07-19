@@ -39,8 +39,10 @@ func initTabs(vm *hvue.VM) {
 
 	}
 
+	/*
 	//ToDo: remove export (Debug only)
 	js.Global.Set("vm", vm)
+	*/
 }
 
 func (c *CompTabsData) UpdateSelectedTab(vm *hvue.VM, selectedID int) {
@@ -73,7 +75,7 @@ const (
 	<div>
 		<ul class="nav nav-tabs">
 	        <li v-for="t in tabs" :class="{ 'active' : t.isActive }">
-	          <a href="#" @click="UpdateSelectedTab(t.id)">{{t.id}}: {{ t.header }}</slot></a>
+	          <a href="#" @click="UpdateSelectedTab(t.id)">{{ t.header }}</slot></a>
 	        </li>
 		</ul>
 	</div>
