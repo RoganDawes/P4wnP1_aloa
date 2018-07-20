@@ -5596,7 +5596,7 @@ $packages["github.com/gopherjs/gopherjs/nosync"] = (function() {
 	return $pkg;
 })();
 $packages["time"] = (function() {
-	var $pkg = {}, $init, errors, js, nosync, runtime, syscall, runtimeTimer, ParseError, Timer, Time, Month, Weekday, Duration, Location, zone, zoneTrans, sliceType, sliceType$1, ptrType, sliceType$2, arrayType, sliceType$3, arrayType$1, arrayType$2, ptrType$2, funcType, arrayType$3, funcType$1, ptrType$3, ptrType$4, ptrType$5, chanType$1, ptrType$7, zoneSources, std0x, longDayNames, shortDayNames, shortMonthNames, longMonthNames, atoiError, errBad, errLeadingInt, months, days, daysBefore, utcLoc, utcLoc$24ptr, localLoc, localLoc$24ptr, localOnce, errLocation, badData, init, initLocal, runtimeNano, now, startTimer, stopTimer, indexByte, startsWithLowerCase, nextStdChunk, match, lookup, appendInt, atoi, formatNano, quote, isDigit, getnum, cutspace, skip, Parse, parse, parseTimeZone, parseGMT, parseNanoseconds, leadingInt, when, AfterFunc, goFunc, absWeekday, absClock, fmtFrac, fmtInt, lessThanHalf, Until, absDate, daysIn, Now, unixTime, Unix, isLeap, norm, Date, div, FixedZone;
+	var $pkg = {}, $init, errors, js, nosync, runtime, syscall, runtimeTimer, ParseError, Timer, Time, Month, Weekday, Duration, Location, zone, zoneTrans, sliceType, sliceType$1, ptrType, sliceType$2, structType, arrayType, sliceType$3, arrayType$1, arrayType$2, ptrType$2, funcType, arrayType$3, funcType$1, ptrType$3, ptrType$4, ptrType$5, chanType$1, ptrType$7, zoneSources, std0x, longDayNames, shortDayNames, shortMonthNames, longMonthNames, atoiError, errBad, errLeadingInt, months, days, daysBefore, utcLoc, utcLoc$24ptr, localLoc, localLoc$24ptr, localOnce, errLocation, badData, init, initLocal, runtimeNano, now, Sleep, startTimer, stopTimer, indexByte, startsWithLowerCase, nextStdChunk, match, lookup, appendInt, atoi, formatNano, quote, isDigit, getnum, cutspace, skip, Parse, parse, parseTimeZone, parseGMT, parseNanoseconds, leadingInt, when, AfterFunc, goFunc, absWeekday, absClock, fmtFrac, fmtInt, lessThanHalf, Until, absDate, daysIn, Now, unixTime, Unix, isLeap, norm, Date, div, FixedZone;
 	errors = $packages["errors"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	nosync = $packages["github.com/gopherjs/gopherjs/nosync"];
@@ -5711,6 +5711,7 @@ $packages["time"] = (function() {
 	sliceType$1 = $sliceType(zoneTrans);
 	ptrType = $ptrType(zone);
 	sliceType$2 = $sliceType($String);
+	structType = $structType("", []);
 	arrayType = $arrayType($Uint8, 20);
 	sliceType$3 = $sliceType($Uint8);
 	arrayType$1 = $arrayType($Uint8, 9);
@@ -5757,6 +5758,20 @@ $packages["time"] = (function() {
 		mono = _tmp$2;
 		return [sec, nsec, mono];
 	};
+	Sleep = function(d) {
+		var _r, c, d, x, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; d = $f.d; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = [c];
+		c[0] = new $Chan(structType, 0);
+		$setTimeout((function(c) { return function() {
+			$close(c[0]);
+		}; })(c), (((x = $div64(d, new Duration(0, 1000000), false), x.$low + ((x.$high >> 31) * 4294967296)) >> 0)));
+		_r = $recv(c[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_r[0];
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Sleep }; } $f._r = _r; $f.c = c; $f.d = d; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.Sleep = Sleep;
 	startTimer = function(t) {
 		var diff, t, x, x$1;
 		t.active = true;
@@ -20909,8 +20924,719 @@ $packages["fmt"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
+$packages["bytes"] = (function() {
+	var $pkg = {}, $init, errors, io, unicode, utf8, Buffer, readOp, ptrType, sliceType, arrayType, sliceType$1, errNegativeRead, IndexByte, Equal, makeSlice, explode, countGeneric, genSplit, SplitN, indexRabinKarp, hashStr, Index, Count;
+	errors = $packages["errors"];
+	io = $packages["io"];
+	unicode = $packages["unicode"];
+	utf8 = $packages["unicode/utf8"];
+	Buffer = $pkg.Buffer = $newType(0, $kindStruct, "bytes.Buffer", true, "bytes", true, function(buf_, off_, bootstrap_, lastRead_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.buf = sliceType.nil;
+			this.off = 0;
+			this.bootstrap = arrayType.zero();
+			this.lastRead = 0;
+			return;
+		}
+		this.buf = buf_;
+		this.off = off_;
+		this.bootstrap = bootstrap_;
+		this.lastRead = lastRead_;
+	});
+	readOp = $pkg.readOp = $newType(1, $kindInt8, "bytes.readOp", true, "bytes", false, null);
+	ptrType = $ptrType(Buffer);
+	sliceType = $sliceType($Uint8);
+	arrayType = $arrayType($Uint8, 64);
+	sliceType$1 = $sliceType(sliceType);
+	IndexByte = function(s, c) {
+		var _i, _ref, b, c, i, s;
+		_ref = s;
+		_i = 0;
+		while (true) {
+			if (!(_i < _ref.$length)) { break; }
+			i = _i;
+			b = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			if (b === c) {
+				return i;
+			}
+			_i++;
+		}
+		return -1;
+	};
+	$pkg.IndexByte = IndexByte;
+	Equal = function(a, b) {
+		var _i, _ref, a, b, c, i;
+		if (!((a.$length === b.$length))) {
+			return false;
+		}
+		_ref = a;
+		_i = 0;
+		while (true) {
+			if (!(_i < _ref.$length)) { break; }
+			i = _i;
+			c = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			if (!((c === ((i < 0 || i >= b.$length) ? ($throwRuntimeError("index out of range"), undefined) : b.$array[b.$offset + i])))) {
+				return false;
+			}
+			_i++;
+		}
+		return true;
+	};
+	$pkg.Equal = Equal;
+	Buffer.ptr.prototype.Bytes = function() {
+		var b;
+		b = this;
+		return $subslice(b.buf, b.off);
+	};
+	Buffer.prototype.Bytes = function() { return this.$val.Bytes(); };
+	Buffer.ptr.prototype.String = function() {
+		var b;
+		b = this;
+		if (b === ptrType.nil) {
+			return "<nil>";
+		}
+		return ($bytesToString($subslice(b.buf, b.off)));
+	};
+	Buffer.prototype.String = function() { return this.$val.String(); };
+	Buffer.ptr.prototype.empty = function() {
+		var b;
+		b = this;
+		return b.buf.$length <= b.off;
+	};
+	Buffer.prototype.empty = function() { return this.$val.empty(); };
+	Buffer.ptr.prototype.Len = function() {
+		var b;
+		b = this;
+		return b.buf.$length - b.off >> 0;
+	};
+	Buffer.prototype.Len = function() { return this.$val.Len(); };
+	Buffer.ptr.prototype.Cap = function() {
+		var b;
+		b = this;
+		return b.buf.$capacity;
+	};
+	Buffer.prototype.Cap = function() { return this.$val.Cap(); };
+	Buffer.ptr.prototype.Truncate = function(n) {
+		var b, n;
+		b = this;
+		if (n === 0) {
+			b.Reset();
+			return;
+		}
+		b.lastRead = 0;
+		if (n < 0 || n > b.Len()) {
+			$panic(new $String("bytes.Buffer: truncation out of range"));
+		}
+		b.buf = $subslice(b.buf, 0, (b.off + n >> 0));
+	};
+	Buffer.prototype.Truncate = function(n) { return this.$val.Truncate(n); };
+	Buffer.ptr.prototype.Reset = function() {
+		var b;
+		b = this;
+		b.buf = $subslice(b.buf, 0, 0);
+		b.off = 0;
+		b.lastRead = 0;
+	};
+	Buffer.prototype.Reset = function() { return this.$val.Reset(); };
+	Buffer.ptr.prototype.tryGrowByReslice = function(n) {
+		var b, l, n;
+		b = this;
+		l = b.buf.$length;
+		if (n <= (b.buf.$capacity - l >> 0)) {
+			b.buf = $subslice(b.buf, 0, (l + n >> 0));
+			return [l, true];
+		}
+		return [0, false];
+	};
+	Buffer.prototype.tryGrowByReslice = function(n) { return this.$val.tryGrowByReslice(n); };
+	Buffer.ptr.prototype.grow = function(n) {
+		var _q, _tuple, b, buf, c, i, m, n, ok;
+		b = this;
+		m = b.Len();
+		if ((m === 0) && !((b.off === 0))) {
+			b.Reset();
+		}
+		_tuple = b.tryGrowByReslice(n);
+		i = _tuple[0];
+		ok = _tuple[1];
+		if (ok) {
+			return i;
+		}
+		if (b.buf === sliceType.nil && n <= 64) {
+			b.buf = $subslice(new sliceType(b.bootstrap), 0, n);
+			return 0;
+		}
+		c = b.buf.$capacity;
+		if (n <= ((_q = c / 2, (_q === _q && _q !== 1/0 && _q !== -1/0) ? _q >> 0 : $throwRuntimeError("integer divide by zero")) - m >> 0)) {
+			$copySlice(b.buf, $subslice(b.buf, b.off));
+		} else if (c > ((2147483647 - c >> 0) - n >> 0)) {
+			$panic($pkg.ErrTooLarge);
+		} else {
+			buf = makeSlice(($imul(2, c)) + n >> 0);
+			$copySlice(buf, $subslice(b.buf, b.off));
+			b.buf = buf;
+		}
+		b.off = 0;
+		b.buf = $subslice(b.buf, 0, (m + n >> 0));
+		return m;
+	};
+	Buffer.prototype.grow = function(n) { return this.$val.grow(n); };
+	Buffer.ptr.prototype.Grow = function(n) {
+		var b, m, n;
+		b = this;
+		if (n < 0) {
+			$panic(new $String("bytes.Buffer.Grow: negative count"));
+		}
+		m = b.grow(n);
+		b.buf = $subslice(b.buf, 0, m);
+	};
+	Buffer.prototype.Grow = function(n) { return this.$val.Grow(n); };
+	Buffer.ptr.prototype.Write = function(p) {
+		var _tmp, _tmp$1, _tuple, b, err, m, n, ok, p;
+		n = 0;
+		err = $ifaceNil;
+		b = this;
+		b.lastRead = 0;
+		_tuple = b.tryGrowByReslice(p.$length);
+		m = _tuple[0];
+		ok = _tuple[1];
+		if (!ok) {
+			m = b.grow(p.$length);
+		}
+		_tmp = $copySlice($subslice(b.buf, m), p);
+		_tmp$1 = $ifaceNil;
+		n = _tmp;
+		err = _tmp$1;
+		return [n, err];
+	};
+	Buffer.prototype.Write = function(p) { return this.$val.Write(p); };
+	Buffer.ptr.prototype.WriteString = function(s) {
+		var _tmp, _tmp$1, _tuple, b, err, m, n, ok, s;
+		n = 0;
+		err = $ifaceNil;
+		b = this;
+		b.lastRead = 0;
+		_tuple = b.tryGrowByReslice(s.length);
+		m = _tuple[0];
+		ok = _tuple[1];
+		if (!ok) {
+			m = b.grow(s.length);
+		}
+		_tmp = $copyString($subslice(b.buf, m), s);
+		_tmp$1 = $ifaceNil;
+		n = _tmp;
+		err = _tmp$1;
+		return [n, err];
+	};
+	Buffer.prototype.WriteString = function(s) { return this.$val.WriteString(s); };
+	Buffer.ptr.prototype.ReadFrom = function(r) {
+		var _r, _tmp, _tmp$1, _tmp$2, _tmp$3, _tuple, b, e, err, i, m, n, r, x, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tuple = $f._tuple; b = $f.b; e = $f.e; err = $f.err; i = $f.i; m = $f.m; n = $f.n; r = $f.r; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		n = new $Int64(0, 0);
+		err = $ifaceNil;
+		b = this;
+		b.lastRead = 0;
+		/* while (true) { */ case 1:
+			i = b.grow(512);
+			_r = r.Read($subslice(b.buf, i, b.buf.$capacity)); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			_tuple = _r;
+			m = _tuple[0];
+			e = _tuple[1];
+			if (m < 0) {
+				$panic(errNegativeRead);
+			}
+			b.buf = $subslice(b.buf, 0, (i + m >> 0));
+			n = (x = (new $Int64(0, m)), new $Int64(n.$high + x.$high, n.$low + x.$low));
+			if ($interfaceIsEqual(e, io.EOF)) {
+				_tmp = n;
+				_tmp$1 = $ifaceNil;
+				n = _tmp;
+				err = _tmp$1;
+				$s = -1; return [n, err];
+			}
+			if (!($interfaceIsEqual(e, $ifaceNil))) {
+				_tmp$2 = n;
+				_tmp$3 = e;
+				n = _tmp$2;
+				err = _tmp$3;
+				$s = -1; return [n, err];
+			}
+		/* } */ $s = 1; continue; case 2:
+		$s = -1; return [n, err];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Buffer.ptr.prototype.ReadFrom }; } $f._r = _r; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tuple = _tuple; $f.b = b; $f.e = e; $f.err = err; $f.i = i; $f.m = m; $f.n = n; $f.r = r; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Buffer.prototype.ReadFrom = function(r) { return this.$val.ReadFrom(r); };
+	makeSlice = function(n) {
+		var n, $deferred;
+		/* */ var $err = null; try { $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		$deferred.push([(function() {
+			if (!($interfaceIsEqual($recover(), $ifaceNil))) {
+				$panic($pkg.ErrTooLarge);
+			}
+		}), []]);
+		return $makeSlice(sliceType, n);
+		/* */ } catch(err) { $err = err; return sliceType.nil; } finally { $callDeferred($deferred, $err); }
+	};
+	Buffer.ptr.prototype.WriteTo = function(w) {
+		var _r, _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tuple, b, e, err, m, n, nBytes, w, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tmp$4 = $f._tmp$4; _tmp$5 = $f._tmp$5; _tuple = $f._tuple; b = $f.b; e = $f.e; err = $f.err; m = $f.m; n = $f.n; nBytes = $f.nBytes; w = $f.w; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		n = new $Int64(0, 0);
+		err = $ifaceNil;
+		b = this;
+		b.lastRead = 0;
+		nBytes = b.Len();
+		/* */ if (nBytes > 0) { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if (nBytes > 0) { */ case 1:
+			_r = w.Write($subslice(b.buf, b.off)); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			_tuple = _r;
+			m = _tuple[0];
+			e = _tuple[1];
+			if (m > nBytes) {
+				$panic(new $String("bytes.Buffer.WriteTo: invalid Write count"));
+			}
+			b.off = b.off + (m) >> 0;
+			n = (new $Int64(0, m));
+			if (!($interfaceIsEqual(e, $ifaceNil))) {
+				_tmp = n;
+				_tmp$1 = e;
+				n = _tmp;
+				err = _tmp$1;
+				$s = -1; return [n, err];
+			}
+			if (!((m === nBytes))) {
+				_tmp$2 = n;
+				_tmp$3 = io.ErrShortWrite;
+				n = _tmp$2;
+				err = _tmp$3;
+				$s = -1; return [n, err];
+			}
+		/* } */ case 2:
+		b.Reset();
+		_tmp$4 = n;
+		_tmp$5 = $ifaceNil;
+		n = _tmp$4;
+		err = _tmp$5;
+		$s = -1; return [n, err];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Buffer.ptr.prototype.WriteTo }; } $f._r = _r; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tmp$4 = _tmp$4; $f._tmp$5 = _tmp$5; $f._tuple = _tuple; $f.b = b; $f.e = e; $f.err = err; $f.m = m; $f.n = n; $f.nBytes = nBytes; $f.w = w; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Buffer.prototype.WriteTo = function(w) { return this.$val.WriteTo(w); };
+	Buffer.ptr.prototype.WriteByte = function(c) {
+		var _tuple, b, c, m, ok, x;
+		b = this;
+		b.lastRead = 0;
+		_tuple = b.tryGrowByReslice(1);
+		m = _tuple[0];
+		ok = _tuple[1];
+		if (!ok) {
+			m = b.grow(1);
+		}
+		(x = b.buf, ((m < 0 || m >= x.$length) ? ($throwRuntimeError("index out of range"), undefined) : x.$array[x.$offset + m] = c));
+		return $ifaceNil;
+	};
+	Buffer.prototype.WriteByte = function(c) { return this.$val.WriteByte(c); };
+	Buffer.ptr.prototype.WriteRune = function(r) {
+		var _tmp, _tmp$1, _tmp$2, _tmp$3, _tuple, b, err, m, n, ok, r;
+		n = 0;
+		err = $ifaceNil;
+		b = this;
+		if (r < 128) {
+			b.WriteByte(((r << 24 >>> 24)));
+			_tmp = 1;
+			_tmp$1 = $ifaceNil;
+			n = _tmp;
+			err = _tmp$1;
+			return [n, err];
+		}
+		b.lastRead = 0;
+		_tuple = b.tryGrowByReslice(4);
+		m = _tuple[0];
+		ok = _tuple[1];
+		if (!ok) {
+			m = b.grow(4);
+		}
+		n = utf8.EncodeRune($subslice(b.buf, m, (m + 4 >> 0)), r);
+		b.buf = $subslice(b.buf, 0, (m + n >> 0));
+		_tmp$2 = n;
+		_tmp$3 = $ifaceNil;
+		n = _tmp$2;
+		err = _tmp$3;
+		return [n, err];
+	};
+	Buffer.prototype.WriteRune = function(r) { return this.$val.WriteRune(r); };
+	Buffer.ptr.prototype.Read = function(p) {
+		var _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, b, err, n, p;
+		n = 0;
+		err = $ifaceNil;
+		b = this;
+		b.lastRead = 0;
+		if (b.empty()) {
+			b.Reset();
+			if (p.$length === 0) {
+				_tmp = 0;
+				_tmp$1 = $ifaceNil;
+				n = _tmp;
+				err = _tmp$1;
+				return [n, err];
+			}
+			_tmp$2 = 0;
+			_tmp$3 = io.EOF;
+			n = _tmp$2;
+			err = _tmp$3;
+			return [n, err];
+		}
+		n = $copySlice(p, $subslice(b.buf, b.off));
+		b.off = b.off + (n) >> 0;
+		if (n > 0) {
+			b.lastRead = -1;
+		}
+		_tmp$4 = n;
+		_tmp$5 = $ifaceNil;
+		n = _tmp$4;
+		err = _tmp$5;
+		return [n, err];
+	};
+	Buffer.prototype.Read = function(p) { return this.$val.Read(p); };
+	Buffer.ptr.prototype.Next = function(n) {
+		var b, data, m, n;
+		b = this;
+		b.lastRead = 0;
+		m = b.Len();
+		if (n > m) {
+			n = m;
+		}
+		data = $subslice(b.buf, b.off, (b.off + n >> 0));
+		b.off = b.off + (n) >> 0;
+		if (n > 0) {
+			b.lastRead = -1;
+		}
+		return data;
+	};
+	Buffer.prototype.Next = function(n) { return this.$val.Next(n); };
+	Buffer.ptr.prototype.ReadByte = function() {
+		var b, c, x, x$1;
+		b = this;
+		if (b.empty()) {
+			b.Reset();
+			return [0, io.EOF];
+		}
+		c = (x = b.buf, x$1 = b.off, ((x$1 < 0 || x$1 >= x.$length) ? ($throwRuntimeError("index out of range"), undefined) : x.$array[x.$offset + x$1]));
+		b.off = b.off + (1) >> 0;
+		b.lastRead = -1;
+		return [c, $ifaceNil];
+	};
+	Buffer.prototype.ReadByte = function() { return this.$val.ReadByte(); };
+	Buffer.ptr.prototype.ReadRune = function() {
+		var _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tuple, b, c, err, n, r, size, x, x$1;
+		r = 0;
+		size = 0;
+		err = $ifaceNil;
+		b = this;
+		if (b.empty()) {
+			b.Reset();
+			_tmp = 0;
+			_tmp$1 = 0;
+			_tmp$2 = io.EOF;
+			r = _tmp;
+			size = _tmp$1;
+			err = _tmp$2;
+			return [r, size, err];
+		}
+		c = (x = b.buf, x$1 = b.off, ((x$1 < 0 || x$1 >= x.$length) ? ($throwRuntimeError("index out of range"), undefined) : x.$array[x.$offset + x$1]));
+		if (c < 128) {
+			b.off = b.off + (1) >> 0;
+			b.lastRead = 1;
+			_tmp$3 = ((c >> 0));
+			_tmp$4 = 1;
+			_tmp$5 = $ifaceNil;
+			r = _tmp$3;
+			size = _tmp$4;
+			err = _tmp$5;
+			return [r, size, err];
+		}
+		_tuple = utf8.DecodeRune($subslice(b.buf, b.off));
+		r = _tuple[0];
+		n = _tuple[1];
+		b.off = b.off + (n) >> 0;
+		b.lastRead = ((n << 24 >> 24));
+		_tmp$6 = r;
+		_tmp$7 = n;
+		_tmp$8 = $ifaceNil;
+		r = _tmp$6;
+		size = _tmp$7;
+		err = _tmp$8;
+		return [r, size, err];
+	};
+	Buffer.prototype.ReadRune = function() { return this.$val.ReadRune(); };
+	Buffer.ptr.prototype.UnreadRune = function() {
+		var b;
+		b = this;
+		if (b.lastRead <= 0) {
+			return errors.New("bytes.Buffer: UnreadRune: previous operation was not a successful ReadRune");
+		}
+		if (b.off >= ((b.lastRead >> 0))) {
+			b.off = b.off - (((b.lastRead >> 0))) >> 0;
+		}
+		b.lastRead = 0;
+		return $ifaceNil;
+	};
+	Buffer.prototype.UnreadRune = function() { return this.$val.UnreadRune(); };
+	Buffer.ptr.prototype.UnreadByte = function() {
+		var b;
+		b = this;
+		if (b.lastRead === 0) {
+			return errors.New("bytes.Buffer: UnreadByte: previous operation was not a successful read");
+		}
+		b.lastRead = 0;
+		if (b.off > 0) {
+			b.off = b.off - (1) >> 0;
+		}
+		return $ifaceNil;
+	};
+	Buffer.prototype.UnreadByte = function() { return this.$val.UnreadByte(); };
+	Buffer.ptr.prototype.ReadBytes = function(delim) {
+		var _tmp, _tmp$1, _tuple, b, delim, err, line, slice;
+		line = sliceType.nil;
+		err = $ifaceNil;
+		b = this;
+		_tuple = b.readSlice(delim);
+		slice = _tuple[0];
+		err = _tuple[1];
+		line = $appendSlice(line, slice);
+		_tmp = line;
+		_tmp$1 = err;
+		line = _tmp;
+		err = _tmp$1;
+		return [line, err];
+	};
+	Buffer.prototype.ReadBytes = function(delim) { return this.$val.ReadBytes(delim); };
+	Buffer.ptr.prototype.readSlice = function(delim) {
+		var _tmp, _tmp$1, b, delim, end, err, i, line;
+		line = sliceType.nil;
+		err = $ifaceNil;
+		b = this;
+		i = IndexByte($subslice(b.buf, b.off), delim);
+		end = (b.off + i >> 0) + 1 >> 0;
+		if (i < 0) {
+			end = b.buf.$length;
+			err = io.EOF;
+		}
+		line = $subslice(b.buf, b.off, end);
+		b.off = end;
+		b.lastRead = -1;
+		_tmp = line;
+		_tmp$1 = err;
+		line = _tmp;
+		err = _tmp$1;
+		return [line, err];
+	};
+	Buffer.prototype.readSlice = function(delim) { return this.$val.readSlice(delim); };
+	Buffer.ptr.prototype.ReadString = function(delim) {
+		var _tmp, _tmp$1, _tuple, b, delim, err, line, slice;
+		line = "";
+		err = $ifaceNil;
+		b = this;
+		_tuple = b.readSlice(delim);
+		slice = _tuple[0];
+		err = _tuple[1];
+		_tmp = ($bytesToString(slice));
+		_tmp$1 = err;
+		line = _tmp;
+		err = _tmp$1;
+		return [line, err];
+	};
+	Buffer.prototype.ReadString = function(delim) { return this.$val.ReadString(delim); };
+	explode = function(s, n) {
+		var _tuple, a, n, na, s, size;
+		if (n <= 0) {
+			n = s.$length;
+		}
+		a = $makeSlice(sliceType$1, n);
+		size = 0;
+		na = 0;
+		while (true) {
+			if (!(s.$length > 0)) { break; }
+			if ((na + 1 >> 0) >= n) {
+				((na < 0 || na >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + na] = s);
+				na = na + (1) >> 0;
+				break;
+			}
+			_tuple = utf8.DecodeRune(s);
+			size = _tuple[1];
+			((na < 0 || na >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + na] = $subslice(s, 0, size, size));
+			s = $subslice(s, size);
+			na = na + (1) >> 0;
+		}
+		return $subslice(a, 0, na);
+	};
+	countGeneric = function(s, sep) {
+		var i, n, s, sep;
+		if (sep.$length === 0) {
+			return utf8.RuneCount(s) + 1 >> 0;
+		}
+		n = 0;
+		while (true) {
+			i = Index(s, sep);
+			if (i === -1) {
+				return n;
+			}
+			n = n + (1) >> 0;
+			s = $subslice(s, (i + sep.$length >> 0));
+		}
+	};
+	genSplit = function(s, sep, sepSave, n) {
+		var a, i, m, n, s, sep, sepSave;
+		if (n === 0) {
+			return sliceType$1.nil;
+		}
+		if (sep.$length === 0) {
+			return explode(s, n);
+		}
+		if (n < 0) {
+			n = Count(s, sep) + 1 >> 0;
+		}
+		a = $makeSlice(sliceType$1, n);
+		n = n - (1) >> 0;
+		i = 0;
+		while (true) {
+			if (!(i < n)) { break; }
+			m = Index(s, sep);
+			if (m < 0) {
+				break;
+			}
+			((i < 0 || i >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + i] = $subslice(s, 0, (m + sepSave >> 0), (m + sepSave >> 0)));
+			s = $subslice(s, (m + sep.$length >> 0));
+			i = i + (1) >> 0;
+		}
+		((i < 0 || i >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + i] = s);
+		return $subslice(a, 0, (i + 1 >> 0));
+	};
+	SplitN = function(s, sep, n) {
+		var n, s, sep;
+		return genSplit(s, sep, 0, n);
+	};
+	$pkg.SplitN = SplitN;
+	indexRabinKarp = function(s, sep) {
+		var _tuple, h, hashsep, i, i$1, n, pow, s, sep, x;
+		_tuple = hashStr(sep);
+		hashsep = _tuple[0];
+		pow = _tuple[1];
+		n = sep.$length;
+		h = 0;
+		i = 0;
+		while (true) {
+			if (!(i < n)) { break; }
+			h = ($imul(h, 16777619) >>> 0) + ((((i < 0 || i >= s.$length) ? ($throwRuntimeError("index out of range"), undefined) : s.$array[s.$offset + i]) >>> 0)) >>> 0;
+			i = i + (1) >> 0;
+		}
+		if ((h === hashsep) && Equal($subslice(s, 0, n), sep)) {
+			return 0;
+		}
+		i$1 = n;
+		while (true) {
+			if (!(i$1 < s.$length)) { break; }
+			h = $imul(h, (16777619)) >>> 0;
+			h = h + (((((i$1 < 0 || i$1 >= s.$length) ? ($throwRuntimeError("index out of range"), undefined) : s.$array[s.$offset + i$1]) >>> 0))) >>> 0;
+			h = h - (($imul(pow, (((x = i$1 - n >> 0, ((x < 0 || x >= s.$length) ? ($throwRuntimeError("index out of range"), undefined) : s.$array[s.$offset + x])) >>> 0))) >>> 0)) >>> 0;
+			i$1 = i$1 + (1) >> 0;
+			if ((h === hashsep) && Equal($subslice(s, (i$1 - n >> 0), i$1), sep)) {
+				return i$1 - n >> 0;
+			}
+		}
+		return -1;
+	};
+	hashStr = function(sep) {
+		var _tmp, _tmp$1, hash, i, i$1, pow, sep, sq;
+		hash = 0;
+		i = 0;
+		while (true) {
+			if (!(i < sep.$length)) { break; }
+			hash = ($imul(hash, 16777619) >>> 0) + ((((i < 0 || i >= sep.$length) ? ($throwRuntimeError("index out of range"), undefined) : sep.$array[sep.$offset + i]) >>> 0)) >>> 0;
+			i = i + (1) >> 0;
+		}
+		_tmp = 1;
+		_tmp$1 = 16777619;
+		pow = _tmp;
+		sq = _tmp$1;
+		i$1 = sep.$length;
+		while (true) {
+			if (!(i$1 > 0)) { break; }
+			if (!(((i$1 & 1) === 0))) {
+				pow = $imul(pow, (sq)) >>> 0;
+			}
+			sq = $imul(sq, (sq)) >>> 0;
+			i$1 = (i$1 >> $min((1), 31)) >> 0;
+		}
+		return [hash, pow];
+	};
+	Index = function(s, sep) {
+		var c, fails, i, j, n, o, s, sep, t;
+		n = sep.$length;
+		if ((n === 0)) {
+			return 0;
+		} else if ((n === 1)) {
+			return IndexByte(s, (0 >= sep.$length ? ($throwRuntimeError("index out of range"), undefined) : sep.$array[sep.$offset + 0]));
+		} else if ((n === s.$length)) {
+			if (Equal(sep, s)) {
+				return 0;
+			}
+			return -1;
+		} else if (n > s.$length) {
+			return -1;
+		}
+		c = (0 >= sep.$length ? ($throwRuntimeError("index out of range"), undefined) : sep.$array[sep.$offset + 0]);
+		i = 0;
+		fails = 0;
+		t = $subslice(s, 0, ((s.$length - n >> 0) + 1 >> 0));
+		while (true) {
+			if (!(i < t.$length)) { break; }
+			if (!((((i < 0 || i >= t.$length) ? ($throwRuntimeError("index out of range"), undefined) : t.$array[t.$offset + i]) === c))) {
+				o = IndexByte($subslice(t, i), c);
+				if (o < 0) {
+					break;
+				}
+				i = i + (o) >> 0;
+			}
+			if (Equal($subslice(s, i, (i + n >> 0)), sep)) {
+				return i;
+			}
+			i = i + (1) >> 0;
+			fails = fails + (1) >> 0;
+			if (fails >= (4 + (i >> 4 >> 0) >> 0) && i < t.$length) {
+				j = indexRabinKarp($subslice(s, i), sep);
+				if (j < 0) {
+					return -1;
+				}
+				return i + j >> 0;
+			}
+		}
+		return -1;
+	};
+	$pkg.Index = Index;
+	Count = function(s, sep) {
+		var s, sep;
+		return countGeneric(s, sep);
+	};
+	$pkg.Count = Count;
+	ptrType.methods = [{prop: "Bytes", name: "Bytes", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}, {prop: "empty", name: "empty", pkg: "bytes", typ: $funcType([], [$Bool], false)}, {prop: "Len", name: "Len", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Cap", name: "Cap", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Truncate", name: "Truncate", pkg: "", typ: $funcType([$Int], [], false)}, {prop: "Reset", name: "Reset", pkg: "", typ: $funcType([], [], false)}, {prop: "tryGrowByReslice", name: "tryGrowByReslice", pkg: "bytes", typ: $funcType([$Int], [$Int, $Bool], false)}, {prop: "grow", name: "grow", pkg: "bytes", typ: $funcType([$Int], [$Int], false)}, {prop: "Grow", name: "Grow", pkg: "", typ: $funcType([$Int], [], false)}, {prop: "Write", name: "Write", pkg: "", typ: $funcType([sliceType], [$Int, $error], false)}, {prop: "WriteString", name: "WriteString", pkg: "", typ: $funcType([$String], [$Int, $error], false)}, {prop: "ReadFrom", name: "ReadFrom", pkg: "", typ: $funcType([io.Reader], [$Int64, $error], false)}, {prop: "WriteTo", name: "WriteTo", pkg: "", typ: $funcType([io.Writer], [$Int64, $error], false)}, {prop: "WriteByte", name: "WriteByte", pkg: "", typ: $funcType([$Uint8], [$error], false)}, {prop: "WriteRune", name: "WriteRune", pkg: "", typ: $funcType([$Int32], [$Int, $error], false)}, {prop: "Read", name: "Read", pkg: "", typ: $funcType([sliceType], [$Int, $error], false)}, {prop: "Next", name: "Next", pkg: "", typ: $funcType([$Int], [sliceType], false)}, {prop: "ReadByte", name: "ReadByte", pkg: "", typ: $funcType([], [$Uint8, $error], false)}, {prop: "ReadRune", name: "ReadRune", pkg: "", typ: $funcType([], [$Int32, $Int, $error], false)}, {prop: "UnreadRune", name: "UnreadRune", pkg: "", typ: $funcType([], [$error], false)}, {prop: "UnreadByte", name: "UnreadByte", pkg: "", typ: $funcType([], [$error], false)}, {prop: "ReadBytes", name: "ReadBytes", pkg: "", typ: $funcType([$Uint8], [sliceType, $error], false)}, {prop: "readSlice", name: "readSlice", pkg: "bytes", typ: $funcType([$Uint8], [sliceType, $error], false)}, {prop: "ReadString", name: "ReadString", pkg: "", typ: $funcType([$Uint8], [$String, $error], false)}];
+	Buffer.init("bytes", [{prop: "buf", name: "buf", anonymous: false, exported: false, typ: sliceType, tag: ""}, {prop: "off", name: "off", anonymous: false, exported: false, typ: $Int, tag: ""}, {prop: "bootstrap", name: "bootstrap", anonymous: false, exported: false, typ: arrayType, tag: ""}, {prop: "lastRead", name: "lastRead", anonymous: false, exported: false, typ: readOp, tag: ""}]);
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = errors.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = io.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = unicode.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = utf8.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$pkg.ErrTooLarge = errors.New("bytes.Buffer: too large");
+		errNegativeRead = errors.New("bytes.Buffer: reader returned negative count from Read");
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
 $packages["context"] = (function() {
-	var $pkg = {}, $init, errors, fmt, reflect, sync, time, Context, deadlineExceededError, emptyCtx, canceler, cancelCtx, timerCtx, valueCtx, ptrType, structType, ptrType$1, ptrType$2, ptrType$3, ptrType$4, sliceType, ptrType$5, chanType, chanType$1, mapType, background, todo, closedchan, x, Background, TODO, WithCancel, newCancelCtx, propagateCancel, parentCancelCtx, removeChild, init, WithDeadline, WithTimeout;
+	var $pkg = {}, $init, errors, fmt, reflect, sync, time, Context, deadlineExceededError, emptyCtx, CancelFunc, canceler, cancelCtx, timerCtx, valueCtx, ptrType, structType, ptrType$1, ptrType$2, ptrType$3, ptrType$4, sliceType, ptrType$5, chanType, chanType$1, mapType, background, todo, closedchan, x, Background, TODO, WithCancel, newCancelCtx, propagateCancel, parentCancelCtx, removeChild, init, WithDeadline, WithTimeout;
 	errors = $packages["errors"];
 	fmt = $packages["fmt"];
 	reflect = $packages["reflect"];
@@ -20924,6 +21650,7 @@ $packages["context"] = (function() {
 		}
 	});
 	emptyCtx = $pkg.emptyCtx = $newType(4, $kindInt, "context.emptyCtx", true, "context", false, null);
+	CancelFunc = $pkg.CancelFunc = $newType(4, $kindFunc, "context.CancelFunc", true, "context", true, null);
 	canceler = $pkg.canceler = $newType(8, $kindInterface, "context.canceler", true, "context", false, null);
 	cancelCtx = $pkg.cancelCtx = $newType(0, $kindStruct, "context.cancelCtx", true, "context", false, function(Context_, mu_, done_, children_, err_) {
 		this.$val = this;
@@ -21349,6 +22076,7 @@ $packages["context"] = (function() {
 	ptrType$4.methods = [{prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}, {prop: "Value", name: "Value", pkg: "", typ: $funcType([$emptyInterface], [$emptyInterface], false)}];
 	Context.init([{prop: "Deadline", name: "Deadline", pkg: "", typ: $funcType([], [time.Time, $Bool], false)}, {prop: "Done", name: "Done", pkg: "", typ: $funcType([], [chanType], false)}, {prop: "Err", name: "Err", pkg: "", typ: $funcType([], [$error], false)}, {prop: "Value", name: "Value", pkg: "", typ: $funcType([$emptyInterface], [$emptyInterface], false)}]);
 	deadlineExceededError.init("", []);
+	CancelFunc.init([], [], false);
 	canceler.init([{prop: "Done", name: "Done", pkg: "", typ: $funcType([], [chanType], false)}, {prop: "cancel", name: "cancel", pkg: "context", typ: $funcType([$Bool, $error], [], false)}]);
 	cancelCtx.init("context", [{prop: "Context", name: "Context", anonymous: true, exported: true, typ: Context, tag: ""}, {prop: "mu", name: "mu", anonymous: false, exported: false, typ: sync.Mutex, tag: ""}, {prop: "done", name: "done", anonymous: false, exported: false, typ: chanType$1, tag: ""}, {prop: "children", name: "children", anonymous: false, exported: false, typ: mapType, tag: ""}, {prop: "err", name: "err", anonymous: false, exported: false, typ: $error, tag: ""}]);
 	timerCtx.init("context", [{prop: "cancelCtx", name: "cancelCtx", anonymous: true, exported: false, typ: cancelCtx, tag: ""}, {prop: "timer", name: "timer", anonymous: false, exported: false, typ: ptrType$5, tag: ""}, {prop: "deadline", name: "deadline", anonymous: false, exported: false, typ: time.Time, tag: ""}]);
@@ -21372,131 +22100,384 @@ $packages["context"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
-	(function() {
-!function(e,t){for(var r in t)e[r]=t[r]}(this,function(e){function t(n){if(r[n])return r[n].exports;var o=r[n]={i:n,l:!1,exports:{}};return e[n].call(o.exports,o,o.exports,t),o.l=!0,o.exports}var r={};return t.m=e,t.c=r,t.d=function(e,r,n){t.o(e,r)||Object.defineProperty(e,r,{configurable:!1,enumerable:!0,get:n})},t.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(r,"a",r),r},t.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},t.p="",t(t.s=29)}([function(e,t){var r;r=function(){return this}();try{r=r||Function("return this")()||(0,eval)("this")}catch(e){"object"==typeof window&&(r=window)}e.exports=r},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var n=r(13);t.Metadata=n.BrowserHeaders},function(e,t){"function"==typeof Object.create?e.exports=function(e,t){e.super_=t,e.prototype=Object.create(t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}})}:e.exports=function(e,t){e.super_=t;var r=function(){};r.prototype=t.prototype,e.prototype=new r,e.prototype.constructor=e}},function(e,t,r){"use strict";(function(e){function n(){return i.TYPED_ARRAY_SUPPORT?2147483647:1073741823}function o(e,t){if(n()<t)throw new RangeError("Invalid typed array length");return i.TYPED_ARRAY_SUPPORT?(e=new Uint8Array(t),e.__proto__=i.prototype):(null===e&&(e=new i(t)),e.length=t),e}function i(e,t,r){if(!(i.TYPED_ARRAY_SUPPORT||this instanceof i))return new i(e,t,r);if("number"==typeof e){if("string"==typeof t)throw new Error("If encoding is specified then the first argument must be a string");return h(this,e)}return s(this,e,t,r)}function s(e,t,r,n){if("number"==typeof t)throw new TypeError('"value" argument must not be a number');return"undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer?l(e,t,r,n):"string"==typeof t?f(e,t,r):d(e,t)}function a(e){if("number"!=typeof e)throw new TypeError('"size" argument must be a number');if(e<0)throw new RangeError('"size" argument must not be negative')}function u(e,t,r,n){return a(t),t<=0?o(e,t):void 0!==r?"string"==typeof n?o(e,t).fill(r,n):o(e,t).fill(r):o(e,t)}function h(e,t){if(a(t),e=o(e,t<0?0:0|p(t)),!i.TYPED_ARRAY_SUPPORT)for(var r=0;r<t;++r)e[r]=0;return e}function f(e,t,r){if("string"==typeof r&&""!==r||(r="utf8"),!i.isEncoding(r))throw new TypeError('"encoding" must be a valid string encoding');var n=0|y(t,r);e=o(e,n);var s=e.write(t,r);return s!==n&&(e=e.slice(0,s)),e}function c(e,t){var r=t.length<0?0:0|p(t.length);e=o(e,r);for(var n=0;n<r;n+=1)e[n]=255&t[n];return e}function l(e,t,r,n){if(t.byteLength,r<0||t.byteLength<r)throw new RangeError("'offset' is out of bounds");if(t.byteLength<r+(n||0))throw new RangeError("'length' is out of bounds");return t=void 0===r&&void 0===n?new Uint8Array(t):void 0===n?new Uint8Array(t,r):new Uint8Array(t,r,n),i.TYPED_ARRAY_SUPPORT?(e=t,e.__proto__=i.prototype):e=c(e,t),e}function d(e,t){if(i.isBuffer(t)){var r=0|p(t.length);return e=o(e,r),0===e.length?e:(t.copy(e,0,0,r),e)}if(t){if("undefined"!=typeof ArrayBuffer&&t.buffer instanceof ArrayBuffer||"length"in t)return"number"!=typeof t.length||K(t.length)?o(e,0):c(e,t);if("Buffer"===t.type&&J(t.data))return c(e,t.data)}throw new TypeError("First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.")}function p(e){if(e>=n())throw new RangeError("Attempt to allocate Buffer larger than maximum size: 0x"+n().toString(16)+" bytes");return 0|e}function g(e){return+e!=e&&(e=0),i.alloc(+e)}function y(e,t){if(i.isBuffer(e))return e.length;if("undefined"!=typeof ArrayBuffer&&"function"==typeof ArrayBuffer.isView&&(ArrayBuffer.isView(e)||e instanceof ArrayBuffer))return e.byteLength;"string"!=typeof e&&(e=""+e);var r=e.length;if(0===r)return 0;for(var n=!1;;)switch(t){case"ascii":case"latin1":case"binary":return r;case"utf8":case"utf-8":case void 0:return z(e).length;case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return 2*r;case"hex":return r>>>1;case"base64":return V(e).length;default:if(n)return z(e).length;t=(""+t).toLowerCase(),n=!0}}function v(e,t,r){var n=!1;if((void 0===t||t<0)&&(t=0),t>this.length)return"";if((void 0===r||r>this.length)&&(r=this.length),r<=0)return"";if(r>>>=0,t>>>=0,r<=t)return"";for(e||(e="utf8");;)switch(e){case"hex":return P(this,t,r);case"utf8":case"utf-8":return M(this,t,r);case"ascii":return O(this,t,r);case"latin1":case"binary":return k(this,t,r);case"base64":return C(this,t,r);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return L(this,t,r);default:if(n)throw new TypeError("Unknown encoding: "+e);e=(e+"").toLowerCase(),n=!0}}function b(e,t,r){var n=e[t];e[t]=e[r],e[r]=n}function m(e,t,r,n,o){if(0===e.length)return-1;if("string"==typeof r?(n=r,r=0):r>2147483647?r=2147483647:r<-2147483648&&(r=-2147483648),r=+r,isNaN(r)&&(r=o?0:e.length-1),r<0&&(r=e.length+r),r>=e.length){if(o)return-1;r=e.length-1}else if(r<0){if(!o)return-1;r=0}if("string"==typeof t&&(t=i.from(t,n)),i.isBuffer(t))return 0===t.length?-1:w(e,t,r,n,o);if("number"==typeof t)return t&=255,i.TYPED_ARRAY_SUPPORT&&"function"==typeof Uint8Array.prototype.indexOf?o?Uint8Array.prototype.indexOf.call(e,t,r):Uint8Array.prototype.lastIndexOf.call(e,t,r):w(e,[t],r,n,o);throw new TypeError("val must be string, number or Buffer")}function w(e,t,r,n,o){function i(e,t){return 1===s?e[t]:e.readUInt16BE(t*s)}var s=1,a=e.length,u=t.length;if(void 0!==n&&("ucs2"===(n=String(n).toLowerCase())||"ucs-2"===n||"utf16le"===n||"utf-16le"===n)){if(e.length<2||t.length<2)return-1;s=2,a/=2,u/=2,r/=2}var h;if(o){var f=-1;for(h=r;h<a;h++)if(i(e,h)===i(t,-1===f?0:h-f)){if(-1===f&&(f=h),h-f+1===u)return f*s}else-1!==f&&(h-=h-f),f=-1}else for(r+u>a&&(r=a-u),h=r;h>=0;h--){for(var c=!0,l=0;l<u;l++)if(i(e,h+l)!==i(t,l)){c=!1;break}if(c)return h}return-1}function _(e,t,r,n){r=Number(r)||0;var o=e.length-r;n?(n=Number(n))>o&&(n=o):n=o;var i=t.length;if(i%2!=0)throw new TypeError("Invalid hex string");n>i/2&&(n=i/2);for(var s=0;s<n;++s){var a=parseInt(t.substr(2*s,2),16);if(isNaN(a))return s;e[r+s]=a}return s}function E(e,t,r,n){return G(z(t,e.length-r),e,r,n)}function S(e,t,r,n){return G(X(t),e,r,n)}function R(e,t,r,n){return S(e,t,r,n)}function A(e,t,r,n){return G(V(t),e,r,n)}function T(e,t,r,n){return G(W(t,e.length-r),e,r,n)}function C(e,t,r){return 0===t&&r===e.length?$.fromByteArray(e):$.fromByteArray(e.slice(t,r))}function M(e,t,r){r=Math.min(e.length,r);for(var n=[],o=t;o<r;){var i=e[o],s=null,a=i>239?4:i>223?3:i>191?2:1;if(o+a<=r){var u,h,f,c;switch(a){case 1:i<128&&(s=i);break;case 2:u=e[o+1],128==(192&u)&&(c=(31&i)<<6|63&u)>127&&(s=c);break;case 3:u=e[o+1],h=e[o+2],128==(192&u)&&128==(192&h)&&(c=(15&i)<<12|(63&u)<<6|63&h)>2047&&(c<55296||c>57343)&&(s=c);break;case 4:u=e[o+1],h=e[o+2],f=e[o+3],128==(192&u)&&128==(192&h)&&128==(192&f)&&(c=(15&i)<<18|(63&u)<<12|(63&h)<<6|63&f)>65535&&c<1114112&&(s=c)}}null===s?(s=65533,a=1):s>65535&&(s-=65536,n.push(s>>>10&1023|55296),s=56320|1023&s),n.push(s),o+=a}return x(n)}function x(e){var t=e.length;if(t<=Q)return String.fromCharCode.apply(String,e);for(var r="",n=0;n<t;)r+=String.fromCharCode.apply(String,e.slice(n,n+=Q));return r}function O(e,t,r){var n="";r=Math.min(e.length,r);for(var o=t;o<r;++o)n+=String.fromCharCode(127&e[o]);return n}function k(e,t,r){var n="";r=Math.min(e.length,r);for(var o=t;o<r;++o)n+=String.fromCharCode(e[o]);return n}function P(e,t,r){var n=e.length;(!t||t<0)&&(t=0),(!r||r<0||r>n)&&(r=n);for(var o="",i=t;i<r;++i)o+=Y(e[i]);return o}function L(e,t,r){for(var n=e.slice(t,r),o="",i=0;i<n.length;i+=2)o+=String.fromCharCode(n[i]+256*n[i+1]);return o}function I(e,t,r){if(e%1!=0||e<0)throw new RangeError("offset is not uint");if(e+t>r)throw new RangeError("Trying to access beyond buffer length")}function U(e,t,r,n,o,s){if(!i.isBuffer(e))throw new TypeError('"buffer" argument must be a Buffer instance');if(t>o||t<s)throw new RangeError('"value" argument is out of bounds');if(r+n>e.length)throw new RangeError("Index out of range")}function H(e,t,r,n){t<0&&(t=65535+t+1);for(var o=0,i=Math.min(e.length-r,2);o<i;++o)e[r+o]=(t&255<<8*(n?o:1-o))>>>8*(n?o:1-o)}function j(e,t,r,n){t<0&&(t=4294967295+t+1);for(var o=0,i=Math.min(e.length-r,4);o<i;++o)e[r+o]=t>>>8*(n?o:3-o)&255}function N(e,t,r,n,o,i){if(r+n>e.length)throw new RangeError("Index out of range");if(r<0)throw new RangeError("Index out of range")}function B(e,t,r,n,o){return o||N(e,t,r,4,3.4028234663852886e38,-3.4028234663852886e38),Z.write(e,t,r,n,23,4),r+4}function q(e,t,r,n,o){return o||N(e,t,r,8,1.7976931348623157e308,-1.7976931348623157e308),Z.write(e,t,r,n,52,8),r+8}function D(e){if(e=F(e).replace(ee,""),e.length<2)return"";for(;e.length%4!=0;)e+="=";return e}function F(e){return e.trim?e.trim():e.replace(/^\s+|\s+$/g,"")}function Y(e){return e<16?"0"+e.toString(16):e.toString(16)}function z(e,t){t=t||1/0;for(var r,n=e.length,o=null,i=[],s=0;s<n;++s){if((r=e.charCodeAt(s))>55295&&r<57344){if(!o){if(r>56319){(t-=3)>-1&&i.push(239,191,189);continue}if(s+1===n){(t-=3)>-1&&i.push(239,191,189);continue}o=r;continue}if(r<56320){(t-=3)>-1&&i.push(239,191,189),o=r;continue}r=65536+(o-55296<<10|r-56320)}else o&&(t-=3)>-1&&i.push(239,191,189);if(o=null,r<128){if((t-=1)<0)break;i.push(r)}else if(r<2048){if((t-=2)<0)break;i.push(r>>6|192,63&r|128)}else if(r<65536){if((t-=3)<0)break;i.push(r>>12|224,r>>6&63|128,63&r|128)}else{if(!(r<1114112))throw new Error("Invalid code point");if((t-=4)<0)break;i.push(r>>18|240,r>>12&63|128,r>>6&63|128,63&r|128)}}return i}function X(e){for(var t=[],r=0;r<e.length;++r)t.push(255&e.charCodeAt(r));return t}function W(e,t){for(var r,n,o,i=[],s=0;s<e.length&&!((t-=2)<0);++s)r=e.charCodeAt(s),n=r>>8,o=r%256,i.push(o),i.push(n);return i}function V(e){return $.toByteArray(D(e))}function G(e,t,r,n){for(var o=0;o<n&&!(o+r>=t.length||o>=e.length);++o)t[o+r]=e[o];return o}function K(e){return e!==e}/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * @license  MIT
- */
-var $=r(38),Z=r(39),J=r(15);t.Buffer=i,t.SlowBuffer=g,t.INSPECT_MAX_BYTES=50,i.TYPED_ARRAY_SUPPORT=void 0!==e.TYPED_ARRAY_SUPPORT?e.TYPED_ARRAY_SUPPORT:function(){try{var e=new Uint8Array(1);return e.__proto__={__proto__:Uint8Array.prototype,foo:function(){return 42}},42===e.foo()&&"function"==typeof e.subarray&&0===e.subarray(1,1).byteLength}catch(e){return!1}}(),t.kMaxLength=n(),i.poolSize=8192,i._augment=function(e){return e.__proto__=i.prototype,e},i.from=function(e,t,r){return s(null,e,t,r)},i.TYPED_ARRAY_SUPPORT&&(i.prototype.__proto__=Uint8Array.prototype,i.__proto__=Uint8Array,"undefined"!=typeof Symbol&&Symbol.species&&i[Symbol.species]===i&&Object.defineProperty(i,Symbol.species,{value:null,configurable:!0})),i.alloc=function(e,t,r){return u(null,e,t,r)},i.allocUnsafe=function(e){return h(null,e)},i.allocUnsafeSlow=function(e){return h(null,e)},i.isBuffer=function(e){return!(null==e||!e._isBuffer)},i.compare=function(e,t){if(!i.isBuffer(e)||!i.isBuffer(t))throw new TypeError("Arguments must be Buffers");if(e===t)return 0;for(var r=e.length,n=t.length,o=0,s=Math.min(r,n);o<s;++o)if(e[o]!==t[o]){r=e[o],n=t[o];break}return r<n?-1:n<r?1:0},i.isEncoding=function(e){switch(String(e).toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"latin1":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return!0;default:return!1}},i.concat=function(e,t){if(!J(e))throw new TypeError('"list" argument must be an Array of Buffers');if(0===e.length)return i.alloc(0);var r;if(void 0===t)for(t=0,r=0;r<e.length;++r)t+=e[r].length;var n=i.allocUnsafe(t),o=0;for(r=0;r<e.length;++r){var s=e[r];if(!i.isBuffer(s))throw new TypeError('"list" argument must be an Array of Buffers');s.copy(n,o),o+=s.length}return n},i.byteLength=y,i.prototype._isBuffer=!0,i.prototype.swap16=function(){var e=this.length;if(e%2!=0)throw new RangeError("Buffer size must be a multiple of 16-bits");for(var t=0;t<e;t+=2)b(this,t,t+1);return this},i.prototype.swap32=function(){var e=this.length;if(e%4!=0)throw new RangeError("Buffer size must be a multiple of 32-bits");for(var t=0;t<e;t+=4)b(this,t,t+3),b(this,t+1,t+2);return this},i.prototype.swap64=function(){var e=this.length;if(e%8!=0)throw new RangeError("Buffer size must be a multiple of 64-bits");for(var t=0;t<e;t+=8)b(this,t,t+7),b(this,t+1,t+6),b(this,t+2,t+5),b(this,t+3,t+4);return this},i.prototype.toString=function(){var e=0|this.length;return 0===e?"":0===arguments.length?M(this,0,e):v.apply(this,arguments)},i.prototype.equals=function(e){if(!i.isBuffer(e))throw new TypeError("Argument must be a Buffer");return this===e||0===i.compare(this,e)},i.prototype.inspect=function(){var e="",r=t.INSPECT_MAX_BYTES;return this.length>0&&(e=this.toString("hex",0,r).match(/.{2}/g).join(" "),this.length>r&&(e+=" ... ")),"<Buffer "+e+">"},i.prototype.compare=function(e,t,r,n,o){if(!i.isBuffer(e))throw new TypeError("Argument must be a Buffer");if(void 0===t&&(t=0),void 0===r&&(r=e?e.length:0),void 0===n&&(n=0),void 0===o&&(o=this.length),t<0||r>e.length||n<0||o>this.length)throw new RangeError("out of range index");if(n>=o&&t>=r)return 0;if(n>=o)return-1;if(t>=r)return 1;if(t>>>=0,r>>>=0,n>>>=0,o>>>=0,this===e)return 0;for(var s=o-n,a=r-t,u=Math.min(s,a),h=this.slice(n,o),f=e.slice(t,r),c=0;c<u;++c)if(h[c]!==f[c]){s=h[c],a=f[c];break}return s<a?-1:a<s?1:0},i.prototype.includes=function(e,t,r){return-1!==this.indexOf(e,t,r)},i.prototype.indexOf=function(e,t,r){return m(this,e,t,r,!0)},i.prototype.lastIndexOf=function(e,t,r){return m(this,e,t,r,!1)},i.prototype.write=function(e,t,r,n){if(void 0===t)n="utf8",r=this.length,t=0;else if(void 0===r&&"string"==typeof t)n=t,r=this.length,t=0;else{if(!isFinite(t))throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");t|=0,isFinite(r)?(r|=0,void 0===n&&(n="utf8")):(n=r,r=void 0)}var o=this.length-t;if((void 0===r||r>o)&&(r=o),e.length>0&&(r<0||t<0)||t>this.length)throw new RangeError("Attempt to write outside buffer bounds");n||(n="utf8");for(var i=!1;;)switch(n){case"hex":return _(this,e,t,r);case"utf8":case"utf-8":return E(this,e,t,r);case"ascii":return S(this,e,t,r);case"latin1":case"binary":return R(this,e,t,r);case"base64":return A(this,e,t,r);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return T(this,e,t,r);default:if(i)throw new TypeError("Unknown encoding: "+n);n=(""+n).toLowerCase(),i=!0}},i.prototype.toJSON=function(){return{type:"Buffer",data:Array.prototype.slice.call(this._arr||this,0)}};var Q=4096;i.prototype.slice=function(e,t){var r=this.length;e=~~e,t=void 0===t?r:~~t,e<0?(e+=r)<0&&(e=0):e>r&&(e=r),t<0?(t+=r)<0&&(t=0):t>r&&(t=r),t<e&&(t=e);var n;if(i.TYPED_ARRAY_SUPPORT)n=this.subarray(e,t),n.__proto__=i.prototype;else{var o=t-e;n=new i(o,void 0);for(var s=0;s<o;++s)n[s]=this[s+e]}return n},i.prototype.readUIntLE=function(e,t,r){e|=0,t|=0,r||I(e,t,this.length);for(var n=this[e],o=1,i=0;++i<t&&(o*=256);)n+=this[e+i]*o;return n},i.prototype.readUIntBE=function(e,t,r){e|=0,t|=0,r||I(e,t,this.length);for(var n=this[e+--t],o=1;t>0&&(o*=256);)n+=this[e+--t]*o;return n},i.prototype.readUInt8=function(e,t){return t||I(e,1,this.length),this[e]},i.prototype.readUInt16LE=function(e,t){return t||I(e,2,this.length),this[e]|this[e+1]<<8},i.prototype.readUInt16BE=function(e,t){return t||I(e,2,this.length),this[e]<<8|this[e+1]},i.prototype.readUInt32LE=function(e,t){return t||I(e,4,this.length),(this[e]|this[e+1]<<8|this[e+2]<<16)+16777216*this[e+3]},i.prototype.readUInt32BE=function(e,t){return t||I(e,4,this.length),16777216*this[e]+(this[e+1]<<16|this[e+2]<<8|this[e+3])},i.prototype.readIntLE=function(e,t,r){e|=0,t|=0,r||I(e,t,this.length);for(var n=this[e],o=1,i=0;++i<t&&(o*=256);)n+=this[e+i]*o;return o*=128,n>=o&&(n-=Math.pow(2,8*t)),n},i.prototype.readIntBE=function(e,t,r){e|=0,t|=0,r||I(e,t,this.length);for(var n=t,o=1,i=this[e+--n];n>0&&(o*=256);)i+=this[e+--n]*o;return o*=128,i>=o&&(i-=Math.pow(2,8*t)),i},i.prototype.readInt8=function(e,t){return t||I(e,1,this.length),128&this[e]?-1*(255-this[e]+1):this[e]},i.prototype.readInt16LE=function(e,t){t||I(e,2,this.length);var r=this[e]|this[e+1]<<8;return 32768&r?4294901760|r:r},i.prototype.readInt16BE=function(e,t){t||I(e,2,this.length);var r=this[e+1]|this[e]<<8;return 32768&r?4294901760|r:r},i.prototype.readInt32LE=function(e,t){return t||I(e,4,this.length),this[e]|this[e+1]<<8|this[e+2]<<16|this[e+3]<<24},i.prototype.readInt32BE=function(e,t){return t||I(e,4,this.length),this[e]<<24|this[e+1]<<16|this[e+2]<<8|this[e+3]},i.prototype.readFloatLE=function(e,t){return t||I(e,4,this.length),Z.read(this,e,!0,23,4)},i.prototype.readFloatBE=function(e,t){return t||I(e,4,this.length),Z.read(this,e,!1,23,4)},i.prototype.readDoubleLE=function(e,t){return t||I(e,8,this.length),Z.read(this,e,!0,52,8)},i.prototype.readDoubleBE=function(e,t){return t||I(e,8,this.length),Z.read(this,e,!1,52,8)},i.prototype.writeUIntLE=function(e,t,r,n){if(e=+e,t|=0,r|=0,!n){U(this,e,t,r,Math.pow(2,8*r)-1,0)}var o=1,i=0;for(this[t]=255&e;++i<r&&(o*=256);)this[t+i]=e/o&255;return t+r},i.prototype.writeUIntBE=function(e,t,r,n){if(e=+e,t|=0,r|=0,!n){U(this,e,t,r,Math.pow(2,8*r)-1,0)}var o=r-1,i=1;for(this[t+o]=255&e;--o>=0&&(i*=256);)this[t+o]=e/i&255;return t+r},i.prototype.writeUInt8=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,1,255,0),i.TYPED_ARRAY_SUPPORT||(e=Math.floor(e)),this[t]=255&e,t+1},i.prototype.writeUInt16LE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,2,65535,0),i.TYPED_ARRAY_SUPPORT?(this[t]=255&e,this[t+1]=e>>>8):H(this,e,t,!0),t+2},i.prototype.writeUInt16BE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,2,65535,0),i.TYPED_ARRAY_SUPPORT?(this[t]=e>>>8,this[t+1]=255&e):H(this,e,t,!1),t+2},i.prototype.writeUInt32LE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,4,4294967295,0),i.TYPED_ARRAY_SUPPORT?(this[t+3]=e>>>24,this[t+2]=e>>>16,this[t+1]=e>>>8,this[t]=255&e):j(this,e,t,!0),t+4},i.prototype.writeUInt32BE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,4,4294967295,0),i.TYPED_ARRAY_SUPPORT?(this[t]=e>>>24,this[t+1]=e>>>16,this[t+2]=e>>>8,this[t+3]=255&e):j(this,e,t,!1),t+4},i.prototype.writeIntLE=function(e,t,r,n){if(e=+e,t|=0,!n){var o=Math.pow(2,8*r-1);U(this,e,t,r,o-1,-o)}var i=0,s=1,a=0;for(this[t]=255&e;++i<r&&(s*=256);)e<0&&0===a&&0!==this[t+i-1]&&(a=1),this[t+i]=(e/s>>0)-a&255;return t+r},i.prototype.writeIntBE=function(e,t,r,n){if(e=+e,t|=0,!n){var o=Math.pow(2,8*r-1);U(this,e,t,r,o-1,-o)}var i=r-1,s=1,a=0;for(this[t+i]=255&e;--i>=0&&(s*=256);)e<0&&0===a&&0!==this[t+i+1]&&(a=1),this[t+i]=(e/s>>0)-a&255;return t+r},i.prototype.writeInt8=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,1,127,-128),i.TYPED_ARRAY_SUPPORT||(e=Math.floor(e)),e<0&&(e=255+e+1),this[t]=255&e,t+1},i.prototype.writeInt16LE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,2,32767,-32768),i.TYPED_ARRAY_SUPPORT?(this[t]=255&e,this[t+1]=e>>>8):H(this,e,t,!0),t+2},i.prototype.writeInt16BE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,2,32767,-32768),i.TYPED_ARRAY_SUPPORT?(this[t]=e>>>8,this[t+1]=255&e):H(this,e,t,!1),t+2},i.prototype.writeInt32LE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,4,2147483647,-2147483648),i.TYPED_ARRAY_SUPPORT?(this[t]=255&e,this[t+1]=e>>>8,this[t+2]=e>>>16,this[t+3]=e>>>24):j(this,e,t,!0),t+4},i.prototype.writeInt32BE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,4,2147483647,-2147483648),e<0&&(e=4294967295+e+1),i.TYPED_ARRAY_SUPPORT?(this[t]=e>>>24,this[t+1]=e>>>16,this[t+2]=e>>>8,this[t+3]=255&e):j(this,e,t,!1),t+4},i.prototype.writeFloatLE=function(e,t,r){return B(this,e,t,!0,r)},i.prototype.writeFloatBE=function(e,t,r){return B(this,e,t,!1,r)},i.prototype.writeDoubleLE=function(e,t,r){return q(this,e,t,!0,r)},i.prototype.writeDoubleBE=function(e,t,r){return q(this,e,t,!1,r)},i.prototype.copy=function(e,t,r,n){if(r||(r=0),n||0===n||(n=this.length),t>=e.length&&(t=e.length),t||(t=0),n>0&&n<r&&(n=r),n===r)return 0;if(0===e.length||0===this.length)return 0;if(t<0)throw new RangeError("targetStart out of bounds");if(r<0||r>=this.length)throw new RangeError("sourceStart out of bounds");if(n<0)throw new RangeError("sourceEnd out of bounds");n>this.length&&(n=this.length),e.length-t<n-r&&(n=e.length-t+r);var o,s=n-r;if(this===e&&r<t&&t<n)for(o=s-1;o>=0;--o)e[o+t]=this[o+r];else if(s<1e3||!i.TYPED_ARRAY_SUPPORT)for(o=0;o<s;++o)e[o+t]=this[o+r];else Uint8Array.prototype.set.call(e,this.subarray(r,r+s),t);return s},i.prototype.fill=function(e,t,r,n){if("string"==typeof e){if("string"==typeof t?(n=t,t=0,r=this.length):"string"==typeof r&&(n=r,r=this.length),1===e.length){var o=e.charCodeAt(0);o<256&&(e=o)}if(void 0!==n&&"string"!=typeof n)throw new TypeError("encoding must be a string");if("string"==typeof n&&!i.isEncoding(n))throw new TypeError("Unknown encoding: "+n)}else"number"==typeof e&&(e&=255);if(t<0||this.length<t||this.length<r)throw new RangeError("Out of range index");if(r<=t)return this;t>>>=0,r=void 0===r?this.length:r>>>0,e||(e=0);var s;if("number"==typeof e)for(s=t;s<r;++s)this[s]=e;else{var a=i.isBuffer(e)?e:z(new i(e,n).toString()),u=a.length;for(s=0;s<r-t;++s)this[s+t]=a[s%u]}return this};var ee=/[^+\/0-9A-Za-z-_]/g}).call(t,r(0))},function(e,t){function r(){throw new Error("setTimeout has not been defined")}function n(){throw new Error("clearTimeout has not been defined")}function o(e){if(f===setTimeout)return setTimeout(e,0);if((f===r||!f)&&setTimeout)return f=setTimeout,setTimeout(e,0);try{return f(e,0)}catch(t){try{return f.call(null,e,0)}catch(t){return f.call(this,e,0)}}}function i(e){if(c===clearTimeout)return clearTimeout(e);if((c===n||!c)&&clearTimeout)return c=clearTimeout,clearTimeout(e);try{return c(e)}catch(t){try{return c.call(null,e)}catch(t){return c.call(this,e)}}}function s(){g&&d&&(g=!1,d.length?p=d.concat(p):y=-1,p.length&&a())}function a(){if(!g){var e=o(s);g=!0;for(var t=p.length;t;){for(d=p,p=[];++y<t;)d&&d[y].run();y=-1,t=p.length}d=null,g=!1,i(e)}}function u(e,t){this.fun=e,this.array=t}function h(){}var f,c,l=e.exports={};!function(){try{f="function"==typeof setTimeout?setTimeout:r}catch(e){f=r}try{c="function"==typeof clearTimeout?clearTimeout:n}catch(e){c=n}}();var d,p=[],g=!1,y=-1;l.nextTick=function(e){var t=new Array(arguments.length-1);if(arguments.length>1)for(var r=1;r<arguments.length;r++)t[r-1]=arguments[r];p.push(new u(e,t)),1!==p.length||g||o(a)},u.prototype.run=function(){this.fun.apply(null,this.array)},l.title="browser",l.browser=!0,l.env={},l.argv=[],l.version="",l.versions={},l.on=h,l.addListener=h,l.once=h,l.off=h,l.removeListener=h,l.removeAllListeners=h,l.emit=h,l.prependListener=h,l.prependOnceListener=h,l.listeners=function(e){return[]},l.binding=function(e){throw new Error("process.binding is not supported")},l.cwd=function(){return"/"},l.chdir=function(e){throw new Error("process.chdir is not supported")},l.umask=function(){return 0}},function(e,t,r){"use strict";function n(e){if(!(this instanceof n))return new n(e);h.call(this,e),f.call(this,e),e&&!1===e.readable&&(this.readable=!1),e&&!1===e.writable&&(this.writable=!1),this.allowHalfOpen=!0,e&&!1===e.allowHalfOpen&&(this.allowHalfOpen=!1),this.once("end",o)}function o(){this.allowHalfOpen||this._writableState.ended||s(i,this)}function i(e){e.end()}var s=r(9),a=Object.keys||function(e){var t=[];for(var r in e)t.push(r);return t};e.exports=n;var u=r(8);u.inherits=r(2);var h=r(20),f=r(24);u.inherits(n,h);for(var c=a(f.prototype),l=0;l<c.length;l++){var d=c[l];n.prototype[d]||(n.prototype[d]=f.prototype[d])}Object.defineProperty(n.prototype,"destroyed",{get:function(){return void 0!==this._readableState&&void 0!==this._writableState&&(this._readableState.destroyed&&this._writableState.destroyed)},set:function(e){void 0!==this._readableState&&void 0!==this._writableState&&(this._readableState.destroyed=e,this._writableState.destroyed=e)}}),n.prototype._destroy=function(e,t){this.push(null),this.end(),s(t,e)}},function(e,t,r){"use strict";function n(){for(var e=[],t=0;t<arguments.length;t++)e[t]=arguments[t];console.debug?console.debug.apply(null,e):console.log.apply(null,e)}Object.defineProperty(t,"__esModule",{value:!0}),t.debug=n},function(e,t,r){"use strict";function n(){if(i){var e=i;i=null;for(var t=0;t<e.length;t++)try{e[t]()}catch(o){null===i&&(i=[],setTimeout(function(){n()},0));for(var r=e.length-1;r>t;r--)i.unshift(e[r]);throw o}}}function o(e){if(null!==i)return void i.push(e);i=[e],setTimeout(function(){n()},0)}Object.defineProperty(t,"__esModule",{value:!0});var i=null;t.default=o},function(e,t,r){(function(e){function r(e){return Array.isArray?Array.isArray(e):"[object Array]"===y(e)}function n(e){return"boolean"==typeof e}function o(e){return null===e}function i(e){return null==e}function s(e){return"number"==typeof e}function a(e){return"string"==typeof e}function u(e){return"symbol"==typeof e}function h(e){return void 0===e}function f(e){return"[object RegExp]"===y(e)}function c(e){return"object"==typeof e&&null!==e}function l(e){return"[object Date]"===y(e)}function d(e){return"[object Error]"===y(e)||e instanceof Error}function p(e){return"function"==typeof e}function g(e){return null===e||"boolean"==typeof e||"number"==typeof e||"string"==typeof e||"symbol"==typeof e||void 0===e}function y(e){return Object.prototype.toString.call(e)}t.isArray=r,t.isBoolean=n,t.isNull=o,t.isNullOrUndefined=i,t.isNumber=s,t.isString=a,t.isSymbol=u,t.isUndefined=h,t.isRegExp=f,t.isObject=c,t.isDate=l,t.isError=d,t.isFunction=p,t.isPrimitive=g,t.isBuffer=e.isBuffer}).call(t,r(3).Buffer)},function(e,t,r){"use strict";(function(t){function r(e,r,n,o){if("function"!=typeof e)throw new TypeError('"callback" argument must be a function');var i,s,a=arguments.length;switch(a){case 0:case 1:return t.nextTick(e);case 2:return t.nextTick(function(){e.call(null,r)});case 3:return t.nextTick(function(){e.call(null,r,n)});case 4:return t.nextTick(function(){e.call(null,r,n,o)});default:for(i=new Array(a-1),s=0;s<i.length;)i[s++]=arguments[s];return t.nextTick(function(){e.apply(null,i)})}}!t.version||0===t.version.indexOf("v0.")||0===t.version.indexOf("v1.")&&0!==t.version.indexOf("v1.8.")?e.exports=r:e.exports=t.nextTick}).call(t,r(4))},function(e,t,r){function n(e,t){for(var r in e)t[r]=e[r]}function o(e,t,r){return s(e,t,r)}var i=r(3),s=i.Buffer;s.from&&s.alloc&&s.allocUnsafe&&s.allocUnsafeSlow?e.exports=i:(n(i,t),t.Buffer=o),n(s,o),o.from=function(e,t,r){if("number"==typeof e)throw new TypeError("Argument must not be a number");return s(e,t,r)},o.alloc=function(e,t,r){if("number"!=typeof e)throw new TypeError("Argument must be a number");var n=s(e);return void 0!==t?"string"==typeof r?n.fill(t,r):n.fill(t):n.fill(0),n},o.allocUnsafe=function(e){if("number"!=typeof e)throw new TypeError("Argument must be a number");return s(e)},o.allocUnsafeSlow=function(e){if("number"!=typeof e)throw new TypeError("Argument must be a number");return i.SlowBuffer(e)}},function(e,t,r){"use strict";function n(){this.protocol=null,this.slashes=null,this.auth=null,this.host=null,this.port=null,this.hostname=null,this.hash=null,this.search=null,this.query=null,this.pathname=null,this.path=null,this.href=null}function o(e,t,r){if(e&&h.isObject(e)&&e instanceof n)return e;var o=new n;return o.parse(e,t,r),o}function i(e){return h.isString(e)&&(e=o(e)),e instanceof n?e.format():n.prototype.format.call(e)}function s(e,t){return o(e,!1,!0).resolve(t)}function a(e,t){return e?o(e,!1,!0).resolveObject(t):t}var u=r(50),h=r(52);t.parse=o,t.resolve=s,t.resolveObject=a,t.format=i,t.Url=n;var f=/^([a-z0-9.+-]+:)/i,c=/:[0-9]*$/,l=/^(\/\/?(?!\/)[^\?\s]*)(\?[^\s]*)?$/,d=["<",">",'"',"`"," ","\r","\n","\t"],p=["{","}","|","\\","^","`"].concat(d),g=["'"].concat(p),y=["%","/","?",";","#"].concat(g),v=["/","?","#"],b=/^[+a-z0-9A-Z_-]{0,63}$/,m=/^([+a-z0-9A-Z_-]{0,63})(.*)$/,w={javascript:!0,"javascript:":!0},_={javascript:!0,"javascript:":!0},E={http:!0,https:!0,ftp:!0,gopher:!0,file:!0,"http:":!0,"https:":!0,"ftp:":!0,"gopher:":!0,"file:":!0},S=r(53);n.prototype.parse=function(e,t,r){if(!h.isString(e))throw new TypeError("Parameter 'url' must be a string, not "+typeof e);var n=e.indexOf("?"),o=-1!==n&&n<e.indexOf("#")?"?":"#",i=e.split(o),s=/\\/g;i[0]=i[0].replace(s,"/"),e=i.join(o);var a=e;if(a=a.trim(),!r&&1===e.split("#").length){var c=l.exec(a);if(c)return this.path=a,this.href=a,this.pathname=c[1],c[2]?(this.search=c[2],this.query=t?S.parse(this.search.substr(1)):this.search.substr(1)):t&&(this.search="",this.query={}),this}var d=f.exec(a);if(d){d=d[0];var p=d.toLowerCase();this.protocol=p,a=a.substr(d.length)}if(r||d||a.match(/^\/\/[^@\/]+@[^@\/]+/)){var R="//"===a.substr(0,2);!R||d&&_[d]||(a=a.substr(2),this.slashes=!0)}if(!_[d]&&(R||d&&!E[d])){for(var A=-1,T=0;T<v.length;T++){var C=a.indexOf(v[T]);-1!==C&&(-1===A||C<A)&&(A=C)}var M,x;x=-1===A?a.lastIndexOf("@"):a.lastIndexOf("@",A),-1!==x&&(M=a.slice(0,x),a=a.slice(x+1),this.auth=decodeURIComponent(M)),A=-1;for(var T=0;T<y.length;T++){var C=a.indexOf(y[T]);-1!==C&&(-1===A||C<A)&&(A=C)}-1===A&&(A=a.length),this.host=a.slice(0,A),a=a.slice(A),this.parseHost(),this.hostname=this.hostname||"";var O="["===this.hostname[0]&&"]"===this.hostname[this.hostname.length-1];if(!O)for(var k=this.hostname.split(/\./),T=0,P=k.length;T<P;T++){var L=k[T];if(L&&!L.match(b)){for(var I="",U=0,H=L.length;U<H;U++)L.charCodeAt(U)>127?I+="x":I+=L[U];if(!I.match(b)){var j=k.slice(0,T),N=k.slice(T+1),B=L.match(m);B&&(j.push(B[1]),N.unshift(B[2])),N.length&&(a="/"+N.join(".")+a),this.hostname=j.join(".");break}}}this.hostname.length>255?this.hostname="":this.hostname=this.hostname.toLowerCase(),O||(this.hostname=u.toASCII(this.hostname));var q=this.port?":"+this.port:"",D=this.hostname||"";this.host=D+q,this.href+=this.host,O&&(this.hostname=this.hostname.substr(1,this.hostname.length-2),"/"!==a[0]&&(a="/"+a))}if(!w[p])for(var T=0,P=g.length;T<P;T++){var F=g[T];if(-1!==a.indexOf(F)){var Y=encodeURIComponent(F);Y===F&&(Y=escape(F)),a=a.split(F).join(Y)}}var z=a.indexOf("#");-1!==z&&(this.hash=a.substr(z),a=a.slice(0,z));var X=a.indexOf("?");if(-1!==X?(this.search=a.substr(X),this.query=a.substr(X+1),t&&(this.query=S.parse(this.query)),a=a.slice(0,X)):t&&(this.search="",this.query={}),a&&(this.pathname=a),E[p]&&this.hostname&&!this.pathname&&(this.pathname="/"),this.pathname||this.search){var q=this.pathname||"",W=this.search||"";this.path=q+W}return this.href=this.format(),this},n.prototype.format=function(){var e=this.auth||"";e&&(e=encodeURIComponent(e),e=e.replace(/%3A/i,":"),e+="@");var t=this.protocol||"",r=this.pathname||"",n=this.hash||"",o=!1,i="";this.host?o=e+this.host:this.hostname&&(o=e+(-1===this.hostname.indexOf(":")?this.hostname:"["+this.hostname+"]"),this.port&&(o+=":"+this.port)),this.query&&h.isObject(this.query)&&Object.keys(this.query).length&&(i=S.stringify(this.query));var s=this.search||i&&"?"+i||"";return t&&":"!==t.substr(-1)&&(t+=":"),this.slashes||(!t||E[t])&&!1!==o?(o="//"+(o||""),r&&"/"!==r.charAt(0)&&(r="/"+r)):o||(o=""),n&&"#"!==n.charAt(0)&&(n="#"+n),s&&"?"!==s.charAt(0)&&(s="?"+s),r=r.replace(/[?#]/g,function(e){return encodeURIComponent(e)}),s=s.replace("#","%23"),t+o+r+s+n},n.prototype.resolve=function(e){return this.resolveObject(o(e,!1,!0)).format()},n.prototype.resolveObject=function(e){if(h.isString(e)){var t=new n;t.parse(e,!1,!0),e=t}for(var r=new n,o=Object.keys(this),i=0;i<o.length;i++){var s=o[i];r[s]=this[s]}if(r.hash=e.hash,""===e.href)return r.href=r.format(),r;if(e.slashes&&!e.protocol){for(var a=Object.keys(e),u=0;u<a.length;u++){var f=a[u];"protocol"!==f&&(r[f]=e[f])}return E[r.protocol]&&r.hostname&&!r.pathname&&(r.path=r.pathname="/"),r.href=r.format(),r}if(e.protocol&&e.protocol!==r.protocol){if(!E[e.protocol]){for(var c=Object.keys(e),l=0;l<c.length;l++){var d=c[l];r[d]=e[d]}return r.href=r.format(),r}if(r.protocol=e.protocol,e.host||_[e.protocol])r.pathname=e.pathname;else{for(var p=(e.pathname||"").split("/");p.length&&!(e.host=p.shift()););e.host||(e.host=""),e.hostname||(e.hostname=""),""!==p[0]&&p.unshift(""),p.length<2&&p.unshift(""),r.pathname=p.join("/")}if(r.search=e.search,r.query=e.query,r.host=e.host||"",r.auth=e.auth,r.hostname=e.hostname||e.host,r.port=e.port,r.pathname||r.search){var g=r.pathname||"",y=r.search||"";r.path=g+y}return r.slashes=r.slashes||e.slashes,r.href=r.format(),r}var v=r.pathname&&"/"===r.pathname.charAt(0),b=e.host||e.pathname&&"/"===e.pathname.charAt(0),m=b||v||r.host&&e.pathname,w=m,S=r.pathname&&r.pathname.split("/")||[],p=e.pathname&&e.pathname.split("/")||[],R=r.protocol&&!E[r.protocol];if(R&&(r.hostname="",r.port=null,r.host&&(""===S[0]?S[0]=r.host:S.unshift(r.host)),r.host="",e.protocol&&(e.hostname=null,e.port=null,e.host&&(""===p[0]?p[0]=e.host:p.unshift(e.host)),e.host=null),m=m&&(""===p[0]||""===S[0])),b)r.host=e.host||""===e.host?e.host:r.host,r.hostname=e.hostname||""===e.hostname?e.hostname:r.hostname,r.search=e.search,r.query=e.query,S=p;else if(p.length)S||(S=[]),S.pop(),S=S.concat(p),r.search=e.search,r.query=e.query;else if(!h.isNullOrUndefined(e.search)){if(R){r.hostname=r.host=S.shift();var A=!!(r.host&&r.host.indexOf("@")>0)&&r.host.split("@");A&&(r.auth=A.shift(),r.host=r.hostname=A.shift())}return r.search=e.search,r.query=e.query,h.isNull(r.pathname)&&h.isNull(r.search)||(r.path=(r.pathname?r.pathname:"")+(r.search?r.search:"")),r.href=r.format(),r}if(!S.length)return r.pathname=null,r.search?r.path="/"+r.search:r.path=null,r.href=r.format(),r;for(var T=S.slice(-1)[0],C=(r.host||e.host||S.length>1)&&("."===T||".."===T)||""===T,M=0,x=S.length;x>=0;x--)T=S[x],"."===T?S.splice(x,1):".."===T?(S.splice(x,1),M++):M&&(S.splice(x,1),M--);if(!m&&!w)for(;M--;M)S.unshift("..");!m||""===S[0]||S[0]&&"/"===S[0].charAt(0)||S.unshift(""),C&&"/"!==S.join("/").substr(-1)&&S.push("");var O=""===S[0]||S[0]&&"/"===S[0].charAt(0);if(R){r.hostname=r.host=O?"":S.length?S.shift():"";var A=!!(r.host&&r.host.indexOf("@")>0)&&r.host.split("@");A&&(r.auth=A.shift(),r.host=r.hostname=A.shift())}return m=m||r.host&&S.length,m&&!O&&S.unshift(""),S.length?r.pathname=S.join("/"):(r.pathname=null,r.path=null),h.isNull(r.pathname)&&h.isNull(r.search)||(r.path=(r.pathname?r.pathname:"")+(r.search?r.search:"")),r.auth=e.auth||r.auth,r.slashes=r.slashes||e.slashes,r.href=r.format(),r},n.prototype.parseHost=function(){var e=this.host,t=c.exec(e);t&&(t=t[0],":"!==t&&(this.port=t.substr(1)),e=e.substr(0,e.length-t.length)),e&&(this.hostname=e)}},function(e,t,r){"use strict";function n(e,t){return new l(e,t)}function o(e){var t=e.get("grpc-status")||[];if(t.length>0)try{var r=t[0];return parseInt(r,10)}catch(e){return null}return null}Object.defineProperty(t,"__esModule",{value:!0});var i=r(1),s=r(27),a=r(28),u=r(6),h=r(7),f=r(14),c=r(59);t.client=n;var l=function(){function e(e,t){this.started=!1,this.sentFirstMessage=!1,this.completed=!1,this.closed=!1,this.finishedSending=!1,this.onHeadersCallbacks=[],this.onMessageCallbacks=[],this.onEndCallbacks=[],this.parser=new s.ChunkParser,this.methodDefinition=e,this.props=t,this.createTransport()}return e.prototype.createTransport=function(){var e=this.props.host+"/"+this.methodDefinition.service.serviceName+"/"+this.methodDefinition.methodName,t={methodDefinition:this.methodDefinition,debug:this.props.debug||!1,url:e,onHeaders:this.onTransportHeaders.bind(this),onChunk:this.onTransportChunk.bind(this),onEnd:this.onTransportEnd.bind(this)},r=this.props.transport;if(r){var n=r(t);if(n instanceof Error)throw n;this.transport=n}else{var o=f.DefaultTransportFactory(t);if(o instanceof Error)throw o;this.transport=o}},e.prototype.onTransportHeaders=function(e,t){if(this.props.debug&&u.debug("onHeaders",e,t),this.closed)return void(this.props.debug&&u.debug("grpc.onHeaders received after request was closed - ignoring"));if(0===t);else{this.responseHeaders=e,this.props.debug&&u.debug("onHeaders.responseHeaders",JSON.stringify(this.responseHeaders,null,2));var r=a.httpStatusToCode(t);this.props.debug&&u.debug("onHeaders.code",r);var n=e.get("grpc-message")||[];if(this.props.debug&&u.debug("onHeaders.gRPCMessage",n),r!==a.Code.OK)return void this.rawOnError(r,n[0]);this.rawOnHeaders(e)}},e.prototype.onTransportChunk=function(e){var t=this;if(this.closed)return void(this.props.debug&&u.debug("grpc.onChunk received after request was closed - ignoring"));var r=[];try{r=this.parser.parse(e)}catch(e){return this.props.debug&&u.debug("onChunk.parsing error",e,e.message),void this.rawOnError(a.Code.Internal,"parsing error: "+e.message)}r.forEach(function(e){if(e.chunkType===s.ChunkType.MESSAGE){var r=t.methodDefinition.responseType.deserializeBinary(e.data);t.rawOnMessage(r)}else e.chunkType===s.ChunkType.TRAILERS&&(t.responseHeaders?(t.responseTrailers=new i.Metadata(e.trailers),t.props.debug&&u.debug("onChunk.trailers",t.responseTrailers)):(t.responseHeaders=new i.Metadata(e.trailers),t.rawOnHeaders(t.responseHeaders)))})},e.prototype.onTransportEnd=function(){if(this.props.debug&&u.debug("grpc.onEnd"),this.closed)return void(this.props.debug&&u.debug("grpc.onEnd received after request was closed - ignoring"));if(void 0===this.responseTrailers){if(void 0===this.responseHeaders)return void this.rawOnError(a.Code.Unknown,"Response closed without headers");var e=o(this.responseHeaders),t=this.responseHeaders.get("grpc-message");return this.props.debug&&u.debug("grpc.headers only response ",e,t),null===e?void this.rawOnEnd(a.Code.Unknown,"Response closed without grpc-status (Headers only)",this.responseHeaders):void this.rawOnEnd(e,t[0],this.responseHeaders)}var r=o(this.responseTrailers);if(null===r)return void this.rawOnError(a.Code.Internal,"Response closed without grpc-status (Trailers provided)");var n=this.responseTrailers.get("grpc-message");this.rawOnEnd(r,n[0],this.responseTrailers)},e.prototype.rawOnEnd=function(e,t,r){this.props.debug&&u.debug("rawOnEnd",e,t,r),this.completed||(this.completed=!0,this.onEndCallbacks.forEach(function(n){h.default(function(){n(e,t,r)})}))},e.prototype.rawOnHeaders=function(e){this.props.debug&&u.debug("rawOnHeaders",e),this.completed||this.onHeadersCallbacks.forEach(function(t){h.default(function(){t(e)})})},e.prototype.rawOnError=function(e,t){this.props.debug&&u.debug("rawOnError",e,t),this.completed||(this.completed=!0,this.onEndCallbacks.forEach(function(r){h.default(function(){r(e,t,new i.Metadata)})}))},e.prototype.rawOnMessage=function(e){this.props.debug&&u.debug("rawOnMessage",e.toObject()),this.completed||this.onMessageCallbacks.forEach(function(t){h.default(function(){t(e)})})},e.prototype.onHeaders=function(e){this.onHeadersCallbacks.push(e)},e.prototype.onMessage=function(e){this.onMessageCallbacks.push(e)},e.prototype.onEnd=function(e){this.onEndCallbacks.push(e)},e.prototype.start=function(e){if(this.started)throw new Error("Client already started - cannot .start()");this.started=!0;var t=new i.Metadata(e||{});t.set("content-type","application/grpc-web+proto"),t.set("x-grpc-web","1"),this.transport.start(t)},e.prototype.send=function(e){if(!this.started)throw new Error("Client not started - .start() must be called before .send()");if(this.closed)throw new Error("Client already closed - cannot .send()");if(this.finishedSending)throw new Error("Client already finished sending - cannot .send()");if(!this.methodDefinition.requestStream&&this.sentFirstMessage)throw new Error("Message already sent for non-client-streaming method - cannot .send()");this.sentFirstMessage=!0;var t=c.frameRequest(e);this.transport.sendMessage(t)},e.prototype.finishSend=function(){if(!this.started)throw new Error("Client not started - .finishSend() must be called before .close()");if(this.closed)throw new Error("Client already closed - cannot .send()");if(this.finishedSending)throw new Error("Client already finished sending - cannot .finishSend()");this.finishedSending=!0,this.transport.finishSend()},e.prototype.close=function(){if(!this.started)throw new Error("Client not started - .start() must be called before .close()");if(this.closed)throw new Error("Client already closed - cannot .close()");this.closed=!0,this.props.debug&&u.debug("request.abort aborting request"),this.transport.cancel()},e}()},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var n=r(30);t.BrowserHeaders=n.BrowserHeaders},function(e,t,r){"use strict";function n(e){return e.methodDefinition.requestStream?new Error("No transport available for client-streaming (requestStream) method"):(s||(s=o()),s(e))}function o(){if(a.detectFetchSupport())return a.default;if(h.detectMozXHRSupport())return h.default;if(u.detectXHRSupport())return u.default;if(f.detectNodeHTTPSupport())return f.default;throw new Error("No suitable transport found for gRPC-Web")}function i(e){return c.default(e)}Object.defineProperty(t,"__esModule",{value:!0});var s,a=r(33),u=r(34),h=r(35),f=r(37),c=r(57);t.DefaultTransportFactory=n,t.WebsocketTransportFactory=i},function(e,t){var r={}.toString;e.exports=Array.isArray||function(e){return"[object Array]"==r.call(e)}},function(e,t,r){(function(e){var n=r(40),o=r(18),i=r(48),s=r(49),a=r(11),u=t;u.request=function(t,r){t="string"==typeof t?a.parse(t):i(t);var o=-1===e.location.protocol.search(/^https?:$/)?"http:":"",s=t.protocol||o,u=t.hostname||t.host,h=t.port,f=t.path||"/";u&&-1!==u.indexOf(":")&&(u="["+u+"]"),t.url=(u?s+"//"+u:"")+(h?":"+h:"")+f,t.method=(t.method||"GET").toUpperCase(),t.headers=t.headers||{};var c=new n(t);return r&&c.on("response",r),c},u.get=function(e,t){var r=u.request(e,t);return r.end(),r},u.ClientRequest=n,u.IncomingMessage=o,u.Agent=function(){},u.Agent.defaultMaxSockets=4,u.STATUS_CODES=s,u.METHODS=["CHECKOUT","CONNECT","COPY","DELETE","GET","HEAD","LOCK","M-SEARCH","MERGE","MKACTIVITY","MKCOL","MOVE","NOTIFY","OPTIONS","PATCH","POST","PROPFIND","PROPPATCH","PURGE","PUT","REPORT","SEARCH","SUBSCRIBE","TRACE","UNLOCK","UNSUBSCRIBE"]}).call(t,r(0))},function(e,t,r){(function(e){function r(){if(void 0!==i)return i;if(e.XMLHttpRequest){i=new e.XMLHttpRequest;try{i.open("GET",e.XDomainRequest?"/":"https://example.com")}catch(e){i=null}}else i=null;return i}function n(e){var t=r();if(!t)return!1;try{return t.responseType=e,t.responseType===e}catch(e){}return!1}function o(e){return"function"==typeof e}t.fetch=o(e.fetch)&&o(e.ReadableStream),t.writableStream=o(e.WritableStream),t.abortController=o(e.AbortController),t.blobConstructor=!1;try{new Blob([new ArrayBuffer(1)]),t.blobConstructor=!0}catch(e){}var i,s=void 0!==e.ArrayBuffer,a=s&&o(e.ArrayBuffer.prototype.slice);t.arraybuffer=t.fetch||s&&n("arraybuffer"),t.msstream=!t.fetch&&a&&n("ms-stream"),t.mozchunkedarraybuffer=!t.fetch&&s&&n("moz-chunked-arraybuffer"),t.overrideMimeType=t.fetch||!!r()&&o(r().overrideMimeType),t.vbArray=o(e.VBArray),i=null}).call(t,r(0))},function(e,t,r){(function(e,n,o){var i=r(17),s=r(2),a=r(19),u=t.readyStates={UNSENT:0,OPENED:1,HEADERS_RECEIVED:2,LOADING:3,DONE:4},h=t.IncomingMessage=function(t,r,o){function s(){f.read().then(function(e){if(!u._destroyed){if(e.done)return void u.push(null);u.push(new n(e.value)),s()}}).catch(function(e){u._destroyed||u.emit("error",e)})}var u=this;if(a.Readable.call(u),u._mode=o,u.headers={},u.rawHeaders=[],u.trailers={},u.rawTrailers=[],u.on("end",function(){e.nextTick(function(){u.emit("close")})}),"fetch"===o){if(u._fetchResponse=r,u.url=r.url,u.statusCode=r.status,u.statusMessage=r.statusText,r.headers.forEach(function(e,t){u.headers[t.toLowerCase()]=e,u.rawHeaders.push(t,e)}),i.writableStream){var h=new WritableStream({write:function(e){return new Promise(function(t,r){u._destroyed||(u.push(new n(e))?t():u._resumeFetch=t)})},close:function(){u._destroyed||u.push(null)},abort:function(e){u._destroyed||u.emit("error",e)}});try{return void r.body.pipeTo(h)}catch(e){}}var f=r.body.getReader();s()}else{u._xhr=t,u._pos=0,u.url=t.responseURL,u.statusCode=t.status,u.statusMessage=t.statusText;if(t.getAllResponseHeaders().split(/\r?\n/).forEach(function(e){var t=e.match(/^([^:]+):\s*(.*)/);if(t){var r=t[1].toLowerCase();"set-cookie"===r?(void 0===u.headers[r]&&(u.headers[r]=[]),u.headers[r].push(t[2])):void 0!==u.headers[r]?u.headers[r]+=", "+t[2]:u.headers[r]=t[2],u.rawHeaders.push(t[1],t[2])}}),u._charset="x-user-defined",!i.overrideMimeType){var c=u.rawHeaders["mime-type"];if(c){var l=c.match(/;\s*charset=([^;])(;|$)/);l&&(u._charset=l[1].toLowerCase())}u._charset||(u._charset="utf-8")}}};s(h,a.Readable),h.prototype._read=function(){var e=this,t=e._resumeFetch;t&&(e._resumeFetch=null,t())},h.prototype._onXHRProgress=function(){var e=this,t=e._xhr,r=null;switch(e._mode){case"text:vbarray":if(t.readyState!==u.DONE)break;try{r=new o.VBArray(t.responseBody).toArray()}catch(e){}if(null!==r){e.push(new n(r));break}case"text":try{r=t.responseText}catch(t){e._mode="text:vbarray";break}if(r.length>e._pos){var i=r.substr(e._pos);if("x-user-defined"===e._charset){for(var s=new n(i.length),a=0;a<i.length;a++)s[a]=255&i.charCodeAt(a);e.push(s)}else e.push(i,e._charset);e._pos=r.length}break;case"arraybuffer":if(t.readyState!==u.DONE||!t.response)break;r=t.response,e.push(new n(new Uint8Array(r)));break;case"moz-chunked-arraybuffer":if(r=t.response,t.readyState!==u.LOADING||!r)break;e.push(new n(new Uint8Array(r)));break;case"ms-stream":if(r=t.response,t.readyState!==u.LOADING)break;var h=new o.MSStreamReader;h.onprogress=function(){h.result.byteLength>e._pos&&(e.push(new n(new Uint8Array(h.result.slice(e._pos)))),e._pos=h.result.byteLength)},h.onload=function(){e.push(null)},h.readAsArrayBuffer(r)}e._xhr.readyState===u.DONE&&"ms-stream"!==e._mode&&e.push(null)}}).call(t,r(4),r(3).Buffer,r(0))},function(e,t,r){t=e.exports=r(20),t.Stream=t,t.Readable=t,t.Writable=r(24),t.Duplex=r(5),t.Transform=r(26),t.PassThrough=r(46)},function(e,t,r){"use strict";(function(t,n){function o(e){return j.from(e)}function i(e){return j.isBuffer(e)||e instanceof N}function s(e,t,r){if("function"==typeof e.prependListener)return e.prependListener(t,r);e._events&&e._events[t]?I(e._events[t])?e._events[t].unshift(r):e._events[t]=[r,e._events[t]]:e.on(t,r)}function a(e,t){L=L||r(5),e=e||{},this.objectMode=!!e.objectMode,t instanceof L&&(this.objectMode=this.objectMode||!!e.readableObjectMode);var n=e.highWaterMark,o=this.objectMode?16:16384;this.highWaterMark=n||0===n?n:o,this.highWaterMark=Math.floor(this.highWaterMark),this.buffer=new Y,this.length=0,this.pipes=null,this.pipesCount=0,this.flowing=null,this.ended=!1,this.endEmitted=!1,this.reading=!1,this.sync=!0,this.needReadable=!1,this.emittedReadable=!1,this.readableListening=!1,this.resumeScheduled=!1,this.destroyed=!1,this.defaultEncoding=e.defaultEncoding||"utf8",this.awaitDrain=0,this.readingMore=!1,this.decoder=null,this.encoding=null,e.encoding&&(F||(F=r(25).StringDecoder),this.decoder=new F(e.encoding),this.encoding=e.encoding)}function u(e){if(L=L||r(5),!(this instanceof u))return new u(e);this._readableState=new a(e,this),this.readable=!0,e&&("function"==typeof e.read&&(this._read=e.read),"function"==typeof e.destroy&&(this._destroy=e.destroy)),H.call(this)}function h(e,t,r,n,i){var s=e._readableState;if(null===t)s.reading=!1,g(e,s);else{var a;i||(a=c(s,t)),a?e.emit("error",a):s.objectMode||t&&t.length>0?("string"==typeof t||s.objectMode||Object.getPrototypeOf(t)===j.prototype||(t=o(t)),n?s.endEmitted?e.emit("error",new Error("stream.unshift() after end event")):f(e,s,t,!0):s.ended?e.emit("error",new Error("stream.push() after EOF")):(s.reading=!1,s.decoder&&!r?(t=s.decoder.write(t),s.objectMode||0!==t.length?f(e,s,t,!1):b(e,s)):f(e,s,t,!1))):n||(s.reading=!1)}return l(s)}function f(e,t,r,n){t.flowing&&0===t.length&&!t.sync?(e.emit("data",r),e.read(0)):(t.length+=t.objectMode?1:r.length,n?t.buffer.unshift(r):t.buffer.push(r),t.needReadable&&y(e)),b(e,t)}function c(e,t){var r;return i(t)||"string"==typeof t||void 0===t||e.objectMode||(r=new TypeError("Invalid non-string/buffer chunk")),r}function l(e){return!e.ended&&(e.needReadable||e.length<e.highWaterMark||0===e.length)}function d(e){return e>=W?e=W:(e--,e|=e>>>1,e|=e>>>2,e|=e>>>4,e|=e>>>8,e|=e>>>16,e++),e}function p(e,t){return e<=0||0===t.length&&t.ended?0:t.objectMode?1:e!==e?t.flowing&&t.length?t.buffer.head.data.length:t.length:(e>t.highWaterMark&&(t.highWaterMark=d(e)),e<=t.length?e:t.ended?t.length:(t.needReadable=!0,0))}function g(e,t){if(!t.ended){if(t.decoder){var r=t.decoder.end();r&&r.length&&(t.buffer.push(r),t.length+=t.objectMode?1:r.length)}t.ended=!0,y(e)}}function y(e){var t=e._readableState;t.needReadable=!1,t.emittedReadable||(D("emitReadable",t.flowing),t.emittedReadable=!0,t.sync?P(v,e):v(e))}function v(e){D("emit readable"),e.emit("readable"),R(e)}function b(e,t){t.readingMore||(t.readingMore=!0,P(m,e,t))}function m(e,t){for(var r=t.length;!t.reading&&!t.flowing&&!t.ended&&t.length<t.highWaterMark&&(D("maybeReadMore read 0"),e.read(0),r!==t.length);)r=t.length;t.readingMore=!1}function w(e){return function(){var t=e._readableState;D("pipeOnDrain",t.awaitDrain),t.awaitDrain&&t.awaitDrain--,0===t.awaitDrain&&U(e,"data")&&(t.flowing=!0,R(e))}}function _(e){D("readable nexttick read 0"),e.read(0)}function E(e,t){t.resumeScheduled||(t.resumeScheduled=!0,P(S,e,t))}function S(e,t){t.reading||(D("resume read 0"),e.read(0)),t.resumeScheduled=!1,t.awaitDrain=0,e.emit("resume"),R(e),t.flowing&&!t.reading&&e.read(0)}function R(e){var t=e._readableState;for(D("flow",t.flowing);t.flowing&&null!==e.read(););}function A(e,t){if(0===t.length)return null;var r;return t.objectMode?r=t.buffer.shift():!e||e>=t.length?(r=t.decoder?t.buffer.join(""):1===t.buffer.length?t.buffer.head.data:t.buffer.concat(t.length),t.buffer.clear()):r=T(e,t.buffer,t.decoder),r}function T(e,t,r){var n;return e<t.head.data.length?(n=t.head.data.slice(0,e),t.head.data=t.head.data.slice(e)):n=e===t.head.data.length?t.shift():r?C(e,t):M(e,t),n}function C(e,t){var r=t.head,n=1,o=r.data;for(e-=o.length;r=r.next;){var i=r.data,s=e>i.length?i.length:e;if(s===i.length?o+=i:o+=i.slice(0,e),0===(e-=s)){s===i.length?(++n,r.next?t.head=r.next:t.head=t.tail=null):(t.head=r,r.data=i.slice(s));break}++n}return t.length-=n,o}function M(e,t){var r=j.allocUnsafe(e),n=t.head,o=1;for(n.data.copy(r),e-=n.data.length;n=n.next;){var i=n.data,s=e>i.length?i.length:e;if(i.copy(r,r.length-e,0,s),0===(e-=s)){s===i.length?(++o,n.next?t.head=n.next:t.head=t.tail=null):(t.head=n,n.data=i.slice(s));break}++o}return t.length-=o,r}function x(e){var t=e._readableState;if(t.length>0)throw new Error('"endReadable()" called on non-empty stream');t.endEmitted||(t.ended=!0,P(O,t,e))}function O(e,t){e.endEmitted||0!==e.length||(e.endEmitted=!0,t.readable=!1,t.emit("end"))}function k(e,t){for(var r=0,n=e.length;r<n;r++)if(e[r]===t)return r;return-1}var P=r(9);e.exports=u;var L,I=r(15);u.ReadableState=a;var U=(r(21).EventEmitter,function(e,t){return e.listeners(t).length}),H=r(22),j=r(10).Buffer,N=t.Uint8Array||function(){},B=r(8);B.inherits=r(2);var q=r(41),D=void 0;D=q&&q.debuglog?q.debuglog("stream"):function(){};var F,Y=r(42),z=r(23);B.inherits(u,H);var X=["error","close","destroy","pause","resume"];Object.defineProperty(u.prototype,"destroyed",{get:function(){return void 0!==this._readableState&&this._readableState.destroyed},set:function(e){this._readableState&&(this._readableState.destroyed=e)}}),u.prototype.destroy=z.destroy,u.prototype._undestroy=z.undestroy,u.prototype._destroy=function(e,t){this.push(null),t(e)},u.prototype.push=function(e,t){var r,n=this._readableState;return n.objectMode?r=!0:"string"==typeof e&&(t=t||n.defaultEncoding,t!==n.encoding&&(e=j.from(e,t),t=""),r=!0),h(this,e,t,!1,r)},u.prototype.unshift=function(e){return h(this,e,null,!0,!1)},u.prototype.isPaused=function(){return!1===this._readableState.flowing},u.prototype.setEncoding=function(e){return F||(F=r(25).StringDecoder),this._readableState.decoder=new F(e),this._readableState.encoding=e,this};var W=8388608;u.prototype.read=function(e){D("read",e),e=parseInt(e,10);var t=this._readableState,r=e;if(0!==e&&(t.emittedReadable=!1),0===e&&t.needReadable&&(t.length>=t.highWaterMark||t.ended))return D("read: emitReadable",t.length,t.ended),0===t.length&&t.ended?x(this):y(this),null;if(0===(e=p(e,t))&&t.ended)return 0===t.length&&x(this),null;var n=t.needReadable;D("need readable",n),(0===t.length||t.length-e<t.highWaterMark)&&(n=!0,D("length less than watermark",n)),t.ended||t.reading?(n=!1,D("reading or ended",n)):n&&(D("do read"),t.reading=!0,t.sync=!0,0===t.length&&(t.needReadable=!0),this._read(t.highWaterMark),t.sync=!1,t.reading||(e=p(r,t)));var o;return o=e>0?A(e,t):null,null===o?(t.needReadable=!0,e=0):t.length-=e,0===t.length&&(t.ended||(t.needReadable=!0),r!==e&&t.ended&&x(this)),null!==o&&this.emit("data",o),o},u.prototype._read=function(e){this.emit("error",new Error("_read() is not implemented"))},u.prototype.pipe=function(e,t){function r(e,t){D("onunpipe"),e===l&&t&&!1===t.hasUnpiped&&(t.hasUnpiped=!0,i())}function o(){D("onend"),e.end()}function i(){D("cleanup"),e.removeListener("close",h),e.removeListener("finish",f),e.removeListener("drain",y),e.removeListener("error",u),e.removeListener("unpipe",r),l.removeListener("end",o),l.removeListener("end",c),l.removeListener("data",a),v=!0,!d.awaitDrain||e._writableState&&!e._writableState.needDrain||y()}function a(t){D("ondata"),b=!1,!1!==e.write(t)||b||((1===d.pipesCount&&d.pipes===e||d.pipesCount>1&&-1!==k(d.pipes,e))&&!v&&(D("false write response, pause",l._readableState.awaitDrain),l._readableState.awaitDrain++,b=!0),l.pause())}function u(t){D("onerror",t),c(),e.removeListener("error",u),0===U(e,"error")&&e.emit("error",t)}function h(){e.removeListener("finish",f),c()}function f(){D("onfinish"),e.removeListener("close",h),c()}function c(){D("unpipe"),l.unpipe(e)}var l=this,d=this._readableState;switch(d.pipesCount){case 0:d.pipes=e;break;case 1:d.pipes=[d.pipes,e];break;default:d.pipes.push(e)}d.pipesCount+=1,D("pipe count=%d opts=%j",d.pipesCount,t);var p=(!t||!1!==t.end)&&e!==n.stdout&&e!==n.stderr,g=p?o:c;d.endEmitted?P(g):l.once("end",g),e.on("unpipe",r);var y=w(l);e.on("drain",y);var v=!1,b=!1;return l.on("data",a),s(e,"error",u),e.once("close",h),e.once("finish",f),e.emit("pipe",l),d.flowing||(D("pipe resume"),l.resume()),e},u.prototype.unpipe=function(e){var t=this._readableState,r={hasUnpiped:!1};if(0===t.pipesCount)return this;if(1===t.pipesCount)return e&&e!==t.pipes?this:(e||(e=t.pipes),t.pipes=null,t.pipesCount=0,t.flowing=!1,e&&e.emit("unpipe",this,r),this);if(!e){var n=t.pipes,o=t.pipesCount;t.pipes=null,t.pipesCount=0,t.flowing=!1;for(var i=0;i<o;i++)n[i].emit("unpipe",this,r);return this}var s=k(t.pipes,e);return-1===s?this:(t.pipes.splice(s,1),t.pipesCount-=1,1===t.pipesCount&&(t.pipes=t.pipes[0]),e.emit("unpipe",this,r),this)},u.prototype.on=function(e,t){var r=H.prototype.on.call(this,e,t);if("data"===e)!1!==this._readableState.flowing&&this.resume();else if("readable"===e){var n=this._readableState;n.endEmitted||n.readableListening||(n.readableListening=n.needReadable=!0,n.emittedReadable=!1,n.reading?n.length&&y(this):P(_,this))}return r},u.prototype.addListener=u.prototype.on,u.prototype.resume=function(){var e=this._readableState;return e.flowing||(D("resume"),e.flowing=!0,E(this,e)),this},u.prototype.pause=function(){return D("call pause flowing=%j",this._readableState.flowing),!1!==this._readableState.flowing&&(D("pause"),this._readableState.flowing=!1,this.emit("pause")),this},u.prototype.wrap=function(e){var t=this._readableState,r=!1,n=this;e.on("end",function(){if(D("wrapped end"),t.decoder&&!t.ended){var e=t.decoder.end();e&&e.length&&n.push(e)}n.push(null)}),e.on("data",function(o){if(D("wrapped data"),t.decoder&&(o=t.decoder.write(o)),(!t.objectMode||null!==o&&void 0!==o)&&(t.objectMode||o&&o.length)){n.push(o)||(r=!0,e.pause())}});for(var o in e)void 0===this[o]&&"function"==typeof e[o]&&(this[o]=function(t){return function(){return e[t].apply(e,arguments)}}(o));for(var i=0;i<X.length;i++)e.on(X[i],n.emit.bind(n,X[i]));return n._read=function(t){D("wrapped _read",t),r&&(r=!1,e.resume())},n},u._fromList=A}).call(t,r(0),r(4))},function(e,t){function r(){this._events=this._events||{},this._maxListeners=this._maxListeners||void 0}function n(e){return"function"==typeof e}function o(e){return"number"==typeof e}function i(e){return"object"==typeof e&&null!==e}function s(e){return void 0===e}e.exports=r,r.EventEmitter=r,r.prototype._events=void 0,r.prototype._maxListeners=void 0,r.defaultMaxListeners=10,r.prototype.setMaxListeners=function(e){if(!o(e)||e<0||isNaN(e))throw TypeError("n must be a positive number");return this._maxListeners=e,this},r.prototype.emit=function(e){var t,r,o,a,u,h;if(this._events||(this._events={}),"error"===e&&(!this._events.error||i(this._events.error)&&!this._events.error.length)){if((t=arguments[1])instanceof Error)throw t;var f=new Error('Uncaught, unspecified "error" event. ('+t+")");throw f.context=t,f}if(r=this._events[e],s(r))return!1;if(n(r))switch(arguments.length){case 1:r.call(this);break;case 2:r.call(this,arguments[1]);break;case 3:r.call(this,arguments[1],arguments[2]);break;default:a=Array.prototype.slice.call(arguments,1),r.apply(this,a)}else if(i(r))for(a=Array.prototype.slice.call(arguments,1),h=r.slice(),o=h.length,u=0;u<o;u++)h[u].apply(this,a);return!0},r.prototype.addListener=function(e,t){var o;if(!n(t))throw TypeError("listener must be a function");return this._events||(this._events={}),this._events.newListener&&this.emit("newListener",e,n(t.listener)?t.listener:t),this._events[e]?i(this._events[e])?this._events[e].push(t):this._events[e]=[this._events[e],t]:this._events[e]=t,i(this._events[e])&&!this._events[e].warned&&(o=s(this._maxListeners)?r.defaultMaxListeners:this._maxListeners)&&o>0&&this._events[e].length>o&&(this._events[e].warned=!0,console.error("(node) warning: possible EventEmitter memory leak detected. %d listeners added. Use emitter.setMaxListeners() to increase limit.",this._events[e].length),"function"==typeof console.trace&&console.trace()),this},r.prototype.on=r.prototype.addListener,r.prototype.once=function(e,t){function r(){this.removeListener(e,r),o||(o=!0,t.apply(this,arguments))}if(!n(t))throw TypeError("listener must be a function");var o=!1;return r.listener=t,this.on(e,r),this},r.prototype.removeListener=function(e,t){var r,o,s,a;if(!n(t))throw TypeError("listener must be a function");if(!this._events||!this._events[e])return this;if(r=this._events[e],s=r.length,o=-1,r===t||n(r.listener)&&r.listener===t)delete this._events[e],this._events.removeListener&&this.emit("removeListener",e,t);else if(i(r)){for(a=s;a-- >0;)if(r[a]===t||r[a].listener&&r[a].listener===t){o=a;break}if(o<0)return this;1===r.length?(r.length=0,delete this._events[e]):r.splice(o,1),this._events.removeListener&&this.emit("removeListener",e,t)}return this},r.prototype.removeAllListeners=function(e){var t,r;if(!this._events)return this;if(!this._events.removeListener)return 0===arguments.length?this._events={}:this._events[e]&&delete this._events[e],this;if(0===arguments.length){for(t in this._events)"removeListener"!==t&&this.removeAllListeners(t);return this.removeAllListeners("removeListener"),this._events={},this}if(r=this._events[e],n(r))this.removeListener(e,r);else if(r)for(;r.length;)this.removeListener(e,r[r.length-1]);return delete this._events[e],this},r.prototype.listeners=function(e){return this._events&&this._events[e]?n(this._events[e])?[this._events[e]]:this._events[e].slice():[]},r.prototype.listenerCount=function(e){if(this._events){var t=this._events[e];if(n(t))return 1;if(t)return t.length}return 0},r.listenerCount=function(e,t){return e.listenerCount(t)}},function(e,t,r){e.exports=r(21).EventEmitter},function(e,t,r){"use strict";function n(e,t){var r=this,n=this._readableState&&this._readableState.destroyed,o=this._writableState&&this._writableState.destroyed;if(n||o)return void(t?t(e):!e||this._writableState&&this._writableState.errorEmitted||s(i,this,e));this._readableState&&(this._readableState.destroyed=!0),this._writableState&&(this._writableState.destroyed=!0),this._destroy(e||null,function(e){!t&&e?(s(i,r,e),r._writableState&&(r._writableState.errorEmitted=!0)):t&&t(e)})}function o(){this._readableState&&(this._readableState.destroyed=!1,this._readableState.reading=!1,this._readableState.ended=!1,this._readableState.endEmitted=!1),this._writableState&&(this._writableState.destroyed=!1,this._writableState.ended=!1,this._writableState.ending=!1,this._writableState.finished=!1,this._writableState.errorEmitted=!1)}function i(e,t){e.emit("error",t)}var s=r(9);e.exports={destroy:n,undestroy:o}},function(e,t,r){"use strict";(function(t,n,o){function i(e){var t=this;this.next=null,this.entry=null,this.finish=function(){C(t,e)}}function s(e){return I.from(e)}function a(e){return I.isBuffer(e)||e instanceof U}function u(){}function h(e,t){x=x||r(5),e=e||{},this.objectMode=!!e.objectMode,t instanceof x&&(this.objectMode=this.objectMode||!!e.writableObjectMode);var n=e.highWaterMark,o=this.objectMode?16:16384;this.highWaterMark=n||0===n?n:o,this.highWaterMark=Math.floor(this.highWaterMark),this.finalCalled=!1,this.needDrain=!1,this.ending=!1,this.ended=!1,this.finished=!1,this.destroyed=!1;var s=!1===e.decodeStrings;this.decodeStrings=!s,this.defaultEncoding=e.defaultEncoding||"utf8",this.length=0,this.writing=!1,this.corked=0,this.sync=!0,this.bufferProcessing=!1,this.onwrite=function(e){b(t,e)},this.writecb=null,this.writelen=0,this.bufferedRequest=null,this.lastBufferedRequest=null,this.pendingcb=0,this.prefinished=!1,this.errorEmitted=!1,this.bufferedRequestCount=0,this.corkedRequestsFree=new i(this)}function f(e){if(x=x||r(5),!(j.call(f,this)||this instanceof x))return new f(e);this._writableState=new h(e,this),this.writable=!0,e&&("function"==typeof e.write&&(this._write=e.write),"function"==typeof e.writev&&(this._writev=e.writev),"function"==typeof e.destroy&&(this._destroy=e.destroy),"function"==typeof e.final&&(this._final=e.final)),L.call(this)}function c(e,t){var r=new Error("write after end");e.emit("error",r),M(t,r)}function l(e,t,r,n){var o=!0,i=!1;return null===r?i=new TypeError("May not write null values to stream"):"string"==typeof r||void 0===r||t.objectMode||(i=new TypeError("Invalid non-string/buffer chunk")),i&&(e.emit("error",i),M(n,i),o=!1),o}function d(e,t,r){return e.objectMode||!1===e.decodeStrings||"string"!=typeof t||(t=I.from(t,r)),t}function p(e,t,r,n,o,i){if(!r){var s=d(t,n,o);n!==s&&(r=!0,o="buffer",n=s)}var a=t.objectMode?1:n.length;t.length+=a;var u=t.length<t.highWaterMark;if(u||(t.needDrain=!0),t.writing||t.corked){var h=t.lastBufferedRequest;t.lastBufferedRequest={chunk:n,encoding:o,isBuf:r,callback:i,next:null},h?h.next=t.lastBufferedRequest:t.bufferedRequest=t.lastBufferedRequest,t.bufferedRequestCount+=1}else g(e,t,!1,a,n,o,i);return u}function g(e,t,r,n,o,i,s){t.writelen=n,t.writecb=s,t.writing=!0,t.sync=!0,r?e._writev(o,t.onwrite):e._write(o,i,t.onwrite),t.sync=!1}function y(e,t,r,n,o){--t.pendingcb,r?(M(o,n),M(A,e,t),e._writableState.errorEmitted=!0,e.emit("error",n)):(o(n),e._writableState.errorEmitted=!0,e.emit("error",n),A(e,t))}function v(e){e.writing=!1,e.writecb=null,e.length-=e.writelen,e.writelen=0}function b(e,t){var r=e._writableState,n=r.sync,o=r.writecb;if(v(r),t)y(e,r,n,t,o);else{var i=E(r);i||r.corked||r.bufferProcessing||!r.bufferedRequest||_(e,r),n?O(m,e,r,i,o):m(e,r,i,o)}}function m(e,t,r,n){r||w(e,t),t.pendingcb--,n(),A(e,t)}function w(e,t){0===t.length&&t.needDrain&&(t.needDrain=!1,e.emit("drain"))}function _(e,t){t.bufferProcessing=!0;var r=t.bufferedRequest;if(e._writev&&r&&r.next){var n=t.bufferedRequestCount,o=new Array(n),s=t.corkedRequestsFree;s.entry=r;for(var a=0,u=!0;r;)o[a]=r,r.isBuf||(u=!1),r=r.next,a+=1;o.allBuffers=u,g(e,t,!0,t.length,o,"",s.finish),t.pendingcb++,t.lastBufferedRequest=null,s.next?(t.corkedRequestsFree=s.next,s.next=null):t.corkedRequestsFree=new i(t)}else{for(;r;){var h=r.chunk,f=r.encoding,c=r.callback;if(g(e,t,!1,t.objectMode?1:h.length,h,f,c),r=r.next,t.writing)break}null===r&&(t.lastBufferedRequest=null)}t.bufferedRequestCount=0,t.bufferedRequest=r,t.bufferProcessing=!1}function E(e){return e.ending&&0===e.length&&null===e.bufferedRequest&&!e.finished&&!e.writing}function S(e,t){e._final(function(r){t.pendingcb--,r&&e.emit("error",r),t.prefinished=!0,e.emit("prefinish"),A(e,t)})}function R(e,t){t.prefinished||t.finalCalled||("function"==typeof e._final?(t.pendingcb++,t.finalCalled=!0,M(S,e,t)):(t.prefinished=!0,e.emit("prefinish")))}function A(e,t){var r=E(t);return r&&(R(e,t),0===t.pendingcb&&(t.finished=!0,e.emit("finish"))),r}function T(e,t,r){t.ending=!0,A(e,t),r&&(t.finished?M(r):e.once("finish",r)),t.ended=!0,e.writable=!1}function C(e,t,r){var n=e.entry;for(e.entry=null;n;){var o=n.callback;t.pendingcb--,o(r),n=n.next}t.corkedRequestsFree?t.corkedRequestsFree.next=e:t.corkedRequestsFree=e}var M=r(9);e.exports=f;var x,O=!t.browser&&["v0.10","v0.9."].indexOf(t.version.slice(0,5))>-1?n:M;f.WritableState=h;var k=r(8);k.inherits=r(2);var P={deprecate:r(45)},L=r(22),I=r(10).Buffer,U=o.Uint8Array||function(){},H=r(23);k.inherits(f,L),h.prototype.getBuffer=function(){for(var e=this.bufferedRequest,t=[];e;)t.push(e),e=e.next;return t},function(){try{Object.defineProperty(h.prototype,"buffer",{get:P.deprecate(function(){return this.getBuffer()},"_writableState.buffer is deprecated. Use _writableState.getBuffer instead.","DEP0003")})}catch(e){}}();var j;"function"==typeof Symbol&&Symbol.hasInstance&&"function"==typeof Function.prototype[Symbol.hasInstance]?(j=Function.prototype[Symbol.hasInstance],Object.defineProperty(f,Symbol.hasInstance,{value:function(e){return!!j.call(this,e)||e&&e._writableState instanceof h}})):j=function(e){return e instanceof this},f.prototype.pipe=function(){this.emit("error",new Error("Cannot pipe, not readable"))},f.prototype.write=function(e,t,r){var n=this._writableState,o=!1,i=a(e)&&!n.objectMode;return i&&!I.isBuffer(e)&&(e=s(e)),"function"==typeof t&&(r=t,t=null),i?t="buffer":t||(t=n.defaultEncoding),"function"!=typeof r&&(r=u),n.ended?c(this,r):(i||l(this,n,e,r))&&(n.pendingcb++,o=p(this,n,i,e,t,r)),o},f.prototype.cork=function(){this._writableState.corked++},f.prototype.uncork=function(){var e=this._writableState;e.corked&&(e.corked--,e.writing||e.corked||e.finished||e.bufferProcessing||!e.bufferedRequest||_(this,e))},f.prototype.setDefaultEncoding=function(e){if("string"==typeof e&&(e=e.toLowerCase()),!(["hex","utf8","utf-8","ascii","binary","base64","ucs2","ucs-2","utf16le","utf-16le","raw"].indexOf((e+"").toLowerCase())>-1))throw new TypeError("Unknown encoding: "+e);return this._writableState.defaultEncoding=e,this},f.prototype._write=function(e,t,r){r(new Error("_write() is not implemented"))},f.prototype._writev=null,f.prototype.end=function(e,t,r){var n=this._writableState;"function"==typeof e?(r=e,e=null,t=null):"function"==typeof t&&(r=t,t=null),null!==e&&void 0!==e&&this.write(e,t),n.corked&&(n.corked=1,this.uncork()),n.ending||n.finished||T(this,n,r)},Object.defineProperty(f.prototype,"destroyed",{get:function(){return void 0!==this._writableState&&this._writableState.destroyed},set:function(e){this._writableState&&(this._writableState.destroyed=e)}}),f.prototype.destroy=H.destroy,f.prototype._undestroy=H.undestroy,f.prototype._destroy=function(e,t){this.end(),t(e)}}).call(t,r(4),r(43).setImmediate,r(0))},function(e,t,r){"use strict";function n(e){if(!e)return"utf8";for(var t;;)switch(e){case"utf8":case"utf-8":return"utf8";case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return"utf16le";case"latin1":case"binary":return"latin1";case"base64":case"ascii":case"hex":return e;default:if(t)return;e=(""+e).toLowerCase(),t=!0}}function o(e){var t=n(e);if("string"!=typeof t&&(b.isEncoding===m||!m(e)))throw new Error("Unknown encoding: "+e);return t||e}function i(e){this.encoding=o(e);var t;switch(this.encoding){case"utf16le":this.text=l,this.end=d,t=4;break;case"utf8":this.fillLast=h,t=4;break;case"base64":this.text=p,this.end=g,t=3;break;default:return this.write=y,void(this.end=v)}this.lastNeed=0,this.lastTotal=0,this.lastChar=b.allocUnsafe(t)}function s(e){return e<=127?0:e>>5==6?2:e>>4==14?3:e>>3==30?4:-1}function a(e,t,r){var n=t.length-1;if(n<r)return 0;var o=s(t[n]);return o>=0?(o>0&&(e.lastNeed=o-1),o):--n<r?0:(o=s(t[n]))>=0?(o>0&&(e.lastNeed=o-2),o):--n<r?0:(o=s(t[n]),o>=0?(o>0&&(2===o?o=0:e.lastNeed=o-3),o):0)}function u(e,t,r){if(128!=(192&t[0]))return e.lastNeed=0,"�".repeat(r);if(e.lastNeed>1&&t.length>1){if(128!=(192&t[1]))return e.lastNeed=1,"�".repeat(r+1);if(e.lastNeed>2&&t.length>2&&128!=(192&t[2]))return e.lastNeed=2,"�".repeat(r+2)}}function h(e){var t=this.lastTotal-this.lastNeed,r=u(this,e,t);return void 0!==r?r:this.lastNeed<=e.length?(e.copy(this.lastChar,t,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal)):(e.copy(this.lastChar,t,0,e.length),void(this.lastNeed-=e.length))}function f(e,t){var r=a(this,e,t);if(!this.lastNeed)return e.toString("utf8",t);this.lastTotal=r;var n=e.length-(r-this.lastNeed);return e.copy(this.lastChar,0,n),e.toString("utf8",t,n)}function c(e){var t=e&&e.length?this.write(e):"";return this.lastNeed?t+"�".repeat(this.lastTotal-this.lastNeed):t}function l(e,t){if((e.length-t)%2==0){var r=e.toString("utf16le",t);if(r){var n=r.charCodeAt(r.length-1);if(n>=55296&&n<=56319)return this.lastNeed=2,this.lastTotal=4,this.lastChar[0]=e[e.length-2],this.lastChar[1]=e[e.length-1],r.slice(0,-1)}return r}return this.lastNeed=1,this.lastTotal=2,this.lastChar[0]=e[e.length-1],e.toString("utf16le",t,e.length-1)}function d(e){var t=e&&e.length?this.write(e):"";if(this.lastNeed){var r=this.lastTotal-this.lastNeed;return t+this.lastChar.toString("utf16le",0,r)}return t}function p(e,t){var r=(e.length-t)%3;return 0===r?e.toString("base64",t):(this.lastNeed=3-r,this.lastTotal=3,1===r?this.lastChar[0]=e[e.length-1]:(this.lastChar[0]=e[e.length-2],this.lastChar[1]=e[e.length-1]),e.toString("base64",t,e.length-r))}function g(e){var t=e&&e.length?this.write(e):"";return this.lastNeed?t+this.lastChar.toString("base64",0,3-this.lastNeed):t}function y(e){return e.toString(this.encoding)}function v(e){return e&&e.length?this.write(e):""}var b=r(10).Buffer,m=b.isEncoding||function(e){switch((e=""+e)&&e.toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":case"raw":return!0;default:return!1}};t.StringDecoder=i,i.prototype.write=function(e){if(0===e.length)return"";var t,r;if(this.lastNeed){if(void 0===(t=this.fillLast(e)))return"";r=this.lastNeed,this.lastNeed=0}else r=0;return r<e.length?t?t+this.text(e,r):this.text(e,r):t||""},i.prototype.end=c,i.prototype.text=f,i.prototype.fillLast=function(e){if(this.lastNeed<=e.length)return e.copy(this.lastChar,this.lastTotal-this.lastNeed,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal);e.copy(this.lastChar,this.lastTotal-this.lastNeed,0,e.length),this.lastNeed-=e.length}},function(e,t,r){"use strict";function n(e){this.afterTransform=function(t,r){return o(e,t,r)},this.needTransform=!1,this.transforming=!1,this.writecb=null,this.writechunk=null,this.writeencoding=null}function o(e,t,r){var n=e._transformState;n.transforming=!1;var o=n.writecb;if(!o)return e.emit("error",new Error("write callback called multiple times"));n.writechunk=null,n.writecb=null,null!==r&&void 0!==r&&e.push(r),o(t);var i=e._readableState;i.reading=!1,(i.needReadable||i.length<i.highWaterMark)&&e._read(i.highWaterMark)}function i(e){if(!(this instanceof i))return new i(e);a.call(this,e),this._transformState=new n(this);var t=this;this._readableState.needReadable=!0,this._readableState.sync=!1,e&&("function"==typeof e.transform&&(this._transform=e.transform),"function"==typeof e.flush&&(this._flush=e.flush)),this.once("prefinish",function(){"function"==typeof this._flush?this._flush(function(e,r){s(t,e,r)}):s(t)})}function s(e,t,r){if(t)return e.emit("error",t);null!==r&&void 0!==r&&e.push(r);var n=e._writableState,o=e._transformState;if(n.length)throw new Error("Calling transform done when ws.length != 0");if(o.transforming)throw new Error("Calling transform done when still transforming");return e.push(null)}e.exports=i;var a=r(5),u=r(8);u.inherits=r(2),u.inherits(i,a),i.prototype.push=function(e,t){return this._transformState.needTransform=!1,a.prototype.push.call(this,e,t)},i.prototype._transform=function(e,t,r){throw new Error("_transform() is not implemented")},i.prototype._write=function(e,t,r){var n=this._transformState;if(n.writecb=r,n.writechunk=e,n.writeencoding=t,!n.transforming){var o=this._readableState;(n.needTransform||o.needReadable||o.length<o.highWaterMark)&&this._read(o.highWaterMark)}},i.prototype._read=function(e){var t=this._transformState;null!==t.writechunk&&t.writecb&&!t.transforming?(t.transforming=!0,this._transform(t.writechunk,t.writeencoding,t.afterTransform)):t.needTransform=!0},i.prototype._destroy=function(e,t){var r=this;a.prototype._destroy.call(this,e,function(e){t(e),r.emit("close")})}},function(e,t,r){"use strict";function n(e){return l(e)||e>=32&&e<=126}function o(e){for(var t=0;t!==e.length;++t)if(!n(e[t]))throw new Error("Metadata is not valid (printable) ASCII");return String.fromCharCode.apply(String,Array.prototype.slice.call(e))}function i(e){for(var t=new Uint8Array(e.length),r=0;r!==e.length;++r){var o=e.charCodeAt(r);if(!n(o))throw new Error("Metadata contains invalid ASCII");t[r]=o}return t}function s(e){return 128==(128&e.getUint8(0))}function a(e){return new c.Metadata(o(e))}function u(e){return e.getUint32(1,!1)}function h(e,t,r){return e.byteLength-t>=r}function f(e,t,r){if(e.slice)return e.slice(t,r);var n=e.length;void 0!==r&&(n=r);for(var o=n-t,i=new Uint8Array(o),s=0,a=t;a<n;a++)i[s++]=e[a];return i}Object.defineProperty(t,"__esModule",{value:!0});var c=r(1),l=function(e){return 9===e||10===e||13===e};t.decodeASCII=o,t.encodeASCII=i;var d;!function(e){e[e.MESSAGE=1]="MESSAGE",e[e.TRAILERS=2]="TRAILERS"}(d=t.ChunkType||(t.ChunkType={}));var p=function(){function e(){this.buffer=null,this.position=0}return e.prototype.parse=function(e,t){if(0===e.length&&t)return[];var r=[];if(null==this.buffer)this.buffer=e,this.position=0;else if(this.position===this.buffer.byteLength)this.buffer=e,this.position=0;else{var n=this.buffer.byteLength-this.position,o=new Uint8Array(n+e.byteLength),i=f(this.buffer,this.position);o.set(i,0);var c=new Uint8Array(e);o.set(c,n),this.buffer=o,this.position=0}for(;;){if(!h(this.buffer,this.position,5))return r;var l=f(this.buffer,this.position,this.position+5),p=new DataView(l.buffer,l.byteOffset,l.byteLength),g=u(p);if(!h(this.buffer,this.position,5+g))return r;var y=f(this.buffer,this.position+5,this.position+5+g);if(this.position+=5+g,s(p))return r.push({chunkType:d.TRAILERS,trailers:a(y)}),r;r.push({chunkType:d.MESSAGE,data:y})}},e}();t.ChunkParser=p},function(e,t,r){"use strict";function n(e){switch(e){case 0:return o.Internal;case 200:return o.OK;case 400:return o.InvalidArgument;case 401:return o.Unauthenticated;case 403:return o.PermissionDenied;case 404:return o.NotFound;case 409:return o.Aborted;case 412:return o.FailedPrecondition;case 429:return o.ResourceExhausted;case 499:return o.Canceled;case 500:return o.Unknown;case 501:return o.Unimplemented;case 503:return o.Unavailable;case 504:return o.DeadlineExceeded;default:return o.Unknown}}Object.defineProperty(t,"__esModule",{value:!0});var o;!function(e){e[e.OK=0]="OK",e[e.Canceled=1]="Canceled",e[e.Unknown=2]="Unknown",e[e.InvalidArgument=3]="InvalidArgument",e[e.DeadlineExceeded=4]="DeadlineExceeded",e[e.NotFound=5]="NotFound",e[e.AlreadyExists=6]="AlreadyExists",e[e.PermissionDenied=7]="PermissionDenied",e[e.ResourceExhausted=8]="ResourceExhausted",e[e.FailedPrecondition=9]="FailedPrecondition",e[e.Aborted=10]="Aborted",e[e.OutOfRange=11]="OutOfRange",e[e.Unimplemented=12]="Unimplemented",e[e.Internal=13]="Internal",e[e.Unavailable=14]="Unavailable",e[e.DataLoss=15]="DataLoss",e[e.Unauthenticated=16]="Unauthenticated"}(o=t.Code||(t.Code={})),t.httpStatusToCode=n},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var n=r(13),o=r(14),i=r(28),s=r(58),a=r(60),u=r(12);!function(e){function t(e,t){return u.client(e,t)}e.DefaultTransportFactory=o.DefaultTransportFactory,e.WebsocketTransportFactory=o.WebsocketTransportFactory,e.Code=i.Code,e.Metadata=n.BrowserHeaders,e.client=t,e.invoke=s.invoke,e.unary=a.unary}(t.grpc||(t.grpc={}))},function(e,t,r){"use strict";function n(e){return"object"==typeof e&&"object"==typeof e.headersMap&&"function"==typeof e.forEach}Object.defineProperty(t,"__esModule",{value:!0});var o=r(31),i=function(){function e(e,t){void 0===e&&(e={}),void 0===t&&(t={splitValues:!1});var r=this;if(this.headersMap={},e)if("undefined"!=typeof Headers&&e instanceof Headers){var i=o.getHeaderKeys(e);i.forEach(function(n){o.getHeaderValues(e,n).forEach(function(e){t.splitValues?r.append(n,o.splitHeaderValue(e)):r.append(n,e)})})}else if(n(e))e.forEach(function(e,t){r.append(e,t)});else if("undefined"!=typeof Map&&e instanceof Map){var s=e;s.forEach(function(e,t){r.append(t,e)})}else"string"==typeof e?this.appendFromString(e):"object"==typeof e&&Object.getOwnPropertyNames(e).forEach(function(t){var n=e,o=n[t];Array.isArray(o)?o.forEach(function(e){r.append(t,e)}):r.append(t,o)})}return e.prototype.appendFromString=function(e){for(var t=e.split("\r\n"),r=0;r<t.length;r++){var n=t[r],o=n.indexOf(":");if(o>0){var i=n.substring(0,o).trim(),s=n.substring(o+1).trim();this.append(i,s)}}},e.prototype.delete=function(e,t){var r=o.normalizeName(e);if(void 0===t)delete this.headersMap[r];else{var n=this.headersMap[r];if(n){var i=n.indexOf(t);i>=0&&n.splice(i,1),0===n.length&&delete this.headersMap[r]}}},e.prototype.append=function(e,t){var r=this,n=o.normalizeName(e);Array.isArray(this.headersMap[n])||(this.headersMap[n]=[]),Array.isArray(t)?t.forEach(function(e){r.headersMap[n].push(o.normalizeValue(e))}):this.headersMap[n].push(o.normalizeValue(t))},e.prototype.set=function(e,t){var r=o.normalizeName(e);if(Array.isArray(t)){var n=[];t.forEach(function(e){n.push(o.normalizeValue(e))}),this.headersMap[r]=n}else this.headersMap[r]=[o.normalizeValue(t)]},e.prototype.has=function(e,t){var r=this.headersMap[o.normalizeName(e)];if(!Array.isArray(r))return!1;if(void 0!==t){var n=o.normalizeValue(t);return r.indexOf(n)>=0}return!0},e.prototype.get=function(e){var t=this.headersMap[o.normalizeName(e)];return void 0!==t?t.concat():[]},e.prototype.forEach=function(e){var t=this;Object.getOwnPropertyNames(this.headersMap).forEach(function(r){e(r,t.headersMap[r])},this)},e.prototype.toHeaders=function(){if("undefined"!=typeof Headers){var e=new Headers;return this.forEach(function(t,r){r.forEach(function(r){e.append(t,r)})}),e}throw new Error("Headers class is not defined")},e}();t.BrowserHeaders=i},function(e,t,r){"use strict";function n(e){if("string"!=typeof e&&(e=String(e)),/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(e))throw new TypeError("Invalid character in header field name");return e.toLowerCase()}function o(e){return"string"!=typeof e&&(e=String(e)),e}function i(e,t){var r=s(e);if(r instanceof Headers&&r.getAll)return r.getAll(t);var n=r.get(t);return n&&"string"==typeof n?[n]:n}function s(e){return e}function a(e){var t=s(e),r={},n=[];return t.keys?h.iterateHeadersKeys(t,function(e){r[e]||(r[e]=!0,n.push(e))}):t.forEach?t.forEach(function(e,t){r[t]||(r[t]=!0,n.push(t))}):h.iterateHeaders(t,function(e){var t=e[0];r[t]||(r[t]=!0,n.push(t))}),n}function u(e){var t=[];return e.split(", ").forEach(function(e){e.split(",").forEach(function(e){t.push(e)})}),t}Object.defineProperty(t,"__esModule",{value:!0});var h=r(32);t.normalizeName=n,t.normalizeValue=o,t.getHeaderValues=i,t.getHeaderKeys=a,t.splitHeaderValue=u},function(e,t){function r(e,t){for(var r=e[Symbol.iterator](),n=r.next();!n.done;)t(n.value[0]),n=r.next()}function n(e,t){for(var r=e.keys(),n=r.next();!n.done;)t(n.value),n=r.next()}e.exports={iterateHeaders:r,iterateHeadersKeys:n}},function(e,t,r){"use strict";function n(e){return e.debug&&s.debug("fetchRequest",e),new u(e)}function o(){return"undefined"!=typeof Response&&Response.prototype.hasOwnProperty("body")&&"function"==typeof Headers}Object.defineProperty(t,"__esModule",{value:!0});var i=r(1),s=r(6),a=r(7);t.default=n;var u=function(){function e(e){this.cancelled=!1,this.options=e}return e.prototype.pump=function(e,t){var r=this;return this.reader=e,this.cancelled?(this.options.debug&&s.debug("Fetch.pump.cancel at first pump"),this.reader.cancel()):this.reader.read().then(function(e){return e.done?(a.default(function(){r.options.onEnd()}),t):(a.default(function(){r.options.onChunk(e.value)}),r.pump(r.reader,t))})},e.prototype.send=function(e){var t=this;fetch(this.options.url,{headers:this.metadata.toHeaders(),method:"POST",body:e,credentials:"same-origin"}).then(function(e){return t.options.debug&&s.debug("Fetch.response",e),a.default(function(){t.options.onHeaders(new i.Metadata(e.headers),e.status)}),e.body?t.pump(e.body.getReader(),e):e}).catch(function(e){if(t.cancelled)return void(t.options.debug&&s.debug("Fetch.catch - request cancelled"));t.options.debug&&s.debug("Fetch.catch",e.message),a.default(function(){t.options.onEnd(e)})})},e.prototype.sendMessage=function(e){this.send(e)},e.prototype.finishSend=function(){},e.prototype.start=function(e){this.metadata=e},e.prototype.cancel=function(){this.cancelled=!0,this.reader?(this.options.debug&&s.debug("Fetch.abort.cancel"),this.reader.cancel()):this.options.debug&&s.debug("Fetch.abort.cancel before reader")},e}();t.detectFetchSupport=o},function(e,t,r){"use strict";function n(e){return e.debug&&u.debug("xhrRequest",e),new f(e)}function o(e,t){var r=e.charCodeAt(t);if(r>=55296&&r<=56319){var n=e.charCodeAt(t+1);n>=56320&&n<=57343&&(r=65536+(r-55296<<10)+(n-56320))}return r}function i(e){for(var t=new Uint8Array(e.length),r=0,n=0;n<e.length;n++){var i=String.prototype.codePointAt?e.codePointAt(n):o(e,n);t[r++]=255&i}return t}function s(){return"undefined"!=typeof XMLHttpRequest&&XMLHttpRequest.prototype.hasOwnProperty("overrideMimeType")}Object.defineProperty(t,"__esModule",{value:!0});var a=r(1),u=r(6),h=r(7);t.default=n;var f=function(){function e(e){this.options=e}return e.prototype.onProgressEvent=function(){var e=this;this.options.debug&&u.debug("XHR.onProgressEvent.length: ",this.xhr.response.length);var t=this.xhr.response.substr(this.index);this.index=this.xhr.response.length;var r=i(t);h.default(function(){e.options.onChunk(r)})},e.prototype.onLoadEvent=function(){var e=this;this.options.debug&&u.debug("XHR.onLoadEvent"),h.default(function(){e.options.onEnd()})},e.prototype.onStateChange=function(){var e=this;this.options.debug&&u.debug("XHR.onStateChange",this.xhr.readyState),this.xhr.readyState===XMLHttpRequest.HEADERS_RECEIVED&&h.default(function(){e.options.onHeaders(new a.Metadata(e.xhr.getAllResponseHeaders()),e.xhr.status)})},e.prototype.sendMessage=function(e){this.xhr.send(e)},e.prototype.finishSend=function(){},e.prototype.start=function(e){var t=this;this.metadata=e;var r=new XMLHttpRequest;this.xhr=r,r.open("POST",this.options.url),r.responseType="text",r.overrideMimeType("text/plain; charset=x-user-defined"),this.metadata.forEach(function(e,t){r.setRequestHeader(e,t.join(", "))}),r.addEventListener("readystatechange",this.onStateChange.bind(this)),r.addEventListener("progress",this.onProgressEvent.bind(this)),r.addEventListener("loadend",this.onLoadEvent.bind(this)),r.addEventListener("error",function(e){t.options.debug&&u.debug("XHR.error",e),h.default(function(){t.options.onEnd(e.error)})})},e.prototype.cancel=function(){this.options.debug&&u.debug("XHR.abort"),this.xhr.abort()},e}();t.stringToArrayBuffer=i,t.detectXHRSupport=s},function(e,t,r){"use strict";function n(e){return e.debug&&s.debug("mozXhrRequest",e),new h(e)}function o(){return"undefined"!=typeof XMLHttpRequest&&u.xhrSupportsResponseType("moz-chunked-arraybuffer")}Object.defineProperty(t,"__esModule",{value:!0});var i=r(1),s=r(6),a=r(7),u=r(36);t.default=n;var h=function(){function e(e){this.options=e}return e.prototype.onProgressEvent=function(){var e=this,t=this.xhr.response;this.options.debug&&s.debug("MozXHR.onProgressEvent: ",new Uint8Array(t)),a.default(function(){e.options.onChunk(new Uint8Array(t))})},e.prototype.onLoadEvent=function(){var e=this;this.options.debug&&s.debug("MozXHR.onLoadEvent"),a.default(function(){e.options.onEnd()})},e.prototype.onStateChange=function(){var e=this;this.options.debug&&s.debug("MozXHR.onStateChange",this.xhr.readyState),this.options.debug&&s.debug("MozXHR.XMLHttpRequest.HEADERS_RECEIVED",XMLHttpRequest.HEADERS_RECEIVED),this.xhr.readyState===XMLHttpRequest.HEADERS_RECEIVED&&a.default(function(){e.options.onHeaders(new i.Metadata(e.xhr.getAllResponseHeaders()),e.xhr.status)})},e.prototype.sendMessage=function(e){this.options.debug&&s.debug("MozXHR.sendMessage"),this.xhr.send(e)},e.prototype.finishSend=function(){},e.prototype.start=function(e){var t=this;this.options.debug&&s.debug("MozXHR.start"),this.metadata=e;var r=new XMLHttpRequest;this.xhr=r,r.open("POST",this.options.url),r.responseType="moz-chunked-arraybuffer",this.metadata.forEach(function(e,t){r.setRequestHeader(e,t.join(", "))}),r.addEventListener("readystatechange",this.onStateChange.bind(this)),r.addEventListener("progress",this.onProgressEvent.bind(this)),r.addEventListener("loadend",this.onLoadEvent.bind(this)),r.addEventListener("error",function(e){t.options.debug&&s.debug("MozXHR.error",e),a.default(function(){t.options.onEnd(e.error)})})},e.prototype.cancel=function(){this.options.debug&&s.debug("MozXHR.cancel"),this.xhr.abort()},e}();t.detectMozXHRSupport=o},function(e,t,r){"use strict";function n(){if(void 0!==i)return i;if(XMLHttpRequest){i=new XMLHttpRequest;try{i.open("GET","https://localhost")}catch(e){}}return i}function o(e){var t=n();if(!t)return!1;try{return t.responseType=e,t.responseType===e}catch(e){}return!1}Object.defineProperty(t,"__esModule",{value:!0});var i;t.xhrSupportsResponseType=o},function(e,t,r){"use strict";(function(n){function o(e){return e.debug&&console.log("nodeHttpRequest",e),new d(e)}function i(e){var t={};for(var r in e){var n=e[r];e.hasOwnProperty(r)&&void 0!==n&&(t[r]=n)}return t}function s(e){for(var t=new Uint8Array(e.length),r=0;r<e.length;r++)t[r]=e[r];return t}function a(e){for(var t=new n(e.byteLength),r=new Uint8Array(e.buffer),o=0;o<t.length;o++)t[o]=r[o];return t}function u(){return void 0!==e&&e.exports}Object.defineProperty(t,"__esModule",{value:!0});var h=r(16),f=r(56),c=r(11),l=r(1);t.default=o;var d=function(){function e(e){this.options=e}return e.prototype.sendMessage=function(e){this.request.write(a(e)),this.request.end()},e.prototype.finishSend=function(){},e.prototype.responseCallback=function(e){var t=this;this.options.debug&&console.log("NodeHttp.response",e.statusCode);var r=i(e.headers);this.options.onHeaders(new l.Metadata(r),e.statusCode),e.on("data",function(e){t.options.debug&&console.log("NodeHttp.data",e),t.options.onChunk(s(e))}),e.on("end",function(){t.options.debug&&console.log("NodeHttp.end"),t.options.onEnd()})},e.prototype.start=function(e){var t=this,r={};e.forEach(function(e,t){r[e]=t.join(", ")});var n=c.parse(this.options.url),o={host:n.hostname,port:n.port?parseInt(n.port):void 0,path:n.path,headers:r,method:"POST"};"https:"===n.protocol?this.request=f.request(o,this.responseCallback.bind(this)):this.request=h.request(o,this.responseCallback.bind(this)),this.request.on("error",function(e){t.options.debug&&console.log("NodeHttp.error",e),t.options.onEnd(e)})},e.prototype.cancel=function(){this.options.debug&&console.log("NodeHttp.abort"),this.request.abort()},e}();t.detectNodeHTTPSupport=u}).call(t,r(3).Buffer)},function(e,t,r){"use strict";function n(e){var t=e.length;if(t%4>0)throw new Error("Invalid string. Length must be a multiple of 4");return"="===e[t-2]?2:"="===e[t-1]?1:0}function o(e){return 3*e.length/4-n(e)}function i(e){var t,r,o,i,s,a=e.length;i=n(e),s=new c(3*a/4-i),r=i>0?a-4:a;var u=0;for(t=0;t<r;t+=4)o=f[e.charCodeAt(t)]<<18|f[e.charCodeAt(t+1)]<<12|f[e.charCodeAt(t+2)]<<6|f[e.charCodeAt(t+3)],s[u++]=o>>16&255,s[u++]=o>>8&255,s[u++]=255&o;return 2===i?(o=f[e.charCodeAt(t)]<<2|f[e.charCodeAt(t+1)]>>4,s[u++]=255&o):1===i&&(o=f[e.charCodeAt(t)]<<10|f[e.charCodeAt(t+1)]<<4|f[e.charCodeAt(t+2)]>>2,s[u++]=o>>8&255,s[u++]=255&o),s}function s(e){return h[e>>18&63]+h[e>>12&63]+h[e>>6&63]+h[63&e]}function a(e,t,r){for(var n,o=[],i=t;i<r;i+=3)n=(e[i]<<16)+(e[i+1]<<8)+e[i+2],o.push(s(n));return o.join("")}function u(e){for(var t,r=e.length,n=r%3,o="",i=[],s=0,u=r-n;s<u;s+=16383)i.push(a(e,s,s+16383>u?u:s+16383));return 1===n?(t=e[r-1],o+=h[t>>2],o+=h[t<<4&63],o+="=="):2===n&&(t=(e[r-2]<<8)+e[r-1],o+=h[t>>10],o+=h[t>>4&63],o+=h[t<<2&63],o+="="),i.push(o),i.join("")}t.byteLength=o,t.toByteArray=i,t.fromByteArray=u;for(var h=[],f=[],c="undefined"!=typeof Uint8Array?Uint8Array:Array,l="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",d=0,p=l.length;d<p;++d)h[d]=l[d],f[l.charCodeAt(d)]=d;f["-".charCodeAt(0)]=62,f["_".charCodeAt(0)]=63},function(e,t){t.read=function(e,t,r,n,o){var i,s,a=8*o-n-1,u=(1<<a)-1,h=u>>1,f=-7,c=r?o-1:0,l=r?-1:1,d=e[t+c];for(c+=l,i=d&(1<<-f)-1,d>>=-f,f+=a;f>0;i=256*i+e[t+c],c+=l,f-=8);for(s=i&(1<<-f)-1,i>>=-f,f+=n;f>0;s=256*s+e[t+c],c+=l,f-=8);if(0===i)i=1-h;else{if(i===u)return s?NaN:1/0*(d?-1:1);s+=Math.pow(2,n),i-=h}return(d?-1:1)*s*Math.pow(2,i-n)},t.write=function(e,t,r,n,o,i){var s,a,u,h=8*i-o-1,f=(1<<h)-1,c=f>>1,l=23===o?Math.pow(2,-24)-Math.pow(2,-77):0,d=n?0:i-1,p=n?1:-1,g=t<0||0===t&&1/t<0?1:0;for(t=Math.abs(t),isNaN(t)||t===1/0?(a=isNaN(t)?1:0,s=f):(s=Math.floor(Math.log(t)/Math.LN2),t*(u=Math.pow(2,-s))<1&&(s--,u*=2),t+=s+c>=1?l/u:l*Math.pow(2,1-c),t*u>=2&&(s++,u/=2),s+c>=f?(a=0,s=f):s+c>=1?(a=(t*u-1)*Math.pow(2,o),s+=c):(a=t*Math.pow(2,c-1)*Math.pow(2,o),s=0));o>=8;e[r+d]=255&a,d+=p,a/=256,o-=8);for(s=s<<o|a,h+=o;h>0;e[r+d]=255&s,d+=p,s/=256,h-=8);e[r+d-p]|=128*g}},function(e,t,r){(function(t,n,o){function i(e,t){return a.fetch&&t?"fetch":a.mozchunkedarraybuffer?"moz-chunked-arraybuffer":a.msstream?"ms-stream":a.arraybuffer&&e?"arraybuffer":a.vbArray&&e?"text:vbarray":"text"}function s(e){try{var t=e.status;return null!==t&&0!==t}catch(e){return!1}}var a=r(17),u=r(2),h=r(18),f=r(19),c=r(47),l=h.IncomingMessage,d=h.readyStates,p=e.exports=function(e){var r=this;f.Writable.call(r),r._opts=e,r._body=[],r._headers={},e.auth&&r.setHeader("Authorization","Basic "+new t(e.auth).toString("base64")),Object.keys(e.headers).forEach(function(t){r.setHeader(t,e.headers[t])});var n,o=!0;if("disable-fetch"===e.mode||"requestTimeout"in e&&!a.abortController)o=!1,n=!0;else if("prefer-streaming"===e.mode)n=!1;else if("allow-wrong-content-type"===e.mode)n=!a.overrideMimeType;else{if(e.mode&&"default"!==e.mode&&"prefer-fast"!==e.mode)throw new Error("Invalid value for opts.mode");n=!0}r._mode=i(n,o),r.on("finish",function(){r._onFinish()})};u(p,f.Writable),p.prototype.setHeader=function(e,t){var r=this,n=e.toLowerCase();-1===g.indexOf(n)&&(r._headers[n]={name:e,value:t})},p.prototype.getHeader=function(e){var t=this._headers[e.toLowerCase()];return t?t.value:null},p.prototype.removeHeader=function(e){delete this._headers[e.toLowerCase()]},p.prototype._onFinish=function(){var e=this;if(!e._destroyed){var r=e._opts,i=e._headers,s=null;"GET"!==r.method&&"HEAD"!==r.method&&(s=a.arraybuffer?c(t.concat(e._body)):a.blobConstructor?new n.Blob(e._body.map(function(e){return c(e)}),{type:(i["content-type"]||{}).value||""}):t.concat(e._body).toString());var u=[];if(Object.keys(i).forEach(function(e){var t=i[e].name,r=i[e].value;Array.isArray(r)?r.forEach(function(e){u.push([t,e])}):u.push([t,r])}),"fetch"===e._mode){var h=null;if(a.abortController){var f=new AbortController;h=f.signal,e._fetchAbortController=f,"requestTimeout"in r&&0!==r.requestTimeout&&n.setTimeout(function(){e.emit("requestTimeout"),e._fetchAbortController&&e._fetchAbortController.abort()},r.requestTimeout)}n.fetch(e._opts.url,{method:e._opts.method,headers:u,body:s||void 0,mode:"cors",credentials:r.withCredentials?"include":"same-origin",signal:h}).then(function(t){e._fetchResponse=t,e._connect()},function(t){e.emit("error",t)})}else{var l=e._xhr=new n.XMLHttpRequest;try{l.open(e._opts.method,e._opts.url,!0)}catch(t){return void o.nextTick(function(){e.emit("error",t)})}"responseType"in l&&(l.responseType=e._mode.split(":")[0]),"withCredentials"in l&&(l.withCredentials=!!r.withCredentials),"text"===e._mode&&"overrideMimeType"in l&&l.overrideMimeType("text/plain; charset=x-user-defined"),"requestTimeout"in r&&(l.timeout=r.requestTimeout,l.ontimeout=function(){e.emit("requestTimeout")}),u.forEach(function(e){l.setRequestHeader(e[0],e[1])}),e._response=null,l.onreadystatechange=function(){switch(l.readyState){case d.LOADING:case d.DONE:e._onXHRProgress()}},"moz-chunked-arraybuffer"===e._mode&&(l.onprogress=function(){e._onXHRProgress()}),l.onerror=function(){e._destroyed||e.emit("error",new Error("XHR error"))};try{l.send(s)}catch(t){return void o.nextTick(function(){e.emit("error",t)})}}}},p.prototype._onXHRProgress=function(){var e=this;s(e._xhr)&&!e._destroyed&&(e._response||e._connect(),e._response._onXHRProgress())},p.prototype._connect=function(){var e=this;e._destroyed||(e._response=new l(e._xhr,e._fetchResponse,e._mode),e._response.on("error",function(t){e.emit("error",t)}),e.emit("response",e._response))},p.prototype._write=function(e,t,r){this._body.push(e),r()},p.prototype.abort=p.prototype.destroy=function(){var e=this;e._destroyed=!0,e._response&&(e._response._destroyed=!0),e._xhr?e._xhr.abort():e._fetchAbortController&&e._fetchAbortController.abort()},p.prototype.end=function(e,t,r){var n=this;"function"==typeof e&&(r=e,e=void 0),f.Writable.prototype.end.call(n,e,t,r)},p.prototype.flushHeaders=function(){},p.prototype.setTimeout=function(){},p.prototype.setNoDelay=function(){},p.prototype.setSocketKeepAlive=function(){};var g=["accept-charset","accept-encoding","access-control-request-headers","access-control-request-method","connection","content-length","cookie","cookie2","date","dnt","expect","host","keep-alive","origin","referer","te","trailer","transfer-encoding","upgrade","user-agent","via"]}).call(t,r(3).Buffer,r(0),r(4))},function(e,t){},function(e,t,r){"use strict";function n(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function o(e,t,r){e.copy(t,r)}var i=r(10).Buffer;e.exports=function(){function e(){n(this,e),this.head=null,this.tail=null,this.length=0}return e.prototype.push=function(e){var t={data:e,next:null};this.length>0?this.tail.next=t:this.head=t,this.tail=t,++this.length},e.prototype.unshift=function(e){var t={data:e,next:this.head};0===this.length&&(this.tail=t),this.head=t,++this.length},e.prototype.shift=function(){if(0!==this.length){var e=this.head.data;return 1===this.length?this.head=this.tail=null:this.head=this.head.next,--this.length,e}},e.prototype.clear=function(){this.head=this.tail=null,this.length=0},e.prototype.join=function(e){if(0===this.length)return"";for(var t=this.head,r=""+t.data;t=t.next;)r+=e+t.data;return r},e.prototype.concat=function(e){if(0===this.length)return i.alloc(0);if(1===this.length)return this.head.data;for(var t=i.allocUnsafe(e>>>0),r=this.head,n=0;r;)o(r.data,t,n),n+=r.data.length,r=r.next;return t},e}()},function(e,t,r){(function(e){function n(e,t){this._id=e,this._clearFn=t}var o=Function.prototype.apply;t.setTimeout=function(){return new n(o.call(setTimeout,window,arguments),clearTimeout)},t.setInterval=function(){return new n(o.call(setInterval,window,arguments),clearInterval)},t.clearTimeout=t.clearInterval=function(e){e&&e.close()},n.prototype.unref=n.prototype.ref=function(){},n.prototype.close=function(){this._clearFn.call(window,this._id)},t.enroll=function(e,t){clearTimeout(e._idleTimeoutId),e._idleTimeout=t},t.unenroll=function(e){clearTimeout(e._idleTimeoutId),e._idleTimeout=-1},t._unrefActive=t.active=function(e){clearTimeout(e._idleTimeoutId);var t=e._idleTimeout;t>=0&&(e._idleTimeoutId=setTimeout(function(){e._onTimeout&&e._onTimeout()},t))},r(44),t.setImmediate="undefined"!=typeof self&&self.setImmediate||void 0!==e&&e.setImmediate||this&&this.setImmediate,t.clearImmediate="undefined"!=typeof self&&self.clearImmediate||void 0!==e&&e.clearImmediate||this&&this.clearImmediate}).call(t,r(0))},function(e,t,r){(function(e,t){!function(e,r){"use strict";function n(e){"function"!=typeof e&&(e=new Function(""+e));for(var t=new Array(arguments.length-1),r=0;r<t.length;r++)t[r]=arguments[r+1];var n={callback:e,args:t};return h[u]=n,a(u),u++}function o(e){delete h[e]}function i(e){var t=e.callback,n=e.args;switch(n.length){case 0:t();break;case 1:t(n[0]);break;case 2:t(n[0],n[1]);break;case 3:t(n[0],n[1],n[2]);break;default:t.apply(r,n)}}function s(e){if(f)setTimeout(s,0,e);else{var t=h[e];if(t){f=!0;try{i(t)}finally{o(e),f=!1}}}}if(!e.setImmediate){var a,u=1,h={},f=!1,c=e.document,l=Object.getPrototypeOf&&Object.getPrototypeOf(e);l=l&&l.setTimeout?l:e,"[object process]"==={}.toString.call(e.process)?function(){a=function(e){t.nextTick(function(){s(e)})}}():function(){if(e.postMessage&&!e.importScripts){var t=!0,r=e.onmessage;return e.onmessage=function(){t=!1},e.postMessage("","*"),e.onmessage=r,t}}()?function(){var t="setImmediate$"+Math.random()+"$",r=function(r){r.source===e&&"string"==typeof r.data&&0===r.data.indexOf(t)&&s(+r.data.slice(t.length))};e.addEventListener?e.addEventListener("message",r,!1):e.attachEvent("onmessage",r),a=function(r){e.postMessage(t+r,"*")}}():e.MessageChannel?function(){var e=new MessageChannel;e.port1.onmessage=function(e){s(e.data)},a=function(t){e.port2.postMessage(t)}}():c&&"onreadystatechange"in c.createElement("script")?function(){var e=c.documentElement;a=function(t){var r=c.createElement("script");r.onreadystatechange=function(){s(t),r.onreadystatechange=null,e.removeChild(r),r=null},e.appendChild(r)}}():function(){a=function(e){setTimeout(s,0,e)}}(),l.setImmediate=n,l.clearImmediate=o}}("undefined"==typeof self?void 0===e?this:e:self)}).call(t,r(0),r(4))},function(e,t,r){(function(t){function r(e,t){function r(){if(!o){if(n("throwDeprecation"))throw new Error(t);n("traceDeprecation")?console.trace(t):console.warn(t),o=!0}return e.apply(this,arguments)}if(n("noDeprecation"))return e;var o=!1;return r}function n(e){try{if(!t.localStorage)return!1}catch(e){return!1}var r=t.localStorage[e];return null!=r&&"true"===String(r).toLowerCase()}e.exports=r}).call(t,r(0))},function(e,t,r){"use strict";function n(e){if(!(this instanceof n))return new n(e);o.call(this,e)}e.exports=n;var o=r(26),i=r(8);i.inherits=r(2),i.inherits(n,o),n.prototype._transform=function(e,t,r){r(null,e)}},function(e,t,r){var n=r(3).Buffer;e.exports=function(e){if(e instanceof Uint8Array){if(0===e.byteOffset&&e.byteLength===e.buffer.byteLength)return e.buffer;if("function"==typeof e.buffer.slice)return e.buffer.slice(e.byteOffset,e.byteOffset+e.byteLength)}if(n.isBuffer(e)){for(var t=new Uint8Array(e.length),r=e.length,o=0;o<r;o++)t[o]=e[o];return t.buffer}throw new Error("Argument must be a Buffer")}},function(e,t){function r(){for(var e={},t=0;t<arguments.length;t++){var r=arguments[t];for(var o in r)n.call(r,o)&&(e[o]=r[o])}return e}e.exports=r;var n=Object.prototype.hasOwnProperty},function(e,t){e.exports={100:"Continue",101:"Switching Protocols",102:"Processing",200:"OK",201:"Created",202:"Accepted",203:"Non-Authoritative Information",204:"No Content",205:"Reset Content",206:"Partial Content",207:"Multi-Status",208:"Already Reported",226:"IM Used",300:"Multiple Choices",301:"Moved Permanently",302:"Found",303:"See Other",304:"Not Modified",305:"Use Proxy",307:"Temporary Redirect",308:"Permanent Redirect",400:"Bad Request",401:"Unauthorized",402:"Payment Required",403:"Forbidden",404:"Not Found",405:"Method Not Allowed",406:"Not Acceptable",407:"Proxy Authentication Required",408:"Request Timeout",409:"Conflict",410:"Gone",411:"Length Required",412:"Precondition Failed",413:"Payload Too Large",414:"URI Too Long",415:"Unsupported Media Type",416:"Range Not Satisfiable",417:"Expectation Failed",418:"I'm a teapot",421:"Misdirected Request",422:"Unprocessable Entity",423:"Locked",424:"Failed Dependency",425:"Unordered Collection",426:"Upgrade Required",428:"Precondition Required",429:"Too Many Requests",431:"Request Header Fields Too Large",451:"Unavailable For Legal Reasons",500:"Internal Server Error",501:"Not Implemented",502:"Bad Gateway",503:"Service Unavailable",504:"Gateway Timeout",505:"HTTP Version Not Supported",506:"Variant Also Negotiates",507:"Insufficient Storage",508:"Loop Detected",509:"Bandwidth Limit Exceeded",510:"Not Extended",511:"Network Authentication Required"}},function(e,t,r){(function(e,n){var o;!function(i){function s(e){throw new RangeError(P[e])}function a(e,t){for(var r=e.length,n=[];r--;)n[r]=t(e[r]);return n}function u(e,t){var r=e.split("@"),n="";return r.length>1&&(n=r[0]+"@",e=r[1]),e=e.replace(k,"."),n+a(e.split("."),t).join(".")}function h(e){for(var t,r,n=[],o=0,i=e.length;o<i;)t=e.charCodeAt(o++),t>=55296&&t<=56319&&o<i?(r=e.charCodeAt(o++),56320==(64512&r)?n.push(((1023&t)<<10)+(1023&r)+65536):(n.push(t),o--)):n.push(t);return n}function f(e){return a(e,function(e){var t="";return e>65535&&(e-=65536,t+=U(e>>>10&1023|55296),e=56320|1023&e),t+=U(e)}).join("")}function c(e){return e-48<10?e-22:e-65<26?e-65:e-97<26?e-97:_}function l(e,t){return e+22+75*(e<26)-((0!=t)<<5)}function d(e,t,r){var n=0;for(e=r?I(e/A):e>>1,e+=I(e/t);e>L*S>>1;n+=_)e=I(e/L);return I(n+(L+1)*e/(e+R))}function p(e){var t,r,n,o,i,a,u,h,l,p,g=[],y=e.length,v=0,b=C,m=T;for(r=e.lastIndexOf(M),r<0&&(r=0),n=0;n<r;++n)e.charCodeAt(n)>=128&&s("not-basic"),g.push(e.charCodeAt(n));for(o=r>0?r+1:0;o<y;){for(i=v,a=1,u=_;o>=y&&s("invalid-input"),h=c(e.charCodeAt(o++)),(h>=_||h>I((w-v)/a))&&s("overflow"),v+=h*a,l=u<=m?E:u>=m+S?S:u-m,!(h<l);u+=_)p=_-l,a>I(w/p)&&s("overflow"),a*=p;t=g.length+1,m=d(v-i,t,0==i),I(v/t)>w-b&&s("overflow"),b+=I(v/t),v%=t,g.splice(v++,0,b)}return f(g)}function g(e){var t,r,n,o,i,a,u,f,c,p,g,y,v,b,m,R=[];for(e=h(e),y=e.length,t=C,r=0,i=T,a=0;a<y;++a)(g=e[a])<128&&R.push(U(g));for(n=o=R.length,o&&R.push(M);n<y;){for(u=w,a=0;a<y;++a)(g=e[a])>=t&&g<u&&(u=g);for(v=n+1,u-t>I((w-r)/v)&&s("overflow"),r+=(u-t)*v,t=u,a=0;a<y;++a)if(g=e[a],g<t&&++r>w&&s("overflow"),g==t){for(f=r,c=_;p=c<=i?E:c>=i+S?S:c-i,!(f<p);c+=_)m=f-p,b=_-p,R.push(U(l(p+m%b,0))),f=I(m/b);R.push(U(l(f,0))),i=d(r,v,n==o),r=0,++n}++r,++t}return R.join("")}function y(e){return u(e,function(e){return x.test(e)?p(e.slice(4).toLowerCase()):e})}function v(e){return u(e,function(e){return O.test(e)?"xn--"+g(e):e})}var b=("object"==typeof t&&t&&t.nodeType,"object"==typeof e&&e&&e.nodeType,"object"==typeof n&&n);var m,w=2147483647,_=36,E=1,S=26,R=38,A=700,T=72,C=128,M="-",x=/^xn--/,O=/[^\x20-\x7E]/,k=/[\x2E\u3002\uFF0E\uFF61]/g,P={overflow:"Overflow: input needs wider integers to process","not-basic":"Illegal input >= 0x80 (not a basic code point)","invalid-input":"Invalid input"},L=_-E,I=Math.floor,U=String.fromCharCode;m={version:"1.4.1",ucs2:{decode:h,encode:f},decode:p,encode:g,toASCII:v,toUnicode:y},void 0!==(o=function(){return m}.call(t,r,t,e))&&(e.exports=o)}()}).call(t,r(51)(e),r(0))},function(e,t){e.exports=function(e){return e.webpackPolyfill||(e.deprecate=function(){},e.paths=[],e.children||(e.children=[]),Object.defineProperty(e,"loaded",{enumerable:!0,get:function(){return e.l}}),Object.defineProperty(e,"id",{enumerable:!0,get:function(){return e.i}}),e.webpackPolyfill=1),e}},function(e,t,r){"use strict";e.exports={isString:function(e){return"string"==typeof e},isObject:function(e){return"object"==typeof e&&null!==e},isNull:function(e){return null===e},isNullOrUndefined:function(e){return null==e}}},function(e,t,r){"use strict";t.decode=t.parse=r(54),t.encode=t.stringify=r(55)},function(e,t,r){"use strict";function n(e,t){return Object.prototype.hasOwnProperty.call(e,t)}e.exports=function(e,t,r,i){t=t||"&",r=r||"=";var s={};if("string"!=typeof e||0===e.length)return s;var a=/\+/g;e=e.split(t);var u=1e3;i&&"number"==typeof i.maxKeys&&(u=i.maxKeys);var h=e.length;u>0&&h>u&&(h=u);for(var f=0;f<h;++f){var c,l,d,p,g=e[f].replace(a,"%20"),y=g.indexOf(r);y>=0?(c=g.substr(0,y),l=g.substr(y+1)):(c=g,l=""),d=decodeURIComponent(c),p=decodeURIComponent(l),n(s,d)?o(s[d])?s[d].push(p):s[d]=[s[d],p]:s[d]=p}return s};var o=Array.isArray||function(e){return"[object Array]"===Object.prototype.toString.call(e)}},function(e,t,r){"use strict";function n(e,t){if(e.map)return e.map(t);for(var r=[],n=0;n<e.length;n++)r.push(t(e[n],n));return r}var o=function(e){switch(typeof e){case"string":return e;case"boolean":return e?"true":"false";case"number":return isFinite(e)?e:"";default:return""}};e.exports=function(e,t,r,a){return t=t||"&",r=r||"=",null===e&&(e=void 0),"object"==typeof e?n(s(e),function(s){var a=encodeURIComponent(o(s))+r;return i(e[s])?n(e[s],function(e){return a+encodeURIComponent(o(e))}).join(t):a+encodeURIComponent(o(e[s]))}).join(t):a?encodeURIComponent(o(a))+r+encodeURIComponent(o(e)):""};var i=Array.isArray||function(e){return"[object Array]"===Object.prototype.toString.call(e)},s=Object.keys||function(e){var t=[];for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&t.push(r);return t}},function(e,t,r){function n(e){if("string"==typeof e&&(e=i.parse(e)),e.protocol||(e.protocol="https:"),"https:"!==e.protocol)throw new Error('Protocol "'+e.protocol+'" not supported. Expected "https:"');return e}var o=r(16),i=r(11),s=e.exports;for(var a in o)o.hasOwnProperty(a)&&(s[a]=o[a]);s.request=function(e,t){return e=n(e),o.request.call(this,e,t)},s.get=function(e,t){return e=n(e),o.get.call(this,e,t)}},function(e,t,r){"use strict";function n(e){function t(e){if(e===s.FINISH_SEND)r.send(f);else{var t=e,n=new Int8Array(t.byteLength+1);n.set(new Uint8Array([0])),n.set(t,1),r.send(n)}}e.debug&&a.debug("websocketRequest",e);var r,n=o(e.url),h=[];return{sendMessage:function(e){r&&r.readyState!==r.CONNECTING?t(e):h.push(e)},finishSend:function(){r&&r.readyState!==r.CONNECTING?t(s.FINISH_SEND):h.push(s.FINISH_SEND)},start:function(o){r=new WebSocket(n,["grpc-websockets"]),r.binaryType="arraybuffer",r.onopen=function(){e.debug&&a.debug("websocketRequest.onopen"),r.send(i(o)),h.forEach(function(e){t(e)})},r.onclose=function(t){e.debug&&a.debug("websocketRequest.onclose",t),u.default(function(){e.onEnd()})},r.onerror=function(t){e.debug&&a.debug("websocketRequest.onerror",t)},r.onmessage=function(t){u.default(function(){e.onChunk(new Uint8Array(t.data))})}},cancel:function(){e.debug&&a.debug("websocket.abort"),u.default(function(){r.close()})}}}function o(e){if("https://"===e.substr(0,8))return"wss://"+e.substr(8);if("http://"===e.substr(0,7))return"ws://"+e.substr(7);throw new Error("Websocket transport constructed with non-https:// or http:// host.")}function i(e){var t="";return e.forEach(function(e,r){t+=e+": "+r.join(", ")+"\r\n"}),h.encodeASCII(t)}Object.defineProperty(t,"__esModule",{value:!0});var s,a=r(6),u=r(7),h=r(27);!function(e){e[e.FINISH_SEND=1]="FINISH_SEND"}(s||(s={}));var f=new Uint8Array([1]);t.default=n},function(e,t,r){"use strict";function n(e,t){if(e.requestStream)throw new Error(".invoke cannot be used with client-streaming methods. Use .client instead.");var r=o.client(e,{host:t.host,transport:t.transport,debug:t.debug});return t.onHeaders&&r.onHeaders(t.onHeaders),t.onMessage&&r.onMessage(t.onMessage),t.onEnd&&r.onEnd(t.onEnd),r.start(t.metadata),r.send(t.request),{close:function(){r.close()}}}Object.defineProperty(t,"__esModule",{value:!0});var o=r(12);t.invoke=n},function(e,t,r){"use strict";function n(e){var t=e.serializeBinary(),r=new ArrayBuffer(t.byteLength+5);return new DataView(r,1,4).setUint32(0,t.length,!1),new Uint8Array(r,5).set(t),new Uint8Array(r)}Object.defineProperty(t,"__esModule",{value:!0}),t.frameRequest=n},function(e,t,r){"use strict";function n(e,t){if(e.responseStream)throw new Error(".unary cannot be used with server-streaming methods. Use .invoke or .client instead.");if(e.requestStream)throw new Error(".unary cannot be used with client-streaming methods. Use .client instead.");var r=null,n=null,s=i.client(e,{host:t.host,transport:t.transport,debug:t.debug});return s.onHeaders(function(e){r=e}),s.onMessage(function(e){n=e}),s.onEnd(function(e,i,s){t.onEnd({status:e,statusMessage:i,headers:r||new o.Metadata,message:n,trailers:s})}),s.start(t.metadata),s.send(t.request),{close:function(){s.close()}}}Object.defineProperty(t,"__esModule",{value:!0});var o=r(1),i=r(12);t.unary=n}]));
-	}).call($global);
-$packages["github.com/johanbrandhorst/protobuf/grpcweb/grpcwebjs"] = (function() {
-	var $pkg = {}, $init;
-	$init = function() {
-		$pkg.$init = function() {};
-		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+$packages["sort"] = (function() {
+	var $pkg = {}, $init, reflect, IntSlice, sliceType, Search, SearchInts, insertionSort, siftDown, heapSort, medianOfThree, doPivot, quickSort, Sort, maxDepth, Ints;
+	reflect = $packages["reflect"];
+	IntSlice = $pkg.IntSlice = $newType(12, $kindSlice, "sort.IntSlice", true, "sort", true, null);
+	sliceType = $sliceType($Int);
+	Search = function(n, f) {
+		var _r, _tmp, _tmp$1, f, h, i, j, n, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; f = $f.f; h = $f.h; i = $f.i; j = $f.j; n = $f.n; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		_tmp = 0;
+		_tmp$1 = n;
+		i = _tmp;
+		j = _tmp$1;
+		/* while (true) { */ case 1:
+			/* if (!(i < j)) { break; } */ if(!(i < j)) { $s = 2; continue; }
+			h = ((((((i + j >> 0) >>> 0)) >>> 1 >>> 0) >> 0));
+			_r = f(h); /* */ $s = 6; case 6: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			/* */ if (!_r) { $s = 3; continue; }
+			/* */ $s = 4; continue;
+			/* if (!_r) { */ case 3:
+				i = h + 1 >> 0;
+				$s = 5; continue;
+			/* } else { */ case 4:
+				j = h;
+			/* } */ case 5:
+		/* } */ $s = 1; continue; case 2:
+		$s = -1; return i;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Search }; } $f._r = _r; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f.f = f; $f.h = h; $f.i = i; $f.j = j; $f.n = n; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	$pkg.$init = $init;
-	return $pkg;
-})();
-$packages["github.com/johanbrandhorst/protobuf/vendor/google.golang.org/grpc/codes"] = (function() {
-	var $pkg = {}, $init, fmt, strconv, Code, ptrType, sliceType, sliceType$1, strToCode;
-	fmt = $packages["fmt"];
-	strconv = $packages["strconv"];
-	Code = $pkg.Code = $newType(4, $kindUint32, "codes.Code", true, "github.com/johanbrandhorst/protobuf/vendor/google.golang.org/grpc/codes", true, null);
-	ptrType = $ptrType(Code);
-	sliceType = $sliceType($emptyInterface);
-	sliceType$1 = $sliceType($Uint8);
-	Code.prototype.String = function() {
-		var _1, c;
-		c = this.$val;
-		_1 = c;
-		if (_1 === (0)) {
-			return "OK";
-		} else if (_1 === (1)) {
-			return "Canceled";
-		} else if (_1 === (2)) {
-			return "Unknown";
-		} else if (_1 === (3)) {
-			return "InvalidArgument";
-		} else if (_1 === (4)) {
-			return "DeadlineExceeded";
-		} else if (_1 === (5)) {
-			return "NotFound";
-		} else if (_1 === (6)) {
-			return "AlreadyExists";
-		} else if (_1 === (7)) {
-			return "PermissionDenied";
-		} else if (_1 === (8)) {
-			return "ResourceExhausted";
-		} else if (_1 === (9)) {
-			return "FailedPrecondition";
-		} else if (_1 === (10)) {
-			return "Aborted";
-		} else if (_1 === (11)) {
-			return "OutOfRange";
-		} else if (_1 === (12)) {
-			return "Unimplemented";
-		} else if (_1 === (13)) {
-			return "Internal";
-		} else if (_1 === (14)) {
-			return "Unavailable";
-		} else if (_1 === (15)) {
-			return "DataLoss";
-		} else if (_1 === (16)) {
-			return "Unauthenticated";
-		} else {
-			return "Code(" + strconv.FormatInt((new $Int64(0, c)), 10) + ")";
-		}
+	$pkg.Search = Search;
+	SearchInts = function(a, x) {
+		var _r, a, x, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; a = $f.a; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		a = [a];
+		x = [x];
+		_r = Search(a[0].$length, (function(a, x) { return function(i) {
+			var i;
+			return ((i < 0 || i >= a[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : a[0].$array[a[0].$offset + i]) >= x[0];
+		}; })(a, x)); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$s = -1; return _r;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: SearchInts }; } $f._r = _r; $f.a = a; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	$ptrType(Code).prototype.String = function() { return new Code(this.$get()).String(); };
-	$ptrType(Code).prototype.UnmarshalJSON = function(b) {
-		var _entry, _r, _r$1, _tuple, b, c, jc, ok, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _r = $f._r; _r$1 = $f._r$1; _tuple = $f._tuple; b = $f.b; c = $f.c; jc = $f.jc; ok = $f.ok; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		c = this;
-		if (($bytesToString(b)) === "null") {
-			$s = -1; return $ifaceNil;
-		}
-		/* */ if (c === ptrType.nil) { $s = 1; continue; }
+	$pkg.SearchInts = SearchInts;
+	IntSlice.prototype.Search = function(x) {
+		var _r, p, x, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; p = $f.p; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		p = this;
+		_r = SearchInts($subslice(new sliceType(p.$array), p.$offset, p.$offset + p.$length), x); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$s = -1; return _r;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: IntSlice.prototype.Search }; } $f._r = _r; $f.p = p; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$ptrType(IntSlice).prototype.Search = function(x) { return this.$get().Search(x); };
+	insertionSort = function(data, a, b) {
+		var _r, _v, a, b, data, i, j, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _v = $f._v; a = $f.a; b = $f.b; data = $f.data; i = $f.i; j = $f.j; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		i = a + 1 >> 0;
+		/* while (true) { */ case 1:
+			/* if (!(i < b)) { break; } */ if(!(i < b)) { $s = 2; continue; }
+			j = i;
+			/* while (true) { */ case 3:
+				if (!(j > a)) { _v = false; $s = 5; continue s; }
+				_r = data.Less(j, j - 1 >> 0); /* */ $s = 6; case 6: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+				_v = _r; case 5:
+				/* if (!(_v)) { break; } */ if(!(_v)) { $s = 4; continue; }
+				$r = data.Swap(j, j - 1 >> 0); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				j = j - (1) >> 0;
+			/* } */ $s = 3; continue; case 4:
+			i = i + (1) >> 0;
+		/* } */ $s = 1; continue; case 2:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: insertionSort }; } $f._r = _r; $f._v = _v; $f.a = a; $f.b = b; $f.data = data; $f.i = i; $f.j = j; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	siftDown = function(data, lo, hi, first) {
+		var _r, _r$1, _v, child, data, first, hi, lo, root, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _v = $f._v; child = $f.child; data = $f.data; first = $f.first; hi = $f.hi; lo = $f.lo; root = $f.root; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		root = lo;
+		/* while (true) { */ case 1:
+			child = ($imul(2, root)) + 1 >> 0;
+			if (child >= hi) {
+				/* break; */ $s = 2; continue;
+			}
+			if (!((child + 1 >> 0) < hi)) { _v = false; $s = 5; continue s; }
+			_r = data.Less(first + child >> 0, (first + child >> 0) + 1 >> 0); /* */ $s = 6; case 6: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			_v = _r; case 5:
+			/* */ if (_v) { $s = 3; continue; }
+			/* */ $s = 4; continue;
+			/* if (_v) { */ case 3:
+				child = child + (1) >> 0;
+			/* } */ case 4:
+			_r$1 = data.Less(first + root >> 0, first + child >> 0); /* */ $s = 9; case 9: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+			/* */ if (!_r$1) { $s = 7; continue; }
+			/* */ $s = 8; continue;
+			/* if (!_r$1) { */ case 7:
+				$s = -1; return;
+			/* } */ case 8:
+			$r = data.Swap(first + root >> 0, first + child >> 0); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			root = child;
+		/* } */ $s = 1; continue; case 2:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: siftDown }; } $f._r = _r; $f._r$1 = _r$1; $f._v = _v; $f.child = child; $f.data = data; $f.first = first; $f.hi = hi; $f.lo = lo; $f.root = root; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	heapSort = function(data, a, b) {
+		var _q, a, b, data, first, hi, i, i$1, lo, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _q = $f._q; a = $f.a; b = $f.b; data = $f.data; first = $f.first; hi = $f.hi; i = $f.i; i$1 = $f.i$1; lo = $f.lo; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		first = a;
+		lo = 0;
+		hi = b - a >> 0;
+		i = (_q = ((hi - 1 >> 0)) / 2, (_q === _q && _q !== 1/0 && _q !== -1/0) ? _q >> 0 : $throwRuntimeError("integer divide by zero"));
+		/* while (true) { */ case 1:
+			/* if (!(i >= 0)) { break; } */ if(!(i >= 0)) { $s = 2; continue; }
+			$r = siftDown(data, i, hi, first); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			i = i - (1) >> 0;
+		/* } */ $s = 1; continue; case 2:
+		i$1 = hi - 1 >> 0;
+		/* while (true) { */ case 4:
+			/* if (!(i$1 >= 0)) { break; } */ if(!(i$1 >= 0)) { $s = 5; continue; }
+			$r = data.Swap(first, first + i$1 >> 0); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			$r = siftDown(data, lo, i$1, first); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			i$1 = i$1 - (1) >> 0;
+		/* } */ $s = 4; continue; case 5:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: heapSort }; } $f._q = _q; $f.a = a; $f.b = b; $f.data = data; $f.first = first; $f.hi = hi; $f.i = i; $f.i$1 = i$1; $f.lo = lo; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	medianOfThree = function(data, m1, m0, m2) {
+		var _r, _r$1, _r$2, data, m0, m1, m2, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; data = $f.data; m0 = $f.m0; m1 = $f.m1; m2 = $f.m2; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		_r = data.Less(m1, m0); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		/* */ if (_r) { $s = 1; continue; }
 		/* */ $s = 2; continue;
-		/* if (c === ptrType.nil) { */ case 1:
-			_r = fmt.Errorf("nil receiver passed to UnmarshalJSON", new sliceType([])); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			$s = -1; return _r;
+		/* if (_r) { */ case 1:
+			$r = data.Swap(m1, m0); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* } */ case 2:
-		_tuple = (_entry = strToCode[$String.keyFor(($bytesToString(b)))], _entry !== undefined ? [_entry.v, true] : [0, false]);
-		jc = _tuple[0];
-		ok = _tuple[1];
-		if (ok) {
-			c.$set(jc);
-			$s = -1; return $ifaceNil;
+		_r$1 = data.Less(m2, m1); /* */ $s = 7; case 7: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		/* */ if (_r$1) { $s = 5; continue; }
+		/* */ $s = 6; continue;
+		/* if (_r$1) { */ case 5:
+			$r = data.Swap(m2, m1); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			_r$2 = data.Less(m1, m0); /* */ $s = 11; case 11: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+			/* */ if (_r$2) { $s = 9; continue; }
+			/* */ $s = 10; continue;
+			/* if (_r$2) { */ case 9:
+				$r = data.Swap(m1, m0); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			/* } */ case 10:
+		/* } */ case 6:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: medianOfThree }; } $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f.data = data; $f.m0 = m0; $f.m1 = m1; $f.m2 = m2; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	doPivot = function(data, lo, hi) {
+		var _q, _q$1, _r, _r$1, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _tmp, _tmp$1, _tmp$2, _tmp$3, _v, _v$1, _v$2, _v$3, _v$4, a, b, c, data, dups, hi, lo, m, midhi, midlo, pivot, protect, s, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _q = $f._q; _q$1 = $f._q$1; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _v = $f._v; _v$1 = $f._v$1; _v$2 = $f._v$2; _v$3 = $f._v$3; _v$4 = $f._v$4; a = $f.a; b = $f.b; c = $f.c; data = $f.data; dups = $f.dups; hi = $f.hi; lo = $f.lo; m = $f.m; midhi = $f.midhi; midlo = $f.midlo; pivot = $f.pivot; protect = $f.protect; s = $f.s; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		midlo = 0;
+		midhi = 0;
+		m = ((((((lo + hi >> 0) >>> 0)) >>> 1 >>> 0) >> 0));
+		/* */ if ((hi - lo >> 0) > 40) { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if ((hi - lo >> 0) > 40) { */ case 1:
+			s = (_q = ((hi - lo >> 0)) / 8, (_q === _q && _q !== 1/0 && _q !== -1/0) ? _q >> 0 : $throwRuntimeError("integer divide by zero"));
+			$r = medianOfThree(data, lo, lo + s >> 0, lo + ($imul(2, s)) >> 0); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			$r = medianOfThree(data, m, m - s >> 0, m + s >> 0); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			$r = medianOfThree(data, hi - 1 >> 0, (hi - 1 >> 0) - s >> 0, (hi - 1 >> 0) - ($imul(2, s)) >> 0); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 2:
+		$r = medianOfThree(data, lo, m, hi - 1 >> 0); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		pivot = lo;
+		_tmp = lo + 1 >> 0;
+		_tmp$1 = hi - 1 >> 0;
+		a = _tmp;
+		c = _tmp$1;
+		/* while (true) { */ case 7:
+			if (!(a < c)) { _v = false; $s = 9; continue s; }
+			_r = data.Less(a, pivot); /* */ $s = 10; case 10: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			_v = _r; case 9:
+			/* if (!(_v)) { break; } */ if(!(_v)) { $s = 8; continue; }
+			a = a + (1) >> 0;
+		/* } */ $s = 7; continue; case 8:
+		b = a;
+		/* while (true) { */ case 11:
+			/* while (true) { */ case 13:
+				if (!(b < c)) { _v$1 = false; $s = 15; continue s; }
+				_r$1 = data.Less(pivot, b); /* */ $s = 16; case 16: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+				_v$1 = !_r$1; case 15:
+				/* if (!(_v$1)) { break; } */ if(!(_v$1)) { $s = 14; continue; }
+				b = b + (1) >> 0;
+			/* } */ $s = 13; continue; case 14:
+			/* while (true) { */ case 17:
+				if (!(b < c)) { _v$2 = false; $s = 19; continue s; }
+				_r$2 = data.Less(pivot, c - 1 >> 0); /* */ $s = 20; case 20: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+				_v$2 = _r$2; case 19:
+				/* if (!(_v$2)) { break; } */ if(!(_v$2)) { $s = 18; continue; }
+				c = c - (1) >> 0;
+			/* } */ $s = 17; continue; case 18:
+			if (b >= c) {
+				/* break; */ $s = 12; continue;
+			}
+			$r = data.Swap(b, c - 1 >> 0); /* */ $s = 21; case 21: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			b = b + (1) >> 0;
+			c = c - (1) >> 0;
+		/* } */ $s = 11; continue; case 12:
+		protect = (hi - c >> 0) < 5;
+		/* */ if (!protect && (hi - c >> 0) < (_q$1 = ((hi - lo >> 0)) / 4, (_q$1 === _q$1 && _q$1 !== 1/0 && _q$1 !== -1/0) ? _q$1 >> 0 : $throwRuntimeError("integer divide by zero"))) { $s = 22; continue; }
+		/* */ $s = 23; continue;
+		/* if (!protect && (hi - c >> 0) < (_q$1 = ((hi - lo >> 0)) / 4, (_q$1 === _q$1 && _q$1 !== 1/0 && _q$1 !== -1/0) ? _q$1 >> 0 : $throwRuntimeError("integer divide by zero"))) { */ case 22:
+			dups = 0;
+			_r$3 = data.Less(pivot, hi - 1 >> 0); /* */ $s = 26; case 26: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+			/* */ if (!_r$3) { $s = 24; continue; }
+			/* */ $s = 25; continue;
+			/* if (!_r$3) { */ case 24:
+				$r = data.Swap(c, hi - 1 >> 0); /* */ $s = 27; case 27: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				c = c + (1) >> 0;
+				dups = dups + (1) >> 0;
+			/* } */ case 25:
+			_r$4 = data.Less(b - 1 >> 0, pivot); /* */ $s = 30; case 30: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+			/* */ if (!_r$4) { $s = 28; continue; }
+			/* */ $s = 29; continue;
+			/* if (!_r$4) { */ case 28:
+				b = b - (1) >> 0;
+				dups = dups + (1) >> 0;
+			/* } */ case 29:
+			_r$5 = data.Less(m, pivot); /* */ $s = 33; case 33: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+			/* */ if (!_r$5) { $s = 31; continue; }
+			/* */ $s = 32; continue;
+			/* if (!_r$5) { */ case 31:
+				$r = data.Swap(m, b - 1 >> 0); /* */ $s = 34; case 34: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				b = b - (1) >> 0;
+				dups = dups + (1) >> 0;
+			/* } */ case 32:
+			protect = dups > 1;
+		/* } */ case 23:
+		/* */ if (protect) { $s = 35; continue; }
+		/* */ $s = 36; continue;
+		/* if (protect) { */ case 35:
+			/* while (true) { */ case 37:
+				/* while (true) { */ case 39:
+					if (!(a < b)) { _v$3 = false; $s = 41; continue s; }
+					_r$6 = data.Less(b - 1 >> 0, pivot); /* */ $s = 42; case 42: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
+					_v$3 = !_r$6; case 41:
+					/* if (!(_v$3)) { break; } */ if(!(_v$3)) { $s = 40; continue; }
+					b = b - (1) >> 0;
+				/* } */ $s = 39; continue; case 40:
+				/* while (true) { */ case 43:
+					if (!(a < b)) { _v$4 = false; $s = 45; continue s; }
+					_r$7 = data.Less(a, pivot); /* */ $s = 46; case 46: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
+					_v$4 = _r$7; case 45:
+					/* if (!(_v$4)) { break; } */ if(!(_v$4)) { $s = 44; continue; }
+					a = a + (1) >> 0;
+				/* } */ $s = 43; continue; case 44:
+				if (a >= b) {
+					/* break; */ $s = 38; continue;
+				}
+				$r = data.Swap(a, b - 1 >> 0); /* */ $s = 47; case 47: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				a = a + (1) >> 0;
+				b = b - (1) >> 0;
+			/* } */ $s = 37; continue; case 38:
+		/* } */ case 36:
+		$r = data.Swap(pivot, b - 1 >> 0); /* */ $s = 48; case 48: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_tmp$2 = b - 1 >> 0;
+		_tmp$3 = c;
+		midlo = _tmp$2;
+		midhi = _tmp$3;
+		$s = -1; return [midlo, midhi];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: doPivot }; } $f._q = _q; $f._q$1 = _q$1; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._v = _v; $f._v$1 = _v$1; $f._v$2 = _v$2; $f._v$3 = _v$3; $f._v$4 = _v$4; $f.a = a; $f.b = b; $f.c = c; $f.data = data; $f.dups = dups; $f.hi = hi; $f.lo = lo; $f.m = m; $f.midhi = midhi; $f.midlo = midlo; $f.pivot = pivot; $f.protect = protect; $f.s = s; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	quickSort = function(data, a, b, maxDepth$1) {
+		var _r, _r$1, _tuple, a, b, data, i, maxDepth$1, mhi, mlo, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _tuple = $f._tuple; a = $f.a; b = $f.b; data = $f.data; i = $f.i; maxDepth$1 = $f.maxDepth$1; mhi = $f.mhi; mlo = $f.mlo; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		/* while (true) { */ case 1:
+			/* if (!((b - a >> 0) > 12)) { break; } */ if(!((b - a >> 0) > 12)) { $s = 2; continue; }
+			/* */ if (maxDepth$1 === 0) { $s = 3; continue; }
+			/* */ $s = 4; continue;
+			/* if (maxDepth$1 === 0) { */ case 3:
+				$r = heapSort(data, a, b); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				$s = -1; return;
+			/* } */ case 4:
+			maxDepth$1 = maxDepth$1 - (1) >> 0;
+			_r = doPivot(data, a, b); /* */ $s = 6; case 6: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			_tuple = _r;
+			mlo = _tuple[0];
+			mhi = _tuple[1];
+			/* */ if ((mlo - a >> 0) < (b - mhi >> 0)) { $s = 7; continue; }
+			/* */ $s = 8; continue;
+			/* if ((mlo - a >> 0) < (b - mhi >> 0)) { */ case 7:
+				$r = quickSort(data, a, mlo, maxDepth$1); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				a = mhi;
+				$s = 9; continue;
+			/* } else { */ case 8:
+				$r = quickSort(data, mhi, b, maxDepth$1); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				b = mlo;
+			/* } */ case 9:
+		/* } */ $s = 1; continue; case 2:
+		/* */ if ((b - a >> 0) > 1) { $s = 12; continue; }
+		/* */ $s = 13; continue;
+		/* if ((b - a >> 0) > 1) { */ case 12:
+			i = a + 6 >> 0;
+			/* while (true) { */ case 14:
+				/* if (!(i < b)) { break; } */ if(!(i < b)) { $s = 15; continue; }
+				_r$1 = data.Less(i, i - 6 >> 0); /* */ $s = 18; case 18: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+				/* */ if (_r$1) { $s = 16; continue; }
+				/* */ $s = 17; continue;
+				/* if (_r$1) { */ case 16:
+					$r = data.Swap(i, i - 6 >> 0); /* */ $s = 19; case 19: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				/* } */ case 17:
+				i = i + (1) >> 0;
+			/* } */ $s = 14; continue; case 15:
+			$r = insertionSort(data, a, b); /* */ $s = 20; case 20: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 13:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: quickSort }; } $f._r = _r; $f._r$1 = _r$1; $f._tuple = _tuple; $f.a = a; $f.b = b; $f.data = data; $f.i = i; $f.maxDepth$1 = maxDepth$1; $f.mhi = mhi; $f.mlo = mlo; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Sort = function(data) {
+		var _r, data, n, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; data = $f.data; n = $f.n; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		_r = data.Len(); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		n = _r;
+		$r = quickSort(data, 0, n, maxDepth(n)); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Sort }; } $f._r = _r; $f.data = data; $f.n = n; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.Sort = Sort;
+	maxDepth = function(n) {
+		var depth, i, n;
+		depth = 0;
+		i = n;
+		while (true) {
+			if (!(i > 0)) { break; }
+			depth = depth + (1) >> 0;
+			i = (i >> $min((1), 31)) >> 0;
 		}
-		_r$1 = fmt.Errorf("invalid code: %q", new sliceType([new $String(($bytesToString(b)))])); /* */ $s = 4; case 4: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-		$s = -1; return _r$1;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: $ptrType(Code).prototype.UnmarshalJSON }; } $f._entry = _entry; $f._r = _r; $f._r$1 = _r$1; $f._tuple = _tuple; $f.b = b; $f.c = c; $f.jc = jc; $f.ok = ok; $f.$s = $s; $f.$r = $r; return $f;
+		return $imul(depth, 2);
 	};
-	Code.methods = [{prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}];
-	ptrType.methods = [{prop: "UnmarshalJSON", name: "UnmarshalJSON", pkg: "", typ: $funcType([sliceType$1], [$error], false)}];
+	IntSlice.prototype.Len = function() {
+		var p;
+		p = this;
+		return p.$length;
+	};
+	$ptrType(IntSlice).prototype.Len = function() { return this.$get().Len(); };
+	IntSlice.prototype.Less = function(i, j) {
+		var i, j, p;
+		p = this;
+		return ((i < 0 || i >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + i]) < ((j < 0 || j >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + j]);
+	};
+	$ptrType(IntSlice).prototype.Less = function(i, j) { return this.$get().Less(i, j); };
+	IntSlice.prototype.Swap = function(i, j) {
+		var _tmp, _tmp$1, i, j, p;
+		p = this;
+		_tmp = ((j < 0 || j >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + j]);
+		_tmp$1 = ((i < 0 || i >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + i]);
+		((i < 0 || i >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + i] = _tmp);
+		((j < 0 || j >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + j] = _tmp$1);
+	};
+	$ptrType(IntSlice).prototype.Swap = function(i, j) { return this.$get().Swap(i, j); };
+	IntSlice.prototype.Sort = function() {
+		var p, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; p = $f.p; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		p = this;
+		$r = Sort(p); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: IntSlice.prototype.Sort }; } $f.p = p; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$ptrType(IntSlice).prototype.Sort = function() { return this.$get().Sort(); };
+	Ints = function(a) {
+		var a, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; a = $f.a; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = Sort(($subslice(new IntSlice(a.$array), a.$offset, a.$offset + a.$length))); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Ints }; } $f.a = a; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.Ints = Ints;
+	IntSlice.methods = [{prop: "Search", name: "Search", pkg: "", typ: $funcType([$Int], [$Int], false)}, {prop: "Len", name: "Len", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Less", name: "Less", pkg: "", typ: $funcType([$Int, $Int], [$Bool], false)}, {prop: "Swap", name: "Swap", pkg: "", typ: $funcType([$Int, $Int], [], false)}, {prop: "Sort", name: "Sort", pkg: "", typ: $funcType([], [], false)}];
+	IntSlice.init($Int);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = fmt.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = strconv.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		strToCode = $makeMap($String.keyFor, [{ k: "\"OK\"", v: 0 }, { k: "\"CANCELLED\"", v: 1 }, { k: "\"UNKNOWN\"", v: 2 }, { k: "\"INVALID_ARGUMENT\"", v: 3 }, { k: "\"DEADLINE_EXCEEDED\"", v: 4 }, { k: "\"NOT_FOUND\"", v: 5 }, { k: "\"ALREADY_EXISTS\"", v: 6 }, { k: "\"PERMISSION_DENIED\"", v: 7 }, { k: "\"RESOURCE_EXHAUSTED\"", v: 8 }, { k: "\"FAILED_PRECONDITION\"", v: 9 }, { k: "\"ABORTED\"", v: 10 }, { k: "\"OUT_OF_RANGE\"", v: 11 }, { k: "\"UNIMPLEMENTED\"", v: 12 }, { k: "\"INTERNAL\"", v: 13 }, { k: "\"UNAVAILABLE\"", v: 14 }, { k: "\"DATA_LOSS\"", v: 15 }, { k: "\"UNAUTHENTICATED\"", v: 16 }]);
-		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.$init = $init;
-	return $pkg;
-})();
-$packages["github.com/johanbrandhorst/protobuf/vendor/golang.org/x/net/context"] = (function() {
-	var $pkg = {}, $init, context, time, todo, background;
-	context = $packages["context"];
-	time = $packages["time"];
-	$init = function() {
-		$pkg.$init = function() {};
-		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = context.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = time.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		todo = context.TODO();
-		background = context.Background();
+		$r = reflect.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
 	return $pkg;
 })();
 $packages["strings"] = (function() {
-	var $pkg = {}, $init, errors, js, io, unicode, utf8, sliceType, sliceType$3, Index, LastIndex, Count, explode, Contains, genSplit, Split, Join, HasPrefix, HasSuffix, TrimSuffix;
+	var $pkg = {}, $init, errors, js, io, unicode, utf8, sliceType, sliceType$3, Index, LastIndex, Count, explode, Contains, genSplit, Split, Join, HasPrefix;
 	errors = $packages["errors"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	io = $packages["io"];
@@ -21638,19 +22619,6 @@ $packages["strings"] = (function() {
 		return s.length >= prefix.length && $substring(s, 0, prefix.length) === prefix;
 	};
 	$pkg.HasPrefix = HasPrefix;
-	HasSuffix = function(s, suffix) {
-		var s, suffix;
-		return s.length >= suffix.length && $substring(s, (s.length - suffix.length >> 0)) === suffix;
-	};
-	$pkg.HasSuffix = HasSuffix;
-	TrimSuffix = function(s, suffix) {
-		var s, suffix;
-		if (HasSuffix(s, suffix)) {
-			return $substring(s, 0, (s.length - suffix.length >> 0));
-		}
-		return s;
-	};
-	$pkg.TrimSuffix = TrimSuffix;
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -21659,6 +22627,214 @@ $packages["strings"] = (function() {
 		$r = io.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = unicode.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = utf8.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+$packages["path/filepath"] = (function() {
+	var $pkg = {}, $init, errors, os, runtime, sort, strings, utf8;
+	errors = $packages["errors"];
+	os = $packages["os"];
+	runtime = $packages["runtime"];
+	sort = $packages["sort"];
+	strings = $packages["strings"];
+	utf8 = $packages["unicode/utf8"];
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = errors.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = os.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = runtime.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = sort.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = strings.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = utf8.$init(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$pkg.ErrBadPattern = errors.New("syntax error in pattern");
+		$pkg.SkipDir = errors.New("skip this directory");
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+$packages["os/exec"] = (function() {
+	var $pkg = {}, $init, bytes, context, errors, io, os, filepath, runtime, strconv, strings, sync, syscall, ptrType$8, skipStdinCopyError, init;
+	bytes = $packages["bytes"];
+	context = $packages["context"];
+	errors = $packages["errors"];
+	io = $packages["io"];
+	os = $packages["os"];
+	filepath = $packages["path/filepath"];
+	runtime = $packages["runtime"];
+	strconv = $packages["strconv"];
+	strings = $packages["strings"];
+	sync = $packages["sync"];
+	syscall = $packages["syscall"];
+	ptrType$8 = $ptrType(os.PathError);
+	init = function() {
+		skipStdinCopyError = (function(err) {
+			var _tuple, err, ok, pe;
+			_tuple = $assertType(err, ptrType$8, true);
+			pe = _tuple[0];
+			ok = _tuple[1];
+			return ok && pe.Op === "write" && pe.Path === "|1" && $interfaceIsEqual(pe.Err, new syscall.Errno(32));
+		});
+	};
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = bytes.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = context.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = errors.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = io.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = os.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = filepath.$init(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = runtime.$init(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = strconv.$init(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = strings.$init(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = sync.$init(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = syscall.$init(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		skipStdinCopyError = $throwNilPointerError;
+		$pkg.ErrNotFound = errors.New("executable file not found in $PATH");
+		init();
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+$packages["../common"] = (function() {
+	var $pkg = {}, $init, fmt, os, exec;
+	fmt = $packages["fmt"];
+	os = $packages["os"];
+	exec = $packages["os/exec"];
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = fmt.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = os.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = exec.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+	(function() {
+!function(e,t){for(var r in t)e[r]=t[r]}(this,function(e){function t(n){if(r[n])return r[n].exports;var o=r[n]={i:n,l:!1,exports:{}};return e[n].call(o.exports,o,o.exports,t),o.l=!0,o.exports}var r={};return t.m=e,t.c=r,t.d=function(e,r,n){t.o(e,r)||Object.defineProperty(e,r,{configurable:!1,enumerable:!0,get:n})},t.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(r,"a",r),r},t.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},t.p="",t(t.s=29)}([function(e,t){var r;r=function(){return this}();try{r=r||Function("return this")()||(0,eval)("this")}catch(e){"object"==typeof window&&(r=window)}e.exports=r},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var n=r(13);t.Metadata=n.BrowserHeaders},function(e,t){"function"==typeof Object.create?e.exports=function(e,t){e.super_=t,e.prototype=Object.create(t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}})}:e.exports=function(e,t){e.super_=t;var r=function(){};r.prototype=t.prototype,e.prototype=new r,e.prototype.constructor=e}},function(e,t,r){"use strict";(function(e){function n(){return i.TYPED_ARRAY_SUPPORT?2147483647:1073741823}function o(e,t){if(n()<t)throw new RangeError("Invalid typed array length");return i.TYPED_ARRAY_SUPPORT?(e=new Uint8Array(t),e.__proto__=i.prototype):(null===e&&(e=new i(t)),e.length=t),e}function i(e,t,r){if(!(i.TYPED_ARRAY_SUPPORT||this instanceof i))return new i(e,t,r);if("number"==typeof e){if("string"==typeof t)throw new Error("If encoding is specified then the first argument must be a string");return h(this,e)}return s(this,e,t,r)}function s(e,t,r,n){if("number"==typeof t)throw new TypeError('"value" argument must not be a number');return"undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer?l(e,t,r,n):"string"==typeof t?f(e,t,r):d(e,t)}function a(e){if("number"!=typeof e)throw new TypeError('"size" argument must be a number');if(e<0)throw new RangeError('"size" argument must not be negative')}function u(e,t,r,n){return a(t),t<=0?o(e,t):void 0!==r?"string"==typeof n?o(e,t).fill(r,n):o(e,t).fill(r):o(e,t)}function h(e,t){if(a(t),e=o(e,t<0?0:0|p(t)),!i.TYPED_ARRAY_SUPPORT)for(var r=0;r<t;++r)e[r]=0;return e}function f(e,t,r){if("string"==typeof r&&""!==r||(r="utf8"),!i.isEncoding(r))throw new TypeError('"encoding" must be a valid string encoding');var n=0|y(t,r);e=o(e,n);var s=e.write(t,r);return s!==n&&(e=e.slice(0,s)),e}function c(e,t){var r=t.length<0?0:0|p(t.length);e=o(e,r);for(var n=0;n<r;n+=1)e[n]=255&t[n];return e}function l(e,t,r,n){if(t.byteLength,r<0||t.byteLength<r)throw new RangeError("'offset' is out of bounds");if(t.byteLength<r+(n||0))throw new RangeError("'length' is out of bounds");return t=void 0===r&&void 0===n?new Uint8Array(t):void 0===n?new Uint8Array(t,r):new Uint8Array(t,r,n),i.TYPED_ARRAY_SUPPORT?(e=t,e.__proto__=i.prototype):e=c(e,t),e}function d(e,t){if(i.isBuffer(t)){var r=0|p(t.length);return e=o(e,r),0===e.length?e:(t.copy(e,0,0,r),e)}if(t){if("undefined"!=typeof ArrayBuffer&&t.buffer instanceof ArrayBuffer||"length"in t)return"number"!=typeof t.length||K(t.length)?o(e,0):c(e,t);if("Buffer"===t.type&&J(t.data))return c(e,t.data)}throw new TypeError("First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.")}function p(e){if(e>=n())throw new RangeError("Attempt to allocate Buffer larger than maximum size: 0x"+n().toString(16)+" bytes");return 0|e}function g(e){return+e!=e&&(e=0),i.alloc(+e)}function y(e,t){if(i.isBuffer(e))return e.length;if("undefined"!=typeof ArrayBuffer&&"function"==typeof ArrayBuffer.isView&&(ArrayBuffer.isView(e)||e instanceof ArrayBuffer))return e.byteLength;"string"!=typeof e&&(e=""+e);var r=e.length;if(0===r)return 0;for(var n=!1;;)switch(t){case"ascii":case"latin1":case"binary":return r;case"utf8":case"utf-8":case void 0:return z(e).length;case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return 2*r;case"hex":return r>>>1;case"base64":return V(e).length;default:if(n)return z(e).length;t=(""+t).toLowerCase(),n=!0}}function v(e,t,r){var n=!1;if((void 0===t||t<0)&&(t=0),t>this.length)return"";if((void 0===r||r>this.length)&&(r=this.length),r<=0)return"";if(r>>>=0,t>>>=0,r<=t)return"";for(e||(e="utf8");;)switch(e){case"hex":return P(this,t,r);case"utf8":case"utf-8":return M(this,t,r);case"ascii":return O(this,t,r);case"latin1":case"binary":return k(this,t,r);case"base64":return C(this,t,r);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return L(this,t,r);default:if(n)throw new TypeError("Unknown encoding: "+e);e=(e+"").toLowerCase(),n=!0}}function b(e,t,r){var n=e[t];e[t]=e[r],e[r]=n}function m(e,t,r,n,o){if(0===e.length)return-1;if("string"==typeof r?(n=r,r=0):r>2147483647?r=2147483647:r<-2147483648&&(r=-2147483648),r=+r,isNaN(r)&&(r=o?0:e.length-1),r<0&&(r=e.length+r),r>=e.length){if(o)return-1;r=e.length-1}else if(r<0){if(!o)return-1;r=0}if("string"==typeof t&&(t=i.from(t,n)),i.isBuffer(t))return 0===t.length?-1:w(e,t,r,n,o);if("number"==typeof t)return t&=255,i.TYPED_ARRAY_SUPPORT&&"function"==typeof Uint8Array.prototype.indexOf?o?Uint8Array.prototype.indexOf.call(e,t,r):Uint8Array.prototype.lastIndexOf.call(e,t,r):w(e,[t],r,n,o);throw new TypeError("val must be string, number or Buffer")}function w(e,t,r,n,o){function i(e,t){return 1===s?e[t]:e.readUInt16BE(t*s)}var s=1,a=e.length,u=t.length;if(void 0!==n&&("ucs2"===(n=String(n).toLowerCase())||"ucs-2"===n||"utf16le"===n||"utf-16le"===n)){if(e.length<2||t.length<2)return-1;s=2,a/=2,u/=2,r/=2}var h;if(o){var f=-1;for(h=r;h<a;h++)if(i(e,h)===i(t,-1===f?0:h-f)){if(-1===f&&(f=h),h-f+1===u)return f*s}else-1!==f&&(h-=h-f),f=-1}else for(r+u>a&&(r=a-u),h=r;h>=0;h--){for(var c=!0,l=0;l<u;l++)if(i(e,h+l)!==i(t,l)){c=!1;break}if(c)return h}return-1}function _(e,t,r,n){r=Number(r)||0;var o=e.length-r;n?(n=Number(n))>o&&(n=o):n=o;var i=t.length;if(i%2!=0)throw new TypeError("Invalid hex string");n>i/2&&(n=i/2);for(var s=0;s<n;++s){var a=parseInt(t.substr(2*s,2),16);if(isNaN(a))return s;e[r+s]=a}return s}function E(e,t,r,n){return G(z(t,e.length-r),e,r,n)}function S(e,t,r,n){return G(X(t),e,r,n)}function R(e,t,r,n){return S(e,t,r,n)}function A(e,t,r,n){return G(V(t),e,r,n)}function T(e,t,r,n){return G(W(t,e.length-r),e,r,n)}function C(e,t,r){return 0===t&&r===e.length?$.fromByteArray(e):$.fromByteArray(e.slice(t,r))}function M(e,t,r){r=Math.min(e.length,r);for(var n=[],o=t;o<r;){var i=e[o],s=null,a=i>239?4:i>223?3:i>191?2:1;if(o+a<=r){var u,h,f,c;switch(a){case 1:i<128&&(s=i);break;case 2:u=e[o+1],128==(192&u)&&(c=(31&i)<<6|63&u)>127&&(s=c);break;case 3:u=e[o+1],h=e[o+2],128==(192&u)&&128==(192&h)&&(c=(15&i)<<12|(63&u)<<6|63&h)>2047&&(c<55296||c>57343)&&(s=c);break;case 4:u=e[o+1],h=e[o+2],f=e[o+3],128==(192&u)&&128==(192&h)&&128==(192&f)&&(c=(15&i)<<18|(63&u)<<12|(63&h)<<6|63&f)>65535&&c<1114112&&(s=c)}}null===s?(s=65533,a=1):s>65535&&(s-=65536,n.push(s>>>10&1023|55296),s=56320|1023&s),n.push(s),o+=a}return x(n)}function x(e){var t=e.length;if(t<=Q)return String.fromCharCode.apply(String,e);for(var r="",n=0;n<t;)r+=String.fromCharCode.apply(String,e.slice(n,n+=Q));return r}function O(e,t,r){var n="";r=Math.min(e.length,r);for(var o=t;o<r;++o)n+=String.fromCharCode(127&e[o]);return n}function k(e,t,r){var n="";r=Math.min(e.length,r);for(var o=t;o<r;++o)n+=String.fromCharCode(e[o]);return n}function P(e,t,r){var n=e.length;(!t||t<0)&&(t=0),(!r||r<0||r>n)&&(r=n);for(var o="",i=t;i<r;++i)o+=Y(e[i]);return o}function L(e,t,r){for(var n=e.slice(t,r),o="",i=0;i<n.length;i+=2)o+=String.fromCharCode(n[i]+256*n[i+1]);return o}function I(e,t,r){if(e%1!=0||e<0)throw new RangeError("offset is not uint");if(e+t>r)throw new RangeError("Trying to access beyond buffer length")}function U(e,t,r,n,o,s){if(!i.isBuffer(e))throw new TypeError('"buffer" argument must be a Buffer instance');if(t>o||t<s)throw new RangeError('"value" argument is out of bounds');if(r+n>e.length)throw new RangeError("Index out of range")}function H(e,t,r,n){t<0&&(t=65535+t+1);for(var o=0,i=Math.min(e.length-r,2);o<i;++o)e[r+o]=(t&255<<8*(n?o:1-o))>>>8*(n?o:1-o)}function j(e,t,r,n){t<0&&(t=4294967295+t+1);for(var o=0,i=Math.min(e.length-r,4);o<i;++o)e[r+o]=t>>>8*(n?o:3-o)&255}function N(e,t,r,n,o,i){if(r+n>e.length)throw new RangeError("Index out of range");if(r<0)throw new RangeError("Index out of range")}function B(e,t,r,n,o){return o||N(e,t,r,4,3.4028234663852886e38,-3.4028234663852886e38),Z.write(e,t,r,n,23,4),r+4}function q(e,t,r,n,o){return o||N(e,t,r,8,1.7976931348623157e308,-1.7976931348623157e308),Z.write(e,t,r,n,52,8),r+8}function D(e){if(e=F(e).replace(ee,""),e.length<2)return"";for(;e.length%4!=0;)e+="=";return e}function F(e){return e.trim?e.trim():e.replace(/^\s+|\s+$/g,"")}function Y(e){return e<16?"0"+e.toString(16):e.toString(16)}function z(e,t){t=t||1/0;for(var r,n=e.length,o=null,i=[],s=0;s<n;++s){if((r=e.charCodeAt(s))>55295&&r<57344){if(!o){if(r>56319){(t-=3)>-1&&i.push(239,191,189);continue}if(s+1===n){(t-=3)>-1&&i.push(239,191,189);continue}o=r;continue}if(r<56320){(t-=3)>-1&&i.push(239,191,189),o=r;continue}r=65536+(o-55296<<10|r-56320)}else o&&(t-=3)>-1&&i.push(239,191,189);if(o=null,r<128){if((t-=1)<0)break;i.push(r)}else if(r<2048){if((t-=2)<0)break;i.push(r>>6|192,63&r|128)}else if(r<65536){if((t-=3)<0)break;i.push(r>>12|224,r>>6&63|128,63&r|128)}else{if(!(r<1114112))throw new Error("Invalid code point");if((t-=4)<0)break;i.push(r>>18|240,r>>12&63|128,r>>6&63|128,63&r|128)}}return i}function X(e){for(var t=[],r=0;r<e.length;++r)t.push(255&e.charCodeAt(r));return t}function W(e,t){for(var r,n,o,i=[],s=0;s<e.length&&!((t-=2)<0);++s)r=e.charCodeAt(s),n=r>>8,o=r%256,i.push(o),i.push(n);return i}function V(e){return $.toByteArray(D(e))}function G(e,t,r,n){for(var o=0;o<n&&!(o+r>=t.length||o>=e.length);++o)t[o+r]=e[o];return o}function K(e){return e!==e}/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ */
+var $=r(38),Z=r(39),J=r(15);t.Buffer=i,t.SlowBuffer=g,t.INSPECT_MAX_BYTES=50,i.TYPED_ARRAY_SUPPORT=void 0!==e.TYPED_ARRAY_SUPPORT?e.TYPED_ARRAY_SUPPORT:function(){try{var e=new Uint8Array(1);return e.__proto__={__proto__:Uint8Array.prototype,foo:function(){return 42}},42===e.foo()&&"function"==typeof e.subarray&&0===e.subarray(1,1).byteLength}catch(e){return!1}}(),t.kMaxLength=n(),i.poolSize=8192,i._augment=function(e){return e.__proto__=i.prototype,e},i.from=function(e,t,r){return s(null,e,t,r)},i.TYPED_ARRAY_SUPPORT&&(i.prototype.__proto__=Uint8Array.prototype,i.__proto__=Uint8Array,"undefined"!=typeof Symbol&&Symbol.species&&i[Symbol.species]===i&&Object.defineProperty(i,Symbol.species,{value:null,configurable:!0})),i.alloc=function(e,t,r){return u(null,e,t,r)},i.allocUnsafe=function(e){return h(null,e)},i.allocUnsafeSlow=function(e){return h(null,e)},i.isBuffer=function(e){return!(null==e||!e._isBuffer)},i.compare=function(e,t){if(!i.isBuffer(e)||!i.isBuffer(t))throw new TypeError("Arguments must be Buffers");if(e===t)return 0;for(var r=e.length,n=t.length,o=0,s=Math.min(r,n);o<s;++o)if(e[o]!==t[o]){r=e[o],n=t[o];break}return r<n?-1:n<r?1:0},i.isEncoding=function(e){switch(String(e).toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"latin1":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return!0;default:return!1}},i.concat=function(e,t){if(!J(e))throw new TypeError('"list" argument must be an Array of Buffers');if(0===e.length)return i.alloc(0);var r;if(void 0===t)for(t=0,r=0;r<e.length;++r)t+=e[r].length;var n=i.allocUnsafe(t),o=0;for(r=0;r<e.length;++r){var s=e[r];if(!i.isBuffer(s))throw new TypeError('"list" argument must be an Array of Buffers');s.copy(n,o),o+=s.length}return n},i.byteLength=y,i.prototype._isBuffer=!0,i.prototype.swap16=function(){var e=this.length;if(e%2!=0)throw new RangeError("Buffer size must be a multiple of 16-bits");for(var t=0;t<e;t+=2)b(this,t,t+1);return this},i.prototype.swap32=function(){var e=this.length;if(e%4!=0)throw new RangeError("Buffer size must be a multiple of 32-bits");for(var t=0;t<e;t+=4)b(this,t,t+3),b(this,t+1,t+2);return this},i.prototype.swap64=function(){var e=this.length;if(e%8!=0)throw new RangeError("Buffer size must be a multiple of 64-bits");for(var t=0;t<e;t+=8)b(this,t,t+7),b(this,t+1,t+6),b(this,t+2,t+5),b(this,t+3,t+4);return this},i.prototype.toString=function(){var e=0|this.length;return 0===e?"":0===arguments.length?M(this,0,e):v.apply(this,arguments)},i.prototype.equals=function(e){if(!i.isBuffer(e))throw new TypeError("Argument must be a Buffer");return this===e||0===i.compare(this,e)},i.prototype.inspect=function(){var e="",r=t.INSPECT_MAX_BYTES;return this.length>0&&(e=this.toString("hex",0,r).match(/.{2}/g).join(" "),this.length>r&&(e+=" ... ")),"<Buffer "+e+">"},i.prototype.compare=function(e,t,r,n,o){if(!i.isBuffer(e))throw new TypeError("Argument must be a Buffer");if(void 0===t&&(t=0),void 0===r&&(r=e?e.length:0),void 0===n&&(n=0),void 0===o&&(o=this.length),t<0||r>e.length||n<0||o>this.length)throw new RangeError("out of range index");if(n>=o&&t>=r)return 0;if(n>=o)return-1;if(t>=r)return 1;if(t>>>=0,r>>>=0,n>>>=0,o>>>=0,this===e)return 0;for(var s=o-n,a=r-t,u=Math.min(s,a),h=this.slice(n,o),f=e.slice(t,r),c=0;c<u;++c)if(h[c]!==f[c]){s=h[c],a=f[c];break}return s<a?-1:a<s?1:0},i.prototype.includes=function(e,t,r){return-1!==this.indexOf(e,t,r)},i.prototype.indexOf=function(e,t,r){return m(this,e,t,r,!0)},i.prototype.lastIndexOf=function(e,t,r){return m(this,e,t,r,!1)},i.prototype.write=function(e,t,r,n){if(void 0===t)n="utf8",r=this.length,t=0;else if(void 0===r&&"string"==typeof t)n=t,r=this.length,t=0;else{if(!isFinite(t))throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");t|=0,isFinite(r)?(r|=0,void 0===n&&(n="utf8")):(n=r,r=void 0)}var o=this.length-t;if((void 0===r||r>o)&&(r=o),e.length>0&&(r<0||t<0)||t>this.length)throw new RangeError("Attempt to write outside buffer bounds");n||(n="utf8");for(var i=!1;;)switch(n){case"hex":return _(this,e,t,r);case"utf8":case"utf-8":return E(this,e,t,r);case"ascii":return S(this,e,t,r);case"latin1":case"binary":return R(this,e,t,r);case"base64":return A(this,e,t,r);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return T(this,e,t,r);default:if(i)throw new TypeError("Unknown encoding: "+n);n=(""+n).toLowerCase(),i=!0}},i.prototype.toJSON=function(){return{type:"Buffer",data:Array.prototype.slice.call(this._arr||this,0)}};var Q=4096;i.prototype.slice=function(e,t){var r=this.length;e=~~e,t=void 0===t?r:~~t,e<0?(e+=r)<0&&(e=0):e>r&&(e=r),t<0?(t+=r)<0&&(t=0):t>r&&(t=r),t<e&&(t=e);var n;if(i.TYPED_ARRAY_SUPPORT)n=this.subarray(e,t),n.__proto__=i.prototype;else{var o=t-e;n=new i(o,void 0);for(var s=0;s<o;++s)n[s]=this[s+e]}return n},i.prototype.readUIntLE=function(e,t,r){e|=0,t|=0,r||I(e,t,this.length);for(var n=this[e],o=1,i=0;++i<t&&(o*=256);)n+=this[e+i]*o;return n},i.prototype.readUIntBE=function(e,t,r){e|=0,t|=0,r||I(e,t,this.length);for(var n=this[e+--t],o=1;t>0&&(o*=256);)n+=this[e+--t]*o;return n},i.prototype.readUInt8=function(e,t){return t||I(e,1,this.length),this[e]},i.prototype.readUInt16LE=function(e,t){return t||I(e,2,this.length),this[e]|this[e+1]<<8},i.prototype.readUInt16BE=function(e,t){return t||I(e,2,this.length),this[e]<<8|this[e+1]},i.prototype.readUInt32LE=function(e,t){return t||I(e,4,this.length),(this[e]|this[e+1]<<8|this[e+2]<<16)+16777216*this[e+3]},i.prototype.readUInt32BE=function(e,t){return t||I(e,4,this.length),16777216*this[e]+(this[e+1]<<16|this[e+2]<<8|this[e+3])},i.prototype.readIntLE=function(e,t,r){e|=0,t|=0,r||I(e,t,this.length);for(var n=this[e],o=1,i=0;++i<t&&(o*=256);)n+=this[e+i]*o;return o*=128,n>=o&&(n-=Math.pow(2,8*t)),n},i.prototype.readIntBE=function(e,t,r){e|=0,t|=0,r||I(e,t,this.length);for(var n=t,o=1,i=this[e+--n];n>0&&(o*=256);)i+=this[e+--n]*o;return o*=128,i>=o&&(i-=Math.pow(2,8*t)),i},i.prototype.readInt8=function(e,t){return t||I(e,1,this.length),128&this[e]?-1*(255-this[e]+1):this[e]},i.prototype.readInt16LE=function(e,t){t||I(e,2,this.length);var r=this[e]|this[e+1]<<8;return 32768&r?4294901760|r:r},i.prototype.readInt16BE=function(e,t){t||I(e,2,this.length);var r=this[e+1]|this[e]<<8;return 32768&r?4294901760|r:r},i.prototype.readInt32LE=function(e,t){return t||I(e,4,this.length),this[e]|this[e+1]<<8|this[e+2]<<16|this[e+3]<<24},i.prototype.readInt32BE=function(e,t){return t||I(e,4,this.length),this[e]<<24|this[e+1]<<16|this[e+2]<<8|this[e+3]},i.prototype.readFloatLE=function(e,t){return t||I(e,4,this.length),Z.read(this,e,!0,23,4)},i.prototype.readFloatBE=function(e,t){return t||I(e,4,this.length),Z.read(this,e,!1,23,4)},i.prototype.readDoubleLE=function(e,t){return t||I(e,8,this.length),Z.read(this,e,!0,52,8)},i.prototype.readDoubleBE=function(e,t){return t||I(e,8,this.length),Z.read(this,e,!1,52,8)},i.prototype.writeUIntLE=function(e,t,r,n){if(e=+e,t|=0,r|=0,!n){U(this,e,t,r,Math.pow(2,8*r)-1,0)}var o=1,i=0;for(this[t]=255&e;++i<r&&(o*=256);)this[t+i]=e/o&255;return t+r},i.prototype.writeUIntBE=function(e,t,r,n){if(e=+e,t|=0,r|=0,!n){U(this,e,t,r,Math.pow(2,8*r)-1,0)}var o=r-1,i=1;for(this[t+o]=255&e;--o>=0&&(i*=256);)this[t+o]=e/i&255;return t+r},i.prototype.writeUInt8=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,1,255,0),i.TYPED_ARRAY_SUPPORT||(e=Math.floor(e)),this[t]=255&e,t+1},i.prototype.writeUInt16LE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,2,65535,0),i.TYPED_ARRAY_SUPPORT?(this[t]=255&e,this[t+1]=e>>>8):H(this,e,t,!0),t+2},i.prototype.writeUInt16BE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,2,65535,0),i.TYPED_ARRAY_SUPPORT?(this[t]=e>>>8,this[t+1]=255&e):H(this,e,t,!1),t+2},i.prototype.writeUInt32LE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,4,4294967295,0),i.TYPED_ARRAY_SUPPORT?(this[t+3]=e>>>24,this[t+2]=e>>>16,this[t+1]=e>>>8,this[t]=255&e):j(this,e,t,!0),t+4},i.prototype.writeUInt32BE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,4,4294967295,0),i.TYPED_ARRAY_SUPPORT?(this[t]=e>>>24,this[t+1]=e>>>16,this[t+2]=e>>>8,this[t+3]=255&e):j(this,e,t,!1),t+4},i.prototype.writeIntLE=function(e,t,r,n){if(e=+e,t|=0,!n){var o=Math.pow(2,8*r-1);U(this,e,t,r,o-1,-o)}var i=0,s=1,a=0;for(this[t]=255&e;++i<r&&(s*=256);)e<0&&0===a&&0!==this[t+i-1]&&(a=1),this[t+i]=(e/s>>0)-a&255;return t+r},i.prototype.writeIntBE=function(e,t,r,n){if(e=+e,t|=0,!n){var o=Math.pow(2,8*r-1);U(this,e,t,r,o-1,-o)}var i=r-1,s=1,a=0;for(this[t+i]=255&e;--i>=0&&(s*=256);)e<0&&0===a&&0!==this[t+i+1]&&(a=1),this[t+i]=(e/s>>0)-a&255;return t+r},i.prototype.writeInt8=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,1,127,-128),i.TYPED_ARRAY_SUPPORT||(e=Math.floor(e)),e<0&&(e=255+e+1),this[t]=255&e,t+1},i.prototype.writeInt16LE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,2,32767,-32768),i.TYPED_ARRAY_SUPPORT?(this[t]=255&e,this[t+1]=e>>>8):H(this,e,t,!0),t+2},i.prototype.writeInt16BE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,2,32767,-32768),i.TYPED_ARRAY_SUPPORT?(this[t]=e>>>8,this[t+1]=255&e):H(this,e,t,!1),t+2},i.prototype.writeInt32LE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,4,2147483647,-2147483648),i.TYPED_ARRAY_SUPPORT?(this[t]=255&e,this[t+1]=e>>>8,this[t+2]=e>>>16,this[t+3]=e>>>24):j(this,e,t,!0),t+4},i.prototype.writeInt32BE=function(e,t,r){return e=+e,t|=0,r||U(this,e,t,4,2147483647,-2147483648),e<0&&(e=4294967295+e+1),i.TYPED_ARRAY_SUPPORT?(this[t]=e>>>24,this[t+1]=e>>>16,this[t+2]=e>>>8,this[t+3]=255&e):j(this,e,t,!1),t+4},i.prototype.writeFloatLE=function(e,t,r){return B(this,e,t,!0,r)},i.prototype.writeFloatBE=function(e,t,r){return B(this,e,t,!1,r)},i.prototype.writeDoubleLE=function(e,t,r){return q(this,e,t,!0,r)},i.prototype.writeDoubleBE=function(e,t,r){return q(this,e,t,!1,r)},i.prototype.copy=function(e,t,r,n){if(r||(r=0),n||0===n||(n=this.length),t>=e.length&&(t=e.length),t||(t=0),n>0&&n<r&&(n=r),n===r)return 0;if(0===e.length||0===this.length)return 0;if(t<0)throw new RangeError("targetStart out of bounds");if(r<0||r>=this.length)throw new RangeError("sourceStart out of bounds");if(n<0)throw new RangeError("sourceEnd out of bounds");n>this.length&&(n=this.length),e.length-t<n-r&&(n=e.length-t+r);var o,s=n-r;if(this===e&&r<t&&t<n)for(o=s-1;o>=0;--o)e[o+t]=this[o+r];else if(s<1e3||!i.TYPED_ARRAY_SUPPORT)for(o=0;o<s;++o)e[o+t]=this[o+r];else Uint8Array.prototype.set.call(e,this.subarray(r,r+s),t);return s},i.prototype.fill=function(e,t,r,n){if("string"==typeof e){if("string"==typeof t?(n=t,t=0,r=this.length):"string"==typeof r&&(n=r,r=this.length),1===e.length){var o=e.charCodeAt(0);o<256&&(e=o)}if(void 0!==n&&"string"!=typeof n)throw new TypeError("encoding must be a string");if("string"==typeof n&&!i.isEncoding(n))throw new TypeError("Unknown encoding: "+n)}else"number"==typeof e&&(e&=255);if(t<0||this.length<t||this.length<r)throw new RangeError("Out of range index");if(r<=t)return this;t>>>=0,r=void 0===r?this.length:r>>>0,e||(e=0);var s;if("number"==typeof e)for(s=t;s<r;++s)this[s]=e;else{var a=i.isBuffer(e)?e:z(new i(e,n).toString()),u=a.length;for(s=0;s<r-t;++s)this[s+t]=a[s%u]}return this};var ee=/[^+\/0-9A-Za-z-_]/g}).call(t,r(0))},function(e,t){function r(){throw new Error("setTimeout has not been defined")}function n(){throw new Error("clearTimeout has not been defined")}function o(e){if(f===setTimeout)return setTimeout(e,0);if((f===r||!f)&&setTimeout)return f=setTimeout,setTimeout(e,0);try{return f(e,0)}catch(t){try{return f.call(null,e,0)}catch(t){return f.call(this,e,0)}}}function i(e){if(c===clearTimeout)return clearTimeout(e);if((c===n||!c)&&clearTimeout)return c=clearTimeout,clearTimeout(e);try{return c(e)}catch(t){try{return c.call(null,e)}catch(t){return c.call(this,e)}}}function s(){g&&d&&(g=!1,d.length?p=d.concat(p):y=-1,p.length&&a())}function a(){if(!g){var e=o(s);g=!0;for(var t=p.length;t;){for(d=p,p=[];++y<t;)d&&d[y].run();y=-1,t=p.length}d=null,g=!1,i(e)}}function u(e,t){this.fun=e,this.array=t}function h(){}var f,c,l=e.exports={};!function(){try{f="function"==typeof setTimeout?setTimeout:r}catch(e){f=r}try{c="function"==typeof clearTimeout?clearTimeout:n}catch(e){c=n}}();var d,p=[],g=!1,y=-1;l.nextTick=function(e){var t=new Array(arguments.length-1);if(arguments.length>1)for(var r=1;r<arguments.length;r++)t[r-1]=arguments[r];p.push(new u(e,t)),1!==p.length||g||o(a)},u.prototype.run=function(){this.fun.apply(null,this.array)},l.title="browser",l.browser=!0,l.env={},l.argv=[],l.version="",l.versions={},l.on=h,l.addListener=h,l.once=h,l.off=h,l.removeListener=h,l.removeAllListeners=h,l.emit=h,l.prependListener=h,l.prependOnceListener=h,l.listeners=function(e){return[]},l.binding=function(e){throw new Error("process.binding is not supported")},l.cwd=function(){return"/"},l.chdir=function(e){throw new Error("process.chdir is not supported")},l.umask=function(){return 0}},function(e,t,r){"use strict";function n(e){if(!(this instanceof n))return new n(e);h.call(this,e),f.call(this,e),e&&!1===e.readable&&(this.readable=!1),e&&!1===e.writable&&(this.writable=!1),this.allowHalfOpen=!0,e&&!1===e.allowHalfOpen&&(this.allowHalfOpen=!1),this.once("end",o)}function o(){this.allowHalfOpen||this._writableState.ended||s(i,this)}function i(e){e.end()}var s=r(9),a=Object.keys||function(e){var t=[];for(var r in e)t.push(r);return t};e.exports=n;var u=r(8);u.inherits=r(2);var h=r(20),f=r(24);u.inherits(n,h);for(var c=a(f.prototype),l=0;l<c.length;l++){var d=c[l];n.prototype[d]||(n.prototype[d]=f.prototype[d])}Object.defineProperty(n.prototype,"destroyed",{get:function(){return void 0!==this._readableState&&void 0!==this._writableState&&(this._readableState.destroyed&&this._writableState.destroyed)},set:function(e){void 0!==this._readableState&&void 0!==this._writableState&&(this._readableState.destroyed=e,this._writableState.destroyed=e)}}),n.prototype._destroy=function(e,t){this.push(null),this.end(),s(t,e)}},function(e,t,r){"use strict";function n(){for(var e=[],t=0;t<arguments.length;t++)e[t]=arguments[t];console.debug?console.debug.apply(null,e):console.log.apply(null,e)}Object.defineProperty(t,"__esModule",{value:!0}),t.debug=n},function(e,t,r){"use strict";function n(){if(i){var e=i;i=null;for(var t=0;t<e.length;t++)try{e[t]()}catch(o){null===i&&(i=[],setTimeout(function(){n()},0));for(var r=e.length-1;r>t;r--)i.unshift(e[r]);throw o}}}function o(e){if(null!==i)return void i.push(e);i=[e],setTimeout(function(){n()},0)}Object.defineProperty(t,"__esModule",{value:!0});var i=null;t.default=o},function(e,t,r){(function(e){function r(e){return Array.isArray?Array.isArray(e):"[object Array]"===y(e)}function n(e){return"boolean"==typeof e}function o(e){return null===e}function i(e){return null==e}function s(e){return"number"==typeof e}function a(e){return"string"==typeof e}function u(e){return"symbol"==typeof e}function h(e){return void 0===e}function f(e){return"[object RegExp]"===y(e)}function c(e){return"object"==typeof e&&null!==e}function l(e){return"[object Date]"===y(e)}function d(e){return"[object Error]"===y(e)||e instanceof Error}function p(e){return"function"==typeof e}function g(e){return null===e||"boolean"==typeof e||"number"==typeof e||"string"==typeof e||"symbol"==typeof e||void 0===e}function y(e){return Object.prototype.toString.call(e)}t.isArray=r,t.isBoolean=n,t.isNull=o,t.isNullOrUndefined=i,t.isNumber=s,t.isString=a,t.isSymbol=u,t.isUndefined=h,t.isRegExp=f,t.isObject=c,t.isDate=l,t.isError=d,t.isFunction=p,t.isPrimitive=g,t.isBuffer=e.isBuffer}).call(t,r(3).Buffer)},function(e,t,r){"use strict";(function(t){function r(e,r,n,o){if("function"!=typeof e)throw new TypeError('"callback" argument must be a function');var i,s,a=arguments.length;switch(a){case 0:case 1:return t.nextTick(e);case 2:return t.nextTick(function(){e.call(null,r)});case 3:return t.nextTick(function(){e.call(null,r,n)});case 4:return t.nextTick(function(){e.call(null,r,n,o)});default:for(i=new Array(a-1),s=0;s<i.length;)i[s++]=arguments[s];return t.nextTick(function(){e.apply(null,i)})}}!t.version||0===t.version.indexOf("v0.")||0===t.version.indexOf("v1.")&&0!==t.version.indexOf("v1.8.")?e.exports=r:e.exports=t.nextTick}).call(t,r(4))},function(e,t,r){function n(e,t){for(var r in e)t[r]=e[r]}function o(e,t,r){return s(e,t,r)}var i=r(3),s=i.Buffer;s.from&&s.alloc&&s.allocUnsafe&&s.allocUnsafeSlow?e.exports=i:(n(i,t),t.Buffer=o),n(s,o),o.from=function(e,t,r){if("number"==typeof e)throw new TypeError("Argument must not be a number");return s(e,t,r)},o.alloc=function(e,t,r){if("number"!=typeof e)throw new TypeError("Argument must be a number");var n=s(e);return void 0!==t?"string"==typeof r?n.fill(t,r):n.fill(t):n.fill(0),n},o.allocUnsafe=function(e){if("number"!=typeof e)throw new TypeError("Argument must be a number");return s(e)},o.allocUnsafeSlow=function(e){if("number"!=typeof e)throw new TypeError("Argument must be a number");return i.SlowBuffer(e)}},function(e,t,r){"use strict";function n(){this.protocol=null,this.slashes=null,this.auth=null,this.host=null,this.port=null,this.hostname=null,this.hash=null,this.search=null,this.query=null,this.pathname=null,this.path=null,this.href=null}function o(e,t,r){if(e&&h.isObject(e)&&e instanceof n)return e;var o=new n;return o.parse(e,t,r),o}function i(e){return h.isString(e)&&(e=o(e)),e instanceof n?e.format():n.prototype.format.call(e)}function s(e,t){return o(e,!1,!0).resolve(t)}function a(e,t){return e?o(e,!1,!0).resolveObject(t):t}var u=r(50),h=r(52);t.parse=o,t.resolve=s,t.resolveObject=a,t.format=i,t.Url=n;var f=/^([a-z0-9.+-]+:)/i,c=/:[0-9]*$/,l=/^(\/\/?(?!\/)[^\?\s]*)(\?[^\s]*)?$/,d=["<",">",'"',"`"," ","\r","\n","\t"],p=["{","}","|","\\","^","`"].concat(d),g=["'"].concat(p),y=["%","/","?",";","#"].concat(g),v=["/","?","#"],b=/^[+a-z0-9A-Z_-]{0,63}$/,m=/^([+a-z0-9A-Z_-]{0,63})(.*)$/,w={javascript:!0,"javascript:":!0},_={javascript:!0,"javascript:":!0},E={http:!0,https:!0,ftp:!0,gopher:!0,file:!0,"http:":!0,"https:":!0,"ftp:":!0,"gopher:":!0,"file:":!0},S=r(53);n.prototype.parse=function(e,t,r){if(!h.isString(e))throw new TypeError("Parameter 'url' must be a string, not "+typeof e);var n=e.indexOf("?"),o=-1!==n&&n<e.indexOf("#")?"?":"#",i=e.split(o),s=/\\/g;i[0]=i[0].replace(s,"/"),e=i.join(o);var a=e;if(a=a.trim(),!r&&1===e.split("#").length){var c=l.exec(a);if(c)return this.path=a,this.href=a,this.pathname=c[1],c[2]?(this.search=c[2],this.query=t?S.parse(this.search.substr(1)):this.search.substr(1)):t&&(this.search="",this.query={}),this}var d=f.exec(a);if(d){d=d[0];var p=d.toLowerCase();this.protocol=p,a=a.substr(d.length)}if(r||d||a.match(/^\/\/[^@\/]+@[^@\/]+/)){var R="//"===a.substr(0,2);!R||d&&_[d]||(a=a.substr(2),this.slashes=!0)}if(!_[d]&&(R||d&&!E[d])){for(var A=-1,T=0;T<v.length;T++){var C=a.indexOf(v[T]);-1!==C&&(-1===A||C<A)&&(A=C)}var M,x;x=-1===A?a.lastIndexOf("@"):a.lastIndexOf("@",A),-1!==x&&(M=a.slice(0,x),a=a.slice(x+1),this.auth=decodeURIComponent(M)),A=-1;for(var T=0;T<y.length;T++){var C=a.indexOf(y[T]);-1!==C&&(-1===A||C<A)&&(A=C)}-1===A&&(A=a.length),this.host=a.slice(0,A),a=a.slice(A),this.parseHost(),this.hostname=this.hostname||"";var O="["===this.hostname[0]&&"]"===this.hostname[this.hostname.length-1];if(!O)for(var k=this.hostname.split(/\./),T=0,P=k.length;T<P;T++){var L=k[T];if(L&&!L.match(b)){for(var I="",U=0,H=L.length;U<H;U++)L.charCodeAt(U)>127?I+="x":I+=L[U];if(!I.match(b)){var j=k.slice(0,T),N=k.slice(T+1),B=L.match(m);B&&(j.push(B[1]),N.unshift(B[2])),N.length&&(a="/"+N.join(".")+a),this.hostname=j.join(".");break}}}this.hostname.length>255?this.hostname="":this.hostname=this.hostname.toLowerCase(),O||(this.hostname=u.toASCII(this.hostname));var q=this.port?":"+this.port:"",D=this.hostname||"";this.host=D+q,this.href+=this.host,O&&(this.hostname=this.hostname.substr(1,this.hostname.length-2),"/"!==a[0]&&(a="/"+a))}if(!w[p])for(var T=0,P=g.length;T<P;T++){var F=g[T];if(-1!==a.indexOf(F)){var Y=encodeURIComponent(F);Y===F&&(Y=escape(F)),a=a.split(F).join(Y)}}var z=a.indexOf("#");-1!==z&&(this.hash=a.substr(z),a=a.slice(0,z));var X=a.indexOf("?");if(-1!==X?(this.search=a.substr(X),this.query=a.substr(X+1),t&&(this.query=S.parse(this.query)),a=a.slice(0,X)):t&&(this.search="",this.query={}),a&&(this.pathname=a),E[p]&&this.hostname&&!this.pathname&&(this.pathname="/"),this.pathname||this.search){var q=this.pathname||"",W=this.search||"";this.path=q+W}return this.href=this.format(),this},n.prototype.format=function(){var e=this.auth||"";e&&(e=encodeURIComponent(e),e=e.replace(/%3A/i,":"),e+="@");var t=this.protocol||"",r=this.pathname||"",n=this.hash||"",o=!1,i="";this.host?o=e+this.host:this.hostname&&(o=e+(-1===this.hostname.indexOf(":")?this.hostname:"["+this.hostname+"]"),this.port&&(o+=":"+this.port)),this.query&&h.isObject(this.query)&&Object.keys(this.query).length&&(i=S.stringify(this.query));var s=this.search||i&&"?"+i||"";return t&&":"!==t.substr(-1)&&(t+=":"),this.slashes||(!t||E[t])&&!1!==o?(o="//"+(o||""),r&&"/"!==r.charAt(0)&&(r="/"+r)):o||(o=""),n&&"#"!==n.charAt(0)&&(n="#"+n),s&&"?"!==s.charAt(0)&&(s="?"+s),r=r.replace(/[?#]/g,function(e){return encodeURIComponent(e)}),s=s.replace("#","%23"),t+o+r+s+n},n.prototype.resolve=function(e){return this.resolveObject(o(e,!1,!0)).format()},n.prototype.resolveObject=function(e){if(h.isString(e)){var t=new n;t.parse(e,!1,!0),e=t}for(var r=new n,o=Object.keys(this),i=0;i<o.length;i++){var s=o[i];r[s]=this[s]}if(r.hash=e.hash,""===e.href)return r.href=r.format(),r;if(e.slashes&&!e.protocol){for(var a=Object.keys(e),u=0;u<a.length;u++){var f=a[u];"protocol"!==f&&(r[f]=e[f])}return E[r.protocol]&&r.hostname&&!r.pathname&&(r.path=r.pathname="/"),r.href=r.format(),r}if(e.protocol&&e.protocol!==r.protocol){if(!E[e.protocol]){for(var c=Object.keys(e),l=0;l<c.length;l++){var d=c[l];r[d]=e[d]}return r.href=r.format(),r}if(r.protocol=e.protocol,e.host||_[e.protocol])r.pathname=e.pathname;else{for(var p=(e.pathname||"").split("/");p.length&&!(e.host=p.shift()););e.host||(e.host=""),e.hostname||(e.hostname=""),""!==p[0]&&p.unshift(""),p.length<2&&p.unshift(""),r.pathname=p.join("/")}if(r.search=e.search,r.query=e.query,r.host=e.host||"",r.auth=e.auth,r.hostname=e.hostname||e.host,r.port=e.port,r.pathname||r.search){var g=r.pathname||"",y=r.search||"";r.path=g+y}return r.slashes=r.slashes||e.slashes,r.href=r.format(),r}var v=r.pathname&&"/"===r.pathname.charAt(0),b=e.host||e.pathname&&"/"===e.pathname.charAt(0),m=b||v||r.host&&e.pathname,w=m,S=r.pathname&&r.pathname.split("/")||[],p=e.pathname&&e.pathname.split("/")||[],R=r.protocol&&!E[r.protocol];if(R&&(r.hostname="",r.port=null,r.host&&(""===S[0]?S[0]=r.host:S.unshift(r.host)),r.host="",e.protocol&&(e.hostname=null,e.port=null,e.host&&(""===p[0]?p[0]=e.host:p.unshift(e.host)),e.host=null),m=m&&(""===p[0]||""===S[0])),b)r.host=e.host||""===e.host?e.host:r.host,r.hostname=e.hostname||""===e.hostname?e.hostname:r.hostname,r.search=e.search,r.query=e.query,S=p;else if(p.length)S||(S=[]),S.pop(),S=S.concat(p),r.search=e.search,r.query=e.query;else if(!h.isNullOrUndefined(e.search)){if(R){r.hostname=r.host=S.shift();var A=!!(r.host&&r.host.indexOf("@")>0)&&r.host.split("@");A&&(r.auth=A.shift(),r.host=r.hostname=A.shift())}return r.search=e.search,r.query=e.query,h.isNull(r.pathname)&&h.isNull(r.search)||(r.path=(r.pathname?r.pathname:"")+(r.search?r.search:"")),r.href=r.format(),r}if(!S.length)return r.pathname=null,r.search?r.path="/"+r.search:r.path=null,r.href=r.format(),r;for(var T=S.slice(-1)[0],C=(r.host||e.host||S.length>1)&&("."===T||".."===T)||""===T,M=0,x=S.length;x>=0;x--)T=S[x],"."===T?S.splice(x,1):".."===T?(S.splice(x,1),M++):M&&(S.splice(x,1),M--);if(!m&&!w)for(;M--;M)S.unshift("..");!m||""===S[0]||S[0]&&"/"===S[0].charAt(0)||S.unshift(""),C&&"/"!==S.join("/").substr(-1)&&S.push("");var O=""===S[0]||S[0]&&"/"===S[0].charAt(0);if(R){r.hostname=r.host=O?"":S.length?S.shift():"";var A=!!(r.host&&r.host.indexOf("@")>0)&&r.host.split("@");A&&(r.auth=A.shift(),r.host=r.hostname=A.shift())}return m=m||r.host&&S.length,m&&!O&&S.unshift(""),S.length?r.pathname=S.join("/"):(r.pathname=null,r.path=null),h.isNull(r.pathname)&&h.isNull(r.search)||(r.path=(r.pathname?r.pathname:"")+(r.search?r.search:"")),r.auth=e.auth||r.auth,r.slashes=r.slashes||e.slashes,r.href=r.format(),r},n.prototype.parseHost=function(){var e=this.host,t=c.exec(e);t&&(t=t[0],":"!==t&&(this.port=t.substr(1)),e=e.substr(0,e.length-t.length)),e&&(this.hostname=e)}},function(e,t,r){"use strict";function n(e,t){return new l(e,t)}function o(e){var t=e.get("grpc-status")||[];if(t.length>0)try{var r=t[0];return parseInt(r,10)}catch(e){return null}return null}Object.defineProperty(t,"__esModule",{value:!0});var i=r(1),s=r(27),a=r(28),u=r(6),h=r(7),f=r(14),c=r(59);t.client=n;var l=function(){function e(e,t){this.started=!1,this.sentFirstMessage=!1,this.completed=!1,this.closed=!1,this.finishedSending=!1,this.onHeadersCallbacks=[],this.onMessageCallbacks=[],this.onEndCallbacks=[],this.parser=new s.ChunkParser,this.methodDefinition=e,this.props=t,this.createTransport()}return e.prototype.createTransport=function(){var e=this.props.host+"/"+this.methodDefinition.service.serviceName+"/"+this.methodDefinition.methodName,t={methodDefinition:this.methodDefinition,debug:this.props.debug||!1,url:e,onHeaders:this.onTransportHeaders.bind(this),onChunk:this.onTransportChunk.bind(this),onEnd:this.onTransportEnd.bind(this)},r=this.props.transport;if(r){var n=r(t);if(n instanceof Error)throw n;this.transport=n}else{var o=f.DefaultTransportFactory(t);if(o instanceof Error)throw o;this.transport=o}},e.prototype.onTransportHeaders=function(e,t){if(this.props.debug&&u.debug("onHeaders",e,t),this.closed)return void(this.props.debug&&u.debug("grpc.onHeaders received after request was closed - ignoring"));if(0===t);else{this.responseHeaders=e,this.props.debug&&u.debug("onHeaders.responseHeaders",JSON.stringify(this.responseHeaders,null,2));var r=a.httpStatusToCode(t);this.props.debug&&u.debug("onHeaders.code",r);var n=e.get("grpc-message")||[];if(this.props.debug&&u.debug("onHeaders.gRPCMessage",n),r!==a.Code.OK)return void this.rawOnError(r,n[0]);this.rawOnHeaders(e)}},e.prototype.onTransportChunk=function(e){var t=this;if(this.closed)return void(this.props.debug&&u.debug("grpc.onChunk received after request was closed - ignoring"));var r=[];try{r=this.parser.parse(e)}catch(e){return this.props.debug&&u.debug("onChunk.parsing error",e,e.message),void this.rawOnError(a.Code.Internal,"parsing error: "+e.message)}r.forEach(function(e){if(e.chunkType===s.ChunkType.MESSAGE){var r=t.methodDefinition.responseType.deserializeBinary(e.data);t.rawOnMessage(r)}else e.chunkType===s.ChunkType.TRAILERS&&(t.responseHeaders?(t.responseTrailers=new i.Metadata(e.trailers),t.props.debug&&u.debug("onChunk.trailers",t.responseTrailers)):(t.responseHeaders=new i.Metadata(e.trailers),t.rawOnHeaders(t.responseHeaders)))})},e.prototype.onTransportEnd=function(){if(this.props.debug&&u.debug("grpc.onEnd"),this.closed)return void(this.props.debug&&u.debug("grpc.onEnd received after request was closed - ignoring"));if(void 0===this.responseTrailers){if(void 0===this.responseHeaders)return void this.rawOnError(a.Code.Unknown,"Response closed without headers");var e=o(this.responseHeaders),t=this.responseHeaders.get("grpc-message");return this.props.debug&&u.debug("grpc.headers only response ",e,t),null===e?void this.rawOnEnd(a.Code.Unknown,"Response closed without grpc-status (Headers only)",this.responseHeaders):void this.rawOnEnd(e,t[0],this.responseHeaders)}var r=o(this.responseTrailers);if(null===r)return void this.rawOnError(a.Code.Internal,"Response closed without grpc-status (Trailers provided)");var n=this.responseTrailers.get("grpc-message");this.rawOnEnd(r,n[0],this.responseTrailers)},e.prototype.rawOnEnd=function(e,t,r){this.props.debug&&u.debug("rawOnEnd",e,t,r),this.completed||(this.completed=!0,this.onEndCallbacks.forEach(function(n){h.default(function(){n(e,t,r)})}))},e.prototype.rawOnHeaders=function(e){this.props.debug&&u.debug("rawOnHeaders",e),this.completed||this.onHeadersCallbacks.forEach(function(t){h.default(function(){t(e)})})},e.prototype.rawOnError=function(e,t){this.props.debug&&u.debug("rawOnError",e,t),this.completed||(this.completed=!0,this.onEndCallbacks.forEach(function(r){h.default(function(){r(e,t,new i.Metadata)})}))},e.prototype.rawOnMessage=function(e){this.props.debug&&u.debug("rawOnMessage",e.toObject()),this.completed||this.onMessageCallbacks.forEach(function(t){h.default(function(){t(e)})})},e.prototype.onHeaders=function(e){this.onHeadersCallbacks.push(e)},e.prototype.onMessage=function(e){this.onMessageCallbacks.push(e)},e.prototype.onEnd=function(e){this.onEndCallbacks.push(e)},e.prototype.start=function(e){if(this.started)throw new Error("Client already started - cannot .start()");this.started=!0;var t=new i.Metadata(e||{});t.set("content-type","application/grpc-web+proto"),t.set("x-grpc-web","1"),this.transport.start(t)},e.prototype.send=function(e){if(!this.started)throw new Error("Client not started - .start() must be called before .send()");if(this.closed)throw new Error("Client already closed - cannot .send()");if(this.finishedSending)throw new Error("Client already finished sending - cannot .send()");if(!this.methodDefinition.requestStream&&this.sentFirstMessage)throw new Error("Message already sent for non-client-streaming method - cannot .send()");this.sentFirstMessage=!0;var t=c.frameRequest(e);this.transport.sendMessage(t)},e.prototype.finishSend=function(){if(!this.started)throw new Error("Client not started - .finishSend() must be called before .close()");if(this.closed)throw new Error("Client already closed - cannot .send()");if(this.finishedSending)throw new Error("Client already finished sending - cannot .finishSend()");this.finishedSending=!0,this.transport.finishSend()},e.prototype.close=function(){if(!this.started)throw new Error("Client not started - .start() must be called before .close()");if(this.closed)throw new Error("Client already closed - cannot .close()");this.closed=!0,this.props.debug&&u.debug("request.abort aborting request"),this.transport.cancel()},e}()},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var n=r(30);t.BrowserHeaders=n.BrowserHeaders},function(e,t,r){"use strict";function n(e){return e.methodDefinition.requestStream?new Error("No transport available for client-streaming (requestStream) method"):(s||(s=o()),s(e))}function o(){if(a.detectFetchSupport())return a.default;if(h.detectMozXHRSupport())return h.default;if(u.detectXHRSupport())return u.default;if(f.detectNodeHTTPSupport())return f.default;throw new Error("No suitable transport found for gRPC-Web")}function i(e){return c.default(e)}Object.defineProperty(t,"__esModule",{value:!0});var s,a=r(33),u=r(34),h=r(35),f=r(37),c=r(57);t.DefaultTransportFactory=n,t.WebsocketTransportFactory=i},function(e,t){var r={}.toString;e.exports=Array.isArray||function(e){return"[object Array]"==r.call(e)}},function(e,t,r){(function(e){var n=r(40),o=r(18),i=r(48),s=r(49),a=r(11),u=t;u.request=function(t,r){t="string"==typeof t?a.parse(t):i(t);var o=-1===e.location.protocol.search(/^https?:$/)?"http:":"",s=t.protocol||o,u=t.hostname||t.host,h=t.port,f=t.path||"/";u&&-1!==u.indexOf(":")&&(u="["+u+"]"),t.url=(u?s+"//"+u:"")+(h?":"+h:"")+f,t.method=(t.method||"GET").toUpperCase(),t.headers=t.headers||{};var c=new n(t);return r&&c.on("response",r),c},u.get=function(e,t){var r=u.request(e,t);return r.end(),r},u.ClientRequest=n,u.IncomingMessage=o,u.Agent=function(){},u.Agent.defaultMaxSockets=4,u.STATUS_CODES=s,u.METHODS=["CHECKOUT","CONNECT","COPY","DELETE","GET","HEAD","LOCK","M-SEARCH","MERGE","MKACTIVITY","MKCOL","MOVE","NOTIFY","OPTIONS","PATCH","POST","PROPFIND","PROPPATCH","PURGE","PUT","REPORT","SEARCH","SUBSCRIBE","TRACE","UNLOCK","UNSUBSCRIBE"]}).call(t,r(0))},function(e,t,r){(function(e){function r(){if(void 0!==i)return i;if(e.XMLHttpRequest){i=new e.XMLHttpRequest;try{i.open("GET",e.XDomainRequest?"/":"https://example.com")}catch(e){i=null}}else i=null;return i}function n(e){var t=r();if(!t)return!1;try{return t.responseType=e,t.responseType===e}catch(e){}return!1}function o(e){return"function"==typeof e}t.fetch=o(e.fetch)&&o(e.ReadableStream),t.writableStream=o(e.WritableStream),t.abortController=o(e.AbortController),t.blobConstructor=!1;try{new Blob([new ArrayBuffer(1)]),t.blobConstructor=!0}catch(e){}var i,s=void 0!==e.ArrayBuffer,a=s&&o(e.ArrayBuffer.prototype.slice);t.arraybuffer=t.fetch||s&&n("arraybuffer"),t.msstream=!t.fetch&&a&&n("ms-stream"),t.mozchunkedarraybuffer=!t.fetch&&s&&n("moz-chunked-arraybuffer"),t.overrideMimeType=t.fetch||!!r()&&o(r().overrideMimeType),t.vbArray=o(e.VBArray),i=null}).call(t,r(0))},function(e,t,r){(function(e,n,o){var i=r(17),s=r(2),a=r(19),u=t.readyStates={UNSENT:0,OPENED:1,HEADERS_RECEIVED:2,LOADING:3,DONE:4},h=t.IncomingMessage=function(t,r,o){function s(){f.read().then(function(e){if(!u._destroyed){if(e.done)return void u.push(null);u.push(new n(e.value)),s()}}).catch(function(e){u._destroyed||u.emit("error",e)})}var u=this;if(a.Readable.call(u),u._mode=o,u.headers={},u.rawHeaders=[],u.trailers={},u.rawTrailers=[],u.on("end",function(){e.nextTick(function(){u.emit("close")})}),"fetch"===o){if(u._fetchResponse=r,u.url=r.url,u.statusCode=r.status,u.statusMessage=r.statusText,r.headers.forEach(function(e,t){u.headers[t.toLowerCase()]=e,u.rawHeaders.push(t,e)}),i.writableStream){var h=new WritableStream({write:function(e){return new Promise(function(t,r){u._destroyed||(u.push(new n(e))?t():u._resumeFetch=t)})},close:function(){u._destroyed||u.push(null)},abort:function(e){u._destroyed||u.emit("error",e)}});try{return void r.body.pipeTo(h)}catch(e){}}var f=r.body.getReader();s()}else{u._xhr=t,u._pos=0,u.url=t.responseURL,u.statusCode=t.status,u.statusMessage=t.statusText;if(t.getAllResponseHeaders().split(/\r?\n/).forEach(function(e){var t=e.match(/^([^:]+):\s*(.*)/);if(t){var r=t[1].toLowerCase();"set-cookie"===r?(void 0===u.headers[r]&&(u.headers[r]=[]),u.headers[r].push(t[2])):void 0!==u.headers[r]?u.headers[r]+=", "+t[2]:u.headers[r]=t[2],u.rawHeaders.push(t[1],t[2])}}),u._charset="x-user-defined",!i.overrideMimeType){var c=u.rawHeaders["mime-type"];if(c){var l=c.match(/;\s*charset=([^;])(;|$)/);l&&(u._charset=l[1].toLowerCase())}u._charset||(u._charset="utf-8")}}};s(h,a.Readable),h.prototype._read=function(){var e=this,t=e._resumeFetch;t&&(e._resumeFetch=null,t())},h.prototype._onXHRProgress=function(){var e=this,t=e._xhr,r=null;switch(e._mode){case"text:vbarray":if(t.readyState!==u.DONE)break;try{r=new o.VBArray(t.responseBody).toArray()}catch(e){}if(null!==r){e.push(new n(r));break}case"text":try{r=t.responseText}catch(t){e._mode="text:vbarray";break}if(r.length>e._pos){var i=r.substr(e._pos);if("x-user-defined"===e._charset){for(var s=new n(i.length),a=0;a<i.length;a++)s[a]=255&i.charCodeAt(a);e.push(s)}else e.push(i,e._charset);e._pos=r.length}break;case"arraybuffer":if(t.readyState!==u.DONE||!t.response)break;r=t.response,e.push(new n(new Uint8Array(r)));break;case"moz-chunked-arraybuffer":if(r=t.response,t.readyState!==u.LOADING||!r)break;e.push(new n(new Uint8Array(r)));break;case"ms-stream":if(r=t.response,t.readyState!==u.LOADING)break;var h=new o.MSStreamReader;h.onprogress=function(){h.result.byteLength>e._pos&&(e.push(new n(new Uint8Array(h.result.slice(e._pos)))),e._pos=h.result.byteLength)},h.onload=function(){e.push(null)},h.readAsArrayBuffer(r)}e._xhr.readyState===u.DONE&&"ms-stream"!==e._mode&&e.push(null)}}).call(t,r(4),r(3).Buffer,r(0))},function(e,t,r){t=e.exports=r(20),t.Stream=t,t.Readable=t,t.Writable=r(24),t.Duplex=r(5),t.Transform=r(26),t.PassThrough=r(46)},function(e,t,r){"use strict";(function(t,n){function o(e){return j.from(e)}function i(e){return j.isBuffer(e)||e instanceof N}function s(e,t,r){if("function"==typeof e.prependListener)return e.prependListener(t,r);e._events&&e._events[t]?I(e._events[t])?e._events[t].unshift(r):e._events[t]=[r,e._events[t]]:e.on(t,r)}function a(e,t){L=L||r(5),e=e||{},this.objectMode=!!e.objectMode,t instanceof L&&(this.objectMode=this.objectMode||!!e.readableObjectMode);var n=e.highWaterMark,o=this.objectMode?16:16384;this.highWaterMark=n||0===n?n:o,this.highWaterMark=Math.floor(this.highWaterMark),this.buffer=new Y,this.length=0,this.pipes=null,this.pipesCount=0,this.flowing=null,this.ended=!1,this.endEmitted=!1,this.reading=!1,this.sync=!0,this.needReadable=!1,this.emittedReadable=!1,this.readableListening=!1,this.resumeScheduled=!1,this.destroyed=!1,this.defaultEncoding=e.defaultEncoding||"utf8",this.awaitDrain=0,this.readingMore=!1,this.decoder=null,this.encoding=null,e.encoding&&(F||(F=r(25).StringDecoder),this.decoder=new F(e.encoding),this.encoding=e.encoding)}function u(e){if(L=L||r(5),!(this instanceof u))return new u(e);this._readableState=new a(e,this),this.readable=!0,e&&("function"==typeof e.read&&(this._read=e.read),"function"==typeof e.destroy&&(this._destroy=e.destroy)),H.call(this)}function h(e,t,r,n,i){var s=e._readableState;if(null===t)s.reading=!1,g(e,s);else{var a;i||(a=c(s,t)),a?e.emit("error",a):s.objectMode||t&&t.length>0?("string"==typeof t||s.objectMode||Object.getPrototypeOf(t)===j.prototype||(t=o(t)),n?s.endEmitted?e.emit("error",new Error("stream.unshift() after end event")):f(e,s,t,!0):s.ended?e.emit("error",new Error("stream.push() after EOF")):(s.reading=!1,s.decoder&&!r?(t=s.decoder.write(t),s.objectMode||0!==t.length?f(e,s,t,!1):b(e,s)):f(e,s,t,!1))):n||(s.reading=!1)}return l(s)}function f(e,t,r,n){t.flowing&&0===t.length&&!t.sync?(e.emit("data",r),e.read(0)):(t.length+=t.objectMode?1:r.length,n?t.buffer.unshift(r):t.buffer.push(r),t.needReadable&&y(e)),b(e,t)}function c(e,t){var r;return i(t)||"string"==typeof t||void 0===t||e.objectMode||(r=new TypeError("Invalid non-string/buffer chunk")),r}function l(e){return!e.ended&&(e.needReadable||e.length<e.highWaterMark||0===e.length)}function d(e){return e>=W?e=W:(e--,e|=e>>>1,e|=e>>>2,e|=e>>>4,e|=e>>>8,e|=e>>>16,e++),e}function p(e,t){return e<=0||0===t.length&&t.ended?0:t.objectMode?1:e!==e?t.flowing&&t.length?t.buffer.head.data.length:t.length:(e>t.highWaterMark&&(t.highWaterMark=d(e)),e<=t.length?e:t.ended?t.length:(t.needReadable=!0,0))}function g(e,t){if(!t.ended){if(t.decoder){var r=t.decoder.end();r&&r.length&&(t.buffer.push(r),t.length+=t.objectMode?1:r.length)}t.ended=!0,y(e)}}function y(e){var t=e._readableState;t.needReadable=!1,t.emittedReadable||(D("emitReadable",t.flowing),t.emittedReadable=!0,t.sync?P(v,e):v(e))}function v(e){D("emit readable"),e.emit("readable"),R(e)}function b(e,t){t.readingMore||(t.readingMore=!0,P(m,e,t))}function m(e,t){for(var r=t.length;!t.reading&&!t.flowing&&!t.ended&&t.length<t.highWaterMark&&(D("maybeReadMore read 0"),e.read(0),r!==t.length);)r=t.length;t.readingMore=!1}function w(e){return function(){var t=e._readableState;D("pipeOnDrain",t.awaitDrain),t.awaitDrain&&t.awaitDrain--,0===t.awaitDrain&&U(e,"data")&&(t.flowing=!0,R(e))}}function _(e){D("readable nexttick read 0"),e.read(0)}function E(e,t){t.resumeScheduled||(t.resumeScheduled=!0,P(S,e,t))}function S(e,t){t.reading||(D("resume read 0"),e.read(0)),t.resumeScheduled=!1,t.awaitDrain=0,e.emit("resume"),R(e),t.flowing&&!t.reading&&e.read(0)}function R(e){var t=e._readableState;for(D("flow",t.flowing);t.flowing&&null!==e.read(););}function A(e,t){if(0===t.length)return null;var r;return t.objectMode?r=t.buffer.shift():!e||e>=t.length?(r=t.decoder?t.buffer.join(""):1===t.buffer.length?t.buffer.head.data:t.buffer.concat(t.length),t.buffer.clear()):r=T(e,t.buffer,t.decoder),r}function T(e,t,r){var n;return e<t.head.data.length?(n=t.head.data.slice(0,e),t.head.data=t.head.data.slice(e)):n=e===t.head.data.length?t.shift():r?C(e,t):M(e,t),n}function C(e,t){var r=t.head,n=1,o=r.data;for(e-=o.length;r=r.next;){var i=r.data,s=e>i.length?i.length:e;if(s===i.length?o+=i:o+=i.slice(0,e),0===(e-=s)){s===i.length?(++n,r.next?t.head=r.next:t.head=t.tail=null):(t.head=r,r.data=i.slice(s));break}++n}return t.length-=n,o}function M(e,t){var r=j.allocUnsafe(e),n=t.head,o=1;for(n.data.copy(r),e-=n.data.length;n=n.next;){var i=n.data,s=e>i.length?i.length:e;if(i.copy(r,r.length-e,0,s),0===(e-=s)){s===i.length?(++o,n.next?t.head=n.next:t.head=t.tail=null):(t.head=n,n.data=i.slice(s));break}++o}return t.length-=o,r}function x(e){var t=e._readableState;if(t.length>0)throw new Error('"endReadable()" called on non-empty stream');t.endEmitted||(t.ended=!0,P(O,t,e))}function O(e,t){e.endEmitted||0!==e.length||(e.endEmitted=!0,t.readable=!1,t.emit("end"))}function k(e,t){for(var r=0,n=e.length;r<n;r++)if(e[r]===t)return r;return-1}var P=r(9);e.exports=u;var L,I=r(15);u.ReadableState=a;var U=(r(21).EventEmitter,function(e,t){return e.listeners(t).length}),H=r(22),j=r(10).Buffer,N=t.Uint8Array||function(){},B=r(8);B.inherits=r(2);var q=r(41),D=void 0;D=q&&q.debuglog?q.debuglog("stream"):function(){};var F,Y=r(42),z=r(23);B.inherits(u,H);var X=["error","close","destroy","pause","resume"];Object.defineProperty(u.prototype,"destroyed",{get:function(){return void 0!==this._readableState&&this._readableState.destroyed},set:function(e){this._readableState&&(this._readableState.destroyed=e)}}),u.prototype.destroy=z.destroy,u.prototype._undestroy=z.undestroy,u.prototype._destroy=function(e,t){this.push(null),t(e)},u.prototype.push=function(e,t){var r,n=this._readableState;return n.objectMode?r=!0:"string"==typeof e&&(t=t||n.defaultEncoding,t!==n.encoding&&(e=j.from(e,t),t=""),r=!0),h(this,e,t,!1,r)},u.prototype.unshift=function(e){return h(this,e,null,!0,!1)},u.prototype.isPaused=function(){return!1===this._readableState.flowing},u.prototype.setEncoding=function(e){return F||(F=r(25).StringDecoder),this._readableState.decoder=new F(e),this._readableState.encoding=e,this};var W=8388608;u.prototype.read=function(e){D("read",e),e=parseInt(e,10);var t=this._readableState,r=e;if(0!==e&&(t.emittedReadable=!1),0===e&&t.needReadable&&(t.length>=t.highWaterMark||t.ended))return D("read: emitReadable",t.length,t.ended),0===t.length&&t.ended?x(this):y(this),null;if(0===(e=p(e,t))&&t.ended)return 0===t.length&&x(this),null;var n=t.needReadable;D("need readable",n),(0===t.length||t.length-e<t.highWaterMark)&&(n=!0,D("length less than watermark",n)),t.ended||t.reading?(n=!1,D("reading or ended",n)):n&&(D("do read"),t.reading=!0,t.sync=!0,0===t.length&&(t.needReadable=!0),this._read(t.highWaterMark),t.sync=!1,t.reading||(e=p(r,t)));var o;return o=e>0?A(e,t):null,null===o?(t.needReadable=!0,e=0):t.length-=e,0===t.length&&(t.ended||(t.needReadable=!0),r!==e&&t.ended&&x(this)),null!==o&&this.emit("data",o),o},u.prototype._read=function(e){this.emit("error",new Error("_read() is not implemented"))},u.prototype.pipe=function(e,t){function r(e,t){D("onunpipe"),e===l&&t&&!1===t.hasUnpiped&&(t.hasUnpiped=!0,i())}function o(){D("onend"),e.end()}function i(){D("cleanup"),e.removeListener("close",h),e.removeListener("finish",f),e.removeListener("drain",y),e.removeListener("error",u),e.removeListener("unpipe",r),l.removeListener("end",o),l.removeListener("end",c),l.removeListener("data",a),v=!0,!d.awaitDrain||e._writableState&&!e._writableState.needDrain||y()}function a(t){D("ondata"),b=!1,!1!==e.write(t)||b||((1===d.pipesCount&&d.pipes===e||d.pipesCount>1&&-1!==k(d.pipes,e))&&!v&&(D("false write response, pause",l._readableState.awaitDrain),l._readableState.awaitDrain++,b=!0),l.pause())}function u(t){D("onerror",t),c(),e.removeListener("error",u),0===U(e,"error")&&e.emit("error",t)}function h(){e.removeListener("finish",f),c()}function f(){D("onfinish"),e.removeListener("close",h),c()}function c(){D("unpipe"),l.unpipe(e)}var l=this,d=this._readableState;switch(d.pipesCount){case 0:d.pipes=e;break;case 1:d.pipes=[d.pipes,e];break;default:d.pipes.push(e)}d.pipesCount+=1,D("pipe count=%d opts=%j",d.pipesCount,t);var p=(!t||!1!==t.end)&&e!==n.stdout&&e!==n.stderr,g=p?o:c;d.endEmitted?P(g):l.once("end",g),e.on("unpipe",r);var y=w(l);e.on("drain",y);var v=!1,b=!1;return l.on("data",a),s(e,"error",u),e.once("close",h),e.once("finish",f),e.emit("pipe",l),d.flowing||(D("pipe resume"),l.resume()),e},u.prototype.unpipe=function(e){var t=this._readableState,r={hasUnpiped:!1};if(0===t.pipesCount)return this;if(1===t.pipesCount)return e&&e!==t.pipes?this:(e||(e=t.pipes),t.pipes=null,t.pipesCount=0,t.flowing=!1,e&&e.emit("unpipe",this,r),this);if(!e){var n=t.pipes,o=t.pipesCount;t.pipes=null,t.pipesCount=0,t.flowing=!1;for(var i=0;i<o;i++)n[i].emit("unpipe",this,r);return this}var s=k(t.pipes,e);return-1===s?this:(t.pipes.splice(s,1),t.pipesCount-=1,1===t.pipesCount&&(t.pipes=t.pipes[0]),e.emit("unpipe",this,r),this)},u.prototype.on=function(e,t){var r=H.prototype.on.call(this,e,t);if("data"===e)!1!==this._readableState.flowing&&this.resume();else if("readable"===e){var n=this._readableState;n.endEmitted||n.readableListening||(n.readableListening=n.needReadable=!0,n.emittedReadable=!1,n.reading?n.length&&y(this):P(_,this))}return r},u.prototype.addListener=u.prototype.on,u.prototype.resume=function(){var e=this._readableState;return e.flowing||(D("resume"),e.flowing=!0,E(this,e)),this},u.prototype.pause=function(){return D("call pause flowing=%j",this._readableState.flowing),!1!==this._readableState.flowing&&(D("pause"),this._readableState.flowing=!1,this.emit("pause")),this},u.prototype.wrap=function(e){var t=this._readableState,r=!1,n=this;e.on("end",function(){if(D("wrapped end"),t.decoder&&!t.ended){var e=t.decoder.end();e&&e.length&&n.push(e)}n.push(null)}),e.on("data",function(o){if(D("wrapped data"),t.decoder&&(o=t.decoder.write(o)),(!t.objectMode||null!==o&&void 0!==o)&&(t.objectMode||o&&o.length)){n.push(o)||(r=!0,e.pause())}});for(var o in e)void 0===this[o]&&"function"==typeof e[o]&&(this[o]=function(t){return function(){return e[t].apply(e,arguments)}}(o));for(var i=0;i<X.length;i++)e.on(X[i],n.emit.bind(n,X[i]));return n._read=function(t){D("wrapped _read",t),r&&(r=!1,e.resume())},n},u._fromList=A}).call(t,r(0),r(4))},function(e,t){function r(){this._events=this._events||{},this._maxListeners=this._maxListeners||void 0}function n(e){return"function"==typeof e}function o(e){return"number"==typeof e}function i(e){return"object"==typeof e&&null!==e}function s(e){return void 0===e}e.exports=r,r.EventEmitter=r,r.prototype._events=void 0,r.prototype._maxListeners=void 0,r.defaultMaxListeners=10,r.prototype.setMaxListeners=function(e){if(!o(e)||e<0||isNaN(e))throw TypeError("n must be a positive number");return this._maxListeners=e,this},r.prototype.emit=function(e){var t,r,o,a,u,h;if(this._events||(this._events={}),"error"===e&&(!this._events.error||i(this._events.error)&&!this._events.error.length)){if((t=arguments[1])instanceof Error)throw t;var f=new Error('Uncaught, unspecified "error" event. ('+t+")");throw f.context=t,f}if(r=this._events[e],s(r))return!1;if(n(r))switch(arguments.length){case 1:r.call(this);break;case 2:r.call(this,arguments[1]);break;case 3:r.call(this,arguments[1],arguments[2]);break;default:a=Array.prototype.slice.call(arguments,1),r.apply(this,a)}else if(i(r))for(a=Array.prototype.slice.call(arguments,1),h=r.slice(),o=h.length,u=0;u<o;u++)h[u].apply(this,a);return!0},r.prototype.addListener=function(e,t){var o;if(!n(t))throw TypeError("listener must be a function");return this._events||(this._events={}),this._events.newListener&&this.emit("newListener",e,n(t.listener)?t.listener:t),this._events[e]?i(this._events[e])?this._events[e].push(t):this._events[e]=[this._events[e],t]:this._events[e]=t,i(this._events[e])&&!this._events[e].warned&&(o=s(this._maxListeners)?r.defaultMaxListeners:this._maxListeners)&&o>0&&this._events[e].length>o&&(this._events[e].warned=!0,console.error("(node) warning: possible EventEmitter memory leak detected. %d listeners added. Use emitter.setMaxListeners() to increase limit.",this._events[e].length),"function"==typeof console.trace&&console.trace()),this},r.prototype.on=r.prototype.addListener,r.prototype.once=function(e,t){function r(){this.removeListener(e,r),o||(o=!0,t.apply(this,arguments))}if(!n(t))throw TypeError("listener must be a function");var o=!1;return r.listener=t,this.on(e,r),this},r.prototype.removeListener=function(e,t){var r,o,s,a;if(!n(t))throw TypeError("listener must be a function");if(!this._events||!this._events[e])return this;if(r=this._events[e],s=r.length,o=-1,r===t||n(r.listener)&&r.listener===t)delete this._events[e],this._events.removeListener&&this.emit("removeListener",e,t);else if(i(r)){for(a=s;a-- >0;)if(r[a]===t||r[a].listener&&r[a].listener===t){o=a;break}if(o<0)return this;1===r.length?(r.length=0,delete this._events[e]):r.splice(o,1),this._events.removeListener&&this.emit("removeListener",e,t)}return this},r.prototype.removeAllListeners=function(e){var t,r;if(!this._events)return this;if(!this._events.removeListener)return 0===arguments.length?this._events={}:this._events[e]&&delete this._events[e],this;if(0===arguments.length){for(t in this._events)"removeListener"!==t&&this.removeAllListeners(t);return this.removeAllListeners("removeListener"),this._events={},this}if(r=this._events[e],n(r))this.removeListener(e,r);else if(r)for(;r.length;)this.removeListener(e,r[r.length-1]);return delete this._events[e],this},r.prototype.listeners=function(e){return this._events&&this._events[e]?n(this._events[e])?[this._events[e]]:this._events[e].slice():[]},r.prototype.listenerCount=function(e){if(this._events){var t=this._events[e];if(n(t))return 1;if(t)return t.length}return 0},r.listenerCount=function(e,t){return e.listenerCount(t)}},function(e,t,r){e.exports=r(21).EventEmitter},function(e,t,r){"use strict";function n(e,t){var r=this,n=this._readableState&&this._readableState.destroyed,o=this._writableState&&this._writableState.destroyed;if(n||o)return void(t?t(e):!e||this._writableState&&this._writableState.errorEmitted||s(i,this,e));this._readableState&&(this._readableState.destroyed=!0),this._writableState&&(this._writableState.destroyed=!0),this._destroy(e||null,function(e){!t&&e?(s(i,r,e),r._writableState&&(r._writableState.errorEmitted=!0)):t&&t(e)})}function o(){this._readableState&&(this._readableState.destroyed=!1,this._readableState.reading=!1,this._readableState.ended=!1,this._readableState.endEmitted=!1),this._writableState&&(this._writableState.destroyed=!1,this._writableState.ended=!1,this._writableState.ending=!1,this._writableState.finished=!1,this._writableState.errorEmitted=!1)}function i(e,t){e.emit("error",t)}var s=r(9);e.exports={destroy:n,undestroy:o}},function(e,t,r){"use strict";(function(t,n,o){function i(e){var t=this;this.next=null,this.entry=null,this.finish=function(){C(t,e)}}function s(e){return I.from(e)}function a(e){return I.isBuffer(e)||e instanceof U}function u(){}function h(e,t){x=x||r(5),e=e||{},this.objectMode=!!e.objectMode,t instanceof x&&(this.objectMode=this.objectMode||!!e.writableObjectMode);var n=e.highWaterMark,o=this.objectMode?16:16384;this.highWaterMark=n||0===n?n:o,this.highWaterMark=Math.floor(this.highWaterMark),this.finalCalled=!1,this.needDrain=!1,this.ending=!1,this.ended=!1,this.finished=!1,this.destroyed=!1;var s=!1===e.decodeStrings;this.decodeStrings=!s,this.defaultEncoding=e.defaultEncoding||"utf8",this.length=0,this.writing=!1,this.corked=0,this.sync=!0,this.bufferProcessing=!1,this.onwrite=function(e){b(t,e)},this.writecb=null,this.writelen=0,this.bufferedRequest=null,this.lastBufferedRequest=null,this.pendingcb=0,this.prefinished=!1,this.errorEmitted=!1,this.bufferedRequestCount=0,this.corkedRequestsFree=new i(this)}function f(e){if(x=x||r(5),!(j.call(f,this)||this instanceof x))return new f(e);this._writableState=new h(e,this),this.writable=!0,e&&("function"==typeof e.write&&(this._write=e.write),"function"==typeof e.writev&&(this._writev=e.writev),"function"==typeof e.destroy&&(this._destroy=e.destroy),"function"==typeof e.final&&(this._final=e.final)),L.call(this)}function c(e,t){var r=new Error("write after end");e.emit("error",r),M(t,r)}function l(e,t,r,n){var o=!0,i=!1;return null===r?i=new TypeError("May not write null values to stream"):"string"==typeof r||void 0===r||t.objectMode||(i=new TypeError("Invalid non-string/buffer chunk")),i&&(e.emit("error",i),M(n,i),o=!1),o}function d(e,t,r){return e.objectMode||!1===e.decodeStrings||"string"!=typeof t||(t=I.from(t,r)),t}function p(e,t,r,n,o,i){if(!r){var s=d(t,n,o);n!==s&&(r=!0,o="buffer",n=s)}var a=t.objectMode?1:n.length;t.length+=a;var u=t.length<t.highWaterMark;if(u||(t.needDrain=!0),t.writing||t.corked){var h=t.lastBufferedRequest;t.lastBufferedRequest={chunk:n,encoding:o,isBuf:r,callback:i,next:null},h?h.next=t.lastBufferedRequest:t.bufferedRequest=t.lastBufferedRequest,t.bufferedRequestCount+=1}else g(e,t,!1,a,n,o,i);return u}function g(e,t,r,n,o,i,s){t.writelen=n,t.writecb=s,t.writing=!0,t.sync=!0,r?e._writev(o,t.onwrite):e._write(o,i,t.onwrite),t.sync=!1}function y(e,t,r,n,o){--t.pendingcb,r?(M(o,n),M(A,e,t),e._writableState.errorEmitted=!0,e.emit("error",n)):(o(n),e._writableState.errorEmitted=!0,e.emit("error",n),A(e,t))}function v(e){e.writing=!1,e.writecb=null,e.length-=e.writelen,e.writelen=0}function b(e,t){var r=e._writableState,n=r.sync,o=r.writecb;if(v(r),t)y(e,r,n,t,o);else{var i=E(r);i||r.corked||r.bufferProcessing||!r.bufferedRequest||_(e,r),n?O(m,e,r,i,o):m(e,r,i,o)}}function m(e,t,r,n){r||w(e,t),t.pendingcb--,n(),A(e,t)}function w(e,t){0===t.length&&t.needDrain&&(t.needDrain=!1,e.emit("drain"))}function _(e,t){t.bufferProcessing=!0;var r=t.bufferedRequest;if(e._writev&&r&&r.next){var n=t.bufferedRequestCount,o=new Array(n),s=t.corkedRequestsFree;s.entry=r;for(var a=0,u=!0;r;)o[a]=r,r.isBuf||(u=!1),r=r.next,a+=1;o.allBuffers=u,g(e,t,!0,t.length,o,"",s.finish),t.pendingcb++,t.lastBufferedRequest=null,s.next?(t.corkedRequestsFree=s.next,s.next=null):t.corkedRequestsFree=new i(t)}else{for(;r;){var h=r.chunk,f=r.encoding,c=r.callback;if(g(e,t,!1,t.objectMode?1:h.length,h,f,c),r=r.next,t.writing)break}null===r&&(t.lastBufferedRequest=null)}t.bufferedRequestCount=0,t.bufferedRequest=r,t.bufferProcessing=!1}function E(e){return e.ending&&0===e.length&&null===e.bufferedRequest&&!e.finished&&!e.writing}function S(e,t){e._final(function(r){t.pendingcb--,r&&e.emit("error",r),t.prefinished=!0,e.emit("prefinish"),A(e,t)})}function R(e,t){t.prefinished||t.finalCalled||("function"==typeof e._final?(t.pendingcb++,t.finalCalled=!0,M(S,e,t)):(t.prefinished=!0,e.emit("prefinish")))}function A(e,t){var r=E(t);return r&&(R(e,t),0===t.pendingcb&&(t.finished=!0,e.emit("finish"))),r}function T(e,t,r){t.ending=!0,A(e,t),r&&(t.finished?M(r):e.once("finish",r)),t.ended=!0,e.writable=!1}function C(e,t,r){var n=e.entry;for(e.entry=null;n;){var o=n.callback;t.pendingcb--,o(r),n=n.next}t.corkedRequestsFree?t.corkedRequestsFree.next=e:t.corkedRequestsFree=e}var M=r(9);e.exports=f;var x,O=!t.browser&&["v0.10","v0.9."].indexOf(t.version.slice(0,5))>-1?n:M;f.WritableState=h;var k=r(8);k.inherits=r(2);var P={deprecate:r(45)},L=r(22),I=r(10).Buffer,U=o.Uint8Array||function(){},H=r(23);k.inherits(f,L),h.prototype.getBuffer=function(){for(var e=this.bufferedRequest,t=[];e;)t.push(e),e=e.next;return t},function(){try{Object.defineProperty(h.prototype,"buffer",{get:P.deprecate(function(){return this.getBuffer()},"_writableState.buffer is deprecated. Use _writableState.getBuffer instead.","DEP0003")})}catch(e){}}();var j;"function"==typeof Symbol&&Symbol.hasInstance&&"function"==typeof Function.prototype[Symbol.hasInstance]?(j=Function.prototype[Symbol.hasInstance],Object.defineProperty(f,Symbol.hasInstance,{value:function(e){return!!j.call(this,e)||e&&e._writableState instanceof h}})):j=function(e){return e instanceof this},f.prototype.pipe=function(){this.emit("error",new Error("Cannot pipe, not readable"))},f.prototype.write=function(e,t,r){var n=this._writableState,o=!1,i=a(e)&&!n.objectMode;return i&&!I.isBuffer(e)&&(e=s(e)),"function"==typeof t&&(r=t,t=null),i?t="buffer":t||(t=n.defaultEncoding),"function"!=typeof r&&(r=u),n.ended?c(this,r):(i||l(this,n,e,r))&&(n.pendingcb++,o=p(this,n,i,e,t,r)),o},f.prototype.cork=function(){this._writableState.corked++},f.prototype.uncork=function(){var e=this._writableState;e.corked&&(e.corked--,e.writing||e.corked||e.finished||e.bufferProcessing||!e.bufferedRequest||_(this,e))},f.prototype.setDefaultEncoding=function(e){if("string"==typeof e&&(e=e.toLowerCase()),!(["hex","utf8","utf-8","ascii","binary","base64","ucs2","ucs-2","utf16le","utf-16le","raw"].indexOf((e+"").toLowerCase())>-1))throw new TypeError("Unknown encoding: "+e);return this._writableState.defaultEncoding=e,this},f.prototype._write=function(e,t,r){r(new Error("_write() is not implemented"))},f.prototype._writev=null,f.prototype.end=function(e,t,r){var n=this._writableState;"function"==typeof e?(r=e,e=null,t=null):"function"==typeof t&&(r=t,t=null),null!==e&&void 0!==e&&this.write(e,t),n.corked&&(n.corked=1,this.uncork()),n.ending||n.finished||T(this,n,r)},Object.defineProperty(f.prototype,"destroyed",{get:function(){return void 0!==this._writableState&&this._writableState.destroyed},set:function(e){this._writableState&&(this._writableState.destroyed=e)}}),f.prototype.destroy=H.destroy,f.prototype._undestroy=H.undestroy,f.prototype._destroy=function(e,t){this.end(),t(e)}}).call(t,r(4),r(43).setImmediate,r(0))},function(e,t,r){"use strict";function n(e){if(!e)return"utf8";for(var t;;)switch(e){case"utf8":case"utf-8":return"utf8";case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return"utf16le";case"latin1":case"binary":return"latin1";case"base64":case"ascii":case"hex":return e;default:if(t)return;e=(""+e).toLowerCase(),t=!0}}function o(e){var t=n(e);if("string"!=typeof t&&(b.isEncoding===m||!m(e)))throw new Error("Unknown encoding: "+e);return t||e}function i(e){this.encoding=o(e);var t;switch(this.encoding){case"utf16le":this.text=l,this.end=d,t=4;break;case"utf8":this.fillLast=h,t=4;break;case"base64":this.text=p,this.end=g,t=3;break;default:return this.write=y,void(this.end=v)}this.lastNeed=0,this.lastTotal=0,this.lastChar=b.allocUnsafe(t)}function s(e){return e<=127?0:e>>5==6?2:e>>4==14?3:e>>3==30?4:-1}function a(e,t,r){var n=t.length-1;if(n<r)return 0;var o=s(t[n]);return o>=0?(o>0&&(e.lastNeed=o-1),o):--n<r?0:(o=s(t[n]))>=0?(o>0&&(e.lastNeed=o-2),o):--n<r?0:(o=s(t[n]),o>=0?(o>0&&(2===o?o=0:e.lastNeed=o-3),o):0)}function u(e,t,r){if(128!=(192&t[0]))return e.lastNeed=0,"�".repeat(r);if(e.lastNeed>1&&t.length>1){if(128!=(192&t[1]))return e.lastNeed=1,"�".repeat(r+1);if(e.lastNeed>2&&t.length>2&&128!=(192&t[2]))return e.lastNeed=2,"�".repeat(r+2)}}function h(e){var t=this.lastTotal-this.lastNeed,r=u(this,e,t);return void 0!==r?r:this.lastNeed<=e.length?(e.copy(this.lastChar,t,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal)):(e.copy(this.lastChar,t,0,e.length),void(this.lastNeed-=e.length))}function f(e,t){var r=a(this,e,t);if(!this.lastNeed)return e.toString("utf8",t);this.lastTotal=r;var n=e.length-(r-this.lastNeed);return e.copy(this.lastChar,0,n),e.toString("utf8",t,n)}function c(e){var t=e&&e.length?this.write(e):"";return this.lastNeed?t+"�".repeat(this.lastTotal-this.lastNeed):t}function l(e,t){if((e.length-t)%2==0){var r=e.toString("utf16le",t);if(r){var n=r.charCodeAt(r.length-1);if(n>=55296&&n<=56319)return this.lastNeed=2,this.lastTotal=4,this.lastChar[0]=e[e.length-2],this.lastChar[1]=e[e.length-1],r.slice(0,-1)}return r}return this.lastNeed=1,this.lastTotal=2,this.lastChar[0]=e[e.length-1],e.toString("utf16le",t,e.length-1)}function d(e){var t=e&&e.length?this.write(e):"";if(this.lastNeed){var r=this.lastTotal-this.lastNeed;return t+this.lastChar.toString("utf16le",0,r)}return t}function p(e,t){var r=(e.length-t)%3;return 0===r?e.toString("base64",t):(this.lastNeed=3-r,this.lastTotal=3,1===r?this.lastChar[0]=e[e.length-1]:(this.lastChar[0]=e[e.length-2],this.lastChar[1]=e[e.length-1]),e.toString("base64",t,e.length-r))}function g(e){var t=e&&e.length?this.write(e):"";return this.lastNeed?t+this.lastChar.toString("base64",0,3-this.lastNeed):t}function y(e){return e.toString(this.encoding)}function v(e){return e&&e.length?this.write(e):""}var b=r(10).Buffer,m=b.isEncoding||function(e){switch((e=""+e)&&e.toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":case"raw":return!0;default:return!1}};t.StringDecoder=i,i.prototype.write=function(e){if(0===e.length)return"";var t,r;if(this.lastNeed){if(void 0===(t=this.fillLast(e)))return"";r=this.lastNeed,this.lastNeed=0}else r=0;return r<e.length?t?t+this.text(e,r):this.text(e,r):t||""},i.prototype.end=c,i.prototype.text=f,i.prototype.fillLast=function(e){if(this.lastNeed<=e.length)return e.copy(this.lastChar,this.lastTotal-this.lastNeed,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal);e.copy(this.lastChar,this.lastTotal-this.lastNeed,0,e.length),this.lastNeed-=e.length}},function(e,t,r){"use strict";function n(e){this.afterTransform=function(t,r){return o(e,t,r)},this.needTransform=!1,this.transforming=!1,this.writecb=null,this.writechunk=null,this.writeencoding=null}function o(e,t,r){var n=e._transformState;n.transforming=!1;var o=n.writecb;if(!o)return e.emit("error",new Error("write callback called multiple times"));n.writechunk=null,n.writecb=null,null!==r&&void 0!==r&&e.push(r),o(t);var i=e._readableState;i.reading=!1,(i.needReadable||i.length<i.highWaterMark)&&e._read(i.highWaterMark)}function i(e){if(!(this instanceof i))return new i(e);a.call(this,e),this._transformState=new n(this);var t=this;this._readableState.needReadable=!0,this._readableState.sync=!1,e&&("function"==typeof e.transform&&(this._transform=e.transform),"function"==typeof e.flush&&(this._flush=e.flush)),this.once("prefinish",function(){"function"==typeof this._flush?this._flush(function(e,r){s(t,e,r)}):s(t)})}function s(e,t,r){if(t)return e.emit("error",t);null!==r&&void 0!==r&&e.push(r);var n=e._writableState,o=e._transformState;if(n.length)throw new Error("Calling transform done when ws.length != 0");if(o.transforming)throw new Error("Calling transform done when still transforming");return e.push(null)}e.exports=i;var a=r(5),u=r(8);u.inherits=r(2),u.inherits(i,a),i.prototype.push=function(e,t){return this._transformState.needTransform=!1,a.prototype.push.call(this,e,t)},i.prototype._transform=function(e,t,r){throw new Error("_transform() is not implemented")},i.prototype._write=function(e,t,r){var n=this._transformState;if(n.writecb=r,n.writechunk=e,n.writeencoding=t,!n.transforming){var o=this._readableState;(n.needTransform||o.needReadable||o.length<o.highWaterMark)&&this._read(o.highWaterMark)}},i.prototype._read=function(e){var t=this._transformState;null!==t.writechunk&&t.writecb&&!t.transforming?(t.transforming=!0,this._transform(t.writechunk,t.writeencoding,t.afterTransform)):t.needTransform=!0},i.prototype._destroy=function(e,t){var r=this;a.prototype._destroy.call(this,e,function(e){t(e),r.emit("close")})}},function(e,t,r){"use strict";function n(e){return l(e)||e>=32&&e<=126}function o(e){for(var t=0;t!==e.length;++t)if(!n(e[t]))throw new Error("Metadata is not valid (printable) ASCII");return String.fromCharCode.apply(String,Array.prototype.slice.call(e))}function i(e){for(var t=new Uint8Array(e.length),r=0;r!==e.length;++r){var o=e.charCodeAt(r);if(!n(o))throw new Error("Metadata contains invalid ASCII");t[r]=o}return t}function s(e){return 128==(128&e.getUint8(0))}function a(e){return new c.Metadata(o(e))}function u(e){return e.getUint32(1,!1)}function h(e,t,r){return e.byteLength-t>=r}function f(e,t,r){if(e.slice)return e.slice(t,r);var n=e.length;void 0!==r&&(n=r);for(var o=n-t,i=new Uint8Array(o),s=0,a=t;a<n;a++)i[s++]=e[a];return i}Object.defineProperty(t,"__esModule",{value:!0});var c=r(1),l=function(e){return 9===e||10===e||13===e};t.decodeASCII=o,t.encodeASCII=i;var d;!function(e){e[e.MESSAGE=1]="MESSAGE",e[e.TRAILERS=2]="TRAILERS"}(d=t.ChunkType||(t.ChunkType={}));var p=function(){function e(){this.buffer=null,this.position=0}return e.prototype.parse=function(e,t){if(0===e.length&&t)return[];var r=[];if(null==this.buffer)this.buffer=e,this.position=0;else if(this.position===this.buffer.byteLength)this.buffer=e,this.position=0;else{var n=this.buffer.byteLength-this.position,o=new Uint8Array(n+e.byteLength),i=f(this.buffer,this.position);o.set(i,0);var c=new Uint8Array(e);o.set(c,n),this.buffer=o,this.position=0}for(;;){if(!h(this.buffer,this.position,5))return r;var l=f(this.buffer,this.position,this.position+5),p=new DataView(l.buffer,l.byteOffset,l.byteLength),g=u(p);if(!h(this.buffer,this.position,5+g))return r;var y=f(this.buffer,this.position+5,this.position+5+g);if(this.position+=5+g,s(p))return r.push({chunkType:d.TRAILERS,trailers:a(y)}),r;r.push({chunkType:d.MESSAGE,data:y})}},e}();t.ChunkParser=p},function(e,t,r){"use strict";function n(e){switch(e){case 0:return o.Internal;case 200:return o.OK;case 400:return o.InvalidArgument;case 401:return o.Unauthenticated;case 403:return o.PermissionDenied;case 404:return o.NotFound;case 409:return o.Aborted;case 412:return o.FailedPrecondition;case 429:return o.ResourceExhausted;case 499:return o.Canceled;case 500:return o.Unknown;case 501:return o.Unimplemented;case 503:return o.Unavailable;case 504:return o.DeadlineExceeded;default:return o.Unknown}}Object.defineProperty(t,"__esModule",{value:!0});var o;!function(e){e[e.OK=0]="OK",e[e.Canceled=1]="Canceled",e[e.Unknown=2]="Unknown",e[e.InvalidArgument=3]="InvalidArgument",e[e.DeadlineExceeded=4]="DeadlineExceeded",e[e.NotFound=5]="NotFound",e[e.AlreadyExists=6]="AlreadyExists",e[e.PermissionDenied=7]="PermissionDenied",e[e.ResourceExhausted=8]="ResourceExhausted",e[e.FailedPrecondition=9]="FailedPrecondition",e[e.Aborted=10]="Aborted",e[e.OutOfRange=11]="OutOfRange",e[e.Unimplemented=12]="Unimplemented",e[e.Internal=13]="Internal",e[e.Unavailable=14]="Unavailable",e[e.DataLoss=15]="DataLoss",e[e.Unauthenticated=16]="Unauthenticated"}(o=t.Code||(t.Code={})),t.httpStatusToCode=n},function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var n=r(13),o=r(14),i=r(28),s=r(58),a=r(60),u=r(12);!function(e){function t(e,t){return u.client(e,t)}e.DefaultTransportFactory=o.DefaultTransportFactory,e.WebsocketTransportFactory=o.WebsocketTransportFactory,e.Code=i.Code,e.Metadata=n.BrowserHeaders,e.client=t,e.invoke=s.invoke,e.unary=a.unary}(t.grpc||(t.grpc={}))},function(e,t,r){"use strict";function n(e){return"object"==typeof e&&"object"==typeof e.headersMap&&"function"==typeof e.forEach}Object.defineProperty(t,"__esModule",{value:!0});var o=r(31),i=function(){function e(e,t){void 0===e&&(e={}),void 0===t&&(t={splitValues:!1});var r=this;if(this.headersMap={},e)if("undefined"!=typeof Headers&&e instanceof Headers){var i=o.getHeaderKeys(e);i.forEach(function(n){o.getHeaderValues(e,n).forEach(function(e){t.splitValues?r.append(n,o.splitHeaderValue(e)):r.append(n,e)})})}else if(n(e))e.forEach(function(e,t){r.append(e,t)});else if("undefined"!=typeof Map&&e instanceof Map){var s=e;s.forEach(function(e,t){r.append(t,e)})}else"string"==typeof e?this.appendFromString(e):"object"==typeof e&&Object.getOwnPropertyNames(e).forEach(function(t){var n=e,o=n[t];Array.isArray(o)?o.forEach(function(e){r.append(t,e)}):r.append(t,o)})}return e.prototype.appendFromString=function(e){for(var t=e.split("\r\n"),r=0;r<t.length;r++){var n=t[r],o=n.indexOf(":");if(o>0){var i=n.substring(0,o).trim(),s=n.substring(o+1).trim();this.append(i,s)}}},e.prototype.delete=function(e,t){var r=o.normalizeName(e);if(void 0===t)delete this.headersMap[r];else{var n=this.headersMap[r];if(n){var i=n.indexOf(t);i>=0&&n.splice(i,1),0===n.length&&delete this.headersMap[r]}}},e.prototype.append=function(e,t){var r=this,n=o.normalizeName(e);Array.isArray(this.headersMap[n])||(this.headersMap[n]=[]),Array.isArray(t)?t.forEach(function(e){r.headersMap[n].push(o.normalizeValue(e))}):this.headersMap[n].push(o.normalizeValue(t))},e.prototype.set=function(e,t){var r=o.normalizeName(e);if(Array.isArray(t)){var n=[];t.forEach(function(e){n.push(o.normalizeValue(e))}),this.headersMap[r]=n}else this.headersMap[r]=[o.normalizeValue(t)]},e.prototype.has=function(e,t){var r=this.headersMap[o.normalizeName(e)];if(!Array.isArray(r))return!1;if(void 0!==t){var n=o.normalizeValue(t);return r.indexOf(n)>=0}return!0},e.prototype.get=function(e){var t=this.headersMap[o.normalizeName(e)];return void 0!==t?t.concat():[]},e.prototype.forEach=function(e){var t=this;Object.getOwnPropertyNames(this.headersMap).forEach(function(r){e(r,t.headersMap[r])},this)},e.prototype.toHeaders=function(){if("undefined"!=typeof Headers){var e=new Headers;return this.forEach(function(t,r){r.forEach(function(r){e.append(t,r)})}),e}throw new Error("Headers class is not defined")},e}();t.BrowserHeaders=i},function(e,t,r){"use strict";function n(e){if("string"!=typeof e&&(e=String(e)),/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(e))throw new TypeError("Invalid character in header field name");return e.toLowerCase()}function o(e){return"string"!=typeof e&&(e=String(e)),e}function i(e,t){var r=s(e);if(r instanceof Headers&&r.getAll)return r.getAll(t);var n=r.get(t);return n&&"string"==typeof n?[n]:n}function s(e){return e}function a(e){var t=s(e),r={},n=[];return t.keys?h.iterateHeadersKeys(t,function(e){r[e]||(r[e]=!0,n.push(e))}):t.forEach?t.forEach(function(e,t){r[t]||(r[t]=!0,n.push(t))}):h.iterateHeaders(t,function(e){var t=e[0];r[t]||(r[t]=!0,n.push(t))}),n}function u(e){var t=[];return e.split(", ").forEach(function(e){e.split(",").forEach(function(e){t.push(e)})}),t}Object.defineProperty(t,"__esModule",{value:!0});var h=r(32);t.normalizeName=n,t.normalizeValue=o,t.getHeaderValues=i,t.getHeaderKeys=a,t.splitHeaderValue=u},function(e,t){function r(e,t){for(var r=e[Symbol.iterator](),n=r.next();!n.done;)t(n.value[0]),n=r.next()}function n(e,t){for(var r=e.keys(),n=r.next();!n.done;)t(n.value),n=r.next()}e.exports={iterateHeaders:r,iterateHeadersKeys:n}},function(e,t,r){"use strict";function n(e){return e.debug&&s.debug("fetchRequest",e),new u(e)}function o(){return"undefined"!=typeof Response&&Response.prototype.hasOwnProperty("body")&&"function"==typeof Headers}Object.defineProperty(t,"__esModule",{value:!0});var i=r(1),s=r(6),a=r(7);t.default=n;var u=function(){function e(e){this.cancelled=!1,this.options=e}return e.prototype.pump=function(e,t){var r=this;return this.reader=e,this.cancelled?(this.options.debug&&s.debug("Fetch.pump.cancel at first pump"),this.reader.cancel()):this.reader.read().then(function(e){return e.done?(a.default(function(){r.options.onEnd()}),t):(a.default(function(){r.options.onChunk(e.value)}),r.pump(r.reader,t))})},e.prototype.send=function(e){var t=this;fetch(this.options.url,{headers:this.metadata.toHeaders(),method:"POST",body:e,credentials:"same-origin"}).then(function(e){return t.options.debug&&s.debug("Fetch.response",e),a.default(function(){t.options.onHeaders(new i.Metadata(e.headers),e.status)}),e.body?t.pump(e.body.getReader(),e):e}).catch(function(e){if(t.cancelled)return void(t.options.debug&&s.debug("Fetch.catch - request cancelled"));t.options.debug&&s.debug("Fetch.catch",e.message),a.default(function(){t.options.onEnd(e)})})},e.prototype.sendMessage=function(e){this.send(e)},e.prototype.finishSend=function(){},e.prototype.start=function(e){this.metadata=e},e.prototype.cancel=function(){this.cancelled=!0,this.reader?(this.options.debug&&s.debug("Fetch.abort.cancel"),this.reader.cancel()):this.options.debug&&s.debug("Fetch.abort.cancel before reader")},e}();t.detectFetchSupport=o},function(e,t,r){"use strict";function n(e){return e.debug&&u.debug("xhrRequest",e),new f(e)}function o(e,t){var r=e.charCodeAt(t);if(r>=55296&&r<=56319){var n=e.charCodeAt(t+1);n>=56320&&n<=57343&&(r=65536+(r-55296<<10)+(n-56320))}return r}function i(e){for(var t=new Uint8Array(e.length),r=0,n=0;n<e.length;n++){var i=String.prototype.codePointAt?e.codePointAt(n):o(e,n);t[r++]=255&i}return t}function s(){return"undefined"!=typeof XMLHttpRequest&&XMLHttpRequest.prototype.hasOwnProperty("overrideMimeType")}Object.defineProperty(t,"__esModule",{value:!0});var a=r(1),u=r(6),h=r(7);t.default=n;var f=function(){function e(e){this.options=e}return e.prototype.onProgressEvent=function(){var e=this;this.options.debug&&u.debug("XHR.onProgressEvent.length: ",this.xhr.response.length);var t=this.xhr.response.substr(this.index);this.index=this.xhr.response.length;var r=i(t);h.default(function(){e.options.onChunk(r)})},e.prototype.onLoadEvent=function(){var e=this;this.options.debug&&u.debug("XHR.onLoadEvent"),h.default(function(){e.options.onEnd()})},e.prototype.onStateChange=function(){var e=this;this.options.debug&&u.debug("XHR.onStateChange",this.xhr.readyState),this.xhr.readyState===XMLHttpRequest.HEADERS_RECEIVED&&h.default(function(){e.options.onHeaders(new a.Metadata(e.xhr.getAllResponseHeaders()),e.xhr.status)})},e.prototype.sendMessage=function(e){this.xhr.send(e)},e.prototype.finishSend=function(){},e.prototype.start=function(e){var t=this;this.metadata=e;var r=new XMLHttpRequest;this.xhr=r,r.open("POST",this.options.url),r.responseType="text",r.overrideMimeType("text/plain; charset=x-user-defined"),this.metadata.forEach(function(e,t){r.setRequestHeader(e,t.join(", "))}),r.addEventListener("readystatechange",this.onStateChange.bind(this)),r.addEventListener("progress",this.onProgressEvent.bind(this)),r.addEventListener("loadend",this.onLoadEvent.bind(this)),r.addEventListener("error",function(e){t.options.debug&&u.debug("XHR.error",e),h.default(function(){t.options.onEnd(e.error)})})},e.prototype.cancel=function(){this.options.debug&&u.debug("XHR.abort"),this.xhr.abort()},e}();t.stringToArrayBuffer=i,t.detectXHRSupport=s},function(e,t,r){"use strict";function n(e){return e.debug&&s.debug("mozXhrRequest",e),new h(e)}function o(){return"undefined"!=typeof XMLHttpRequest&&u.xhrSupportsResponseType("moz-chunked-arraybuffer")}Object.defineProperty(t,"__esModule",{value:!0});var i=r(1),s=r(6),a=r(7),u=r(36);t.default=n;var h=function(){function e(e){this.options=e}return e.prototype.onProgressEvent=function(){var e=this,t=this.xhr.response;this.options.debug&&s.debug("MozXHR.onProgressEvent: ",new Uint8Array(t)),a.default(function(){e.options.onChunk(new Uint8Array(t))})},e.prototype.onLoadEvent=function(){var e=this;this.options.debug&&s.debug("MozXHR.onLoadEvent"),a.default(function(){e.options.onEnd()})},e.prototype.onStateChange=function(){var e=this;this.options.debug&&s.debug("MozXHR.onStateChange",this.xhr.readyState),this.options.debug&&s.debug("MozXHR.XMLHttpRequest.HEADERS_RECEIVED",XMLHttpRequest.HEADERS_RECEIVED),this.xhr.readyState===XMLHttpRequest.HEADERS_RECEIVED&&a.default(function(){e.options.onHeaders(new i.Metadata(e.xhr.getAllResponseHeaders()),e.xhr.status)})},e.prototype.sendMessage=function(e){this.options.debug&&s.debug("MozXHR.sendMessage"),this.xhr.send(e)},e.prototype.finishSend=function(){},e.prototype.start=function(e){var t=this;this.options.debug&&s.debug("MozXHR.start"),this.metadata=e;var r=new XMLHttpRequest;this.xhr=r,r.open("POST",this.options.url),r.responseType="moz-chunked-arraybuffer",this.metadata.forEach(function(e,t){r.setRequestHeader(e,t.join(", "))}),r.addEventListener("readystatechange",this.onStateChange.bind(this)),r.addEventListener("progress",this.onProgressEvent.bind(this)),r.addEventListener("loadend",this.onLoadEvent.bind(this)),r.addEventListener("error",function(e){t.options.debug&&s.debug("MozXHR.error",e),a.default(function(){t.options.onEnd(e.error)})})},e.prototype.cancel=function(){this.options.debug&&s.debug("MozXHR.cancel"),this.xhr.abort()},e}();t.detectMozXHRSupport=o},function(e,t,r){"use strict";function n(){if(void 0!==i)return i;if(XMLHttpRequest){i=new XMLHttpRequest;try{i.open("GET","https://localhost")}catch(e){}}return i}function o(e){var t=n();if(!t)return!1;try{return t.responseType=e,t.responseType===e}catch(e){}return!1}Object.defineProperty(t,"__esModule",{value:!0});var i;t.xhrSupportsResponseType=o},function(e,t,r){"use strict";(function(n){function o(e){return e.debug&&console.log("nodeHttpRequest",e),new d(e)}function i(e){var t={};for(var r in e){var n=e[r];e.hasOwnProperty(r)&&void 0!==n&&(t[r]=n)}return t}function s(e){for(var t=new Uint8Array(e.length),r=0;r<e.length;r++)t[r]=e[r];return t}function a(e){for(var t=new n(e.byteLength),r=new Uint8Array(e.buffer),o=0;o<t.length;o++)t[o]=r[o];return t}function u(){return void 0!==e&&e.exports}Object.defineProperty(t,"__esModule",{value:!0});var h=r(16),f=r(56),c=r(11),l=r(1);t.default=o;var d=function(){function e(e){this.options=e}return e.prototype.sendMessage=function(e){this.request.write(a(e)),this.request.end()},e.prototype.finishSend=function(){},e.prototype.responseCallback=function(e){var t=this;this.options.debug&&console.log("NodeHttp.response",e.statusCode);var r=i(e.headers);this.options.onHeaders(new l.Metadata(r),e.statusCode),e.on("data",function(e){t.options.debug&&console.log("NodeHttp.data",e),t.options.onChunk(s(e))}),e.on("end",function(){t.options.debug&&console.log("NodeHttp.end"),t.options.onEnd()})},e.prototype.start=function(e){var t=this,r={};e.forEach(function(e,t){r[e]=t.join(", ")});var n=c.parse(this.options.url),o={host:n.hostname,port:n.port?parseInt(n.port):void 0,path:n.path,headers:r,method:"POST"};"https:"===n.protocol?this.request=f.request(o,this.responseCallback.bind(this)):this.request=h.request(o,this.responseCallback.bind(this)),this.request.on("error",function(e){t.options.debug&&console.log("NodeHttp.error",e),t.options.onEnd(e)})},e.prototype.cancel=function(){this.options.debug&&console.log("NodeHttp.abort"),this.request.abort()},e}();t.detectNodeHTTPSupport=u}).call(t,r(3).Buffer)},function(e,t,r){"use strict";function n(e){var t=e.length;if(t%4>0)throw new Error("Invalid string. Length must be a multiple of 4");return"="===e[t-2]?2:"="===e[t-1]?1:0}function o(e){return 3*e.length/4-n(e)}function i(e){var t,r,o,i,s,a=e.length;i=n(e),s=new c(3*a/4-i),r=i>0?a-4:a;var u=0;for(t=0;t<r;t+=4)o=f[e.charCodeAt(t)]<<18|f[e.charCodeAt(t+1)]<<12|f[e.charCodeAt(t+2)]<<6|f[e.charCodeAt(t+3)],s[u++]=o>>16&255,s[u++]=o>>8&255,s[u++]=255&o;return 2===i?(o=f[e.charCodeAt(t)]<<2|f[e.charCodeAt(t+1)]>>4,s[u++]=255&o):1===i&&(o=f[e.charCodeAt(t)]<<10|f[e.charCodeAt(t+1)]<<4|f[e.charCodeAt(t+2)]>>2,s[u++]=o>>8&255,s[u++]=255&o),s}function s(e){return h[e>>18&63]+h[e>>12&63]+h[e>>6&63]+h[63&e]}function a(e,t,r){for(var n,o=[],i=t;i<r;i+=3)n=(e[i]<<16)+(e[i+1]<<8)+e[i+2],o.push(s(n));return o.join("")}function u(e){for(var t,r=e.length,n=r%3,o="",i=[],s=0,u=r-n;s<u;s+=16383)i.push(a(e,s,s+16383>u?u:s+16383));return 1===n?(t=e[r-1],o+=h[t>>2],o+=h[t<<4&63],o+="=="):2===n&&(t=(e[r-2]<<8)+e[r-1],o+=h[t>>10],o+=h[t>>4&63],o+=h[t<<2&63],o+="="),i.push(o),i.join("")}t.byteLength=o,t.toByteArray=i,t.fromByteArray=u;for(var h=[],f=[],c="undefined"!=typeof Uint8Array?Uint8Array:Array,l="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",d=0,p=l.length;d<p;++d)h[d]=l[d],f[l.charCodeAt(d)]=d;f["-".charCodeAt(0)]=62,f["_".charCodeAt(0)]=63},function(e,t){t.read=function(e,t,r,n,o){var i,s,a=8*o-n-1,u=(1<<a)-1,h=u>>1,f=-7,c=r?o-1:0,l=r?-1:1,d=e[t+c];for(c+=l,i=d&(1<<-f)-1,d>>=-f,f+=a;f>0;i=256*i+e[t+c],c+=l,f-=8);for(s=i&(1<<-f)-1,i>>=-f,f+=n;f>0;s=256*s+e[t+c],c+=l,f-=8);if(0===i)i=1-h;else{if(i===u)return s?NaN:1/0*(d?-1:1);s+=Math.pow(2,n),i-=h}return(d?-1:1)*s*Math.pow(2,i-n)},t.write=function(e,t,r,n,o,i){var s,a,u,h=8*i-o-1,f=(1<<h)-1,c=f>>1,l=23===o?Math.pow(2,-24)-Math.pow(2,-77):0,d=n?0:i-1,p=n?1:-1,g=t<0||0===t&&1/t<0?1:0;for(t=Math.abs(t),isNaN(t)||t===1/0?(a=isNaN(t)?1:0,s=f):(s=Math.floor(Math.log(t)/Math.LN2),t*(u=Math.pow(2,-s))<1&&(s--,u*=2),t+=s+c>=1?l/u:l*Math.pow(2,1-c),t*u>=2&&(s++,u/=2),s+c>=f?(a=0,s=f):s+c>=1?(a=(t*u-1)*Math.pow(2,o),s+=c):(a=t*Math.pow(2,c-1)*Math.pow(2,o),s=0));o>=8;e[r+d]=255&a,d+=p,a/=256,o-=8);for(s=s<<o|a,h+=o;h>0;e[r+d]=255&s,d+=p,s/=256,h-=8);e[r+d-p]|=128*g}},function(e,t,r){(function(t,n,o){function i(e,t){return a.fetch&&t?"fetch":a.mozchunkedarraybuffer?"moz-chunked-arraybuffer":a.msstream?"ms-stream":a.arraybuffer&&e?"arraybuffer":a.vbArray&&e?"text:vbarray":"text"}function s(e){try{var t=e.status;return null!==t&&0!==t}catch(e){return!1}}var a=r(17),u=r(2),h=r(18),f=r(19),c=r(47),l=h.IncomingMessage,d=h.readyStates,p=e.exports=function(e){var r=this;f.Writable.call(r),r._opts=e,r._body=[],r._headers={},e.auth&&r.setHeader("Authorization","Basic "+new t(e.auth).toString("base64")),Object.keys(e.headers).forEach(function(t){r.setHeader(t,e.headers[t])});var n,o=!0;if("disable-fetch"===e.mode||"requestTimeout"in e&&!a.abortController)o=!1,n=!0;else if("prefer-streaming"===e.mode)n=!1;else if("allow-wrong-content-type"===e.mode)n=!a.overrideMimeType;else{if(e.mode&&"default"!==e.mode&&"prefer-fast"!==e.mode)throw new Error("Invalid value for opts.mode");n=!0}r._mode=i(n,o),r.on("finish",function(){r._onFinish()})};u(p,f.Writable),p.prototype.setHeader=function(e,t){var r=this,n=e.toLowerCase();-1===g.indexOf(n)&&(r._headers[n]={name:e,value:t})},p.prototype.getHeader=function(e){var t=this._headers[e.toLowerCase()];return t?t.value:null},p.prototype.removeHeader=function(e){delete this._headers[e.toLowerCase()]},p.prototype._onFinish=function(){var e=this;if(!e._destroyed){var r=e._opts,i=e._headers,s=null;"GET"!==r.method&&"HEAD"!==r.method&&(s=a.arraybuffer?c(t.concat(e._body)):a.blobConstructor?new n.Blob(e._body.map(function(e){return c(e)}),{type:(i["content-type"]||{}).value||""}):t.concat(e._body).toString());var u=[];if(Object.keys(i).forEach(function(e){var t=i[e].name,r=i[e].value;Array.isArray(r)?r.forEach(function(e){u.push([t,e])}):u.push([t,r])}),"fetch"===e._mode){var h=null;if(a.abortController){var f=new AbortController;h=f.signal,e._fetchAbortController=f,"requestTimeout"in r&&0!==r.requestTimeout&&n.setTimeout(function(){e.emit("requestTimeout"),e._fetchAbortController&&e._fetchAbortController.abort()},r.requestTimeout)}n.fetch(e._opts.url,{method:e._opts.method,headers:u,body:s||void 0,mode:"cors",credentials:r.withCredentials?"include":"same-origin",signal:h}).then(function(t){e._fetchResponse=t,e._connect()},function(t){e.emit("error",t)})}else{var l=e._xhr=new n.XMLHttpRequest;try{l.open(e._opts.method,e._opts.url,!0)}catch(t){return void o.nextTick(function(){e.emit("error",t)})}"responseType"in l&&(l.responseType=e._mode.split(":")[0]),"withCredentials"in l&&(l.withCredentials=!!r.withCredentials),"text"===e._mode&&"overrideMimeType"in l&&l.overrideMimeType("text/plain; charset=x-user-defined"),"requestTimeout"in r&&(l.timeout=r.requestTimeout,l.ontimeout=function(){e.emit("requestTimeout")}),u.forEach(function(e){l.setRequestHeader(e[0],e[1])}),e._response=null,l.onreadystatechange=function(){switch(l.readyState){case d.LOADING:case d.DONE:e._onXHRProgress()}},"moz-chunked-arraybuffer"===e._mode&&(l.onprogress=function(){e._onXHRProgress()}),l.onerror=function(){e._destroyed||e.emit("error",new Error("XHR error"))};try{l.send(s)}catch(t){return void o.nextTick(function(){e.emit("error",t)})}}}},p.prototype._onXHRProgress=function(){var e=this;s(e._xhr)&&!e._destroyed&&(e._response||e._connect(),e._response._onXHRProgress())},p.prototype._connect=function(){var e=this;e._destroyed||(e._response=new l(e._xhr,e._fetchResponse,e._mode),e._response.on("error",function(t){e.emit("error",t)}),e.emit("response",e._response))},p.prototype._write=function(e,t,r){this._body.push(e),r()},p.prototype.abort=p.prototype.destroy=function(){var e=this;e._destroyed=!0,e._response&&(e._response._destroyed=!0),e._xhr?e._xhr.abort():e._fetchAbortController&&e._fetchAbortController.abort()},p.prototype.end=function(e,t,r){var n=this;"function"==typeof e&&(r=e,e=void 0),f.Writable.prototype.end.call(n,e,t,r)},p.prototype.flushHeaders=function(){},p.prototype.setTimeout=function(){},p.prototype.setNoDelay=function(){},p.prototype.setSocketKeepAlive=function(){};var g=["accept-charset","accept-encoding","access-control-request-headers","access-control-request-method","connection","content-length","cookie","cookie2","date","dnt","expect","host","keep-alive","origin","referer","te","trailer","transfer-encoding","upgrade","user-agent","via"]}).call(t,r(3).Buffer,r(0),r(4))},function(e,t){},function(e,t,r){"use strict";function n(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function o(e,t,r){e.copy(t,r)}var i=r(10).Buffer;e.exports=function(){function e(){n(this,e),this.head=null,this.tail=null,this.length=0}return e.prototype.push=function(e){var t={data:e,next:null};this.length>0?this.tail.next=t:this.head=t,this.tail=t,++this.length},e.prototype.unshift=function(e){var t={data:e,next:this.head};0===this.length&&(this.tail=t),this.head=t,++this.length},e.prototype.shift=function(){if(0!==this.length){var e=this.head.data;return 1===this.length?this.head=this.tail=null:this.head=this.head.next,--this.length,e}},e.prototype.clear=function(){this.head=this.tail=null,this.length=0},e.prototype.join=function(e){if(0===this.length)return"";for(var t=this.head,r=""+t.data;t=t.next;)r+=e+t.data;return r},e.prototype.concat=function(e){if(0===this.length)return i.alloc(0);if(1===this.length)return this.head.data;for(var t=i.allocUnsafe(e>>>0),r=this.head,n=0;r;)o(r.data,t,n),n+=r.data.length,r=r.next;return t},e}()},function(e,t,r){(function(e){function n(e,t){this._id=e,this._clearFn=t}var o=Function.prototype.apply;t.setTimeout=function(){return new n(o.call(setTimeout,window,arguments),clearTimeout)},t.setInterval=function(){return new n(o.call(setInterval,window,arguments),clearInterval)},t.clearTimeout=t.clearInterval=function(e){e&&e.close()},n.prototype.unref=n.prototype.ref=function(){},n.prototype.close=function(){this._clearFn.call(window,this._id)},t.enroll=function(e,t){clearTimeout(e._idleTimeoutId),e._idleTimeout=t},t.unenroll=function(e){clearTimeout(e._idleTimeoutId),e._idleTimeout=-1},t._unrefActive=t.active=function(e){clearTimeout(e._idleTimeoutId);var t=e._idleTimeout;t>=0&&(e._idleTimeoutId=setTimeout(function(){e._onTimeout&&e._onTimeout()},t))},r(44),t.setImmediate="undefined"!=typeof self&&self.setImmediate||void 0!==e&&e.setImmediate||this&&this.setImmediate,t.clearImmediate="undefined"!=typeof self&&self.clearImmediate||void 0!==e&&e.clearImmediate||this&&this.clearImmediate}).call(t,r(0))},function(e,t,r){(function(e,t){!function(e,r){"use strict";function n(e){"function"!=typeof e&&(e=new Function(""+e));for(var t=new Array(arguments.length-1),r=0;r<t.length;r++)t[r]=arguments[r+1];var n={callback:e,args:t};return h[u]=n,a(u),u++}function o(e){delete h[e]}function i(e){var t=e.callback,n=e.args;switch(n.length){case 0:t();break;case 1:t(n[0]);break;case 2:t(n[0],n[1]);break;case 3:t(n[0],n[1],n[2]);break;default:t.apply(r,n)}}function s(e){if(f)setTimeout(s,0,e);else{var t=h[e];if(t){f=!0;try{i(t)}finally{o(e),f=!1}}}}if(!e.setImmediate){var a,u=1,h={},f=!1,c=e.document,l=Object.getPrototypeOf&&Object.getPrototypeOf(e);l=l&&l.setTimeout?l:e,"[object process]"==={}.toString.call(e.process)?function(){a=function(e){t.nextTick(function(){s(e)})}}():function(){if(e.postMessage&&!e.importScripts){var t=!0,r=e.onmessage;return e.onmessage=function(){t=!1},e.postMessage("","*"),e.onmessage=r,t}}()?function(){var t="setImmediate$"+Math.random()+"$",r=function(r){r.source===e&&"string"==typeof r.data&&0===r.data.indexOf(t)&&s(+r.data.slice(t.length))};e.addEventListener?e.addEventListener("message",r,!1):e.attachEvent("onmessage",r),a=function(r){e.postMessage(t+r,"*")}}():e.MessageChannel?function(){var e=new MessageChannel;e.port1.onmessage=function(e){s(e.data)},a=function(t){e.port2.postMessage(t)}}():c&&"onreadystatechange"in c.createElement("script")?function(){var e=c.documentElement;a=function(t){var r=c.createElement("script");r.onreadystatechange=function(){s(t),r.onreadystatechange=null,e.removeChild(r),r=null},e.appendChild(r)}}():function(){a=function(e){setTimeout(s,0,e)}}(),l.setImmediate=n,l.clearImmediate=o}}("undefined"==typeof self?void 0===e?this:e:self)}).call(t,r(0),r(4))},function(e,t,r){(function(t){function r(e,t){function r(){if(!o){if(n("throwDeprecation"))throw new Error(t);n("traceDeprecation")?console.trace(t):console.warn(t),o=!0}return e.apply(this,arguments)}if(n("noDeprecation"))return e;var o=!1;return r}function n(e){try{if(!t.localStorage)return!1}catch(e){return!1}var r=t.localStorage[e];return null!=r&&"true"===String(r).toLowerCase()}e.exports=r}).call(t,r(0))},function(e,t,r){"use strict";function n(e){if(!(this instanceof n))return new n(e);o.call(this,e)}e.exports=n;var o=r(26),i=r(8);i.inherits=r(2),i.inherits(n,o),n.prototype._transform=function(e,t,r){r(null,e)}},function(e,t,r){var n=r(3).Buffer;e.exports=function(e){if(e instanceof Uint8Array){if(0===e.byteOffset&&e.byteLength===e.buffer.byteLength)return e.buffer;if("function"==typeof e.buffer.slice)return e.buffer.slice(e.byteOffset,e.byteOffset+e.byteLength)}if(n.isBuffer(e)){for(var t=new Uint8Array(e.length),r=e.length,o=0;o<r;o++)t[o]=e[o];return t.buffer}throw new Error("Argument must be a Buffer")}},function(e,t){function r(){for(var e={},t=0;t<arguments.length;t++){var r=arguments[t];for(var o in r)n.call(r,o)&&(e[o]=r[o])}return e}e.exports=r;var n=Object.prototype.hasOwnProperty},function(e,t){e.exports={100:"Continue",101:"Switching Protocols",102:"Processing",200:"OK",201:"Created",202:"Accepted",203:"Non-Authoritative Information",204:"No Content",205:"Reset Content",206:"Partial Content",207:"Multi-Status",208:"Already Reported",226:"IM Used",300:"Multiple Choices",301:"Moved Permanently",302:"Found",303:"See Other",304:"Not Modified",305:"Use Proxy",307:"Temporary Redirect",308:"Permanent Redirect",400:"Bad Request",401:"Unauthorized",402:"Payment Required",403:"Forbidden",404:"Not Found",405:"Method Not Allowed",406:"Not Acceptable",407:"Proxy Authentication Required",408:"Request Timeout",409:"Conflict",410:"Gone",411:"Length Required",412:"Precondition Failed",413:"Payload Too Large",414:"URI Too Long",415:"Unsupported Media Type",416:"Range Not Satisfiable",417:"Expectation Failed",418:"I'm a teapot",421:"Misdirected Request",422:"Unprocessable Entity",423:"Locked",424:"Failed Dependency",425:"Unordered Collection",426:"Upgrade Required",428:"Precondition Required",429:"Too Many Requests",431:"Request Header Fields Too Large",451:"Unavailable For Legal Reasons",500:"Internal Server Error",501:"Not Implemented",502:"Bad Gateway",503:"Service Unavailable",504:"Gateway Timeout",505:"HTTP Version Not Supported",506:"Variant Also Negotiates",507:"Insufficient Storage",508:"Loop Detected",509:"Bandwidth Limit Exceeded",510:"Not Extended",511:"Network Authentication Required"}},function(e,t,r){(function(e,n){var o;!function(i){function s(e){throw new RangeError(P[e])}function a(e,t){for(var r=e.length,n=[];r--;)n[r]=t(e[r]);return n}function u(e,t){var r=e.split("@"),n="";return r.length>1&&(n=r[0]+"@",e=r[1]),e=e.replace(k,"."),n+a(e.split("."),t).join(".")}function h(e){for(var t,r,n=[],o=0,i=e.length;o<i;)t=e.charCodeAt(o++),t>=55296&&t<=56319&&o<i?(r=e.charCodeAt(o++),56320==(64512&r)?n.push(((1023&t)<<10)+(1023&r)+65536):(n.push(t),o--)):n.push(t);return n}function f(e){return a(e,function(e){var t="";return e>65535&&(e-=65536,t+=U(e>>>10&1023|55296),e=56320|1023&e),t+=U(e)}).join("")}function c(e){return e-48<10?e-22:e-65<26?e-65:e-97<26?e-97:_}function l(e,t){return e+22+75*(e<26)-((0!=t)<<5)}function d(e,t,r){var n=0;for(e=r?I(e/A):e>>1,e+=I(e/t);e>L*S>>1;n+=_)e=I(e/L);return I(n+(L+1)*e/(e+R))}function p(e){var t,r,n,o,i,a,u,h,l,p,g=[],y=e.length,v=0,b=C,m=T;for(r=e.lastIndexOf(M),r<0&&(r=0),n=0;n<r;++n)e.charCodeAt(n)>=128&&s("not-basic"),g.push(e.charCodeAt(n));for(o=r>0?r+1:0;o<y;){for(i=v,a=1,u=_;o>=y&&s("invalid-input"),h=c(e.charCodeAt(o++)),(h>=_||h>I((w-v)/a))&&s("overflow"),v+=h*a,l=u<=m?E:u>=m+S?S:u-m,!(h<l);u+=_)p=_-l,a>I(w/p)&&s("overflow"),a*=p;t=g.length+1,m=d(v-i,t,0==i),I(v/t)>w-b&&s("overflow"),b+=I(v/t),v%=t,g.splice(v++,0,b)}return f(g)}function g(e){var t,r,n,o,i,a,u,f,c,p,g,y,v,b,m,R=[];for(e=h(e),y=e.length,t=C,r=0,i=T,a=0;a<y;++a)(g=e[a])<128&&R.push(U(g));for(n=o=R.length,o&&R.push(M);n<y;){for(u=w,a=0;a<y;++a)(g=e[a])>=t&&g<u&&(u=g);for(v=n+1,u-t>I((w-r)/v)&&s("overflow"),r+=(u-t)*v,t=u,a=0;a<y;++a)if(g=e[a],g<t&&++r>w&&s("overflow"),g==t){for(f=r,c=_;p=c<=i?E:c>=i+S?S:c-i,!(f<p);c+=_)m=f-p,b=_-p,R.push(U(l(p+m%b,0))),f=I(m/b);R.push(U(l(f,0))),i=d(r,v,n==o),r=0,++n}++r,++t}return R.join("")}function y(e){return u(e,function(e){return x.test(e)?p(e.slice(4).toLowerCase()):e})}function v(e){return u(e,function(e){return O.test(e)?"xn--"+g(e):e})}var b=("object"==typeof t&&t&&t.nodeType,"object"==typeof e&&e&&e.nodeType,"object"==typeof n&&n);var m,w=2147483647,_=36,E=1,S=26,R=38,A=700,T=72,C=128,M="-",x=/^xn--/,O=/[^\x20-\x7E]/,k=/[\x2E\u3002\uFF0E\uFF61]/g,P={overflow:"Overflow: input needs wider integers to process","not-basic":"Illegal input >= 0x80 (not a basic code point)","invalid-input":"Invalid input"},L=_-E,I=Math.floor,U=String.fromCharCode;m={version:"1.4.1",ucs2:{decode:h,encode:f},decode:p,encode:g,toASCII:v,toUnicode:y},void 0!==(o=function(){return m}.call(t,r,t,e))&&(e.exports=o)}()}).call(t,r(51)(e),r(0))},function(e,t){e.exports=function(e){return e.webpackPolyfill||(e.deprecate=function(){},e.paths=[],e.children||(e.children=[]),Object.defineProperty(e,"loaded",{enumerable:!0,get:function(){return e.l}}),Object.defineProperty(e,"id",{enumerable:!0,get:function(){return e.i}}),e.webpackPolyfill=1),e}},function(e,t,r){"use strict";e.exports={isString:function(e){return"string"==typeof e},isObject:function(e){return"object"==typeof e&&null!==e},isNull:function(e){return null===e},isNullOrUndefined:function(e){return null==e}}},function(e,t,r){"use strict";t.decode=t.parse=r(54),t.encode=t.stringify=r(55)},function(e,t,r){"use strict";function n(e,t){return Object.prototype.hasOwnProperty.call(e,t)}e.exports=function(e,t,r,i){t=t||"&",r=r||"=";var s={};if("string"!=typeof e||0===e.length)return s;var a=/\+/g;e=e.split(t);var u=1e3;i&&"number"==typeof i.maxKeys&&(u=i.maxKeys);var h=e.length;u>0&&h>u&&(h=u);for(var f=0;f<h;++f){var c,l,d,p,g=e[f].replace(a,"%20"),y=g.indexOf(r);y>=0?(c=g.substr(0,y),l=g.substr(y+1)):(c=g,l=""),d=decodeURIComponent(c),p=decodeURIComponent(l),n(s,d)?o(s[d])?s[d].push(p):s[d]=[s[d],p]:s[d]=p}return s};var o=Array.isArray||function(e){return"[object Array]"===Object.prototype.toString.call(e)}},function(e,t,r){"use strict";function n(e,t){if(e.map)return e.map(t);for(var r=[],n=0;n<e.length;n++)r.push(t(e[n],n));return r}var o=function(e){switch(typeof e){case"string":return e;case"boolean":return e?"true":"false";case"number":return isFinite(e)?e:"";default:return""}};e.exports=function(e,t,r,a){return t=t||"&",r=r||"=",null===e&&(e=void 0),"object"==typeof e?n(s(e),function(s){var a=encodeURIComponent(o(s))+r;return i(e[s])?n(e[s],function(e){return a+encodeURIComponent(o(e))}).join(t):a+encodeURIComponent(o(e[s]))}).join(t):a?encodeURIComponent(o(a))+r+encodeURIComponent(o(e)):""};var i=Array.isArray||function(e){return"[object Array]"===Object.prototype.toString.call(e)},s=Object.keys||function(e){var t=[];for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&t.push(r);return t}},function(e,t,r){function n(e){if("string"==typeof e&&(e=i.parse(e)),e.protocol||(e.protocol="https:"),"https:"!==e.protocol)throw new Error('Protocol "'+e.protocol+'" not supported. Expected "https:"');return e}var o=r(16),i=r(11),s=e.exports;for(var a in o)o.hasOwnProperty(a)&&(s[a]=o[a]);s.request=function(e,t){return e=n(e),o.request.call(this,e,t)},s.get=function(e,t){return e=n(e),o.get.call(this,e,t)}},function(e,t,r){"use strict";function n(e){function t(e){if(e===s.FINISH_SEND)r.send(f);else{var t=e,n=new Int8Array(t.byteLength+1);n.set(new Uint8Array([0])),n.set(t,1),r.send(n)}}e.debug&&a.debug("websocketRequest",e);var r,n=o(e.url),h=[];return{sendMessage:function(e){r&&r.readyState!==r.CONNECTING?t(e):h.push(e)},finishSend:function(){r&&r.readyState!==r.CONNECTING?t(s.FINISH_SEND):h.push(s.FINISH_SEND)},start:function(o){r=new WebSocket(n,["grpc-websockets"]),r.binaryType="arraybuffer",r.onopen=function(){e.debug&&a.debug("websocketRequest.onopen"),r.send(i(o)),h.forEach(function(e){t(e)})},r.onclose=function(t){e.debug&&a.debug("websocketRequest.onclose",t),u.default(function(){e.onEnd()})},r.onerror=function(t){e.debug&&a.debug("websocketRequest.onerror",t)},r.onmessage=function(t){u.default(function(){e.onChunk(new Uint8Array(t.data))})}},cancel:function(){e.debug&&a.debug("websocket.abort"),u.default(function(){r.close()})}}}function o(e){if("https://"===e.substr(0,8))return"wss://"+e.substr(8);if("http://"===e.substr(0,7))return"ws://"+e.substr(7);throw new Error("Websocket transport constructed with non-https:// or http:// host.")}function i(e){var t="";return e.forEach(function(e,r){t+=e+": "+r.join(", ")+"\r\n"}),h.encodeASCII(t)}Object.defineProperty(t,"__esModule",{value:!0});var s,a=r(6),u=r(7),h=r(27);!function(e){e[e.FINISH_SEND=1]="FINISH_SEND"}(s||(s={}));var f=new Uint8Array([1]);t.default=n},function(e,t,r){"use strict";function n(e,t){if(e.requestStream)throw new Error(".invoke cannot be used with client-streaming methods. Use .client instead.");var r=o.client(e,{host:t.host,transport:t.transport,debug:t.debug});return t.onHeaders&&r.onHeaders(t.onHeaders),t.onMessage&&r.onMessage(t.onMessage),t.onEnd&&r.onEnd(t.onEnd),r.start(t.metadata),r.send(t.request),{close:function(){r.close()}}}Object.defineProperty(t,"__esModule",{value:!0});var o=r(12);t.invoke=n},function(e,t,r){"use strict";function n(e){var t=e.serializeBinary(),r=new ArrayBuffer(t.byteLength+5);return new DataView(r,1,4).setUint32(0,t.length,!1),new Uint8Array(r,5).set(t),new Uint8Array(r)}Object.defineProperty(t,"__esModule",{value:!0}),t.frameRequest=n},function(e,t,r){"use strict";function n(e,t){if(e.responseStream)throw new Error(".unary cannot be used with server-streaming methods. Use .invoke or .client instead.");if(e.requestStream)throw new Error(".unary cannot be used with client-streaming methods. Use .client instead.");var r=null,n=null,s=i.client(e,{host:t.host,transport:t.transport,debug:t.debug});return s.onHeaders(function(e){r=e}),s.onMessage(function(e){n=e}),s.onEnd(function(e,i,s){t.onEnd({status:e,statusMessage:i,headers:r||new o.Metadata,message:n,trailers:s})}),s.start(t.metadata),s.send(t.request),{close:function(){s.close()}}}Object.defineProperty(t,"__esModule",{value:!0});var o=r(1),i=r(12);t.unary=n}]));
+	}).call($global);
+$packages["github.com/johanbrandhorst/protobuf/grpcweb/grpcwebjs"] = (function() {
+	var $pkg = {}, $init;
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+$packages["github.com/johanbrandhorst/protobuf/vendor/google.golang.org/grpc/codes"] = (function() {
+	var $pkg = {}, $init, fmt, strconv, Code, ptrType, sliceType, sliceType$1, strToCode;
+	fmt = $packages["fmt"];
+	strconv = $packages["strconv"];
+	Code = $pkg.Code = $newType(4, $kindUint32, "codes.Code", true, "github.com/johanbrandhorst/protobuf/vendor/google.golang.org/grpc/codes", true, null);
+	ptrType = $ptrType(Code);
+	sliceType = $sliceType($emptyInterface);
+	sliceType$1 = $sliceType($Uint8);
+	Code.prototype.String = function() {
+		var _1, c;
+		c = this.$val;
+		_1 = c;
+		if (_1 === (0)) {
+			return "OK";
+		} else if (_1 === (1)) {
+			return "Canceled";
+		} else if (_1 === (2)) {
+			return "Unknown";
+		} else if (_1 === (3)) {
+			return "InvalidArgument";
+		} else if (_1 === (4)) {
+			return "DeadlineExceeded";
+		} else if (_1 === (5)) {
+			return "NotFound";
+		} else if (_1 === (6)) {
+			return "AlreadyExists";
+		} else if (_1 === (7)) {
+			return "PermissionDenied";
+		} else if (_1 === (8)) {
+			return "ResourceExhausted";
+		} else if (_1 === (9)) {
+			return "FailedPrecondition";
+		} else if (_1 === (10)) {
+			return "Aborted";
+		} else if (_1 === (11)) {
+			return "OutOfRange";
+		} else if (_1 === (12)) {
+			return "Unimplemented";
+		} else if (_1 === (13)) {
+			return "Internal";
+		} else if (_1 === (14)) {
+			return "Unavailable";
+		} else if (_1 === (15)) {
+			return "DataLoss";
+		} else if (_1 === (16)) {
+			return "Unauthenticated";
+		} else {
+			return "Code(" + strconv.FormatInt((new $Int64(0, c)), 10) + ")";
+		}
+	};
+	$ptrType(Code).prototype.String = function() { return new Code(this.$get()).String(); };
+	$ptrType(Code).prototype.UnmarshalJSON = function(b) {
+		var _entry, _r, _r$1, _tuple, b, c, jc, ok, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _entry = $f._entry; _r = $f._r; _r$1 = $f._r$1; _tuple = $f._tuple; b = $f.b; c = $f.c; jc = $f.jc; ok = $f.ok; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = this;
+		if (($bytesToString(b)) === "null") {
+			$s = -1; return $ifaceNil;
+		}
+		/* */ if (c === ptrType.nil) { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if (c === ptrType.nil) { */ case 1:
+			_r = fmt.Errorf("nil receiver passed to UnmarshalJSON", new sliceType([])); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			$s = -1; return _r;
+		/* } */ case 2:
+		_tuple = (_entry = strToCode[$String.keyFor(($bytesToString(b)))], _entry !== undefined ? [_entry.v, true] : [0, false]);
+		jc = _tuple[0];
+		ok = _tuple[1];
+		if (ok) {
+			c.$set(jc);
+			$s = -1; return $ifaceNil;
+		}
+		_r$1 = fmt.Errorf("invalid code: %q", new sliceType([new $String(($bytesToString(b)))])); /* */ $s = 4; case 4: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		$s = -1; return _r$1;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $ptrType(Code).prototype.UnmarshalJSON }; } $f._entry = _entry; $f._r = _r; $f._r$1 = _r$1; $f._tuple = _tuple; $f.b = b; $f.c = c; $f.jc = jc; $f.ok = ok; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Code.methods = [{prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}];
+	ptrType.methods = [{prop: "UnmarshalJSON", name: "UnmarshalJSON", pkg: "", typ: $funcType([sliceType$1], [$error], false)}];
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = fmt.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = strconv.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		strToCode = $makeMap($String.keyFor, [{ k: "\"OK\"", v: 0 }, { k: "\"CANCELLED\"", v: 1 }, { k: "\"UNKNOWN\"", v: 2 }, { k: "\"INVALID_ARGUMENT\"", v: 3 }, { k: "\"DEADLINE_EXCEEDED\"", v: 4 }, { k: "\"NOT_FOUND\"", v: 5 }, { k: "\"ALREADY_EXISTS\"", v: 6 }, { k: "\"PERMISSION_DENIED\"", v: 7 }, { k: "\"RESOURCE_EXHAUSTED\"", v: 8 }, { k: "\"FAILED_PRECONDITION\"", v: 9 }, { k: "\"ABORTED\"", v: 10 }, { k: "\"OUT_OF_RANGE\"", v: 11 }, { k: "\"UNIMPLEMENTED\"", v: 12 }, { k: "\"INTERNAL\"", v: 13 }, { k: "\"UNAVAILABLE\"", v: 14 }, { k: "\"DATA_LOSS\"", v: 15 }, { k: "\"UNAUTHENTICATED\"", v: 16 }]);
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+$packages["github.com/johanbrandhorst/protobuf/vendor/golang.org/x/net/context"] = (function() {
+	var $pkg = {}, $init, context, time, todo, background;
+	context = $packages["context"];
+	time = $packages["time"];
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = context.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = time.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		todo = context.TODO();
+		background = context.Background();
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
@@ -23390,13 +24566,64 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 	return $pkg;
 })();
 $packages["../proto/gopherjs"] = (function() {
-	var $pkg = {}, $init, context, grpcweb, jspb, EthernetInterfaceSettings_Mode, WiFiSettings_Mode, WiFiSettings_APAuthMode, TempDirOrFileRequest, TempDirOrFileResponse, ReadFileRequest, ReadFileResponse, WriteFileRequest, FileInfoRequest, FileInfoResponse, HIDScriptRequest, HIDScriptJob, HIDScriptJobList, HIDScriptResult, LEDSettings, GadgetSettings, GadgetSettingsEthernet, GadgetSettingsUMS, EthernetInterfaceSettings, DHCPServerSettings, DHCPServerRange, DHCPServerStaticHost, WiFiSettings, BSSCfg, Empty, p4WNP1Client, ptrType, ptrType$1, ptrType$2, sliceType, ptrType$3, ptrType$4, ptrType$5, ptrType$6, ptrType$7, ptrType$8, sliceType$1, ptrType$9, ptrType$10, ptrType$11, ptrType$12, ptrType$13, ptrType$14, ptrType$15, ptrType$16, ptrType$17, sliceType$2, ptrType$18, sliceType$3, ptrType$19, ptrType$20, ptrType$21, ptrType$22, mapType, sliceType$4, ptrType$23, NewP4WNP1Client;
+	var $pkg = {}, $init, context, grpcweb, jspb, EthernetInterfaceSettings_Mode, WiFiSettings_Mode, WiFiSettings_APAuthMode, EventRequest, EventValue, isEventValue_Val, EventValue_Tstring, EventValue_Tbool, EventValue_Tint64, Event, TempDirOrFileRequest, TempDirOrFileResponse, ReadFileRequest, ReadFileResponse, WriteFileRequest, FileInfoRequest, FileInfoResponse, HIDScriptRequest, HIDScriptJob, HIDScriptJobList, HIDScriptResult, LEDSettings, GadgetSettings, GadgetSettingsEthernet, GadgetSettingsUMS, EthernetInterfaceSettings, DHCPServerSettings, DHCPServerRange, DHCPServerStaticHost, WiFiSettings, BSSCfg, Empty, P4WNP1Client, p4WNP1Client, P4WNP1_EventListenClient, p4WNP1EventListenClient, ptrType, ptrType$1, ptrType$2, ptrType$3, ptrType$4, ptrType$5, sliceType, ptrType$6, ptrType$7, ptrType$8, sliceType$1, ptrType$9, ptrType$10, ptrType$11, ptrType$12, ptrType$13, ptrType$14, sliceType$2, ptrType$15, ptrType$16, ptrType$17, ptrType$18, ptrType$19, ptrType$20, ptrType$21, ptrType$22, ptrType$23, sliceType$3, ptrType$24, sliceType$4, ptrType$25, ptrType$26, ptrType$27, ptrType$28, mapType, sliceType$5, ptrType$29, ptrType$30, NewP4WNP1Client;
 	context = $packages["context"];
 	grpcweb = $packages["github.com/johanbrandhorst/protobuf/grpcweb"];
 	jspb = $packages["github.com/johanbrandhorst/protobuf/jspb"];
 	EthernetInterfaceSettings_Mode = $pkg.EthernetInterfaceSettings_Mode = $newType(4, $kindInt, "P4wnP1_grpc.EthernetInterfaceSettings_Mode", true, "../proto/gopherjs", true, null);
 	WiFiSettings_Mode = $pkg.WiFiSettings_Mode = $newType(4, $kindInt, "P4wnP1_grpc.WiFiSettings_Mode", true, "../proto/gopherjs", true, null);
 	WiFiSettings_APAuthMode = $pkg.WiFiSettings_APAuthMode = $newType(4, $kindInt, "P4wnP1_grpc.WiFiSettings_APAuthMode", true, "../proto/gopherjs", true, null);
+	EventRequest = $pkg.EventRequest = $newType(0, $kindStruct, "P4wnP1_grpc.EventRequest", true, "../proto/gopherjs", true, function(ListenType_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.ListenType = new $Int64(0, 0);
+			return;
+		}
+		this.ListenType = ListenType_;
+	});
+	EventValue = $pkg.EventValue = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue", true, "../proto/gopherjs", true, function(Val_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Val = $ifaceNil;
+			return;
+		}
+		this.Val = Val_;
+	});
+	isEventValue_Val = $pkg.isEventValue_Val = $newType(8, $kindInterface, "P4wnP1_grpc.isEventValue_Val", true, "../proto/gopherjs", false, null);
+	EventValue_Tstring = $pkg.EventValue_Tstring = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue_Tstring", true, "../proto/gopherjs", true, function(Tstring_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Tstring = "";
+			return;
+		}
+		this.Tstring = Tstring_;
+	});
+	EventValue_Tbool = $pkg.EventValue_Tbool = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue_Tbool", true, "../proto/gopherjs", true, function(Tbool_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Tbool = false;
+			return;
+		}
+		this.Tbool = Tbool_;
+	});
+	EventValue_Tint64 = $pkg.EventValue_Tint64 = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue_Tint64", true, "../proto/gopherjs", true, function(Tint64_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Tint64 = new $Int64(0, 0);
+			return;
+		}
+		this.Tint64 = Tint64_;
+	});
+	Event = $pkg.Event = $newType(0, $kindStruct, "P4wnP1_grpc.Event", true, "../proto/gopherjs", true, function(Type_, Values_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Type = new $Int64(0, 0);
+			this.Values = sliceType.nil;
+			return;
+		}
+		this.Type = Type_;
+		this.Values = Values_;
+	});
 	TempDirOrFileRequest = $pkg.TempDirOrFileRequest = $newType(0, $kindStruct, "P4wnP1_grpc.TempDirOrFileRequest", true, "../proto/gopherjs", true, function(Dir_, Prefix_, OnlyFolder_) {
 		this.$val = this;
 		if (arguments.length === 0) {
@@ -23422,7 +24649,7 @@ $packages["../proto/gopherjs"] = (function() {
 		if (arguments.length === 0) {
 			this.Path = "";
 			this.Start = new $Int64(0, 0);
-			this.Data = sliceType.nil;
+			this.Data = sliceType$1.nil;
 			return;
 		}
 		this.Path = Path_;
@@ -23443,7 +24670,7 @@ $packages["../proto/gopherjs"] = (function() {
 			this.Path = "";
 			this.Append = false;
 			this.MustNotExist = false;
-			this.Data = sliceType.nil;
+			this.Data = sliceType$1.nil;
 			return;
 		}
 		this.Path = Path_;
@@ -23496,7 +24723,7 @@ $packages["../proto/gopherjs"] = (function() {
 	HIDScriptJobList = $pkg.HIDScriptJobList = $newType(0, $kindStruct, "P4wnP1_grpc.HIDScriptJobList", true, "../proto/gopherjs", true, function(Ids_) {
 		this.$val = this;
 		if (arguments.length === 0) {
-			this.Ids = sliceType$1.nil;
+			this.Ids = sliceType$2.nil;
 			return;
 		}
 		this.Ids = Ids_;
@@ -23504,7 +24731,7 @@ $packages["../proto/gopherjs"] = (function() {
 	HIDScriptResult = $pkg.HIDScriptResult = $newType(0, $kindStruct, "P4wnP1_grpc.HIDScriptResult", true, "../proto/gopherjs", true, function(Job_, IsFinished_, ResultJson_) {
 		this.$val = this;
 		if (arguments.length === 0) {
-			this.Job = ptrType$8.nil;
+			this.Job = ptrType$14.nil;
 			this.IsFinished = false;
 			this.ResultJson = "";
 			return;
@@ -23537,9 +24764,9 @@ $packages["../proto/gopherjs"] = (function() {
 			this.Use_HID_RAW = false;
 			this.Use_UMS = false;
 			this.Use_SERIAL = false;
-			this.RndisSettings = ptrType$13.nil;
-			this.CdcEcmSettings = ptrType$13.nil;
-			this.UmsSettings = ptrType$14.nil;
+			this.RndisSettings = ptrType$19.nil;
+			this.CdcEcmSettings = ptrType$19.nil;
+			this.UmsSettings = ptrType$20.nil;
 			return;
 		}
 		this.Enabled = Enabled_;
@@ -23587,7 +24814,7 @@ $packages["../proto/gopherjs"] = (function() {
 			this.IpAddress4 = "";
 			this.Netmask4 = "";
 			this.Enabled = false;
-			this.DhcpServerSettings = ptrType$16.nil;
+			this.DhcpServerSettings = ptrType$22.nil;
 			return;
 		}
 		this.Name = Name_;
@@ -23606,9 +24833,9 @@ $packages["../proto/gopherjs"] = (function() {
 			this.NotAuthoritative = false;
 			this.DoNotBindInterface = false;
 			this.CallbackScript = "";
-			this.Ranges = sliceType$2.nil;
+			this.Ranges = sliceType$3.nil;
 			this.Options = false;
-			this.StaticHosts = sliceType$3.nil;
+			this.StaticHosts = sliceType$4.nil;
 			return;
 		}
 		this.ListenPort = ListenPort_;
@@ -23651,8 +24878,8 @@ $packages["../proto/gopherjs"] = (function() {
 			this.Mode = 0;
 			this.AuthMode = 0;
 			this.ApChannel = 0;
-			this.BssCfgAP = ptrType$20.nil;
-			this.BssCfgClient = ptrType$20.nil;
+			this.BssCfgAP = ptrType$26.nil;
+			this.BssCfgClient = ptrType$26.nil;
 			this.ApHideSsid = false;
 			this.DisableNexmon = false;
 			return;
@@ -23683,44 +24910,62 @@ $packages["../proto/gopherjs"] = (function() {
 			return;
 		}
 	});
+	P4WNP1Client = $pkg.P4WNP1Client = $newType(8, $kindInterface, "P4wnP1_grpc.P4WNP1Client", true, "../proto/gopherjs", true, null);
 	p4WNP1Client = $pkg.p4WNP1Client = $newType(0, $kindStruct, "P4wnP1_grpc.p4WNP1Client", true, "../proto/gopherjs", false, function(client_) {
 		this.$val = this;
 		if (arguments.length === 0) {
-			this.client = ptrType$22.nil;
+			this.client = ptrType$28.nil;
 			return;
 		}
 		this.client = client_;
 	});
-	ptrType = $ptrType(TempDirOrFileRequest);
-	ptrType$1 = $ptrType(TempDirOrFileResponse);
-	ptrType$2 = $ptrType(ReadFileRequest);
-	sliceType = $sliceType($Uint8);
-	ptrType$3 = $ptrType(ReadFileResponse);
-	ptrType$4 = $ptrType(WriteFileRequest);
-	ptrType$5 = $ptrType(FileInfoRequest);
-	ptrType$6 = $ptrType(FileInfoResponse);
-	ptrType$7 = $ptrType(HIDScriptRequest);
-	ptrType$8 = $ptrType(HIDScriptJob);
-	sliceType$1 = $sliceType($Uint32);
-	ptrType$9 = $ptrType(HIDScriptJobList);
-	ptrType$10 = $ptrType(HIDScriptResult);
-	ptrType$11 = $ptrType(LEDSettings);
-	ptrType$12 = $ptrType(GadgetSettings);
-	ptrType$13 = $ptrType(GadgetSettingsEthernet);
-	ptrType$14 = $ptrType(GadgetSettingsUMS);
-	ptrType$15 = $ptrType(EthernetInterfaceSettings);
-	ptrType$16 = $ptrType(DHCPServerSettings);
-	ptrType$17 = $ptrType(DHCPServerRange);
-	sliceType$2 = $sliceType(ptrType$17);
-	ptrType$18 = $ptrType(DHCPServerStaticHost);
-	sliceType$3 = $sliceType(ptrType$18);
-	ptrType$19 = $ptrType(WiFiSettings);
-	ptrType$20 = $ptrType(BSSCfg);
-	ptrType$21 = $ptrType(Empty);
-	ptrType$22 = $ptrType(grpcweb.Client);
+	P4WNP1_EventListenClient = $pkg.P4WNP1_EventListenClient = $newType(8, $kindInterface, "P4wnP1_grpc.P4WNP1_EventListenClient", true, "../proto/gopherjs", true, null);
+	p4WNP1EventListenClient = $pkg.p4WNP1EventListenClient = $newType(0, $kindStruct, "P4wnP1_grpc.p4WNP1EventListenClient", true, "../proto/gopherjs", false, function(ClientStream_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.ClientStream = $ifaceNil;
+			return;
+		}
+		this.ClientStream = ClientStream_;
+	});
+	ptrType = $ptrType(EventRequest);
+	ptrType$1 = $ptrType(EventValue);
+	ptrType$2 = $ptrType(EventValue_Tstring);
+	ptrType$3 = $ptrType(EventValue_Tbool);
+	ptrType$4 = $ptrType(EventValue_Tint64);
+	ptrType$5 = $ptrType(Event);
+	sliceType = $sliceType(ptrType$1);
+	ptrType$6 = $ptrType(TempDirOrFileRequest);
+	ptrType$7 = $ptrType(TempDirOrFileResponse);
+	ptrType$8 = $ptrType(ReadFileRequest);
+	sliceType$1 = $sliceType($Uint8);
+	ptrType$9 = $ptrType(ReadFileResponse);
+	ptrType$10 = $ptrType(WriteFileRequest);
+	ptrType$11 = $ptrType(FileInfoRequest);
+	ptrType$12 = $ptrType(FileInfoResponse);
+	ptrType$13 = $ptrType(HIDScriptRequest);
+	ptrType$14 = $ptrType(HIDScriptJob);
+	sliceType$2 = $sliceType($Uint32);
+	ptrType$15 = $ptrType(HIDScriptJobList);
+	ptrType$16 = $ptrType(HIDScriptResult);
+	ptrType$17 = $ptrType(LEDSettings);
+	ptrType$18 = $ptrType(GadgetSettings);
+	ptrType$19 = $ptrType(GadgetSettingsEthernet);
+	ptrType$20 = $ptrType(GadgetSettingsUMS);
+	ptrType$21 = $ptrType(EthernetInterfaceSettings);
+	ptrType$22 = $ptrType(DHCPServerSettings);
+	ptrType$23 = $ptrType(DHCPServerRange);
+	sliceType$3 = $sliceType(ptrType$23);
+	ptrType$24 = $ptrType(DHCPServerStaticHost);
+	sliceType$4 = $sliceType(ptrType$24);
+	ptrType$25 = $ptrType(WiFiSettings);
+	ptrType$26 = $ptrType(BSSCfg);
+	ptrType$27 = $ptrType(Empty);
+	ptrType$28 = $ptrType(grpcweb.Client);
 	mapType = $mapType($Uint32, $String);
-	sliceType$4 = $sliceType(grpcweb.CallOption);
-	ptrType$23 = $ptrType(p4WNP1Client);
+	sliceType$5 = $sliceType(grpcweb.CallOption);
+	ptrType$29 = $ptrType(p4WNP1Client);
+	ptrType$30 = $ptrType(p4WNP1EventListenClient);
 	EthernetInterfaceSettings_Mode.prototype.String = function() {
 		var _entry, x;
 		x = this.$val;
@@ -23739,11 +24984,377 @@ $packages["../proto/gopherjs"] = (function() {
 		return (_entry = $pkg.WiFiSettings_APAuthMode_name[$Int.keyFor(((x >> 0)))], _entry !== undefined ? _entry.v : "");
 	};
 	$ptrType(WiFiSettings_APAuthMode).prototype.String = function() { return new WiFiSettings_APAuthMode(this.$get()).String(); };
+	EventRequest.ptr.prototype.GetListenType = function() {
+		var m, x;
+		x = new $Int64(0, 0);
+		m = this;
+		if (m === ptrType.nil) {
+			x = x;
+			return x;
+		}
+		x = m.ListenType;
+		return x;
+	};
+	EventRequest.prototype.GetListenType = function() { return this.$val.GetListenType(); };
+	EventRequest.ptr.prototype.MarshalToWriter = function(writer) {
+		var m, writer, x, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		m = this;
+		if (m === ptrType.nil) {
+			$s = -1; return;
+		}
+		/* */ if (!((x = m.ListenType, (x.$high === 0 && x.$low === 0)))) { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if (!((x = m.ListenType, (x.$high === 0 && x.$low === 0)))) { */ case 1:
+			$r = writer.WriteInt64(1, m.ListenType); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 2:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: EventRequest.ptr.prototype.MarshalToWriter }; } $f.m = m; $f.writer = writer; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	EventRequest.prototype.MarshalToWriter = function(writer) { return this.$val.MarshalToWriter(writer); };
+	EventRequest.ptr.prototype.Marshal = function() {
+		var _r, m, writer, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		m = this;
+		writer = jspb.NewWriter();
+		$r = m.MarshalToWriter(writer); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_r = writer.GetResult(); /* */ $s = 2; case 2: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$s = -1; return _r;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: EventRequest.ptr.prototype.Marshal }; } $f._r = _r; $f.m = m; $f.writer = writer; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	EventRequest.prototype.Marshal = function() { return this.$val.Marshal(); };
+	EventRequest.ptr.prototype.UnmarshalFromReader = function(reader) {
+		var _1, _r, _r$1, _r$2, m, reader, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _1 = $f._1; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; m = $f.m; reader = $f.reader; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		m = this;
+		/* while (true) { */ case 1:
+			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
+			if (m === ptrType.nil) {
+				m = new EventRequest.ptr(new $Int64(0, 0));
+			}
+				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+				_1 = _r$1;
+				/* */ if (_1 === (1)) { $s = 6; continue; }
+				/* */ $s = 7; continue;
+				/* if (_1 === (1)) { */ case 6:
+					_r$2 = reader.ReadInt64(); /* */ $s = 9; case 9: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+					m.ListenType = _r$2;
+					$s = 8; continue;
+				/* } else { */ case 7:
+					$r = reader.SkipField(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				/* } */ case 8:
+			case 4:
+		/* } */ $s = 1; continue; case 2:
+		$s = -1; return m;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: EventRequest.ptr.prototype.UnmarshalFromReader }; } $f._1 = _1; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f.m = m; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	EventRequest.prototype.UnmarshalFromReader = function(reader) { return this.$val.UnmarshalFromReader(reader); };
+	EventRequest.ptr.prototype.Unmarshal = function(rawBytes) {
+		var _r, _r$1, err, m, rawBytes, reader, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; err = $f.err; m = $f.m; rawBytes = $f.rawBytes; reader = $f.reader; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		m = this;
+		reader = jspb.NewReader(rawBytes);
+		_r = m.UnmarshalFromReader(reader); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		m = _r;
+		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		err = _r$1;
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			$s = -1; return [ptrType.nil, err];
+		}
+		$s = -1; return [m, $ifaceNil];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: EventRequest.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	EventRequest.prototype.Unmarshal = function(rawBytes) { return this.$val.Unmarshal(rawBytes); };
+	EventValue.ptr.prototype.GetVal = function() {
+		var m, x;
+		x = $ifaceNil;
+		m = this;
+		if (m === ptrType$1.nil) {
+			x = x;
+			return x;
+		}
+		x = m.Val;
+		return x;
+	};
+	EventValue.prototype.GetVal = function() { return this.$val.GetVal(); };
+	EventValue.ptr.prototype.GetTstring = function() {
+		var _tuple, m, ok, v, x;
+		x = "";
+		m = this;
+		_tuple = $assertType(m.GetVal(), ptrType$2, true);
+		v = _tuple[0];
+		ok = _tuple[1];
+		if (ok) {
+			x = v.Tstring;
+			return x;
+		}
+		x = x;
+		return x;
+	};
+	EventValue.prototype.GetTstring = function() { return this.$val.GetTstring(); };
+	EventValue.ptr.prototype.GetTbool = function() {
+		var _tuple, m, ok, v, x;
+		x = false;
+		m = this;
+		_tuple = $assertType(m.GetVal(), ptrType$3, true);
+		v = _tuple[0];
+		ok = _tuple[1];
+		if (ok) {
+			x = v.Tbool;
+			return x;
+		}
+		x = x;
+		return x;
+	};
+	EventValue.prototype.GetTbool = function() { return this.$val.GetTbool(); };
+	EventValue.ptr.prototype.GetTint64 = function() {
+		var _tuple, m, ok, v, x;
+		x = new $Int64(0, 0);
+		m = this;
+		_tuple = $assertType(m.GetVal(), ptrType$4, true);
+		v = _tuple[0];
+		ok = _tuple[1];
+		if (ok) {
+			x = v.Tint64;
+			return x;
+		}
+		x = x;
+		return x;
+	};
+	EventValue.prototype.GetTint64 = function() { return this.$val.GetTint64(); };
+	EventValue.ptr.prototype.MarshalToWriter = function(writer) {
+		var _ref, m, t, t$1, t$2, writer, x, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _ref = $f._ref; m = $f.m; t = $f.t; t$1 = $f.t$1; t$2 = $f.t$2; writer = $f.writer; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		m = this;
+		if (m === ptrType$1.nil) {
+			$s = -1; return;
+		}
+		_ref = m.Val;
+		/* */ if ($assertType(_ref, ptrType$2, true)[1]) { $s = 1; continue; }
+		/* */ if ($assertType(_ref, ptrType$3, true)[1]) { $s = 2; continue; }
+		/* */ if ($assertType(_ref, ptrType$4, true)[1]) { $s = 3; continue; }
+		/* */ $s = 4; continue;
+		/* if ($assertType(_ref, ptrType$2, true)[1]) { */ case 1:
+			t = _ref.$val;
+			/* */ if (t.Tstring.length > 0) { $s = 5; continue; }
+			/* */ $s = 6; continue;
+			/* if (t.Tstring.length > 0) { */ case 5:
+				$r = writer.WriteString(1, t.Tstring); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			/* } */ case 6:
+			$s = 4; continue;
+		/* } else if ($assertType(_ref, ptrType$3, true)[1]) { */ case 2:
+			t$1 = _ref.$val;
+			/* */ if (t$1.Tbool) { $s = 8; continue; }
+			/* */ $s = 9; continue;
+			/* if (t$1.Tbool) { */ case 8:
+				$r = writer.WriteBool(2, t$1.Tbool); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			/* } */ case 9:
+			$s = 4; continue;
+		/* } else if ($assertType(_ref, ptrType$4, true)[1]) { */ case 3:
+			t$2 = _ref.$val;
+			/* */ if (!((x = t$2.Tint64, (x.$high === 0 && x.$low === 0)))) { $s = 11; continue; }
+			/* */ $s = 12; continue;
+			/* if (!((x = t$2.Tint64, (x.$high === 0 && x.$low === 0)))) { */ case 11:
+				$r = writer.WriteInt64(3, t$2.Tint64); /* */ $s = 13; case 13: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			/* } */ case 12:
+		/* } */ case 4:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: EventValue.ptr.prototype.MarshalToWriter }; } $f._ref = _ref; $f.m = m; $f.t = t; $f.t$1 = t$1; $f.t$2 = t$2; $f.writer = writer; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	EventValue.prototype.MarshalToWriter = function(writer) { return this.$val.MarshalToWriter(writer); };
+	EventValue.ptr.prototype.Marshal = function() {
+		var _r, m, writer, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		m = this;
+		writer = jspb.NewWriter();
+		$r = m.MarshalToWriter(writer); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_r = writer.GetResult(); /* */ $s = 2; case 2: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$s = -1; return _r;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: EventValue.ptr.prototype.Marshal }; } $f._r = _r; $f.m = m; $f.writer = writer; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	EventValue.prototype.Marshal = function() { return this.$val.Marshal(); };
+	EventValue.ptr.prototype.UnmarshalFromReader = function(reader) {
+		var _1, _r, _r$1, _r$2, _r$3, _r$4, m, reader, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _1 = $f._1; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; m = $f.m; reader = $f.reader; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		m = this;
+		/* while (true) { */ case 1:
+			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
+			if (m === ptrType$1.nil) {
+				m = new EventValue.ptr($ifaceNil);
+			}
+				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+				_1 = _r$1;
+				/* */ if (_1 === (1)) { $s = 6; continue; }
+				/* */ if (_1 === (2)) { $s = 7; continue; }
+				/* */ if (_1 === (3)) { $s = 8; continue; }
+				/* */ $s = 9; continue;
+				/* if (_1 === (1)) { */ case 6:
+					_r$2 = reader.ReadString(); /* */ $s = 11; case 11: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+					m.Val = new EventValue_Tstring.ptr(_r$2);
+					$s = 10; continue;
+				/* } else if (_1 === (2)) { */ case 7:
+					_r$3 = reader.ReadBool(); /* */ $s = 12; case 12: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+					m.Val = new EventValue_Tbool.ptr(_r$3);
+					$s = 10; continue;
+				/* } else if (_1 === (3)) { */ case 8:
+					_r$4 = reader.ReadInt64(); /* */ $s = 13; case 13: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+					m.Val = new EventValue_Tint64.ptr(_r$4);
+					$s = 10; continue;
+				/* } else { */ case 9:
+					$r = reader.SkipField(); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				/* } */ case 10:
+			case 4:
+		/* } */ $s = 1; continue; case 2:
+		$s = -1; return m;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: EventValue.ptr.prototype.UnmarshalFromReader }; } $f._1 = _1; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f.m = m; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	EventValue.prototype.UnmarshalFromReader = function(reader) { return this.$val.UnmarshalFromReader(reader); };
+	EventValue.ptr.prototype.Unmarshal = function(rawBytes) {
+		var _r, _r$1, err, m, rawBytes, reader, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; err = $f.err; m = $f.m; rawBytes = $f.rawBytes; reader = $f.reader; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		m = this;
+		reader = jspb.NewReader(rawBytes);
+		_r = m.UnmarshalFromReader(reader); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		m = _r;
+		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		err = _r$1;
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			$s = -1; return [ptrType$1.nil, err];
+		}
+		$s = -1; return [m, $ifaceNil];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: EventValue.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	EventValue.prototype.Unmarshal = function(rawBytes) { return this.$val.Unmarshal(rawBytes); };
+	Event.ptr.prototype.GetType = function() {
+		var m, x;
+		x = new $Int64(0, 0);
+		m = this;
+		if (m === ptrType$5.nil) {
+			x = x;
+			return x;
+		}
+		x = m.Type;
+		return x;
+	};
+	Event.prototype.GetType = function() { return this.$val.GetType(); };
+	Event.ptr.prototype.GetValues = function() {
+		var m, x;
+		x = sliceType.nil;
+		m = this;
+		if (m === ptrType$5.nil) {
+			x = x;
+			return x;
+		}
+		x = m.Values;
+		return x;
+	};
+	Event.prototype.GetValues = function() { return this.$val.GetValues(); };
+	Event.ptr.prototype.MarshalToWriter = function(writer) {
+		var _i, _ref, m, msg, writer, x, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _ref = $f._ref; m = $f.m; msg = $f.msg; writer = $f.writer; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		msg = [msg];
+		writer = [writer];
+		m = this;
+		if (m === ptrType$5.nil) {
+			$s = -1; return;
+		}
+		/* */ if (!((x = m.Type, (x.$high === 0 && x.$low === 0)))) { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if (!((x = m.Type, (x.$high === 0 && x.$low === 0)))) { */ case 1:
+			$r = writer[0].WriteInt64(1, m.Type); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 2:
+		_ref = m.Values;
+		_i = 0;
+		/* while (true) { */ case 4:
+			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 5; continue; }
+			msg[0] = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			$r = writer[0].WriteMessage(2, (function(msg, writer) { return function $b() {
+				var $s, $r;
+				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+				$r = msg[0].MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				$s = -1; return;
+				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
+			}; })(msg, writer)); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			_i++;
+		/* } */ $s = 4; continue; case 5:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Event.ptr.prototype.MarshalToWriter }; } $f._i = _i; $f._ref = _ref; $f.m = m; $f.msg = msg; $f.writer = writer; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Event.prototype.MarshalToWriter = function(writer) { return this.$val.MarshalToWriter(writer); };
+	Event.ptr.prototype.Marshal = function() {
+		var _r, m, writer, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		m = this;
+		writer = jspb.NewWriter();
+		$r = m.MarshalToWriter(writer); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_r = writer.GetResult(); /* */ $s = 2; case 2: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$s = -1; return _r;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Event.ptr.prototype.Marshal }; } $f._r = _r; $f.m = m; $f.writer = writer; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Event.prototype.Marshal = function() { return this.$val.Marshal(); };
+	Event.ptr.prototype.UnmarshalFromReader = function(reader) {
+		var _1, _r, _r$1, _r$2, m, reader, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _1 = $f._1; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; m = $f.m; reader = $f.reader; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		m = [m];
+		reader = [reader];
+		m[0] = this;
+		/* while (true) { */ case 1:
+			_r = reader[0].Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
+			if (m[0] === ptrType$5.nil) {
+				m[0] = new Event.ptr(new $Int64(0, 0), sliceType.nil);
+			}
+				_r$1 = reader[0].GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+				_1 = _r$1;
+				/* */ if (_1 === (1)) { $s = 6; continue; }
+				/* */ if (_1 === (2)) { $s = 7; continue; }
+				/* */ $s = 8; continue;
+				/* if (_1 === (1)) { */ case 6:
+					_r$2 = reader[0].ReadInt64(); /* */ $s = 10; case 10: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+					m[0].Type = _r$2;
+					$s = 9; continue;
+				/* } else if (_1 === (2)) { */ case 7:
+					$r = reader[0].ReadMessage((function(m, reader) { return function $b() {
+						var _r$3, $s, $r;
+						/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$3 = $f._r$3; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+						_r$3 = new EventValue.ptr($ifaceNil).UnmarshalFromReader(reader[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+						m[0].Values = $append(m[0].Values, _r$3);
+						$s = -1; return;
+						/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$3 = _r$3; $f.$s = $s; $f.$r = $r; return $f;
+					}; })(m, reader)); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$s = 9; continue;
+				/* } else { */ case 8:
+					$r = reader[0].SkipField(); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				/* } */ case 9:
+			case 4:
+		/* } */ $s = 1; continue; case 2:
+		$s = -1; return m[0];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Event.ptr.prototype.UnmarshalFromReader }; } $f._1 = _1; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f.m = m; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Event.prototype.UnmarshalFromReader = function(reader) { return this.$val.UnmarshalFromReader(reader); };
+	Event.ptr.prototype.Unmarshal = function(rawBytes) {
+		var _r, _r$1, err, m, rawBytes, reader, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; err = $f.err; m = $f.m; rawBytes = $f.rawBytes; reader = $f.reader; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		m = this;
+		reader = jspb.NewReader(rawBytes);
+		_r = m.UnmarshalFromReader(reader); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		m = _r;
+		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		err = _r$1;
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			$s = -1; return [ptrType$5.nil, err];
+		}
+		$s = -1; return [m, $ifaceNil];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Event.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Event.prototype.Unmarshal = function(rawBytes) { return this.$val.Unmarshal(rawBytes); };
 	TempDirOrFileRequest.ptr.prototype.GetDir = function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType.nil) {
+		if (m === ptrType$6.nil) {
 			x = x;
 			return x;
 		}
@@ -23755,7 +25366,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType.nil) {
+		if (m === ptrType$6.nil) {
 			x = x;
 			return x;
 		}
@@ -23767,7 +25378,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType.nil) {
+		if (m === ptrType$6.nil) {
 			x = x;
 			return x;
 		}
@@ -23779,7 +25390,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType.nil) {
+		if (m === ptrType$6.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.Dir.length > 0) { $s = 1; continue; }
@@ -23819,7 +25430,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType.nil) {
+			if (m === ptrType$6.nil) {
 				m = new TempDirOrFileRequest.ptr("", "", false);
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -23859,7 +25470,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType.nil, err];
+			$s = -1; return [ptrType$6.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: TempDirOrFileRequest.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -23869,7 +25480,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$1.nil) {
+		if (m === ptrType$7.nil) {
 			x = x;
 			return x;
 		}
@@ -23881,7 +25492,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$1.nil) {
+		if (m === ptrType$7.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.ResultPath.length > 0) { $s = 1; continue; }
@@ -23911,7 +25522,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$1.nil) {
+			if (m === ptrType$7.nil) {
 				m = new TempDirOrFileResponse.ptr("");
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -23941,7 +25552,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$1.nil, err];
+			$s = -1; return [ptrType$7.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: TempDirOrFileResponse.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -23951,7 +25562,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$2.nil) {
+		if (m === ptrType$8.nil) {
 			x = x;
 			return x;
 		}
@@ -23963,7 +25574,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = new $Int64(0, 0);
 		m = this;
-		if (m === ptrType$2.nil) {
+		if (m === ptrType$8.nil) {
 			x = x;
 			return x;
 		}
@@ -23973,9 +25584,9 @@ $packages["../proto/gopherjs"] = (function() {
 	ReadFileRequest.prototype.GetStart = function() { return this.$val.GetStart(); };
 	ReadFileRequest.ptr.prototype.GetData = function() {
 		var m, x;
-		x = sliceType.nil;
+		x = sliceType$1.nil;
 		m = this;
-		if (m === ptrType$2.nil) {
+		if (m === ptrType$8.nil) {
 			x = x;
 			return x;
 		}
@@ -23987,7 +25598,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, x, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$2.nil) {
+		if (m === ptrType$8.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.Path.length > 0) { $s = 1; continue; }
@@ -24027,8 +25638,8 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$2.nil) {
-				m = new ReadFileRequest.ptr("", new $Int64(0, 0), sliceType.nil);
+			if (m === ptrType$8.nil) {
+				m = new ReadFileRequest.ptr("", new $Int64(0, 0), sliceType$1.nil);
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 				_1 = _r$1;
@@ -24067,7 +25678,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$2.nil, err];
+			$s = -1; return [ptrType$8.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: ReadFileRequest.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -24077,7 +25688,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = new $Int64(0, 0);
 		m = this;
-		if (m === ptrType$3.nil) {
+		if (m === ptrType$9.nil) {
 			x = x;
 			return x;
 		}
@@ -24089,7 +25700,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, x, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$3.nil) {
+		if (m === ptrType$9.nil) {
 			$s = -1; return;
 		}
 		/* */ if (!((x = m.ReadCount, (x.$high === 0 && x.$low === 0)))) { $s = 1; continue; }
@@ -24119,7 +25730,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$3.nil) {
+			if (m === ptrType$9.nil) {
 				m = new ReadFileResponse.ptr(new $Int64(0, 0));
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -24149,7 +25760,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$3.nil, err];
+			$s = -1; return [ptrType$9.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: ReadFileResponse.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -24159,7 +25770,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$4.nil) {
+		if (m === ptrType$10.nil) {
 			x = x;
 			return x;
 		}
@@ -24171,7 +25782,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$4.nil) {
+		if (m === ptrType$10.nil) {
 			x = x;
 			return x;
 		}
@@ -24183,7 +25794,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$4.nil) {
+		if (m === ptrType$10.nil) {
 			x = x;
 			return x;
 		}
@@ -24193,9 +25804,9 @@ $packages["../proto/gopherjs"] = (function() {
 	WriteFileRequest.prototype.GetMustNotExist = function() { return this.$val.GetMustNotExist(); };
 	WriteFileRequest.ptr.prototype.GetData = function() {
 		var m, x;
-		x = sliceType.nil;
+		x = sliceType$1.nil;
 		m = this;
-		if (m === ptrType$4.nil) {
+		if (m === ptrType$10.nil) {
 			x = x;
 			return x;
 		}
@@ -24207,7 +25818,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$4.nil) {
+		if (m === ptrType$10.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.Path.length > 0) { $s = 1; continue; }
@@ -24252,8 +25863,8 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$4.nil) {
-				m = new WriteFileRequest.ptr("", false, false, sliceType.nil);
+			if (m === ptrType$10.nil) {
+				m = new WriteFileRequest.ptr("", false, false, sliceType$1.nil);
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 				_1 = _r$1;
@@ -24297,7 +25908,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$4.nil, err];
+			$s = -1; return [ptrType$10.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: WriteFileRequest.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -24307,7 +25918,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$5.nil) {
+		if (m === ptrType$11.nil) {
 			x = x;
 			return x;
 		}
@@ -24319,7 +25930,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$5.nil) {
+		if (m === ptrType$11.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.Path.length > 0) { $s = 1; continue; }
@@ -24349,7 +25960,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$5.nil) {
+			if (m === ptrType$11.nil) {
 				m = new FileInfoRequest.ptr("");
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -24379,7 +25990,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$5.nil, err];
+			$s = -1; return [ptrType$11.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: FileInfoRequest.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -24389,7 +26000,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$6.nil) {
+		if (m === ptrType$12.nil) {
 			x = x;
 			return x;
 		}
@@ -24401,7 +26012,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = new $Int64(0, 0);
 		m = this;
-		if (m === ptrType$6.nil) {
+		if (m === ptrType$12.nil) {
 			x = x;
 			return x;
 		}
@@ -24413,7 +26024,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = 0;
 		m = this;
-		if (m === ptrType$6.nil) {
+		if (m === ptrType$12.nil) {
 			x = x;
 			return x;
 		}
@@ -24425,7 +26036,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = new $Int64(0, 0);
 		m = this;
-		if (m === ptrType$6.nil) {
+		if (m === ptrType$12.nil) {
 			x = x;
 			return x;
 		}
@@ -24437,7 +26048,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$6.nil) {
+		if (m === ptrType$12.nil) {
 			x = x;
 			return x;
 		}
@@ -24449,7 +26060,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, x, x$1, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; x = $f.x; x$1 = $f.x$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$6.nil) {
+		if (m === ptrType$12.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.Name.length > 0) { $s = 1; continue; }
@@ -24499,7 +26110,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$6.nil) {
+			if (m === ptrType$12.nil) {
 				m = new FileInfoResponse.ptr("", new $Int64(0, 0), 0, new $Int64(0, 0), false);
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -24549,7 +26160,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$6.nil, err];
+			$s = -1; return [ptrType$12.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: FileInfoResponse.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -24559,7 +26170,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$7.nil) {
+		if (m === ptrType$13.nil) {
 			x = x;
 			return x;
 		}
@@ -24571,7 +26182,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = 0;
 		m = this;
-		if (m === ptrType$7.nil) {
+		if (m === ptrType$13.nil) {
 			x = x;
 			return x;
 		}
@@ -24583,7 +26194,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$7.nil) {
+		if (m === ptrType$13.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.ScriptPath.length > 0) { $s = 1; continue; }
@@ -24618,7 +26229,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$7.nil) {
+			if (m === ptrType$13.nil) {
 				m = new HIDScriptRequest.ptr("", 0);
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -24653,7 +26264,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$7.nil, err];
+			$s = -1; return [ptrType$13.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: HIDScriptRequest.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -24663,7 +26274,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = 0;
 		m = this;
-		if (m === ptrType$8.nil) {
+		if (m === ptrType$14.nil) {
 			x = x;
 			return x;
 		}
@@ -24675,7 +26286,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$8.nil) {
+		if (m === ptrType$14.nil) {
 			$s = -1; return;
 		}
 		/* */ if (!((m.Id === 0))) { $s = 1; continue; }
@@ -24705,7 +26316,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$8.nil) {
+			if (m === ptrType$14.nil) {
 				m = new HIDScriptJob.ptr(0);
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -24735,7 +26346,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$8.nil, err];
+			$s = -1; return [ptrType$14.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: HIDScriptJob.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -24743,9 +26354,9 @@ $packages["../proto/gopherjs"] = (function() {
 	HIDScriptJob.prototype.Unmarshal = function(rawBytes) { return this.$val.Unmarshal(rawBytes); };
 	HIDScriptJobList.ptr.prototype.GetIds = function() {
 		var m, x;
-		x = sliceType$1.nil;
+		x = sliceType$2.nil;
 		m = this;
-		if (m === ptrType$9.nil) {
+		if (m === ptrType$15.nil) {
 			x = x;
 			return x;
 		}
@@ -24757,7 +26368,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$9.nil) {
+		if (m === ptrType$15.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.Ids.$length > 0) { $s = 1; continue; }
@@ -24787,8 +26398,8 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$9.nil) {
-				m = new HIDScriptJobList.ptr(sliceType$1.nil);
+			if (m === ptrType$15.nil) {
+				m = new HIDScriptJobList.ptr(sliceType$2.nil);
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 				_1 = _r$1;
@@ -24817,7 +26428,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$9.nil, err];
+			$s = -1; return [ptrType$15.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: HIDScriptJobList.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -24825,9 +26436,9 @@ $packages["../proto/gopherjs"] = (function() {
 	HIDScriptJobList.prototype.Unmarshal = function(rawBytes) { return this.$val.Unmarshal(rawBytes); };
 	HIDScriptResult.ptr.prototype.GetJob = function() {
 		var m, x;
-		x = ptrType$8.nil;
+		x = ptrType$14.nil;
 		m = this;
-		if (m === ptrType$10.nil) {
+		if (m === ptrType$16.nil) {
 			x = x;
 			return x;
 		}
@@ -24839,7 +26450,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$10.nil) {
+		if (m === ptrType$16.nil) {
 			x = x;
 			return x;
 		}
@@ -24851,7 +26462,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$10.nil) {
+		if (m === ptrType$16.nil) {
 			x = x;
 			return x;
 		}
@@ -24865,12 +26476,12 @@ $packages["../proto/gopherjs"] = (function() {
 		m = [m];
 		writer = [writer];
 		m[0] = this;
-		if (m[0] === ptrType$10.nil) {
+		if (m[0] === ptrType$16.nil) {
 			$s = -1; return;
 		}
-		/* */ if (!(m[0].Job === ptrType$8.nil)) { $s = 1; continue; }
+		/* */ if (!(m[0].Job === ptrType$14.nil)) { $s = 1; continue; }
 		/* */ $s = 2; continue;
-		/* if (!(m[0].Job === ptrType$8.nil)) { */ case 1:
+		/* if (!(m[0].Job === ptrType$14.nil)) { */ case 1:
 			$r = writer[0].WriteMessage(1, (function(m, writer) { return function $b() {
 				var $s, $r;
 				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -24913,8 +26524,8 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader[0].Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m[0] === ptrType$10.nil) {
-				m[0] = new HIDScriptResult.ptr(ptrType$8.nil, false, "");
+			if (m[0] === ptrType$16.nil) {
+				m[0] = new HIDScriptResult.ptr(ptrType$14.nil, false, "");
 			}
 				_r$1 = reader[0].GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 				_1 = _r$1;
@@ -24959,7 +26570,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$10.nil, err];
+			$s = -1; return [ptrType$16.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: HIDScriptResult.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -24969,7 +26580,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = 0;
 		m = this;
-		if (m === ptrType$11.nil) {
+		if (m === ptrType$17.nil) {
 			x = x;
 			return x;
 		}
@@ -24981,7 +26592,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$11.nil) {
+		if (m === ptrType$17.nil) {
 			$s = -1; return;
 		}
 		/* */ if (!((m.BlinkCount === 0))) { $s = 1; continue; }
@@ -25011,7 +26622,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$11.nil) {
+			if (m === ptrType$17.nil) {
 				m = new LEDSettings.ptr(0);
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -25041,7 +26652,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$11.nil, err];
+			$s = -1; return [ptrType$17.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: LEDSettings.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -25051,7 +26662,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25063,7 +26674,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25075,7 +26686,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25087,7 +26698,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25099,7 +26710,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25111,7 +26722,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25123,7 +26734,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25135,7 +26746,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25147,7 +26758,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25159,7 +26770,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25171,7 +26782,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25183,7 +26794,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25195,7 +26806,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25205,9 +26816,9 @@ $packages["../proto/gopherjs"] = (function() {
 	GadgetSettings.prototype.GetUse_SERIAL = function() { return this.$val.GetUse_SERIAL(); };
 	GadgetSettings.ptr.prototype.GetRndisSettings = function() {
 		var m, x;
-		x = ptrType$13.nil;
+		x = ptrType$19.nil;
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25217,9 +26828,9 @@ $packages["../proto/gopherjs"] = (function() {
 	GadgetSettings.prototype.GetRndisSettings = function() { return this.$val.GetRndisSettings(); };
 	GadgetSettings.ptr.prototype.GetCdcEcmSettings = function() {
 		var m, x;
-		x = ptrType$13.nil;
+		x = ptrType$19.nil;
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25229,9 +26840,9 @@ $packages["../proto/gopherjs"] = (function() {
 	GadgetSettings.prototype.GetCdcEcmSettings = function() { return this.$val.GetCdcEcmSettings(); };
 	GadgetSettings.ptr.prototype.GetUmsSettings = function() {
 		var m, x;
-		x = ptrType$14.nil;
+		x = ptrType$20.nil;
 		m = this;
-		if (m === ptrType$12.nil) {
+		if (m === ptrType$18.nil) {
 			x = x;
 			return x;
 		}
@@ -25245,7 +26856,7 @@ $packages["../proto/gopherjs"] = (function() {
 		m = [m];
 		writer = [writer];
 		m[0] = this;
-		if (m[0] === ptrType$12.nil) {
+		if (m[0] === ptrType$18.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m[0].Enabled) { $s = 1; continue; }
@@ -25313,9 +26924,9 @@ $packages["../proto/gopherjs"] = (function() {
 		/* if (m[0].Use_SERIAL) { */ case 37:
 			$r = writer[0].WriteBool(13, m[0].Use_SERIAL); /* */ $s = 39; case 39: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* } */ case 38:
-		/* */ if (!(m[0].RndisSettings === ptrType$13.nil)) { $s = 40; continue; }
+		/* */ if (!(m[0].RndisSettings === ptrType$19.nil)) { $s = 40; continue; }
 		/* */ $s = 41; continue;
-		/* if (!(m[0].RndisSettings === ptrType$13.nil)) { */ case 40:
+		/* if (!(m[0].RndisSettings === ptrType$19.nil)) { */ case 40:
 			$r = writer[0].WriteMessage(14, (function(m, writer) { return function $b() {
 				var $s, $r;
 				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -25324,9 +26935,9 @@ $packages["../proto/gopherjs"] = (function() {
 				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 			}; })(m, writer)); /* */ $s = 42; case 42: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* } */ case 41:
-		/* */ if (!(m[0].CdcEcmSettings === ptrType$13.nil)) { $s = 43; continue; }
+		/* */ if (!(m[0].CdcEcmSettings === ptrType$19.nil)) { $s = 43; continue; }
 		/* */ $s = 44; continue;
-		/* if (!(m[0].CdcEcmSettings === ptrType$13.nil)) { */ case 43:
+		/* if (!(m[0].CdcEcmSettings === ptrType$19.nil)) { */ case 43:
 			$r = writer[0].WriteMessage(15, (function(m, writer) { return function $b() {
 				var $s, $r;
 				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -25335,9 +26946,9 @@ $packages["../proto/gopherjs"] = (function() {
 				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 			}; })(m, writer)); /* */ $s = 45; case 45: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* } */ case 44:
-		/* */ if (!(m[0].UmsSettings === ptrType$14.nil)) { $s = 46; continue; }
+		/* */ if (!(m[0].UmsSettings === ptrType$20.nil)) { $s = 46; continue; }
 		/* */ $s = 47; continue;
-		/* if (!(m[0].UmsSettings === ptrType$14.nil)) { */ case 46:
+		/* if (!(m[0].UmsSettings === ptrType$20.nil)) { */ case 46:
 			$r = writer[0].WriteMessage(16, (function(m, writer) { return function $b() {
 				var $s, $r;
 				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -25370,8 +26981,8 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader[0].Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m[0] === ptrType$12.nil) {
-				m[0] = new GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$13.nil, ptrType$13.nil, ptrType$14.nil);
+			if (m[0] === ptrType$18.nil) {
+				m[0] = new GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$19.nil, ptrType$19.nil, ptrType$20.nil);
 			}
 				_r$1 = reader[0].GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 				_1 = _r$1;
@@ -25493,7 +27104,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$12.nil, err];
+			$s = -1; return [ptrType$18.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: GadgetSettings.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -25503,7 +27114,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$13.nil) {
+		if (m === ptrType$19.nil) {
 			x = x;
 			return x;
 		}
@@ -25515,7 +27126,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$13.nil) {
+		if (m === ptrType$19.nil) {
 			x = x;
 			return x;
 		}
@@ -25527,7 +27138,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$13.nil) {
+		if (m === ptrType$19.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.HostAddr.length > 0) { $s = 1; continue; }
@@ -25562,7 +27173,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$13.nil) {
+			if (m === ptrType$19.nil) {
 				m = new GadgetSettingsEthernet.ptr("", "");
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -25597,7 +27208,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$13.nil, err];
+			$s = -1; return [ptrType$19.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: GadgetSettingsEthernet.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -25607,7 +27218,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$14.nil) {
+		if (m === ptrType$20.nil) {
 			x = x;
 			return x;
 		}
@@ -25619,7 +27230,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$14.nil) {
+		if (m === ptrType$20.nil) {
 			x = x;
 			return x;
 		}
@@ -25631,7 +27242,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$14.nil) {
+		if (m === ptrType$20.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.Cdrom) { $s = 1; continue; }
@@ -25666,7 +27277,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$14.nil) {
+			if (m === ptrType$20.nil) {
 				m = new GadgetSettingsUMS.ptr(false, "");
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -25701,7 +27312,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$14.nil, err];
+			$s = -1; return [ptrType$20.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: GadgetSettingsUMS.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -25711,7 +27322,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$15.nil) {
+		if (m === ptrType$21.nil) {
 			x = x;
 			return x;
 		}
@@ -25723,7 +27334,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = 0;
 		m = this;
-		if (m === ptrType$15.nil) {
+		if (m === ptrType$21.nil) {
 			x = x;
 			return x;
 		}
@@ -25735,7 +27346,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$15.nil) {
+		if (m === ptrType$21.nil) {
 			x = x;
 			return x;
 		}
@@ -25747,7 +27358,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$15.nil) {
+		if (m === ptrType$21.nil) {
 			x = x;
 			return x;
 		}
@@ -25759,7 +27370,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$15.nil) {
+		if (m === ptrType$21.nil) {
 			x = x;
 			return x;
 		}
@@ -25769,9 +27380,9 @@ $packages["../proto/gopherjs"] = (function() {
 	EthernetInterfaceSettings.prototype.GetEnabled = function() { return this.$val.GetEnabled(); };
 	EthernetInterfaceSettings.ptr.prototype.GetDhcpServerSettings = function() {
 		var m, x;
-		x = ptrType$16.nil;
+		x = ptrType$22.nil;
 		m = this;
-		if (m === ptrType$15.nil) {
+		if (m === ptrType$21.nil) {
 			x = x;
 			return x;
 		}
@@ -25785,7 +27396,7 @@ $packages["../proto/gopherjs"] = (function() {
 		m = [m];
 		writer = [writer];
 		m[0] = this;
-		if (m[0] === ptrType$15.nil) {
+		if (m[0] === ptrType$21.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m[0].Name.length > 0) { $s = 1; continue; }
@@ -25813,9 +27424,9 @@ $packages["../proto/gopherjs"] = (function() {
 		/* if (m[0].Enabled) { */ case 13:
 			$r = writer[0].WriteBool(5, m[0].Enabled); /* */ $s = 15; case 15: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* } */ case 14:
-		/* */ if (!(m[0].DhcpServerSettings === ptrType$16.nil)) { $s = 16; continue; }
+		/* */ if (!(m[0].DhcpServerSettings === ptrType$22.nil)) { $s = 16; continue; }
 		/* */ $s = 17; continue;
-		/* if (!(m[0].DhcpServerSettings === ptrType$16.nil)) { */ case 16:
+		/* if (!(m[0].DhcpServerSettings === ptrType$22.nil)) { */ case 16:
 			$r = writer[0].WriteMessage(6, (function(m, writer) { return function $b() {
 				var $s, $r;
 				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -25848,8 +27459,8 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader[0].Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m[0] === ptrType$15.nil) {
-				m[0] = new EthernetInterfaceSettings.ptr("", 0, "", "", false, ptrType$16.nil);
+			if (m[0] === ptrType$21.nil) {
+				m[0] = new EthernetInterfaceSettings.ptr("", 0, "", "", false, ptrType$22.nil);
 			}
 				_r$1 = reader[0].GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 				_1 = _r$1;
@@ -25909,7 +27520,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$15.nil, err];
+			$s = -1; return [ptrType$21.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: EthernetInterfaceSettings.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -25919,7 +27530,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = 0;
 		m = this;
-		if (m === ptrType$16.nil) {
+		if (m === ptrType$22.nil) {
 			x = x;
 			return x;
 		}
@@ -25931,7 +27542,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$16.nil) {
+		if (m === ptrType$22.nil) {
 			x = x;
 			return x;
 		}
@@ -25943,7 +27554,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$16.nil) {
+		if (m === ptrType$22.nil) {
 			x = x;
 			return x;
 		}
@@ -25955,7 +27566,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$16.nil) {
+		if (m === ptrType$22.nil) {
 			x = x;
 			return x;
 		}
@@ -25967,7 +27578,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$16.nil) {
+		if (m === ptrType$22.nil) {
 			x = x;
 			return x;
 		}
@@ -25979,7 +27590,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$16.nil) {
+		if (m === ptrType$22.nil) {
 			x = x;
 			return x;
 		}
@@ -25989,9 +27600,9 @@ $packages["../proto/gopherjs"] = (function() {
 	DHCPServerSettings.prototype.GetCallbackScript = function() { return this.$val.GetCallbackScript(); };
 	DHCPServerSettings.ptr.prototype.GetRanges = function() {
 		var m, x;
-		x = sliceType$2.nil;
+		x = sliceType$3.nil;
 		m = this;
-		if (m === ptrType$16.nil) {
+		if (m === ptrType$22.nil) {
 			x = x;
 			return x;
 		}
@@ -26003,7 +27614,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$16.nil) {
+		if (m === ptrType$22.nil) {
 			x = x;
 			return x;
 		}
@@ -26013,9 +27624,9 @@ $packages["../proto/gopherjs"] = (function() {
 	DHCPServerSettings.prototype.GetOptions = function() { return this.$val.GetOptions(); };
 	DHCPServerSettings.ptr.prototype.GetStaticHosts = function() {
 		var m, x;
-		x = sliceType$3.nil;
+		x = sliceType$4.nil;
 		m = this;
-		if (m === ptrType$16.nil) {
+		if (m === ptrType$22.nil) {
 			x = x;
 			return x;
 		}
@@ -26032,7 +27643,7 @@ $packages["../proto/gopherjs"] = (function() {
 		value = [value];
 		writer = [writer];
 		m = this;
-		if (m === ptrType$16.nil) {
+		if (m === ptrType$22.nil) {
 			$s = -1; return;
 		}
 		/* */ if (!((m.ListenPort === 0))) { $s = 1; continue; }
@@ -26143,8 +27754,8 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader[0].Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m[0] === ptrType$16.nil) {
-				m[0] = new DHCPServerSettings.ptr(0, "", "", false, false, "", sliceType$2.nil, false, sliceType$3.nil);
+			if (m[0] === ptrType$22.nil) {
+				m[0] = new DHCPServerSettings.ptr(0, "", "", false, false, "", sliceType$3.nil, false, sliceType$4.nil);
 			}
 				_r$1 = reader[0].GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 				_1 = _r$1;
@@ -26253,7 +27864,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$16.nil, err];
+			$s = -1; return [ptrType$22.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: DHCPServerSettings.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -26263,7 +27874,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$17.nil) {
+		if (m === ptrType$23.nil) {
 			x = x;
 			return x;
 		}
@@ -26275,7 +27886,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$17.nil) {
+		if (m === ptrType$23.nil) {
 			x = x;
 			return x;
 		}
@@ -26287,7 +27898,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$17.nil) {
+		if (m === ptrType$23.nil) {
 			x = x;
 			return x;
 		}
@@ -26299,7 +27910,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$17.nil) {
+		if (m === ptrType$23.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.RangeLower.length > 0) { $s = 1; continue; }
@@ -26339,7 +27950,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$17.nil) {
+			if (m === ptrType$23.nil) {
 				m = new DHCPServerRange.ptr("", "", "");
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -26379,7 +27990,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$17.nil, err];
+			$s = -1; return [ptrType$23.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: DHCPServerRange.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -26389,7 +28000,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$18.nil) {
+		if (m === ptrType$24.nil) {
 			x = x;
 			return x;
 		}
@@ -26401,7 +28012,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$18.nil) {
+		if (m === ptrType$24.nil) {
 			x = x;
 			return x;
 		}
@@ -26413,7 +28024,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$18.nil) {
+		if (m === ptrType$24.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.Mac.length > 0) { $s = 1; continue; }
@@ -26448,7 +28059,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$18.nil) {
+			if (m === ptrType$24.nil) {
 				m = new DHCPServerStaticHost.ptr("", "");
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -26483,7 +28094,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$18.nil, err];
+			$s = -1; return [ptrType$24.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: DHCPServerStaticHost.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -26493,7 +28104,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$19.nil) {
+		if (m === ptrType$25.nil) {
 			x = x;
 			return x;
 		}
@@ -26505,7 +28116,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$19.nil) {
+		if (m === ptrType$25.nil) {
 			x = x;
 			return x;
 		}
@@ -26517,7 +28128,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = 0;
 		m = this;
-		if (m === ptrType$19.nil) {
+		if (m === ptrType$25.nil) {
 			x = x;
 			return x;
 		}
@@ -26529,7 +28140,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = 0;
 		m = this;
-		if (m === ptrType$19.nil) {
+		if (m === ptrType$25.nil) {
 			x = x;
 			return x;
 		}
@@ -26541,7 +28152,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = 0;
 		m = this;
-		if (m === ptrType$19.nil) {
+		if (m === ptrType$25.nil) {
 			x = x;
 			return x;
 		}
@@ -26551,9 +28162,9 @@ $packages["../proto/gopherjs"] = (function() {
 	WiFiSettings.prototype.GetApChannel = function() { return this.$val.GetApChannel(); };
 	WiFiSettings.ptr.prototype.GetBssCfgAP = function() {
 		var m, x;
-		x = ptrType$20.nil;
+		x = ptrType$26.nil;
 		m = this;
-		if (m === ptrType$19.nil) {
+		if (m === ptrType$25.nil) {
 			x = x;
 			return x;
 		}
@@ -26563,9 +28174,9 @@ $packages["../proto/gopherjs"] = (function() {
 	WiFiSettings.prototype.GetBssCfgAP = function() { return this.$val.GetBssCfgAP(); };
 	WiFiSettings.ptr.prototype.GetBssCfgClient = function() {
 		var m, x;
-		x = ptrType$20.nil;
+		x = ptrType$26.nil;
 		m = this;
-		if (m === ptrType$19.nil) {
+		if (m === ptrType$25.nil) {
 			x = x;
 			return x;
 		}
@@ -26577,7 +28188,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$19.nil) {
+		if (m === ptrType$25.nil) {
 			x = x;
 			return x;
 		}
@@ -26589,7 +28200,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = false;
 		m = this;
-		if (m === ptrType$19.nil) {
+		if (m === ptrType$25.nil) {
 			x = x;
 			return x;
 		}
@@ -26603,7 +28214,7 @@ $packages["../proto/gopherjs"] = (function() {
 		m = [m];
 		writer = [writer];
 		m[0] = this;
-		if (m[0] === ptrType$19.nil) {
+		if (m[0] === ptrType$25.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m[0].Disabled) { $s = 1; continue; }
@@ -26631,9 +28242,9 @@ $packages["../proto/gopherjs"] = (function() {
 		/* if (!((m[0].ApChannel === 0))) { */ case 13:
 			$r = writer[0].WriteUint32(5, m[0].ApChannel); /* */ $s = 15; case 15: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* } */ case 14:
-		/* */ if (!(m[0].BssCfgAP === ptrType$20.nil)) { $s = 16; continue; }
+		/* */ if (!(m[0].BssCfgAP === ptrType$26.nil)) { $s = 16; continue; }
 		/* */ $s = 17; continue;
-		/* if (!(m[0].BssCfgAP === ptrType$20.nil)) { */ case 16:
+		/* if (!(m[0].BssCfgAP === ptrType$26.nil)) { */ case 16:
 			$r = writer[0].WriteMessage(6, (function(m, writer) { return function $b() {
 				var $s, $r;
 				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -26642,9 +28253,9 @@ $packages["../proto/gopherjs"] = (function() {
 				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 			}; })(m, writer)); /* */ $s = 18; case 18: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* } */ case 17:
-		/* */ if (!(m[0].BssCfgClient === ptrType$20.nil)) { $s = 19; continue; }
+		/* */ if (!(m[0].BssCfgClient === ptrType$26.nil)) { $s = 19; continue; }
 		/* */ $s = 20; continue;
-		/* if (!(m[0].BssCfgClient === ptrType$20.nil)) { */ case 19:
+		/* if (!(m[0].BssCfgClient === ptrType$26.nil)) { */ case 19:
 			$r = writer[0].WriteMessage(7, (function(m, writer) { return function $b() {
 				var $s, $r;
 				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -26687,8 +28298,8 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader[0].Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m[0] === ptrType$19.nil) {
-				m[0] = new WiFiSettings.ptr(false, "", 0, 0, 0, ptrType$20.nil, ptrType$20.nil, false, false);
+			if (m[0] === ptrType$25.nil) {
+				m[0] = new WiFiSettings.ptr(false, "", 0, 0, 0, ptrType$26.nil, ptrType$26.nil, false, false);
 			}
 				_r$1 = reader[0].GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 				_1 = _r$1;
@@ -26769,7 +28380,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$19.nil, err];
+			$s = -1; return [ptrType$25.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: WiFiSettings.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -26779,7 +28390,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$20.nil) {
+		if (m === ptrType$26.nil) {
 			x = x;
 			return x;
 		}
@@ -26791,7 +28402,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, x;
 		x = "";
 		m = this;
-		if (m === ptrType$20.nil) {
+		if (m === ptrType$26.nil) {
 			x = x;
 			return x;
 		}
@@ -26803,7 +28414,7 @@ $packages["../proto/gopherjs"] = (function() {
 		var m, writer, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; m = $f.m; writer = $f.writer; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		m = this;
-		if (m === ptrType$20.nil) {
+		if (m === ptrType$26.nil) {
 			$s = -1; return;
 		}
 		/* */ if (m.SSID.length > 0) { $s = 1; continue; }
@@ -26838,7 +28449,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$20.nil) {
+			if (m === ptrType$26.nil) {
 				m = new BSSCfg.ptr("", "");
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -26873,7 +28484,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$20.nil, err];
+			$s = -1; return [ptrType$26.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: BSSCfg.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -26882,7 +28493,7 @@ $packages["../proto/gopherjs"] = (function() {
 	Empty.ptr.prototype.MarshalToWriter = function(writer) {
 		var m, writer;
 		m = this;
-		if (m === ptrType$21.nil) {
+		if (m === ptrType$27.nil) {
 			return;
 		}
 		return;
@@ -26906,7 +28517,7 @@ $packages["../proto/gopherjs"] = (function() {
 		/* while (true) { */ case 1:
 			_r = reader.Next(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 			/* if (!(_r)) { break; } */ if(!(_r)) { $s = 2; continue; }
-			if (m === ptrType$21.nil) {
+			if (m === ptrType$27.nil) {
 				m = new Empty.ptr();
 			}
 				_r$1 = reader.GetFieldNumber(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
@@ -26928,7 +28539,7 @@ $packages["../proto/gopherjs"] = (function() {
 		_r$1 = reader.Err(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		err = _r$1;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$21.nil, err];
+			$s = -1; return [ptrType$27.nil, err];
 		}
 		$s = -1; return [m, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: Empty.ptr.prototype.Unmarshal }; } $f._r = _r; $f._r$1 = _r$1; $f.err = err; $f.m = m; $f.rawBytes = rawBytes; $f.reader = reader; $f.$s = $s; $f.$r = $r; return $f;
@@ -26955,9 +28566,9 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$12.nil, err];
+			$s = -1; return [ptrType$18.nil, err];
 		}
-		_r$2 = new GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$13.nil, ptrType$13.nil, ptrType$14.nil).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$2 = new GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$19.nil, ptrType$19.nil, ptrType$20.nil).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: p4WNP1Client.ptr.prototype.GetDeployedGadgetSetting }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.ctx = ctx; $f.err = err; $f.in$1 = in$1; $f.opts = opts; $f.resp = resp; $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -26975,9 +28586,9 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$12.nil, err];
+			$s = -1; return [ptrType$18.nil, err];
 		}
-		_r$2 = new GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$13.nil, ptrType$13.nil, ptrType$14.nil).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$2 = new GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$19.nil, ptrType$19.nil, ptrType$20.nil).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: p4WNP1Client.ptr.prototype.DeployGadgetSetting }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.ctx = ctx; $f.err = err; $f.in$1 = in$1; $f.opts = opts; $f.resp = resp; $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -26995,9 +28606,9 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$12.nil, err];
+			$s = -1; return [ptrType$18.nil, err];
 		}
-		_r$2 = new GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$13.nil, ptrType$13.nil, ptrType$14.nil).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$2 = new GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$19.nil, ptrType$19.nil, ptrType$20.nil).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: p4WNP1Client.ptr.prototype.GetGadgetSettings }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.ctx = ctx; $f.err = err; $f.in$1 = in$1; $f.opts = opts; $f.resp = resp; $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -27015,9 +28626,9 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$12.nil, err];
+			$s = -1; return [ptrType$18.nil, err];
 		}
-		_r$2 = new GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$13.nil, ptrType$13.nil, ptrType$14.nil).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$2 = new GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$19.nil, ptrType$19.nil, ptrType$20.nil).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: p4WNP1Client.ptr.prototype.SetGadgetSettings }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.ctx = ctx; $f.err = err; $f.in$1 = in$1; $f.opts = opts; $f.resp = resp; $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -27035,7 +28646,7 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$11.nil, err];
+			$s = -1; return [ptrType$17.nil, err];
 		}
 		_r$2 = new LEDSettings.ptr(0).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
@@ -27055,7 +28666,7 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$21.nil, err];
+			$s = -1; return [ptrType$27.nil, err];
 		}
 		_r$2 = new Empty.ptr().Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
@@ -27075,7 +28686,7 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$21.nil, err];
+			$s = -1; return [ptrType$27.nil, err];
 		}
 		_r$2 = new Empty.ptr().Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
@@ -27095,7 +28706,7 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$21.nil, err];
+			$s = -1; return [ptrType$27.nil, err];
 		}
 		_r$2 = new Empty.ptr().Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
@@ -27115,7 +28726,7 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$21.nil, err];
+			$s = -1; return [ptrType$27.nil, err];
 		}
 		_r$2 = new Empty.ptr().Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
@@ -27135,9 +28746,9 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$10.nil, err];
+			$s = -1; return [ptrType$16.nil, err];
 		}
-		_r$2 = new HIDScriptResult.ptr(ptrType$8.nil, false, "").Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$2 = new HIDScriptResult.ptr(ptrType$14.nil, false, "").Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: p4WNP1Client.ptr.prototype.HIDRunScript }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.ctx = ctx; $f.err = err; $f.in$1 = in$1; $f.opts = opts; $f.resp = resp; $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -27155,7 +28766,7 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$8.nil, err];
+			$s = -1; return [ptrType$14.nil, err];
 		}
 		_r$2 = new HIDScriptJob.ptr(0).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
@@ -27175,9 +28786,9 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$10.nil, err];
+			$s = -1; return [ptrType$16.nil, err];
 		}
-		_r$2 = new HIDScriptResult.ptr(ptrType$8.nil, false, "").Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$2 = new HIDScriptResult.ptr(ptrType$14.nil, false, "").Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: p4WNP1Client.ptr.prototype.HIDGetScriptJobResult }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.ctx = ctx; $f.err = err; $f.in$1 = in$1; $f.opts = opts; $f.resp = resp; $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -27195,7 +28806,7 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$21.nil, err];
+			$s = -1; return [ptrType$27.nil, err];
 		}
 		_r$2 = new Empty.ptr().Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
@@ -27215,9 +28826,9 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$9.nil, err];
+			$s = -1; return [ptrType$15.nil, err];
 		}
-		_r$2 = new HIDScriptJobList.ptr(sliceType$1.nil).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$2 = new HIDScriptJobList.ptr(sliceType$2.nil).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: p4WNP1Client.ptr.prototype.HIDGetRunningScriptJobs }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.ctx = ctx; $f.err = err; $f.in$1 = in$1; $f.opts = opts; $f.resp = resp; $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -27235,7 +28846,7 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$21.nil, err];
+			$s = -1; return [ptrType$27.nil, err];
 		}
 		_r$2 = new Empty.ptr().Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
@@ -27255,7 +28866,7 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$21.nil, err];
+			$s = -1; return [ptrType$27.nil, err];
 		}
 		_r$2 = new Empty.ptr().Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
@@ -27275,7 +28886,7 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$3.nil, err];
+			$s = -1; return [ptrType$9.nil, err];
 		}
 		_r$2 = new ReadFileResponse.ptr(new $Int64(0, 0)).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
@@ -27295,7 +28906,7 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$6.nil, err];
+			$s = -1; return [ptrType$12.nil, err];
 		}
 		_r$2 = new FileInfoResponse.ptr("", new $Int64(0, 0), 0, new $Int64(0, 0), false).Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
@@ -27315,62 +28926,116 @@ $packages["../proto/gopherjs"] = (function() {
 		resp = _tuple[0];
 		err = _tuple[1];
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			$s = -1; return [ptrType$1.nil, err];
+			$s = -1; return [ptrType$7.nil, err];
 		}
 		_r$2 = new TempDirOrFileResponse.ptr("").Unmarshal(resp); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		$s = -1; return _r$2;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: p4WNP1Client.ptr.prototype.FSCreateTempDirOrFile }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.ctx = ctx; $f.err = err; $f.in$1 = in$1; $f.opts = opts; $f.resp = resp; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	p4WNP1Client.prototype.FSCreateTempDirOrFile = function(ctx, in$1, opts) { return this.$val.FSCreateTempDirOrFile(ctx, in$1, opts); };
+	p4WNP1Client.ptr.prototype.EventListen = function(ctx, in$1, opts) {
+		var _r, _r$1, _r$2, _tuple, c, ctx, err, in$1, opts, srv, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _tuple = $f._tuple; c = $f.c; ctx = $f.ctx; err = $f.err; in$1 = $f.in$1; opts = $f.opts; srv = $f.srv; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = this;
+		_r = $clone(c.client, grpcweb.Client).NewClientStream(ctx, false, true, "EventListen", opts); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_tuple = _r;
+		srv = _tuple[0];
+		err = _tuple[1];
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			$s = -1; return [$ifaceNil, err];
+		}
+		_r$1 = in$1.Marshal(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		_r$2 = srv.SendMsg(_r$1); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		err = _r$2;
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			$s = -1; return [$ifaceNil, err];
+		}
+		$s = -1; return [new p4WNP1EventListenClient.ptr(srv), $ifaceNil];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: p4WNP1Client.ptr.prototype.EventListen }; } $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.ctx = ctx; $f.err = err; $f.in$1 = in$1; $f.opts = opts; $f.srv = srv; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	p4WNP1Client.prototype.EventListen = function(ctx, in$1, opts) { return this.$val.EventListen(ctx, in$1, opts); };
+	p4WNP1EventListenClient.ptr.prototype.Recv = function() {
+		var _r, _r$1, _tuple, err, resp, x, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _tuple = $f._tuple; err = $f.err; resp = $f.resp; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		x = this;
+		_r = x.ClientStream.RecvMsg(); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_tuple = _r;
+		resp = _tuple[0];
+		err = _tuple[1];
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			$s = -1; return [ptrType$5.nil, err];
+		}
+		_r$1 = new Event.ptr(new $Int64(0, 0), sliceType.nil).Unmarshal(resp); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		$s = -1; return _r$1;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: p4WNP1EventListenClient.ptr.prototype.Recv }; } $f._r = _r; $f._r$1 = _r$1; $f._tuple = _tuple; $f.err = err; $f.resp = resp; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	p4WNP1EventListenClient.prototype.Recv = function() { return this.$val.Recv(); };
 	EthernetInterfaceSettings_Mode.methods = [{prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}];
 	WiFiSettings_Mode.methods = [{prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}];
 	WiFiSettings_APAuthMode.methods = [{prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}];
-	ptrType.methods = [{prop: "GetDir", name: "GetDir", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetPrefix", name: "GetPrefix", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetOnlyFolder", name: "GetOnlyFolder", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType, $error], false)}];
-	ptrType$1.methods = [{prop: "GetResultPath", name: "GetResultPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$1], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$1, $error], false)}];
-	ptrType$2.methods = [{prop: "GetPath", name: "GetPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetStart", name: "GetStart", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "GetData", name: "GetData", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$2], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$2, $error], false)}];
-	ptrType$3.methods = [{prop: "GetReadCount", name: "GetReadCount", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$3], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$3, $error], false)}];
-	ptrType$4.methods = [{prop: "GetPath", name: "GetPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetAppend", name: "GetAppend", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetMustNotExist", name: "GetMustNotExist", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetData", name: "GetData", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$4], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$4, $error], false)}];
-	ptrType$5.methods = [{prop: "GetPath", name: "GetPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$5], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$5, $error], false)}];
-	ptrType$6.methods = [{prop: "GetName", name: "GetName", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetSize", name: "GetSize", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "GetMode", name: "GetMode", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "GetModTime", name: "GetModTime", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "GetIsDir", name: "GetIsDir", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$6], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$6, $error], false)}];
-	ptrType$7.methods = [{prop: "GetScriptPath", name: "GetScriptPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetTimeoutSeconds", name: "GetTimeoutSeconds", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$7], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$7, $error], false)}];
-	ptrType$8.methods = [{prop: "GetId", name: "GetId", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$8], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$8, $error], false)}];
-	ptrType$9.methods = [{prop: "GetIds", name: "GetIds", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$9], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$9, $error], false)}];
-	ptrType$10.methods = [{prop: "GetJob", name: "GetJob", pkg: "", typ: $funcType([], [ptrType$8], false)}, {prop: "GetIsFinished", name: "GetIsFinished", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetResultJson", name: "GetResultJson", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$10], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$10, $error], false)}];
-	ptrType$11.methods = [{prop: "GetBlinkCount", name: "GetBlinkCount", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$11], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$11, $error], false)}];
-	ptrType$12.methods = [{prop: "GetEnabled", name: "GetEnabled", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetVid", name: "GetVid", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetPid", name: "GetPid", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetManufacturer", name: "GetManufacturer", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetProduct", name: "GetProduct", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetSerial", name: "GetSerial", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetUse_CDC_ECM", name: "GetUse_CDC_ECM", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_RNDIS", name: "GetUse_RNDIS", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_HID_KEYBOARD", name: "GetUse_HID_KEYBOARD", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_HID_MOUSE", name: "GetUse_HID_MOUSE", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_HID_RAW", name: "GetUse_HID_RAW", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_UMS", name: "GetUse_UMS", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_SERIAL", name: "GetUse_SERIAL", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetRndisSettings", name: "GetRndisSettings", pkg: "", typ: $funcType([], [ptrType$13], false)}, {prop: "GetCdcEcmSettings", name: "GetCdcEcmSettings", pkg: "", typ: $funcType([], [ptrType$13], false)}, {prop: "GetUmsSettings", name: "GetUmsSettings", pkg: "", typ: $funcType([], [ptrType$14], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$12], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$12, $error], false)}];
-	ptrType$13.methods = [{prop: "GetHostAddr", name: "GetHostAddr", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetDevAddr", name: "GetDevAddr", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$13], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$13, $error], false)}];
-	ptrType$14.methods = [{prop: "GetCdrom", name: "GetCdrom", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetFile", name: "GetFile", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$14], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$14, $error], false)}];
-	ptrType$15.methods = [{prop: "GetName", name: "GetName", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetMode", name: "GetMode", pkg: "", typ: $funcType([], [EthernetInterfaceSettings_Mode], false)}, {prop: "GetIpAddress4", name: "GetIpAddress4", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetNetmask4", name: "GetNetmask4", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetEnabled", name: "GetEnabled", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetDhcpServerSettings", name: "GetDhcpServerSettings", pkg: "", typ: $funcType([], [ptrType$16], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$15], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$15, $error], false)}];
-	ptrType$16.methods = [{prop: "GetListenPort", name: "GetListenPort", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "GetListenInterface", name: "GetListenInterface", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetLeaseFile", name: "GetLeaseFile", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetNotAuthoritative", name: "GetNotAuthoritative", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetDoNotBindInterface", name: "GetDoNotBindInterface", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetCallbackScript", name: "GetCallbackScript", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetRanges", name: "GetRanges", pkg: "", typ: $funcType([], [sliceType$2], false)}, {prop: "GetOptions", name: "GetOptions", pkg: "", typ: $funcType([], [mapType], false)}, {prop: "GetStaticHosts", name: "GetStaticHosts", pkg: "", typ: $funcType([], [sliceType$3], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$16], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$16, $error], false)}];
-	ptrType$17.methods = [{prop: "GetRangeLower", name: "GetRangeLower", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetRangeUpper", name: "GetRangeUpper", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetLeaseTime", name: "GetLeaseTime", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$17], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$17, $error], false)}];
-	ptrType$18.methods = [{prop: "GetMac", name: "GetMac", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetIp", name: "GetIp", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$18], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$18, $error], false)}];
-	ptrType$19.methods = [{prop: "GetDisabled", name: "GetDisabled", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetReg", name: "GetReg", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetMode", name: "GetMode", pkg: "", typ: $funcType([], [WiFiSettings_Mode], false)}, {prop: "GetAuthMode", name: "GetAuthMode", pkg: "", typ: $funcType([], [WiFiSettings_APAuthMode], false)}, {prop: "GetApChannel", name: "GetApChannel", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "GetBssCfgAP", name: "GetBssCfgAP", pkg: "", typ: $funcType([], [ptrType$20], false)}, {prop: "GetBssCfgClient", name: "GetBssCfgClient", pkg: "", typ: $funcType([], [ptrType$20], false)}, {prop: "GetApHideSsid", name: "GetApHideSsid", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetDisableNexmon", name: "GetDisableNexmon", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$19], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$19, $error], false)}];
-	ptrType$20.methods = [{prop: "GetSSID", name: "GetSSID", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetPSK", name: "GetPSK", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$20], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$20, $error], false)}];
-	ptrType$21.methods = [{prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$21], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType], [ptrType$21, $error], false)}];
-	ptrType$23.methods = [{prop: "GetDeployedGadgetSetting", name: "GetDeployedGadgetSetting", pkg: "", typ: $funcType([context.Context, ptrType$21, sliceType$4], [ptrType$12, $error], true)}, {prop: "DeployGadgetSetting", name: "DeployGadgetSetting", pkg: "", typ: $funcType([context.Context, ptrType$21, sliceType$4], [ptrType$12, $error], true)}, {prop: "GetGadgetSettings", name: "GetGadgetSettings", pkg: "", typ: $funcType([context.Context, ptrType$21, sliceType$4], [ptrType$12, $error], true)}, {prop: "SetGadgetSettings", name: "SetGadgetSettings", pkg: "", typ: $funcType([context.Context, ptrType$12, sliceType$4], [ptrType$12, $error], true)}, {prop: "GetLEDSettings", name: "GetLEDSettings", pkg: "", typ: $funcType([context.Context, ptrType$21, sliceType$4], [ptrType$11, $error], true)}, {prop: "SetLEDSettings", name: "SetLEDSettings", pkg: "", typ: $funcType([context.Context, ptrType$11, sliceType$4], [ptrType$21, $error], true)}, {prop: "MountUMSFile", name: "MountUMSFile", pkg: "", typ: $funcType([context.Context, ptrType$14, sliceType$4], [ptrType$21, $error], true)}, {prop: "DeployEthernetInterfaceSettings", name: "DeployEthernetInterfaceSettings", pkg: "", typ: $funcType([context.Context, ptrType$15, sliceType$4], [ptrType$21, $error], true)}, {prop: "DeployWifiSettings", name: "DeployWifiSettings", pkg: "", typ: $funcType([context.Context, ptrType$19, sliceType$4], [ptrType$21, $error], true)}, {prop: "HIDRunScript", name: "HIDRunScript", pkg: "", typ: $funcType([context.Context, ptrType$7, sliceType$4], [ptrType$10, $error], true)}, {prop: "HIDRunScriptJob", name: "HIDRunScriptJob", pkg: "", typ: $funcType([context.Context, ptrType$7, sliceType$4], [ptrType$8, $error], true)}, {prop: "HIDGetScriptJobResult", name: "HIDGetScriptJobResult", pkg: "", typ: $funcType([context.Context, ptrType$8, sliceType$4], [ptrType$10, $error], true)}, {prop: "HIDCancelScriptJob", name: "HIDCancelScriptJob", pkg: "", typ: $funcType([context.Context, ptrType$8, sliceType$4], [ptrType$21, $error], true)}, {prop: "HIDGetRunningScriptJobs", name: "HIDGetRunningScriptJobs", pkg: "", typ: $funcType([context.Context, ptrType$21, sliceType$4], [ptrType$9, $error], true)}, {prop: "HIDCancelAllScriptJobs", name: "HIDCancelAllScriptJobs", pkg: "", typ: $funcType([context.Context, ptrType$21, sliceType$4], [ptrType$21, $error], true)}, {prop: "FSWriteFile", name: "FSWriteFile", pkg: "", typ: $funcType([context.Context, ptrType$4, sliceType$4], [ptrType$21, $error], true)}, {prop: "FSReadFile", name: "FSReadFile", pkg: "", typ: $funcType([context.Context, ptrType$2, sliceType$4], [ptrType$3, $error], true)}, {prop: "FSGetFileInfo", name: "FSGetFileInfo", pkg: "", typ: $funcType([context.Context, ptrType$5, sliceType$4], [ptrType$6, $error], true)}, {prop: "FSCreateTempDirOrFile", name: "FSCreateTempDirOrFile", pkg: "", typ: $funcType([context.Context, ptrType, sliceType$4], [ptrType$1, $error], true)}];
+	ptrType.methods = [{prop: "GetListenType", name: "GetListenType", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType, $error], false)}];
+	ptrType$1.methods = [{prop: "GetVal", name: "GetVal", pkg: "", typ: $funcType([], [isEventValue_Val], false)}, {prop: "GetTstring", name: "GetTstring", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetTbool", name: "GetTbool", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetTint64", name: "GetTint64", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$1], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$1, $error], false)}];
+	ptrType$2.methods = [{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "../proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$3.methods = [{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "../proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$4.methods = [{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "../proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$5.methods = [{prop: "GetType", name: "GetType", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "GetValues", name: "GetValues", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$5], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$5, $error], false)}];
+	ptrType$6.methods = [{prop: "GetDir", name: "GetDir", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetPrefix", name: "GetPrefix", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetOnlyFolder", name: "GetOnlyFolder", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$6], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$6, $error], false)}];
+	ptrType$7.methods = [{prop: "GetResultPath", name: "GetResultPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$7], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$7, $error], false)}];
+	ptrType$8.methods = [{prop: "GetPath", name: "GetPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetStart", name: "GetStart", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "GetData", name: "GetData", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$8], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$8, $error], false)}];
+	ptrType$9.methods = [{prop: "GetReadCount", name: "GetReadCount", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$9], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$9, $error], false)}];
+	ptrType$10.methods = [{prop: "GetPath", name: "GetPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetAppend", name: "GetAppend", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetMustNotExist", name: "GetMustNotExist", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetData", name: "GetData", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$10], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$10, $error], false)}];
+	ptrType$11.methods = [{prop: "GetPath", name: "GetPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$11], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$11, $error], false)}];
+	ptrType$12.methods = [{prop: "GetName", name: "GetName", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetSize", name: "GetSize", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "GetMode", name: "GetMode", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "GetModTime", name: "GetModTime", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "GetIsDir", name: "GetIsDir", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$12], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$12, $error], false)}];
+	ptrType$13.methods = [{prop: "GetScriptPath", name: "GetScriptPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetTimeoutSeconds", name: "GetTimeoutSeconds", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$13], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$13, $error], false)}];
+	ptrType$14.methods = [{prop: "GetId", name: "GetId", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$14], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$14, $error], false)}];
+	ptrType$15.methods = [{prop: "GetIds", name: "GetIds", pkg: "", typ: $funcType([], [sliceType$2], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$15], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$15, $error], false)}];
+	ptrType$16.methods = [{prop: "GetJob", name: "GetJob", pkg: "", typ: $funcType([], [ptrType$14], false)}, {prop: "GetIsFinished", name: "GetIsFinished", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetResultJson", name: "GetResultJson", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$16], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$16, $error], false)}];
+	ptrType$17.methods = [{prop: "GetBlinkCount", name: "GetBlinkCount", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$17], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$17, $error], false)}];
+	ptrType$18.methods = [{prop: "GetEnabled", name: "GetEnabled", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetVid", name: "GetVid", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetPid", name: "GetPid", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetManufacturer", name: "GetManufacturer", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetProduct", name: "GetProduct", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetSerial", name: "GetSerial", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetUse_CDC_ECM", name: "GetUse_CDC_ECM", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_RNDIS", name: "GetUse_RNDIS", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_HID_KEYBOARD", name: "GetUse_HID_KEYBOARD", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_HID_MOUSE", name: "GetUse_HID_MOUSE", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_HID_RAW", name: "GetUse_HID_RAW", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_UMS", name: "GetUse_UMS", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetUse_SERIAL", name: "GetUse_SERIAL", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetRndisSettings", name: "GetRndisSettings", pkg: "", typ: $funcType([], [ptrType$19], false)}, {prop: "GetCdcEcmSettings", name: "GetCdcEcmSettings", pkg: "", typ: $funcType([], [ptrType$19], false)}, {prop: "GetUmsSettings", name: "GetUmsSettings", pkg: "", typ: $funcType([], [ptrType$20], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$18], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$18, $error], false)}];
+	ptrType$19.methods = [{prop: "GetHostAddr", name: "GetHostAddr", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetDevAddr", name: "GetDevAddr", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$19], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$19, $error], false)}];
+	ptrType$20.methods = [{prop: "GetCdrom", name: "GetCdrom", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetFile", name: "GetFile", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$20], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$20, $error], false)}];
+	ptrType$21.methods = [{prop: "GetName", name: "GetName", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetMode", name: "GetMode", pkg: "", typ: $funcType([], [EthernetInterfaceSettings_Mode], false)}, {prop: "GetIpAddress4", name: "GetIpAddress4", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetNetmask4", name: "GetNetmask4", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetEnabled", name: "GetEnabled", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetDhcpServerSettings", name: "GetDhcpServerSettings", pkg: "", typ: $funcType([], [ptrType$22], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$21], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$21, $error], false)}];
+	ptrType$22.methods = [{prop: "GetListenPort", name: "GetListenPort", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "GetListenInterface", name: "GetListenInterface", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetLeaseFile", name: "GetLeaseFile", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetNotAuthoritative", name: "GetNotAuthoritative", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetDoNotBindInterface", name: "GetDoNotBindInterface", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetCallbackScript", name: "GetCallbackScript", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetRanges", name: "GetRanges", pkg: "", typ: $funcType([], [sliceType$3], false)}, {prop: "GetOptions", name: "GetOptions", pkg: "", typ: $funcType([], [mapType], false)}, {prop: "GetStaticHosts", name: "GetStaticHosts", pkg: "", typ: $funcType([], [sliceType$4], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$22], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$22, $error], false)}];
+	ptrType$23.methods = [{prop: "GetRangeLower", name: "GetRangeLower", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetRangeUpper", name: "GetRangeUpper", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetLeaseTime", name: "GetLeaseTime", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$23], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$23, $error], false)}];
+	ptrType$24.methods = [{prop: "GetMac", name: "GetMac", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetIp", name: "GetIp", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$24], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$24, $error], false)}];
+	ptrType$25.methods = [{prop: "GetDisabled", name: "GetDisabled", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetReg", name: "GetReg", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetMode", name: "GetMode", pkg: "", typ: $funcType([], [WiFiSettings_Mode], false)}, {prop: "GetAuthMode", name: "GetAuthMode", pkg: "", typ: $funcType([], [WiFiSettings_APAuthMode], false)}, {prop: "GetApChannel", name: "GetApChannel", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "GetBssCfgAP", name: "GetBssCfgAP", pkg: "", typ: $funcType([], [ptrType$26], false)}, {prop: "GetBssCfgClient", name: "GetBssCfgClient", pkg: "", typ: $funcType([], [ptrType$26], false)}, {prop: "GetApHideSsid", name: "GetApHideSsid", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetDisableNexmon", name: "GetDisableNexmon", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$25], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$25, $error], false)}];
+	ptrType$26.methods = [{prop: "GetSSID", name: "GetSSID", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetPSK", name: "GetPSK", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$26], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$26, $error], false)}];
+	ptrType$27.methods = [{prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$27], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$27, $error], false)}];
+	ptrType$29.methods = [{prop: "GetDeployedGadgetSetting", name: "GetDeployedGadgetSetting", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$18, $error], true)}, {prop: "DeployGadgetSetting", name: "DeployGadgetSetting", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$18, $error], true)}, {prop: "GetGadgetSettings", name: "GetGadgetSettings", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$18, $error], true)}, {prop: "SetGadgetSettings", name: "SetGadgetSettings", pkg: "", typ: $funcType([context.Context, ptrType$18, sliceType$5], [ptrType$18, $error], true)}, {prop: "GetLEDSettings", name: "GetLEDSettings", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$17, $error], true)}, {prop: "SetLEDSettings", name: "SetLEDSettings", pkg: "", typ: $funcType([context.Context, ptrType$17, sliceType$5], [ptrType$27, $error], true)}, {prop: "MountUMSFile", name: "MountUMSFile", pkg: "", typ: $funcType([context.Context, ptrType$20, sliceType$5], [ptrType$27, $error], true)}, {prop: "DeployEthernetInterfaceSettings", name: "DeployEthernetInterfaceSettings", pkg: "", typ: $funcType([context.Context, ptrType$21, sliceType$5], [ptrType$27, $error], true)}, {prop: "DeployWifiSettings", name: "DeployWifiSettings", pkg: "", typ: $funcType([context.Context, ptrType$25, sliceType$5], [ptrType$27, $error], true)}, {prop: "HIDRunScript", name: "HIDRunScript", pkg: "", typ: $funcType([context.Context, ptrType$13, sliceType$5], [ptrType$16, $error], true)}, {prop: "HIDRunScriptJob", name: "HIDRunScriptJob", pkg: "", typ: $funcType([context.Context, ptrType$13, sliceType$5], [ptrType$14, $error], true)}, {prop: "HIDGetScriptJobResult", name: "HIDGetScriptJobResult", pkg: "", typ: $funcType([context.Context, ptrType$14, sliceType$5], [ptrType$16, $error], true)}, {prop: "HIDCancelScriptJob", name: "HIDCancelScriptJob", pkg: "", typ: $funcType([context.Context, ptrType$14, sliceType$5], [ptrType$27, $error], true)}, {prop: "HIDGetRunningScriptJobs", name: "HIDGetRunningScriptJobs", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$15, $error], true)}, {prop: "HIDCancelAllScriptJobs", name: "HIDCancelAllScriptJobs", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$27, $error], true)}, {prop: "FSWriteFile", name: "FSWriteFile", pkg: "", typ: $funcType([context.Context, ptrType$10, sliceType$5], [ptrType$27, $error], true)}, {prop: "FSReadFile", name: "FSReadFile", pkg: "", typ: $funcType([context.Context, ptrType$8, sliceType$5], [ptrType$9, $error], true)}, {prop: "FSGetFileInfo", name: "FSGetFileInfo", pkg: "", typ: $funcType([context.Context, ptrType$11, sliceType$5], [ptrType$12, $error], true)}, {prop: "FSCreateTempDirOrFile", name: "FSCreateTempDirOrFile", pkg: "", typ: $funcType([context.Context, ptrType$6, sliceType$5], [ptrType$7, $error], true)}, {prop: "EventListen", name: "EventListen", pkg: "", typ: $funcType([context.Context, ptrType, sliceType$5], [P4WNP1_EventListenClient, $error], true)}];
+	ptrType$30.methods = [{prop: "Recv", name: "Recv", pkg: "", typ: $funcType([], [ptrType$5, $error], false)}];
+	EventRequest.init("", [{prop: "ListenType", name: "ListenType", anonymous: false, exported: true, typ: $Int64, tag: ""}]);
+	EventValue.init("", [{prop: "Val", name: "Val", anonymous: false, exported: true, typ: isEventValue_Val, tag: ""}]);
+	isEventValue_Val.init([{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "../proto/gopherjs", typ: $funcType([], [], false)}]);
+	EventValue_Tstring.init("", [{prop: "Tstring", name: "Tstring", anonymous: false, exported: true, typ: $String, tag: ""}]);
+	EventValue_Tbool.init("", [{prop: "Tbool", name: "Tbool", anonymous: false, exported: true, typ: $Bool, tag: ""}]);
+	EventValue_Tint64.init("", [{prop: "Tint64", name: "Tint64", anonymous: false, exported: true, typ: $Int64, tag: ""}]);
+	Event.init("", [{prop: "Type", name: "Type", anonymous: false, exported: true, typ: $Int64, tag: ""}, {prop: "Values", name: "Values", anonymous: false, exported: true, typ: sliceType, tag: ""}]);
 	TempDirOrFileRequest.init("", [{prop: "Dir", name: "Dir", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Prefix", name: "Prefix", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "OnlyFolder", name: "OnlyFolder", anonymous: false, exported: true, typ: $Bool, tag: ""}]);
 	TempDirOrFileResponse.init("", [{prop: "ResultPath", name: "ResultPath", anonymous: false, exported: true, typ: $String, tag: ""}]);
-	ReadFileRequest.init("", [{prop: "Path", name: "Path", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Start", name: "Start", anonymous: false, exported: true, typ: $Int64, tag: ""}, {prop: "Data", name: "Data", anonymous: false, exported: true, typ: sliceType, tag: ""}]);
+	ReadFileRequest.init("", [{prop: "Path", name: "Path", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Start", name: "Start", anonymous: false, exported: true, typ: $Int64, tag: ""}, {prop: "Data", name: "Data", anonymous: false, exported: true, typ: sliceType$1, tag: ""}]);
 	ReadFileResponse.init("", [{prop: "ReadCount", name: "ReadCount", anonymous: false, exported: true, typ: $Int64, tag: ""}]);
-	WriteFileRequest.init("", [{prop: "Path", name: "Path", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Append", name: "Append", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "MustNotExist", name: "MustNotExist", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Data", name: "Data", anonymous: false, exported: true, typ: sliceType, tag: ""}]);
+	WriteFileRequest.init("", [{prop: "Path", name: "Path", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Append", name: "Append", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "MustNotExist", name: "MustNotExist", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Data", name: "Data", anonymous: false, exported: true, typ: sliceType$1, tag: ""}]);
 	FileInfoRequest.init("", [{prop: "Path", name: "Path", anonymous: false, exported: true, typ: $String, tag: ""}]);
 	FileInfoResponse.init("", [{prop: "Name", name: "Name", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Size", name: "Size", anonymous: false, exported: true, typ: $Int64, tag: ""}, {prop: "Mode", name: "Mode", anonymous: false, exported: true, typ: $Uint32, tag: ""}, {prop: "ModTime", name: "ModTime", anonymous: false, exported: true, typ: $Int64, tag: ""}, {prop: "IsDir", name: "IsDir", anonymous: false, exported: true, typ: $Bool, tag: ""}]);
 	HIDScriptRequest.init("", [{prop: "ScriptPath", name: "ScriptPath", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "TimeoutSeconds", name: "TimeoutSeconds", anonymous: false, exported: true, typ: $Uint32, tag: ""}]);
 	HIDScriptJob.init("", [{prop: "Id", name: "Id", anonymous: false, exported: true, typ: $Uint32, tag: ""}]);
-	HIDScriptJobList.init("", [{prop: "Ids", name: "Ids", anonymous: false, exported: true, typ: sliceType$1, tag: ""}]);
-	HIDScriptResult.init("", [{prop: "Job", name: "Job", anonymous: false, exported: true, typ: ptrType$8, tag: ""}, {prop: "IsFinished", name: "IsFinished", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "ResultJson", name: "ResultJson", anonymous: false, exported: true, typ: $String, tag: ""}]);
+	HIDScriptJobList.init("", [{prop: "Ids", name: "Ids", anonymous: false, exported: true, typ: sliceType$2, tag: ""}]);
+	HIDScriptResult.init("", [{prop: "Job", name: "Job", anonymous: false, exported: true, typ: ptrType$14, tag: ""}, {prop: "IsFinished", name: "IsFinished", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "ResultJson", name: "ResultJson", anonymous: false, exported: true, typ: $String, tag: ""}]);
 	LEDSettings.init("", [{prop: "BlinkCount", name: "BlinkCount", anonymous: false, exported: true, typ: $Uint32, tag: ""}]);
-	GadgetSettings.init("", [{prop: "Enabled", name: "Enabled", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Vid", name: "Vid", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Pid", name: "Pid", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Manufacturer", name: "Manufacturer", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Product", name: "Product", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Serial", name: "Serial", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Use_CDC_ECM", name: "Use_CDC_ECM", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_RNDIS", name: "Use_RNDIS", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_HID_KEYBOARD", name: "Use_HID_KEYBOARD", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_HID_MOUSE", name: "Use_HID_MOUSE", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_HID_RAW", name: "Use_HID_RAW", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_UMS", name: "Use_UMS", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_SERIAL", name: "Use_SERIAL", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "RndisSettings", name: "RndisSettings", anonymous: false, exported: true, typ: ptrType$13, tag: ""}, {prop: "CdcEcmSettings", name: "CdcEcmSettings", anonymous: false, exported: true, typ: ptrType$13, tag: ""}, {prop: "UmsSettings", name: "UmsSettings", anonymous: false, exported: true, typ: ptrType$14, tag: ""}]);
+	GadgetSettings.init("", [{prop: "Enabled", name: "Enabled", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Vid", name: "Vid", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Pid", name: "Pid", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Manufacturer", name: "Manufacturer", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Product", name: "Product", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Serial", name: "Serial", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Use_CDC_ECM", name: "Use_CDC_ECM", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_RNDIS", name: "Use_RNDIS", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_HID_KEYBOARD", name: "Use_HID_KEYBOARD", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_HID_MOUSE", name: "Use_HID_MOUSE", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_HID_RAW", name: "Use_HID_RAW", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_UMS", name: "Use_UMS", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Use_SERIAL", name: "Use_SERIAL", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "RndisSettings", name: "RndisSettings", anonymous: false, exported: true, typ: ptrType$19, tag: ""}, {prop: "CdcEcmSettings", name: "CdcEcmSettings", anonymous: false, exported: true, typ: ptrType$19, tag: ""}, {prop: "UmsSettings", name: "UmsSettings", anonymous: false, exported: true, typ: ptrType$20, tag: ""}]);
 	GadgetSettingsEthernet.init("", [{prop: "HostAddr", name: "HostAddr", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "DevAddr", name: "DevAddr", anonymous: false, exported: true, typ: $String, tag: ""}]);
 	GadgetSettingsUMS.init("", [{prop: "Cdrom", name: "Cdrom", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "File", name: "File", anonymous: false, exported: true, typ: $String, tag: ""}]);
-	EthernetInterfaceSettings.init("", [{prop: "Name", name: "Name", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Mode", name: "Mode", anonymous: false, exported: true, typ: EthernetInterfaceSettings_Mode, tag: ""}, {prop: "IpAddress4", name: "IpAddress4", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Netmask4", name: "Netmask4", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Enabled", name: "Enabled", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "DhcpServerSettings", name: "DhcpServerSettings", anonymous: false, exported: true, typ: ptrType$16, tag: ""}]);
-	DHCPServerSettings.init("", [{prop: "ListenPort", name: "ListenPort", anonymous: false, exported: true, typ: $Uint32, tag: ""}, {prop: "ListenInterface", name: "ListenInterface", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "LeaseFile", name: "LeaseFile", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "NotAuthoritative", name: "NotAuthoritative", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "DoNotBindInterface", name: "DoNotBindInterface", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "CallbackScript", name: "CallbackScript", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Ranges", name: "Ranges", anonymous: false, exported: true, typ: sliceType$2, tag: ""}, {prop: "Options", name: "Options", anonymous: false, exported: true, typ: mapType, tag: ""}, {prop: "StaticHosts", name: "StaticHosts", anonymous: false, exported: true, typ: sliceType$3, tag: ""}]);
+	EthernetInterfaceSettings.init("", [{prop: "Name", name: "Name", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Mode", name: "Mode", anonymous: false, exported: true, typ: EthernetInterfaceSettings_Mode, tag: ""}, {prop: "IpAddress4", name: "IpAddress4", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Netmask4", name: "Netmask4", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Enabled", name: "Enabled", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "DhcpServerSettings", name: "DhcpServerSettings", anonymous: false, exported: true, typ: ptrType$22, tag: ""}]);
+	DHCPServerSettings.init("", [{prop: "ListenPort", name: "ListenPort", anonymous: false, exported: true, typ: $Uint32, tag: ""}, {prop: "ListenInterface", name: "ListenInterface", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "LeaseFile", name: "LeaseFile", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "NotAuthoritative", name: "NotAuthoritative", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "DoNotBindInterface", name: "DoNotBindInterface", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "CallbackScript", name: "CallbackScript", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Ranges", name: "Ranges", anonymous: false, exported: true, typ: sliceType$3, tag: ""}, {prop: "Options", name: "Options", anonymous: false, exported: true, typ: mapType, tag: ""}, {prop: "StaticHosts", name: "StaticHosts", anonymous: false, exported: true, typ: sliceType$4, tag: ""}]);
 	DHCPServerRange.init("", [{prop: "RangeLower", name: "RangeLower", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "RangeUpper", name: "RangeUpper", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "LeaseTime", name: "LeaseTime", anonymous: false, exported: true, typ: $String, tag: ""}]);
 	DHCPServerStaticHost.init("", [{prop: "Mac", name: "Mac", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Ip", name: "Ip", anonymous: false, exported: true, typ: $String, tag: ""}]);
-	WiFiSettings.init("", [{prop: "Disabled", name: "Disabled", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Reg", name: "Reg", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Mode", name: "Mode", anonymous: false, exported: true, typ: WiFiSettings_Mode, tag: ""}, {prop: "AuthMode", name: "AuthMode", anonymous: false, exported: true, typ: WiFiSettings_APAuthMode, tag: ""}, {prop: "ApChannel", name: "ApChannel", anonymous: false, exported: true, typ: $Uint32, tag: ""}, {prop: "BssCfgAP", name: "BssCfgAP", anonymous: false, exported: true, typ: ptrType$20, tag: ""}, {prop: "BssCfgClient", name: "BssCfgClient", anonymous: false, exported: true, typ: ptrType$20, tag: ""}, {prop: "ApHideSsid", name: "ApHideSsid", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "DisableNexmon", name: "DisableNexmon", anonymous: false, exported: true, typ: $Bool, tag: ""}]);
+	WiFiSettings.init("", [{prop: "Disabled", name: "Disabled", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "Reg", name: "Reg", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Mode", name: "Mode", anonymous: false, exported: true, typ: WiFiSettings_Mode, tag: ""}, {prop: "AuthMode", name: "AuthMode", anonymous: false, exported: true, typ: WiFiSettings_APAuthMode, tag: ""}, {prop: "ApChannel", name: "ApChannel", anonymous: false, exported: true, typ: $Uint32, tag: ""}, {prop: "BssCfgAP", name: "BssCfgAP", anonymous: false, exported: true, typ: ptrType$26, tag: ""}, {prop: "BssCfgClient", name: "BssCfgClient", anonymous: false, exported: true, typ: ptrType$26, tag: ""}, {prop: "ApHideSsid", name: "ApHideSsid", anonymous: false, exported: true, typ: $Bool, tag: ""}, {prop: "DisableNexmon", name: "DisableNexmon", anonymous: false, exported: true, typ: $Bool, tag: ""}]);
 	BSSCfg.init("", [{prop: "SSID", name: "SSID", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "PSK", name: "PSK", anonymous: false, exported: true, typ: $String, tag: ""}]);
 	Empty.init("", []);
-	p4WNP1Client.init("../proto/gopherjs", [{prop: "client", name: "client", anonymous: false, exported: false, typ: ptrType$22, tag: ""}]);
+	P4WNP1Client.init([{prop: "DeployEthernetInterfaceSettings", name: "DeployEthernetInterfaceSettings", pkg: "", typ: $funcType([context.Context, ptrType$21, sliceType$5], [ptrType$27, $error], true)}, {prop: "DeployGadgetSetting", name: "DeployGadgetSetting", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$18, $error], true)}, {prop: "DeployWifiSettings", name: "DeployWifiSettings", pkg: "", typ: $funcType([context.Context, ptrType$25, sliceType$5], [ptrType$27, $error], true)}, {prop: "EventListen", name: "EventListen", pkg: "", typ: $funcType([context.Context, ptrType, sliceType$5], [P4WNP1_EventListenClient, $error], true)}, {prop: "FSCreateTempDirOrFile", name: "FSCreateTempDirOrFile", pkg: "", typ: $funcType([context.Context, ptrType$6, sliceType$5], [ptrType$7, $error], true)}, {prop: "FSGetFileInfo", name: "FSGetFileInfo", pkg: "", typ: $funcType([context.Context, ptrType$11, sliceType$5], [ptrType$12, $error], true)}, {prop: "FSReadFile", name: "FSReadFile", pkg: "", typ: $funcType([context.Context, ptrType$8, sliceType$5], [ptrType$9, $error], true)}, {prop: "FSWriteFile", name: "FSWriteFile", pkg: "", typ: $funcType([context.Context, ptrType$10, sliceType$5], [ptrType$27, $error], true)}, {prop: "GetDeployedGadgetSetting", name: "GetDeployedGadgetSetting", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$18, $error], true)}, {prop: "GetGadgetSettings", name: "GetGadgetSettings", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$18, $error], true)}, {prop: "GetLEDSettings", name: "GetLEDSettings", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$17, $error], true)}, {prop: "HIDCancelAllScriptJobs", name: "HIDCancelAllScriptJobs", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$27, $error], true)}, {prop: "HIDCancelScriptJob", name: "HIDCancelScriptJob", pkg: "", typ: $funcType([context.Context, ptrType$14, sliceType$5], [ptrType$27, $error], true)}, {prop: "HIDGetRunningScriptJobs", name: "HIDGetRunningScriptJobs", pkg: "", typ: $funcType([context.Context, ptrType$27, sliceType$5], [ptrType$15, $error], true)}, {prop: "HIDGetScriptJobResult", name: "HIDGetScriptJobResult", pkg: "", typ: $funcType([context.Context, ptrType$14, sliceType$5], [ptrType$16, $error], true)}, {prop: "HIDRunScript", name: "HIDRunScript", pkg: "", typ: $funcType([context.Context, ptrType$13, sliceType$5], [ptrType$16, $error], true)}, {prop: "HIDRunScriptJob", name: "HIDRunScriptJob", pkg: "", typ: $funcType([context.Context, ptrType$13, sliceType$5], [ptrType$14, $error], true)}, {prop: "MountUMSFile", name: "MountUMSFile", pkg: "", typ: $funcType([context.Context, ptrType$20, sliceType$5], [ptrType$27, $error], true)}, {prop: "SetGadgetSettings", name: "SetGadgetSettings", pkg: "", typ: $funcType([context.Context, ptrType$18, sliceType$5], [ptrType$18, $error], true)}, {prop: "SetLEDSettings", name: "SetLEDSettings", pkg: "", typ: $funcType([context.Context, ptrType$17, sliceType$5], [ptrType$27, $error], true)}]);
+	p4WNP1Client.init("../proto/gopherjs", [{prop: "client", name: "client", anonymous: false, exported: false, typ: ptrType$28, tag: ""}]);
+	P4WNP1_EventListenClient.init([{prop: "CloseSend", name: "CloseSend", pkg: "", typ: $funcType([], [$error], false)}, {prop: "Context", name: "Context", pkg: "", typ: $funcType([], [context.Context], false)}, {prop: "Header", name: "Header", pkg: "", typ: $funcType([], [$packages["github.com/johanbrandhorst/protobuf/vendor/google.golang.org/grpc/metadata"].MD], false)}, {prop: "Recv", name: "Recv", pkg: "", typ: $funcType([], [ptrType$5, $error], false)}, {prop: "RecvMsg", name: "RecvMsg", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}, {prop: "SendMsg", name: "SendMsg", pkg: "", typ: $funcType([sliceType$1], [$error], false)}, {prop: "Trailer", name: "Trailer", pkg: "", typ: $funcType([], [$packages["github.com/johanbrandhorst/protobuf/vendor/google.golang.org/grpc/metadata"].MD], false)}]);
+	p4WNP1EventListenClient.init("", [{prop: "ClientStream", name: "ClientStream", anonymous: true, exported: true, typ: grpcweb.ClientStream, tag: ""}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -27850,717 +29515,6 @@ $packages["crypto/md5"] = (function() {
 		block = blockGeneric;
 		init();
 		init$1();
-		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.$init = $init;
-	return $pkg;
-})();
-$packages["bytes"] = (function() {
-	var $pkg = {}, $init, errors, io, unicode, utf8, Buffer, readOp, ptrType, sliceType, arrayType, sliceType$1, errNegativeRead, IndexByte, Equal, makeSlice, explode, countGeneric, genSplit, SplitN, indexRabinKarp, hashStr, Index, Count;
-	errors = $packages["errors"];
-	io = $packages["io"];
-	unicode = $packages["unicode"];
-	utf8 = $packages["unicode/utf8"];
-	Buffer = $pkg.Buffer = $newType(0, $kindStruct, "bytes.Buffer", true, "bytes", true, function(buf_, off_, bootstrap_, lastRead_) {
-		this.$val = this;
-		if (arguments.length === 0) {
-			this.buf = sliceType.nil;
-			this.off = 0;
-			this.bootstrap = arrayType.zero();
-			this.lastRead = 0;
-			return;
-		}
-		this.buf = buf_;
-		this.off = off_;
-		this.bootstrap = bootstrap_;
-		this.lastRead = lastRead_;
-	});
-	readOp = $pkg.readOp = $newType(1, $kindInt8, "bytes.readOp", true, "bytes", false, null);
-	ptrType = $ptrType(Buffer);
-	sliceType = $sliceType($Uint8);
-	arrayType = $arrayType($Uint8, 64);
-	sliceType$1 = $sliceType(sliceType);
-	IndexByte = function(s, c) {
-		var _i, _ref, b, c, i, s;
-		_ref = s;
-		_i = 0;
-		while (true) {
-			if (!(_i < _ref.$length)) { break; }
-			i = _i;
-			b = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-			if (b === c) {
-				return i;
-			}
-			_i++;
-		}
-		return -1;
-	};
-	$pkg.IndexByte = IndexByte;
-	Equal = function(a, b) {
-		var _i, _ref, a, b, c, i;
-		if (!((a.$length === b.$length))) {
-			return false;
-		}
-		_ref = a;
-		_i = 0;
-		while (true) {
-			if (!(_i < _ref.$length)) { break; }
-			i = _i;
-			c = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-			if (!((c === ((i < 0 || i >= b.$length) ? ($throwRuntimeError("index out of range"), undefined) : b.$array[b.$offset + i])))) {
-				return false;
-			}
-			_i++;
-		}
-		return true;
-	};
-	$pkg.Equal = Equal;
-	Buffer.ptr.prototype.Bytes = function() {
-		var b;
-		b = this;
-		return $subslice(b.buf, b.off);
-	};
-	Buffer.prototype.Bytes = function() { return this.$val.Bytes(); };
-	Buffer.ptr.prototype.String = function() {
-		var b;
-		b = this;
-		if (b === ptrType.nil) {
-			return "<nil>";
-		}
-		return ($bytesToString($subslice(b.buf, b.off)));
-	};
-	Buffer.prototype.String = function() { return this.$val.String(); };
-	Buffer.ptr.prototype.empty = function() {
-		var b;
-		b = this;
-		return b.buf.$length <= b.off;
-	};
-	Buffer.prototype.empty = function() { return this.$val.empty(); };
-	Buffer.ptr.prototype.Len = function() {
-		var b;
-		b = this;
-		return b.buf.$length - b.off >> 0;
-	};
-	Buffer.prototype.Len = function() { return this.$val.Len(); };
-	Buffer.ptr.prototype.Cap = function() {
-		var b;
-		b = this;
-		return b.buf.$capacity;
-	};
-	Buffer.prototype.Cap = function() { return this.$val.Cap(); };
-	Buffer.ptr.prototype.Truncate = function(n) {
-		var b, n;
-		b = this;
-		if (n === 0) {
-			b.Reset();
-			return;
-		}
-		b.lastRead = 0;
-		if (n < 0 || n > b.Len()) {
-			$panic(new $String("bytes.Buffer: truncation out of range"));
-		}
-		b.buf = $subslice(b.buf, 0, (b.off + n >> 0));
-	};
-	Buffer.prototype.Truncate = function(n) { return this.$val.Truncate(n); };
-	Buffer.ptr.prototype.Reset = function() {
-		var b;
-		b = this;
-		b.buf = $subslice(b.buf, 0, 0);
-		b.off = 0;
-		b.lastRead = 0;
-	};
-	Buffer.prototype.Reset = function() { return this.$val.Reset(); };
-	Buffer.ptr.prototype.tryGrowByReslice = function(n) {
-		var b, l, n;
-		b = this;
-		l = b.buf.$length;
-		if (n <= (b.buf.$capacity - l >> 0)) {
-			b.buf = $subslice(b.buf, 0, (l + n >> 0));
-			return [l, true];
-		}
-		return [0, false];
-	};
-	Buffer.prototype.tryGrowByReslice = function(n) { return this.$val.tryGrowByReslice(n); };
-	Buffer.ptr.prototype.grow = function(n) {
-		var _q, _tuple, b, buf, c, i, m, n, ok;
-		b = this;
-		m = b.Len();
-		if ((m === 0) && !((b.off === 0))) {
-			b.Reset();
-		}
-		_tuple = b.tryGrowByReslice(n);
-		i = _tuple[0];
-		ok = _tuple[1];
-		if (ok) {
-			return i;
-		}
-		if (b.buf === sliceType.nil && n <= 64) {
-			b.buf = $subslice(new sliceType(b.bootstrap), 0, n);
-			return 0;
-		}
-		c = b.buf.$capacity;
-		if (n <= ((_q = c / 2, (_q === _q && _q !== 1/0 && _q !== -1/0) ? _q >> 0 : $throwRuntimeError("integer divide by zero")) - m >> 0)) {
-			$copySlice(b.buf, $subslice(b.buf, b.off));
-		} else if (c > ((2147483647 - c >> 0) - n >> 0)) {
-			$panic($pkg.ErrTooLarge);
-		} else {
-			buf = makeSlice(($imul(2, c)) + n >> 0);
-			$copySlice(buf, $subslice(b.buf, b.off));
-			b.buf = buf;
-		}
-		b.off = 0;
-		b.buf = $subslice(b.buf, 0, (m + n >> 0));
-		return m;
-	};
-	Buffer.prototype.grow = function(n) { return this.$val.grow(n); };
-	Buffer.ptr.prototype.Grow = function(n) {
-		var b, m, n;
-		b = this;
-		if (n < 0) {
-			$panic(new $String("bytes.Buffer.Grow: negative count"));
-		}
-		m = b.grow(n);
-		b.buf = $subslice(b.buf, 0, m);
-	};
-	Buffer.prototype.Grow = function(n) { return this.$val.Grow(n); };
-	Buffer.ptr.prototype.Write = function(p) {
-		var _tmp, _tmp$1, _tuple, b, err, m, n, ok, p;
-		n = 0;
-		err = $ifaceNil;
-		b = this;
-		b.lastRead = 0;
-		_tuple = b.tryGrowByReslice(p.$length);
-		m = _tuple[0];
-		ok = _tuple[1];
-		if (!ok) {
-			m = b.grow(p.$length);
-		}
-		_tmp = $copySlice($subslice(b.buf, m), p);
-		_tmp$1 = $ifaceNil;
-		n = _tmp;
-		err = _tmp$1;
-		return [n, err];
-	};
-	Buffer.prototype.Write = function(p) { return this.$val.Write(p); };
-	Buffer.ptr.prototype.WriteString = function(s) {
-		var _tmp, _tmp$1, _tuple, b, err, m, n, ok, s;
-		n = 0;
-		err = $ifaceNil;
-		b = this;
-		b.lastRead = 0;
-		_tuple = b.tryGrowByReslice(s.length);
-		m = _tuple[0];
-		ok = _tuple[1];
-		if (!ok) {
-			m = b.grow(s.length);
-		}
-		_tmp = $copyString($subslice(b.buf, m), s);
-		_tmp$1 = $ifaceNil;
-		n = _tmp;
-		err = _tmp$1;
-		return [n, err];
-	};
-	Buffer.prototype.WriteString = function(s) { return this.$val.WriteString(s); };
-	Buffer.ptr.prototype.ReadFrom = function(r) {
-		var _r, _tmp, _tmp$1, _tmp$2, _tmp$3, _tuple, b, e, err, i, m, n, r, x, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tuple = $f._tuple; b = $f.b; e = $f.e; err = $f.err; i = $f.i; m = $f.m; n = $f.n; r = $f.r; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		n = new $Int64(0, 0);
-		err = $ifaceNil;
-		b = this;
-		b.lastRead = 0;
-		/* while (true) { */ case 1:
-			i = b.grow(512);
-			_r = r.Read($subslice(b.buf, i, b.buf.$capacity)); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			_tuple = _r;
-			m = _tuple[0];
-			e = _tuple[1];
-			if (m < 0) {
-				$panic(errNegativeRead);
-			}
-			b.buf = $subslice(b.buf, 0, (i + m >> 0));
-			n = (x = (new $Int64(0, m)), new $Int64(n.$high + x.$high, n.$low + x.$low));
-			if ($interfaceIsEqual(e, io.EOF)) {
-				_tmp = n;
-				_tmp$1 = $ifaceNil;
-				n = _tmp;
-				err = _tmp$1;
-				$s = -1; return [n, err];
-			}
-			if (!($interfaceIsEqual(e, $ifaceNil))) {
-				_tmp$2 = n;
-				_tmp$3 = e;
-				n = _tmp$2;
-				err = _tmp$3;
-				$s = -1; return [n, err];
-			}
-		/* } */ $s = 1; continue; case 2:
-		$s = -1; return [n, err];
-		/* */ } return; } if ($f === undefined) { $f = { $blk: Buffer.ptr.prototype.ReadFrom }; } $f._r = _r; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tuple = _tuple; $f.b = b; $f.e = e; $f.err = err; $f.i = i; $f.m = m; $f.n = n; $f.r = r; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	Buffer.prototype.ReadFrom = function(r) { return this.$val.ReadFrom(r); };
-	makeSlice = function(n) {
-		var n, $deferred;
-		/* */ var $err = null; try { $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
-		$deferred.push([(function() {
-			if (!($interfaceIsEqual($recover(), $ifaceNil))) {
-				$panic($pkg.ErrTooLarge);
-			}
-		}), []]);
-		return $makeSlice(sliceType, n);
-		/* */ } catch(err) { $err = err; return sliceType.nil; } finally { $callDeferred($deferred, $err); }
-	};
-	Buffer.ptr.prototype.WriteTo = function(w) {
-		var _r, _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tuple, b, e, err, m, n, nBytes, w, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tmp$4 = $f._tmp$4; _tmp$5 = $f._tmp$5; _tuple = $f._tuple; b = $f.b; e = $f.e; err = $f.err; m = $f.m; n = $f.n; nBytes = $f.nBytes; w = $f.w; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		n = new $Int64(0, 0);
-		err = $ifaceNil;
-		b = this;
-		b.lastRead = 0;
-		nBytes = b.Len();
-		/* */ if (nBytes > 0) { $s = 1; continue; }
-		/* */ $s = 2; continue;
-		/* if (nBytes > 0) { */ case 1:
-			_r = w.Write($subslice(b.buf, b.off)); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			_tuple = _r;
-			m = _tuple[0];
-			e = _tuple[1];
-			if (m > nBytes) {
-				$panic(new $String("bytes.Buffer.WriteTo: invalid Write count"));
-			}
-			b.off = b.off + (m) >> 0;
-			n = (new $Int64(0, m));
-			if (!($interfaceIsEqual(e, $ifaceNil))) {
-				_tmp = n;
-				_tmp$1 = e;
-				n = _tmp;
-				err = _tmp$1;
-				$s = -1; return [n, err];
-			}
-			if (!((m === nBytes))) {
-				_tmp$2 = n;
-				_tmp$3 = io.ErrShortWrite;
-				n = _tmp$2;
-				err = _tmp$3;
-				$s = -1; return [n, err];
-			}
-		/* } */ case 2:
-		b.Reset();
-		_tmp$4 = n;
-		_tmp$5 = $ifaceNil;
-		n = _tmp$4;
-		err = _tmp$5;
-		$s = -1; return [n, err];
-		/* */ } return; } if ($f === undefined) { $f = { $blk: Buffer.ptr.prototype.WriteTo }; } $f._r = _r; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tmp$4 = _tmp$4; $f._tmp$5 = _tmp$5; $f._tuple = _tuple; $f.b = b; $f.e = e; $f.err = err; $f.m = m; $f.n = n; $f.nBytes = nBytes; $f.w = w; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	Buffer.prototype.WriteTo = function(w) { return this.$val.WriteTo(w); };
-	Buffer.ptr.prototype.WriteByte = function(c) {
-		var _tuple, b, c, m, ok, x;
-		b = this;
-		b.lastRead = 0;
-		_tuple = b.tryGrowByReslice(1);
-		m = _tuple[0];
-		ok = _tuple[1];
-		if (!ok) {
-			m = b.grow(1);
-		}
-		(x = b.buf, ((m < 0 || m >= x.$length) ? ($throwRuntimeError("index out of range"), undefined) : x.$array[x.$offset + m] = c));
-		return $ifaceNil;
-	};
-	Buffer.prototype.WriteByte = function(c) { return this.$val.WriteByte(c); };
-	Buffer.ptr.prototype.WriteRune = function(r) {
-		var _tmp, _tmp$1, _tmp$2, _tmp$3, _tuple, b, err, m, n, ok, r;
-		n = 0;
-		err = $ifaceNil;
-		b = this;
-		if (r < 128) {
-			b.WriteByte(((r << 24 >>> 24)));
-			_tmp = 1;
-			_tmp$1 = $ifaceNil;
-			n = _tmp;
-			err = _tmp$1;
-			return [n, err];
-		}
-		b.lastRead = 0;
-		_tuple = b.tryGrowByReslice(4);
-		m = _tuple[0];
-		ok = _tuple[1];
-		if (!ok) {
-			m = b.grow(4);
-		}
-		n = utf8.EncodeRune($subslice(b.buf, m, (m + 4 >> 0)), r);
-		b.buf = $subslice(b.buf, 0, (m + n >> 0));
-		_tmp$2 = n;
-		_tmp$3 = $ifaceNil;
-		n = _tmp$2;
-		err = _tmp$3;
-		return [n, err];
-	};
-	Buffer.prototype.WriteRune = function(r) { return this.$val.WriteRune(r); };
-	Buffer.ptr.prototype.Read = function(p) {
-		var _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, b, err, n, p;
-		n = 0;
-		err = $ifaceNil;
-		b = this;
-		b.lastRead = 0;
-		if (b.empty()) {
-			b.Reset();
-			if (p.$length === 0) {
-				_tmp = 0;
-				_tmp$1 = $ifaceNil;
-				n = _tmp;
-				err = _tmp$1;
-				return [n, err];
-			}
-			_tmp$2 = 0;
-			_tmp$3 = io.EOF;
-			n = _tmp$2;
-			err = _tmp$3;
-			return [n, err];
-		}
-		n = $copySlice(p, $subslice(b.buf, b.off));
-		b.off = b.off + (n) >> 0;
-		if (n > 0) {
-			b.lastRead = -1;
-		}
-		_tmp$4 = n;
-		_tmp$5 = $ifaceNil;
-		n = _tmp$4;
-		err = _tmp$5;
-		return [n, err];
-	};
-	Buffer.prototype.Read = function(p) { return this.$val.Read(p); };
-	Buffer.ptr.prototype.Next = function(n) {
-		var b, data, m, n;
-		b = this;
-		b.lastRead = 0;
-		m = b.Len();
-		if (n > m) {
-			n = m;
-		}
-		data = $subslice(b.buf, b.off, (b.off + n >> 0));
-		b.off = b.off + (n) >> 0;
-		if (n > 0) {
-			b.lastRead = -1;
-		}
-		return data;
-	};
-	Buffer.prototype.Next = function(n) { return this.$val.Next(n); };
-	Buffer.ptr.prototype.ReadByte = function() {
-		var b, c, x, x$1;
-		b = this;
-		if (b.empty()) {
-			b.Reset();
-			return [0, io.EOF];
-		}
-		c = (x = b.buf, x$1 = b.off, ((x$1 < 0 || x$1 >= x.$length) ? ($throwRuntimeError("index out of range"), undefined) : x.$array[x.$offset + x$1]));
-		b.off = b.off + (1) >> 0;
-		b.lastRead = -1;
-		return [c, $ifaceNil];
-	};
-	Buffer.prototype.ReadByte = function() { return this.$val.ReadByte(); };
-	Buffer.ptr.prototype.ReadRune = function() {
-		var _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tuple, b, c, err, n, r, size, x, x$1;
-		r = 0;
-		size = 0;
-		err = $ifaceNil;
-		b = this;
-		if (b.empty()) {
-			b.Reset();
-			_tmp = 0;
-			_tmp$1 = 0;
-			_tmp$2 = io.EOF;
-			r = _tmp;
-			size = _tmp$1;
-			err = _tmp$2;
-			return [r, size, err];
-		}
-		c = (x = b.buf, x$1 = b.off, ((x$1 < 0 || x$1 >= x.$length) ? ($throwRuntimeError("index out of range"), undefined) : x.$array[x.$offset + x$1]));
-		if (c < 128) {
-			b.off = b.off + (1) >> 0;
-			b.lastRead = 1;
-			_tmp$3 = ((c >> 0));
-			_tmp$4 = 1;
-			_tmp$5 = $ifaceNil;
-			r = _tmp$3;
-			size = _tmp$4;
-			err = _tmp$5;
-			return [r, size, err];
-		}
-		_tuple = utf8.DecodeRune($subslice(b.buf, b.off));
-		r = _tuple[0];
-		n = _tuple[1];
-		b.off = b.off + (n) >> 0;
-		b.lastRead = ((n << 24 >> 24));
-		_tmp$6 = r;
-		_tmp$7 = n;
-		_tmp$8 = $ifaceNil;
-		r = _tmp$6;
-		size = _tmp$7;
-		err = _tmp$8;
-		return [r, size, err];
-	};
-	Buffer.prototype.ReadRune = function() { return this.$val.ReadRune(); };
-	Buffer.ptr.prototype.UnreadRune = function() {
-		var b;
-		b = this;
-		if (b.lastRead <= 0) {
-			return errors.New("bytes.Buffer: UnreadRune: previous operation was not a successful ReadRune");
-		}
-		if (b.off >= ((b.lastRead >> 0))) {
-			b.off = b.off - (((b.lastRead >> 0))) >> 0;
-		}
-		b.lastRead = 0;
-		return $ifaceNil;
-	};
-	Buffer.prototype.UnreadRune = function() { return this.$val.UnreadRune(); };
-	Buffer.ptr.prototype.UnreadByte = function() {
-		var b;
-		b = this;
-		if (b.lastRead === 0) {
-			return errors.New("bytes.Buffer: UnreadByte: previous operation was not a successful read");
-		}
-		b.lastRead = 0;
-		if (b.off > 0) {
-			b.off = b.off - (1) >> 0;
-		}
-		return $ifaceNil;
-	};
-	Buffer.prototype.UnreadByte = function() { return this.$val.UnreadByte(); };
-	Buffer.ptr.prototype.ReadBytes = function(delim) {
-		var _tmp, _tmp$1, _tuple, b, delim, err, line, slice;
-		line = sliceType.nil;
-		err = $ifaceNil;
-		b = this;
-		_tuple = b.readSlice(delim);
-		slice = _tuple[0];
-		err = _tuple[1];
-		line = $appendSlice(line, slice);
-		_tmp = line;
-		_tmp$1 = err;
-		line = _tmp;
-		err = _tmp$1;
-		return [line, err];
-	};
-	Buffer.prototype.ReadBytes = function(delim) { return this.$val.ReadBytes(delim); };
-	Buffer.ptr.prototype.readSlice = function(delim) {
-		var _tmp, _tmp$1, b, delim, end, err, i, line;
-		line = sliceType.nil;
-		err = $ifaceNil;
-		b = this;
-		i = IndexByte($subslice(b.buf, b.off), delim);
-		end = (b.off + i >> 0) + 1 >> 0;
-		if (i < 0) {
-			end = b.buf.$length;
-			err = io.EOF;
-		}
-		line = $subslice(b.buf, b.off, end);
-		b.off = end;
-		b.lastRead = -1;
-		_tmp = line;
-		_tmp$1 = err;
-		line = _tmp;
-		err = _tmp$1;
-		return [line, err];
-	};
-	Buffer.prototype.readSlice = function(delim) { return this.$val.readSlice(delim); };
-	Buffer.ptr.prototype.ReadString = function(delim) {
-		var _tmp, _tmp$1, _tuple, b, delim, err, line, slice;
-		line = "";
-		err = $ifaceNil;
-		b = this;
-		_tuple = b.readSlice(delim);
-		slice = _tuple[0];
-		err = _tuple[1];
-		_tmp = ($bytesToString(slice));
-		_tmp$1 = err;
-		line = _tmp;
-		err = _tmp$1;
-		return [line, err];
-	};
-	Buffer.prototype.ReadString = function(delim) { return this.$val.ReadString(delim); };
-	explode = function(s, n) {
-		var _tuple, a, n, na, s, size;
-		if (n <= 0) {
-			n = s.$length;
-		}
-		a = $makeSlice(sliceType$1, n);
-		size = 0;
-		na = 0;
-		while (true) {
-			if (!(s.$length > 0)) { break; }
-			if ((na + 1 >> 0) >= n) {
-				((na < 0 || na >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + na] = s);
-				na = na + (1) >> 0;
-				break;
-			}
-			_tuple = utf8.DecodeRune(s);
-			size = _tuple[1];
-			((na < 0 || na >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + na] = $subslice(s, 0, size, size));
-			s = $subslice(s, size);
-			na = na + (1) >> 0;
-		}
-		return $subslice(a, 0, na);
-	};
-	countGeneric = function(s, sep) {
-		var i, n, s, sep;
-		if (sep.$length === 0) {
-			return utf8.RuneCount(s) + 1 >> 0;
-		}
-		n = 0;
-		while (true) {
-			i = Index(s, sep);
-			if (i === -1) {
-				return n;
-			}
-			n = n + (1) >> 0;
-			s = $subslice(s, (i + sep.$length >> 0));
-		}
-	};
-	genSplit = function(s, sep, sepSave, n) {
-		var a, i, m, n, s, sep, sepSave;
-		if (n === 0) {
-			return sliceType$1.nil;
-		}
-		if (sep.$length === 0) {
-			return explode(s, n);
-		}
-		if (n < 0) {
-			n = Count(s, sep) + 1 >> 0;
-		}
-		a = $makeSlice(sliceType$1, n);
-		n = n - (1) >> 0;
-		i = 0;
-		while (true) {
-			if (!(i < n)) { break; }
-			m = Index(s, sep);
-			if (m < 0) {
-				break;
-			}
-			((i < 0 || i >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + i] = $subslice(s, 0, (m + sepSave >> 0), (m + sepSave >> 0)));
-			s = $subslice(s, (m + sep.$length >> 0));
-			i = i + (1) >> 0;
-		}
-		((i < 0 || i >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + i] = s);
-		return $subslice(a, 0, (i + 1 >> 0));
-	};
-	SplitN = function(s, sep, n) {
-		var n, s, sep;
-		return genSplit(s, sep, 0, n);
-	};
-	$pkg.SplitN = SplitN;
-	indexRabinKarp = function(s, sep) {
-		var _tuple, h, hashsep, i, i$1, n, pow, s, sep, x;
-		_tuple = hashStr(sep);
-		hashsep = _tuple[0];
-		pow = _tuple[1];
-		n = sep.$length;
-		h = 0;
-		i = 0;
-		while (true) {
-			if (!(i < n)) { break; }
-			h = ($imul(h, 16777619) >>> 0) + ((((i < 0 || i >= s.$length) ? ($throwRuntimeError("index out of range"), undefined) : s.$array[s.$offset + i]) >>> 0)) >>> 0;
-			i = i + (1) >> 0;
-		}
-		if ((h === hashsep) && Equal($subslice(s, 0, n), sep)) {
-			return 0;
-		}
-		i$1 = n;
-		while (true) {
-			if (!(i$1 < s.$length)) { break; }
-			h = $imul(h, (16777619)) >>> 0;
-			h = h + (((((i$1 < 0 || i$1 >= s.$length) ? ($throwRuntimeError("index out of range"), undefined) : s.$array[s.$offset + i$1]) >>> 0))) >>> 0;
-			h = h - (($imul(pow, (((x = i$1 - n >> 0, ((x < 0 || x >= s.$length) ? ($throwRuntimeError("index out of range"), undefined) : s.$array[s.$offset + x])) >>> 0))) >>> 0)) >>> 0;
-			i$1 = i$1 + (1) >> 0;
-			if ((h === hashsep) && Equal($subslice(s, (i$1 - n >> 0), i$1), sep)) {
-				return i$1 - n >> 0;
-			}
-		}
-		return -1;
-	};
-	hashStr = function(sep) {
-		var _tmp, _tmp$1, hash, i, i$1, pow, sep, sq;
-		hash = 0;
-		i = 0;
-		while (true) {
-			if (!(i < sep.$length)) { break; }
-			hash = ($imul(hash, 16777619) >>> 0) + ((((i < 0 || i >= sep.$length) ? ($throwRuntimeError("index out of range"), undefined) : sep.$array[sep.$offset + i]) >>> 0)) >>> 0;
-			i = i + (1) >> 0;
-		}
-		_tmp = 1;
-		_tmp$1 = 16777619;
-		pow = _tmp;
-		sq = _tmp$1;
-		i$1 = sep.$length;
-		while (true) {
-			if (!(i$1 > 0)) { break; }
-			if (!(((i$1 & 1) === 0))) {
-				pow = $imul(pow, (sq)) >>> 0;
-			}
-			sq = $imul(sq, (sq)) >>> 0;
-			i$1 = (i$1 >> $min((1), 31)) >> 0;
-		}
-		return [hash, pow];
-	};
-	Index = function(s, sep) {
-		var c, fails, i, j, n, o, s, sep, t;
-		n = sep.$length;
-		if ((n === 0)) {
-			return 0;
-		} else if ((n === 1)) {
-			return IndexByte(s, (0 >= sep.$length ? ($throwRuntimeError("index out of range"), undefined) : sep.$array[sep.$offset + 0]));
-		} else if ((n === s.$length)) {
-			if (Equal(sep, s)) {
-				return 0;
-			}
-			return -1;
-		} else if (n > s.$length) {
-			return -1;
-		}
-		c = (0 >= sep.$length ? ($throwRuntimeError("index out of range"), undefined) : sep.$array[sep.$offset + 0]);
-		i = 0;
-		fails = 0;
-		t = $subslice(s, 0, ((s.$length - n >> 0) + 1 >> 0));
-		while (true) {
-			if (!(i < t.$length)) { break; }
-			if (!((((i < 0 || i >= t.$length) ? ($throwRuntimeError("index out of range"), undefined) : t.$array[t.$offset + i]) === c))) {
-				o = IndexByte($subslice(t, i), c);
-				if (o < 0) {
-					break;
-				}
-				i = i + (o) >> 0;
-			}
-			if (Equal($subslice(s, i, (i + n >> 0)), sep)) {
-				return i;
-			}
-			i = i + (1) >> 0;
-			fails = fails + (1) >> 0;
-			if (fails >= (4 + (i >> 4 >> 0) >> 0) && i < t.$length) {
-				j = indexRabinKarp($subslice(s, i), sep);
-				if (j < 0) {
-					return -1;
-				}
-				return i + j >> 0;
-			}
-		}
-		return -1;
-	};
-	$pkg.Index = Index;
-	Count = function(s, sep) {
-		var s, sep;
-		return countGeneric(s, sep);
-	};
-	$pkg.Count = Count;
-	ptrType.methods = [{prop: "Bytes", name: "Bytes", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}, {prop: "empty", name: "empty", pkg: "bytes", typ: $funcType([], [$Bool], false)}, {prop: "Len", name: "Len", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Cap", name: "Cap", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Truncate", name: "Truncate", pkg: "", typ: $funcType([$Int], [], false)}, {prop: "Reset", name: "Reset", pkg: "", typ: $funcType([], [], false)}, {prop: "tryGrowByReslice", name: "tryGrowByReslice", pkg: "bytes", typ: $funcType([$Int], [$Int, $Bool], false)}, {prop: "grow", name: "grow", pkg: "bytes", typ: $funcType([$Int], [$Int], false)}, {prop: "Grow", name: "Grow", pkg: "", typ: $funcType([$Int], [], false)}, {prop: "Write", name: "Write", pkg: "", typ: $funcType([sliceType], [$Int, $error], false)}, {prop: "WriteString", name: "WriteString", pkg: "", typ: $funcType([$String], [$Int, $error], false)}, {prop: "ReadFrom", name: "ReadFrom", pkg: "", typ: $funcType([io.Reader], [$Int64, $error], false)}, {prop: "WriteTo", name: "WriteTo", pkg: "", typ: $funcType([io.Writer], [$Int64, $error], false)}, {prop: "WriteByte", name: "WriteByte", pkg: "", typ: $funcType([$Uint8], [$error], false)}, {prop: "WriteRune", name: "WriteRune", pkg: "", typ: $funcType([$Int32], [$Int, $error], false)}, {prop: "Read", name: "Read", pkg: "", typ: $funcType([sliceType], [$Int, $error], false)}, {prop: "Next", name: "Next", pkg: "", typ: $funcType([$Int], [sliceType], false)}, {prop: "ReadByte", name: "ReadByte", pkg: "", typ: $funcType([], [$Uint8, $error], false)}, {prop: "ReadRune", name: "ReadRune", pkg: "", typ: $funcType([], [$Int32, $Int, $error], false)}, {prop: "UnreadRune", name: "UnreadRune", pkg: "", typ: $funcType([], [$error], false)}, {prop: "UnreadByte", name: "UnreadByte", pkg: "", typ: $funcType([], [$error], false)}, {prop: "ReadBytes", name: "ReadBytes", pkg: "", typ: $funcType([$Uint8], [sliceType, $error], false)}, {prop: "readSlice", name: "readSlice", pkg: "bytes", typ: $funcType([$Uint8], [sliceType, $error], false)}, {prop: "ReadString", name: "ReadString", pkg: "", typ: $funcType([$Uint8], [$String, $error], false)}];
-	Buffer.init("bytes", [{prop: "buf", name: "buf", anonymous: false, exported: false, typ: sliceType, tag: ""}, {prop: "off", name: "off", anonymous: false, exported: false, typ: $Int, tag: ""}, {prop: "bootstrap", name: "bootstrap", anonymous: false, exported: false, typ: arrayType, tag: ""}, {prop: "lastRead", name: "lastRead", anonymous: false, exported: false, typ: readOp, tag: ""}]);
-	$init = function() {
-		$pkg.$init = function() {};
-		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = errors.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = io.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = unicode.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = utf8.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$pkg.ErrTooLarge = errors.New("bytes.Buffer: too large");
-		errNegativeRead = errors.New("bytes.Buffer: reader returned negative count from Read");
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
@@ -30156,382 +31110,6 @@ $packages["encoding/base64"] = (function() {
 		$pkg.URLEncoding = NewEncoding("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_");
 		$pkg.RawStdEncoding = $clone($pkg.StdEncoding, Encoding).WithPadding(-1);
 		$pkg.RawURLEncoding = $clone($pkg.URLEncoding, Encoding).WithPadding(-1);
-		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.$init = $init;
-	return $pkg;
-})();
-$packages["sort"] = (function() {
-	var $pkg = {}, $init, reflect, IntSlice, sliceType, Search, SearchInts, insertionSort, siftDown, heapSort, medianOfThree, doPivot, quickSort, Sort, maxDepth, Ints;
-	reflect = $packages["reflect"];
-	IntSlice = $pkg.IntSlice = $newType(12, $kindSlice, "sort.IntSlice", true, "sort", true, null);
-	sliceType = $sliceType($Int);
-	Search = function(n, f) {
-		var _r, _tmp, _tmp$1, f, h, i, j, n, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; f = $f.f; h = $f.h; i = $f.i; j = $f.j; n = $f.n; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		_tmp = 0;
-		_tmp$1 = n;
-		i = _tmp;
-		j = _tmp$1;
-		/* while (true) { */ case 1:
-			/* if (!(i < j)) { break; } */ if(!(i < j)) { $s = 2; continue; }
-			h = ((((((i + j >> 0) >>> 0)) >>> 1 >>> 0) >> 0));
-			_r = f(h); /* */ $s = 6; case 6: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			/* */ if (!_r) { $s = 3; continue; }
-			/* */ $s = 4; continue;
-			/* if (!_r) { */ case 3:
-				i = h + 1 >> 0;
-				$s = 5; continue;
-			/* } else { */ case 4:
-				j = h;
-			/* } */ case 5:
-		/* } */ $s = 1; continue; case 2:
-		$s = -1; return i;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: Search }; } $f._r = _r; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f.f = f; $f.h = h; $f.i = i; $f.j = j; $f.n = n; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.Search = Search;
-	SearchInts = function(a, x) {
-		var _r, a, x, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; a = $f.a; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		a = [a];
-		x = [x];
-		_r = Search(a[0].$length, (function(a, x) { return function(i) {
-			var i;
-			return ((i < 0 || i >= a[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : a[0].$array[a[0].$offset + i]) >= x[0];
-		}; })(a, x)); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-		$s = -1; return _r;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: SearchInts }; } $f._r = _r; $f.a = a; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.SearchInts = SearchInts;
-	IntSlice.prototype.Search = function(x) {
-		var _r, p, x, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; p = $f.p; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		p = this;
-		_r = SearchInts($subslice(new sliceType(p.$array), p.$offset, p.$offset + p.$length), x); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-		$s = -1; return _r;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: IntSlice.prototype.Search }; } $f._r = _r; $f.p = p; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$ptrType(IntSlice).prototype.Search = function(x) { return this.$get().Search(x); };
-	insertionSort = function(data, a, b) {
-		var _r, _v, a, b, data, i, j, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _v = $f._v; a = $f.a; b = $f.b; data = $f.data; i = $f.i; j = $f.j; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		i = a + 1 >> 0;
-		/* while (true) { */ case 1:
-			/* if (!(i < b)) { break; } */ if(!(i < b)) { $s = 2; continue; }
-			j = i;
-			/* while (true) { */ case 3:
-				if (!(j > a)) { _v = false; $s = 5; continue s; }
-				_r = data.Less(j, j - 1 >> 0); /* */ $s = 6; case 6: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-				_v = _r; case 5:
-				/* if (!(_v)) { break; } */ if(!(_v)) { $s = 4; continue; }
-				$r = data.Swap(j, j - 1 >> 0); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-				j = j - (1) >> 0;
-			/* } */ $s = 3; continue; case 4:
-			i = i + (1) >> 0;
-		/* } */ $s = 1; continue; case 2:
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: insertionSort }; } $f._r = _r; $f._v = _v; $f.a = a; $f.b = b; $f.data = data; $f.i = i; $f.j = j; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	siftDown = function(data, lo, hi, first) {
-		var _r, _r$1, _v, child, data, first, hi, lo, root, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _v = $f._v; child = $f.child; data = $f.data; first = $f.first; hi = $f.hi; lo = $f.lo; root = $f.root; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		root = lo;
-		/* while (true) { */ case 1:
-			child = ($imul(2, root)) + 1 >> 0;
-			if (child >= hi) {
-				/* break; */ $s = 2; continue;
-			}
-			if (!((child + 1 >> 0) < hi)) { _v = false; $s = 5; continue s; }
-			_r = data.Less(first + child >> 0, (first + child >> 0) + 1 >> 0); /* */ $s = 6; case 6: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			_v = _r; case 5:
-			/* */ if (_v) { $s = 3; continue; }
-			/* */ $s = 4; continue;
-			/* if (_v) { */ case 3:
-				child = child + (1) >> 0;
-			/* } */ case 4:
-			_r$1 = data.Less(first + root >> 0, first + child >> 0); /* */ $s = 9; case 9: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-			/* */ if (!_r$1) { $s = 7; continue; }
-			/* */ $s = 8; continue;
-			/* if (!_r$1) { */ case 7:
-				$s = -1; return;
-			/* } */ case 8:
-			$r = data.Swap(first + root >> 0, first + child >> 0); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			root = child;
-		/* } */ $s = 1; continue; case 2:
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: siftDown }; } $f._r = _r; $f._r$1 = _r$1; $f._v = _v; $f.child = child; $f.data = data; $f.first = first; $f.hi = hi; $f.lo = lo; $f.root = root; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	heapSort = function(data, a, b) {
-		var _q, a, b, data, first, hi, i, i$1, lo, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _q = $f._q; a = $f.a; b = $f.b; data = $f.data; first = $f.first; hi = $f.hi; i = $f.i; i$1 = $f.i$1; lo = $f.lo; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		first = a;
-		lo = 0;
-		hi = b - a >> 0;
-		i = (_q = ((hi - 1 >> 0)) / 2, (_q === _q && _q !== 1/0 && _q !== -1/0) ? _q >> 0 : $throwRuntimeError("integer divide by zero"));
-		/* while (true) { */ case 1:
-			/* if (!(i >= 0)) { break; } */ if(!(i >= 0)) { $s = 2; continue; }
-			$r = siftDown(data, i, hi, first); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			i = i - (1) >> 0;
-		/* } */ $s = 1; continue; case 2:
-		i$1 = hi - 1 >> 0;
-		/* while (true) { */ case 4:
-			/* if (!(i$1 >= 0)) { break; } */ if(!(i$1 >= 0)) { $s = 5; continue; }
-			$r = data.Swap(first, first + i$1 >> 0); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			$r = siftDown(data, lo, i$1, first); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			i$1 = i$1 - (1) >> 0;
-		/* } */ $s = 4; continue; case 5:
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: heapSort }; } $f._q = _q; $f.a = a; $f.b = b; $f.data = data; $f.first = first; $f.hi = hi; $f.i = i; $f.i$1 = i$1; $f.lo = lo; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	medianOfThree = function(data, m1, m0, m2) {
-		var _r, _r$1, _r$2, data, m0, m1, m2, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; data = $f.data; m0 = $f.m0; m1 = $f.m1; m2 = $f.m2; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		_r = data.Less(m1, m0); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-		/* */ if (_r) { $s = 1; continue; }
-		/* */ $s = 2; continue;
-		/* if (_r) { */ case 1:
-			$r = data.Swap(m1, m0); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		/* } */ case 2:
-		_r$1 = data.Less(m2, m1); /* */ $s = 7; case 7: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-		/* */ if (_r$1) { $s = 5; continue; }
-		/* */ $s = 6; continue;
-		/* if (_r$1) { */ case 5:
-			$r = data.Swap(m2, m1); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			_r$2 = data.Less(m1, m0); /* */ $s = 11; case 11: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-			/* */ if (_r$2) { $s = 9; continue; }
-			/* */ $s = 10; continue;
-			/* if (_r$2) { */ case 9:
-				$r = data.Swap(m1, m0); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			/* } */ case 10:
-		/* } */ case 6:
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: medianOfThree }; } $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f.data = data; $f.m0 = m0; $f.m1 = m1; $f.m2 = m2; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	doPivot = function(data, lo, hi) {
-		var _q, _q$1, _r, _r$1, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _tmp, _tmp$1, _tmp$2, _tmp$3, _v, _v$1, _v$2, _v$3, _v$4, a, b, c, data, dups, hi, lo, m, midhi, midlo, pivot, protect, s, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _q = $f._q; _q$1 = $f._q$1; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _v = $f._v; _v$1 = $f._v$1; _v$2 = $f._v$2; _v$3 = $f._v$3; _v$4 = $f._v$4; a = $f.a; b = $f.b; c = $f.c; data = $f.data; dups = $f.dups; hi = $f.hi; lo = $f.lo; m = $f.m; midhi = $f.midhi; midlo = $f.midlo; pivot = $f.pivot; protect = $f.protect; s = $f.s; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		midlo = 0;
-		midhi = 0;
-		m = ((((((lo + hi >> 0) >>> 0)) >>> 1 >>> 0) >> 0));
-		/* */ if ((hi - lo >> 0) > 40) { $s = 1; continue; }
-		/* */ $s = 2; continue;
-		/* if ((hi - lo >> 0) > 40) { */ case 1:
-			s = (_q = ((hi - lo >> 0)) / 8, (_q === _q && _q !== 1/0 && _q !== -1/0) ? _q >> 0 : $throwRuntimeError("integer divide by zero"));
-			$r = medianOfThree(data, lo, lo + s >> 0, lo + ($imul(2, s)) >> 0); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			$r = medianOfThree(data, m, m - s >> 0, m + s >> 0); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			$r = medianOfThree(data, hi - 1 >> 0, (hi - 1 >> 0) - s >> 0, (hi - 1 >> 0) - ($imul(2, s)) >> 0); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		/* } */ case 2:
-		$r = medianOfThree(data, lo, m, hi - 1 >> 0); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		pivot = lo;
-		_tmp = lo + 1 >> 0;
-		_tmp$1 = hi - 1 >> 0;
-		a = _tmp;
-		c = _tmp$1;
-		/* while (true) { */ case 7:
-			if (!(a < c)) { _v = false; $s = 9; continue s; }
-			_r = data.Less(a, pivot); /* */ $s = 10; case 10: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			_v = _r; case 9:
-			/* if (!(_v)) { break; } */ if(!(_v)) { $s = 8; continue; }
-			a = a + (1) >> 0;
-		/* } */ $s = 7; continue; case 8:
-		b = a;
-		/* while (true) { */ case 11:
-			/* while (true) { */ case 13:
-				if (!(b < c)) { _v$1 = false; $s = 15; continue s; }
-				_r$1 = data.Less(pivot, b); /* */ $s = 16; case 16: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-				_v$1 = !_r$1; case 15:
-				/* if (!(_v$1)) { break; } */ if(!(_v$1)) { $s = 14; continue; }
-				b = b + (1) >> 0;
-			/* } */ $s = 13; continue; case 14:
-			/* while (true) { */ case 17:
-				if (!(b < c)) { _v$2 = false; $s = 19; continue s; }
-				_r$2 = data.Less(pivot, c - 1 >> 0); /* */ $s = 20; case 20: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-				_v$2 = _r$2; case 19:
-				/* if (!(_v$2)) { break; } */ if(!(_v$2)) { $s = 18; continue; }
-				c = c - (1) >> 0;
-			/* } */ $s = 17; continue; case 18:
-			if (b >= c) {
-				/* break; */ $s = 12; continue;
-			}
-			$r = data.Swap(b, c - 1 >> 0); /* */ $s = 21; case 21: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			b = b + (1) >> 0;
-			c = c - (1) >> 0;
-		/* } */ $s = 11; continue; case 12:
-		protect = (hi - c >> 0) < 5;
-		/* */ if (!protect && (hi - c >> 0) < (_q$1 = ((hi - lo >> 0)) / 4, (_q$1 === _q$1 && _q$1 !== 1/0 && _q$1 !== -1/0) ? _q$1 >> 0 : $throwRuntimeError("integer divide by zero"))) { $s = 22; continue; }
-		/* */ $s = 23; continue;
-		/* if (!protect && (hi - c >> 0) < (_q$1 = ((hi - lo >> 0)) / 4, (_q$1 === _q$1 && _q$1 !== 1/0 && _q$1 !== -1/0) ? _q$1 >> 0 : $throwRuntimeError("integer divide by zero"))) { */ case 22:
-			dups = 0;
-			_r$3 = data.Less(pivot, hi - 1 >> 0); /* */ $s = 26; case 26: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-			/* */ if (!_r$3) { $s = 24; continue; }
-			/* */ $s = 25; continue;
-			/* if (!_r$3) { */ case 24:
-				$r = data.Swap(c, hi - 1 >> 0); /* */ $s = 27; case 27: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-				c = c + (1) >> 0;
-				dups = dups + (1) >> 0;
-			/* } */ case 25:
-			_r$4 = data.Less(b - 1 >> 0, pivot); /* */ $s = 30; case 30: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
-			/* */ if (!_r$4) { $s = 28; continue; }
-			/* */ $s = 29; continue;
-			/* if (!_r$4) { */ case 28:
-				b = b - (1) >> 0;
-				dups = dups + (1) >> 0;
-			/* } */ case 29:
-			_r$5 = data.Less(m, pivot); /* */ $s = 33; case 33: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
-			/* */ if (!_r$5) { $s = 31; continue; }
-			/* */ $s = 32; continue;
-			/* if (!_r$5) { */ case 31:
-				$r = data.Swap(m, b - 1 >> 0); /* */ $s = 34; case 34: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-				b = b - (1) >> 0;
-				dups = dups + (1) >> 0;
-			/* } */ case 32:
-			protect = dups > 1;
-		/* } */ case 23:
-		/* */ if (protect) { $s = 35; continue; }
-		/* */ $s = 36; continue;
-		/* if (protect) { */ case 35:
-			/* while (true) { */ case 37:
-				/* while (true) { */ case 39:
-					if (!(a < b)) { _v$3 = false; $s = 41; continue s; }
-					_r$6 = data.Less(b - 1 >> 0, pivot); /* */ $s = 42; case 42: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
-					_v$3 = !_r$6; case 41:
-					/* if (!(_v$3)) { break; } */ if(!(_v$3)) { $s = 40; continue; }
-					b = b - (1) >> 0;
-				/* } */ $s = 39; continue; case 40:
-				/* while (true) { */ case 43:
-					if (!(a < b)) { _v$4 = false; $s = 45; continue s; }
-					_r$7 = data.Less(a, pivot); /* */ $s = 46; case 46: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
-					_v$4 = _r$7; case 45:
-					/* if (!(_v$4)) { break; } */ if(!(_v$4)) { $s = 44; continue; }
-					a = a + (1) >> 0;
-				/* } */ $s = 43; continue; case 44:
-				if (a >= b) {
-					/* break; */ $s = 38; continue;
-				}
-				$r = data.Swap(a, b - 1 >> 0); /* */ $s = 47; case 47: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-				a = a + (1) >> 0;
-				b = b - (1) >> 0;
-			/* } */ $s = 37; continue; case 38:
-		/* } */ case 36:
-		$r = data.Swap(pivot, b - 1 >> 0); /* */ $s = 48; case 48: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_tmp$2 = b - 1 >> 0;
-		_tmp$3 = c;
-		midlo = _tmp$2;
-		midhi = _tmp$3;
-		$s = -1; return [midlo, midhi];
-		/* */ } return; } if ($f === undefined) { $f = { $blk: doPivot }; } $f._q = _q; $f._q$1 = _q$1; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._v = _v; $f._v$1 = _v$1; $f._v$2 = _v$2; $f._v$3 = _v$3; $f._v$4 = _v$4; $f.a = a; $f.b = b; $f.c = c; $f.data = data; $f.dups = dups; $f.hi = hi; $f.lo = lo; $f.m = m; $f.midhi = midhi; $f.midlo = midlo; $f.pivot = pivot; $f.protect = protect; $f.s = s; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	quickSort = function(data, a, b, maxDepth$1) {
-		var _r, _r$1, _tuple, a, b, data, i, maxDepth$1, mhi, mlo, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _tuple = $f._tuple; a = $f.a; b = $f.b; data = $f.data; i = $f.i; maxDepth$1 = $f.maxDepth$1; mhi = $f.mhi; mlo = $f.mlo; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		/* while (true) { */ case 1:
-			/* if (!((b - a >> 0) > 12)) { break; } */ if(!((b - a >> 0) > 12)) { $s = 2; continue; }
-			/* */ if (maxDepth$1 === 0) { $s = 3; continue; }
-			/* */ $s = 4; continue;
-			/* if (maxDepth$1 === 0) { */ case 3:
-				$r = heapSort(data, a, b); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-				$s = -1; return;
-			/* } */ case 4:
-			maxDepth$1 = maxDepth$1 - (1) >> 0;
-			_r = doPivot(data, a, b); /* */ $s = 6; case 6: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			_tuple = _r;
-			mlo = _tuple[0];
-			mhi = _tuple[1];
-			/* */ if ((mlo - a >> 0) < (b - mhi >> 0)) { $s = 7; continue; }
-			/* */ $s = 8; continue;
-			/* if ((mlo - a >> 0) < (b - mhi >> 0)) { */ case 7:
-				$r = quickSort(data, a, mlo, maxDepth$1); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-				a = mhi;
-				$s = 9; continue;
-			/* } else { */ case 8:
-				$r = quickSort(data, mhi, b, maxDepth$1); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-				b = mlo;
-			/* } */ case 9:
-		/* } */ $s = 1; continue; case 2:
-		/* */ if ((b - a >> 0) > 1) { $s = 12; continue; }
-		/* */ $s = 13; continue;
-		/* if ((b - a >> 0) > 1) { */ case 12:
-			i = a + 6 >> 0;
-			/* while (true) { */ case 14:
-				/* if (!(i < b)) { break; } */ if(!(i < b)) { $s = 15; continue; }
-				_r$1 = data.Less(i, i - 6 >> 0); /* */ $s = 18; case 18: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-				/* */ if (_r$1) { $s = 16; continue; }
-				/* */ $s = 17; continue;
-				/* if (_r$1) { */ case 16:
-					$r = data.Swap(i, i - 6 >> 0); /* */ $s = 19; case 19: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-				/* } */ case 17:
-				i = i + (1) >> 0;
-			/* } */ $s = 14; continue; case 15:
-			$r = insertionSort(data, a, b); /* */ $s = 20; case 20: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		/* } */ case 13:
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: quickSort }; } $f._r = _r; $f._r$1 = _r$1; $f._tuple = _tuple; $f.a = a; $f.b = b; $f.data = data; $f.i = i; $f.maxDepth$1 = maxDepth$1; $f.mhi = mhi; $f.mlo = mlo; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	Sort = function(data) {
-		var _r, data, n, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; data = $f.data; n = $f.n; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		_r = data.Len(); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-		n = _r;
-		$r = quickSort(data, 0, n, maxDepth(n)); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: Sort }; } $f._r = _r; $f.data = data; $f.n = n; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.Sort = Sort;
-	maxDepth = function(n) {
-		var depth, i, n;
-		depth = 0;
-		i = n;
-		while (true) {
-			if (!(i > 0)) { break; }
-			depth = depth + (1) >> 0;
-			i = (i >> $min((1), 31)) >> 0;
-		}
-		return $imul(depth, 2);
-	};
-	IntSlice.prototype.Len = function() {
-		var p;
-		p = this;
-		return p.$length;
-	};
-	$ptrType(IntSlice).prototype.Len = function() { return this.$get().Len(); };
-	IntSlice.prototype.Less = function(i, j) {
-		var i, j, p;
-		p = this;
-		return ((i < 0 || i >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + i]) < ((j < 0 || j >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + j]);
-	};
-	$ptrType(IntSlice).prototype.Less = function(i, j) { return this.$get().Less(i, j); };
-	IntSlice.prototype.Swap = function(i, j) {
-		var _tmp, _tmp$1, i, j, p;
-		p = this;
-		_tmp = ((j < 0 || j >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + j]);
-		_tmp$1 = ((i < 0 || i >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + i]);
-		((i < 0 || i >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + i] = _tmp);
-		((j < 0 || j >= p.$length) ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + j] = _tmp$1);
-	};
-	$ptrType(IntSlice).prototype.Swap = function(i, j) { return this.$get().Swap(i, j); };
-	IntSlice.prototype.Sort = function() {
-		var p, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; p = $f.p; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		p = this;
-		$r = Sort(p); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: IntSlice.prototype.Sort }; } $f.p = p; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$ptrType(IntSlice).prototype.Sort = function() { return this.$get().Sort(); };
-	Ints = function(a) {
-		var a, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; a = $f.a; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = Sort(($subslice(new IntSlice(a.$array), a.$offset, a.$offset + a.$length))); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: Ints }; } $f.a = a; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.Ints = Ints;
-	IntSlice.methods = [{prop: "Search", name: "Search", pkg: "", typ: $funcType([$Int], [$Int], false)}, {prop: "Len", name: "Len", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Less", name: "Less", pkg: "", typ: $funcType([$Int, $Int], [$Bool], false)}, {prop: "Swap", name: "Swap", pkg: "", typ: $funcType([$Int, $Int], [], false)}, {prop: "Sort", name: "Sort", pkg: "", typ: $funcType([], [], false)}];
-	IntSlice.init($Int);
-	$init = function() {
-		$pkg.$init = function() {};
-		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = reflect.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
@@ -51112,18 +51690,20 @@ $packages["honnef.co/go/js/dom"] = (function() {
 	return $pkg;
 })();
 $packages["."] = (function() {
-	var $pkg = {}, $init, P4wnP1_grpc, context, md5, hex, fmt, hvue, js, status, dom, strconv, strings, time, CodeMirrorOptionsType, CompCodeEditorData, CompEthernetAddressesData2, CompHIDScriptData, CompTabData, CompTabsData, CompToggleSwitchData, VGadgetSettings, VGadgetSettingsEthernet, VGadgetSettingsUMS, CompUSBSettingsData, ptrType, sliceType, sliceType$1, arrayType, sliceType$2, ptrType$1, ptrType$2, ptrType$3, structType, structType$1, sliceType$3, funcType, sliceType$4, sliceType$5, sliceType$6, sliceType$7, sliceType$8, ptrType$4, ptrType$5, ptrType$6, ptrType$7, ptrType$8, structType$2, ptrType$9, ptrType$10, ptrType$11, ptrType$12, document, serverAddr, _r, _r$1, O, Alert, StringToMD5, UploadHIDScript, RunHIDScript, NewCodeEditorData, initCodeMirror, InitCompCodeEditor, newCompEthernetAddressesData2, InitCompEthernetAddresses2, newCompHIDScriptData, InitCompHIDScript, NewCompTabData, InitCompTab, NewCompTabsData, initTabs, InitCompTabs, newCompToggleSwitchData, InitCompToggleSwitch, InitCompUSBSettings, newCompUSBSettingsData, GetBaseURL, main;
+	var $pkg = {}, $init, common, P4wnP1_grpc, context, md5, hex, errors, hvue, js, status, dom, io, strconv, sync, time, CodeMirrorOptionsType, CompCodeEditorData, CompEthernetAddressesData2, CompHIDScriptData, CompTabData, CompTabsData, CompToggleSwitchData, VGadgetSettings, VGadgetSettingsEthernet, VGadgetSettingsUMS, CompUSBSettingsData, Rpc, ptrType, sliceType, arrayType, sliceType$1, sliceType$2, ptrType$1, ptrType$2, ptrType$3, structType, structType$1, sliceType$3, funcType, sliceType$4, sliceType$5, sliceType$6, sliceType$7, sliceType$8, ptrType$4, ptrType$5, ptrType$6, ptrType$7, ptrType$8, structType$2, ptrType$9, ptrType$10, ptrType$11, ptrType$12, ptrType$13, ptrType$14, ptrType$15, ptrType$16, document, serverAddr, _r, _r$1, O, Alert, StringToMD5, UploadHIDScript, RunHIDScript, NewCodeEditorData, initCodeMirror, InitCompCodeEditor, newCompEthernetAddressesData2, InitCompEthernetAddresses2, newCompHIDScriptData, InitCompHIDScript, NewCompTabData, InitCompTab, NewCompTabsData, initTabs, InitCompTabs, newCompToggleSwitchData, InitCompToggleSwitch, InitCompUSBSettings, newCompUSBSettingsData, GetBaseURL, main, NewRpcClient;
+	common = $packages["../common"];
 	P4wnP1_grpc = $packages["../proto/gopherjs"];
 	context = $packages["context"];
 	md5 = $packages["crypto/md5"];
 	hex = $packages["encoding/hex"];
-	fmt = $packages["fmt"];
+	errors = $packages["errors"];
 	hvue = $packages["github.com/HuckRidgeSW/hvue"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	status = $packages["google.golang.org/grpc/status"];
 	dom = $packages["honnef.co/go/js/dom"];
+	io = $packages["io"];
 	strconv = $packages["strconv"];
-	strings = $packages["strings"];
+	sync = $packages["sync"];
 	time = $packages["time"];
 	CodeMirrorOptionsType = $pkg.CodeMirrorOptionsType = $newType(0, $kindStruct, "main.CodeMirrorOptionsType", true, ".", true, function(Object_, Mode_, LineNumbers_, LineWrapping_, AutoCloseBrackets_, ExtraKeys_) {
 		this.$val = this;
@@ -51285,10 +51865,26 @@ $packages["."] = (function() {
 		this.CdcEcmDetails = CdcEcmDetails_;
 		this.RndisDetails = RndisDetails_;
 	});
+	Rpc = $pkg.Rpc = $newType(0, $kindStruct, "main.Rpc", true, ".", true, function(Mutex_, Client_, eventListeningOn_, eventListeningCtx_, eventListeningCancel_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Mutex = ptrType$12.nil;
+			this.Client = $ifaceNil;
+			this.eventListeningOn = false;
+			this.eventListeningCtx = ptrType$11.nil;
+			this.eventListeningCancel = ptrType$10.nil;
+			return;
+		}
+		this.Mutex = Mutex_;
+		this.Client = Client_;
+		this.eventListeningOn = eventListeningOn_;
+		this.eventListeningCtx = eventListeningCtx_;
+		this.eventListeningCancel = eventListeningCancel_;
+	});
 	ptrType = $ptrType(P4wnP1_grpc.GadgetSettings);
-	sliceType = $sliceType($packages["github.com/johanbrandhorst/protobuf/grpcweb"].DialOption);
-	sliceType$1 = $sliceType($Uint8);
+	sliceType = $sliceType($Uint8);
 	arrayType = $arrayType($Uint8, 16);
+	sliceType$1 = $sliceType($packages["github.com/johanbrandhorst/protobuf/grpcweb"].DialOption);
 	sliceType$2 = $sliceType($packages["github.com/johanbrandhorst/protobuf/grpcweb"].CallOption);
 	ptrType$1 = $ptrType(P4wnP1_grpc.HIDScriptJob);
 	ptrType$2 = $ptrType(CodeMirrorOptionsType);
@@ -51309,9 +51905,13 @@ $packages["."] = (function() {
 	ptrType$8 = $ptrType(VGadgetSettings);
 	structType$2 = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "TestString", name: "TestString", anonymous: false, exported: true, typ: $String, tag: "js:\"testString\""}]);
 	ptrType$9 = $ptrType(hvue.VM);
-	ptrType$10 = $ptrType(CompHIDScriptData);
-	ptrType$11 = $ptrType(CompTabsData);
-	ptrType$12 = $ptrType(CompUSBSettingsData);
+	ptrType$10 = $ptrType(context.CancelFunc);
+	ptrType$11 = $ptrType(context.Context);
+	ptrType$12 = $ptrType(sync.Mutex);
+	ptrType$13 = $ptrType(CompHIDScriptData);
+	ptrType$14 = $ptrType(CompTabsData);
+	ptrType$15 = $ptrType(CompUSBSettingsData);
+	ptrType$16 = $ptrType(Rpc);
 	O = function() {
 		return new ($global.Object)();
 	};
@@ -51324,10 +51924,10 @@ $packages["."] = (function() {
 	StringToMD5 = function(input) {
 		var _r$2, dst, input, sum, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; dst = $f.dst; input = $f.input; sum = $f.sum; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		_r$2 = md5.Sum((new sliceType$1($stringToBytes(input)))); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$2 = md5.Sum((new sliceType($stringToBytes(input)))); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		sum = $clone(_r$2, arrayType);
-		dst = $makeSlice(sliceType$1, hex.EncodedLen(16));
-		hex.Encode(dst, new sliceType$1(sum));
+		dst = $makeSlice(sliceType, hex.EncodedLen(16));
+		hex.Encode(dst, new sliceType(sum));
 		$s = -1; return ($bytesToString(dst));
 		/* */ } return; } if ($f === undefined) { $f = { $blk: StringToMD5 }; } $f._r$2 = _r$2; $f.dst = dst; $f.input = input; $f.sum = sum; $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -51341,9 +51941,9 @@ $packages["."] = (function() {
 		ctx = _tuple[0];
 		cancel = _tuple[1];
 		$deferred.push([cancel, []]);
-		_r$3 = P4wnP1_grpc.NewP4WNP1Client(serverAddr, new sliceType([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		_r$3 = P4wnP1_grpc.NewP4WNP1Client(serverAddr, new sliceType$1([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
 		client = _r$3;
-		_r$4 = client.FSWriteFile(ctx, new P4wnP1_grpc.WriteFileRequest.ptr("/tmp/" + filename, false, false, (new sliceType$1($stringToBytes(content)))), new sliceType$2([])); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+		_r$4 = client.FSWriteFile(ctx, new P4wnP1_grpc.WriteFileRequest.ptr("/tmp/" + filename, false, false, (new sliceType($stringToBytes(content)))), new sliceType$2([])); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
 		_tuple$1 = _r$4;
 		err = _tuple$1[1];
 		err = err;
@@ -51361,7 +51961,7 @@ $packages["."] = (function() {
 		ctx = _tuple[0];
 		cancel = _tuple[1];
 		$deferred.push([cancel, []]);
-		_r$3 = P4wnP1_grpc.NewP4WNP1Client(serverAddr, new sliceType([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		_r$3 = P4wnP1_grpc.NewP4WNP1Client(serverAddr, new sliceType$1([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
 		client = _r$3;
 		_r$4 = client.HIDRunScriptJob(ctx, new P4wnP1_grpc.HIDScriptRequest.ptr("/tmp/" + filename, timeoutSeconds), new sliceType$2([])); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
 		_tuple$1 = _r$4;
@@ -51623,7 +52223,7 @@ $packages["."] = (function() {
 			ctx = _tuple[0];
 			cancel = _tuple[1];
 			$deferred.push([cancel, []]);
-			_r$3 = P4wnP1_grpc.NewP4WNP1Client(serverAddr, new sliceType([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+			_r$3 = P4wnP1_grpc.NewP4WNP1Client(serverAddr, new sliceType$1([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
 			_r$4 = _r$3.GetDeployedGadgetSetting(ctx, new P4wnP1_grpc.Empty.ptr(), new sliceType$2([])); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
 			_tuple$1 = _r$4;
 			deployedGs = _tuple$1[0];
@@ -51657,7 +52257,7 @@ $packages["."] = (function() {
 			ctx = _tuple[0];
 			cancel = _tuple[1];
 			$deferred.push([cancel, []]);
-			_r$3 = P4wnP1_grpc.NewP4WNP1Client(serverAddr, new sliceType([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+			_r$3 = P4wnP1_grpc.NewP4WNP1Client(serverAddr, new sliceType$1([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
 			client = _r$3;
 			_r$4 = client.SetGadgetSettings(ctx, gs, new sliceType$2([])); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
 			_tuple$1 = _r$4;
@@ -51729,43 +52329,33 @@ $packages["."] = (function() {
 	};
 	$pkg.GetBaseURL = GetBaseURL;
 	main = function() {
-		var _arg, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _tuple, _tuple$1, cancel, ctx, err, gs, vm, $s, $deferred, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; cancel = $f.cancel; ctx = $f.ctx; err = $f.err; gs = $f.gs; vm = $f.vm; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		var _r$2, _r$3, _r$4, err, vm, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; err = $f.err; vm = $f.vm; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		console.log(GetBaseURL());
-		_r$2 = document.BaseURI(); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-		_r$3 = strings.TrimSuffix(_r$2, "/"); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-		_arg = new $String(_r$3);
-		_r$4 = fmt.Printf("Address %v\n", new sliceType$3([_arg])); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
-		_r$4;
-		_r$5 = fmt.Printf("Client %v\n", new sliceType$3([$pkg.Client])); /* */ $s = 4; case 4: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
-		_r$5;
-		_r$6 = context.WithTimeout(context.Background(), new time.Duration(0, 1000000000)); /* */ $s = 5; case 5: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
-		_tuple = _r$6;
-		ctx = _tuple[0];
-		cancel = _tuple[1];
-		$deferred.push([cancel, []]);
-		_r$7 = $pkg.Client.GetDeployedGadgetSetting(ctx, new P4wnP1_grpc.Empty.ptr(), new sliceType$2([])); /* */ $s = 6; case 6: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
-		_tuple$1 = _r$7;
-		gs = _tuple$1[0];
-		err = _tuple$1[1];
-		/* */ if ($interfaceIsEqual(err, $ifaceNil)) { $s = 7; continue; }
-		/* */ $s = 8; continue;
-		/* if ($interfaceIsEqual(err, $ifaceNil)) { */ case 7:
-			$global.gs = $externalize(gs, ptrType);
-			$pkg.GS = gs;
-			$s = 9; continue;
-		/* } else { */ case 8:
-			_r$8 = fmt.Printf("Error rpc call: %v\n", new sliceType$3([err])); /* */ $s = 10; case 10: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
-			_r$8;
-		/* } */ case 9:
-		$r = InitCompEthernetAddresses2(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompToggleSwitch(); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompUSBSettings(); /* */ $s = 13; case 13: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompTab(); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompTabs(); /* */ $s = 15; case 15: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompCodeEditor(); /* */ $s = 16; case 16: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompHIDScript(); /* */ $s = 17; case 17: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_r$9 = hvue.NewVM(new sliceType$6([hvue.El("#app"), hvue.DataFunc((function(vm) {
+		console.log("Listening for RPC events ...");
+		_r$2 = $pkg.Client.StartListenEvents(new $Int64(0, 1)); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		err = _r$2;
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			console.log(err);
+		}
+		$r = time.Sleep(new time.Duration(1, 705032704)); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = $pkg.Client.StopEventListening(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		console.log("... done listening for RPC events");
+		$r = time.Sleep(new time.Duration(0, 1000000000)); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		console.log("Listening for RPC events ...");
+		_r$3 = $pkg.Client.StartListenEvents(new $Int64(0, 1)); /* */ $s = 5; case 5: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		err = _r$3;
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			console.log(err);
+		}
+		$r = InitCompEthernetAddresses2(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompToggleSwitch(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompUSBSettings(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompTab(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompTabs(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompCodeEditor(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompHIDScript(); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_r$4 = hvue.NewVM(new sliceType$6([hvue.El("#app"), hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$2.ptr(O(), "");
 			data.Object.testString = $externalize("type('hello');", $String);
@@ -51773,17 +52363,112 @@ $packages["."] = (function() {
 		})), hvue.Computed("console", (function(vm) {
 			var vm;
 			return new $jsObjectPtr($global.console);
-		}))])); /* */ $s = 18; case 18: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
-		vm = _r$9;
+		}))])); /* */ $s = 13; case 13: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+		vm = _r$4;
 		$global.vm = $externalize(vm, ptrType$9);
 		$s = -1; return;
-		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: main }; } $f._arg = _arg; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.cancel = cancel; $f.ctx = ctx; $f.err = err; $f.gs = gs; $f.vm = vm; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+		/* */ } return; } if ($f === undefined) { $f = { $blk: main }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f.err = err; $f.vm = vm; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	ptrType$10.methods = [{prop: "SendAndRun", name: "SendAndRun", pkg: "", typ: $funcType([ptrType$9], [], false)}];
-	ptrType$11.methods = [{prop: "UpdateSelectedTab", name: "UpdateSelectedTab", pkg: "", typ: $funcType([ptrType$9, $Int], [], false)}];
+	Rpc.ptr.prototype.StartListenEvents = function(evtType) {
+		var _r$2, _r$3, _tuple, _tuple$1, cancel, cancel$1, ctx, err, evStream, evtType, rpc, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; cancel = $f.cancel; cancel$1 = $f.cancel$1; ctx = $f.ctx; err = $f.err; evStream = $f.evStream; evtType = $f.evtType; rpc = $f.rpc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		cancel = [cancel];
+		ctx = [ctx];
+		evStream = [evStream];
+		rpc = [rpc];
+		err = $ifaceNil;
+		rpc[0] = this;
+		$r = rpc[0].Mutex.Lock(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* */ if (rpc[0].eventListeningOn) { $s = 2; continue; }
+		/* */ $s = 3; continue;
+		/* if (rpc[0].eventListeningOn) { */ case 2:
+			$r = rpc[0].Mutex.Unlock(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			err = errors.New("Already listening to events");
+			$s = -1; return err;
+		/* } */ case 3:
+		/* */ if (!(rpc[0].eventListeningCancel === ptrType$10.nil)) { $s = 5; continue; }
+		/* */ $s = 6; continue;
+		/* if (!(rpc[0].eventListeningCancel === ptrType$10.nil)) { */ case 5:
+			cancel$1 = rpc[0].eventListeningCancel.$get();
+			$r = cancel$1(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 6:
+		_r$2 = context.WithCancel(context.Background()); /* */ $s = 8; case 8: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_tuple = _r$2;
+		ctx[0] = _tuple[0];
+		cancel[0] = _tuple[1];
+		rpc[0].eventListeningCtx = (ctx.$ptr || (ctx.$ptr = new ptrType$11(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, ctx)));
+		rpc[0].eventListeningCancel = (cancel.$ptr || (cancel.$ptr = new ptrType$10(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, cancel)));
+		rpc[0].eventListeningOn = true;
+		$r = rpc[0].Mutex.Unlock(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_r$3 = rpc[0].Client.EventListen(ctx[0], new P4wnP1_grpc.EventRequest.ptr(evtType), new sliceType$2([])); /* */ $s = 10; case 10: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		_tuple$1 = _r$3;
+		evStream[0] = _tuple$1[0];
+		err = _tuple$1[1];
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			err = err;
+			$s = -1; return err;
+		}
+		$go((function(cancel, ctx, evStream, rpc) { return function $b() {
+			var _r$4, _tuple$2, err$1, event, $s, $deferred, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$4 = $f._r$4; _tuple$2 = $f._tuple$2; err$1 = $f.err$1; event = $f.event; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+			$deferred.push([$methodVal(rpc[0], "StopEventListening"), []]);
+			/* while (true) { */ case 1:
+				_r$4 = evStream[0].Recv(); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+				_tuple$2 = _r$4;
+				event = _tuple$2[0];
+				err$1 = _tuple$2[1];
+				if ($interfaceIsEqual(err$1, io.EOF)) {
+					/* break; */ $s = 2; continue;
+				}
+				if (!($interfaceIsEqual(err$1, $ifaceNil))) {
+					$s = -1; return;
+				}
+				console.log("Event: ", event);
+			/* } */ $s = 1; continue; case 2:
+			$s = -1; return;
+			/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: $b }; } $f._r$4 = _r$4; $f._tuple$2 = _tuple$2; $f.err$1 = err$1; $f.event = event; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+		}; })(cancel, ctx, evStream, rpc), []);
+		err = $ifaceNil;
+		$s = -1; return err;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Rpc.ptr.prototype.StartListenEvents }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.cancel = cancel; $f.cancel$1 = cancel$1; $f.ctx = ctx; $f.err = err; $f.evStream = evStream; $f.evtType = evtType; $f.rpc = rpc; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Rpc.prototype.StartListenEvents = function(evtType) { return this.$val.StartListenEvents(evtType); };
+	Rpc.ptr.prototype.StopEventListening = function() {
+		var rpc, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; rpc = $f.rpc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		rpc = this;
+		$r = rpc.Mutex.Lock(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* */ if (!(rpc.eventListeningCancel === ptrType$10.nil)) { $s = 2; continue; }
+		/* */ $s = 3; continue;
+		/* if (!(rpc.eventListeningCancel === ptrType$10.nil)) { */ case 2:
+			$r = rpc.eventListeningCancel.$get()(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 3:
+		rpc.eventListeningCancel = ptrType$10.nil;
+		rpc.eventListeningCtx = ptrType$11.nil;
+		rpc.eventListeningOn = false;
+		$r = rpc.Mutex.Unlock(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Rpc.ptr.prototype.StopEventListening }; } $f.rpc = rpc; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Rpc.prototype.StopEventListening = function() { return this.$val.StopEventListening(); };
+	NewRpcClient = function(addr) {
+		var _r$2, addr, cl, rcl, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; addr = $f.addr; cl = $f.cl; rcl = $f.rcl; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		rcl = new Rpc.ptr(ptrType$12.nil, $ifaceNil, false, ptrType$11.nil, ptrType$10.nil);
+		rcl.Mutex = new sync.Mutex.ptr(0, 0);
+		_r$2 = P4wnP1_grpc.NewP4WNP1Client(addr, new sliceType$1([])); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		cl = _r$2;
+		rcl.Client = cl;
+		$s = -1; return rcl;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: NewRpcClient }; } $f._r$2 = _r$2; $f.addr = addr; $f.cl = cl; $f.rcl = rcl; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.NewRpcClient = NewRpcClient;
+	ptrType$13.methods = [{prop: "SendAndRun", name: "SendAndRun", pkg: "", typ: $funcType([ptrType$9], [], false)}];
+	ptrType$14.methods = [{prop: "UpdateSelectedTab", name: "UpdateSelectedTab", pkg: "", typ: $funcType([ptrType$9, $Int], [], false)}];
 	VGadgetSettings.methods = [{prop: "toGS", name: "toGS", pkg: ".", typ: $funcType([], [ptrType], false)}];
 	ptrType$8.methods = [{prop: "fromGS", name: "fromGS", pkg: ".", typ: $funcType([ptrType], [], false)}];
-	ptrType$12.methods = [{prop: "UpdateToDeployedGadgetSettings", name: "UpdateToDeployedGadgetSettings", pkg: "", typ: $funcType([ptrType$9], [], false)}, {prop: "ApplyGadgetSettings", name: "ApplyGadgetSettings", pkg: "", typ: $funcType([ptrType$9], [], false)}];
+	ptrType$15.methods = [{prop: "UpdateToDeployedGadgetSettings", name: "UpdateToDeployedGadgetSettings", pkg: "", typ: $funcType([ptrType$9], [], false)}, {prop: "ApplyGadgetSettings", name: "ApplyGadgetSettings", pkg: "", typ: $funcType([ptrType$9], [], false)}];
+	ptrType$16.methods = [{prop: "StartListenEvents", name: "StartListenEvents", pkg: "", typ: $funcType([$Int64], [$error], false)}, {prop: "StopEventListening", name: "StopEventListening", pkg: "", typ: $funcType([], [], false)}];
 	CodeMirrorOptionsType.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Mode", name: "Mode", anonymous: false, exported: true, typ: $emptyInterface, tag: "js:\"mode\""}, {prop: "LineNumbers", name: "LineNumbers", anonymous: false, exported: true, typ: $Bool, tag: "js:\"lineNumbers\""}, {prop: "LineWrapping", name: "LineWrapping", anonymous: false, exported: true, typ: $Bool, tag: "js:\"lineWrapping\""}, {prop: "AutoCloseBrackets", name: "AutoCloseBrackets", anonymous: false, exported: true, typ: $Bool, tag: "js:\"autoCloseBrackets\""}, {prop: "ExtraKeys", name: "ExtraKeys", anonymous: false, exported: true, typ: $emptyInterface, tag: "js:\"extraKeys\""}]);
 	CompCodeEditorData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "ScriptContent", name: "ScriptContent", anonymous: false, exported: true, typ: $String, tag: "js:\"scriptContent\""}, {prop: "CodeMirrorOptions", name: "CodeMirrorOptions", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"codemirrorOptions\""}]);
 	CompEthernetAddressesData2.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}]);
@@ -51795,33 +52480,35 @@ $packages["."] = (function() {
 	VGadgetSettingsEthernet.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "HostAddr", name: "HostAddr", anonymous: false, exported: true, typ: $String, tag: "js:\"HostAddr\""}, {prop: "DevAddr", name: "DevAddr", anonymous: false, exported: true, typ: $String, tag: "js:\"DevAddr\""}]);
 	VGadgetSettingsUMS.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Cdrom", name: "Cdrom", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Cdrom\""}, {prop: "File", name: "File", anonymous: false, exported: true, typ: $String, tag: "js:\"File\""}]);
 	CompUSBSettingsData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "GadgetSettings", name: "GadgetSettings", anonymous: false, exported: true, typ: ptrType$8, tag: "js:\"gadgetSettings\""}, {prop: "DeployPending", name: "DeployPending", anonymous: false, exported: true, typ: $Bool, tag: "js:\"deployPending\""}, {prop: "CdcEcmDetails", name: "CdcEcmDetails", anonymous: false, exported: true, typ: $Bool, tag: "js:\"cdcEcmDetails\""}, {prop: "RndisDetails", name: "RndisDetails", anonymous: false, exported: true, typ: $Bool, tag: "js:\"rndisDetails\""}]);
+	Rpc.init(".", [{prop: "Mutex", name: "Mutex", anonymous: true, exported: true, typ: ptrType$12, tag: ""}, {prop: "Client", name: "Client", anonymous: false, exported: true, typ: P4wnP1_grpc.P4WNP1Client, tag: ""}, {prop: "eventListeningOn", name: "eventListeningOn", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "eventListeningCtx", name: "eventListeningCtx", anonymous: false, exported: false, typ: ptrType$11, tag: ""}, {prop: "eventListeningCancel", name: "eventListeningCancel", anonymous: false, exported: false, typ: ptrType$10, tag: ""}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = P4wnP1_grpc.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = context.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = md5.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hex.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = fmt.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.$init(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = js.$init(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = status.$init(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = dom.$init(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = strconv.$init(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = strings.$init(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = time.$init(); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$pkg.GS = ptrType.nil;
-		_r = dom.GetWindow().Document(); /* */ $s = 13; case 13: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$r = common.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = P4wnP1_grpc.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = context.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = md5.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hex.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = errors.$init(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.$init(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = js.$init(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = status.$init(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = dom.$init(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = io.$init(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = strconv.$init(); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = sync.$init(); /* */ $s = 13; case 13: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = time.$init(); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_r = dom.GetWindow().Document(); /* */ $s = 15; case 15: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		document = $assertType(_r, dom.HTMLDocument);
 		serverAddr = GetBaseURL();
-		_r$1 = P4wnP1_grpc.NewP4WNP1Client(serverAddr + ":80", new sliceType([])); /* */ $s = 14; case 14: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-		$pkg.Client = _r$1;
-		/* */ if ($pkg === $mainPkg) { $s = 15; continue; }
-		/* */ $s = 16; continue;
-		/* if ($pkg === $mainPkg) { */ case 15:
-			$r = main(); /* */ $s = 17; case 17: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_r$1 = NewRpcClient(serverAddr + ":80"); /* */ $s = 16; case 16: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		$pkg.Client = $clone(_r$1, Rpc);
+		/* */ if ($pkg === $mainPkg) { $s = 17; continue; }
+		/* */ $s = 18; continue;
+		/* if ($pkg === $mainPkg) { */ case 17:
+			$r = main(); /* */ $s = 19; case 19: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$mainFinished = true;
-		/* } */ case 16:
+		/* } */ case 18:
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;

@@ -1,23 +1,18 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"strings"
-	"time"
-
 	pb "../proto/gopherjs"
 	"honnef.co/go/js/dom"
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/HuckRidgeSW/hvue"
+	"time"
+	"../common"
 )
 
 var (
 	document   = dom.GetWindow().Document().(dom.HTMLDocument)
 	serverAddr = GetBaseURL()
-	Client     = pb.NewP4WNP1Client(
-		serverAddr + ":80",
-	)
+	Client     = NewRpcClient(serverAddr + ":80")
 	GS *pb.GadgetSettings
 )
 
@@ -39,9 +34,25 @@ type appController struct {
 func main() {
 	println(GetBaseURL())
 
+	println("Listening for RPC events ...")
+	err := Client.StartListenEvents(common.EVT_ANY)
+	if err != nil {println(err)}
 
+	time.Sleep(time.Second * 5)
+
+	Client.StopEventListening()
+	println("... done listening for RPC events")
+
+	time.Sleep(time.Second)
+	println("Listening for RPC events ...")
+	err = Client.StartListenEvents(common.EVT_LOG)
+	if err != nil {println(err)}
+
+
+	/*
 	fmt.Printf("Address %v\n", strings.TrimSuffix(document.BaseURI(), "/"))
 	fmt.Printf("Client %v\n", Client)
+
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -54,6 +65,7 @@ func main() {
 	} else {
 		fmt.Printf("Error rpc call: %v\n", err)
 	}
+	*/
 
 	InitCompEthernetAddresses2()
 	InitCompToggleSwitch()

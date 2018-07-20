@@ -3,6 +3,7 @@ syntax = "proto3";
 package P4wnP1_grpc;
 
 service P4WNP1 {
+	//USB gadget
 	rpc GetDeployedGadgetSetting (Empty) returns (GadgetSettings) {}
 	rpc DeployGadgetSetting (Empty) returns (GadgetSettings) {}
 	rpc GetGadgetSettings (Empty) returns (GadgetSettings) {}
@@ -11,10 +12,13 @@ service P4WNP1 {
 	rpc SetLEDSettings (LEDSettings) returns (Empty) {}
 	rpc MountUMSFile (GadgetSettingsUMS) returns (Empty) {}
 
+	//Ethernet
 	rpc DeployEthernetInterfaceSettings(EthernetInterfaceSettings) returns (Empty) {}
 
+	// WiFi
 	rpc DeployWifiSettings(WiFiSettings) returns (Empty) {}
 
+	//HIDScript / job management
 	rpc HIDRunScript(HIDScriptRequest) returns (HIDScriptResult) {}
 	rpc HIDRunScriptJob(HIDScriptRequest) returns (HIDScriptJob) {}
 	rpc HIDGetScriptJobResult(HIDScriptJob) returns (HIDScriptResult) {}
@@ -22,10 +26,32 @@ service P4WNP1 {
 	rpc HIDGetRunningScriptJobs(Empty) returns (HIDScriptJobList) {}
 	rpc HIDCancelAllScriptJobs(Empty) returns (Empty) {}
 
+	//FileSystem
 	rpc FSWriteFile(WriteFileRequest) returns (Empty) {}
 	rpc FSReadFile(ReadFileRequest) returns (ReadFileResponse) {}
 	rpc FSGetFileInfo(FileInfoRequest) returns (FileInfoResponse) {}
 	rpc FSCreateTempDirOrFile(TempDirOrFileRequest) returns (TempDirOrFileResponse) {}
+
+	//Events
+	rpc EventListen(EventRequest) returns (stream Event) {}
+}
+
+/* Events */
+message EventRequest {
+	int64 listenType = 1;
+}
+
+message EventValue {
+	oneof val {
+		string tstring = 1;
+		bool tbool = 2;
+		int64 tint64 = 3;
+	}
+}
+
+message Event {
+	int64 type = 1;
+	repeated EventValue values = 2;
 }
 
 /* File System */

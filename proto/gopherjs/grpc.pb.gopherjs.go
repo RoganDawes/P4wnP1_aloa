@@ -8,6 +8,9 @@
 		grpc.proto
 
 	It has these top-level messages:
+		EventRequest
+		EventValue
+		Event
 		TempDirOrFileRequest
 		TempDirOrFileResponse
 		ReadFileRequest
@@ -109,6 +112,286 @@ var WiFiSettings_APAuthMode_value = map[string]int{
 
 func (x WiFiSettings_APAuthMode) String() string {
 	return WiFiSettings_APAuthMode_name[int(x)]
+}
+
+// Events
+type EventRequest struct {
+	ListenType int64
+}
+
+// GetListenType gets the ListenType of the EventRequest.
+func (m *EventRequest) GetListenType() (x int64) {
+	if m == nil {
+		return x
+	}
+	return m.ListenType
+}
+
+// MarshalToWriter marshals EventRequest to the provided writer.
+func (m *EventRequest) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if m.ListenType != 0 {
+		writer.WriteInt64(1, m.ListenType)
+	}
+
+	return
+}
+
+// Marshal marshals EventRequest to a slice of bytes.
+func (m *EventRequest) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a EventRequest from the provided reader.
+func (m *EventRequest) UnmarshalFromReader(reader jspb.Reader) *EventRequest {
+	for reader.Next() {
+		if m == nil {
+			m = &EventRequest{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.ListenType = reader.ReadInt64()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a EventRequest from a slice of bytes.
+func (m *EventRequest) Unmarshal(rawBytes []byte) (*EventRequest, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type EventValue struct {
+	// Types that are valid to be assigned to Val:
+	//	*EventValue_Tstring
+	//	*EventValue_Tbool
+	//	*EventValue_Tint64
+	Val isEventValue_Val
+}
+
+// isEventValue_Val is used to distinguish types assignable to Val
+type isEventValue_Val interface{ isEventValue_Val() }
+
+// EventValue_Tstring is assignable to Val
+type EventValue_Tstring struct {
+	Tstring string
+}
+
+// EventValue_Tbool is assignable to Val
+type EventValue_Tbool struct {
+	Tbool bool
+}
+
+// EventValue_Tint64 is assignable to Val
+type EventValue_Tint64 struct {
+	Tint64 int64
+}
+
+func (*EventValue_Tstring) isEventValue_Val() {}
+func (*EventValue_Tbool) isEventValue_Val()   {}
+func (*EventValue_Tint64) isEventValue_Val()  {}
+
+// GetVal gets the Val of the EventValue.
+func (m *EventValue) GetVal() (x isEventValue_Val) {
+	if m == nil {
+		return x
+	}
+	return m.Val
+}
+
+// GetTstring gets the Tstring of the EventValue.
+func (m *EventValue) GetTstring() (x string) {
+	if v, ok := m.GetVal().(*EventValue_Tstring); ok {
+		return v.Tstring
+	}
+	return x
+}
+
+// GetTbool gets the Tbool of the EventValue.
+func (m *EventValue) GetTbool() (x bool) {
+	if v, ok := m.GetVal().(*EventValue_Tbool); ok {
+		return v.Tbool
+	}
+	return x
+}
+
+// GetTint64 gets the Tint64 of the EventValue.
+func (m *EventValue) GetTint64() (x int64) {
+	if v, ok := m.GetVal().(*EventValue_Tint64); ok {
+		return v.Tint64
+	}
+	return x
+}
+
+// MarshalToWriter marshals EventValue to the provided writer.
+func (m *EventValue) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	switch t := m.Val.(type) {
+	case *EventValue_Tstring:
+		if len(t.Tstring) > 0 {
+			writer.WriteString(1, t.Tstring)
+		}
+	case *EventValue_Tbool:
+		if t.Tbool {
+			writer.WriteBool(2, t.Tbool)
+		}
+	case *EventValue_Tint64:
+		if t.Tint64 != 0 {
+			writer.WriteInt64(3, t.Tint64)
+		}
+	}
+
+	return
+}
+
+// Marshal marshals EventValue to a slice of bytes.
+func (m *EventValue) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a EventValue from the provided reader.
+func (m *EventValue) UnmarshalFromReader(reader jspb.Reader) *EventValue {
+	for reader.Next() {
+		if m == nil {
+			m = &EventValue{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Val = &EventValue_Tstring{
+				Tstring: reader.ReadString(),
+			}
+		case 2:
+			m.Val = &EventValue_Tbool{
+				Tbool: reader.ReadBool(),
+			}
+		case 3:
+			m.Val = &EventValue_Tint64{
+				Tint64: reader.ReadInt64(),
+			}
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a EventValue from a slice of bytes.
+func (m *EventValue) Unmarshal(rawBytes []byte) (*EventValue, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type Event struct {
+	Type   int64
+	Values []*EventValue
+}
+
+// GetType gets the Type of the Event.
+func (m *Event) GetType() (x int64) {
+	if m == nil {
+		return x
+	}
+	return m.Type
+}
+
+// GetValues gets the Values of the Event.
+func (m *Event) GetValues() (x []*EventValue) {
+	if m == nil {
+		return x
+	}
+	return m.Values
+}
+
+// MarshalToWriter marshals Event to the provided writer.
+func (m *Event) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if m.Type != 0 {
+		writer.WriteInt64(1, m.Type)
+	}
+
+	for _, msg := range m.Values {
+		writer.WriteMessage(2, func() {
+			msg.MarshalToWriter(writer)
+		})
+	}
+
+	return
+}
+
+// Marshal marshals Event to a slice of bytes.
+func (m *Event) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a Event from the provided reader.
+func (m *Event) UnmarshalFromReader(reader jspb.Reader) *Event {
+	for reader.Next() {
+		if m == nil {
+			m = &Event{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Type = reader.ReadInt64()
+		case 2:
+			reader.ReadMessage(func() {
+				m.Values = append(m.Values, new(EventValue).UnmarshalFromReader(reader))
+			})
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a Event from a slice of bytes.
+func (m *Event) Unmarshal(rawBytes []byte) (*Event, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
 
 // File System
@@ -2398,6 +2681,7 @@ const _ = grpcweb.GrpcWebPackageIsVersion3
 // Client API for P4WNP1 service
 
 type P4WNP1Client interface {
+	// USB gadget
 	GetDeployedGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
 	DeployGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
 	GetGadgetSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
@@ -2405,18 +2689,24 @@ type P4WNP1Client interface {
 	GetLEDSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*LEDSettings, error)
 	SetLEDSettings(ctx context.Context, in *LEDSettings, opts ...grpcweb.CallOption) (*Empty, error)
 	MountUMSFile(ctx context.Context, in *GadgetSettingsUMS, opts ...grpcweb.CallOption) (*Empty, error)
+	// Ethernet
 	DeployEthernetInterfaceSettings(ctx context.Context, in *EthernetInterfaceSettings, opts ...grpcweb.CallOption) (*Empty, error)
+	// WiFi
 	DeployWifiSettings(ctx context.Context, in *WiFiSettings, opts ...grpcweb.CallOption) (*Empty, error)
+	// HIDScript / job management
 	HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error)
 	HIDRunScriptJob(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptJob, error)
 	HIDGetScriptJobResult(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*HIDScriptResult, error)
 	HIDCancelScriptJob(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*Empty, error)
 	HIDGetRunningScriptJobs(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*HIDScriptJobList, error)
 	HIDCancelAllScriptJobs(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*Empty, error)
+	// FileSystem
 	FSWriteFile(ctx context.Context, in *WriteFileRequest, opts ...grpcweb.CallOption) (*Empty, error)
 	FSReadFile(ctx context.Context, in *ReadFileRequest, opts ...grpcweb.CallOption) (*ReadFileResponse, error)
 	FSGetFileInfo(ctx context.Context, in *FileInfoRequest, opts ...grpcweb.CallOption) (*FileInfoResponse, error)
 	FSCreateTempDirOrFile(ctx context.Context, in *TempDirOrFileRequest, opts ...grpcweb.CallOption) (*TempDirOrFileResponse, error)
+	// Events
+	EventListen(ctx context.Context, in *EventRequest, opts ...grpcweb.CallOption) (P4WNP1_EventListenClient, error)
 }
 
 type p4WNP1Client struct {
@@ -2599,4 +2889,36 @@ func (c *p4WNP1Client) FSCreateTempDirOrFile(ctx context.Context, in *TempDirOrF
 	}
 
 	return new(TempDirOrFileResponse).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) EventListen(ctx context.Context, in *EventRequest, opts ...grpcweb.CallOption) (P4WNP1_EventListenClient, error) {
+	srv, err := c.client.NewClientStream(ctx, false, true, "EventListen", opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = srv.SendMsg(in.Marshal())
+	if err != nil {
+		return nil, err
+	}
+
+	return &p4WNP1EventListenClient{srv}, nil
+}
+
+type P4WNP1_EventListenClient interface {
+	Recv() (*Event, error)
+	grpcweb.ClientStream
+}
+
+type p4WNP1EventListenClient struct {
+	grpcweb.ClientStream
+}
+
+func (x *p4WNP1EventListenClient) Recv() (*Event, error) {
+	resp, err := x.RecvMsg()
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Event).Unmarshal(resp)
 }

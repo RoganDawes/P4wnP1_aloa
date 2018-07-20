@@ -4,10 +4,10 @@ package service
 import (
 	"log"
 	pb "../proto"
-	"golang.org/x/net/context"
+	"context"
 	"net"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+//	"google.golang.org/grpc/reflection"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -28,6 +28,44 @@ var (
 )
 
 type server struct {}
+
+func (s *server) EventListen(eReq *pb.EventRequest, eStream pb.P4WNP1_EventListenServer) (err error) {
+	//ToDo: Check if this needs to be wrapped into  go routine
+
+	rcv := EvMgr.RegisterReceiver()
+
+	for {
+
+		/*
+		// generate test event with multiple values of multiple types
+		ev := &pb.Event{
+			Type: 0,
+			Values: []*pb.EventValue{
+				{Val:	&pb.EventValue_Tbool{Tbool:true}	},
+				{Val:	&pb.EventValue_Tbool{Tbool:false}	},
+				{Val:	&pb.EventValue_Tstring{Tstring:fmt.Sprintf("message %d", i)}	},
+				{Val: &pb.EventValue_Tint64{Tint64: int64(i)}},
+			},
+		}
+		*/
+
+		select {
+			case ev := <- rcv.EventQueue:
+				fmt.Printf("Event dequed to send: %+v\n", ev)
+				if ev.Type == eReq.ListenType || eReq.ListenType == common.EVT_ANY {
+					//send Event to stream
+					err = eStream.Send(ev)
+					if err != nil {
+						rcv.Cancel()
+						log.Println(err)
+						return err
+					}
+				}
+			case <-rcv.Ctx.Done():
+				return errors.New("Service stopped event manager")
+		}
+	}
+}
 
 func (s *server) FSWriteFile(ctx context.Context, req *pb.WriteFileRequest) (empty *pb.Empty, err error) {
 	return &pb.Empty{}, common.WriteFile(req.Path, req.MustNotExist, req.Append, req.Data)
@@ -274,8 +312,10 @@ func StartRpcServer(host string, port string) {
 	//Create gRPC Server
 	s := grpc.NewServer()
 	pb.RegisterP4WNP1Server(s, &server{})
+	/*
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
+	*/
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}

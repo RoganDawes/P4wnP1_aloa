@@ -75,6 +75,26 @@ func ClientUploadFileFromSrcPath(host string, port string, srcPath string, destP
 	return  ClientUploadFile(host,port,f,destPath,forceOverwrite)
 }
 
+func ClientRegisterEvent(host string, port string,  evtType int64) (err error) {
+	// open gRPC Client
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {return}
+	defer connection.Close()
+	client := pb.NewP4WNP1Client(connection)
+	evStream, err := client.EventListen(context.Background(), &pb.EventRequest{ListenType: evtType})
+	if err != nil { return err }
+
+	for {
+		event, err := evStream.Recv()
+		if err == io.EOF { break }
+		if err != nil { return err }
+
+		log.Printf("Event: %+v", event)
+	}
+	return nil
+}
+
 func ClientUploadFile(host string, port string, src io.Reader, destPath string, forceOverwrite bool) (err error) {
 
 	// open gRPC Client

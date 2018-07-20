@@ -10,6 +10,8 @@ import (
 	"fmt"
 	pb "./proto"
 	"./common"
+	"time"
+	"strconv"
 )
 
 func main() {
@@ -48,9 +50,21 @@ func main() {
 	//Indicate servers up with LED blink count 1
 	service.SetLed(pb.LEDSettings{1})
 
+	service.StartEventManager(20)
 	go func() {
 		err := common.RunBashScript("/usr/local/P4wnP1/scripts/servicestart.sh")
 		if err != nil { log.Printf("Error executing service startup script: %v\n", err) }
+	}()
+
+
+	//Send some log messages for testing
+	i := 0
+	go func() {
+		for {
+			service.EvMgr.Emit(service.ConstructEventLog("test "+strconv.Itoa(i), "message"))
+			time.Sleep(time.Second)
+			i++
+		}
 	}()
 
 
