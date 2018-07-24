@@ -74,8 +74,8 @@ const (
 <div>
 	<div>
 		<ul class="nav nav-tabs">
-	        <li v-for="t in tabs" :class="{ 'active' : t.isActive }">
-	          <a href="#" @click="UpdateSelectedTab(t.id)">{{ t.header }}</slot></a>
+	        <li v-for="t in tabs" :class="{ 'active' : t.isActive }" :key="t.id">
+	          <a href="#" @click="UpdateSelectedTab(t.id)">{{ t.header }}</a>
 	        </li>
 		</ul>
 	</div>

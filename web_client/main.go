@@ -5,8 +5,6 @@ import (
 	"honnef.co/go/js/dom"
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/HuckRidgeSW/hvue"
-	"time"
-	"../common"
 )
 
 var (
@@ -34,6 +32,7 @@ type appController struct {
 func main() {
 	println(GetBaseURL())
 
+	/*
 	println("Listening for RPC events ...")
 	err := Client.StartListenEvents(common.EVT_ANY)
 	if err != nil {println(err)}
@@ -44,10 +43,11 @@ func main() {
 	println("... done listening for RPC events")
 
 	time.Sleep(time.Second)
-	println("Listening for RPC events ...")
-	err = Client.StartListenEvents(common.EVT_LOG)
-	if err != nil {println(err)}
 
+	println("Listening for RPC events ...")
+	err := Client.StartListenEvents(common.EVT_LOG)
+	if err != nil {println(err)}
+	*/
 
 	/*
 	fmt.Printf("Address %v\n", strings.TrimSuffix(document.BaseURI(), "/"))
@@ -74,6 +74,7 @@ func main() {
 	InitCompTabs()
 	InitCompCodeEditor()
 	InitCompHIDScript()
+	InitCompLogger()
 	vm := hvue.NewVM(
 		hvue.El("#app"),
 		//add "testString" to data

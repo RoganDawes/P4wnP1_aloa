@@ -14,7 +14,13 @@ import (
 	"strconv"
 )
 
+
+
 func main() {
+
+
+
+
 	//ToDo: Check for root privs
 
 	var err error
@@ -51,6 +57,8 @@ func main() {
 	service.SetLed(pb.LEDSettings{1})
 
 	service.StartEventManager(20)
+	log.SetOutput(service.EvMgr)
+	log.Println("TESTMESSAGE")
 	go func() {
 		err := common.RunBashScript("/usr/local/P4wnP1/scripts/servicestart.sh")
 		if err != nil { log.Printf("Error executing service startup script: %v\n", err) }
@@ -58,11 +66,12 @@ func main() {
 
 
 	//Send some log messages for testing
+	textfill := "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea"
 	i := 0
 	go func() {
 		for {
-			service.EvMgr.Emit(service.ConstructEventLog("test "+strconv.Itoa(i), "message"))
-			time.Sleep(time.Second)
+			service.EvMgr.Emit(service.ConstructEventLog("test source", i%5, "message " +strconv.Itoa(i) + ": " + textfill))
+			time.Sleep(time.Millisecond *500)
 			i++
 		}
 	}()

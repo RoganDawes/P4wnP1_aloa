@@ -30,28 +30,14 @@ var (
 type server struct {}
 
 func (s *server) EventListen(eReq *pb.EventRequest, eStream pb.P4WNP1_EventListenServer) (err error) {
-	//ToDo: Check if this needs to be wrapped into  go routine
-
-	rcv := EvMgr.RegisterReceiver()
+	rcv := EvMgr.RegisterReceiver(eReq.ListenType)
 
 	for {
-
-		/*
-		// generate test event with multiple values of multiple types
-		ev := &pb.Event{
-			Type: 0,
-			Values: []*pb.EventValue{
-				{Val:	&pb.EventValue_Tbool{Tbool:true}	},
-				{Val:	&pb.EventValue_Tbool{Tbool:false}	},
-				{Val:	&pb.EventValue_Tstring{Tstring:fmt.Sprintf("message %d", i)}	},
-				{Val: &pb.EventValue_Tint64{Tint64: int64(i)}},
-			},
-		}
-		*/
 
 		select {
 			case ev := <- rcv.EventQueue:
 				fmt.Printf("Event dequed to send: %+v\n", ev)
+/*
 				if ev.Type == eReq.ListenType || eReq.ListenType == common.EVT_ANY {
 					//send Event to stream
 					err = eStream.Send(ev)
@@ -61,6 +47,19 @@ func (s *server) EventListen(eReq *pb.EventRequest, eStream pb.P4WNP1_EventListe
 						return err
 					}
 				}
+*/
+				//send Event to stream
+				err = eStream.Send(ev)
+				if err != nil {
+					rcv.Cancel()
+					log.Println(err)
+					return err
+				}
+
+			case <-eStream.Context().Done():
+				fmt.Println("Receiver aborted ...")
+				rcv.Cancel()
+				return errors.New("Event listening request aborted")
 			case <-rcv.Ctx.Done():
 				return errors.New("Service stopped event manager")
 		}
@@ -397,10 +396,12 @@ func StartRpcServerAndWeb(host string, gRPCPort string, webPort string, absWebRo
 
 
 	//Wrap the server into a gRPC-web server
-	grpc_web_srv := grpcweb.WrapServer(s) //Wrap server to improbable grpc-web with websockets
+	grpc_web_srv := grpcweb.WrapServer(s, grpcweb.WithWebsockets(true)) //Wrap server to improbable grpc-web with websockets
 	//define a handler for a HTTP web server using the gRPC-web proxy
 	http_gRPC_web_handler := func(resp http.ResponseWriter, req *http.Request) {
-		if strings.Contains(req.Header.Get("Content-Type"), "application/grpc") || req.Method == "OPTIONS" {
+		if strings.Contains(req.Header.Get("Content-Type"), "application/grpc") ||
+			req.Method == "OPTIONS" ||
+			strings.Contains(req.Header.Get("Sec-Websocket-Protocol"), "grpc-websockets") {
 			fmt.Printf("gRPC-web req:\n %v\n", req)
 			grpc_web_srv.ServeHTTP(resp, req) // if content type indicates grpc or REQUEST METHOD IS OPTIONS (pre-flight) serve gRPC-web
 		} else {

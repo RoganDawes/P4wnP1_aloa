@@ -6,6 +6,7 @@ import (
 	"../common"
 	"context"
 	"sync"
+	"time"
 )
 
 var (
@@ -63,15 +64,23 @@ func StopEventManager() {
 
 func (em *EventManager) Emit(event *pb.Event) {
 	em.eventQueue <-event
-	fmt.Println("Event enqueued")
+//	fmt.Println("Event enqueued")
 }
 
-func (em *EventManager) RegisterReceiver() *EventReceiver {
+func (em *EventManager) Write(p []byte) (n int, err error) {
+	ev := ConstructEventLog("logWriter", 1, string(p))
+	em.Emit(ev)
+	return len(p),nil
+}
+
+
+func (em *EventManager) RegisterReceiver(filterEventType int64) *EventReceiver {
 	ctx,cancel := context.WithCancel(context.Background())
 	er := &EventReceiver{
 		EventQueue: make(chan *pb.Event, 10), //allow buffering 10 events per receiver
 		Ctx: ctx,
 		Cancel: cancel,
+		FilterEventType: filterEventType,
 	}
 	em.receiverRegListMutex.Lock()
 	em.receiverRegisterList[er] = true
@@ -96,13 +105,16 @@ func (em *EventManager) dispatch() {
 			// distribute to registered receiver
 			// Note: no mutex on em.registeredReceivers needed, only accessed in this method
 			for receiver := range em.registeredReceivers {
-				select {
-				case <-receiver.Ctx.Done():
-					//receiver canceled
-					em.UnregisterReceiver(receiver)
-					continue // go on with next registered receiver
-				case receiver.EventQueue <- evToDispatch:
-					//Do nothing
+				// check if this receiver is listening for this event type
+				if receiver.FilterEventType == evToDispatch.Type || receiver.FilterEventType == common.EVT_ANY {
+					select {
+					case <-receiver.Ctx.Done():
+						//receiver canceled
+						em.UnregisterReceiver(receiver)
+						continue // go on with next registered receiver
+					case receiver.EventQueue <- evToDispatch:
+						//Do nothing
+					}
 				}
 			}
 
@@ -144,16 +156,20 @@ type EventReceiver struct {
 	Ctx context.Context
 	Cancel context.CancelFunc
 	EventQueue chan *pb.Event
+	FilterEventType int64
 }
 
 
 
-func ConstructEventLog(source, message string) *pb.Event {
+func ConstructEventLog(source string, level int, message string) *pb.Event {
+
 	return &pb.Event{
 		Type: common.EVT_LOG,
 		Values: []*pb.EventValue{
-			{Val: &pb.EventValue_Tstring{Tstring:fmt.Sprintf(source)} },
-			{Val: &pb.EventValue_Tstring{Tstring:fmt.Sprintf(message)} },
+			{Val: &pb.EventValue_Tstring{Tstring:source} },
+			{Val: &pb.EventValue_Tint64{Tint64:int64(level)} },
+			{Val: &pb.EventValue_Tstring{Tstring:message} },
+			{Val: &pb.EventValue_Tstring{Tstring:time.Now().String()} },
 		},
 	}
 }

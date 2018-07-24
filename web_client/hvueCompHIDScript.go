@@ -48,9 +48,7 @@ const (
 <div>
 	<span>P4wnP1 HID Script</span>
 	<button @click="SendAndRun()">as Job</button><br>
-	<keep-alive>
-		<code-editor v-model="scriptContent"></code-editor>
-	</keep-alive>
+	<code-editor v-model="scriptContent"></code-editor>
 </div>
 `
 )

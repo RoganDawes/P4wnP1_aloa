@@ -1,4 +1,3 @@
-
 html {
     height: 100%;
 }
@@ -42,6 +41,44 @@ button {
     letter-spacing: 1px;
 
 }
+
+/* LOGGER */
+.logger table {
+    border-collapse: collapse;
+    width: 100%;
+}
+.logger table th{
+    text-align: left;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.log-entry td {
+    border-bottom: 1px solid gray;
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: top;
+}
+.log-entry-level-undefined {
+    background: lightgray;
+}
+
+.log-entry-level-information {
+    background: lightgreen;
+}
+.log-entry-level-warning {
+    background: lightgoldenrodyellow;
+}
+.log-entry-level-error {
+    background: lightsalmon;
+}
+.log-entry-level-critical {
+    background: lightcoral;
+}
+
+
+
+/* toggle switch */
+
 
 .toggle-switch {
     position: relative;

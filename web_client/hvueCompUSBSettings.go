@@ -134,7 +134,7 @@ func (c *CompUSBSettingsData) UpdateToDeployedGadgetSettings(vm *hvue.VM) {
 		ctx,cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
 
-		deployedGs, err := pb.NewP4WNP1Client(serverAddr).GetDeployedGadgetSetting(ctx, &pb.Empty{})
+		deployedGs, err := Client.Client.GetDeployedGadgetSetting(ctx, &pb.Empty{})
 		if err != nil { println(err); return }
 
 		newGs := &VGadgetSettings{
@@ -156,10 +156,8 @@ func (c *CompUSBSettingsData) ApplyGadgetSettings(vm *hvue.VM) {
 		ctx,cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		client := pb.NewP4WNP1Client(serverAddr)
-
 		//Set gadget settings
-		_, err := client.SetGadgetSettings(ctx, gs)
+		_, err := Client.Client.SetGadgetSettings(ctx, gs)
 		if err != nil {
 			js.Global.Call("alert", "Error setting given gadget settings: " + status.Convert(err).Message())
 			println(err)
@@ -171,7 +169,7 @@ func (c *CompUSBSettingsData) ApplyGadgetSettings(vm *hvue.VM) {
 
 
 		//deploy the settings
-		deployedGs,err := client.DeployGadgetSetting(ctx, &pb.Empty{})
+		deployedGs,err := Client.Client.DeployGadgetSetting(ctx, &pb.Empty{})
 		if err != nil {
 			js.Global.Call("alert", "Error deploying gadget settings: " + status.Convert(err).Message())
 			println(err)

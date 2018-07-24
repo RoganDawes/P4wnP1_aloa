@@ -43,9 +43,11 @@ func InitCompTab()  {
 		hvue.Computed("_isTab", func(vm *hvue.VM) interface{} {
 			return true
 		}),
+		/*
 		hvue.Computed("index", func(vm *hvue.VM) interface{} {
 			return 0
 		}),
+		*/
 		hvue.Mounted(func(vm *hvue.VM) {
 			vm.Set("isActive", vm.Get("selected")) //propagate "selected" property over to "isActive" from data
 		}),

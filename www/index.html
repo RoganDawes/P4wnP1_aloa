@@ -8,6 +8,7 @@
                 width: 80%;
                 height: 80%;
             }
+
         </style>
 
 
@@ -25,18 +26,24 @@
 <body>
 <h1>P4wnP1 service - USB settings</h1>
 <div id="app">
+
     <tabs>
         <tab header="USB">
+            <keep-alive>
             <usb-settings></usb-settings>
+            </keep-alive>
         </tab>
-
         <tab header="HID Script" :selected="true">
             <hid-script></hid-script>
         </tab>
-
-        <tab header="foo" >blaaaa </tab>
-        <tab header="bar">blaaaa </tab>
+        <tab header="Logger" >
+            <logger :max-entries="7"></logger>
+        </tab>
+        <tab header="bar">blaaaa
+            <textarea cols="80" rows="50"></textarea>
+        </tab>
     </tabs>
+
 </div>
 
 <script type="text/javascript" src="webapp.js"></script>
