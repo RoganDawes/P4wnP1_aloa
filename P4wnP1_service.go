@@ -71,7 +71,7 @@ func main() {
 	go func() {
 		for {
 			service.EvMgr.Emit(service.ConstructEventLog("test source", i%5, "message " +strconv.Itoa(i) + ": " + textfill))
-			time.Sleep(time.Millisecond *500)
+			time.Sleep(time.Millisecond *100)
 			i++
 		}
 	}()

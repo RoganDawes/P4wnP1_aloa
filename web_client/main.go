@@ -4,7 +4,7 @@ import (
 	pb "../proto/gopherjs"
 	"honnef.co/go/js/dom"
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/HuckRidgeSW/hvue"
+	"github.com/mame82/hvue"
 )
 
 var (
@@ -67,6 +67,8 @@ func main() {
 	}
 	*/
 
+	InitGlobalState() //sets Vuex store in JS window.store
+
 	InitCompEthernetAddresses2()
 	InitCompToggleSwitch()
 	InitCompUSBSettings()
@@ -75,6 +77,7 @@ func main() {
 	InitCompCodeEditor()
 	InitCompHIDScript()
 	InitCompLogger()
+	InitCompState()
 	vm := hvue.NewVM(
 		hvue.El("#app"),
 		//add "testString" to data
@@ -91,7 +94,12 @@ func main() {
 			"console",
 			func(vm *hvue.VM) interface{} {
 			return js.Global.Get("console")
-		}))
+		}),
+		hvue.Computed("state", func(vm *hvue.VM) interface{} {
+			return vm.Store.Get("state") //works only with Vuex store option added
+		}),
+		hvue.Store(), //include Vuex store in global scope, using own hvue fork, see here: https://github.com/HuckRidgeSW/hvue/pull/6
+	)
 	js.Global.Set("vm",vm)
 
 }

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/HuckRidgeSW/hvue"
+	"github.com/mame82/hvue"
 )
 
 //https://github.com/cnu4/vue-codemirror-lite/blob/master/codemirror.vue
@@ -81,7 +81,6 @@ func initCodeMirror(vm *hvue.VM) {
 		//propagate up change
 		vm.Emit("change", newVal)
 		vm.Emit("input", newVal)
-
 	})
 
 }

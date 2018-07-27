@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/HuckRidgeSW/hvue"
+	"github.com/mame82/hvue"
 )
 
 type CompTabData struct {
@@ -43,11 +43,11 @@ func InitCompTab()  {
 		hvue.Computed("_isTab", func(vm *hvue.VM) interface{} {
 			return true
 		}),
-		/*
-		hvue.Computed("index", func(vm *hvue.VM) interface{} {
-			return 0
+
+		hvue.Computed("hasOverride", func(vm *hvue.VM) interface{} {
+			return vm.Slots.Get("override").Bool()
 		}),
-		*/
+
 		hvue.Mounted(func(vm *hvue.VM) {
 			vm.Set("isActive", vm.Get("selected")) //propagate "selected" property over to "isActive" from data
 		}),
@@ -58,9 +58,10 @@ func InitCompTab()  {
 const (
 
 	compTabTemplate = `
-	<div v-if="isActive">
-		<slot></slot>
-	</div>
+		<div v-if="isActive">
+			<slot></slot>
+		</div>
+	
 `
 )
 

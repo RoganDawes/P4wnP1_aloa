@@ -2081,7 +2081,7 @@ var $isASCII = function(s) {
 };
 
 $packages["github.com/gopherjs/gopherjs/js"] = (function() {
-	var $pkg = {}, $init, Object, Error, sliceType, sliceType$1, ptrType, ptrType$1, MakeFunc, Keys, init;
+	var $pkg = {}, $init, Object, Error, M, sliceType, sliceType$1, ptrType, ptrType$1, MakeFunc, Keys, init;
 	Object = $pkg.Object = $newType(0, $kindStruct, "js.Object", true, "github.com/gopherjs/gopherjs/js", true, function(object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
@@ -2098,6 +2098,7 @@ $packages["github.com/gopherjs/gopherjs/js"] = (function() {
 		}
 		this.Object = Object_;
 	});
+	M = $pkg.M = $newType(4, $kindMap, "js.M", true, "github.com/gopherjs/gopherjs/js", true, null);
 	sliceType = $sliceType($emptyInterface);
 	sliceType$1 = $sliceType($String);
 	ptrType = $ptrType(Object);
@@ -2246,6 +2247,7 @@ $packages["github.com/gopherjs/gopherjs/js"] = (function() {
 	ptrType$1.methods = [{prop: "Error", name: "Error", pkg: "", typ: $funcType([], [$String], false)}, {prop: "Stack", name: "Stack", pkg: "", typ: $funcType([], [$String], false)}];
 	Object.init("github.com/gopherjs/gopherjs/js", [{prop: "object", name: "object", anonymous: false, exported: false, typ: ptrType, tag: ""}]);
 	Error.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType, tag: ""}]);
+	M.init($String, $emptyInterface);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -23851,7 +23853,7 @@ $packages["github.com/johanbrandhorst/protobuf/jspb"] = (function() {
 	return $pkg;
 })();
 $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
-	var $pkg = {}, $init, context, js, grpcwebjs, status, jspb, codes, metadata, io, callInfo, CallOption, Client, clientStreamClient, ClientStream, DialOption, mdwrapper, onHeadersFunc, onEndFunc, onMessageFunc, client, service, responseType, requestType, methodDescriptor, properties, ptrType, ptrType$1, sliceType, ptrType$2, ptrType$3, ptrType$4, funcType, funcType$1, funcType$2, ptrType$5, funcType$3, funcType$4, ptrType$6, ptrType$7, sliceType$1, chanType, chanType$1, ptrType$8, ptrType$9, ptrType$10, NewClient, newClient, newService, newResponseType, newRequestType, newMethodDescriptor, newProperties;
+	var $pkg = {}, $init, context, js, grpcwebjs, status, jspb, codes, metadata, io, callInfo, CallOption, beforeCall, Client, clientStreamClient, ClientStream, DialOption, mdwrapper, onHeadersFunc, onEndFunc, onMessageFunc, client, service, responseType, requestType, methodDescriptor, properties, sliceType, ptrType, ptrType$1, sliceType$1, ptrType$2, ptrType$3, ptrType$4, funcType, funcType$1, funcType$2, ptrType$5, funcType$3, funcType$4, ptrType$6, ptrType$7, chanType, chanType$1, ptrType$8, ptrType$9, ptrType$10, ForceWebsocketTransport, NewClient, WithDefaultCallOptions, newClient, newService, newResponseType, newRequestType, newMethodDescriptor, newProperties;
 	context = $packages["context"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	grpcwebjs = $packages["github.com/johanbrandhorst/protobuf/grpcweb/grpcwebjs"];
@@ -23860,28 +23862,31 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 	codes = $packages["github.com/johanbrandhorst/protobuf/vendor/google.golang.org/grpc/codes"];
 	metadata = $packages["github.com/johanbrandhorst/protobuf/vendor/google.golang.org/grpc/metadata"];
 	io = $packages["io"];
-	callInfo = $pkg.callInfo = $newType(0, $kindStruct, "grpcweb.callInfo", true, "github.com/johanbrandhorst/protobuf/grpcweb", false, function(headers_, trailers_) {
+	callInfo = $pkg.callInfo = $newType(0, $kindStruct, "grpcweb.callInfo", true, "github.com/johanbrandhorst/protobuf/grpcweb", false, function(headers_, trailers_, forceWebsockets_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.headers = false;
 			this.trailers = false;
+			this.forceWebsockets = false;
 			return;
 		}
 		this.headers = headers_;
 		this.trailers = trailers_;
+		this.forceWebsockets = forceWebsockets_;
 	});
 	CallOption = $pkg.CallOption = $newType(8, $kindInterface, "grpcweb.CallOption", true, "github.com/johanbrandhorst/protobuf/grpcweb", true, null);
-	Client = $pkg.Client = $newType(0, $kindStruct, "grpcweb.Client", true, "github.com/johanbrandhorst/protobuf/grpcweb", true, function(host_, service_, forceWS_) {
+	beforeCall = $pkg.beforeCall = $newType(4, $kindFunc, "grpcweb.beforeCall", true, "github.com/johanbrandhorst/protobuf/grpcweb", false, null);
+	Client = $pkg.Client = $newType(0, $kindStruct, "grpcweb.Client", true, "github.com/johanbrandhorst/protobuf/grpcweb", true, function(host_, service_, defaultCallOptions_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.host = "";
 			this.service = "";
-			this.forceWS = false;
+			this.defaultCallOptions = sliceType.nil;
 			return;
 		}
 		this.host = host_;
 		this.service = service_;
-		this.forceWS = forceWS_;
+		this.defaultCallOptions = defaultCallOptions_;
 	});
 	clientStreamClient = $pkg.clientStreamClient = $newType(0, $kindStruct, "grpcweb.clientStreamClient", true, "github.com/johanbrandhorst/protobuf/grpcweb", false, function(ctx_, client_, errChan_, respChan_, isClientStreaming_, isServerStreaming_, callInfo_, headers_, trailers_) {
 		this.$val = this;
@@ -23998,30 +24003,52 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 		this.debug = debug_;
 		this.transport = transport_;
 	});
+	sliceType = $sliceType(CallOption);
 	ptrType = $ptrType(client);
 	ptrType$1 = $ptrType(callInfo);
-	sliceType = $sliceType($Uint8);
+	sliceType$1 = $sliceType($Uint8);
 	ptrType$2 = $ptrType(js.Error);
 	ptrType$3 = $ptrType(methodDescriptor);
 	ptrType$4 = $ptrType(properties);
 	funcType = $funcType([mdwrapper], [], false);
 	funcType$1 = $funcType([$Int, $String, mdwrapper], [], false);
-	funcType$2 = $funcType([sliceType], [], false);
+	funcType$2 = $funcType([sliceType$1], [], false);
 	ptrType$5 = $ptrType(requestType);
-	funcType$3 = $funcType([sliceType], [sliceType], false);
-	funcType$4 = $funcType([], [sliceType], false);
+	funcType$3 = $funcType([sliceType$1], [sliceType$1], false);
+	funcType$4 = $funcType([], [sliceType$1], false);
 	ptrType$6 = $ptrType(service);
 	ptrType$7 = $ptrType(responseType);
-	sliceType$1 = $sliceType(CallOption);
 	chanType = $chanType($error, false, false);
-	chanType$1 = $chanType(sliceType, false, false);
+	chanType$1 = $chanType(sliceType$1, false, false);
 	ptrType$8 = $ptrType(Client);
 	ptrType$9 = $ptrType(js.Object);
 	ptrType$10 = $ptrType(status.Status);
+	beforeCall.prototype.before = function(c) {
+		var _r, c, o, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; o = $f.o; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		o = this.$val;
+		_r = o(c); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$s = -1; return _r;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: beforeCall.prototype.before }; } $f._r = _r; $f.c = c; $f.o = o; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$ptrType(beforeCall).prototype.before = function(c) { return new beforeCall(this.$get()).before(c); };
+	beforeCall.prototype.after = function(c) {
+		var c, o;
+		o = this.$val;
+	};
+	$ptrType(beforeCall).prototype.after = function(c) { return new beforeCall(this.$get()).after(c); };
+	ForceWebsocketTransport = function() {
+		return new beforeCall(((function(c) {
+			var c;
+			c.forceWebsockets = true;
+			return $ifaceNil;
+		})));
+	};
+	$pkg.ForceWebsocketTransport = ForceWebsocketTransport;
 	NewClient = function(host, service$1, opts) {
 		var _i, _ref, c, host, opt, opts, service$1, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _ref = $f._ref; c = $f.c; host = $f.host; opt = $f.opt; opts = $f.opts; service$1 = $f.service$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		c = new Client.ptr(host, service$1, false);
+		c = new Client.ptr(host, service$1, sliceType.nil);
 		_ref = opts;
 		_i = 0;
 		/* while (true) { */ case 1:
@@ -24035,49 +24062,63 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 	};
 	$pkg.NewClient = NewClient;
 	Client.ptr.prototype.NewClientStream = function(ctx, isClientStreaming, isServerStreaming, method, opts) {
-		var _i, _r, _r$1, _r$2, _r$3, _r$4, _ref, _tuple, _tuple$1, c, client$1, cs, ctx, err, err$1, isClientStreaming, isServerStreaming, md, method, methodDesc, o, opts, props, useWS, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _ref = $f._ref; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; c = $f.c; client$1 = $f.client$1; cs = $f.cs; ctx = $f.ctx; err = $f.err; err$1 = $f.err$1; isClientStreaming = $f.isClientStreaming; isServerStreaming = $f.isServerStreaming; md = $f.md; method = $f.method; methodDesc = $f.methodDesc; o = $f.o; opts = $f.opts; props = $f.props; useWS = $f.useWS; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		var _i, _r, _r$1, _r$2, _r$3, _r$4, _ref, _tuple, _tuple$1, c, ci, client$1, cs, ctx, err, err$1, isClientStreaming, isServerStreaming, md, method, methodDesc, o, opts, props, useWebsockets, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _ref = $f._ref; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; c = $f.c; ci = $f.ci; client$1 = $f.client$1; cs = $f.cs; ctx = $f.ctx; err = $f.err; err$1 = $f.err$1; isClientStreaming = $f.isClientStreaming; isServerStreaming = $f.isServerStreaming; md = $f.md; method = $f.method; methodDesc = $f.methodDesc; o = $f.o; opts = $f.opts; props = $f.props; useWebsockets = $f.useWebsockets; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = [c];
 		cs = [cs];
 		opts = [opts];
-		c = this;
-		methodDesc = newMethodDescriptor(newService(c.service), method, isClientStreaming, isServerStreaming);
-		useWS = isClientStreaming;
-		if (c.forceWS) {
-			useWS = true;
-		}
-		props = newProperties(c.host, useWS);
+		c[0] = this;
+		methodDesc = newMethodDescriptor(newService(c[0].service), method, isClientStreaming, isServerStreaming);
+		ci = new callInfo.ptr(false, false, false);
+		_ref = $appendSlice(c[0].defaultCallOptions, opts[0]);
+		_i = 0;
+		/* while (true) { */ case 1:
+			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 2; continue; }
+			o = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			_r = o.before(ci); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			err = _r;
+			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 4; continue; }
+			/* */ $s = 5; continue;
+			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 4:
+				_r$1 = status.FromError(err); /* */ $s = 6; case 6: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+				$s = -1; return [$ifaceNil, _r$1];
+			/* } */ case 5:
+			_i++;
+		/* } */ $s = 1; continue; case 2:
+		useWebsockets = isClientStreaming || ci.forceWebsockets;
+		props = newProperties(c[0].host, useWebsockets);
 		_tuple = newClient(methodDesc, props);
 		client$1 = _tuple[0];
-		err = _tuple[1];
-		/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 1; continue; }
-		/* */ $s = 2; continue;
-		/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 1:
-			_r = status.FromError(err); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			$s = -1; return [$ifaceNil, _r];
-		/* } */ case 2:
-		cs[0] = new clientStreamClient.ptr(ctx, client$1, new $Chan($error, 1), new $Chan(sliceType, 10), isClientStreaming, isServerStreaming, new callInfo.ptr(false, false), $makeMap($String.keyFor, []), $makeMap($String.keyFor, []));
-		client$1.onHeaders = (function(cs, opts) { return function(headers) {
+		err$1 = _tuple[1];
+		/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 7; continue; }
+		/* */ $s = 8; continue;
+		/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 7:
+			_r$2 = status.FromError(err$1); /* */ $s = 9; case 9: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+			$s = -1; return [$ifaceNil, _r$2];
+		/* } */ case 8:
+		cs[0] = new clientStreamClient.ptr(ctx, client$1, new $Chan($error, 1), new $Chan(sliceType$1, 10), isClientStreaming, isServerStreaming, ci, $makeMap($String.keyFor, []), $makeMap($String.keyFor, []));
+		client$1.onHeaders = (function(c, cs, opts) { return function(headers) {
 			var headers;
 			cs[0].headers = $internalize(headers.Object.headersMap, metadata.MD);
-		}; })(cs, opts);
-		client$1.onMessage = (function(cs, opts) { return function $b(in$1) {
+		}; })(c, cs, opts);
+		client$1.onMessage = (function(c, cs, opts) { return function $b(in$1) {
 			var in$1, $s, $r;
 			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; in$1 = $f.in$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 			$r = $send(cs[0].respChan, in$1); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$s = -1; return;
 			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.in$1 = in$1; $f.$s = $s; $f.$r = $r; return $f;
-		}; })(cs, opts);
-		client$1.onEnd = (function(cs, opts) { return function $b(s) {
-			var _i, _ref, o, s, $s, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _ref = $f._ref; o = $f.o; s = $f.s; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		}; })(c, cs, opts);
+		client$1.onEnd = (function(c, cs, opts) { return function $b(s) {
+			var _i$1, _ref$1, o$1, s, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i$1 = $f._i$1; _ref$1 = $f._ref$1; o$1 = $f.o$1; s = $f.s; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 			cs[0].trailers = s.Trailers;
-			_ref = opts[0];
-			_i = 0;
+			_ref$1 = $appendSlice(c[0].defaultCallOptions, opts[0]);
+			_i$1 = 0;
 			/* while (true) { */ case 1:
-				/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 2; continue; }
-				o = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-				$r = o.after(cs[0].callInfo); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-				_i++;
+				/* if (!(_i$1 < _ref$1.$length)) { break; } */ if(!(_i$1 < _ref$1.$length)) { $s = 2; continue; }
+				o$1 = ((_i$1 < 0 || _i$1 >= _ref$1.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$1.$array[_ref$1.$offset + _i$1]);
+				$r = o$1.after(cs[0].callInfo); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				_i$1++;
 			/* } */ $s = 1; continue; case 2:
 			/* */ if (!((s.Code === 0))) { $s = 4; continue; }
 			/* */ $s = 5; continue;
@@ -24088,35 +24129,20 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 				$r = $send(cs[0].errChan, io.EOF); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 6:
 			$s = -1; return;
-			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._i = _i; $f._ref = _ref; $f.o = o; $f.s = s; $f.$s = $s; $f.$r = $r; return $f;
-		}; })(cs, opts);
-		_ref = opts[0];
-		_i = 0;
-		/* while (true) { */ case 4:
-			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 5; continue; }
-			o = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-			_r$1 = o.before(cs[0].callInfo); /* */ $s = 6; case 6: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-			err$1 = _r$1;
-			/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 7; continue; }
-			/* */ $s = 8; continue;
-			/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 7:
-				_r$2 = status.FromError(err$1); /* */ $s = 9; case 9: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-				$s = -1; return [$ifaceNil, _r$2];
-			/* } */ case 8:
-			_i++;
-		/* } */ $s = 4; continue; case 5:
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._i$1 = _i$1; $f._ref$1 = _ref$1; $f.o$1 = o$1; $f.s = s; $f.$s = $s; $f.$r = $r; return $f;
+		}; })(c, cs, opts);
 		_r$3 = metadata.FromOutgoingContext(ctx); /* */ $s = 10; case 10: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
 		_tuple$1 = _r$3;
 		md = _tuple$1[0];
-		err = $clone(client$1, client).Start(md);
-		/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 11; continue; }
+		err$1 = $clone(client$1, client).Start(md);
+		/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 11; continue; }
 		/* */ $s = 12; continue;
-		/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 11:
-			_r$4 = status.FromError(err); /* */ $s = 13; case 13: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+		/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 11:
+			_r$4 = status.FromError(err$1); /* */ $s = 13; case 13: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
 			$s = -1; return [$ifaceNil, _r$4];
 		/* } */ case 12:
 		$s = -1; return [cs[0], $ifaceNil];
-		/* */ } return; } if ($f === undefined) { $f = { $blk: Client.ptr.prototype.NewClientStream }; } $f._i = _i; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._ref = _ref; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.c = c; $f.client$1 = client$1; $f.cs = cs; $f.ctx = ctx; $f.err = err; $f.err$1 = err$1; $f.isClientStreaming = isClientStreaming; $f.isServerStreaming = isServerStreaming; $f.md = md; $f.method = method; $f.methodDesc = methodDesc; $f.o = o; $f.opts = opts; $f.props = props; $f.useWS = useWS; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Client.ptr.prototype.NewClientStream }; } $f._i = _i; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._ref = _ref; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.c = c; $f.ci = ci; $f.client$1 = client$1; $f.cs = cs; $f.ctx = ctx; $f.err = err; $f.err$1 = err$1; $f.isClientStreaming = isClientStreaming; $f.isServerStreaming = isServerStreaming; $f.md = md; $f.method = method; $f.methodDesc = methodDesc; $f.o = o; $f.opts = opts; $f.props = props; $f.useWebsockets = useWebsockets; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	Client.prototype.NewClientStream = function(ctx, isClientStreaming, isServerStreaming, method, opts) { return this.$val.NewClientStream(ctx, isClientStreaming, isServerStreaming, method, opts); };
 	clientStreamClient.ptr.prototype.SendMsg = function(payload) {
@@ -24152,24 +24178,24 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 				if ($interfaceIsEqual(err, io.EOF)) {
 					$s = -1; return [msg, $ifaceNil];
 				}
-				$s = -1; return [sliceType.nil, err];
+				$s = -1; return [sliceType$1.nil, err];
 			/* } else if (_selection$1[0] === 1) { */ case 10:
 				$unused($clone(cs.client, client).Close());
 				_r$4 = cs.ctx.Err(); /* */ $s = 12; case 12: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
 				_r$5 = _r$4.Error(); /* */ $s = 13; case 13: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
-				$s = -1; return [sliceType.nil, new status.Status.ptr(1, _r$5, false)];
+				$s = -1; return [sliceType$1.nil, new status.Status.ptr(1, _r$5, false)];
 			/* } */ case 11:
 			$s = 6; continue;
 		/* } else if (_selection[0] === 1) { */ case 4:
 			err$1 = _selection[1][0];
-			$s = -1; return [sliceType.nil, err$1];
+			$s = -1; return [sliceType$1.nil, err$1];
 		/* } else if (_selection[0] === 2) { */ case 5:
 			$unused($clone(cs.client, client).Close());
 			_r$6 = cs.ctx.Err(); /* */ $s = 14; case 14: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
 			_r$7 = _r$6.Error(); /* */ $s = 15; case 15: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
-			$s = -1; return [sliceType.nil, new status.Status.ptr(1, _r$7, false)];
+			$s = -1; return [sliceType$1.nil, new status.Status.ptr(1, _r$7, false)];
 		/* } */ case 6:
-		$s = -1; return [sliceType.nil, $ifaceNil];
+		$s = -1; return [sliceType$1.nil, $ifaceNil];
 		/* */ } return; } if ($f === undefined) { $f = { $blk: clientStreamClient.ptr.prototype.RecvMsg }; } $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._selection = _selection; $f._selection$1 = _selection$1; $f.cs = cs; $f.err = err; $f.err$1 = err$1; $f.msg = msg; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	clientStreamClient.prototype.RecvMsg = function() { return this.$val.RecvMsg(); };
@@ -24197,6 +24223,14 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 		return cs.trailers;
 	};
 	clientStreamClient.prototype.Trailer = function() { return this.$val.Trailer(); };
+	WithDefaultCallOptions = function(opts) {
+		var opts;
+		return (function(c) {
+			var c;
+			c.defaultCallOptions = $appendSlice(c.defaultCallOptions, opts);
+		});
+	};
+	$pkg.WithDefaultCallOptions = WithDefaultCallOptions;
 	newClient = function(methodDesc, props) {
 		var _tmp, _tmp$1, c, err, methodDesc, props, $deferred;
 		/* */ var $err = null; try { $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
@@ -24396,53 +24430,65 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 		return r;
 	};
 	Client.ptr.prototype.RPCCall = function(ctx, method, req, opts) {
-		var _i, _r, _r$1, _r$10, _r$11, _r$12, _r$13, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _ref, _selection, _selection$1, _tuple, _tuple$1, c, ci, client$1, ctx, err, err$1, err$2, errChan, md, method, methodDesc, o, opts, props, req, resp, respChan, useWS, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _r = $f._r; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _ref = $f._ref; _selection = $f._selection; _selection$1 = $f._selection$1; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; c = $f.c; ci = $f.ci; client$1 = $f.client$1; ctx = $f.ctx; err = $f.err; err$1 = $f.err$1; err$2 = $f.err$2; errChan = $f.errChan; md = $f.md; method = $f.method; methodDesc = $f.methodDesc; o = $f.o; opts = $f.opts; props = $f.props; req = $f.req; resp = $f.resp; respChan = $f.respChan; useWS = $f.useWS; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		var _i, _r, _r$1, _r$10, _r$11, _r$12, _r$13, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _ref, _selection, _selection$1, _tuple, _tuple$1, c, ci, client$1, ctx, err, err$1, err$2, errChan, md, method, methodDesc, o, opts, props, req, resp, respChan, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _r = $f._r; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _ref = $f._ref; _selection = $f._selection; _selection$1 = $f._selection$1; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; c = $f.c; ci = $f.ci; client$1 = $f.client$1; ctx = $f.ctx; err = $f.err; err$1 = $f.err$1; err$2 = $f.err$2; errChan = $f.errChan; md = $f.md; method = $f.method; methodDesc = $f.methodDesc; o = $f.o; opts = $f.opts; props = $f.props; req = $f.req; resp = $f.resp; respChan = $f.respChan; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = [c];
 		ci = [ci];
 		errChan = [errChan];
 		opts = [opts];
 		respChan = [respChan];
-		c = this;
-		respChan[0] = new $Chan(sliceType, 1);
+		c[0] = this;
+		respChan[0] = new $Chan(sliceType$1, 1);
 		errChan[0] = new $Chan($error, 1);
-		ci[0] = new callInfo.ptr(false, false);
-		methodDesc = newMethodDescriptor(newService(c.service), method, false, false);
-		useWS = false;
-		if (c.forceWS) {
-			useWS = true;
-		}
-		props = newProperties(c.host, useWS);
+		ci[0] = new callInfo.ptr(false, false, false);
+		methodDesc = newMethodDescriptor(newService(c[0].service), method, false, false);
+		_ref = $appendSlice(c[0].defaultCallOptions, opts[0]);
+		_i = 0;
+		/* while (true) { */ case 1:
+			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 2; continue; }
+			o = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			_r = o.before(ci[0]); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			err = _r;
+			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 4; continue; }
+			/* */ $s = 5; continue;
+			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 4:
+				_r$1 = status.FromError(err); /* */ $s = 6; case 6: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+				$s = -1; return [sliceType$1.nil, _r$1];
+			/* } */ case 5:
+			_i++;
+		/* } */ $s = 1; continue; case 2:
+		props = newProperties(c[0].host, ci[0].forceWebsockets);
 		_tuple = newClient(methodDesc, props);
 		client$1 = _tuple[0];
-		err = _tuple[1];
-		/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 1; continue; }
-		/* */ $s = 2; continue;
-		/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 1:
-			_r = status.FromError(err); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			$s = -1; return [sliceType.nil, _r];
-		/* } */ case 2:
-		client$1.onHeaders = (function(ci, errChan, opts, respChan) { return function(headers) {
+		err$1 = _tuple[1];
+		/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 7; continue; }
+		/* */ $s = 8; continue;
+		/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 7:
+			_r$2 = status.FromError(err$1); /* */ $s = 9; case 9: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+			$s = -1; return [sliceType$1.nil, _r$2];
+		/* } */ case 8:
+		client$1.onHeaders = (function(c, ci, errChan, opts, respChan) { return function(headers) {
 			var headers;
 			ci[0].headers = $internalize(headers.Object.headersMap, metadata.MD);
-		}; })(ci, errChan, opts, respChan);
-		client$1.onMessage = (function(ci, errChan, opts, respChan) { return function $b(in$1) {
+		}; })(c, ci, errChan, opts, respChan);
+		client$1.onMessage = (function(c, ci, errChan, opts, respChan) { return function $b(in$1) {
 			var in$1, $s, $r;
 			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; in$1 = $f.in$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 			$r = $send(respChan[0], in$1); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$s = -1; return;
 			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.in$1 = in$1; $f.$s = $s; $f.$r = $r; return $f;
-		}; })(ci, errChan, opts, respChan);
-		client$1.onEnd = (function(ci, errChan, opts, respChan) { return function $b(s) {
-			var _i, _ref, o, s, $s, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _ref = $f._ref; o = $f.o; s = $f.s; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		}; })(c, ci, errChan, opts, respChan);
+		client$1.onEnd = (function(c, ci, errChan, opts, respChan) { return function $b(s) {
+			var _i$1, _ref$1, o$1, s, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i$1 = $f._i$1; _ref$1 = $f._ref$1; o$1 = $f.o$1; s = $f.s; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 			ci[0].trailers = s.Trailers;
-			_ref = opts[0];
-			_i = 0;
+			_ref$1 = $appendSlice(c[0].defaultCallOptions, opts[0]);
+			_i$1 = 0;
 			/* while (true) { */ case 1:
-				/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 2; continue; }
-				o = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-				$r = o.after(ci[0]); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-				_i++;
+				/* if (!(_i$1 < _ref$1.$length)) { break; } */ if(!(_i$1 < _ref$1.$length)) { $s = 2; continue; }
+				o$1 = ((_i$1 < 0 || _i$1 >= _ref$1.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$1.$array[_ref$1.$offset + _i$1]);
+				$r = o$1.after(ci[0]); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				_i$1++;
 			/* } */ $s = 1; continue; case 2:
 			/* */ if (!((s.Code === 0))) { $s = 4; continue; }
 			/* */ $s = 5; continue;
@@ -24453,39 +24499,24 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 				$r = $send(errChan[0], io.EOF); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 6:
 			$s = -1; return;
-			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._i = _i; $f._ref = _ref; $f.o = o; $f.s = s; $f.$s = $s; $f.$r = $r; return $f;
-		}; })(ci, errChan, opts, respChan);
-		_ref = opts[0];
-		_i = 0;
-		/* while (true) { */ case 4:
-			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 5; continue; }
-			o = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-			_r$1 = o.before(ci[0]); /* */ $s = 6; case 6: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-			err$1 = _r$1;
-			/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 7; continue; }
-			/* */ $s = 8; continue;
-			/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 7:
-				_r$2 = status.FromError(err$1); /* */ $s = 9; case 9: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-				$s = -1; return [sliceType.nil, _r$2];
-			/* } */ case 8:
-			_i++;
-		/* } */ $s = 4; continue; case 5:
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._i$1 = _i$1; $f._ref$1 = _ref$1; $f.o$1 = o$1; $f.s = s; $f.$s = $s; $f.$r = $r; return $f;
+		}; })(c, ci, errChan, opts, respChan);
 		_r$3 = metadata.FromOutgoingContext(ctx); /* */ $s = 10; case 10: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
 		_tuple$1 = _r$3;
 		md = _tuple$1[0];
-		err = $clone(client$1, client).Start(md);
-		/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 11; continue; }
+		err$1 = $clone(client$1, client).Start(md);
+		/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 11; continue; }
 		/* */ $s = 12; continue;
-		/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 11:
-			_r$4 = status.FromError(err); /* */ $s = 13; case 13: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
-			$s = -1; return [sliceType.nil, _r$4];
+		/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 11:
+			_r$4 = status.FromError(err$1); /* */ $s = 13; case 13: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+			$s = -1; return [sliceType$1.nil, _r$4];
 		/* } */ case 12:
-		err = $clone(client$1, client).Send(req);
-		/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 14; continue; }
+		err$1 = $clone(client$1, client).Send(req);
+		/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 14; continue; }
 		/* */ $s = 15; continue;
-		/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 14:
-			_r$5 = status.FromError(err); /* */ $s = 16; case 16: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
-			$s = -1; return [sliceType.nil, _r$5];
+		/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 14:
+			_r$5 = status.FromError(err$1); /* */ $s = 16; case 16: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+			$s = -1; return [sliceType$1.nil, _r$5];
 		/* } */ case 15:
 		_r$6 = ctx.Done(); /* */ $s = 17; case 17: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
 		_r$7 = $select([[errChan[0]], [_r$6]]); /* */ $s = 18; case 18: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
@@ -24511,33 +24542,35 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 					$unused($clone(client$1, client).Close());
 					_r$10 = ctx.Err(); /* */ $s = 29; case 29: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
 					_r$11 = _r$10.Error(); /* */ $s = 30; case 30: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
-					$s = -1; return [sliceType.nil, new status.Status.ptr(1, _r$11, false)];
+					$s = -1; return [sliceType$1.nil, new status.Status.ptr(1, _r$11, false)];
 				/* } */ case 28:
 			/* } */ case 23:
-			$s = -1; return [sliceType.nil, err$2];
+			$s = -1; return [sliceType$1.nil, err$2];
 		/* } else if (_selection[0] === 1) { */ case 20:
 			$unused($clone(client$1, client).Close());
 			_r$12 = ctx.Err(); /* */ $s = 31; case 31: if($c) { $c = false; _r$12 = _r$12.$blk(); } if (_r$12 && _r$12.$blk !== undefined) { break s; }
 			_r$13 = _r$12.Error(); /* */ $s = 32; case 32: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
-			$s = -1; return [sliceType.nil, new status.Status.ptr(1, _r$13, false)];
+			$s = -1; return [sliceType$1.nil, new status.Status.ptr(1, _r$13, false)];
 		/* } */ case 21:
-		$s = -1; return [sliceType.nil, $ifaceNil];
-		/* */ } return; } if ($f === undefined) { $f = { $blk: Client.ptr.prototype.RPCCall }; } $f._i = _i; $f._r = _r; $f._r$1 = _r$1; $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f._ref = _ref; $f._selection = _selection; $f._selection$1 = _selection$1; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.c = c; $f.ci = ci; $f.client$1 = client$1; $f.ctx = ctx; $f.err = err; $f.err$1 = err$1; $f.err$2 = err$2; $f.errChan = errChan; $f.md = md; $f.method = method; $f.methodDesc = methodDesc; $f.o = o; $f.opts = opts; $f.props = props; $f.req = req; $f.resp = resp; $f.respChan = respChan; $f.useWS = useWS; $f.$s = $s; $f.$r = $r; return $f;
+		$s = -1; return [sliceType$1.nil, $ifaceNil];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Client.ptr.prototype.RPCCall }; } $f._i = _i; $f._r = _r; $f._r$1 = _r$1; $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f._ref = _ref; $f._selection = _selection; $f._selection$1 = _selection$1; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.c = c; $f.ci = ci; $f.client$1 = client$1; $f.ctx = ctx; $f.err = err; $f.err$1 = err$1; $f.err$2 = err$2; $f.errChan = errChan; $f.md = md; $f.method = method; $f.methodDesc = methodDesc; $f.o = o; $f.opts = opts; $f.props = props; $f.req = req; $f.resp = resp; $f.respChan = respChan; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	Client.prototype.RPCCall = function(ctx, method, req, opts) { return this.$val.RPCCall(ctx, method, req, opts); };
-	Client.methods = [{prop: "NewClientStream", name: "NewClientStream", pkg: "", typ: $funcType([context.Context, $Bool, $Bool, $String, sliceType$1], [ClientStream, $error], true)}, {prop: "RPCCall", name: "RPCCall", pkg: "", typ: $funcType([context.Context, $String, sliceType, sliceType$1], [sliceType, $error], true)}];
-	clientStreamClient.methods = [{prop: "SendMsg", name: "SendMsg", pkg: "", typ: $funcType([sliceType], [$error], false)}, {prop: "RecvMsg", name: "RecvMsg", pkg: "", typ: $funcType([], [sliceType, $error], false)}, {prop: "Context", name: "Context", pkg: "", typ: $funcType([], [context.Context], false)}, {prop: "CloseSend", name: "CloseSend", pkg: "", typ: $funcType([], [$error], false)}, {prop: "Header", name: "Header", pkg: "", typ: $funcType([], [metadata.MD], false)}, {prop: "Trailer", name: "Trailer", pkg: "", typ: $funcType([], [metadata.MD], false)}];
-	client.methods = [{prop: "Close", name: "Close", pkg: "", typ: $funcType([], [$error], false)}, {prop: "Start", name: "Start", pkg: "", typ: $funcType([metadata.MD], [$error], false)}, {prop: "Send", name: "Send", pkg: "", typ: $funcType([sliceType], [$error], false)}, {prop: "FinishSend", name: "FinishSend", pkg: "", typ: $funcType([], [$error], false)}];
-	callInfo.init("github.com/johanbrandhorst/protobuf/grpcweb", [{prop: "headers", name: "headers", anonymous: false, exported: false, typ: metadata.MD, tag: ""}, {prop: "trailers", name: "trailers", anonymous: false, exported: false, typ: metadata.MD, tag: ""}]);
+	beforeCall.methods = [{prop: "before", name: "before", pkg: "github.com/johanbrandhorst/protobuf/grpcweb", typ: $funcType([ptrType$1], [$error], false)}, {prop: "after", name: "after", pkg: "github.com/johanbrandhorst/protobuf/grpcweb", typ: $funcType([ptrType$1], [], false)}];
+	Client.methods = [{prop: "NewClientStream", name: "NewClientStream", pkg: "", typ: $funcType([context.Context, $Bool, $Bool, $String, sliceType], [ClientStream, $error], true)}, {prop: "RPCCall", name: "RPCCall", pkg: "", typ: $funcType([context.Context, $String, sliceType$1, sliceType], [sliceType$1, $error], true)}];
+	clientStreamClient.methods = [{prop: "SendMsg", name: "SendMsg", pkg: "", typ: $funcType([sliceType$1], [$error], false)}, {prop: "RecvMsg", name: "RecvMsg", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}, {prop: "Context", name: "Context", pkg: "", typ: $funcType([], [context.Context], false)}, {prop: "CloseSend", name: "CloseSend", pkg: "", typ: $funcType([], [$error], false)}, {prop: "Header", name: "Header", pkg: "", typ: $funcType([], [metadata.MD], false)}, {prop: "Trailer", name: "Trailer", pkg: "", typ: $funcType([], [metadata.MD], false)}];
+	client.methods = [{prop: "Close", name: "Close", pkg: "", typ: $funcType([], [$error], false)}, {prop: "Start", name: "Start", pkg: "", typ: $funcType([metadata.MD], [$error], false)}, {prop: "Send", name: "Send", pkg: "", typ: $funcType([sliceType$1], [$error], false)}, {prop: "FinishSend", name: "FinishSend", pkg: "", typ: $funcType([], [$error], false)}];
+	callInfo.init("github.com/johanbrandhorst/protobuf/grpcweb", [{prop: "headers", name: "headers", anonymous: false, exported: false, typ: metadata.MD, tag: ""}, {prop: "trailers", name: "trailers", anonymous: false, exported: false, typ: metadata.MD, tag: ""}, {prop: "forceWebsockets", name: "forceWebsockets", anonymous: false, exported: false, typ: $Bool, tag: ""}]);
 	CallOption.init([{prop: "after", name: "after", pkg: "github.com/johanbrandhorst/protobuf/grpcweb", typ: $funcType([ptrType$1], [], false)}, {prop: "before", name: "before", pkg: "github.com/johanbrandhorst/protobuf/grpcweb", typ: $funcType([ptrType$1], [$error], false)}]);
-	Client.init("github.com/johanbrandhorst/protobuf/grpcweb", [{prop: "host", name: "host", anonymous: false, exported: false, typ: $String, tag: ""}, {prop: "service", name: "service", anonymous: false, exported: false, typ: $String, tag: ""}, {prop: "forceWS", name: "forceWS", anonymous: false, exported: false, typ: $Bool, tag: ""}]);
+	beforeCall.init([ptrType$1], [$error], false);
+	Client.init("github.com/johanbrandhorst/protobuf/grpcweb", [{prop: "host", name: "host", anonymous: false, exported: false, typ: $String, tag: ""}, {prop: "service", name: "service", anonymous: false, exported: false, typ: $String, tag: ""}, {prop: "defaultCallOptions", name: "defaultCallOptions", anonymous: false, exported: false, typ: sliceType, tag: ""}]);
 	clientStreamClient.init("github.com/johanbrandhorst/protobuf/grpcweb", [{prop: "ctx", name: "ctx", anonymous: false, exported: false, typ: context.Context, tag: ""}, {prop: "client", name: "client", anonymous: false, exported: false, typ: ptrType, tag: ""}, {prop: "errChan", name: "errChan", anonymous: false, exported: false, typ: chanType, tag: ""}, {prop: "respChan", name: "respChan", anonymous: false, exported: false, typ: chanType$1, tag: ""}, {prop: "isClientStreaming", name: "isClientStreaming", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "isServerStreaming", name: "isServerStreaming", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "callInfo", name: "callInfo", anonymous: false, exported: false, typ: ptrType$1, tag: ""}, {prop: "headers", name: "headers", anonymous: false, exported: false, typ: metadata.MD, tag: ""}, {prop: "trailers", name: "trailers", anonymous: false, exported: false, typ: metadata.MD, tag: ""}]);
-	ClientStream.init([{prop: "CloseSend", name: "CloseSend", pkg: "", typ: $funcType([], [$error], false)}, {prop: "Context", name: "Context", pkg: "", typ: $funcType([], [context.Context], false)}, {prop: "Header", name: "Header", pkg: "", typ: $funcType([], [metadata.MD], false)}, {prop: "RecvMsg", name: "RecvMsg", pkg: "", typ: $funcType([], [sliceType, $error], false)}, {prop: "SendMsg", name: "SendMsg", pkg: "", typ: $funcType([sliceType], [$error], false)}, {prop: "Trailer", name: "Trailer", pkg: "", typ: $funcType([], [metadata.MD], false)}]);
+	ClientStream.init([{prop: "CloseSend", name: "CloseSend", pkg: "", typ: $funcType([], [$error], false)}, {prop: "Context", name: "Context", pkg: "", typ: $funcType([], [context.Context], false)}, {prop: "Header", name: "Header", pkg: "", typ: $funcType([], [metadata.MD], false)}, {prop: "RecvMsg", name: "RecvMsg", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}, {prop: "SendMsg", name: "SendMsg", pkg: "", typ: $funcType([sliceType$1], [$error], false)}, {prop: "Trailer", name: "Trailer", pkg: "", typ: $funcType([], [metadata.MD], false)}]);
 	DialOption.init([ptrType$8], [], false);
 	mdwrapper.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$9, tag: ""}, {prop: "MD", name: "MD", anonymous: false, exported: true, typ: metadata.MD, tag: "js:\"headersMap\""}]);
 	onHeadersFunc.init([mdwrapper], [], false);
 	onEndFunc.init([ptrType$10], [], false);
-	onMessageFunc.init([sliceType], [], false);
+	onMessageFunc.init([sliceType$1], [], false);
 	client.init("github.com/johanbrandhorst/protobuf/grpcweb", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$9, tag: ""}, {prop: "onEnd", name: "onEnd", anonymous: false, exported: false, typ: onEndFunc, tag: ""}, {prop: "onMessage", name: "onMessage", anonymous: false, exported: false, typ: onMessageFunc, tag: ""}, {prop: "onHeaders", name: "onHeaders", anonymous: false, exported: false, typ: onHeadersFunc, tag: ""}]);
 	service.init("github.com/johanbrandhorst/protobuf/grpcweb", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$9, tag: ""}, {prop: "name", name: "name", anonymous: false, exported: false, typ: $String, tag: "js:\"serviceName\""}]);
 	responseType.init("github.com/johanbrandhorst/protobuf/grpcweb", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$9, tag: ""}, {prop: "deserializeFunc", name: "deserializeFunc", anonymous: false, exported: false, typ: funcType$3, tag: "js:\"deserializeBinary\""}]);
@@ -24555,10 +24588,6 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 		$r = codes.$init(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = metadata.$init(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = io.$init(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$pkg.ForceWebsocket = (function(c) {
-			var c;
-			c.forceWS = true;
-		});
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
@@ -29049,6 +29078,418 @@ $packages["../proto/gopherjs"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
+$packages["./mvuex"] = (function() {
+	var $pkg = {}, $init, errors, js, reflect, StoreOption, Store, Config, ptrType, sliceType, sliceType$1, ptrType$1, ptrType$2, sliceType$2, funcType, sliceType$3, eTooFewMutationArgs, eTooManyMutationArgs, eTooFewMutationArgsOnCall, eWrongFirstMutationArg, eWrongSecondMutationArg, eFirstFieldIsntPtrJsObject, kindStoreType, kindJsObjectType, x, _r, x$1, _r$1, o, castToType, State, wrapGoMutationFunc, Mutation, NewStore;
+	errors = $packages["errors"];
+	js = $packages["github.com/gopherjs/gopherjs/js"];
+	reflect = $packages["reflect"];
+	StoreOption = $pkg.StoreOption = $newType(4, $kindFunc, "mvuex.StoreOption", true, "./mvuex", true, null);
+	Store = $pkg.Store = $newType(0, $kindStruct, "mvuex.Store", true, "./mvuex", true, function(Object_, Getters_, Commit_, Dispatch_, Strict_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Object = null;
+			this.Getters = null;
+			this.Commit = $throwNilPointerError;
+			this.Dispatch = $throwNilPointerError;
+			this.Strict = false;
+			return;
+		}
+		this.Object = Object_;
+		this.Getters = Getters_;
+		this.Commit = Commit_;
+		this.Dispatch = Dispatch_;
+		this.Strict = Strict_;
+	});
+	Config = $pkg.Config = $newType(0, $kindStruct, "mvuex.Config", true, "./mvuex", true, function(Object_, State_, Mutations_, stateValue_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Object = null;
+			this.State = null;
+			this.Mutations = null;
+			this.stateValue = new reflect.Value.ptr(ptrType.nil, 0, 0);
+			return;
+		}
+		this.Object = Object_;
+		this.State = State_;
+		this.Mutations = Mutations_;
+		this.stateValue = stateValue_;
+	});
+	ptrType = $ptrType(reflect.rtype);
+	sliceType = $sliceType(reflect.Type);
+	sliceType$1 = $sliceType(reflect.Value);
+	ptrType$1 = $ptrType(Config);
+	ptrType$2 = $ptrType(js.Object);
+	sliceType$2 = $sliceType($emptyInterface);
+	funcType = $funcType([sliceType$2], [ptrType$2], true);
+	sliceType$3 = $sliceType(StoreOption);
+	o = function() {
+		return new ($global.Object)();
+	};
+	castToType = function(targetType, sourceVal) {
+		var _1, _r$10, _r$11, _r$12, _r$13, _r$14, _r$15, _r$16, _r$17, _r$18, _r$19, _r$2, _r$20, _r$21, _r$22, _r$23, _r$24, _r$25, _r$26, _r$27, _r$28, _r$29, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tuple, _v, derefType, derefVal, err, err$1, field0, kind, pStructInstance, result, sourceVal, targetType, x$2, x$3, x$4, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _1 = $f._1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$15 = $f._r$15; _r$16 = $f._r$16; _r$17 = $f._r$17; _r$18 = $f._r$18; _r$19 = $f._r$19; _r$2 = $f._r$2; _r$20 = $f._r$20; _r$21 = $f._r$21; _r$22 = $f._r$22; _r$23 = $f._r$23; _r$24 = $f._r$24; _r$25 = $f._r$25; _r$26 = $f._r$26; _r$27 = $f._r$27; _r$28 = $f._r$28; _r$29 = $f._r$29; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tmp$4 = $f._tmp$4; _tmp$5 = $f._tmp$5; _tuple = $f._tuple; _v = $f._v; derefType = $f.derefType; derefVal = $f.derefVal; err = $f.err; err$1 = $f.err$1; field0 = $f.field0; kind = $f.kind; pStructInstance = $f.pStructInstance; result = $f.result; sourceVal = $f.sourceVal; targetType = $f.targetType; x$2 = $f.x$2; x$3 = $f.x$3; x$4 = $f.x$4; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		result = new reflect.Value.ptr(ptrType.nil, 0, 0);
+		err = $ifaceNil;
+			_r$2 = targetType.Kind(); /* */ $s = 2; case 2: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+			kind = _r$2;
+			_1 = kind;
+			/* */ if (_1 === (2)) { $s = 3; continue; }
+			/* */ if (_1 === (3)) { $s = 4; continue; }
+			/* */ if (_1 === (4)) { $s = 5; continue; }
+			/* */ if (_1 === (5)) { $s = 6; continue; }
+			/* */ if (_1 === (6)) { $s = 7; continue; }
+			/* */ if (_1 === (14)) { $s = 8; continue; }
+			/* */ if (_1 === (13)) { $s = 9; continue; }
+			/* */ if (_1 === (1)) { $s = 10; continue; }
+			/* */ if (_1 === (7)) { $s = 11; continue; }
+			/* */ if (_1 === (11)) { $s = 12; continue; }
+			/* */ if (_1 === (10)) { $s = 13; continue; }
+			/* */ if (_1 === (9)) { $s = 14; continue; }
+			/* */ if (_1 === (8)) { $s = 15; continue; }
+			/* */ if (_1 === (12)) { $s = 16; continue; }
+			/* */ if (_1 === (24)) { $s = 17; continue; }
+			/* */ if (_1 === (25)) { $s = 18; continue; }
+			/* */ if (_1 === (22)) { $s = 19; continue; }
+			/* */ if (_1 === (20)) { $s = 20; continue; }
+			/* */ $s = 21; continue;
+			/* if (_1 === (2)) { */ case 3:
+				_r$3 = reflect.ValueOf(new $Int(($parseInt(sourceVal) >> 0))); /* */ $s = 23; case 23: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+				result = _r$3;
+				$s = 22; continue;
+			/* } else if (_1 === (3)) { */ case 4:
+				_r$4 = reflect.ValueOf(new $Int8((((x$2 = $internalize(sourceVal, $Int64), x$2.$low + ((x$2.$high >> 31) * 4294967296)) << 24 >> 24)))); /* */ $s = 24; case 24: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+				result = _r$4;
+				$s = 22; continue;
+			/* } else if (_1 === (4)) { */ case 5:
+				_r$5 = reflect.ValueOf(new $Int16((((x$3 = $internalize(sourceVal, $Int64), x$3.$low + ((x$3.$high >> 31) * 4294967296)) << 16 >> 16)))); /* */ $s = 25; case 25: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+				result = _r$5;
+				$s = 22; continue;
+			/* } else if (_1 === (5)) { */ case 6:
+				_r$6 = reflect.ValueOf(new $Int32((((x$4 = $internalize(sourceVal, $Int64), x$4.$low + ((x$4.$high >> 31) * 4294967296)) >> 0)))); /* */ $s = 26; case 26: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
+				result = _r$6;
+				$s = 22; continue;
+			/* } else if (_1 === (6)) { */ case 7:
+				_r$7 = reflect.ValueOf($internalize(sourceVal, $Int64)); /* */ $s = 27; case 27: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
+				result = _r$7;
+				$s = 22; continue;
+			/* } else if (_1 === (14)) { */ case 8:
+				_r$8 = reflect.ValueOf(new $Float64($parseFloat(sourceVal))); /* */ $s = 28; case 28: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
+				result = _r$8;
+				$s = 22; continue;
+			/* } else if (_1 === (13)) { */ case 9:
+				_r$9 = reflect.ValueOf(new $Float32(($fround($parseFloat(sourceVal))))); /* */ $s = 29; case 29: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
+				result = _r$9;
+				$s = 22; continue;
+			/* } else if (_1 === (1)) { */ case 10:
+				_r$10 = reflect.ValueOf(new $Bool(!!(sourceVal))); /* */ $s = 30; case 30: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
+				result = _r$10;
+				$s = 22; continue;
+			/* } else if (_1 === (7)) { */ case 11:
+				_r$11 = reflect.ValueOf(new $Uint((($internalize(sourceVal, $Uint64).$low >>> 0)))); /* */ $s = 31; case 31: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
+				result = _r$11;
+				$s = 22; continue;
+			/* } else if (_1 === (11)) { */ case 12:
+				_r$12 = reflect.ValueOf($internalize(sourceVal, $Uint64)); /* */ $s = 32; case 32: if($c) { $c = false; _r$12 = _r$12.$blk(); } if (_r$12 && _r$12.$blk !== undefined) { break s; }
+				result = _r$12;
+				$s = 22; continue;
+			/* } else if (_1 === (10)) { */ case 13:
+				_r$13 = reflect.ValueOf(new $Uint32((($internalize(sourceVal, $Uint64).$low >>> 0)))); /* */ $s = 33; case 33: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
+				result = _r$13;
+				$s = 22; continue;
+			/* } else if (_1 === (9)) { */ case 14:
+				_r$14 = reflect.ValueOf(new $Uint16((($internalize(sourceVal, $Uint64).$low << 16 >>> 16)))); /* */ $s = 34; case 34: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
+				result = _r$14;
+				$s = 22; continue;
+			/* } else if (_1 === (8)) { */ case 15:
+				_r$15 = reflect.ValueOf(new $Uint8((($internalize(sourceVal, $Uint64).$low << 24 >>> 24)))); /* */ $s = 35; case 35: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
+				result = _r$15;
+				$s = 22; continue;
+			/* } else if (_1 === (12)) { */ case 16:
+				_r$16 = reflect.ValueOf(new $Uintptr(sourceVal)); /* */ $s = 36; case 36: if($c) { $c = false; _r$16 = _r$16.$blk(); } if (_r$16 && _r$16.$blk !== undefined) { break s; }
+				result = _r$16;
+				$s = 22; continue;
+			/* } else if (_1 === (24)) { */ case 17:
+				_r$17 = reflect.ValueOf(new $String($internalize(sourceVal, $String))); /* */ $s = 37; case 37: if($c) { $c = false; _r$17 = _r$17.$blk(); } if (_r$17 && _r$17.$blk !== undefined) { break s; }
+				result = _r$17;
+				$s = 22; continue;
+			/* } else if (_1 === (25)) { */ case 18:
+				_r$18 = reflect.New(targetType); /* */ $s = 38; case 38: if($c) { $c = false; _r$18 = _r$18.$blk(); } if (_r$18 && _r$18.$blk !== undefined) { break s; }
+				pStructInstance = _r$18;
+				_r$19 = $clone(pStructInstance, reflect.Value).Elem(); /* */ $s = 39; case 39: if($c) { $c = false; _r$19 = _r$19.$blk(); } if (_r$19 && _r$19.$blk !== undefined) { break s; }
+				_r$20 = $clone(_r$19, reflect.Value).Field(0); /* */ $s = 40; case 40: if($c) { $c = false; _r$20 = _r$20.$blk(); } if (_r$20 && _r$20.$blk !== undefined) { break s; }
+				field0 = _r$20;
+				if (!(($clone(field0, reflect.Value).Kind() === 22))) { _v = true; $s = 43; continue s; }
+				_r$21 = $clone(field0, reflect.Value).Elem(); /* */ $s = 44; case 44: if($c) { $c = false; _r$21 = _r$21.$blk(); } if (_r$21 && _r$21.$blk !== undefined) { break s; }
+				_r$22 = $clone(_r$21, reflect.Value).Kind(); /* */ $s = 45; case 45: if($c) { $c = false; _r$22 = _r$22.$blk(); } if (_r$22 && _r$22.$blk !== undefined) { break s; }
+				_v = !((_r$22 === kindJsObjectType)); case 43:
+				/* */ if (_v) { $s = 41; continue; }
+				/* */ $s = 42; continue;
+				/* if (_v) { */ case 41:
+					_tmp = result;
+					_tmp$1 = eFirstFieldIsntPtrJsObject;
+					result = _tmp;
+					err = _tmp$1;
+					$s = -1; return [result, err];
+				/* } */ case 42:
+				_r$23 = $clone(pStructInstance, reflect.Value).Elem(); /* */ $s = 46; case 46: if($c) { $c = false; _r$23 = _r$23.$blk(); } if (_r$23 && _r$23.$blk !== undefined) { break s; }
+				_r$24 = $clone(_r$23, reflect.Value).Field(0); /* */ $s = 47; case 47: if($c) { $c = false; _r$24 = _r$24.$blk(); } if (_r$24 && _r$24.$blk !== undefined) { break s; }
+				_r$25 = reflect.ValueOf(new $jsObjectPtr(sourceVal)); /* */ $s = 48; case 48: if($c) { $c = false; _r$25 = _r$25.$blk(); } if (_r$25 && _r$25.$blk !== undefined) { break s; }
+				$r = $clone(_r$24, reflect.Value).Set($clone(_r$25, reflect.Value)); /* */ $s = 49; case 49: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				_r$26 = $clone(pStructInstance, reflect.Value).Elem(); /* */ $s = 50; case 50: if($c) { $c = false; _r$26 = _r$26.$blk(); } if (_r$26 && _r$26.$blk !== undefined) { break s; }
+				result = _r$26;
+				$s = 22; continue;
+			/* } else if (_1 === (22)) { */ case 19:
+				_r$27 = targetType.Elem(); /* */ $s = 51; case 51: if($c) { $c = false; _r$27 = _r$27.$blk(); } if (_r$27 && _r$27.$blk !== undefined) { break s; }
+				derefType = _r$27;
+				_r$28 = castToType(derefType, sourceVal); /* */ $s = 52; case 52: if($c) { $c = false; _r$28 = _r$28.$blk(); } if (_r$28 && _r$28.$blk !== undefined) { break s; }
+				_tuple = _r$28;
+				derefVal = _tuple[0];
+				err$1 = _tuple[1];
+				if (!($interfaceIsEqual(err$1, $ifaceNil))) {
+					_tmp$2 = result;
+					_tmp$3 = err$1;
+					result = _tmp$2;
+					err = _tmp$3;
+					$s = -1; return [result, err];
+				}
+				result = $clone(derefVal, reflect.Value).Addr();
+				$s = 22; continue;
+			/* } else if (_1 === (20)) { */ case 20:
+				_r$29 = reflect.ValueOf($internalize(sourceVal, $emptyInterface)); /* */ $s = 53; case 53: if($c) { $c = false; _r$29 = _r$29.$blk(); } if (_r$29 && _r$29.$blk !== undefined) { break s; }
+				result = _r$29;
+				$s = 22; continue;
+			/* } else { */ case 21:
+				console.log("No conversion for following type implemented", new reflect.Kind(kind).String(), " from ", sourceVal);
+			/* } */ case 22:
+		case 1:
+		_tmp$4 = result;
+		_tmp$5 = $ifaceNil;
+		result = _tmp$4;
+		err = _tmp$5;
+		$s = -1; return [result, err];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: castToType }; } $f._1 = _1; $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$14 = _r$14; $f._r$15 = _r$15; $f._r$16 = _r$16; $f._r$17 = _r$17; $f._r$18 = _r$18; $f._r$19 = _r$19; $f._r$2 = _r$2; $f._r$20 = _r$20; $f._r$21 = _r$21; $f._r$22 = _r$22; $f._r$23 = _r$23; $f._r$24 = _r$24; $f._r$25 = _r$25; $f._r$26 = _r$26; $f._r$27 = _r$27; $f._r$28 = _r$28; $f._r$29 = _r$29; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tmp$4 = _tmp$4; $f._tmp$5 = _tmp$5; $f._tuple = _tuple; $f._v = _v; $f.derefType = derefType; $f.derefVal = derefVal; $f.err = err; $f.err$1 = err$1; $f.field0 = field0; $f.kind = kind; $f.pStructInstance = pStructInstance; $f.result = result; $f.sourceVal = sourceVal; $f.targetType = targetType; $f.x$2 = x$2; $f.x$3 = x$3; $f.x$4 = x$4; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Config.ptr.prototype.Option = function(opts) {
+		var _i, _ref, c, opt, opts, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _ref = $f._ref; c = $f.c; opt = $f.opt; opts = $f.opts; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = this;
+		_ref = opts;
+		_i = 0;
+		/* while (true) { */ case 1:
+			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 2; continue; }
+			opt = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			$r = opt(c); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			_i++;
+		/* } */ $s = 1; continue; case 2:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Config.ptr.prototype.Option }; } $f._i = _i; $f._ref = _ref; $f.c = c; $f.opt = opt; $f.opts = opts; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Config.prototype.Option = function(opts) { return this.$val.Option(opts); };
+	State = function(value) {
+		var value;
+		return (function(c) {
+			var c;
+			if (!(c.Object.state === undefined)) {
+				$panic(new $String("Cannot use mvuex.Sate together with any other State* options"));
+			}
+			c.Object.state = $externalize(value, $emptyInterface);
+		});
+	};
+	$pkg.State = State;
+	wrapGoMutationFunc = function(reflectedGoFunc) {
+		var _r$10, _r$11, _r$12, _r$13, _r$14, _r$15, _r$16, _r$17, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tmp$9, _v, _v$1, err, goArg0, goArg1, goCallArgTargetTypes, goCallArgsTargetValues, i, jsFunc, numGoArgs, reflectedGoFunc, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$15 = $f._r$15; _r$16 = $f._r$16; _r$17 = $f._r$17; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tmp$4 = $f._tmp$4; _tmp$5 = $f._tmp$5; _tmp$6 = $f._tmp$6; _tmp$7 = $f._tmp$7; _tmp$8 = $f._tmp$8; _tmp$9 = $f._tmp$9; _v = $f._v; _v$1 = $f._v$1; err = $f.err; goArg0 = $f.goArg0; goArg1 = $f.goArg1; goCallArgTargetTypes = $f.goCallArgTargetTypes; goCallArgsTargetValues = $f.goCallArgsTargetValues; i = $f.i; jsFunc = $f.jsFunc; numGoArgs = $f.numGoArgs; reflectedGoFunc = $f.reflectedGoFunc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		goCallArgTargetTypes = [goCallArgTargetTypes];
+		goCallArgsTargetValues = [goCallArgsTargetValues];
+		numGoArgs = [numGoArgs];
+		reflectedGoFunc = [reflectedGoFunc];
+		jsFunc = null;
+		err = $ifaceNil;
+		_r$2 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$3 = _r$2.NumIn(); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		numGoArgs[0] = _r$3;
+		if (numGoArgs[0] < 2) {
+			_tmp = null;
+			_tmp$1 = eTooFewMutationArgs;
+			jsFunc = _tmp;
+			err = _tmp$1;
+			$s = -1; return [jsFunc, err];
+		}
+		if (numGoArgs[0] > 3) {
+			_tmp$2 = null;
+			_tmp$3 = eTooManyMutationArgs;
+			jsFunc = _tmp$2;
+			err = _tmp$3;
+			$s = -1; return [jsFunc, err];
+		}
+		_r$4 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+		_r$5 = _r$4.In(0); /* */ $s = 4; case 4: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+		goArg0 = _r$5;
+		_r$6 = goArg0.Kind(); /* */ $s = 8; case 8: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
+		if (!((_r$6 === 22))) { _v = true; $s = 7; continue s; }
+		_r$7 = goArg0.Elem(); /* */ $s = 9; case 9: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
+		_r$8 = _r$7.Kind(); /* */ $s = 10; case 10: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
+		_v = !((_r$8 === kindStoreType)); case 7:
+		/* */ if (_v) { $s = 5; continue; }
+		/* */ $s = 6; continue;
+		/* if (_v) { */ case 5:
+			_tmp$4 = null;
+			_tmp$5 = eWrongFirstMutationArg;
+			jsFunc = _tmp$4;
+			err = _tmp$5;
+			$s = -1; return [jsFunc, err];
+		/* } */ case 6:
+		_r$9 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 11; case 11: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
+		_r$10 = _r$9.In(1); /* */ $s = 12; case 12: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
+		goArg1 = _r$10;
+		_r$11 = goArg1.Kind(); /* */ $s = 16; case 16: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
+		if (!((_r$11 === 22))) { _v$1 = true; $s = 15; continue s; }
+		_r$12 = goArg1.Elem(); /* */ $s = 17; case 17: if($c) { $c = false; _r$12 = _r$12.$blk(); } if (_r$12 && _r$12.$blk !== undefined) { break s; }
+		_r$13 = _r$12.Kind(); /* */ $s = 18; case 18: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
+		_v$1 = !((_r$13 === 25)); case 15:
+		/* */ if (_v$1) { $s = 13; continue; }
+		/* */ $s = 14; continue;
+		/* if (_v$1) { */ case 13:
+			_tmp$6 = null;
+			_tmp$7 = eWrongSecondMutationArg;
+			jsFunc = _tmp$6;
+			err = _tmp$7;
+			$s = -1; return [jsFunc, err];
+		/* } */ case 14:
+		goCallArgTargetTypes[0] = $makeSlice(sliceType, numGoArgs[0]);
+		goCallArgsTargetValues[0] = $makeSlice(sliceType$1, numGoArgs[0]);
+		i = 0;
+		/* while (true) { */ case 19:
+			_r$14 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 21; case 21: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
+			_r$15 = _r$14.NumIn(); /* */ $s = 22; case 22: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
+			/* if (!(i < _r$15)) { break; } */ if(!(i < _r$15)) { $s = 20; continue; }
+			_r$16 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 23; case 23: if($c) { $c = false; _r$16 = _r$16.$blk(); } if (_r$16 && _r$16.$blk !== undefined) { break s; }
+			_r$17 = _r$16.In(i); /* */ $s = 24; case 24: if($c) { $c = false; _r$17 = _r$17.$blk(); } if (_r$17 && _r$17.$blk !== undefined) { break s; }
+			((i < 0 || i >= goCallArgTargetTypes[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + i] = _r$17);
+			i = i + (1) >> 0;
+		/* } */ $s = 19; continue; case 20:
+		jsFunc = js.MakeFunc((function(goCallArgTargetTypes, goCallArgsTargetValues, numGoArgs, reflectedGoFunc) { return function $b(this$1, arguments$1) {
+			var _i, _r$18, _r$19, _r$20, _r$21, _r$22, _r$23, _r$24, _ref, _tuple, _tuple$1, arguments$1, castedArg, err$1, err$2, goTargetArgT, idx, jsArg, results, storeVal, targetIdx, this$1, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _r$18 = $f._r$18; _r$19 = $f._r$19; _r$20 = $f._r$20; _r$21 = $f._r$21; _r$22 = $f._r$22; _r$23 = $f._r$23; _r$24 = $f._r$24; _ref = $f._ref; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; arguments$1 = $f.arguments$1; castedArg = $f.castedArg; err$1 = $f.err$1; err$2 = $f.err$2; goTargetArgT = $f.goTargetArgT; idx = $f.idx; jsArg = $f.jsArg; results = $f.results; storeVal = $f.storeVal; targetIdx = $f.targetIdx; this$1 = $f.this$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			/* */ if (arguments$1.$length < (numGoArgs[0] - 1 >> 0)) { $s = 1; continue; }
+			/* */ $s = 2; continue;
+			/* if (arguments$1.$length < (numGoArgs[0] - 1 >> 0)) { */ case 1:
+				_r$18 = eTooFewMutationArgsOnCall.Error(); /* */ $s = 3; case 3: if($c) { $c = false; _r$18 = _r$18.$blk(); } if (_r$18 && _r$18.$blk !== undefined) { break s; }
+				$panic(new $String(_r$18));
+			/* } */ case 2:
+			_r$19 = castToType((0 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 0]), this$1); /* */ $s = 4; case 4: if($c) { $c = false; _r$19 = _r$19.$blk(); } if (_r$19 && _r$19.$blk !== undefined) { break s; }
+			_tuple = _r$19;
+			storeVal = _tuple[0];
+			err$1 = _tuple[1];
+			/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 5; continue; }
+			/* */ $s = 6; continue;
+			/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 5:
+				_r$20 = err$1.Error(); /* */ $s = 7; case 7: if($c) { $c = false; _r$20 = _r$20.$blk(); } if (_r$20 && _r$20.$blk !== undefined) { break s; }
+				$panic(new $String("Error converting JavaScript provided argument for mutation function to *Store: " + _r$20));
+			/* } */ case 6:
+			(0 >= goCallArgsTargetValues[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + 0] = storeVal);
+			_ref = arguments$1;
+			_i = 0;
+			/* while (true) { */ case 8:
+				/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 9; continue; }
+				idx = _i;
+				jsArg = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+				targetIdx = idx + 1 >> 0;
+				if (targetIdx >= numGoArgs[0]) {
+					/* break; */ $s = 9; continue;
+				}
+				goTargetArgT = ((targetIdx < 0 || targetIdx >= goCallArgTargetTypes[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + targetIdx]);
+				_r$21 = castToType(goTargetArgT, jsArg); /* */ $s = 10; case 10: if($c) { $c = false; _r$21 = _r$21.$blk(); } if (_r$21 && _r$21.$blk !== undefined) { break s; }
+				_tuple$1 = _r$21;
+				castedArg = _tuple$1[0];
+				err$2 = _tuple$1[1];
+				/* */ if (!($interfaceIsEqual(err$2, $ifaceNil))) { $s = 11; continue; }
+				/* */ $s = 12; continue;
+				/* if (!($interfaceIsEqual(err$2, $ifaceNil))) { */ case 11:
+					_r$22 = goTargetArgT.Kind(); /* */ $s = 13; case 13: if($c) { $c = false; _r$22 = _r$22.$blk(); } if (_r$22 && _r$22.$blk !== undefined) { break s; }
+					_r$23 = new reflect.Kind(_r$22).String(); /* */ $s = 14; case 14: if($c) { $c = false; _r$23 = _r$23.$blk(); } if (_r$23 && _r$23.$blk !== undefined) { break s; }
+					$panic(new $String("Error converting JS object to " + _r$23));
+				/* } */ case 12:
+				((targetIdx < 0 || targetIdx >= goCallArgsTargetValues[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + targetIdx] = castedArg);
+				_i++;
+			/* } */ $s = 8; continue; case 9:
+			_r$24 = $clone(reflectedGoFunc[0], reflect.Value).Call(goCallArgsTargetValues[0]); /* */ $s = 15; case 15: if($c) { $c = false; _r$24 = _r$24.$blk(); } if (_r$24 && _r$24.$blk !== undefined) { break s; }
+			results = _r$24;
+			$s = -1; return results;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._i = _i; $f._r$18 = _r$18; $f._r$19 = _r$19; $f._r$20 = _r$20; $f._r$21 = _r$21; $f._r$22 = _r$22; $f._r$23 = _r$23; $f._r$24 = _r$24; $f._ref = _ref; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.arguments$1 = arguments$1; $f.castedArg = castedArg; $f.err$1 = err$1; $f.err$2 = err$2; $f.goTargetArgT = goTargetArgT; $f.idx = idx; $f.jsArg = jsArg; $f.results = results; $f.storeVal = storeVal; $f.targetIdx = targetIdx; $f.this$1 = this$1; $f.$s = $s; $f.$r = $r; return $f;
+		}; })(goCallArgTargetTypes, goCallArgsTargetValues, numGoArgs, reflectedGoFunc));
+		_tmp$8 = jsFunc;
+		_tmp$9 = $ifaceNil;
+		jsFunc = _tmp$8;
+		err = _tmp$9;
+		$s = -1; return [jsFunc, err];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: wrapGoMutationFunc }; } $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$14 = _r$14; $f._r$15 = _r$15; $f._r$16 = _r$16; $f._r$17 = _r$17; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tmp$4 = _tmp$4; $f._tmp$5 = _tmp$5; $f._tmp$6 = _tmp$6; $f._tmp$7 = _tmp$7; $f._tmp$8 = _tmp$8; $f._tmp$9 = _tmp$9; $f._v = _v; $f._v$1 = _v$1; $f.err = err; $f.goArg0 = goArg0; $f.goArg1 = goArg1; $f.goCallArgTargetTypes = goCallArgTargetTypes; $f.goCallArgsTargetValues = goCallArgsTargetValues; $f.i = i; $f.jsFunc = jsFunc; $f.numGoArgs = numGoArgs; $f.reflectedGoFunc = reflectedGoFunc; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Mutation = function(name, goFunc) {
+		var goFunc, name;
+		return (function $b(c) {
+			var _r$2, _r$3, _r$4, _tuple, c, err, jsFunc, reflectedGoFunc, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _tuple = $f._tuple; c = $f.c; err = $f.err; jsFunc = $f.jsFunc; reflectedGoFunc = $f.reflectedGoFunc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			console.log("Creating MUTATION FUNC");
+			if (c.Object.mutations === undefined) {
+				c.Object.mutations = o();
+			}
+			_r$2 = reflect.ValueOf(goFunc); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+			reflectedGoFunc = _r$2;
+			if (!(($clone(reflectedGoFunc, reflect.Value).Kind() === 19))) {
+				$panic(new $String("Mutation " + name + " is not a func"));
+			}
+			_r$3 = wrapGoMutationFunc($clone(reflectedGoFunc, reflect.Value)); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+			_tuple = _r$3;
+			jsFunc = _tuple[0];
+			err = _tuple[1];
+			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 3; continue; }
+			/* */ $s = 4; continue;
+			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 3:
+				_r$4 = err.Error(); /* */ $s = 5; case 5: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+				$panic(new $String("Error exposing the mutation function '" + name + "' to JavaScript: " + _r$4));
+			/* } */ case 4:
+			c.Object.mutations[$externalize(name, $String)] = jsFunc;
+			$s = -1; return;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._tuple = _tuple; $f.c = c; $f.err = err; $f.jsFunc = jsFunc; $f.reflectedGoFunc = reflectedGoFunc; $f.$s = $s; $f.$r = $r; return $f;
+		});
+	};
+	$pkg.Mutation = Mutation;
+	NewStore = function(opts) {
+		var c, opts, store, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; opts = $f.opts; store = $f.store; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = new Config.ptr(o(), null, null, new reflect.Value.ptr(ptrType.nil, 0, 0));
+		$r = c.Option(opts); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		store = new Store.ptr(new ($global.Vuex.Store)($externalize(c, ptrType$1)), null, $throwNilPointerError, $throwNilPointerError, false);
+		$s = -1; return store;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: NewStore }; } $f.c = c; $f.opts = opts; $f.store = store; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.NewStore = NewStore;
+	ptrType$1.methods = [{prop: "Option", name: "Option", pkg: "", typ: $funcType([sliceType$3], [], true)}];
+	StoreOption.init([ptrType$1], [], false);
+	Store.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "Getters", name: "Getters", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"getters\""}, {prop: "Commit", name: "Commit", anonymous: false, exported: true, typ: funcType, tag: "js:\"commit\""}, {prop: "Dispatch", name: "Dispatch", anonymous: false, exported: true, typ: funcType, tag: "js:\"dispatch\""}, {prop: "Strict", name: "Strict", anonymous: false, exported: true, typ: $Bool, tag: "js:\"strict\""}]);
+	Config.init("./mvuex", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "State", name: "State", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"state\""}, {prop: "Mutations", name: "Mutations", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"mutations\""}, {prop: "stateValue", name: "stateValue", anonymous: false, exported: false, typ: reflect.Value, tag: ""}]);
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = errors.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = js.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = reflect.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		eTooFewMutationArgs = errors.New("Mutation function has too few arguments (min 2)");
+		eTooManyMutationArgs = errors.New("Mutation function has too many arguments (max 3)");
+		eTooFewMutationArgsOnCall = errors.New("Mutation function called with too few arguments from JavaScrip");
+		eWrongFirstMutationArg = errors.New("Mutation function has to have *Store as first argument type");
+		eWrongSecondMutationArg = errors.New("The second argument of the mutation function has to be a pointer to a struct of the type used for state");
+		eFirstFieldIsntPtrJsObject = errors.New("The first field of the struct has to be of type *js.Object");
+		_r = reflect.TypeOf((x = new Store.ptr(null, null, $throwNilPointerError, $throwNilPointerError, false), new x.constructor.elem(x))).Kind(); /* */ $s = 4; case 4: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		kindStoreType = _r;
+		_r$1 = reflect.TypeOf((x$1 = new js.Object.ptr(null), new x$1.constructor.elem(x$1))).Kind(); /* */ $s = 5; case 5: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		kindJsObjectType = _r$1;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
 $packages["hash"] = (function() {
 	var $pkg = {}, $init, io, Hash, sliceType;
 	io = $packages["io"];
@@ -29558,11 +29999,11 @@ $packages["encoding/hex"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
-$packages["github.com/HuckRidgeSW/hvue"] = (function() {
-	var $pkg = {}, $init, js, reflect, Config, ComponentOption, PropOption, PropConfig, pOptionType, VM, ptrType, sliceType, ptrType$1, ptrType$2, sliceType$1, sliceType$2, sliceType$3, ptrType$3, sliceType$4, ptrType$5, o, jsOType, vmType, dataObjects, nextDataID, _r, _r$1, NewComponent, PropObj, Template, Types, Default, Computed, Created, Mounted, Activated, Deactivated, Destroyed, makeLifecycleMethod, NewObject, jsCallWithVM, NewVM, El, DataFunc, storeDataID, Method, MethodsOf, makeMethod;
+$packages["github.com/mame82/hvue"] = (function() {
+	var $pkg = {}, $init, js, reflect, Config, ComponentOption, PropOption, PropConfig, pOptionType, VM, ptrType, sliceType, ptrType$1, ptrType$2, sliceType$1, sliceType$2, sliceType$3, ptrType$3, sliceType$4, ptrType$5, o, jsOType, vmType, dataObjects, nextDataID, _r, _r$1, NewComponent, PropObj, Template, Types, Default, Computed, ComputedWithGetSet, Created, Mounted, Activated, Deactivated, Destroyed, makeLifecycleMethod, NewObject, jsCallWithVM, NewVM, El, Store, DataFunc, storeDataID, Method, MethodsOf, makeMethod;
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	reflect = $packages["reflect"];
-	Config = $pkg.Config = $newType(0, $kindStruct, "hvue.Config", true, "github.com/HuckRidgeSW/hvue", true, function(Object_, El_, Data_, Methods_, Props_, Template_, Computed_, Components_, Filters_, dataValue_, Setters_) {
+	Config = $pkg.Config = $newType(0, $kindStruct, "hvue.Config", true, "github.com/mame82/hvue", true, function(Object_, El_, Data_, Methods_, Props_, Template_, Computed_, Components_, Filters_, Store_, dataValue_, Setters_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -29574,6 +30015,7 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 			this.Computed = null;
 			this.Components = null;
 			this.Filters = null;
+			this.Store = null;
 			this.dataValue = new reflect.Value.ptr(ptrType$1.nil, 0, 0);
 			this.Setters = null;
 			return;
@@ -29587,12 +30029,13 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 		this.Computed = Computed_;
 		this.Components = Components_;
 		this.Filters = Filters_;
+		this.Store = Store_;
 		this.dataValue = dataValue_;
 		this.Setters = Setters_;
 	});
-	ComponentOption = $pkg.ComponentOption = $newType(4, $kindFunc, "hvue.ComponentOption", true, "github.com/HuckRidgeSW/hvue", true, null);
-	PropOption = $pkg.PropOption = $newType(4, $kindFunc, "hvue.PropOption", true, "github.com/HuckRidgeSW/hvue", true, null);
-	PropConfig = $pkg.PropConfig = $newType(0, $kindStruct, "hvue.PropConfig", true, "github.com/HuckRidgeSW/hvue", true, function(Object_, typ_, required_, def_, validator_) {
+	ComponentOption = $pkg.ComponentOption = $newType(4, $kindFunc, "hvue.ComponentOption", true, "github.com/mame82/hvue", true, null);
+	PropOption = $pkg.PropOption = $newType(4, $kindFunc, "hvue.PropOption", true, "github.com/mame82/hvue", true, null);
+	PropConfig = $pkg.PropConfig = $newType(0, $kindStruct, "hvue.PropConfig", true, "github.com/mame82/hvue", true, function(Object_, typ_, required_, def_, validator_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -29608,8 +30051,8 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 		this.def = def_;
 		this.validator = validator_;
 	});
-	pOptionType = $pkg.pOptionType = $newType(4, $kindInt, "hvue.pOptionType", true, "github.com/HuckRidgeSW/hvue", false, null);
-	VM = $pkg.VM = $newType(0, $kindStruct, "hvue.VM", true, "github.com/HuckRidgeSW/hvue", true, function(Object_, Data_, Props_, El_, Options_, Parent_, Root_, Children_, Slots_, ScopedSlots_, IsServer_, Setters_) {
+	pOptionType = $pkg.pOptionType = $newType(4, $kindInt, "hvue.pOptionType", true, "github.com/mame82/hvue", false, null);
+	VM = $pkg.VM = $newType(0, $kindStruct, "hvue.VM", true, "github.com/mame82/hvue", true, function(Object_, Data_, Props_, El_, Options_, Parent_, Root_, Children_, Slots_, ScopedSlots_, IsServer_, Store_, Setters_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -29623,6 +30066,7 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 			this.Slots = null;
 			this.ScopedSlots = null;
 			this.IsServer = false;
+			this.Store = null;
 			this.Setters = null;
 			return;
 		}
@@ -29637,6 +30081,7 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 		this.Slots = Slots_;
 		this.ScopedSlots = ScopedSlots_;
 		this.IsServer = IsServer_;
+		this.Store = Store_;
 		this.Setters = Setters_;
 	});
 	ptrType = $ptrType(js.Object);
@@ -29650,28 +30095,30 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 	sliceType$4 = $sliceType(PropOption);
 	ptrType$5 = $ptrType(VM);
 	NewComponent = function(name, opts) {
-		var _r$2, c, name, opts, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; c = $f.c; name = $f.name; opts = $f.opts; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		var _r$2, _r$3, c, name, opts, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; c = $f.c; name = $f.name; opts = $f.opts; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		_r$2 = o(); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-		c = new Config.ptr(_r$2, "", null, null, null, "", null, null, null, new reflect.Value.ptr(ptrType$1.nil, 0, 0), null);
-		$r = c.Option(opts); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		c = new Config.ptr(_r$2, "", null, null, null, "", null, null, null, null, new reflect.Value.ptr(ptrType$1.nil, 0, 0), null);
+		_r$3 = o(); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		c.Object.hvue_setters = _r$3;
+		$r = c.Option(opts); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		if (c.Object.data === undefined) {
 			c.Object.data = jsCallWithVM((function $b(vm) {
-				var _r$3, dataID, obj, vm, $s, $r;
-				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$3 = $f._r$3; dataID = $f.dataID; obj = $f.obj; vm = $f.vm; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-				_r$3 = o(); /* */ $s = 1; case 1: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-				obj = _r$3;
+				var _r$4, dataID, obj, vm, $s, $r;
+				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$4 = $f._r$4; dataID = $f.dataID; obj = $f.obj; vm = $f.vm; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+				_r$4 = o(); /* */ $s = 1; case 1: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+				obj = _r$4;
 				dataID = vm.Object.$parent.$data.hvue_dataID;
 				if (!(dataID === undefined)) {
 					obj.hvue_dataID = dataID;
 				}
 				$s = -1; return new $jsObjectPtr(obj);
-				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$3 = _r$3; $f.dataID = dataID; $f.obj = obj; $f.vm = vm; $f.$s = $s; $f.$r = $r; return $f;
+				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$4 = _r$4; $f.dataID = dataID; $f.obj = obj; $f.vm = vm; $f.$s = $s; $f.$r = $r; return $f;
 			}));
 		}
 		$global.Vue.component($externalize(name, $String), c.Object);
 		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: NewComponent }; } $f._r$2 = _r$2; $f.c = c; $f.name = name; $f.opts = opts; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: NewComponent }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f.c = c; $f.name = name; $f.opts = opts; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.NewComponent = NewComponent;
 	PropObj = function(name, opts) {
@@ -29753,6 +30200,25 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 		});
 	};
 	$pkg.Computed = Computed;
+	ComputedWithGetSet = function(name, get, set) {
+		var get, name, set;
+		return (function(c) {
+			var c;
+			if (c.Object.computed === undefined) {
+				c.Object.computed = NewObject();
+			}
+			c.Object.computed[$externalize(name, $String)] = $externalize($makeMap($String.keyFor, [{ k: "get", v: new $jsObjectPtr(jsCallWithVM(get)) }, { k: "set", v: new $jsObjectPtr(js.MakeFunc((function $b(this$1, args) {
+				var args, this$1, vm, $s, $r;
+				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; args = $f.args; this$1 = $f.this$1; vm = $f.vm; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+				vm = new VM.ptr(this$1, null, null, null, null, null, null, sliceType.nil, null, null, false, null, null);
+				$r = set(vm, (0 >= args.$length ? ($throwRuntimeError("index out of range"), undefined) : args.$array[args.$offset + 0])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				$s = -1; return $ifaceNil;
+				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.args = args; $f.this$1 = this$1; $f.vm = vm; $f.$s = $s; $f.$r = $r; return $f;
+			}))) }]), js.M);
+			c.Object.hvue_setters[$externalize(name, $String)] = $externalize(true, $Bool);
+		});
+	};
+	$pkg.ComputedWithGetSet = ComputedWithGetSet;
 	Created = function(f) {
 		var f;
 		return makeLifecycleMethod("created", f);
@@ -29832,7 +30298,7 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 		return js.MakeFunc((function $b(this$1, args) {
 			var _r$2, args, this$1, vm, $s, $r;
 			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; args = $f.args; this$1 = $f.this$1; vm = $f.vm; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-			vm = new VM.ptr(this$1, null, null, null, null, null, null, sliceType.nil, null, null, false, null);
+			vm = new VM.ptr(this$1, null, null, null, null, null, null, sliceType.nil, null, null, false, null, null);
 			_r$2 = f(vm); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 			$s = -1; return _r$2;
 			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$2 = _r$2; $f.args = args; $f.this$1 = this$1; $f.vm = vm; $f.$s = $s; $f.$r = $r; return $f;
@@ -29841,10 +30307,10 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 	NewVM = function(opts) {
 		var _r$2, _r$3, c, opts, vm, vmField, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; c = $f.c; opts = $f.opts; vm = $f.vm; vmField = $f.vmField; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		c = new Config.ptr(NewObject(), "", null, null, null, "", null, null, null, new reflect.Value.ptr(ptrType$1.nil, 0, 0), null);
+		c = new Config.ptr(NewObject(), "", null, null, null, "", null, null, null, null, new reflect.Value.ptr(ptrType$1.nil, 0, 0), null);
 		c.Object.hvue_setters = NewObject();
 		$r = c.Option(opts); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		vm = new VM.ptr(new ($global.Vue)($externalize(c, ptrType$2)), null, null, null, null, null, null, sliceType.nil, null, null, false, null);
+		vm = new VM.ptr(new ($global.Vue)($externalize(c, ptrType$2)), null, null, null, null, null, null, sliceType.nil, null, null, false, null, null);
 		/* */ if ($clone(c.dataValue, reflect.Value).IsValid()) { $s = 2; continue; }
 		/* */ $s = 3; continue;
 		/* if ($clone(c.dataValue, reflect.Value).IsValid()) { */ case 2:
@@ -29870,6 +30336,13 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 		});
 	};
 	$pkg.El = El;
+	Store = function() {
+		return (function(c) {
+			var c;
+			c.Object.store = $global.store;
+		});
+	};
+	$pkg.Store = Store;
 	DataFunc = function(f) {
 		var f;
 		return (function(c) {
@@ -30031,7 +30504,7 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 								if (vmDone) {
 									$panic(new $String("Only a single *hvue.VM arg expected per method: " + name));
 								}
-								_r$8 = reflect.ValueOf(new VM.ptr(this$1, null, null, null, null, null, null, sliceType.nil, null, null, false, null)); /* */ $s = 25; case 25: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
+								_r$8 = reflect.ValueOf(new VM.ptr(this$1, null, null, null, null, null, null, sliceType.nil, null, null, false, null, null)); /* */ $s = 25; case 25: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
 								((goArg < 0 || goArg >= goArgs.$length) ? ($throwRuntimeError("index out of range"), undefined) : goArgs.$array[goArgs.$offset + goArg] = _r$8);
 								jsArg = jsArg - (1) >> 0;
 								vmDone = true;
@@ -30134,11 +30607,11 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 	ptrType$2.methods = [{prop: "Option", name: "Option", pkg: "", typ: $funcType([sliceType$3], [], true)}];
 	ptrType$3.methods = [{prop: "Option", name: "Option", pkg: "", typ: $funcType([sliceType$4], [], true)}];
 	ptrType$5.methods = [{prop: "Emit", name: "Emit", pkg: "", typ: $funcType([$String, sliceType$2], [], true)}, {prop: "Refs", name: "Refs", pkg: "", typ: $funcType([$String], [ptrType], false)}, {prop: "GetData", name: "GetData", pkg: "", typ: $funcType([], [$emptyInterface], false)}, {prop: "Set", name: "Set", pkg: "", typ: $funcType([$String, $emptyInterface], [], false)}];
-	Config.init("github.com/HuckRidgeSW/hvue", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType, tag: ""}, {prop: "El", name: "El", anonymous: false, exported: true, typ: $String, tag: "js:\"el\""}, {prop: "Data", name: "Data", anonymous: false, exported: true, typ: ptrType, tag: "js:\"data\""}, {prop: "Methods", name: "Methods", anonymous: false, exported: true, typ: ptrType, tag: "js:\"methods\""}, {prop: "Props", name: "Props", anonymous: false, exported: true, typ: ptrType, tag: "js:\"props\""}, {prop: "Template", name: "Template", anonymous: false, exported: true, typ: $String, tag: "js:\"template\""}, {prop: "Computed", name: "Computed", anonymous: false, exported: true, typ: ptrType, tag: "js:\"computed\""}, {prop: "Components", name: "Components", anonymous: false, exported: true, typ: ptrType, tag: "js:\"components\""}, {prop: "Filters", name: "Filters", anonymous: false, exported: true, typ: ptrType, tag: "js:\"filters\""}, {prop: "dataValue", name: "dataValue", anonymous: false, exported: false, typ: reflect.Value, tag: ""}, {prop: "Setters", name: "Setters", anonymous: false, exported: true, typ: ptrType, tag: "js:\"hvue_setters\""}]);
+	Config.init("github.com/mame82/hvue", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType, tag: ""}, {prop: "El", name: "El", anonymous: false, exported: true, typ: $String, tag: "js:\"el\""}, {prop: "Data", name: "Data", anonymous: false, exported: true, typ: ptrType, tag: "js:\"data\""}, {prop: "Methods", name: "Methods", anonymous: false, exported: true, typ: ptrType, tag: "js:\"methods\""}, {prop: "Props", name: "Props", anonymous: false, exported: true, typ: ptrType, tag: "js:\"props\""}, {prop: "Template", name: "Template", anonymous: false, exported: true, typ: $String, tag: "js:\"template\""}, {prop: "Computed", name: "Computed", anonymous: false, exported: true, typ: ptrType, tag: "js:\"computed\""}, {prop: "Components", name: "Components", anonymous: false, exported: true, typ: ptrType, tag: "js:\"components\""}, {prop: "Filters", name: "Filters", anonymous: false, exported: true, typ: ptrType, tag: "js:\"filters\""}, {prop: "Store", name: "Store", anonymous: false, exported: true, typ: ptrType, tag: "js:\"store\""}, {prop: "dataValue", name: "dataValue", anonymous: false, exported: false, typ: reflect.Value, tag: ""}, {prop: "Setters", name: "Setters", anonymous: false, exported: true, typ: ptrType, tag: "js:\"hvue_setters\""}]);
 	ComponentOption.init([ptrType$2], [], false);
 	PropOption.init([ptrType$3], [], false);
-	PropConfig.init("github.com/HuckRidgeSW/hvue", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType, tag: ""}, {prop: "typ", name: "typ", anonymous: false, exported: false, typ: ptrType, tag: "js:\"type\""}, {prop: "required", name: "required", anonymous: false, exported: false, typ: $Bool, tag: "js:\"required\""}, {prop: "def", name: "def", anonymous: false, exported: false, typ: $emptyInterface, tag: "js:\"default\""}, {prop: "validator", name: "validator", anonymous: false, exported: false, typ: ptrType, tag: "js:\"validator\""}]);
-	VM.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType, tag: ""}, {prop: "Data", name: "Data", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$data\""}, {prop: "Props", name: "Props", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$props\""}, {prop: "El", name: "El", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$el\""}, {prop: "Options", name: "Options", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$options\""}, {prop: "Parent", name: "Parent", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$parent\""}, {prop: "Root", name: "Root", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$root\""}, {prop: "Children", name: "Children", anonymous: false, exported: true, typ: sliceType, tag: "js:\"$children\""}, {prop: "Slots", name: "Slots", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$slots\""}, {prop: "ScopedSlots", name: "ScopedSlots", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$scopedSlots\""}, {prop: "IsServer", name: "IsServer", anonymous: false, exported: true, typ: $Bool, tag: "js:\"$isServer\""}, {prop: "Setters", name: "Setters", anonymous: false, exported: true, typ: ptrType, tag: "js:\"hvue_setters\""}]);
+	PropConfig.init("github.com/mame82/hvue", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType, tag: ""}, {prop: "typ", name: "typ", anonymous: false, exported: false, typ: ptrType, tag: "js:\"type\""}, {prop: "required", name: "required", anonymous: false, exported: false, typ: $Bool, tag: "js:\"required\""}, {prop: "def", name: "def", anonymous: false, exported: false, typ: $emptyInterface, tag: "js:\"default\""}, {prop: "validator", name: "validator", anonymous: false, exported: false, typ: ptrType, tag: "js:\"validator\""}]);
+	VM.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType, tag: ""}, {prop: "Data", name: "Data", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$data\""}, {prop: "Props", name: "Props", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$props\""}, {prop: "El", name: "El", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$el\""}, {prop: "Options", name: "Options", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$options\""}, {prop: "Parent", name: "Parent", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$parent\""}, {prop: "Root", name: "Root", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$root\""}, {prop: "Children", name: "Children", anonymous: false, exported: true, typ: sliceType, tag: "js:\"$children\""}, {prop: "Slots", name: "Slots", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$slots\""}, {prop: "ScopedSlots", name: "ScopedSlots", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$scopedSlots\""}, {prop: "IsServer", name: "IsServer", anonymous: false, exported: true, typ: $Bool, tag: "js:\"$isServer\""}, {prop: "Store", name: "Store", anonymous: false, exported: true, typ: ptrType, tag: "js:\"$store\""}, {prop: "Setters", name: "Setters", anonymous: false, exported: true, typ: ptrType, tag: "js:\"hvue_setters\""}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -30154,7 +30627,7 @@ $packages["github.com/HuckRidgeSW/hvue"] = (function() {
 		_r = o(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		_r$1 = reflect.TypeOf(new $jsObjectPtr(_r)); /* */ $s = 4; case 4: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		jsOType = _r$1;
-		vmType = reflect.TypeOf(new VM.ptr(null, null, null, null, null, null, null, sliceType.nil, null, null, false, null));
+		vmType = reflect.TypeOf(new VM.ptr(null, null, null, null, null, null, null, sliceType.nil, null, null, false, null, null));
 		dataObjects = $makeMap($Int.keyFor, []);
 		nextDataID = 1;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
@@ -51728,37 +52201,40 @@ $packages["honnef.co/go/js/dom"] = (function() {
 	return $pkg;
 })();
 $packages["."] = (function() {
-	var $pkg = {}, $init, common, P4wnP1_grpc, context, md5, hex, errors, hvue, js, grpcweb, status, dom, io, strconv, sync, time, EventLog, CodeMirrorOptionsType, CompCodeEditorData, CompEthernetAddressesData2, CompHIDScriptData, CompLoggerData, CompTabData, CompTabsData, CompToggleSwitchData, VGadgetSettings, VGadgetSettingsEthernet, VGadgetSettingsUMS, CompUSBSettingsData, Rpc, ptrType, ptrType$1, ptrType$2, ptrType$3, ptrType$4, sliceType, arrayType, sliceType$1, sliceType$2, ptrType$5, ptrType$6, ptrType$7, structType, structType$1, sliceType$3, funcType, sliceType$4, sliceType$5, sliceType$6, ptrType$8, ptrType$9, funcType$1, sliceType$7, sliceType$8, ptrType$10, ptrType$11, ptrType$12, ptrType$13, ptrType$14, structType$2, ptrType$15, ptrType$16, ptrType$17, ptrType$18, ptrType$19, ptrType$20, ptrType$21, document, serverAddr, _r, _r$1, DeconstructEventLog, O, Alert, StringToMD5, UploadHIDScript, RunHIDScript, NewCodeEditorData, initCodeMirror, InitCompCodeEditor, newCompEthernetAddressesData2, InitCompEthernetAddresses2, newCompHIDScriptData, InitCompHIDScript, LogLevelClass, NewLoggerData, InitCompLogger, NewCompTabData, InitCompTab, NewCompTabsData, initTabs, InitCompTabs, newCompToggleSwitchData, InitCompToggleSwitch, InitCompUSBSettings, newCompUSBSettingsData, GetBaseURL, main, NewRpcClient;
+	var $pkg = {}, $init, common, P4wnP1_grpc, mvuex, context, md5, hex, errors, js, grpcweb, hvue, status, dom, io, strconv, sync, time, GlobalState, CodeMirrorOptionsType, CompCodeEditorData, CompEthernetAddressesData2, CompHIDScriptData, CompLoggerData, CompTabData, CompTabsData, CompToggleSwitchData, CompUSBSettingsData, jsGadgetSettings, VGadgetSettingsEthernet, VGadgetSettingsUMS, jsEventLog, Rpc, ptrType, ptrType$1, ptrType$2, ptrType$3, ptrType$4, sliceType, arrayType, sliceType$1, sliceType$2, ptrType$5, ptrType$6, ptrType$7, ptrType$8, funcType, funcType$1, funcType$2, funcType$3, sliceType$3, ptrType$9, ptrType$10, structType, structType$1, sliceType$4, funcType$4, sliceType$5, sliceType$6, sliceType$7, ptrType$11, ptrType$12, funcType$5, funcType$6, funcType$7, sliceType$8, sliceType$9, ptrType$13, ptrType$14, ptrType$15, ptrType$16, structType$2, ptrType$17, ptrType$18, ptrType$19, ptrType$20, ptrType$21, ptrType$22, ptrType$23, document, serverAddr, _r, _r$1, DeconstructEventLog, O, Alert, StringToMD5, UploadHIDScript, RunHIDScript, UpdateGadgetSettingsFromDeployed, createGlobalStateStruct, initMVuex, InitGlobalState, NewCodeEditorData, initCodeMirror, InitCompCodeEditor, newCompEthernetAddressesData2, InitCompEthernetAddresses2, newCompHIDScriptData, InitCompHIDScript, LogLevelClass, NewLoggerData, InitCompLogger, newCompStateData, InitCompState, NewCompTabData, InitCompTab, NewCompTabsData, initTabs, InitCompTabs, newCompToggleSwitchData, InitCompToggleSwitch, InitCompUSBSettings, newCompUSBSettingsData, NewUSBGadgetSettings, GetBaseURL, main, NewRpcClient;
 	common = $packages["../common"];
 	P4wnP1_grpc = $packages["../proto/gopherjs"];
+	mvuex = $packages["./mvuex"];
 	context = $packages["context"];
 	md5 = $packages["crypto/md5"];
 	hex = $packages["encoding/hex"];
 	errors = $packages["errors"];
-	hvue = $packages["github.com/HuckRidgeSW/hvue"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	grpcweb = $packages["github.com/johanbrandhorst/protobuf/grpcweb"];
+	hvue = $packages["github.com/mame82/hvue"];
 	status = $packages["google.golang.org/grpc/status"];
 	dom = $packages["honnef.co/go/js/dom"];
 	io = $packages["io"];
 	strconv = $packages["strconv"];
 	sync = $packages["sync"];
 	time = $packages["time"];
-	EventLog = $pkg.EventLog = $newType(0, $kindStruct, "main.EventLog", true, ".", true, function(Object_, EvLogSource_, EvLogLevel_, EvLogMessage_, EvLogTime_) {
+	GlobalState = $pkg.GlobalState = $newType(0, $kindStruct, "main.GlobalState", true, ".", true, function(Object_, Title_, CurrentHIDScriptSource_, CurrentGadgetSettings_, Counter_, Text_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
-			this.EvLogSource = "";
-			this.EvLogLevel = 0;
-			this.EvLogMessage = "";
-			this.EvLogTime = "";
+			this.Title = "";
+			this.CurrentHIDScriptSource = "";
+			this.CurrentGadgetSettings = ptrType$6.nil;
+			this.Counter = 0;
+			this.Text = "";
 			return;
 		}
 		this.Object = Object_;
-		this.EvLogSource = EvLogSource_;
-		this.EvLogLevel = EvLogLevel_;
-		this.EvLogMessage = EvLogMessage_;
-		this.EvLogTime = EvLogTime_;
+		this.Title = Title_;
+		this.CurrentHIDScriptSource = CurrentHIDScriptSource_;
+		this.CurrentGadgetSettings = CurrentGadgetSettings_;
+		this.Counter = Counter_;
+		this.Text = Text_;
 	});
 	CodeMirrorOptionsType = $pkg.CodeMirrorOptionsType = $newType(0, $kindStruct, "main.CodeMirrorOptionsType", true, ".", true, function(Object_, Mode_, LineNumbers_, LineWrapping_, AutoCloseBrackets_, ExtraKeys_) {
 		this.$val = this;
@@ -51783,7 +52259,7 @@ $packages["."] = (function() {
 		if (arguments.length === 0) {
 			this.Object = null;
 			this.ScriptContent = "";
-			this.CodeMirrorOptions = ptrType$6.nil;
+			this.CodeMirrorOptions = ptrType$9.nil;
 			return;
 		}
 		this.Object = Object_;
@@ -51798,15 +52274,13 @@ $packages["."] = (function() {
 		}
 		this.Object = Object_;
 	});
-	CompHIDScriptData = $pkg.CompHIDScriptData = $newType(0, $kindStruct, "main.CompHIDScriptData", true, ".", true, function(Object_, ScriptContent_) {
+	CompHIDScriptData = $pkg.CompHIDScriptData = $newType(0, $kindStruct, "main.CompHIDScriptData", true, ".", true, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
-			this.ScriptContent = "";
 			return;
 		}
 		this.Object = Object_;
-		this.ScriptContent = ScriptContent_;
 	});
 	CompLoggerData = $pkg.CompLoggerData = $newType(0, $kindStruct, "main.CompLoggerData", true, ".", true, function(Object_, LogArray_, cancel_, Mutex_) {
 		this.$val = this;
@@ -51814,7 +52288,7 @@ $packages["."] = (function() {
 			this.Object = null;
 			this.LogArray = null;
 			this.cancel = $throwNilPointerError;
-			this.Mutex = ptrType$8.nil;
+			this.Mutex = ptrType$11.nil;
 			return;
 		}
 		this.Object = Object_;
@@ -51838,8 +52312,8 @@ $packages["."] = (function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
-			this.headers = sliceType$7.nil;
-			this.tabs = sliceType$8.nil;
+			this.headers = sliceType$8.nil;
+			this.tabs = sliceType$9.nil;
 			return;
 		}
 		this.Object = Object_;
@@ -51854,7 +52328,23 @@ $packages["."] = (function() {
 		}
 		this.Object = Object_;
 	});
-	VGadgetSettings = $pkg.VGadgetSettings = $newType(0, $kindStruct, "main.VGadgetSettings", true, ".", true, function(Object_, Enabled_, Vid_, Pid_, Manufacturer_, Product_, Serial_, Use_CDC_ECM_, Use_RNDIS_, Use_HID_KEYBOARD_, Use_HID_MOUSE_, Use_HID_RAW_, Use_UMS_, Use_SERIAL_, RndisSettings_, CdcEcmSettings_, UmsSettings_) {
+	CompUSBSettingsData = $pkg.CompUSBSettingsData = $newType(0, $kindStruct, "main.CompUSBSettingsData", true, ".", true, function(Object_, GadgetSettings_, DeployPending_, CdcEcmDetails_, RndisDetails_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Object = null;
+			this.GadgetSettings = ptrType$6.nil;
+			this.DeployPending = false;
+			this.CdcEcmDetails = false;
+			this.RndisDetails = false;
+			return;
+		}
+		this.Object = Object_;
+		this.GadgetSettings = GadgetSettings_;
+		this.DeployPending = DeployPending_;
+		this.CdcEcmDetails = CdcEcmDetails_;
+		this.RndisDetails = RndisDetails_;
+	});
+	jsGadgetSettings = $pkg.jsGadgetSettings = $newType(0, $kindStruct, "main.jsGadgetSettings", true, ".", false, function(Object_, Enabled_, Vid_, Pid_, Manufacturer_, Product_, Serial_, Use_CDC_ECM_, Use_RNDIS_, Use_HID_KEYBOARD_, Use_HID_MOUSE_, Use_HID_RAW_, Use_UMS_, Use_SERIAL_, RndisSettings_, CdcEcmSettings_, UmsSettings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -51873,7 +52363,7 @@ $packages["."] = (function() {
 			this.Use_SERIAL = false;
 			this.RndisSettings = ptrType$13.nil;
 			this.CdcEcmSettings = ptrType$13.nil;
-			this.UmsSettings = ptrType$12.nil;
+			this.UmsSettings = ptrType$14.nil;
 			return;
 		}
 		this.Object = Object_;
@@ -51918,30 +52408,30 @@ $packages["."] = (function() {
 		this.Cdrom = Cdrom_;
 		this.File = File_;
 	});
-	CompUSBSettingsData = $pkg.CompUSBSettingsData = $newType(0, $kindStruct, "main.CompUSBSettingsData", true, ".", true, function(Object_, GadgetSettings_, DeployPending_, CdcEcmDetails_, RndisDetails_) {
+	jsEventLog = $pkg.jsEventLog = $newType(0, $kindStruct, "main.jsEventLog", true, ".", false, function(Object_, EvLogSource_, EvLogLevel_, EvLogMessage_, EvLogTime_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
-			this.GadgetSettings = ptrType$14.nil;
-			this.DeployPending = false;
-			this.CdcEcmDetails = false;
-			this.RndisDetails = false;
+			this.EvLogSource = "";
+			this.EvLogLevel = 0;
+			this.EvLogMessage = "";
+			this.EvLogTime = "";
 			return;
 		}
 		this.Object = Object_;
-		this.GadgetSettings = GadgetSettings_;
-		this.DeployPending = DeployPending_;
-		this.CdcEcmDetails = CdcEcmDetails_;
-		this.RndisDetails = RndisDetails_;
+		this.EvLogSource = EvLogSource_;
+		this.EvLogLevel = EvLogLevel_;
+		this.EvLogMessage = EvLogMessage_;
+		this.EvLogTime = EvLogTime_;
 	});
 	Rpc = $pkg.Rpc = $newType(0, $kindStruct, "main.Rpc", true, ".", true, function(Mutex_, Client_, eventListeningOn_, eventListeningCtx_, eventListeningCancel_) {
 		this.$val = this;
 		if (arguments.length === 0) {
-			this.Mutex = ptrType$8.nil;
+			this.Mutex = ptrType$11.nil;
 			this.Client = $ifaceNil;
 			this.eventListeningOn = false;
-			this.eventListeningCtx = ptrType$16.nil;
-			this.eventListeningCancel = ptrType$15.nil;
+			this.eventListeningCtx = ptrType$18.nil;
+			this.eventListeningCancel = ptrType$17.nil;
 			return;
 		}
 		this.Mutex = Mutex_;
@@ -51952,7 +52442,7 @@ $packages["."] = (function() {
 	});
 	ptrType = $ptrType(P4wnP1_grpc.GadgetSettings);
 	ptrType$1 = $ptrType(CompLoggerData);
-	ptrType$2 = $ptrType(EventLog);
+	ptrType$2 = $ptrType(jsEventLog);
 	ptrType$3 = $ptrType(P4wnP1_grpc.EventValue_Tstring);
 	ptrType$4 = $ptrType(P4wnP1_grpc.EventValue_Tint64);
 	sliceType = $sliceType($Uint8);
@@ -51960,33 +52450,42 @@ $packages["."] = (function() {
 	sliceType$1 = $sliceType(grpcweb.DialOption);
 	sliceType$2 = $sliceType(grpcweb.CallOption);
 	ptrType$5 = $ptrType(P4wnP1_grpc.HIDScriptJob);
-	ptrType$6 = $ptrType(CodeMirrorOptionsType);
-	ptrType$7 = $ptrType(js.Object);
-	structType = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "Name", name: "Name", anonymous: false, exported: true, typ: $String, tag: "js:\"name\""}, {prop: "GlobalVars", name: "GlobalVars", anonymous: false, exported: true, typ: $Bool, tag: "js:\"globalVars\""}]);
-	structType$1 = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "CtrlSpace", name: "CtrlSpace", anonymous: false, exported: true, typ: $String, tag: "js:\"Ctrl-Space\""}]);
-	sliceType$3 = $sliceType($emptyInterface);
-	funcType = $funcType([ptrType$7], [], false);
-	sliceType$4 = $sliceType(hvue.pOptionType);
-	sliceType$5 = $sliceType(hvue.PropOption);
-	sliceType$6 = $sliceType(hvue.ComponentOption);
-	ptrType$8 = $ptrType(sync.Mutex);
-	ptrType$9 = $ptrType(hvue.VM);
-	funcType$1 = $funcType([ptrType$9, $Int], [$String], false);
-	sliceType$7 = $sliceType($String);
-	sliceType$8 = $sliceType(ptrType$7);
-	ptrType$10 = $ptrType(P4wnP1_grpc.GadgetSettingsEthernet);
-	ptrType$11 = $ptrType(P4wnP1_grpc.GadgetSettingsUMS);
-	ptrType$12 = $ptrType(VGadgetSettingsUMS);
+	ptrType$6 = $ptrType(jsGadgetSettings);
+	ptrType$7 = $ptrType(mvuex.Store);
+	ptrType$8 = $ptrType(GlobalState);
+	funcType = $funcType([ptrType$7, ptrType$8, $Int], [], false);
+	funcType$1 = $funcType([ptrType$7, ptrType$8], [], false);
+	funcType$2 = $funcType([ptrType$7, ptrType$8, $String], [], false);
+	funcType$3 = $funcType([ptrType$7, ptrType$8, ptrType$6], [], false);
+	sliceType$3 = $sliceType(mvuex.StoreOption);
+	ptrType$9 = $ptrType(CodeMirrorOptionsType);
+	ptrType$10 = $ptrType(js.Object);
+	structType = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "Name", name: "Name", anonymous: false, exported: true, typ: $String, tag: "js:\"name\""}, {prop: "GlobalVars", name: "GlobalVars", anonymous: false, exported: true, typ: $Bool, tag: "js:\"globalVars\""}]);
+	structType$1 = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "CtrlSpace", name: "CtrlSpace", anonymous: false, exported: true, typ: $String, tag: "js:\"Ctrl-Space\""}]);
+	sliceType$4 = $sliceType($emptyInterface);
+	funcType$4 = $funcType([ptrType$10], [], false);
+	sliceType$5 = $sliceType(hvue.pOptionType);
+	sliceType$6 = $sliceType(hvue.PropOption);
+	sliceType$7 = $sliceType(hvue.ComponentOption);
+	ptrType$11 = $ptrType(sync.Mutex);
+	ptrType$12 = $ptrType(hvue.VM);
+	funcType$5 = $funcType([ptrType$12, $Int], [$String], false);
+	funcType$6 = $funcType([ptrType$12, ptrType$10], [], false);
+	funcType$7 = $funcType([ptrType$12], [], false);
+	sliceType$8 = $sliceType($String);
+	sliceType$9 = $sliceType(ptrType$10);
 	ptrType$13 = $ptrType(VGadgetSettingsEthernet);
-	ptrType$14 = $ptrType(VGadgetSettings);
-	structType$2 = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "TestString", name: "TestString", anonymous: false, exported: true, typ: $String, tag: "js:\"testString\""}]);
-	ptrType$15 = $ptrType(context.CancelFunc);
-	ptrType$16 = $ptrType(context.Context);
-	ptrType$17 = $ptrType(CompHIDScriptData);
-	ptrType$18 = $ptrType(P4wnP1_grpc.Event);
-	ptrType$19 = $ptrType(CompTabsData);
-	ptrType$20 = $ptrType(CompUSBSettingsData);
-	ptrType$21 = $ptrType(Rpc);
+	ptrType$14 = $ptrType(VGadgetSettingsUMS);
+	ptrType$15 = $ptrType(P4wnP1_grpc.GadgetSettingsEthernet);
+	ptrType$16 = $ptrType(P4wnP1_grpc.GadgetSettingsUMS);
+	structType$2 = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "TestString", name: "TestString", anonymous: false, exported: true, typ: $String, tag: "js:\"testString\""}]);
+	ptrType$17 = $ptrType(context.CancelFunc);
+	ptrType$18 = $ptrType(context.Context);
+	ptrType$19 = $ptrType(CompHIDScriptData);
+	ptrType$20 = $ptrType(P4wnP1_grpc.Event);
+	ptrType$21 = $ptrType(CompTabsData);
+	ptrType$22 = $ptrType(CompUSBSettingsData);
+	ptrType$23 = $ptrType(Rpc);
 	DeconstructEventLog = function(gRPCEv) {
 		var _ref, _ref$1, _ref$2, _ref$3, _tmp, _tmp$1, _tmp$10, _tmp$11, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tmp$9, err, gRPCEv, res, vT, vT$1, vT$2, vT$3, vT$4, vT$5, vT$6, vT$7, x, x$1, x$2, x$3, x$4, x$5;
 		res = ptrType$2.nil;
@@ -51998,7 +52497,7 @@ $packages["."] = (function() {
 			err = _tmp$1;
 			return [res, err];
 		}
-		res = new EventLog.ptr(O(), "", 0, "", "");
+		res = new jsEventLog.ptr(O(), "", 0, "", "");
 		_ref = (x$1 = gRPCEv.Values, (0 >= x$1.$length ? ($throwRuntimeError("index out of range"), undefined) : x$1.$array[x$1.$offset + 0])).Val;
 		if ($assertType(_ref, ptrType$3, true)[1]) {
 			vT = _ref.$val;
@@ -52113,9 +52612,88 @@ $packages["."] = (function() {
 		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if (!$curGoroutine.asleep) { return  [job, err]; } if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: RunHIDScript }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.cancel = cancel; $f.client = client; $f.ctx = ctx; $f.err = err; $f.filename = filename; $f.job = job; $f.timeoutSeconds = timeoutSeconds; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
 	};
 	$pkg.RunHIDScript = RunHIDScript;
+	UpdateGadgetSettingsFromDeployed = function(jsGS) {
+		var _r$2, _r$3, _tuple, _tuple$1, cancel, ctx, deployedGs, err, jsGS, $s, $deferred, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; cancel = $f.cancel; ctx = $f.ctx; deployedGs = $f.deployedGs; err = $f.err; jsGS = $f.jsGS; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		console.log("UpdateGadgetSettingsFromDeployed called");
+		_r$2 = context.WithTimeout(context.Background(), new time.Duration(0, 3000000000)); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_tuple = _r$2;
+		ctx = _tuple[0];
+		cancel = _tuple[1];
+		$deferred.push([cancel, []]);
+		_r$3 = $pkg.Client.Client.GetDeployedGadgetSetting(ctx, new P4wnP1_grpc.Empty.ptr(), new sliceType$2([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		_tuple$1 = _r$3;
+		deployedGs = _tuple$1[0];
+		err = _tuple$1[1];
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			console.log(err);
+			$s = -1; return;
+		}
+		jsGS.fromGS(deployedGs);
+		$s = -1; return;
+		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: UpdateGadgetSettingsFromDeployed }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.cancel = cancel; $f.ctx = ctx; $f.deployedGs = deployedGs; $f.err = err; $f.jsGS = jsGS; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+	};
+	$pkg.UpdateGadgetSettingsFromDeployed = UpdateGadgetSettingsFromDeployed;
+	createGlobalStateStruct = function() {
+		var state, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; state = $f.state; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		state = new GlobalState.ptr(O(), "", "", ptrType$6.nil, 0, "");
+		state.Object.title = $externalize("P4wnP1 by MaMe82", $String);
+		state.Object.currentHIDScriptSource = $externalize("layout('us');\t\t\t// US keyboard layout\ntypingSpeed(100,150)\t// Wait 100ms between key strokes + an additional random value between 0ms and 150ms (natural)\n\nwaitLEDRepeat(NUM);\t\t// Wait till NUM LED of target changes frequently multiple times (doesn't work on OSX)\npress(\"GUI r\");\ndelay(500);\ntype(\"notepad\\n\")\ndelay(1000);\nfor (var i = 0; i < 3; i++) {\n  type(\"Hello from P4wnP1 run \" + i + \" !\\n\");\n  type(\"Moving mouse right ...\");\n  moveStepped(500,0);\n  type(\"and left\\n\");\n  moveStepped(-500,0);\n}\ntype(\"Let's type fast !!!!!!!!!!!!!!!\\n\")\ntypingSpeed(0,0);\nfor (var i = 3; i < 10; i++) {\n  type(\"Hello from P4wnP1 run \" + i + \" !\\n\");\n  type(\"Moving mouse right ...\");\n  moveStepped(500,0);\n  type(\"and left\\n\");\n  moveStepped(-500,0);\n}", $String);
+		state.Object.currentGadgetSettings = $externalize(NewUSBGadgetSettings(), ptrType$6);
+		$r = UpdateGadgetSettingsFromDeployed($internalize(state.Object.currentGadgetSettings, ptrType$6)); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		state.Object.count = 1337;
+		state.Object.text = $externalize("Hi there says MaMe82", $String);
+		$s = -1; return new state.constructor.elem(state);
+		/* */ } return; } if ($f === undefined) { $f = { $blk: createGlobalStateStruct }; } $f.state = state; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	initMVuex = function() {
+		var _r$2, _r$3, state, store, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; state = $f.state; store = $f.store; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		_r$2 = createGlobalStateStruct(); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		state = _r$2;
+		_r$3 = mvuex.NewStore(new sliceType$3([mvuex.State(state), mvuex.Mutation("increment", new funcType((function(store, state$1, add) {
+			var add, state$1, store;
+			state$1.Object.count = ($parseInt(state$1.Object.count) >> 0) + (add) >> 0;
+			return;
+		}))), mvuex.Mutation("decrement", new funcType$1((function(store, state$1) {
+			var state$1, store;
+			state$1.Object.count = ($parseInt(state$1.Object.count) >> 0) - (1) >> 0;
+			return;
+		}))), mvuex.Mutation("setText", new funcType$2((function(store, state$1, newText) {
+			var newText, state$1, store;
+			state$1.Object.text = $externalize(newText, $String);
+			return;
+		}))), mvuex.Mutation("setCurrentHIDScriptSource", new funcType$2((function(store, state$1, newText) {
+			var newText, state$1, store;
+			state$1.Object.currentHIDScriptSource = $externalize(newText, $String);
+			return;
+		}))), mvuex.Mutation("setCurrentGadgetSettings", new funcType$3((function(store, state$1, newSettings) {
+			var newSettings, state$1, store;
+			state$1.Object.currentGadgetSettings = $externalize(newSettings, ptrType$6);
+			return;
+		}))), mvuex.Mutation("setCurrentGadgetSettingsFromDeployed", new funcType$1((function(store, state$1) {
+			var state$1, store;
+			console.log("Store: commit setCurrentGadgetSettingsFromDeployed");
+			$go(UpdateGadgetSettingsFromDeployed, [$internalize(state$1.Object.currentGadgetSettings, ptrType$6)]);
+			return;
+		})))])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		store = _r$3;
+		$global.store = $externalize(store, ptrType$7);
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: initMVuex }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f.state = state; $f.store = store; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	InitGlobalState = function() {
+		var $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = initMVuex(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: InitGlobalState }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.InitGlobalState = InitGlobalState;
 	NewCodeEditorData = function(vm) {
 		var cmo, data, extraKeys, mode, vm;
-		data = new CompCodeEditorData.ptr(O(), "", ptrType$6.nil);
+		data = new CompCodeEditorData.ptr(O(), "", ptrType$9.nil);
 		data.Object.scriptContent = $externalize("", $String);
 		cmo = new CodeMirrorOptionsType.ptr(O(), $ifaceNil, false, false, false, $ifaceNil);
 		mode = new structType.ptr(O(), "", false);
@@ -52128,7 +52706,7 @@ $packages["."] = (function() {
 		cmo.Object.lineNumbers = $externalize(true, $Bool);
 		cmo.Object.lineWrapping = $externalize(true, $Bool);
 		cmo.Object.autoCloseBrackets = $externalize(true, $Bool);
-		data.Object.codemirrorOptions = $externalize(cmo, ptrType$6);
+		data.Object.codemirrorOptions = $externalize(cmo, ptrType$9);
 		return data;
 	};
 	$pkg.NewCodeEditorData = NewCodeEditorData;
@@ -52144,14 +52722,14 @@ $packages["."] = (function() {
 			var cm, newVal;
 			newVal = cm.getValue();
 			vm.Set("scriptContent", new $jsObjectPtr(newVal));
-			vm.Emit("change", new sliceType$3([new $jsObjectPtr(newVal)]));
-			vm.Emit("input", new sliceType$3([new $jsObjectPtr(newVal)]));
-		}), funcType));
+			vm.Emit("change", new sliceType$4([new $jsObjectPtr(newVal)]));
+			vm.Emit("input", new sliceType$4([new $jsObjectPtr(newVal)]));
+		}), funcType$4));
 	};
 	InitCompCodeEditor = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("code-editor", new sliceType$6([hvue.Template("\n<div>\n\t<textarea id=\"CodeEditor\"></textarea>\n</div>\n"), hvue.DataFunc(NewCodeEditorData), hvue.PropObj("value", new sliceType$5([hvue.Types(new sliceType$4([0])), hvue.Default(new $String("type('Hello');"))])), hvue.Mounted(initCodeMirror)])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("code-editor", new sliceType$7([hvue.Template("\n<div>\n\t<textarea id=\"CodeEditor\"></textarea>\n</div>\n"), hvue.DataFunc(NewCodeEditorData), hvue.PropObj("value", new sliceType$6([hvue.Types(new sliceType$5([0])), hvue.Default(new $String("type('Hello');"))])), hvue.Mounted(initCodeMirror)])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompCodeEditor }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -52164,24 +52742,25 @@ $packages["."] = (function() {
 	InitCompEthernetAddresses2 = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("ethernet-addresses", new sliceType$6([hvue.Template("\n<div>\n\t<table>\n\t<tr>\n\t\t<td>Host MAC address</td><td><input v-bind:value=\"settings.HostAddr\" v-on:input=\"$emit('hostAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t<tr>\n\t\t<td>Device MAC address</td><td><input v-bind:value=\"settings.DevAddr\" v-on:input=\"$emit('devAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t</table>\n</div>\n"), hvue.DataFunc(newCompEthernetAddressesData2), hvue.PropObj("settings", new sliceType$5([hvue.Types(new sliceType$4([4]))]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("ethernet-addresses", new sliceType$7([hvue.Template("\n<div>\n\t<table>\n\t<tr>\n\t\t<td>Host MAC address</td><td><input v-bind:value=\"settings.HostAddr\" v-on:input=\"$emit('hostAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t<tr>\n\t\t<td>Device MAC address</td><td><input v-bind:value=\"settings.DevAddr\" v-on:input=\"$emit('devAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t</table>\n</div>\n"), hvue.DataFunc(newCompEthernetAddressesData2), hvue.PropObj("settings", new sliceType$6([hvue.Types(new sliceType$5([4]))]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompEthernetAddresses2 }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.InitCompEthernetAddresses2 = InitCompEthernetAddresses2;
 	CompHIDScriptData.ptr.prototype.SendAndRun = function(vm) {
-		var _r$2, data, md5$1, vm, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; data = $f.data; md5$1 = $f.md5$1; vm = $f.vm; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		data = [data];
+		var _r$2, data, md5$1, sourceCode, vm, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; data = $f.data; md5$1 = $f.md5$1; sourceCode = $f.sourceCode; vm = $f.vm; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		md5$1 = [md5$1];
-		data[0] = this;
-		_r$2 = StringToMD5($internalize(data[0].Object.scriptContent, $String)); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		sourceCode = [sourceCode];
+		data = this;
+		sourceCode[0] = $internalize(vm.Object.scriptContent, $String);
+		_r$2 = StringToMD5(sourceCode[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		md5$1[0] = _r$2;
-		$go((function(data, md5$1) { return function $b() {
-			var _r$3, _r$4, _r$5, _r$6, _tuple, err, job, timeout, $s, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _tuple = $f._tuple; err = $f.err; job = $f.job; timeout = $f.timeout; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$go((function(md5$1, sourceCode) { return function $b() {
+			var _r$3, _r$4, _r$5, _r$6, _r$7, _tuple, err, job, timeout, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _tuple = $f._tuple; err = $f.err; job = $f.job; timeout = $f.timeout; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 			timeout = 0;
-			_r$3 = UploadHIDScript(md5$1[0], $internalize(data[0].Object.scriptContent, $String)); /* */ $s = 1; case 1: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+			_r$3 = UploadHIDScript(md5$1[0], sourceCode[0]); /* */ $s = 1; case 1: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
 			err = _r$3;
 			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 2; continue; }
 			/* */ $s = 3; continue;
@@ -52197,28 +52776,35 @@ $packages["."] = (function() {
 			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 7; continue; }
 			/* */ $s = 8; continue;
 			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 7:
-				_r$6 = err.Error(); /* */ $s = 9; case 9: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
-				$r = Alert(new $String("Error starting script as background job: " + _r$6)); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				_r$6 = status.Convert(err); /* */ $s = 9; case 9: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
+				console.log(_r$6);
+				_r$7 = err.Error(); /* */ $s = 10; case 10: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
+				$r = Alert(new $String("Error starting script as background job: " + _r$7)); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 				$s = -1; return;
 			/* } */ case 8:
 			Alert(new $String("Script started as background job: " + strconv.Itoa(((job.Id >> 0)))));
 			$s = -1; return;
-			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._tuple = _tuple; $f.err = err; $f.job = job; $f.timeout = timeout; $f.$s = $s; $f.$r = $r; return $f;
-		}; })(data, md5$1), []);
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._tuple = _tuple; $f.err = err; $f.job = job; $f.timeout = timeout; $f.$s = $s; $f.$r = $r; return $f;
+		}; })(md5$1, sourceCode), []);
 		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: CompHIDScriptData.ptr.prototype.SendAndRun }; } $f._r$2 = _r$2; $f.data = data; $f.md5$1 = md5$1; $f.vm = vm; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: CompHIDScriptData.ptr.prototype.SendAndRun }; } $f._r$2 = _r$2; $f.data = data; $f.md5$1 = md5$1; $f.sourceCode = sourceCode; $f.vm = vm; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	CompHIDScriptData.prototype.SendAndRun = function(vm) { return this.$val.SendAndRun(vm); };
 	newCompHIDScriptData = function(vm) {
 		var newVM, vm;
-		newVM = new CompHIDScriptData.ptr(new ($global.Object)(), "");
-		newVM.Object.scriptContent = $externalize("layout('us');\ntype('hello');", $String);
+		newVM = new CompHIDScriptData.ptr(new ($global.Object)());
 		return newVM;
 	};
 	InitCompHIDScript = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("hid-script", new sliceType$6([hvue.Template("\n<div>\n\t<span>P4wnP1 HID Script</span>\n\t<button @click=\"SendAndRun()\">as Job</button><br>\n\t<code-editor v-model=\"scriptContent\"></code-editor>\n</div>\n"), hvue.DataFunc(newCompHIDScriptData), hvue.MethodsOf(new CompHIDScriptData.ptr(null, ""))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("hid-script", new sliceType$7([hvue.Template("\n<div>\n\t<span>P4wnP1 HID Script</span>\n\t<button @click=\"SendAndRun()\">as Job</button><br>\n\t<code-editor v-model=\"scriptContent\"></code-editor>\n</div>\n"), hvue.DataFunc(newCompHIDScriptData), hvue.MethodsOf(new CompHIDScriptData.ptr(null)), hvue.ComputedWithGetSet("scriptContent", (function(vm) {
+			var vm;
+			return new $jsObjectPtr(vm.Object.$store.state.currentHIDScriptSource);
+		}), (function(vm, newValue) {
+			var newValue, vm;
+			vm.Object.$store.commit($externalize("setCurrentHIDScriptSource", $String), newValue);
+		}))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompHIDScript }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -52328,7 +52914,7 @@ $packages["."] = (function() {
 	$pkg.LogLevelClass = LogLevelClass;
 	NewLoggerData = function(vm) {
 		var loggerVmData, vm;
-		loggerVmData = new CompLoggerData.ptr(new ($global.Object)(), null, $throwNilPointerError, ptrType$8.nil);
+		loggerVmData = new CompLoggerData.ptr(new ($global.Object)(), null, $throwNilPointerError, ptrType$11.nil);
 		loggerVmData.Mutex = new sync.Mutex.ptr(0, 0);
 		loggerVmData.Object.logArray = new ($global.Array)();
 		return loggerVmData;
@@ -52337,7 +52923,7 @@ $packages["."] = (function() {
 	InitCompLogger = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("logger", new sliceType$6([hvue.Template("\n\t<div class=\"logger\">\n\t<table class=\"log-entries\">\n\t\t<tr>\n\t\t\t<th>time</th>\n\t\t\t<th>source</th>\n\t\t\t<th>level</th>\n\t\t\t<th>message</th>\n\t\t</tr>\n        <tr v-for=\"(logEntry,idx) in logArray\" :key=\"idx\" :class=\"logLevelClass(logEntry.level)\">\n\t\t\t<td class=\"log-entry-time\">{{ logEntry.time }}</td>\n\t        <td class=\"log-entry-source\">{{ logEntry.source }}</td>\n\t\t\t<td class=\"log-entry-level\">{{ logEntry.level }}</td>\n\t\t\t<td class=\"log-entry-message\">{{ logEntry.message }}</td>\n\t    </tr>\n\t</table>\n\t</div>\n\n"), hvue.DataFunc(NewLoggerData), hvue.MethodsOf(new CompLoggerData.ptr(null, null, $throwNilPointerError, ptrType$8.nil)), hvue.Method("logLevelClass", new funcType$1(LogLevelClass)), hvue.PropObj("max-entries", new sliceType$5([hvue.Types(new sliceType$4([1])), hvue.Default(new $Int(5))])), hvue.Created((function(vm) {
+		$r = hvue.NewComponent("logger", new sliceType$7([hvue.Template("\n\t<div class=\"logger\">\n\t<table class=\"log-entries\">\n\t\t<tr>\n\t\t\t<th>time</th>\n\t\t\t<th>source</th>\n\t\t\t<th>level</th>\n\t\t\t<th>message</th>\n\t\t</tr>\n        <tr v-for=\"(logEntry,idx) in logArray\" :key=\"idx\" :class=\"logLevelClass(logEntry.level)\">\n\t\t\t<td class=\"log-entry-time\">{{ logEntry.time }}</td>\n\t        <td class=\"log-entry-source\">{{ logEntry.source }}</td>\n\t\t\t<td class=\"log-entry-level\">{{ logEntry.level }}</td>\n\t\t\t<td class=\"log-entry-message\">{{ logEntry.message }}</td>\n\t    </tr>\n\t</table>\n\t</div>\n\n"), hvue.DataFunc(NewLoggerData), hvue.MethodsOf(new CompLoggerData.ptr(null, null, $throwNilPointerError, ptrType$11.nil)), hvue.Method("logLevelClass", new funcType$5(LogLevelClass)), hvue.PropObj("max-entries", new sliceType$6([hvue.Types(new sliceType$5([1])), hvue.Default(new $Int(5))])), hvue.Created((function(vm) {
 			var vm;
 			console.log("OnCreated");
 			vm.Object.StartListening();
@@ -52362,6 +52948,34 @@ $packages["."] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompLogger }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.InitCompLogger = InitCompLogger;
+	newCompStateData = function(vm) {
+		var newVM, vm;
+		newVM = new CompToggleSwitchData.ptr(O());
+		return newVM;
+	};
+	InitCompState = function() {
+		var $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = hvue.NewComponent("state", new sliceType$7([hvue.Template("\n<div>\n  <p>{{ count }}</p>\n  <p>{{ text }}</p>\n  <input v-model=\"text\"></input>\n  <p>\n    <button @click=\"increment(1,2,3)\">+</button>\n\t<button @click=\"increment(2)\">+2</button>\n    <button @click=\"decrement\">-</button>\n  </p>\n</div>\n"), hvue.DataFunc(newCompStateData), hvue.Computed("count", (function(vm) {
+			var vm;
+			return new $jsObjectPtr($global.store.state.count);
+		})), hvue.ComputedWithGetSet("text", (function(vm) {
+			var vm;
+			return new $jsObjectPtr($global.store.state.text);
+		}), (function(vm, newValue) {
+			var newValue, vm;
+			$global.store.commit($externalize("setText", $String), newValue);
+		})), hvue.Method("increment", new funcType$6((function(vm, count) {
+			var count, vm;
+			$global.store.commit($externalize("increment", $String), count);
+		}))), hvue.Method("decrement", new funcType$7((function(vm) {
+			var vm;
+			$global.store.commit($externalize("decrement", $String));
+		})))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompState }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.InitCompState = InitCompState;
 	NewCompTabData = function(vm) {
 		var cc, vm;
 		cc = new CompTabData.ptr(new ($global.Object)(), 0, false);
@@ -52373,9 +52987,12 @@ $packages["."] = (function() {
 	InitCompTab = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("tab", new sliceType$6([hvue.Template("\n\t<div v-if=\"isActive\">\n\t\t<keep-alive>\n\t\t<slot></slot>\n\t\t</keep-alive>\n\t</div>\n"), hvue.DataFunc(NewCompTabData), hvue.PropObj("header", new sliceType$5([hvue.Types(new sliceType$4([0])), hvue.Default(new $String("tab name")), hvue.Required])), hvue.PropObj("disabled", new sliceType$5([hvue.Types(new sliceType$4([2])), hvue.Default(new $Bool(false))])), hvue.PropObj("selected", new sliceType$5([hvue.Types(new sliceType$4([2])), hvue.Default(new $Bool(false))])), hvue.Computed("_isTab", (function(vm) {
+		$r = hvue.NewComponent("tab", new sliceType$7([hvue.Template("\n\t\t<div v-if=\"isActive\">\n\t\t\t<slot></slot>\n\t\t</div>\n\t\n"), hvue.DataFunc(NewCompTabData), hvue.PropObj("header", new sliceType$6([hvue.Types(new sliceType$5([0])), hvue.Default(new $String("tab name")), hvue.Required])), hvue.PropObj("disabled", new sliceType$6([hvue.Types(new sliceType$5([2])), hvue.Default(new $Bool(false))])), hvue.PropObj("selected", new sliceType$6([hvue.Types(new sliceType$5([2])), hvue.Default(new $Bool(false))])), hvue.Computed("_isTab", (function(vm) {
 			var vm;
 			return new $Bool(true);
+		})), hvue.Computed("hasOverride", (function(vm) {
+			var vm;
+			return new $Bool(!!(vm.Object.$slots.override));
 		})), hvue.Mounted((function(vm) {
 			var vm;
 			vm.Set("isActive", new $jsObjectPtr(vm.Object.selected));
@@ -52386,16 +53003,16 @@ $packages["."] = (function() {
 	$pkg.InitCompTab = InitCompTab;
 	NewCompTabsData = function(vm) {
 		var cc, vm;
-		cc = new CompTabsData.ptr(new ($global.Object)(), sliceType$7.nil, sliceType$8.nil);
-		cc.Object.headers = $externalize(new sliceType$7([]), sliceType$7);
-		cc.Object.tabs = $externalize(new sliceType$8([]), sliceType$8);
+		cc = new CompTabsData.ptr(new ($global.Object)(), sliceType$8.nil, sliceType$9.nil);
+		cc.Object.headers = $externalize(new sliceType$8([]), sliceType$8);
+		cc.Object.tabs = $externalize(new sliceType$9([]), sliceType$9);
 		return cc;
 	};
 	$pkg.NewCompTabsData = NewCompTabsData;
 	initTabs = function(vm) {
 		var _i, _ref, child, id, isTab, vm;
 		id = 0;
-		_ref = $internalize(vm.Object.$children, sliceType$8);
+		_ref = $internalize(vm.Object.$children, sliceType$9);
 		_i = 0;
 		while (true) {
 			if (!(_i < _ref.$length)) { break; }
@@ -52413,7 +53030,7 @@ $packages["."] = (function() {
 		var _i, _ref, c, child, isTab, selectedID, vm;
 		c = this;
 		console.log("Update selected ID: ", selectedID);
-		_ref = $internalize(vm.Object.$children, sliceType$8);
+		_ref = $internalize(vm.Object.$children, sliceType$9);
 		_i = 0;
 		while (true) {
 			if (!(_i < _ref.$length)) { break; }
@@ -52429,7 +53046,7 @@ $packages["."] = (function() {
 	InitCompTabs = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("tabs", new sliceType$6([hvue.DataFunc(NewCompTabsData), hvue.Template("\n<div>\n\t<div>\n\t\t<ul class=\"nav nav-tabs\">\n\t        <li v-for=\"t in tabs\" :class=\"{ 'active' : t.isActive }\" :key=\"t.id\">\n\t          <a href=\"#\" @click=\"UpdateSelectedTab(t.id)\">{{ t.header }}</a>\n\t        </li>\n\t\t</ul>\n\t</div>\n\t<div class=\"tab-content\">\n\t\t<slot></slot>\n\t</div>\n</div>\n"), hvue.Mounted(initTabs), hvue.MethodsOf(new CompTabsData.ptr(null, sliceType$7.nil, sliceType$8.nil))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("tabs", new sliceType$7([hvue.DataFunc(NewCompTabsData), hvue.Template("\n<div>\n\t<div>\n\t\t<ul class=\"nav nav-tabs\">\n\t        <li v-for=\"t in tabs\" :class=\"{ 'active' : t.isActive }\" :key=\"t.id\">\n\t          <a href=\"#\" @click=\"UpdateSelectedTab(t.id)\">{{ t.header }}</a>\n\t        </li>\n\t\t</ul>\n\t</div>\n\t<div class=\"tab-content\">\n\t\t<slot></slot>\n\t</div>\n</div>\n"), hvue.Mounted(initTabs), hvue.MethodsOf(new CompTabsData.ptr(null, sliceType$8.nil, sliceType$9.nil))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompTabs }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -52442,86 +53059,22 @@ $packages["."] = (function() {
 	InitCompToggleSwitch = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("toggle-switch", new sliceType$6([hvue.Template("\n<label class=\"toggle-switch\">\n   \t<input type=\"checkbox\" v-bind:checked=\"value\" v-on:change=\"$emit('input', $event.target.checked)\">\n   \t<div><span class=\"on\">On</span><span class=\"off\">Off</span></div>\n\t<span class=\"toggle-switch-slider\"></span>\n</label>\n"), hvue.DataFunc(newCompToggleSwitchData), hvue.PropObj("value", new sliceType$5([hvue.Types(new sliceType$4([2])), hvue.Required]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("toggle-switch", new sliceType$7([hvue.Template("\n<label class=\"toggle-switch\">\n   \t<input type=\"checkbox\" v-bind:checked=\"value\" v-on:change=\"$emit('input', $event.target.checked)\">\n   \t<div><span class=\"on\">On</span><span class=\"off\">Off</span></div>\n\t<span class=\"toggle-switch-slider\"></span>\n</label>\n"), hvue.DataFunc(newCompToggleSwitchData), hvue.PropObj("value", new sliceType$6([hvue.Types(new sliceType$5([2])), hvue.Required]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompToggleSwitch }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.InitCompToggleSwitch = InitCompToggleSwitch;
-	VGadgetSettings.ptr.prototype.toGS = function() {
-		var gs, vGS;
-		gs = ptrType.nil;
-		vGS = this;
-		gs = new P4wnP1_grpc.GadgetSettings.ptr(!!(vGS.Object.Enabled), $internalize(vGS.Object.Vid, $String), $internalize(vGS.Object.Pid, $String), $internalize(vGS.Object.Manufacturer, $String), $internalize(vGS.Object.Product, $String), $internalize(vGS.Object.Serial, $String), !!(vGS.Object.Use_CDC_ECM), !!(vGS.Object.Use_RNDIS), !!(vGS.Object.Use_HID_KEYBOARD), !!(vGS.Object.Use_HID_MOUSE), !!(vGS.Object.Use_HID_RAW), !!(vGS.Object.Use_UMS), !!(vGS.Object.Use_SERIAL), new P4wnP1_grpc.GadgetSettingsEthernet.ptr($internalize($internalize(vGS.Object.RndisSettings, ptrType$13).Object.HostAddr, $String), $internalize($internalize(vGS.Object.RndisSettings, ptrType$13).Object.DevAddr, $String)), new P4wnP1_grpc.GadgetSettingsEthernet.ptr($internalize($internalize(vGS.Object.CdcEcmSettings, ptrType$13).Object.HostAddr, $String), $internalize($internalize(vGS.Object.CdcEcmSettings, ptrType$13).Object.DevAddr, $String)), new P4wnP1_grpc.GadgetSettingsUMS.ptr(!!($internalize(vGS.Object.UmsSettings, ptrType$12).Object.Cdrom), $internalize($internalize(vGS.Object.UmsSettings, ptrType$12).Object.File, $String)));
-		return gs;
-	};
-	VGadgetSettings.prototype.toGS = function() { return this.$val.toGS(); };
-	VGadgetSettings.ptr.prototype.fromGS = function(gs) {
-		var gs, vGS;
-		vGS = this;
-		console.log(gs);
-		vGS.Object.Enabled = $externalize(gs.Enabled, $Bool);
-		vGS.Object.Vid = $externalize(gs.Vid, $String);
-		vGS.Object.Pid = $externalize(gs.Pid, $String);
-		vGS.Object.Manufacturer = $externalize(gs.Manufacturer, $String);
-		vGS.Object.Product = $externalize(gs.Product, $String);
-		vGS.Object.Serial = $externalize(gs.Serial, $String);
-		vGS.Object.Use_CDC_ECM = $externalize(gs.Use_CDC_ECM, $Bool);
-		vGS.Object.Use_RNDIS = $externalize(gs.Use_RNDIS, $Bool);
-		vGS.Object.Use_HID_KEYBOARD = $externalize(gs.Use_HID_KEYBOARD, $Bool);
-		vGS.Object.Use_HID_MOUSE = $externalize(gs.Use_HID_MOUSE, $Bool);
-		vGS.Object.Use_HID_RAW = $externalize(gs.Use_HID_RAW, $Bool);
-		vGS.Object.Use_UMS = $externalize(gs.Use_UMS, $Bool);
-		vGS.Object.Use_SERIAL = $externalize(gs.Use_SERIAL, $Bool);
-		vGS.Object.RndisSettings = $externalize(new VGadgetSettingsEthernet.ptr(new ($global.Object)(), "", ""), ptrType$13);
-		if (!(gs.RndisSettings === ptrType$10.nil)) {
-			$internalize(vGS.Object.RndisSettings, ptrType$13).Object.HostAddr = $externalize(gs.RndisSettings.HostAddr, $String);
-			$internalize(vGS.Object.RndisSettings, ptrType$13).Object.DevAddr = $externalize(gs.RndisSettings.DevAddr, $String);
-		}
-		vGS.Object.CdcEcmSettings = $externalize(new VGadgetSettingsEthernet.ptr(new ($global.Object)(), "", ""), ptrType$13);
-		if (!(gs.CdcEcmSettings === ptrType$10.nil)) {
-			$internalize(vGS.Object.CdcEcmSettings, ptrType$13).Object.HostAddr = $externalize(gs.CdcEcmSettings.HostAddr, $String);
-			$internalize(vGS.Object.CdcEcmSettings, ptrType$13).Object.DevAddr = $externalize(gs.CdcEcmSettings.DevAddr, $String);
-		}
-		vGS.Object.UmsSettings = $externalize(new VGadgetSettingsUMS.ptr(new ($global.Object)(), false, ""), ptrType$12);
-		if (!(gs.UmsSettings === ptrType$11.nil)) {
-			$internalize(vGS.Object.UmsSettings, ptrType$12).Object.File = $externalize(gs.UmsSettings.File, $String);
-			$internalize(vGS.Object.UmsSettings, ptrType$12).Object.Cdrom = $externalize(gs.UmsSettings.Cdrom, $Bool);
-		}
-	};
-	VGadgetSettings.prototype.fromGS = function(gs) { return this.$val.fromGS(gs); };
-	CompUSBSettingsData.ptr.prototype.UpdateToDeployedGadgetSettings = function(vm) {
+	CompUSBSettingsData.ptr.prototype.UpdateFromDeployedGadgetSettings = function(vm) {
 		var c, vm;
 		c = this;
-		console.log("Trying to fetch deployed GadgetSettings");
-		$go((function $b() {
-			var _r$2, _r$3, _tuple, _tuple$1, cancel, ctx, deployedGs, err, newGs, $s, $deferred, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; cancel = $f.cancel; ctx = $f.ctx; deployedGs = $f.deployedGs; err = $f.err; newGs = $f.newGs; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
-			_r$2 = context.WithTimeout(context.Background(), new time.Duration(0, 1000000000)); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-			_tuple = _r$2;
-			ctx = _tuple[0];
-			cancel = _tuple[1];
-			$deferred.push([cancel, []]);
-			_r$3 = $pkg.Client.Client.GetDeployedGadgetSetting(ctx, new P4wnP1_grpc.Empty.ptr(), new sliceType$2([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-			_tuple$1 = _r$3;
-			deployedGs = _tuple$1[0];
-			err = _tuple$1[1];
-			if (!($interfaceIsEqual(err, $ifaceNil))) {
-				console.log(err);
-				$s = -1; return;
-			}
-			newGs = new VGadgetSettings.ptr(new ($global.Object)(), false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$13.nil, ptrType$13.nil, ptrType$12.nil);
-			newGs.fromGS(deployedGs);
-			c.Object.gadgetSettings = $externalize(newGs, ptrType$14);
-			$s = -1; return;
-			/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: $b }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.cancel = cancel; $f.ctx = ctx; $f.deployedGs = deployedGs; $f.err = err; $f.newGs = newGs; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
-		}), []);
+		vm.Object.$store.commit($externalize("setCurrentGadgetSettingsFromDeployed", $String));
 	};
-	CompUSBSettingsData.prototype.UpdateToDeployedGadgetSettings = function(vm) { return this.$val.UpdateToDeployedGadgetSettings(vm); };
+	CompUSBSettingsData.prototype.UpdateFromDeployedGadgetSettings = function(vm) { return this.$val.UpdateFromDeployedGadgetSettings(vm); };
 	CompUSBSettingsData.ptr.prototype.ApplyGadgetSettings = function(vm) {
 		var c, gs, vm;
 		c = this;
 		console.log("Trying to deploy GadgetSettings...");
-		gs = $clone($internalize(c.Object.gadgetSettings, ptrType$14), VGadgetSettings).toGS();
+		gs = new jsGadgetSettings.ptr(vm.Object.$store.state.currentGadgetSettings, false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$13.nil, ptrType$13.nil, ptrType$14.nil).toGS();
 		$go((function $b() {
 			var _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _tuple, _tuple$1, _tuple$2, cancel, ctx, deployedGs, err, newGs, $s, $deferred, $r;
 			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; _tuple$2 = $f._tuple$2; cancel = $f.cancel; ctx = $f.ctx; deployedGs = $f.deployedGs; err = $f.err; newGs = $f.newGs; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
@@ -52544,7 +53097,7 @@ $packages["."] = (function() {
 				_r$5 = _r$4.Message(); /* */ $s = 6; case 6: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
 				$global.alert($externalize("Error setting given gadget settings: " + _r$5, $String));
 				console.log(err);
-				c.UpdateToDeployedGadgetSettings(vm);
+				c.UpdateFromDeployedGadgetSettings(vm);
 				$s = -1; return;
 			/* } */ case 4:
 			console.log("New GadgetSettings have been set");
@@ -52559,14 +53112,14 @@ $packages["."] = (function() {
 				_r$8 = _r$7.Message(); /* */ $s = 11; case 11: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
 				$global.alert($externalize("Error deploying gadget settings: " + _r$8, $String));
 				console.log(err);
-				c.UpdateToDeployedGadgetSettings(vm);
+				c.UpdateFromDeployedGadgetSettings(vm);
 				$s = -1; return;
 			/* } */ case 9:
 			console.log("New GadgetSettings have been deployed");
 			$global.alert($externalize("New USB gadget settings deployed ", $String));
-			newGs = new VGadgetSettings.ptr(new ($global.Object)(), false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$13.nil, ptrType$13.nil, ptrType$12.nil);
+			newGs = new jsGadgetSettings.ptr(new ($global.Object)(), false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$13.nil, ptrType$13.nil, ptrType$14.nil);
 			newGs.fromGS(deployedGs);
-			c.Object.gadgetSettings = $externalize(newGs, ptrType$14);
+			c.Object.gadgetSettings = $externalize(newGs, ptrType$6);
 			$s = -1; return;
 			/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: $b }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f._tuple$2 = _tuple$2; $f.cancel = cancel; $f.ctx = ctx; $f.deployedGs = deployedGs; $f.err = err; $f.newGs = newGs; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
 		}), []);
@@ -52575,22 +53128,73 @@ $packages["."] = (function() {
 	InitCompUSBSettings = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("usb-settings", new sliceType$6([hvue.Template("\n<div>\n\t<table>\n\t\t<tr>\n\t\t\t<td>USB gadget settings</td>\n\t\t\t<td><button @click=\"ApplyGadgetSettings\" :disabled=\"deployPending\">Apply</button></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Gadget enabled</td>\n\t\t\t<td><toggle-switch v-model=\"gadgetSettings.Enabled\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Vendor ID</td>\n\t\t\t<td><input v-model=\"gadgetSettings.Vid\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Product ID</td>\n\t\t\t<td><input v-model=\"gadgetSettings.Pid\"/></td> \n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Manufacturer Name</td>\n\t\t\t<td><input v-model=\"gadgetSettings.Manufacturer\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Product Name</td>\n\t\t\t<td><input v-model=\"gadgetSettings.Product\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Serial number</td>\n\t\t\t<td><input v-model=\"gadgetSettings.Serial\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>CDC ECM</td>\n\t\t\t<td><toggle-switch v-model=\"gadgetSettings.Use_CDC_ECM\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr v-if=\"gadgetSettings.Use_CDC_ECM\">\n\t\t\t<td></td>\n\t\t\t<td><ethernet-addresses v-bind:settings=\"gadgetSettings.CdcEcmSettings\" @hostAddrChange=\"gadgetSettings.CdcEcmSettings.HostAddr=$event\" @devAddrChange=\"gadgetSettings.CdcEcmSettings.DevAddr=$event\"></ethernet-addresses></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>RNDIS</td>\n\t\t\t<td><toggle-switch v-model=\"gadgetSettings.Use_RNDIS\"></toggle-switch></td>\n\t\t\t<td><input type=\"checkbox\" v-if=\"gadgetSettings.Use_RNDIS\" v-model=\"rndisDetails\"></td>\n\t\t</tr>\n\t\t<tr v-if=\"rndisDetails\">\n\t\t\t<td></td>\n\t\t\t<td><ethernet-addresses v-bind:settings=\"gadgetSettings.RndisSettings\" @hostAddrChange=\"gadgetSettings.RndisSettings.HostAddr=$event\" @devAddrChange=\"gadgetSettings.RndisSettings.DevAddr=$event\"></ethernet-addresses></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Keyboard</td>\n\t\t\t<td><toggle-switch v-model=\"gadgetSettings.Use_HID_KEYBOARD\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Mouse</td>\n\t\t\t<td><toggle-switch v-model=\"gadgetSettings.Use_HID_MOUSE\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Raw</td>\n\t\t\t<td><toggle-switch v-model=\"gadgetSettings.Use_HID_RAW\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Serial</td>\n\t\t\t<td><toggle-switch v-model=\"gadgetSettings.Use_SERIAL\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Mass Storage</td>\n\t\t\t<td><toggle-switch v-model=\"gadgetSettings.Use_UMS\"></toggle-switch></td>\n\t\t</tr>\n\t</table>\n</div>\n"), hvue.DataFunc(newCompUSBSettingsData), hvue.MethodsOf(new CompUSBSettingsData.ptr(null, ptrType$14.nil, false, false, false))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("usb-settings", new sliceType$7([hvue.Template("\n<div>\n\t<table>\n\t\t<tr>\n\t\t\t<td>USB gadget settings</td>\n\t\t\t<td><button @click=\"ApplyGadgetSettings\" :disabled=\"deployPending\">Apply</button>\n\t\t\t<button @click=\"UpdateFromDeployedGadgetSettings\">Deployed</button></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Gadget enabled</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Enabled\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Vendor ID</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Vid\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Product ID</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Pid\"/></td> \n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Manufacturer Name</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Manufacturer\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Product Name</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Product\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Serial number</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Serial\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>CDC ECM</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_CDC_ECM\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr v-if=\"currentGadgetSettings.Use_CDC_ECM\">\n\t\t\t<td></td>\n\t\t\t<td><ethernet-addresses v-bind:settings=\"currentGadgetSettings.CdcEcmSettings\" @hostAddrChange=\"currentGadgetSettings.CdcEcmSettings.HostAddr=$event\" @devAddrChange=\"currentGadgetSettings.CdcEcmSettings.DevAddr=$event\"></ethernet-addresses></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>RNDIS</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_RNDIS\"></toggle-switch></td>\n\t\t\t<td><input type=\"checkbox\" v-if=\"currentGadgetSettings.Use_RNDIS\" v-model=\"rndisDetails\"></td>\n\t\t</tr>\n\t\t<tr v-if=\"rndisDetails\">\n\t\t\t<td></td>\n\t\t\t<td><ethernet-addresses v-bind:settings=\"currentGadgetSettings.RndisSettings\" @hostAddrChange=\"currentGadgetSettings.RndisSettings.HostAddr=$event\" @devAddrChange=\"currentGadgetSettings.RndisSettings.DevAddr=$event\"></ethernet-addresses></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Keyboard</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_HID_KEYBOARD\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Mouse</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_HID_MOUSE\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Raw</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_HID_RAW\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Serial</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_SERIAL\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Mass Storage</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_UMS\"></toggle-switch></td>\n\t\t</tr>\n\t</table>\n</div>\n"), hvue.DataFunc(newCompUSBSettingsData), hvue.MethodsOf(new CompUSBSettingsData.ptr(null, ptrType$6.nil, false, false, false)), hvue.Computed("currentGadgetSettings", (function(vm) {
+			var vm;
+			return new $jsObjectPtr(vm.Object.$store.state.currentGadgetSettings);
+		}))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompUSBSettings }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.InitCompUSBSettings = InitCompUSBSettings;
 	newCompUSBSettingsData = function(vm) {
 		var cc, vm;
-		cc = new CompUSBSettingsData.ptr(new ($global.Object)(), ptrType$14.nil, false, false, false);
-		cc.Object.gadgetSettings = $externalize(new VGadgetSettings.ptr(new ($global.Object)(), false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$13.nil, ptrType$13.nil, ptrType$12.nil), ptrType$14);
-		$internalize(cc.Object.gadgetSettings, ptrType$14).fromGS(new P4wnP1_grpc.GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$10.nil, ptrType$10.nil, ptrType$11.nil));
-		cc.UpdateToDeployedGadgetSettings(vm);
+		cc = new CompUSBSettingsData.ptr(new ($global.Object)(), ptrType$6.nil, false, false, false);
+		cc.Object.gadgetSettings = $externalize(NewUSBGadgetSettings(), ptrType$6);
+		cc.UpdateFromDeployedGadgetSettings(vm);
 		cc.Object.deployPending = $externalize(false, $Bool);
 		cc.Object.rndisDetails = $externalize(false, $Bool);
 		cc.Object.cdcEcmDetails = $externalize(false, $Bool);
 		return cc;
 	};
+	jsGadgetSettings.ptr.prototype.toGS = function() {
+		var gs, jsGS;
+		gs = ptrType.nil;
+		jsGS = this;
+		gs = new P4wnP1_grpc.GadgetSettings.ptr(!!(jsGS.Object.Enabled), $internalize(jsGS.Object.Vid, $String), $internalize(jsGS.Object.Pid, $String), $internalize(jsGS.Object.Manufacturer, $String), $internalize(jsGS.Object.Product, $String), $internalize(jsGS.Object.Serial, $String), !!(jsGS.Object.Use_CDC_ECM), !!(jsGS.Object.Use_RNDIS), !!(jsGS.Object.Use_HID_KEYBOARD), !!(jsGS.Object.Use_HID_MOUSE), !!(jsGS.Object.Use_HID_RAW), !!(jsGS.Object.Use_UMS), !!(jsGS.Object.Use_SERIAL), new P4wnP1_grpc.GadgetSettingsEthernet.ptr($internalize($internalize(jsGS.Object.RndisSettings, ptrType$13).Object.HostAddr, $String), $internalize($internalize(jsGS.Object.RndisSettings, ptrType$13).Object.DevAddr, $String)), new P4wnP1_grpc.GadgetSettingsEthernet.ptr($internalize($internalize(jsGS.Object.CdcEcmSettings, ptrType$13).Object.HostAddr, $String), $internalize($internalize(jsGS.Object.CdcEcmSettings, ptrType$13).Object.DevAddr, $String)), new P4wnP1_grpc.GadgetSettingsUMS.ptr(!!($internalize(jsGS.Object.UmsSettings, ptrType$14).Object.Cdrom), $internalize($internalize(jsGS.Object.UmsSettings, ptrType$14).Object.File, $String)));
+		return gs;
+	};
+	jsGadgetSettings.prototype.toGS = function() { return this.$val.toGS(); };
+	jsGadgetSettings.ptr.prototype.fromGS = function(gs) {
+		var gs, jsGS;
+		jsGS = this;
+		console.log(gs);
+		jsGS.Object.Enabled = $externalize(gs.Enabled, $Bool);
+		jsGS.Object.Vid = $externalize(gs.Vid, $String);
+		jsGS.Object.Pid = $externalize(gs.Pid, $String);
+		jsGS.Object.Manufacturer = $externalize(gs.Manufacturer, $String);
+		jsGS.Object.Product = $externalize(gs.Product, $String);
+		jsGS.Object.Serial = $externalize(gs.Serial, $String);
+		jsGS.Object.Use_CDC_ECM = $externalize(gs.Use_CDC_ECM, $Bool);
+		jsGS.Object.Use_RNDIS = $externalize(gs.Use_RNDIS, $Bool);
+		jsGS.Object.Use_HID_KEYBOARD = $externalize(gs.Use_HID_KEYBOARD, $Bool);
+		jsGS.Object.Use_HID_MOUSE = $externalize(gs.Use_HID_MOUSE, $Bool);
+		jsGS.Object.Use_HID_RAW = $externalize(gs.Use_HID_RAW, $Bool);
+		jsGS.Object.Use_UMS = $externalize(gs.Use_UMS, $Bool);
+		jsGS.Object.Use_SERIAL = $externalize(gs.Use_SERIAL, $Bool);
+		jsGS.Object.RndisSettings = $externalize(new VGadgetSettingsEthernet.ptr(O(), "", ""), ptrType$13);
+		if (!(gs.RndisSettings === ptrType$15.nil)) {
+			$internalize(jsGS.Object.RndisSettings, ptrType$13).Object.HostAddr = $externalize(gs.RndisSettings.HostAddr, $String);
+			$internalize(jsGS.Object.RndisSettings, ptrType$13).Object.DevAddr = $externalize(gs.RndisSettings.DevAddr, $String);
+		}
+		jsGS.Object.CdcEcmSettings = $externalize(new VGadgetSettingsEthernet.ptr(O(), "", ""), ptrType$13);
+		if (!(gs.CdcEcmSettings === ptrType$15.nil)) {
+			$internalize(jsGS.Object.CdcEcmSettings, ptrType$13).Object.HostAddr = $externalize(gs.CdcEcmSettings.HostAddr, $String);
+			$internalize(jsGS.Object.CdcEcmSettings, ptrType$13).Object.DevAddr = $externalize(gs.CdcEcmSettings.DevAddr, $String);
+		}
+		jsGS.Object.UmsSettings = $externalize(new VGadgetSettingsUMS.ptr(O(), false, ""), ptrType$14);
+		if (!(gs.UmsSettings === ptrType$16.nil)) {
+			$internalize(jsGS.Object.UmsSettings, ptrType$14).Object.File = $externalize(gs.UmsSettings.File, $String);
+			$internalize(jsGS.Object.UmsSettings, ptrType$14).Object.Cdrom = $externalize(gs.UmsSettings.Cdrom, $Bool);
+		}
+	};
+	jsGadgetSettings.prototype.fromGS = function(gs) { return this.$val.fromGS(gs); };
+	NewUSBGadgetSettings = function() {
+		var gs;
+		gs = new jsGadgetSettings.ptr(O(), false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$13.nil, ptrType$13.nil, ptrType$14.nil);
+		gs.fromGS(new P4wnP1_grpc.GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$15.nil, ptrType$15.nil, ptrType$16.nil));
+		return gs;
+	};
+	$pkg.NewUSBGadgetSettings = NewUSBGadgetSettings;
 	GetBaseURL = function() {
 		var document$1, location, port, url;
 		document$1 = $global.window.document;
@@ -52607,15 +53211,17 @@ $packages["."] = (function() {
 		var _r$2, vm, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; vm = $f.vm; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		console.log(GetBaseURL());
-		$r = InitCompEthernetAddresses2(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompToggleSwitch(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompUSBSettings(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompTab(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompTabs(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompCodeEditor(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompHIDScript(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompLogger(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_r$2 = hvue.NewVM(new sliceType$6([hvue.El("#app"), hvue.DataFunc((function(vm) {
+		$r = InitGlobalState(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompEthernetAddresses2(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompToggleSwitch(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompUSBSettings(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompTab(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompTabs(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompCodeEditor(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompHIDScript(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompLogger(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompState(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_r$2 = hvue.NewVM(new sliceType$7([hvue.El("#app"), hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$2.ptr(O(), "");
 			data.Object.testString = $externalize("type('hello');", $String);
@@ -52623,9 +53229,12 @@ $packages["."] = (function() {
 		})), hvue.Computed("console", (function(vm) {
 			var vm;
 			return new $jsObjectPtr($global.console);
-		}))])); /* */ $s = 9; case 9: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		})), hvue.Computed("state", (function(vm) {
+			var vm;
+			return new $jsObjectPtr(vm.Object.$store.state);
+		})), hvue.Store()])); /* */ $s = 11; case 11: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		vm = _r$2;
-		$global.vm = $externalize(vm, ptrType$9);
+		$global.vm = $externalize(vm, ptrType$12);
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: main }; } $f._r$2 = _r$2; $f.vm = vm; $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -52646,9 +53255,9 @@ $packages["."] = (function() {
 			err = errors.New("Already listening to events");
 			$s = -1; return err;
 		/* } */ case 3:
-		/* */ if (!(rpc[0].eventListeningCancel === ptrType$15.nil)) { $s = 5; continue; }
+		/* */ if (!(rpc[0].eventListeningCancel === ptrType$17.nil)) { $s = 5; continue; }
 		/* */ $s = 6; continue;
-		/* if (!(rpc[0].eventListeningCancel === ptrType$15.nil)) { */ case 5:
+		/* if (!(rpc[0].eventListeningCancel === ptrType$17.nil)) { */ case 5:
 			cancel$1 = rpc[0].eventListeningCancel.$get();
 			$r = cancel$1(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* } */ case 6:
@@ -52656,8 +53265,8 @@ $packages["."] = (function() {
 		_tuple = _r$2;
 		ctx[0] = _tuple[0];
 		cancel[0] = _tuple[1];
-		rpc[0].eventListeningCtx = (ctx.$ptr || (ctx.$ptr = new ptrType$16(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, ctx)));
-		rpc[0].eventListeningCancel = (cancel.$ptr || (cancel.$ptr = new ptrType$15(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, cancel)));
+		rpc[0].eventListeningCtx = (ctx.$ptr || (ctx.$ptr = new ptrType$18(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, ctx)));
+		rpc[0].eventListeningCancel = (cancel.$ptr || (cancel.$ptr = new ptrType$17(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, cancel)));
 		rpc[0].eventListeningOn = true;
 		$r = rpc[0].Mutex.Unlock(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		_r$3 = rpc[0].Client.EventListen(ctx[0], new P4wnP1_grpc.EventRequest.ptr(evtType), new sliceType$2([])); /* */ $s = 10; case 10: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
@@ -52698,13 +53307,13 @@ $packages["."] = (function() {
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; rpc = $f.rpc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		rpc = this;
 		$r = rpc.Mutex.Lock(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		/* */ if (!(rpc.eventListeningCancel === ptrType$15.nil)) { $s = 2; continue; }
+		/* */ if (!(rpc.eventListeningCancel === ptrType$17.nil)) { $s = 2; continue; }
 		/* */ $s = 3; continue;
-		/* if (!(rpc.eventListeningCancel === ptrType$15.nil)) { */ case 2:
+		/* if (!(rpc.eventListeningCancel === ptrType$17.nil)) { */ case 2:
 			$r = rpc.eventListeningCancel.$get()(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		/* } */ case 3:
-		rpc.eventListeningCancel = ptrType$15.nil;
-		rpc.eventListeningCtx = ptrType$16.nil;
+		rpc.eventListeningCancel = ptrType$17.nil;
+		rpc.eventListeningCtx = ptrType$18.nil;
 		rpc.eventListeningOn = false;
 		$r = rpc.Mutex.Unlock(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
@@ -52714,65 +53323,67 @@ $packages["."] = (function() {
 	NewRpcClient = function(addr) {
 		var _r$2, addr, cl, rcl, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; addr = $f.addr; cl = $f.cl; rcl = $f.rcl; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		rcl = new Rpc.ptr(ptrType$8.nil, $ifaceNil, false, ptrType$16.nil, ptrType$15.nil);
+		rcl = new Rpc.ptr(ptrType$11.nil, $ifaceNil, false, ptrType$18.nil, ptrType$17.nil);
 		rcl.Mutex = new sync.Mutex.ptr(0, 0);
-		_r$2 = P4wnP1_grpc.NewP4WNP1Client(addr, new sliceType$1([grpcweb.ForceWebsocket])); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$2 = P4wnP1_grpc.NewP4WNP1Client(addr, new sliceType$1([grpcweb.WithDefaultCallOptions(new sliceType$2([grpcweb.ForceWebsocketTransport()]))])); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		cl = _r$2;
 		rcl.Client = cl;
 		$s = -1; return rcl;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: NewRpcClient }; } $f._r$2 = _r$2; $f.addr = addr; $f.cl = cl; $f.rcl = rcl; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.NewRpcClient = NewRpcClient;
-	ptrType$17.methods = [{prop: "SendAndRun", name: "SendAndRun", pkg: "", typ: $funcType([ptrType$9], [], false)}];
-	ptrType$1.methods = [{prop: "AddEntry", name: "AddEntry", pkg: "", typ: $funcType([ptrType$9, ptrType$18], [], false)}, {prop: "StartListening", name: "StartListening", pkg: "", typ: $funcType([ptrType$9], [], false)}, {prop: "StopListening", name: "StopListening", pkg: "", typ: $funcType([ptrType$9], [], false)}];
-	ptrType$19.methods = [{prop: "UpdateSelectedTab", name: "UpdateSelectedTab", pkg: "", typ: $funcType([ptrType$9, $Int], [], false)}];
-	VGadgetSettings.methods = [{prop: "toGS", name: "toGS", pkg: ".", typ: $funcType([], [ptrType], false)}];
-	ptrType$14.methods = [{prop: "fromGS", name: "fromGS", pkg: ".", typ: $funcType([ptrType], [], false)}];
-	ptrType$20.methods = [{prop: "UpdateToDeployedGadgetSettings", name: "UpdateToDeployedGadgetSettings", pkg: "", typ: $funcType([ptrType$9], [], false)}, {prop: "ApplyGadgetSettings", name: "ApplyGadgetSettings", pkg: "", typ: $funcType([ptrType$9], [], false)}];
-	ptrType$21.methods = [{prop: "StartListenEvents", name: "StartListenEvents", pkg: "", typ: $funcType([$Int64], [$error], false)}, {prop: "StopEventListening", name: "StopEventListening", pkg: "", typ: $funcType([], [], false)}];
-	EventLog.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "EvLogSource", name: "EvLogSource", anonymous: false, exported: true, typ: $String, tag: "js:\"source\""}, {prop: "EvLogLevel", name: "EvLogLevel", anonymous: false, exported: true, typ: $Int, tag: "js:\"level\""}, {prop: "EvLogMessage", name: "EvLogMessage", anonymous: false, exported: true, typ: $String, tag: "js:\"message\""}, {prop: "EvLogTime", name: "EvLogTime", anonymous: false, exported: true, typ: $String, tag: "js:\"time\""}]);
-	CodeMirrorOptionsType.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "Mode", name: "Mode", anonymous: false, exported: true, typ: $emptyInterface, tag: "js:\"mode\""}, {prop: "LineNumbers", name: "LineNumbers", anonymous: false, exported: true, typ: $Bool, tag: "js:\"lineNumbers\""}, {prop: "LineWrapping", name: "LineWrapping", anonymous: false, exported: true, typ: $Bool, tag: "js:\"lineWrapping\""}, {prop: "AutoCloseBrackets", name: "AutoCloseBrackets", anonymous: false, exported: true, typ: $Bool, tag: "js:\"autoCloseBrackets\""}, {prop: "ExtraKeys", name: "ExtraKeys", anonymous: false, exported: true, typ: $emptyInterface, tag: "js:\"extraKeys\""}]);
-	CompCodeEditorData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "ScriptContent", name: "ScriptContent", anonymous: false, exported: true, typ: $String, tag: "js:\"scriptContent\""}, {prop: "CodeMirrorOptions", name: "CodeMirrorOptions", anonymous: false, exported: true, typ: ptrType$6, tag: "js:\"codemirrorOptions\""}]);
-	CompEthernetAddressesData2.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}]);
-	CompHIDScriptData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "ScriptContent", name: "ScriptContent", anonymous: false, exported: true, typ: $String, tag: "js:\"scriptContent\""}]);
-	CompLoggerData.init(".", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "LogArray", name: "LogArray", anonymous: false, exported: true, typ: ptrType$7, tag: "js:\"logArray\""}, {prop: "cancel", name: "cancel", anonymous: false, exported: false, typ: context.CancelFunc, tag: ""}, {prop: "Mutex", name: "Mutex", anonymous: true, exported: true, typ: ptrType$8, tag: ""}]);
-	CompTabData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "Id", name: "Id", anonymous: false, exported: true, typ: $Int, tag: "js:\"id\""}, {prop: "IsActive", name: "IsActive", anonymous: false, exported: true, typ: $Bool, tag: "js:\"isActive\""}]);
-	CompTabsData.init(".", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "headers", name: "headers", anonymous: false, exported: false, typ: sliceType$7, tag: "js:\"headers\""}, {prop: "tabs", name: "tabs", anonymous: false, exported: false, typ: sliceType$8, tag: "js:\"tabs\""}]);
-	CompToggleSwitchData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}]);
-	VGadgetSettings.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "Enabled", name: "Enabled", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Enabled\""}, {prop: "Vid", name: "Vid", anonymous: false, exported: true, typ: $String, tag: "js:\"Vid\""}, {prop: "Pid", name: "Pid", anonymous: false, exported: true, typ: $String, tag: "js:\"Pid\""}, {prop: "Manufacturer", name: "Manufacturer", anonymous: false, exported: true, typ: $String, tag: "js:\"Manufacturer\""}, {prop: "Product", name: "Product", anonymous: false, exported: true, typ: $String, tag: "js:\"Product\""}, {prop: "Serial", name: "Serial", anonymous: false, exported: true, typ: $String, tag: "js:\"Serial\""}, {prop: "Use_CDC_ECM", name: "Use_CDC_ECM", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_CDC_ECM\""}, {prop: "Use_RNDIS", name: "Use_RNDIS", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_RNDIS\""}, {prop: "Use_HID_KEYBOARD", name: "Use_HID_KEYBOARD", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_KEYBOARD\""}, {prop: "Use_HID_MOUSE", name: "Use_HID_MOUSE", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_MOUSE\""}, {prop: "Use_HID_RAW", name: "Use_HID_RAW", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_RAW\""}, {prop: "Use_UMS", name: "Use_UMS", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_UMS\""}, {prop: "Use_SERIAL", name: "Use_SERIAL", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_SERIAL\""}, {prop: "RndisSettings", name: "RndisSettings", anonymous: false, exported: true, typ: ptrType$13, tag: "js:\"RndisSettings\""}, {prop: "CdcEcmSettings", name: "CdcEcmSettings", anonymous: false, exported: true, typ: ptrType$13, tag: "js:\"CdcEcmSettings\""}, {prop: "UmsSettings", name: "UmsSettings", anonymous: false, exported: true, typ: ptrType$12, tag: "js:\"UmsSettings\""}]);
-	VGadgetSettingsEthernet.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "HostAddr", name: "HostAddr", anonymous: false, exported: true, typ: $String, tag: "js:\"HostAddr\""}, {prop: "DevAddr", name: "DevAddr", anonymous: false, exported: true, typ: $String, tag: "js:\"DevAddr\""}]);
-	VGadgetSettingsUMS.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "Cdrom", name: "Cdrom", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Cdrom\""}, {prop: "File", name: "File", anonymous: false, exported: true, typ: $String, tag: "js:\"File\""}]);
-	CompUSBSettingsData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$7, tag: ""}, {prop: "GadgetSettings", name: "GadgetSettings", anonymous: false, exported: true, typ: ptrType$14, tag: "js:\"gadgetSettings\""}, {prop: "DeployPending", name: "DeployPending", anonymous: false, exported: true, typ: $Bool, tag: "js:\"deployPending\""}, {prop: "CdcEcmDetails", name: "CdcEcmDetails", anonymous: false, exported: true, typ: $Bool, tag: "js:\"cdcEcmDetails\""}, {prop: "RndisDetails", name: "RndisDetails", anonymous: false, exported: true, typ: $Bool, tag: "js:\"rndisDetails\""}]);
-	Rpc.init(".", [{prop: "Mutex", name: "Mutex", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "Client", name: "Client", anonymous: false, exported: true, typ: P4wnP1_grpc.P4WNP1Client, tag: ""}, {prop: "eventListeningOn", name: "eventListeningOn", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "eventListeningCtx", name: "eventListeningCtx", anonymous: false, exported: false, typ: ptrType$16, tag: ""}, {prop: "eventListeningCancel", name: "eventListeningCancel", anonymous: false, exported: false, typ: ptrType$15, tag: ""}]);
+	ptrType$19.methods = [{prop: "SendAndRun", name: "SendAndRun", pkg: "", typ: $funcType([ptrType$12], [], false)}];
+	ptrType$1.methods = [{prop: "AddEntry", name: "AddEntry", pkg: "", typ: $funcType([ptrType$12, ptrType$20], [], false)}, {prop: "StartListening", name: "StartListening", pkg: "", typ: $funcType([ptrType$12], [], false)}, {prop: "StopListening", name: "StopListening", pkg: "", typ: $funcType([ptrType$12], [], false)}];
+	ptrType$21.methods = [{prop: "UpdateSelectedTab", name: "UpdateSelectedTab", pkg: "", typ: $funcType([ptrType$12, $Int], [], false)}];
+	ptrType$22.methods = [{prop: "UpdateFromDeployedGadgetSettings", name: "UpdateFromDeployedGadgetSettings", pkg: "", typ: $funcType([ptrType$12], [], false)}, {prop: "ApplyGadgetSettings", name: "ApplyGadgetSettings", pkg: "", typ: $funcType([ptrType$12], [], false)}];
+	jsGadgetSettings.methods = [{prop: "toGS", name: "toGS", pkg: ".", typ: $funcType([], [ptrType], false)}];
+	ptrType$6.methods = [{prop: "fromGS", name: "fromGS", pkg: ".", typ: $funcType([ptrType], [], false)}];
+	ptrType$23.methods = [{prop: "StartListenEvents", name: "StartListenEvents", pkg: "", typ: $funcType([$Int64], [$error], false)}, {prop: "StopEventListening", name: "StopEventListening", pkg: "", typ: $funcType([], [], false)}];
+	GlobalState.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "Title", name: "Title", anonymous: false, exported: true, typ: $String, tag: "js:\"title\""}, {prop: "CurrentHIDScriptSource", name: "CurrentHIDScriptSource", anonymous: false, exported: true, typ: $String, tag: "js:\"currentHIDScriptSource\""}, {prop: "CurrentGadgetSettings", name: "CurrentGadgetSettings", anonymous: false, exported: true, typ: ptrType$6, tag: "js:\"currentGadgetSettings\""}, {prop: "Counter", name: "Counter", anonymous: false, exported: true, typ: $Int, tag: "js:\"count\""}, {prop: "Text", name: "Text", anonymous: false, exported: true, typ: $String, tag: "js:\"text\""}]);
+	CodeMirrorOptionsType.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "Mode", name: "Mode", anonymous: false, exported: true, typ: $emptyInterface, tag: "js:\"mode\""}, {prop: "LineNumbers", name: "LineNumbers", anonymous: false, exported: true, typ: $Bool, tag: "js:\"lineNumbers\""}, {prop: "LineWrapping", name: "LineWrapping", anonymous: false, exported: true, typ: $Bool, tag: "js:\"lineWrapping\""}, {prop: "AutoCloseBrackets", name: "AutoCloseBrackets", anonymous: false, exported: true, typ: $Bool, tag: "js:\"autoCloseBrackets\""}, {prop: "ExtraKeys", name: "ExtraKeys", anonymous: false, exported: true, typ: $emptyInterface, tag: "js:\"extraKeys\""}]);
+	CompCodeEditorData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "ScriptContent", name: "ScriptContent", anonymous: false, exported: true, typ: $String, tag: "js:\"scriptContent\""}, {prop: "CodeMirrorOptions", name: "CodeMirrorOptions", anonymous: false, exported: true, typ: ptrType$9, tag: "js:\"codemirrorOptions\""}]);
+	CompEthernetAddressesData2.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}]);
+	CompHIDScriptData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}]);
+	CompLoggerData.init(".", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "LogArray", name: "LogArray", anonymous: false, exported: true, typ: ptrType$10, tag: "js:\"logArray\""}, {prop: "cancel", name: "cancel", anonymous: false, exported: false, typ: context.CancelFunc, tag: ""}, {prop: "Mutex", name: "Mutex", anonymous: true, exported: true, typ: ptrType$11, tag: ""}]);
+	CompTabData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "Id", name: "Id", anonymous: false, exported: true, typ: $Int, tag: "js:\"id\""}, {prop: "IsActive", name: "IsActive", anonymous: false, exported: true, typ: $Bool, tag: "js:\"isActive\""}]);
+	CompTabsData.init(".", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "headers", name: "headers", anonymous: false, exported: false, typ: sliceType$8, tag: "js:\"headers\""}, {prop: "tabs", name: "tabs", anonymous: false, exported: false, typ: sliceType$9, tag: "js:\"tabs\""}]);
+	CompToggleSwitchData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}]);
+	CompUSBSettingsData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "GadgetSettings", name: "GadgetSettings", anonymous: false, exported: true, typ: ptrType$6, tag: "js:\"gadgetSettings\""}, {prop: "DeployPending", name: "DeployPending", anonymous: false, exported: true, typ: $Bool, tag: "js:\"deployPending\""}, {prop: "CdcEcmDetails", name: "CdcEcmDetails", anonymous: false, exported: true, typ: $Bool, tag: "js:\"cdcEcmDetails\""}, {prop: "RndisDetails", name: "RndisDetails", anonymous: false, exported: true, typ: $Bool, tag: "js:\"rndisDetails\""}]);
+	jsGadgetSettings.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "Enabled", name: "Enabled", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Enabled\""}, {prop: "Vid", name: "Vid", anonymous: false, exported: true, typ: $String, tag: "js:\"Vid\""}, {prop: "Pid", name: "Pid", anonymous: false, exported: true, typ: $String, tag: "js:\"Pid\""}, {prop: "Manufacturer", name: "Manufacturer", anonymous: false, exported: true, typ: $String, tag: "js:\"Manufacturer\""}, {prop: "Product", name: "Product", anonymous: false, exported: true, typ: $String, tag: "js:\"Product\""}, {prop: "Serial", name: "Serial", anonymous: false, exported: true, typ: $String, tag: "js:\"Serial\""}, {prop: "Use_CDC_ECM", name: "Use_CDC_ECM", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_CDC_ECM\""}, {prop: "Use_RNDIS", name: "Use_RNDIS", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_RNDIS\""}, {prop: "Use_HID_KEYBOARD", name: "Use_HID_KEYBOARD", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_KEYBOARD\""}, {prop: "Use_HID_MOUSE", name: "Use_HID_MOUSE", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_MOUSE\""}, {prop: "Use_HID_RAW", name: "Use_HID_RAW", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_RAW\""}, {prop: "Use_UMS", name: "Use_UMS", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_UMS\""}, {prop: "Use_SERIAL", name: "Use_SERIAL", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_SERIAL\""}, {prop: "RndisSettings", name: "RndisSettings", anonymous: false, exported: true, typ: ptrType$13, tag: "js:\"RndisSettings\""}, {prop: "CdcEcmSettings", name: "CdcEcmSettings", anonymous: false, exported: true, typ: ptrType$13, tag: "js:\"CdcEcmSettings\""}, {prop: "UmsSettings", name: "UmsSettings", anonymous: false, exported: true, typ: ptrType$14, tag: "js:\"UmsSettings\""}]);
+	VGadgetSettingsEthernet.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "HostAddr", name: "HostAddr", anonymous: false, exported: true, typ: $String, tag: "js:\"HostAddr\""}, {prop: "DevAddr", name: "DevAddr", anonymous: false, exported: true, typ: $String, tag: "js:\"DevAddr\""}]);
+	VGadgetSettingsUMS.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "Cdrom", name: "Cdrom", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Cdrom\""}, {prop: "File", name: "File", anonymous: false, exported: true, typ: $String, tag: "js:\"File\""}]);
+	jsEventLog.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$10, tag: ""}, {prop: "EvLogSource", name: "EvLogSource", anonymous: false, exported: true, typ: $String, tag: "js:\"source\""}, {prop: "EvLogLevel", name: "EvLogLevel", anonymous: false, exported: true, typ: $Int, tag: "js:\"level\""}, {prop: "EvLogMessage", name: "EvLogMessage", anonymous: false, exported: true, typ: $String, tag: "js:\"message\""}, {prop: "EvLogTime", name: "EvLogTime", anonymous: false, exported: true, typ: $String, tag: "js:\"time\""}]);
+	Rpc.init(".", [{prop: "Mutex", name: "Mutex", anonymous: true, exported: true, typ: ptrType$11, tag: ""}, {prop: "Client", name: "Client", anonymous: false, exported: true, typ: P4wnP1_grpc.P4WNP1Client, tag: ""}, {prop: "eventListeningOn", name: "eventListeningOn", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "eventListeningCtx", name: "eventListeningCtx", anonymous: false, exported: false, typ: ptrType$18, tag: ""}, {prop: "eventListeningCancel", name: "eventListeningCancel", anonymous: false, exported: false, typ: ptrType$17, tag: ""}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		$r = common.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = P4wnP1_grpc.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = context.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = md5.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hex.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = errors.$init(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.$init(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = mvuex.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = context.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = md5.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hex.$init(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = errors.$init(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = js.$init(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = grpcweb.$init(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = status.$init(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = dom.$init(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = io.$init(); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = strconv.$init(); /* */ $s = 13; case 13: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = sync.$init(); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = time.$init(); /* */ $s = 15; case 15: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_r = dom.GetWindow().Document(); /* */ $s = 16; case 16: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$r = hvue.$init(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = status.$init(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = dom.$init(); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = io.$init(); /* */ $s = 13; case 13: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = strconv.$init(); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = sync.$init(); /* */ $s = 15; case 15: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = time.$init(); /* */ $s = 16; case 16: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_r = dom.GetWindow().Document(); /* */ $s = 17; case 17: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		document = $assertType(_r, dom.HTMLDocument);
 		serverAddr = GetBaseURL();
-		_r$1 = NewRpcClient(serverAddr + ":80"); /* */ $s = 17; case 17: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		_r$1 = NewRpcClient(serverAddr + ":80"); /* */ $s = 18; case 18: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		$pkg.Client = $clone(_r$1, Rpc);
-		/* */ if ($pkg === $mainPkg) { $s = 18; continue; }
-		/* */ $s = 19; continue;
-		/* if ($pkg === $mainPkg) { */ case 18:
-			$r = main(); /* */ $s = 20; case 20: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* */ if ($pkg === $mainPkg) { $s = 19; continue; }
+		/* */ $s = 20; continue;
+		/* if ($pkg === $mainPkg) { */ case 19:
+			$r = main(); /* */ $s = 21; case 21: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$mainFinished = true;
-		/* } */ case 19:
+		/* } */ case 20:
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;

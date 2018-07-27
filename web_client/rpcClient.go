@@ -69,7 +69,7 @@ func (rpc *Rpc) StopEventListening() {
 func NewRpcClient(addr string) Rpc {
 	rcl := Rpc{}
 	rcl.Mutex = &sync.Mutex{}
-	cl := pb.NewP4WNP1Client(addr, grpcweb.ForceWebsocket)
+	cl := pb.NewP4WNP1Client(addr, grpcweb.WithDefaultCallOptions(grpcweb.ForceWebsocketTransport()))
 	rcl.Client = cl
 	return rcl
 }

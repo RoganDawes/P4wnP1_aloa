@@ -37,17 +37,7 @@ func (s *server) EventListen(eReq *pb.EventRequest, eStream pb.P4WNP1_EventListe
 		select {
 			case ev := <- rcv.EventQueue:
 				fmt.Printf("Event dequed to send: %+v\n", ev)
-/*
-				if ev.Type == eReq.ListenType || eReq.ListenType == common.EVT_ANY {
-					//send Event to stream
-					err = eStream.Send(ev)
-					if err != nil {
-						rcv.Cancel()
-						log.Println(err)
-						return err
-					}
-				}
-*/
+
 				//send Event to stream
 				err = eStream.Send(ev)
 				if err != nil {

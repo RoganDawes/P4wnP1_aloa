@@ -3,13 +3,8 @@
         <title>P4wnP1 by MaMe82</title>
         <link rel="stylesheet" type="text/css" href="p4wnp1.css">
         <script src="vue.js"></script>
-        <style type="text/css">
-            .script-input {
-                width: 80%;
-                height: 80%;
-            }
+        <script src="vuex.js"></script>
 
-        </style>
 
 
 
@@ -22,28 +17,54 @@
         <link rel="stylesheet" href="codemirror/addon/hint/show-hint.css">
         <script src="javascript-p4wnp1-hint.js"></script>
 
+
+        <style type="text/css">
+            .CodeMirror {
+
+                height: 60%;
+            }
+
+        </style>
+
+
     </head>
 <body>
-<h1>P4wnP1 service - USB settings</h1>
-<div id="app">
 
+
+<div id="app">
+    <h1>{{ state.title }}</h1>
+    <p>{{ state.text }}</p>
+<!--
+    <table>
+        <tr>
+            <td><state></state></td>
+            <td><state></state></td>
+        </tr>
+    </table>
+-->
     <tabs>
         <tab header="USB">
-            <keep-alive>
             <usb-settings></usb-settings>
-            </keep-alive>
         </tab>
         <tab header="HID Script" :selected="true">
-            <hid-script></hid-script>
+            <hid-script v-model="testString"></hid-script>
         </tab>
         <tab header="Logger" >
             <logger :max-entries="7"></logger>
         </tab>
-        <tab header="bar">blaaaa
-            <textarea cols="80" rows="50"></textarea>
+        <tab header="bar">
+            <table>
+                <tr>
+                    <td>
+                        <usb-settings></usb-settings>
+                    </td>
+                    <td>
+                        <usb-settings></usb-settings>
+                    </td>
+                </tr>
+            </table>
         </tab>
     </tabs>
-
 </div>
 
 <script type="text/javascript" src="webapp.js"></script>
