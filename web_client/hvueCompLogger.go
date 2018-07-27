@@ -1,15 +1,10 @@
 package main
 
 import (
-	"github.com/gopherjs/gopherjs/js"
 	"github.com/mame82/hvue"
-	pb "../proto/gopherjs"
-	"../common"
-	"io"
-	"context"
-	"sync"
 )
 
+/*
 var preservedCOmpLoggerData *CompLoggerData = nil
 
 type CompLoggerData struct {
@@ -77,6 +72,7 @@ func (data *CompLoggerData) StopListening(vm *hvue.VM) {
 	println("Stop listening called", data, vm)
 	data.cancel()
 }
+*/
 
 func LogLevelClass(vm *hvue.VM, level int) string {
 	prefix := "log-entry log-entry-level-"
@@ -96,6 +92,7 @@ func LogLevelClass(vm *hvue.VM, level int) string {
 	}
 }
 
+/*
 func NewLoggerData(vm *hvue.VM) interface{} {
 	loggerVmData := &CompLoggerData{
 		Object: js.Global.Get("Object").New(),
@@ -106,7 +103,7 @@ func NewLoggerData(vm *hvue.VM) interface{} {
 
 	return loggerVmData
 }
-
+*/
 
 
 func InitCompLogger()  {
@@ -114,36 +111,26 @@ func InitCompLogger()  {
 	hvue.NewComponent(
 		"logger",
 		hvue.Template(compLoggerTemplate),
-		hvue.DataFunc(NewLoggerData),
-		hvue.MethodsOf(&CompLoggerData{}),
+//		hvue.DataFunc(NewLoggerData),
+//		hvue.MethodsOf(&CompLoggerData{}),
 		hvue.Method("logLevelClass", LogLevelClass),
 		hvue.PropObj("max-entries", hvue.Types(hvue.PNumber), hvue.Default(5)),
 		hvue.Created(func(vm *hvue.VM) {
 			println("OnCreated")
-			vm.Call("StartListening")
+//			vm.Call("StartListening")
 		}),
 		hvue.Destroyed(func(vm *hvue.VM) {
 			println("OnDestroyed")
-			vm.Call("StopListening")
+//			vm.Call("StopListening")
 		}),
-		hvue.Activated(func(vm *hvue.VM) {
-			println("OnActivated")
-		}),
-		hvue.Deactivated(func(vm *hvue.VM) {
-			println("OnDeactivated")
-		}),
-		hvue.Mounted(func(vm *hvue.VM) {
-			println("OnMounted")
-		}),
-		/*
-		hvue.Updated(func(vm *hvue.VM) {
-			println("Updated")
-		}),
-		*/
 
 		hvue.Computed("classFromLevel", func(vm *hvue.VM) interface{} {
 			return "info"
 		}),
+		hvue.Computed("logArray",
+			func(vm *hvue.VM) interface{} {
+				return vm.Store.Get("state").Get("eventLog").Get("logArray")
+			}),
 	)
 	//return o.NewComponent()
 }

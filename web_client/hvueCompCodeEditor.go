@@ -69,10 +69,6 @@ func initCodeMirror(vm *hvue.VM) {
 	//copy value property to initial editor state
 	editor.Call("setValue", val)
 
-	// ToDo: Global scope export could be removed, debugging only usage
-	js.Global.Set("editor", editor)
-	//vm.Set("editor", editor)
-
 	editor.Call("on", "change", func(cm *js.Object) {
 		newVal := cm.Call("getValue")
 

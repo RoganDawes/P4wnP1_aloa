@@ -5,7 +5,27 @@ package mvuex
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"reflect"
+	"errors"
 )
+
+
+var (
+	eTooFewMutationArgs       = errors.New("Mutation function has too few arguments (min 2)")
+	eTooManyMutationArgs      = errors.New("Mutation function has too many arguments (max 3)")
+	eWrongActionArgCount      = errors.New("Wrong argument count! An action handler takes 3 or 4 args: actionHandler(store *Store, context *ActionContext, state *{CustomStateType} [, callArg *{CustomArgType])")
+	eTooFewMutationArgsOnCall = errors.New("Mutation function called with too few arguments from JavaScrip")
+	eWrongFirstMutationArg    = errors.New("Mutation function has to have *Store as first argument type")
+	eWrongFirstActionArg      = errors.New("Mutation function has to have *Store as first argument type")
+	eWrongSecondActionArg      = errors.New("Mutation function has to have *ActionContext as second argument type")
+	eWrongSecondMutationArg   = errors.New("The second argument of the mutation function has to be a pointer to a struct of the type used for state")
+	eFirstFieldIsNotPtrJsObject = errors.New("The first field of the struct has to be of type *js.Object")
+
+
+	jsObjectType = reflect.TypeOf(js.Object{})
+	jsStoreType    = reflect.TypeOf(Store{})
+	jsActioContextType    = reflect.TypeOf(ActionContext{})
+)
+
 
 func o() *js.Object { return js.Global.Get("Object").New() } //Helper to create *js.Object
 
@@ -46,19 +66,18 @@ func castToType(targetType reflect.Type, sourceVal *js.Object) (result reflect.V
 		result = reflect.ValueOf(sourceVal.String())
 	case reflect.Struct:
 		//WE ASSUME THAT THE FIRST FIELD OF THE STRUCT IS OF TYPE *js.Object
-
+		//check if first field is *js.Object
+		if !checkIfJSStruct(targetType) {
+			return result, eFirstFieldIsNotPtrJsObject
+		}
 
 		//create a pointer to a new instance of this struct
 		pStructInstance := reflect.New(targetType)
 
 
-		//check if first field is *js.Object
-		field0 := pStructInstance.Elem().Field(0)
-		if field0.Kind() != reflect.Ptr || field0.Elem().Kind() != kindJsObjectType {
-			return result, eFirstFieldIsntPtrJsObject
-		}
-
 		//Assign the sourceValue to the first field of the struct, which is assume to be *js.Object
+//		fN := pStructInstance.Elem().Type().Name()
+//		println("Assigning to '" + fN + "': ", reflect.TypeOf(sourceVal).Elem().Name(), sourceVal)
 		pStructInstance.Elem().Field(0).Set(reflect.ValueOf(sourceVal))
 
 		result = pStructInstance.Elem()
@@ -80,4 +99,19 @@ func castToType(targetType reflect.Type, sourceVal *js.Object) (result reflect.V
 	}
 
 	return result, nil
+}
+
+
+// checks if the obj given is a struct, with *js.Object type in first field
+func checkIfJSStruct(objType reflect.Type) bool {
+
+	//check if Struct
+	if objType.Kind() != reflect.Struct { return false } //not a struct
+	// fetch first field
+	typeField0 := objType.Field(0).Type
+	//check if first field is pointer
+	if typeField0.Kind() != reflect.Ptr { return false } //not a pointer
+	// dereference ptr and check if equal to type js.Object
+	if typeField0.Elem() != jsObjectType { return false } // not pointing to js.Object
+	return true
 }

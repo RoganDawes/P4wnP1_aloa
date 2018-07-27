@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	maxLogEntries = 500
 	initHIDScript = `layout('us');			// US keyboard layout
 typingSpeed(100,150)	// Wait 100ms between key strokes + an additional random value between 0ms and 150ms (natural)
 
@@ -40,6 +41,7 @@ type GlobalState struct {
 	Title string `js:"title"`
 	CurrentHIDScriptSource string `js:"currentHIDScriptSource"`
 	CurrentGadgetSettings *jsGadgetSettings `js:"currentGadgetSettings"`
+	EventLog *jsLoggerData `js:"eventLog"`
 
 	Counter int `js:"count"`
 	Text string `js:"text"`
@@ -60,12 +62,13 @@ func UpdateGadgetSettingsFromDeployed(jsGS *jsGadgetSettings) {
 	return
 }
 
-func createGlobalStateStruct() interface{} {
+func createGlobalStateStruct() GlobalState {
 	state := GlobalState{Object:O()}
 	state.Title = "P4wnP1 by MaMe82"
 	state.CurrentHIDScriptSource = initHIDScript
 	state.CurrentGadgetSettings = NewUSBGadgetSettings()
 	UpdateGadgetSettingsFromDeployed(state.CurrentGadgetSettings)
+	state.EventLog = NewLogger(maxLogEntries)
 
 	state.Counter = 1337
 	state.Text = "Hi there says MaMe82"
@@ -76,6 +79,17 @@ func initMVuex() {
 	state := createGlobalStateStruct()
 	store := mvuex.NewStore(
 		mvuex.State(state),
+		mvuex.Action("actiontest", func(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+			go func() {
+				for i:=0; i<10; i++ {
+					println(state.Counter)
+					time.Sleep(1*time.Second)
+					context.Commit("increment",5)
+				}
+
+			}()
+
+		}),
 		mvuex.Mutation("increment", func (store *mvuex.Store, state *GlobalState, add int) {
 			state.Counter += add
 			return
@@ -102,12 +116,26 @@ func initMVuex() {
 			go UpdateGadgetSettingsFromDeployed(state.CurrentGadgetSettings)
 			return
 		}),
+		mvuex.Mutation("startLogListening", func (store *mvuex.Store, state *GlobalState) {
+			state.EventLog.StartListening()
+			return
+		}),
+		mvuex.Mutation("stopLogListening", func (store *mvuex.Store, state *GlobalState) {
+			state.EventLog.StopListening()
+			return
+		}),
 	)
+
 
 	// propagate Vuex store to global scope to allow injecting it to Vue by setting the "store" option
 	js.Global.Set("store", store)
+
+	// Start Event Listening
+	state.EventLog.StartListening()
+
 }
 
 func InitGlobalState() {
 	initMVuex()
+
 }

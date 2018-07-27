@@ -29,7 +29,7 @@ func UploadHIDScript(filename string, content string) (err error) {
 	ctx,cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	//ToDO: filename could be generated here and returned as result
+	//ToDo: filename could be generated here and returned as result
 
 	//ToDo: split upload data into chunks
 

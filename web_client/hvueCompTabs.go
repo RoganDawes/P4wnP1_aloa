@@ -38,11 +38,6 @@ func initTabs(vm *hvue.VM) {
 		}
 
 	}
-
-	/*
-	//ToDo: remove export (Debug only)
-	js.Global.Set("vm", vm)
-	*/
 }
 
 func (c *CompTabsData) UpdateSelectedTab(vm *hvue.VM, selectedID int) {

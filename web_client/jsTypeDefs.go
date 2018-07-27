@@ -3,6 +3,11 @@ package main
 import (
 	pb "../proto/gopherjs"
 	"github.com/gopherjs/gopherjs/js"
+	"errors"
+	"../common"
+	"sync"
+	"context"
+	"io"
 )
 
 /* USB Gadget types corresponding to gRPC messages */
@@ -131,4 +136,120 @@ type jsEventLog struct {
 	EvLogLevel   int  `js:"level"`
 	EvLogMessage string `js:"message"`
 	EvLogTime string `js:"time"`
+}
+
+func DeconstructEventLog(gRPCEv *pb.Event) (res *jsEventLog, err error) {
+	if gRPCEv.Type != common.EVT_LOG { return nil,errors.New("No log event")}
+
+	res = &jsEventLog{Object:O()}
+	switch vT := gRPCEv.Values[0].Val.(type) {
+	case *pb.EventValue_Tstring:
+		res.EvLogSource = vT.Tstring
+	default:
+		return nil, errors.New("Value at position 0 has wrong type for a log event")
+	}
+	switch vT := gRPCEv.Values[1].Val.(type) {
+	case *pb.EventValue_Tint64:
+		res.EvLogLevel = int(vT.Tint64)
+	default:
+		return nil, errors.New("Value at position 1 has wrong type for a log event")
+	}
+	switch vT := gRPCEv.Values[2].Val.(type) {
+	case *pb.EventValue_Tstring:
+		res.EvLogMessage = vT.Tstring
+	default:
+		return nil, errors.New("Value at position 2 has wrong type for a log event")
+	}
+	switch vT := gRPCEv.Values[3].Val.(type) {
+	case *pb.EventValue_Tstring:
+		res.EvLogTime = vT.Tstring
+	default:
+		return nil, errors.New("Value at position 3 has wrong type for a log event")
+	}
+
+	return res, nil
+}
+
+
+/* EVENT LOGGER */
+
+type jsLoggerData struct {
+	*js.Object
+	LogArray *js.Object `js:"logArray"`
+	cancel context.CancelFunc
+	*sync.Mutex
+	MaxEntries int `js:"maxEntries"`
+}
+
+
+/* This method gets internalized and therefor the mutex won't be accessible*/
+func (data *jsLoggerData) AddEntry(ev *pb.Event ) {
+//	println("ADD ENTRY", ev)
+	go func() {
+/*
+		data.Lock()
+		defer data.Unlock()
+*/
+
+		logEv, err := DeconstructEventLog(ev)
+		if err != nil {
+			println("Logger: Error adding log entry, provided event couldn't be converted to log event")
+			return
+		}
+
+		data.LogArray.Call("push", logEv)
+
+		//reduce to length (note: kebab case 'max-entries' is translated to camel case 'maxEntries' by vue)
+		for data.LogArray.Length() > data.MaxEntries {
+			data.LogArray.Call("shift") // remove first element
+		}
+
+	}()
+
+
+}
+
+func (data *jsLoggerData) StartListening() {
+
+	println("Start listening called", data)
+	ctx,cancel := context.WithCancel(context.Background())
+	data.cancel = cancel
+
+	evStream, err := Client.Client.EventListen(ctx, &pb.EventRequest{ListenType: common.EVT_LOG})
+	if err != nil {
+		cancel()
+		println("Error listening fo Log events", err)
+		return
+	}
+
+	go func() {
+		defer cancel()
+		for {
+			event, err := evStream.Recv()
+			if err == io.EOF { break }
+			if err != nil { return }
+
+			//println("Event: ", event)
+			data.AddEntry(event)
+
+		}
+		return
+	}()
+}
+
+
+func (data *jsLoggerData) StopListening() {
+	data.cancel()
+}
+
+func NewLogger(maxEntries int) *jsLoggerData {
+	loggerVmData := &jsLoggerData{
+		Object: js.Global.Get("Object").New(),
+	}
+
+	loggerVmData.Mutex = &sync.Mutex{}
+	loggerVmData.LogArray = js.Global.Get("Array").New()
+	loggerVmData.MaxEntries = maxEntries
+
+	return loggerVmData
 }

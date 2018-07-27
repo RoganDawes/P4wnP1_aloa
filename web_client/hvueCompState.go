@@ -67,6 +67,9 @@ func InitCompState() {
 			func(vm *hvue.VM, newValue *js.Object) {
 				js.Global.Get("store").Call("commit", "setText", newValue)
 			}),
+		hvue.Method("actionincrement", func(vm *hvue.VM, count *js.Object) {
+			js.Global.Get("store").Call("dispatch", "actiontest")
+		}),
 		hvue.Method("increment", func(vm *hvue.VM, count *js.Object) {
 			// normal way to access the store.commit() function
 			js.Global.Get("store").Call("commit", "increment", count)
@@ -94,6 +97,7 @@ const (
   <p>
     <button @click="increment(1,2,3)">+</button>
 	<button @click="increment(2)">+2</button>
+	<button @click="actionincrement">+x</button>
     <button @click="decrement">-</button>
   </p>
 </div>
