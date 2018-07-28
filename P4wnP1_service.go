@@ -18,31 +18,20 @@ import (
 
 func main() {
 
+	err := service.InitGlobalServiceState()
+	if err != nil { panic(err) }
 
+	state := service.ServiceState
+	state.StartService()
 
 
 	//ToDo: Check for root privs
-
-	var err error
 	err = service.CheckLibComposite()
 	if err != nil {
 		log.Fatalf("Couldn't load libcomposite: %v", err)
 	}
 
-	err = service.DestroyAllGadgets()
-	if err != nil {
-		log.Fatalf("Error while rolling back existing USB gadgets: %v", err)
-	}
-
-	err = service.InitDefaultGadgetSettings()
-	if err != nil {
-		log.Fatalf("Error while setting up the default gadget: %v", err)
-	}
-
-
-	//service.DeployWifiSettings(service.GetDefaultWiFiSettings())
-
-	service.InitLed(false) //Set LED to manual trigger
+	//service.NewLed(false) //Set LED to manual trigger
 	//service.InitDefaultLEDSettings()
 
 	/*
@@ -54,10 +43,10 @@ func main() {
 	service.StartRpcServerAndWeb("0.0.0.0", "50051", "80", "/home/pi/P4wnP1_go/www") //start gRPC service
 
 	//Indicate servers up with LED blink count 1
-	service.SetLed(pb.LEDSettings{1})
+	state.Led.SetLed(&pb.LEDSettings{1})
 
-	service.StartEventManager(20)
-	log.SetOutput(service.EvMgr)
+	//service.StartEventManager(20)
+	log.SetOutput(state.EvMgr)
 	log.Println("TESTMESSAGE")
 	go func() {
 		err := common.RunBashScript("/usr/local/P4wnP1/scripts/servicestart.sh")
@@ -70,7 +59,8 @@ func main() {
 	i := 0
 	go func() {
 		for {
-			service.EvMgr.Emit(service.ConstructEventLog("test source", i%5, "message " +strconv.Itoa(i) + ": " + textfill))
+			//println("Sending log event")
+			state.EvMgr.Emit(service.ConstructEventLog("test source", i%5, "message " +strconv.Itoa(i) + ": " + textfill))
 			time.Sleep(time.Millisecond *2000)
 			i++
 		}
@@ -84,5 +74,6 @@ func main() {
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	s := <-sig
 	log.Printf("Signal (%v) received, ending P4wnP1_service ...\n", s)
+	state.StopService()
 	return
 }
