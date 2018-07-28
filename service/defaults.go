@@ -4,6 +4,15 @@ import (
 	pb "../proto"
 )
 
+const (
+	DEFAULT_CDC_ECM_HOST_ADDR = "42:63:66:12:34:56"
+	DEFAULT_CDC_ECM_DEV_ADDR  = "42:63:66:56:34:12"
+	DEFAULT_RNDIS_HOST_ADDR   = "42:63:65:12:34:56"
+	DEFAULT_RNDIS_DEV_ADDR    = "42:63:65:56:34:12"
+	USB_ETHERNET_BRIDGE_MAC   = "24:22:26:12:14:16"
+	USB_ETHERNET_BRIDGE_NAME  = "usbeth"
+)
+
 func GetDefaultNetworkSettingsUSB() (*pb.EthernetInterfaceSettings) {
 	//configure 172.24.0.1/255.255.255.252 for usbeth
 	ifSettings := &pb.EthernetInterfaceSettings {
@@ -70,8 +79,8 @@ func GetDefaultDHCPConfigWiFi() (settings *pb.DHCPServerSettings) {
 	return
 }
 
-func GetDefaultLEDSettings() (res pb.LEDSettings) {
-	return pb.LEDSettings{
+func GetDefaultLEDSettings() (res *pb.LEDSettings) {
+	return &pb.LEDSettings{
 		BlinkCount: 254,
 	}
 }
@@ -93,12 +102,12 @@ func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
 		Use_UMS:          false,
 		Use_SERIAL:       false,
 		RndisSettings: &pb.GadgetSettingsEthernet{
-			HostAddr: "42:63:65:12:34:56",
-			DevAddr:  "42:63:65:56:34:12",
+			HostAddr: DEFAULT_RNDIS_HOST_ADDR,
+			DevAddr:  DEFAULT_RNDIS_DEV_ADDR,
 		},
 		CdcEcmSettings: &pb.GadgetSettingsEthernet{
-			HostAddr: "42:63:66:12:34:56",
-			DevAddr:  "42:63:66:56:34:12",
+			HostAddr: DEFAULT_CDC_ECM_HOST_ADDR,
+			DevAddr:  DEFAULT_CDC_ECM_DEV_ADDR,
 		},
 		UmsSettings: &pb.GadgetSettingsUMS{
 			File:"", //we don't supply an image file, which is no problem as it could be applied later on (removable media)

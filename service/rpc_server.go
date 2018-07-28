@@ -30,7 +30,8 @@ var (
 type server struct {}
 
 func (s *server) EventListen(eReq *pb.EventRequest, eStream pb.P4WNP1_EventListenServer) (err error) {
-	rcv := EvMgr.RegisterReceiver(eReq.ListenType)
+	//ToDo: check dependency from state (EvMgr initialized)
+	rcv := ServiceState.EvMgr.RegisterReceiver(eReq.ListenType)
 
 	for {
 
@@ -96,9 +97,9 @@ func (s *server) FSCreateTempDirOrFile(ctx context.Context, req *pb.TempDirOrFil
 }
 
 func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) (jobs *pb.HIDScriptJobList, err error) {
-	if HidCtl == nil { return nil, rpcErrNoHid}
+	if ServiceState.HidCtl == nil { return nil, rpcErrNoHid}
 
-	retJobs,err := HidCtl.GetAllBackgroundJobs()
+	retJobs,err := ServiceState.HidCtl.GetAllBackgroundJobs()
 	if err != nil { return nil, err }
 	jobs = &pb.HIDScriptJobList{}
 	jobs.Ids = retJobs
@@ -107,10 +108,10 @@ func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) 
 
 func (s *server) HIDCancelAllScriptJobs(ctx context.Context, rEmpty *pb.Empty) (empty *pb.Empty, err error) {
 	empty = &pb.Empty{}
-	if HidCtl == nil { return empty, rpcErrNoHid}
+	if ServiceState.HidCtl == nil { return empty, rpcErrNoHid}
 
 	// Try to find script
-	HidCtl.CancelAllBackgroundJobs()
+	ServiceState.HidCtl.CancelAllBackgroundJobs()
 	return
 }
 
@@ -118,10 +119,10 @@ func (s *server) HIDCancelAllScriptJobs(ctx context.Context, rEmpty *pb.Empty) (
 
 func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) (empty *pb.Empty, err error) {
 	empty = &pb.Empty{}
-	if HidCtl == nil { return empty, rpcErrNoHid}
+	if ServiceState.HidCtl == nil { return empty, rpcErrNoHid}
 
 	// Try to find script
-	job,err := HidCtl.GetBackgroundJobByID(int(sJob.Id))
+	job,err := ServiceState.HidCtl.GetBackgroundJobByID(int(sJob.Id))
 	if err != nil { return empty, err }
 
 	job.Cancel()
@@ -129,7 +130,7 @@ func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) 
 }
 
 func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptRequest) (scriptRes *pb.HIDScriptResult, err error) {
-	if HidCtl == nil { return nil, rpcErrNoHid}
+	if ServiceState.HidCtl == nil { return nil, rpcErrNoHid}
 
 
 
@@ -142,7 +143,7 @@ func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptReques
 		if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
 
 
-		scriptVal,err := HidCtl.RunScript(jobCtx, string(scriptFile))
+		scriptVal,err := ServiceState.HidCtl.RunScript(jobCtx, string(scriptFile))
 		if err != nil { return nil,err }
 		val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
 		jsonVal,err := json.Marshal(val)
@@ -159,7 +160,7 @@ func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptReques
 }
 
 func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptRequest) (rJob *pb.HIDScriptJob, err error) {
-	if HidCtl == nil { return nil, rpcErrNoHid}
+	if ServiceState.HidCtl == nil { return nil, rpcErrNoHid}
 
 	if scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath); err != nil {
 		return nil, errors.New(fmt.Sprintf("Couldn't load HIDScript '%s': %v\n", scriptReq.ScriptPath, err))
@@ -168,7 +169,7 @@ func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptReq
 		jobCtx := context.Background()
 		// ToDo: we don't retrieve the cancelFunc which should be called to free resources. Solution: use withCancel context and call cancel by go routine on timeout
 		if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
-		job,err := HidCtl.StartScriptAsBackgroundJob(jobCtx, string(scriptFile))
+		job,err := ServiceState.HidCtl.StartScriptAsBackgroundJob(jobCtx, string(scriptFile))
 		if err != nil { return nil,err }
 
 		rJob = &pb.HIDScriptJob{
@@ -180,15 +181,15 @@ func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptReq
 }
 
 func (s *server) HIDGetScriptJobResult(ctx context.Context, sJob *pb.HIDScriptJob) (scriptRes *pb.HIDScriptResult, err error) {
-	if HidCtl == nil { return nil, rpcErrNoHid}
+	if ServiceState.HidCtl == nil { return nil, rpcErrNoHid}
 
 	// Try to find script
-	job,err := HidCtl.GetBackgroundJobByID(int(sJob.Id))
+	job,err := ServiceState.HidCtl.GetBackgroundJobByID(int(sJob.Id))
 	if err != nil { return scriptRes, err }
 
 
 	//ToDo: check impact/behavior, because ctx is provided by gRPC server
-	scriptVal,err := HidCtl.WaitBackgroundJobResult(ctx, job)
+	scriptVal,err := ServiceState.HidCtl.WaitBackgroundJobResult(ctx, job)
 	if err != nil { return nil,err }
 	val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
 	jsonVal,err := json.Marshal(val)
@@ -250,11 +251,11 @@ func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetS
 	//ToDo: Former gadgets are destroyed without testing if there're changes, this should be aborted if GadgetSettingsState == GetDeployedGadgetSettings()
 	DestroyGadget(USB_GADGET_NAME)
 
-	errg := DeployGadgetSettings(GadgetSettingsState)
+	errg := ServiceState.UsbGM.DeployGadgetSettings(ServiceState.UsbGM.UndeployedGadgetSettings)
 	err = nil
 	if errg != nil {
 		err = errors.New(fmt.Sprintf("Deploying new gadget settings failed, reverted to old ones: %v", errg))
-		DeployGadgetSettings(*gs_backup) //We don't catch the error, as the old settings should have been working
+		ServiceState.UsbGM.DeployGadgetSettings(gs_backup) //We don't catch the error, as the old settings should have been working
 	}
 
 	gs, _ = ParseGadgetState(USB_GADGET_NAME) //Return settings from deployed gadget
@@ -262,29 +263,29 @@ func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetS
 }
 
 func (s *server) GetGadgetSettings(context.Context, *pb.Empty) (*pb.GadgetSettings, error) {
-	return &GadgetSettingsState, nil
+	return ServiceState.UsbGM.UndeployedGadgetSettings, nil
 }
 
 func (s *server) SetGadgetSettings(ctx context.Context, gs *pb.GadgetSettings) (res *pb.GadgetSettings, err error) {
 	if err = ValidateGadgetSetting(*gs); err != nil {
 		//We return the validation error and the current (unchanged) GadgetSettingsState
-		res = &GadgetSettingsState
+		res = ServiceState.UsbGM.UndeployedGadgetSettings
 		return
 	}
-	GadgetSettingsState = *gs
-	res = &GadgetSettingsState
+	ServiceState.UsbGM.UndeployedGadgetSettings = gs
+	res = ServiceState.UsbGM.UndeployedGadgetSettings
 	return
 }
 
 func (s *server) GetLEDSettings(context.Context, *pb.Empty) (res *pb.LEDSettings, err error) {
-	res, err = GetLed()
+	res, err = ServiceState.Led.GetLed()
 	log.Printf("GetLEDSettings, result: %+v", res)
 	return
 }
 
 func (s *server) SetLEDSettings(ctx context.Context, ls *pb.LEDSettings) (*pb.Empty, error) {
 	log.Printf("SetLEDSettings %+v", ls)
-	SetLed(*ls)
+	ServiceState.Led.SetLed(ls)
 	return &pb.Empty{}, nil
 }
 

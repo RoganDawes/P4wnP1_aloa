@@ -21,11 +21,19 @@ const (
 	LED_DELAY_PAUSE = 500 * time.Millisecond
 )
 
+
+type LedState struct {
+	blink_count *uint32
+}
+/*
 var (
 	blink_count uint32 = 0
 )
+*/
+func NewLed(led_on bool) (ledState *LedState, err error) {
+	blinkCount := uint32(0)
+	ledState = &LedState{ &blinkCount }
 
-func InitLed(led_on bool) (error) {
 	//set trigger of LED to manual
 	log.Println("Setting LED to manual trigger ...")
 	ioutil.WriteFile(LED_TRIGGER_PATH, []byte(LED_TRIGGER_MANUAL), os.ModePerm)
@@ -36,22 +44,22 @@ func InitLed(led_on bool) (error) {
 		log.Println("Setting LED to OFF ...")
 		ioutil.WriteFile(LED_BRIGHTNESS_PATH, []byte(LED_OFF), os.ModePerm)
 	}
-	atomic.StoreUint32(&blink_count, 0)
-	
-	go led_loop()
-	
-	return nil
+
+	go ledState.led_loop() // watcher loop
+
+	ledState.SetLed(GetDefaultLEDSettings()) //set default setting
+	return ledState,nil
 }
 
-func led_loop() {
+func (leds *LedState) led_loop() {
 	
 	for {
-		for i := uint32(0); i < atomic.LoadUint32(&blink_count); i++ {
+		for i := uint32(0); i < atomic.LoadUint32(leds.blink_count); i++ {
 			ioutil.WriteFile(LED_BRIGHTNESS_PATH, []byte(LED_ON), os.ModePerm)
 			time.Sleep(LED_DELAY_ON)
 			
 			//Don't turn off led if blink_count >= 255 (solid)
-			if 255 > atomic.LoadUint32(&blink_count) {
+			if 255 > atomic.LoadUint32(leds.blink_count) {
 				ioutil.WriteFile(LED_BRIGHTNESS_PATH, []byte(LED_OFF), os.ModePerm)
 				time.Sleep(LED_DELAY_OFF)
 			}
@@ -60,18 +68,15 @@ func led_loop() {
 	}
 }
 
-func SetLed(s pb.LEDSettings) (error) {
+func (leds *LedState) SetLed(s *pb.LEDSettings) (error) {
 	//log.Printf("setLED called with %+v", s)
 	
-	atomic.StoreUint32(&blink_count, s.BlinkCount)
+	atomic.StoreUint32(leds.blink_count, s.BlinkCount)
 	
 	return nil
 }
 
-func GetLed() (res *pb.LEDSettings, err error) {
-	return &pb.LEDSettings{BlinkCount: atomic.LoadUint32(&blink_count)}, nil
+func (leds *LedState) GetLed() (res *pb.LEDSettings, err error) {
+	return &pb.LEDSettings{BlinkCount: atomic.LoadUint32(leds.blink_count)}, nil
 }
 
-func InitDefaultLEDSettings() {
-	SetLed(GetDefaultLEDSettings())
-}

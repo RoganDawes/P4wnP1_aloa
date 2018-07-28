@@ -13,18 +13,10 @@ import (
 	"errors"
 )
 
-var (
-	StoredNetworkSetting map[string]*pb.EthernetInterfaceSettings = make(map[string]*pb.EthernetInterfaceSettings)
-)
 
-func init() {
-	//preinitialize Default settings for "wlan0" and USB_ETHERNET_BRIDGE_NAME ("usbeth")
-	StoredNetworkSetting[USB_ETHERNET_BRIDGE_NAME] = GetDefaultNetworkSettingsUSB()
-	StoredNetworkSetting["wlan0"] = GetDefaultNetworkSettingsWiFi()
-}
 
 func ReInitNetworkInterface(ifName string) (err error) {
-	if settings, existing := StoredNetworkSetting[ifName]; existing {
+	if settings, existing := ServiceState.StoredNetworkSetting[ifName]; existing {
 		log.Printf("Redeploying stored Network settings for interface '%s' ...\n", ifName)
 		return ConfigureInterface(settings)
 	} else {
@@ -208,7 +200,7 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 	}
 
 	//Store latest settings
-	StoredNetworkSetting[settings.Name] = settings
+	ServiceState.StoredNetworkSetting[settings.Name] = settings
 
 	return nil
 }

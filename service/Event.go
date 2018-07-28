@@ -7,13 +7,16 @@ import (
 	"context"
 	"sync"
 	"time"
+	"log"
+	"strconv"
 )
 
+/*
 var (
 	EvMgr    *EventManager
 	evmMutex  = &sync.Mutex{}
 )
-
+*/
 func pDEBUG(message string) {
 	fmt.Println("EVENT DEBUG: " + message)
 }
@@ -30,6 +33,31 @@ type EventManager struct {
 	receiverRegListMutex *sync.Mutex
 }
 
+func NewEventManager(queueSize int) *EventManager {
+	EvMgr := &EventManager{
+		eventQueue: make(chan *pb.Event, queueSize),
+		receiverDelListMutex: &sync.Mutex{},
+		receiverRegListMutex: &sync.Mutex{},
+		receiverRegisterList: make(map[*EventReceiver]bool),
+		registeredReceivers: make(map[*EventReceiver]bool),
+		receiverDeleteList: make(map[*EventReceiver]bool),
+	}
+	EvMgr.ctx, EvMgr.cancel = context.WithCancel(context.Background())
+	return EvMgr
+}
+
+func (evm *EventManager) Start() {
+	log.Println("Event Manager: Starting event dispatcher")
+	go evm.dispatch()
+}
+
+func (evm *EventManager) Stop() {
+	log.Println("Event Manager: Stopping ...")
+	evm.cancel()
+	close(evm.eventQueue)
+}
+
+/*
 func StartEventManager(queueSize int) *EventManager {
 	if EvMgr != nil { StopEventManager() }
 
@@ -61,10 +89,11 @@ func StopEventManager() {
 	close(EvMgr.eventQueue)
 
 }
+*/
 
 func (em *EventManager) Emit(event *pb.Event) {
 	em.eventQueue <-event
-//	fmt.Println("Event enqueued")
+	//fmt.Println("Event enqueued")
 }
 
 func (em *EventManager) Write(p []byte) (n int, err error) {
@@ -75,6 +104,8 @@ func (em *EventManager) Write(p []byte) (n int, err error) {
 
 
 func (em *EventManager) RegisterReceiver(filterEventType int64) *EventReceiver {
+	fmt.Println("!!!Event listener registered for " + strconv.Itoa(int(filterEventType)))
+
 	ctx,cancel := context.WithCancel(context.Background())
 	er := &EventReceiver{
 		EventQueue: make(chan *pb.Event, 10), //allow buffering 10 events per receiver

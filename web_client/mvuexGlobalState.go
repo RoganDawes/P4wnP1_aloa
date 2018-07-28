@@ -1,15 +1,19 @@
 package main
 
 import (
-	"./mvuex"
 	"github.com/gopherjs/gopherjs/js"
 	"time"
-	"context"
-	pb "../proto/gopherjs"
+	"./mvuex"
 )
 
 const (
 	maxLogEntries = 500
+
+	VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS       = "deployCurrentGadgetSettings"
+	VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED = "updateCurrentGadgetSettingsFromDeployed"
+	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO     = "setCurrentGadgetSettings"
+	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO   = "setCurrentHIDScriptSource"
+
 	initHIDScript = `layout('us');			// US keyboard layout
 typingSpeed(100,150)	// Wait 100ms between key strokes + an additional random value between 0ms and 150ms (natural)
 
@@ -42,14 +46,18 @@ type GlobalState struct {
 	CurrentHIDScriptSource string `js:"currentHIDScriptSource"`
 	CurrentGadgetSettings *jsGadgetSettings `js:"currentGadgetSettings"`
 	EventLog *jsLoggerData `js:"eventLog"`
+	IsModalEnabled bool `js:"isModalEnabled"`
 
 	Counter int `js:"count"`
 	Text string `js:"text"`
 }
 
-func UpdateGadgetSettingsFromDeployed(jsGS *jsGadgetSettings) {
+/*
+func (state *GlobalState) UpdateGadgetSettingsFromDeployed(jsGS *jsGadgetSettings) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
 	println("UpdateGadgetSettingsFromDeployed called")
+
+
 
 	ctx,cancel := context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
@@ -61,18 +69,72 @@ func UpdateGadgetSettingsFromDeployed(jsGS *jsGadgetSettings) {
 	jsGS.fromGS(deployedGs)
 	return
 }
+*/
 
 func createGlobalStateStruct() GlobalState {
 	state := GlobalState{Object:O()}
 	state.Title = "P4wnP1 by MaMe82"
 	state.CurrentHIDScriptSource = initHIDScript
 	state.CurrentGadgetSettings = NewUSBGadgetSettings()
-	UpdateGadgetSettingsFromDeployed(state.CurrentGadgetSettings)
+	//UpdateGadgetSettingsFromDeployed(state.CurrentGadgetSettings)
 	state.EventLog = NewLogger(maxLogEntries)
+	state.IsModalEnabled = true
 
 	state.Counter = 1337
 	state.Text = "Hi there says MaMe82"
 	return state
+}
+
+func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		//fetch deployed gadget settings
+		dGS,err := RpcGetDeployedGadgetSettings(time.Second * 3)
+		if err != nil {
+			println("Couldn't retrieve deployed gadget settings")
+			return
+		}
+		//convert to JS version
+		jsGS := &jsGadgetSettings{Object:O()}
+		jsGS.fromGS(dGS)
+
+		//commit to current
+		context.Commit("setCurrentGadgetSettings", jsGS)
+	}()
+
+	return
+}
+
+func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		// ToDo: Indicate deployment process via global state
+
+		//get current GadgetSettings
+		curGS := state.CurrentGadgetSettings.toGS()
+
+		//try to set them via gRPC (the server holds an internal state, setting != deploying)
+		err := RpcSetRemoteGadgetSettings(curGS, time.Second)
+		if err != nil {
+			//ToDo: use global store to return something, or allow actions to return promises (latter is too much JavaScript)
+			Alert(err)
+			return
+		}
+
+		//try to deploy the, now set, remote GadgetSettings via gRPC
+		_,err = RpcDeployRemoteGadgetSettings(time.Second*10)
+		if err != nil {
+			//ToDo: use global store to return something, or allow actions to return promises (latter is too much JavaScript)
+			Alert(err)
+			return
+		}
+
+
+
+		//ToDo: If we're here, we succeeded and should indicate this via global state
+		Alert("GadgetSettings deployed successfully")
+
+	}()
+
+	return
 }
 
 func initMVuex() {
@@ -90,6 +152,10 @@ func initMVuex() {
 			}()
 
 		}),
+		mvuex.Mutation("setModalEnabled", func (store *mvuex.Store, state *GlobalState, enabled bool) {
+			state.IsModalEnabled = enabled
+			return
+		}),
 		mvuex.Mutation("increment", func (store *mvuex.Store, state *GlobalState, add int) {
 			state.Counter += add
 			return
@@ -102,18 +168,12 @@ func initMVuex() {
 			state.Text = newText
 			return
 		}),
-		mvuex.Mutation("setCurrentHIDScriptSource", func (store *mvuex.Store, state *GlobalState, newText string) {
+		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO, func (store *mvuex.Store, state *GlobalState, newText string) {
 			state.CurrentHIDScriptSource = newText
 			return
 		}),
-		mvuex.Mutation("setCurrentGadgetSettings", func (store *mvuex.Store, state *GlobalState, newSettings *jsGadgetSettings) {
-			state.CurrentGadgetSettings = newSettings
-			return
-		}),
-		mvuex.Mutation("setCurrentGadgetSettingsFromDeployed", func (store *mvuex.Store, state *GlobalState) {
-			//ToDo: check if this is valid for synchronous run, has to be dispatched to action otherwise
-			println("Store: commit setCurrentGadgetSettingsFromDeployed")
-			go UpdateGadgetSettingsFromDeployed(state.CurrentGadgetSettings)
+		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO, func (store *mvuex.Store, state *GlobalState, settings *jsGadgetSettings) {
+			state.CurrentGadgetSettings = settings
 			return
 		}),
 		mvuex.Mutation("startLogListening", func (store *mvuex.Store, state *GlobalState) {
@@ -124,8 +184,12 @@ func initMVuex() {
 			state.EventLog.StopListening()
 			return
 		}),
+		mvuex.Action(VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED, actionUpdateGadgetSettingsFromDeployed),
+		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS, actionDeployCurrentGadgetSettings),
 	)
 
+	// fetch deployed gadget settings
+	store.Dispatch("updateCurrentGadgetSettingsFromDeployed")
 
 	// propagate Vuex store to global scope to allow injecting it to Vue by setting the "store" option
 	js.Global.Set("store", store)

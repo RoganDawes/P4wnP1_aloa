@@ -31,9 +31,6 @@ const (
 	USB_GADGET_DIR_BASE      = "/sys/kernel/config/usb_gadget"
 	USB_GADGET_DIR           = USB_GADGET_DIR_BASE + "/" + USB_GADGET_NAME
 
-	USB_ETHERNET_BRIDGE_NAME = "usbeth"
-	USB_ETHERNET_BRIDGE_MAC = "24:22:26:12:14:16"
-
 	USB_bcdDevice = "0x0100" //Version 1.00
 	USB_bcdUSB    = "0x0200" //mode: USB 2.0
 
@@ -77,12 +74,24 @@ const (
 
 )
 
-var (
-	GadgetSettingsState pb.GadgetSettings = pb.GadgetSettings{}
-	rp_usbHidDevName                      = regexp.MustCompile("(?m)DEVNAME=(.*)\n")
-	HidDevPath                            = make(map[string]string) //stores device path for HID devices
-	HidCtl *hid.HIDController
-)
+var rp_usbHidDevName                      = regexp.MustCompile("(?m)DEVNAME=(.*)\n")
+
+type UsbGadgetManager struct {
+	// ToDo: variable, indicating if HIDScript is usable
+	HidCtl *hid.HIDController // Points to an HID controller instance only if keyboard and/or mouse are enabled, nil otherwise
+	UndeployedGadgetSettings *pb.GadgetSettings
+}
+
+func NewUSBGadgetManager() (newUGM *UsbGadgetManager, err error) {
+	newUGM = &UsbGadgetManager{}
+	defGS := GetDefaultGadgetSettings()
+	newUGM.UndeployedGadgetSettings = &defGS //preload state with default settings
+	err = newUGM.DeployGadgetSettings(newUGM.UndeployedGadgetSettings)
+	if err != nil { return nil, err }
+	return
+}
+
+
 
 func ValidateGadgetSetting(gs pb.GadgetSettings) error {
 	/* ToDo: validations
@@ -91,7 +100,7 @@ func ValidateGadgetSetting(gs pb.GadgetSettings) error {
 	- check EP consumption to be not more than 7 (ECM 2 EP, RNDIS 2 EP, HID Mouse 1 EP, HID Keyboard 1 EP, HID Raw 1 EP, Serial 2 EP ??, UMS 2 EP ?)
 	- check serial, product, Manufacturer to not be empty
 	- check Pid, Vid with regex (Note: we don't check if Vid+Pid have been used for another composite function setup, yet)
-	- If the gadget is enabled, at least one function has to be enabled
+	- Done: If the gadget is enabled, at least one function has to be enabled
 	 */
 
 	log.Println("Validating gadget settings ...")
@@ -125,6 +134,18 @@ func ValidateGadgetSetting(gs pb.GadgetSettings) error {
 	strConsumption := fmt.Sprintf("Gadget Settings consume %v out of %v available USB Endpoints\n", sum_ep, USB_EP_USAGE_MAX)
 	log.Print(strConsumption)
 	if sum_ep > USB_EP_USAGE_MAX { return errors.New(strConsumption)}
+
+	//check if composite gadget is enabled without functions
+	if gs.Enabled &&
+		!gs.Use_CDC_ECM &&
+		!gs.Use_RNDIS &&
+		!gs.Use_HID_KEYBOARD &&
+		!gs.Use_HID_MOUSE &&
+		!gs.Use_HID_RAW &&
+		!gs.Use_UMS &&
+		!gs.Use_SERIAL {
+			return errors.New("If the composite gadget isn't disabled, as least one function has to be enabled")
+	}
 
 	return nil
 }
@@ -175,12 +196,6 @@ func pollForUSBEthernet(timeout time.Duration) error {
 	return errors.New(fmt.Sprintf("Timeout %v reached before usb0 or usb1 became ready"))
 }
 
-func InitDefaultGadgetSettings() (err error) {
-	err = DeployGadgetSettings(GetDefaultGadgetSettings()) //Deploy default settings to ConfigFS
-	if err != nil { return }
-	GadgetSettingsState = GetDefaultGadgetSettings() //populate settings state with same values
-	return nil
-}
 
 
 
@@ -291,6 +306,12 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 		} else {
 			result.RndisSettings.DevAddr = strings.TrimSuffix(string(res), "\000\n")
 		}
+	} else {
+		// we provide GadgetSettingsEthernet with default MAC adresses anyway, to have defaults in case RNDIS should be enabled
+		result.RndisSettings = &pb.GadgetSettingsEthernet{
+			HostAddr: DEFAULT_RNDIS_HOST_ADDR,
+			DevAddr: DEFAULT_RNDIS_DEV_ADDR,
+		}
 	}
 
 	//USB CDC ECM
@@ -313,6 +334,12 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 			result.CdcEcmSettings.DevAddr = strings.TrimSuffix(string(res), "\000\n")
 		}
 
+	} else {
+		// we provide GadgetSettingsEthernet with default MAC adresses anyway, to have defaults in case CDC ECM should be enabled
+		result.CdcEcmSettings = &pb.GadgetSettingsEthernet{
+			HostAddr: DEFAULT_CDC_ECM_HOST_ADDR,
+			DevAddr: DEFAULT_CDC_ECM_DEV_ADDR,
+		}
 	}
 
 	//USB serial
@@ -388,7 +415,7 @@ func MountUMSFile(filename string) error {
 	return nil
 }
 
-func DeployGadgetSettings(settings pb.GadgetSettings) error {
+func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) error {
 	var usesUSBEthernet bool
 
 	//gadget_root := "./test"
@@ -576,11 +603,10 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 		}
 	}
 
-
 	//clear device path for HID devices
-	HidDevPath[USB_FUNCTION_HID_KEYBOARD_name] = ""
-	HidDevPath[USB_FUNCTION_HID_MOUSE_name] = ""
-	HidDevPath[USB_FUNCTION_HID_RAW_name] = ""
+	ServiceState.HidDevPath[USB_FUNCTION_HID_KEYBOARD_name] = ""
+	ServiceState.HidDevPath[USB_FUNCTION_HID_MOUSE_name] = ""
+	ServiceState.HidDevPath[USB_FUNCTION_HID_RAW_name] = ""
 
 	//get UDC driver name and bind to gadget
 	if settings.Enabled {
@@ -594,25 +620,25 @@ func DeployGadgetSettings(settings pb.GadgetSettings) error {
 		}
 
 		//update device path'
-		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_KEYBOARD_name); errF == nil  { HidDevPath[USB_FUNCTION_HID_KEYBOARD_name] = devPath }
-		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_MOUSE_name); errF == nil  { HidDevPath[USB_FUNCTION_HID_MOUSE_name] = devPath }
-		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_RAW_name); errF == nil  { HidDevPath[USB_FUNCTION_HID_RAW_name] = devPath }
+		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_KEYBOARD_name); errF == nil  { ServiceState.HidDevPath[USB_FUNCTION_HID_KEYBOARD_name] = devPath }
+		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_MOUSE_name); errF == nil  { ServiceState.HidDevPath[USB_FUNCTION_HID_MOUSE_name] = devPath }
+		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_RAW_name); errF == nil  { ServiceState.HidDevPath[USB_FUNCTION_HID_RAW_name] = devPath }
 
 		//if Keyboard or Mouse are deployed, grab a HIDController Instance else set it to nil (the old HIDController object won't be destroyed)
 		if settings.Use_HID_KEYBOARD || settings.Use_HID_MOUSE {
-			devPathKeyboard := HidDevPath[USB_FUNCTION_HID_KEYBOARD_name]
-			devPathMouse := HidDevPath[USB_FUNCTION_HID_MOUSE_name]
+			devPathKeyboard := ServiceState.HidDevPath[USB_FUNCTION_HID_KEYBOARD_name]
+			devPathMouse := ServiceState.HidDevPath[USB_FUNCTION_HID_MOUSE_name]
 
 			var errH error
-			HidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, USB_KEYBOARD_LANGUAGE_MAP_PATH, devPathMouse)
+			gm.HidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, USB_KEYBOARD_LANGUAGE_MAP_PATH, devPathMouse)
 			if errH != nil {
 				log.Printf("ERROR: Couldn't bring up an instance of HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s'\nReason: %v\n", devPathKeyboard, devPathMouse, USB_KEYBOARD_LANGUAGE_MAP_PATH, errH)
 			} else {
 				log.Printf("HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s' initialized\n", devPathKeyboard, devPathMouse, USB_KEYBOARD_LANGUAGE_MAP_PATH)
 			}
 		} else {
-			if HidCtl != nil { HidCtl.Abort() }
-			HidCtl = nil
+			if gm.HidCtl != nil { gm.HidCtl.Abort() }
+			gm.HidCtl = nil
 			log.Printf("HIDController for keyboard / mouse disabled\n")
 		}
 	}
@@ -667,7 +693,7 @@ func enumDevicePath(funcName string) (devPath string, err error){
 	return
 }
 
-func DestroyAllGadgets() error {
+func (gm *UsbGadgetManager) DestroyAllGadgets() error {
 	//gadget_root := "./test"
 	gadget_root := USB_GADGET_DIR_BASE
 
@@ -690,8 +716,8 @@ func DestroyAllGadgets() error {
 		}
 	}
 
-	if HidCtl != nil { HidCtl.Abort() }
-	HidCtl = nil
+	if gm.HidCtl != nil { gm.HidCtl.Abort() }
+	gm.HidCtl = nil
 	log.Printf("HIDController for keyboard / mouse disabled\n")
 
 	return nil
