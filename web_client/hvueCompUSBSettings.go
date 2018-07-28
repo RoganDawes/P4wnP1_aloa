@@ -2,10 +2,6 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	pb "../proto/gopherjs"
-	"time"
-	"context"
-	"google.golang.org/grpc/status"
 	"github.com/mame82/hvue"
 )
 
@@ -19,69 +15,28 @@ type CompUSBSettingsData struct {
 	RndisDetails bool                `js:"rndisDetails"`
 }
 
-//ToDo: Reimplement with Action on global state
+//This becomes a method of the Vue Component and encapsulates dispatching of a Vuex action
 func (c *CompUSBSettingsData) UpdateFromDeployedGadgetSettings(vm *hvue.VM) {
-	vm.Store.Call("commit", "setCurrentGadgetSettingsFromDeployed")
+	vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED)
 }
 
-//ToDo: Reimplement with actions on global state
+//This becomes a method of the Vue Component and encapsulates dispatching of a Vuex action
 func (c *CompUSBSettingsData) ApplyGadgetSettings(vm *hvue.VM) {
-	//println("Trying to deploy GadgetSettings: " + fmt.Sprintf("%+v",c.GadgetSettings.toGS()))
-	println("Trying to deploy GadgetSettings...")
-	//gs:=c.GadgetSettings.toGS()
-	gs := jsGadgetSettings{Object: vm.Store.Get("state").Get("currentGadgetSettings")}.toGS()
-
-	go func() {
-		c.DeployPending = true
-		defer func() {c.DeployPending = false}()
-
-		ctx,cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		defer cancel()
-
-		//Set gadget settings
-		_, err := Client.Client.SetGadgetSettings(ctx, gs)
-		if err != nil {
-			js.Global.Call("alert", "Error setting given gadget settings: " + status.Convert(err).Message())
-			println(err)
-			c.UpdateFromDeployedGadgetSettings(vm)
-			return
-		}
-		println("New GadgetSettings have been set")
-
-
-
-		//deploy the settings
-		deployedGs,err := Client.Client.DeployGadgetSetting(ctx, &pb.Empty{})
-		if err != nil {
-			js.Global.Call("alert", "Error deploying gadget settings: " + status.Convert(err).Message())
-			println(err)
-			c.UpdateFromDeployedGadgetSettings(vm)
-			return
-		}
-		println("New GadgetSettings have been deployed")
-
-		js.Global.Call("alert", "New USB gadget settings deployed ")
-
-		newGs := &jsGadgetSettings{
-			Object: js.Global.Get("Object").New(),
-		}
-		newGs.fromGS(deployedGs)
-		c.GadgetSettings = newGs
-	}()
+	vm.Store.Call("dispatch", VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS)
 }
 
 func InitCompUSBSettings() {
-
 	hvue.NewComponent(
 		"usb-settings",
 		hvue.Template(compUSBSettingsTemplate),
 		hvue.DataFunc(newCompUSBSettingsData),
-		hvue.MethodsOf(&CompUSBSettingsData{}),
+		hvue.MethodsOf(&CompUSBSettingsData{}), // Add the methods of CompUSBSettingsData to the Vue Component instance
 		hvue.Computed(
 			"currentGadgetSettings",
 			func(vm *hvue.VM) interface{} {
 				return vm.Store.Get("state").Get("currentGadgetSettings")
 			}),
+
 	)
 }
 
@@ -90,10 +45,8 @@ func newCompUSBSettingsData(vm *hvue.VM) interface{} {
 	cc := &CompUSBSettingsData{
 		Object: js.Global.Get("Object").New(),
 	}
-
 	cc.GadgetSettings = NewUSBGadgetSettings()
 
-	cc.UpdateFromDeployedGadgetSettings(vm)
 	cc.DeployPending = false
 	cc.RndisDetails = false
 	cc.CdcEcmDetails = false
@@ -177,4 +130,3 @@ const (
 </div>
 `
 )
-

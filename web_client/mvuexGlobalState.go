@@ -52,24 +52,6 @@ type GlobalState struct {
 	Text string `js:"text"`
 }
 
-/*
-func (state *GlobalState) UpdateGadgetSettingsFromDeployed(jsGS *jsGadgetSettings) {
-	//gs := vue.GetVM(c).Get("gadgetSettings")
-	println("UpdateGadgetSettingsFromDeployed called")
-
-
-
-	ctx,cancel := context.WithTimeout(context.Background(), time.Second*3)
-	defer cancel()
-
-
-	deployedGs, err := Client.Client.GetDeployedGadgetSetting(ctx, &pb.Empty{})
-	if err != nil { println(err); return } // ToDo: change to alert with parsed status
-
-	jsGS.fromGS(deployedGs)
-	return
-}
-*/
 
 func createGlobalStateStruct() GlobalState {
 	state := GlobalState{Object:O()}
@@ -115,7 +97,7 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		err := RpcSetRemoteGadgetSettings(curGS, time.Second)
 		if err != nil {
 			//ToDo: use global store to return something, or allow actions to return promises (latter is too much JavaScript)
-			Alert(err)
+			Alert(err.Error())
 			return
 		}
 
@@ -123,7 +105,7 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		_,err = RpcDeployRemoteGadgetSettings(time.Second*10)
 		if err != nil {
 			//ToDo: use global store to return something, or allow actions to return promises (latter is too much JavaScript)
-			Alert(err)
+			Alert(err.Error())
 			return
 		}
 

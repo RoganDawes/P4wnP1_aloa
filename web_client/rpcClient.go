@@ -3,10 +3,9 @@ package main
 import (
 	pb "../proto/gopherjs"
 	"context"
-	"io"
 	"sync"
-	"errors"
 	"github.com/johanbrandhorst/protobuf/grpcweb"
+	"time"
 )
 
 type Rpc struct {
@@ -17,6 +16,7 @@ type Rpc struct {
 	eventListeningCancel *context.CancelFunc
 }
 
+/*
 func (rpc *Rpc) StartListenEvents(evtType int64) (err error) {
 	rpc.Lock()
 	if rpc.eventListeningOn {
@@ -65,6 +65,7 @@ func (rpc *Rpc) StopEventListening() {
 	rpc.eventListeningOn = false
 	rpc.Unlock()
 }
+*/
 
 func NewRpcClient(addr string) Rpc {
 	rcl := Rpc{}
@@ -72,4 +73,49 @@ func NewRpcClient(addr string) Rpc {
 	cl := pb.NewP4WNP1Client(addr, grpcweb.WithDefaultCallOptions(grpcweb.ForceWebsocketTransport()))
 	rcl.Client = cl
 	return rcl
+}
+
+func RpcGetDeployedGadgetSettings(timeout time.Duration) (*pb.GadgetSettings, error) {
+	//gs := vue.GetVM(c).Get("gadgetSettings")
+	println("RpcGetDeployedGadgetSettings called")
+
+	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+
+	return Client.Client.GetDeployedGadgetSetting(ctx, &pb.Empty{})
+
+}
+
+
+func RpcSetRemoteGadgetSettings(targetGS *pb.GadgetSettings, timeout time.Duration) (err error) {
+	//gs := vue.GetVM(c).Get("gadgetSettings")
+	println("RpcSetRemoteGadgetSettings called")
+
+	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+
+	//Set gadget settings
+	_, err = Client.Client.SetGadgetSettings(ctx, targetGS)
+	if err != nil {
+		//js.Global.Call("alert", "Error setting given gadget settings: " + status.Convert(err).Message())
+		//println(err)
+		//c.UpdateFromDeployedGadgetSettings(vm)
+		return err
+	}
+
+	return nil
+}
+
+func RpcDeployRemoteGadgetSettings(timeout time.Duration) (*pb.GadgetSettings, error) {
+	//gs := vue.GetVM(c).Get("gadgetSettings")
+	println("RpcDeployRemoteGadgetSettings called")
+
+	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+
+	return Client.Client.DeployGadgetSetting(ctx, &pb.Empty{})
+
 }

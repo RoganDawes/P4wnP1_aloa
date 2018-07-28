@@ -69,6 +69,7 @@ func main() {
 
 	InitGlobalState() //sets Vuex store in JS window.store
 
+	InitCompModal()
 	InitCompEthernetAddresses2()
 	InitCompToggleSwitch()
 	InitCompUSBSettings()

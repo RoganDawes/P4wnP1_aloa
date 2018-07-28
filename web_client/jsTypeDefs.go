@@ -8,7 +8,10 @@ import (
 	"sync"
 	"context"
 	"io"
+	"fmt"
 )
+
+var eNoLogEvent = errors.New("No log event")
 
 /* USB Gadget types corresponding to gRPC messages */
 
@@ -129,8 +132,41 @@ func NewUSBGadgetSettings() *jsGadgetSettings {
 
 /** Events **/
 
+type jsEvent struct {
+	*js.Object
+	Type   int64 `js:"type"`
+	Values []interface{}
+	JSValues *js.Object `js:"values"`
+}
+
+
+func NewJsEventFromNative(event *pb.Event) (res *jsEvent) {
+	res = &jsEvent{Object:O()}
+	res.JSValues = js.Global.Get("Array").New()
+	res.Type = event.Type
+	res.Values = make([]interface{}, len(event.Values))
+	for idx,val := range event.Values {
+		switch valT := val.Val.(type) {
+		case *pb.EventValue_Tint64:
+			res.Values[idx] = valT.Tint64
+			res.JSValues.Call("push", valT.Tint64)
+		case *pb.EventValue_Tstring:
+			res.Values[idx] = valT.Tstring
+			res.JSValues.Call("push", valT.Tstring)
+		case *pb.EventValue_Tbool:
+			res.Values[idx] = valT.Tbool
+			res.JSValues.Call("push", valT.Tbool)
+		default:
+			println("error parsing event value", valT)
+		}
+	}
+	println("result",res)
+
+	return res
+}
+
 //Log event
-type jsEventLog struct {
+type jsLogEvent struct {
 	*js.Object
 	EvLogSource  string `js:"source"`
 	EvLogLevel   int  `js:"level"`
@@ -138,10 +174,32 @@ type jsEventLog struct {
 	EvLogTime string `js:"time"`
 }
 
-func DeconstructEventLog(gRPCEv *pb.Event) (res *jsEventLog, err error) {
+func (jsEv *jsEvent) toLogEvent() (res *jsLogEvent, err error) {
+	if jsEv.Type != common.EVT_LOG || len(jsEv.Values) != 4 { return nil,eNoLogEvent}
+	res = &jsLogEvent{Object:O()}
+
+	var ok bool
+	res.EvLogSource,ok = jsEv.Values[0].(string)
+	if !ok { return nil,eNoLogEvent }
+
+	ll,ok := jsEv.Values[1].(int64)
+	if !ok { return nil,eNoLogEvent}
+	res.EvLogLevel = int(ll)
+
+	res.EvLogMessage,ok = jsEv.Values[2].(string)
+	if !ok { return nil,eNoLogEvent}
+
+	res.EvLogTime,ok = jsEv.Values[3].(string)
+	if !ok { return nil,eNoLogEvent}
+
+	return res,nil
+}
+
+/*
+func DeconstructEventLog(gRPCEv *pb.Event) (res *jsLogEvent, err error) {
 	if gRPCEv.Type != common.EVT_LOG { return nil,errors.New("No log event")}
 
-	res = &jsEventLog{Object:O()}
+	res = &jsLogEvent{Object:O()}
 	switch vT := gRPCEv.Values[0].Val.(type) {
 	case *pb.EventValue_Tstring:
 		res.EvLogSource = vT.Tstring
@@ -169,18 +227,31 @@ func DeconstructEventLog(gRPCEv *pb.Event) (res *jsEventLog, err error) {
 
 	return res, nil
 }
-
+*/
 
 /* EVENT LOGGER */
 
 type jsLoggerData struct {
 	*js.Object
 	LogArray *js.Object `js:"logArray"`
+	EventArray *js.Object `js:"eventArray"`
 	cancel context.CancelFunc
 	*sync.Mutex
 	MaxEntries int `js:"maxEntries"`
 }
 
+func NewLogger(maxEntries int) *jsLoggerData {
+	loggerVmData := &jsLoggerData{
+		Object: js.Global.Get("Object").New(),
+	}
+
+	loggerVmData.Mutex = &sync.Mutex{}
+	loggerVmData.LogArray = js.Global.Get("Array").New()
+	loggerVmData.EventArray = js.Global.Get("Array").New()
+	loggerVmData.MaxEntries = maxEntries
+
+	return loggerVmData
+}
 
 /* This method gets internalized and therefor the mutex won't be accessible*/
 func (data *jsLoggerData) AddEntry(ev *pb.Event ) {
@@ -191,6 +262,23 @@ func (data *jsLoggerData) AddEntry(ev *pb.Event ) {
 		defer data.Unlock()
 */
 
+		fmt.Println("LOOOOOG ENTRYYYYYYYYYYYYYYYYY")
+
+		//if LOG event add to logArray
+		jsEv := NewJsEventFromNative(ev)
+		println("JS from native", jsEv)
+		if jsEv.Type == common.EVT_LOG {
+			if logEv,err := jsEv.toLogEvent(); err == nil {
+				data.LogArray.Call("push", logEv)
+			} else {
+				println("couldn't convert to LogEvent: ", jsEv)
+			}
+		} else {
+			data.EventArray.Call("push", jsEv)
+		}
+
+
+		/*
 		logEv, err := DeconstructEventLog(ev)
 		if err != nil {
 			println("Logger: Error adding log entry, provided event couldn't be converted to log event")
@@ -198,10 +286,14 @@ func (data *jsLoggerData) AddEntry(ev *pb.Event ) {
 		}
 
 		data.LogArray.Call("push", logEv)
+		*/
 
 		//reduce to length (note: kebab case 'max-entries' is translated to camel case 'maxEntries' by vue)
 		for data.LogArray.Length() > data.MaxEntries {
 			data.LogArray.Call("shift") // remove first element
+		}
+		for data.EventArray.Length() > data.MaxEntries {
+			data.EventArray.Call("shift") // remove first element
 		}
 
 	}()
@@ -224,6 +316,7 @@ func (data *jsLoggerData) StartListening() {
 
 	go func() {
 		defer cancel()
+		println("EVENTLISTENING ENTERING LOOP")
 		for {
 			event, err := evStream.Recv()
 			if err == io.EOF { break }
@@ -231,8 +324,9 @@ func (data *jsLoggerData) StartListening() {
 
 			//println("Event: ", event)
 			data.AddEntry(event)
-
+			println(event)
 		}
+		println("EVENTLISTENING ABORTED")
 		return
 	}()
 }
@@ -242,14 +336,3 @@ func (data *jsLoggerData) StopListening() {
 	data.cancel()
 }
 
-func NewLogger(maxEntries int) *jsLoggerData {
-	loggerVmData := &jsLoggerData{
-		Object: js.Global.Get("Object").New(),
-	}
-
-	loggerVmData.Mutex = &sync.Mutex{}
-	loggerVmData.LogArray = js.Global.Get("Array").New()
-	loggerVmData.MaxEntries = maxEntries
-
-	return loggerVmData
-}

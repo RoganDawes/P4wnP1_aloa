@@ -51,8 +51,8 @@ func InitCompHIDScript() {
 			func(vm *hvue.VM) interface{} {
 				return vm.Store.Get("state").Get("currentHIDScriptSource")
 			},
-			func(vm *hvue.VM, newValue *js.Object) {
-				vm.Store.Call("commit", "setCurrentHIDScriptSource", newValue)
+			func(vm *hvue.VM, newScriptContent *js.Object) {
+				vm.Store.Call("commit", VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO, newScriptContent)
 			}),
 		)
 }

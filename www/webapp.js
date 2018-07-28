@@ -18428,7 +18428,7 @@ $packages["reflect"] = (function() {
 	return $pkg;
 })();
 $packages["fmt"] = (function() {
-	var $pkg = {}, $init, errors, io, math, os, reflect, strconv, sync, utf8, fmtFlags, fmt, State, Formatter, Stringer, GoStringer, buffer, pp, scanError, ss, ssave, sliceType, ptrType, ptrType$1, arrayType, arrayType$1, sliceType$1, sliceType$2, arrayType$2, ptrType$2, ptrType$5, ptrType$25, funcType, ppFree, space, ssFree, complexError, boolError, newPrinter, Fprintf, Printf, Sprintf, Errorf, Fprint, Print, Sprint, Sprintln, getField, tooLarge, parsenum, intFromArg, parseArgNumber, isSpace, notSpace, indexRune;
+	var $pkg = {}, $init, errors, io, math, os, reflect, strconv, sync, utf8, fmtFlags, fmt, State, Formatter, Stringer, GoStringer, buffer, pp, scanError, ss, ssave, sliceType, ptrType, ptrType$1, arrayType, arrayType$1, sliceType$1, sliceType$2, arrayType$2, ptrType$2, ptrType$5, ptrType$25, funcType, ppFree, space, ssFree, complexError, boolError, newPrinter, Fprintf, Printf, Sprintf, Errorf, Fprint, Print, Sprint, Fprintln, Println, Sprintln, getField, tooLarge, parsenum, intFromArg, parseArgNumber, isSpace, notSpace, indexRune;
 	errors = $packages["errors"];
 	io = $packages["io"];
 	math = $packages["math"];
@@ -19220,6 +19220,36 @@ $packages["fmt"] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: Sprint }; } $f._r = _r; $f.a = a; $f.p = p; $f.s = s; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.Sprint = Sprint;
+	Fprintln = function(w, a) {
+		var _r, _r$1, _tuple, a, err, n, p, w, x, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _tuple = $f._tuple; a = $f.a; err = $f.err; n = $f.n; p = $f.p; w = $f.w; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		n = 0;
+		err = $ifaceNil;
+		_r = newPrinter(); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		p = _r;
+		$r = p.doPrintln(a); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_r$1 = w.Write((x = p.buf, $subslice(new sliceType$2(x.$array), x.$offset, x.$offset + x.$length))); /* */ $s = 3; case 3: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		_tuple = _r$1;
+		n = _tuple[0];
+		err = _tuple[1];
+		p.free();
+		$s = -1; return [n, err];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Fprintln }; } $f._r = _r; $f._r$1 = _r$1; $f._tuple = _tuple; $f.a = a; $f.err = err; $f.n = n; $f.p = p; $f.w = w; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.Fprintln = Fprintln;
+	Println = function(a) {
+		var _r, _tuple, a, err, n, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _tuple = $f._tuple; a = $f.a; err = $f.err; n = $f.n; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		n = 0;
+		err = $ifaceNil;
+		_r = Fprintln(os.Stdout, a); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_tuple = _r;
+		n = _tuple[0];
+		err = _tuple[1];
+		$s = -1; return [n, err];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: Println }; } $f._r = _r; $f._tuple = _tuple; $f.a = a; $f.err = err; $f.n = n; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.Println = Println;
 	Sprintln = function(a) {
 		var _r, a, p, s, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; a = $f.a; p = $f.p; s = $f.s; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -52447,7 +52477,7 @@ $packages["honnef.co/go/js/dom"] = (function() {
 	return $pkg;
 })();
 $packages["."] = (function() {
-	var $pkg = {}, $init, common, P4wnP1_grpc, mvuex, context, md5, hex, errors, js, grpcweb, hvue, status, dom, io, strconv, sync, time, GlobalState, CodeMirrorOptionsType, CompCodeEditorData, CompEthernetAddressesData2, CompHIDScriptData, CompTabData, CompTabsData, CompToggleSwitchData, CompUSBSettingsData, jsGadgetSettings, VGadgetSettingsEthernet, VGadgetSettingsUMS, jsEventLog, jsLoggerData, Rpc, ptrType, sliceType, arrayType, sliceType$1, sliceType$2, ptrType$1, ptrType$2, ptrType$3, ptrType$4, ptrType$5, ptrType$6, funcType, funcType$1, funcType$2, funcType$3, funcType$4, sliceType$3, ptrType$7, ptrType$8, structType, structType$1, sliceType$4, funcType$5, sliceType$5, sliceType$6, sliceType$7, ptrType$9, funcType$6, funcType$7, funcType$8, sliceType$8, sliceType$9, ptrType$10, ptrType$11, ptrType$12, ptrType$13, ptrType$14, ptrType$15, ptrType$16, ptrType$17, structType$2, ptrType$18, ptrType$19, ptrType$20, ptrType$21, ptrType$22, ptrType$23, ptrType$24, document, serverAddr, _r, _r$1, O, Alert, StringToMD5, UploadHIDScript, RunHIDScript, UpdateGadgetSettingsFromDeployed, createGlobalStateStruct, initMVuex, InitGlobalState, NewCodeEditorData, initCodeMirror, InitCompCodeEditor, newCompEthernetAddressesData2, InitCompEthernetAddresses2, newCompHIDScriptData, InitCompHIDScript, LogLevelClass, InitCompLogger, newCompStateData, InitCompState, NewCompTabData, InitCompTab, NewCompTabsData, initTabs, InitCompTabs, newCompToggleSwitchData, InitCompToggleSwitch, InitCompUSBSettings, newCompUSBSettingsData, NewUSBGadgetSettings, DeconstructEventLog, NewLogger, GetBaseURL, main, NewRpcClient;
+	var $pkg = {}, $init, common, P4wnP1_grpc, mvuex, context, md5, hex, errors, fmt, js, grpcweb, hvue, status, dom, io, strconv, sync, time, CodeMirrorOptionsType, CompCodeEditorData, CompEthernetAddressesData2, CompHIDScriptData, CompTabData, CompTabsData, CompToggleSwitchData, CompUSBSettingsData, jsGadgetSettings, VGadgetSettingsEthernet, VGadgetSettingsUMS, jsEvent, jsLogEvent, jsLoggerData, GlobalState, Rpc, ptrType, sliceType, arrayType, sliceType$1, sliceType$2, ptrType$1, ptrType$2, ptrType$3, structType, structType$1, sliceType$3, funcType, sliceType$4, sliceType$5, sliceType$6, ptrType$4, funcType$1, funcType$2, funcType$3, sliceType$7, sliceType$8, ptrType$5, ptrType$6, ptrType$7, ptrType$8, ptrType$9, ptrType$10, ptrType$11, ptrType$12, ptrType$13, ptrType$14, ptrType$15, structType$2, ptrType$16, ptrType$17, ptrType$18, ptrType$19, funcType$4, funcType$5, funcType$6, funcType$7, funcType$8, funcType$9, sliceType$9, ptrType$20, ptrType$21, ptrType$22, ptrType$23, ptrType$24, ptrType$25, eNoLogEvent, document, serverAddr, _r, _r$1, O, Alert, StringToMD5, UploadHIDScript, RunHIDScript, NewCodeEditorData, initCodeMirror, InitCompCodeEditor, newCompEthernetAddressesData2, InitCompEthernetAddresses2, newCompHIDScriptData, InitCompHIDScript, LogLevelClass, InitCompLogger, InitCompModal, newCompStateData, InitCompState, NewCompTabData, InitCompTab, NewCompTabsData, initTabs, InitCompTabs, newCompToggleSwitchData, InitCompToggleSwitch, InitCompUSBSettings, newCompUSBSettingsData, NewUSBGadgetSettings, NewJsEventFromNative, NewLogger, GetBaseURL, main, createGlobalStateStruct, actionUpdateGadgetSettingsFromDeployed, actionDeployCurrentGadgetSettings, initMVuex, InitGlobalState, NewRpcClient, RpcGetDeployedGadgetSettings, RpcSetRemoteGadgetSettings, RpcDeployRemoteGadgetSettings;
 	common = $packages["../common"];
 	P4wnP1_grpc = $packages["../proto/gopherjs"];
 	mvuex = $packages["./mvuex"];
@@ -52455,6 +52485,7 @@ $packages["."] = (function() {
 	md5 = $packages["crypto/md5"];
 	hex = $packages["encoding/hex"];
 	errors = $packages["errors"];
+	fmt = $packages["fmt"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	grpcweb = $packages["github.com/johanbrandhorst/protobuf/grpcweb"];
 	hvue = $packages["github.com/mame82/hvue"];
@@ -52464,26 +52495,6 @@ $packages["."] = (function() {
 	strconv = $packages["strconv"];
 	sync = $packages["sync"];
 	time = $packages["time"];
-	GlobalState = $pkg.GlobalState = $newType(0, $kindStruct, "main.GlobalState", true, ".", true, function(Object_, Title_, CurrentHIDScriptSource_, CurrentGadgetSettings_, EventLog_, Counter_, Text_) {
-		this.$val = this;
-		if (arguments.length === 0) {
-			this.Object = null;
-			this.Title = "";
-			this.CurrentHIDScriptSource = "";
-			this.CurrentGadgetSettings = ptrType$2.nil;
-			this.EventLog = ptrType$3.nil;
-			this.Counter = 0;
-			this.Text = "";
-			return;
-		}
-		this.Object = Object_;
-		this.Title = Title_;
-		this.CurrentHIDScriptSource = CurrentHIDScriptSource_;
-		this.CurrentGadgetSettings = CurrentGadgetSettings_;
-		this.EventLog = EventLog_;
-		this.Counter = Counter_;
-		this.Text = Text_;
-	});
 	CodeMirrorOptionsType = $pkg.CodeMirrorOptionsType = $newType(0, $kindStruct, "main.CodeMirrorOptionsType", true, ".", true, function(Object_, Mode_, LineNumbers_, LineWrapping_, AutoCloseBrackets_, ExtraKeys_) {
 		this.$val = this;
 		if (arguments.length === 0) {
@@ -52507,7 +52518,7 @@ $packages["."] = (function() {
 		if (arguments.length === 0) {
 			this.Object = null;
 			this.ScriptContent = "";
-			this.CodeMirrorOptions = ptrType$7.nil;
+			this.CodeMirrorOptions = ptrType$2.nil;
 			return;
 		}
 		this.Object = Object_;
@@ -52546,8 +52557,8 @@ $packages["."] = (function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
-			this.headers = sliceType$8.nil;
-			this.tabs = sliceType$9.nil;
+			this.headers = sliceType$7.nil;
+			this.tabs = sliceType$8.nil;
 			return;
 		}
 		this.Object = Object_;
@@ -52566,7 +52577,7 @@ $packages["."] = (function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
-			this.GadgetSettings = ptrType$2.nil;
+			this.GadgetSettings = ptrType$5.nil;
 			this.DeployPending = false;
 			this.CdcEcmDetails = false;
 			this.RndisDetails = false;
@@ -52595,9 +52606,9 @@ $packages["."] = (function() {
 			this.Use_HID_RAW = false;
 			this.Use_UMS = false;
 			this.Use_SERIAL = false;
-			this.RndisSettings = ptrType$10.nil;
-			this.CdcEcmSettings = ptrType$10.nil;
-			this.UmsSettings = ptrType$11.nil;
+			this.RndisSettings = ptrType$9.nil;
+			this.CdcEcmSettings = ptrType$9.nil;
+			this.UmsSettings = ptrType$8.nil;
 			return;
 		}
 		this.Object = Object_;
@@ -52642,7 +52653,21 @@ $packages["."] = (function() {
 		this.Cdrom = Cdrom_;
 		this.File = File_;
 	});
-	jsEventLog = $pkg.jsEventLog = $newType(0, $kindStruct, "main.jsEventLog", true, ".", false, function(Object_, EvLogSource_, EvLogLevel_, EvLogMessage_, EvLogTime_) {
+	jsEvent = $pkg.jsEvent = $newType(0, $kindStruct, "main.jsEvent", true, ".", false, function(Object_, Type_, Values_, JSValues_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Object = null;
+			this.Type = new $Int64(0, 0);
+			this.Values = sliceType$3.nil;
+			this.JSValues = null;
+			return;
+		}
+		this.Object = Object_;
+		this.Type = Type_;
+		this.Values = Values_;
+		this.JSValues = JSValues_;
+	});
+	jsLogEvent = $pkg.jsLogEvent = $newType(0, $kindStruct, "main.jsLogEvent", true, ".", false, function(Object_, EvLogSource_, EvLogLevel_, EvLogMessage_, EvLogTime_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -52658,30 +52683,54 @@ $packages["."] = (function() {
 		this.EvLogMessage = EvLogMessage_;
 		this.EvLogTime = EvLogTime_;
 	});
-	jsLoggerData = $pkg.jsLoggerData = $newType(0, $kindStruct, "main.jsLoggerData", true, ".", false, function(Object_, LogArray_, cancel_, Mutex_, MaxEntries_) {
+	jsLoggerData = $pkg.jsLoggerData = $newType(0, $kindStruct, "main.jsLoggerData", true, ".", false, function(Object_, LogArray_, EventArray_, cancel_, Mutex_, MaxEntries_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
 			this.LogArray = null;
+			this.EventArray = null;
 			this.cancel = $throwNilPointerError;
-			this.Mutex = ptrType$17.nil;
+			this.Mutex = ptrType$15.nil;
 			this.MaxEntries = 0;
 			return;
 		}
 		this.Object = Object_;
 		this.LogArray = LogArray_;
+		this.EventArray = EventArray_;
 		this.cancel = cancel_;
 		this.Mutex = Mutex_;
 		this.MaxEntries = MaxEntries_;
 	});
+	GlobalState = $pkg.GlobalState = $newType(0, $kindStruct, "main.GlobalState", true, ".", true, function(Object_, Title_, CurrentHIDScriptSource_, CurrentGadgetSettings_, EventLog_, IsModalEnabled_, Counter_, Text_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Object = null;
+			this.Title = "";
+			this.CurrentHIDScriptSource = "";
+			this.CurrentGadgetSettings = ptrType$5.nil;
+			this.EventLog = ptrType$16.nil;
+			this.IsModalEnabled = false;
+			this.Counter = 0;
+			this.Text = "";
+			return;
+		}
+		this.Object = Object_;
+		this.Title = Title_;
+		this.CurrentHIDScriptSource = CurrentHIDScriptSource_;
+		this.CurrentGadgetSettings = CurrentGadgetSettings_;
+		this.EventLog = EventLog_;
+		this.IsModalEnabled = IsModalEnabled_;
+		this.Counter = Counter_;
+		this.Text = Text_;
+	});
 	Rpc = $pkg.Rpc = $newType(0, $kindStruct, "main.Rpc", true, ".", true, function(Mutex_, Client_, eventListeningOn_, eventListeningCtx_, eventListeningCancel_) {
 		this.$val = this;
 		if (arguments.length === 0) {
-			this.Mutex = ptrType$17.nil;
+			this.Mutex = ptrType$15.nil;
 			this.Client = $ifaceNil;
 			this.eventListeningOn = false;
-			this.eventListeningCtx = ptrType$19.nil;
-			this.eventListeningCancel = ptrType$18.nil;
+			this.eventListeningCtx = ptrType$20.nil;
+			this.eventListeningCancel = ptrType$21.nil;
 			return;
 		}
 		this.Mutex = Mutex_;
@@ -52696,48 +52745,50 @@ $packages["."] = (function() {
 	sliceType$1 = $sliceType(grpcweb.DialOption);
 	sliceType$2 = $sliceType(grpcweb.CallOption);
 	ptrType$1 = $ptrType(P4wnP1_grpc.HIDScriptJob);
-	ptrType$2 = $ptrType(jsGadgetSettings);
-	ptrType$3 = $ptrType(jsLoggerData);
-	ptrType$4 = $ptrType(mvuex.Store);
-	ptrType$5 = $ptrType(mvuex.ActionContext);
-	ptrType$6 = $ptrType(GlobalState);
-	funcType = $funcType([ptrType$4, ptrType$5, ptrType$6], [], false);
-	funcType$1 = $funcType([ptrType$4, ptrType$6, $Int], [], false);
-	funcType$2 = $funcType([ptrType$4, ptrType$6], [], false);
-	funcType$3 = $funcType([ptrType$4, ptrType$6, $String], [], false);
-	funcType$4 = $funcType([ptrType$4, ptrType$6, ptrType$2], [], false);
-	sliceType$3 = $sliceType(mvuex.StoreOption);
-	ptrType$7 = $ptrType(CodeMirrorOptionsType);
-	ptrType$8 = $ptrType(js.Object);
-	structType = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "Name", name: "Name", anonymous: false, exported: true, typ: $String, tag: "js:\"name\""}, {prop: "GlobalVars", name: "GlobalVars", anonymous: false, exported: true, typ: $Bool, tag: "js:\"globalVars\""}]);
-	structType$1 = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "CtrlSpace", name: "CtrlSpace", anonymous: false, exported: true, typ: $String, tag: "js:\"Ctrl-Space\""}]);
-	sliceType$4 = $sliceType($emptyInterface);
-	funcType$5 = $funcType([ptrType$8], [], false);
-	sliceType$5 = $sliceType(hvue.pOptionType);
-	sliceType$6 = $sliceType(hvue.PropOption);
-	sliceType$7 = $sliceType(hvue.ComponentOption);
-	ptrType$9 = $ptrType(hvue.VM);
-	funcType$6 = $funcType([ptrType$9, $Int], [$String], false);
-	funcType$7 = $funcType([ptrType$9, ptrType$8], [], false);
-	funcType$8 = $funcType([ptrType$9], [], false);
-	sliceType$8 = $sliceType($String);
-	sliceType$9 = $sliceType(ptrType$8);
-	ptrType$10 = $ptrType(VGadgetSettingsEthernet);
-	ptrType$11 = $ptrType(VGadgetSettingsUMS);
-	ptrType$12 = $ptrType(P4wnP1_grpc.GadgetSettingsEthernet);
-	ptrType$13 = $ptrType(P4wnP1_grpc.GadgetSettingsUMS);
-	ptrType$14 = $ptrType(jsEventLog);
-	ptrType$15 = $ptrType(P4wnP1_grpc.EventValue_Tstring);
-	ptrType$16 = $ptrType(P4wnP1_grpc.EventValue_Tint64);
-	ptrType$17 = $ptrType(sync.Mutex);
-	structType$2 = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "TestString", name: "TestString", anonymous: false, exported: true, typ: $String, tag: "js:\"testString\""}]);
-	ptrType$18 = $ptrType(context.CancelFunc);
-	ptrType$19 = $ptrType(context.Context);
-	ptrType$20 = $ptrType(CompHIDScriptData);
-	ptrType$21 = $ptrType(CompTabsData);
-	ptrType$22 = $ptrType(CompUSBSettingsData);
-	ptrType$23 = $ptrType(P4wnP1_grpc.Event);
-	ptrType$24 = $ptrType(Rpc);
+	ptrType$2 = $ptrType(CodeMirrorOptionsType);
+	ptrType$3 = $ptrType(js.Object);
+	structType = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Name", name: "Name", anonymous: false, exported: true, typ: $String, tag: "js:\"name\""}, {prop: "GlobalVars", name: "GlobalVars", anonymous: false, exported: true, typ: $Bool, tag: "js:\"globalVars\""}]);
+	structType$1 = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "CtrlSpace", name: "CtrlSpace", anonymous: false, exported: true, typ: $String, tag: "js:\"Ctrl-Space\""}]);
+	sliceType$3 = $sliceType($emptyInterface);
+	funcType = $funcType([ptrType$3], [], false);
+	sliceType$4 = $sliceType(hvue.pOptionType);
+	sliceType$5 = $sliceType(hvue.PropOption);
+	sliceType$6 = $sliceType(hvue.ComponentOption);
+	ptrType$4 = $ptrType(hvue.VM);
+	funcType$1 = $funcType([ptrType$4, $Int], [$String], false);
+	funcType$2 = $funcType([ptrType$4, ptrType$3], [], false);
+	funcType$3 = $funcType([ptrType$4], [], false);
+	sliceType$7 = $sliceType($String);
+	sliceType$8 = $sliceType(ptrType$3);
+	ptrType$5 = $ptrType(jsGadgetSettings);
+	ptrType$6 = $ptrType(P4wnP1_grpc.GadgetSettingsEthernet);
+	ptrType$7 = $ptrType(P4wnP1_grpc.GadgetSettingsUMS);
+	ptrType$8 = $ptrType(VGadgetSettingsUMS);
+	ptrType$9 = $ptrType(VGadgetSettingsEthernet);
+	ptrType$10 = $ptrType(jsEvent);
+	ptrType$11 = $ptrType(P4wnP1_grpc.EventValue_Tint64);
+	ptrType$12 = $ptrType(P4wnP1_grpc.EventValue_Tstring);
+	ptrType$13 = $ptrType(P4wnP1_grpc.EventValue_Tbool);
+	ptrType$14 = $ptrType(jsLogEvent);
+	ptrType$15 = $ptrType(sync.Mutex);
+	structType$2 = $structType("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "TestString", name: "TestString", anonymous: false, exported: true, typ: $String, tag: "js:\"testString\""}]);
+	ptrType$16 = $ptrType(jsLoggerData);
+	ptrType$17 = $ptrType(mvuex.Store);
+	ptrType$18 = $ptrType(mvuex.ActionContext);
+	ptrType$19 = $ptrType(GlobalState);
+	funcType$4 = $funcType([ptrType$17, ptrType$18, ptrType$19], [], false);
+	funcType$5 = $funcType([ptrType$17, ptrType$19, $Bool], [], false);
+	funcType$6 = $funcType([ptrType$17, ptrType$19, $Int], [], false);
+	funcType$7 = $funcType([ptrType$17, ptrType$19], [], false);
+	funcType$8 = $funcType([ptrType$17, ptrType$19, $String], [], false);
+	funcType$9 = $funcType([ptrType$17, ptrType$19, ptrType$5], [], false);
+	sliceType$9 = $sliceType(mvuex.StoreOption);
+	ptrType$20 = $ptrType(context.Context);
+	ptrType$21 = $ptrType(context.CancelFunc);
+	ptrType$22 = $ptrType(CompHIDScriptData);
+	ptrType$23 = $ptrType(CompTabsData);
+	ptrType$24 = $ptrType(CompUSBSettingsData);
+	ptrType$25 = $ptrType(P4wnP1_grpc.Event);
 	O = function() {
 		return new ($global.Object)();
 	};
@@ -52797,149 +52848,9 @@ $packages["."] = (function() {
 		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if (!$curGoroutine.asleep) { return  [job, err]; } if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: RunHIDScript }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.cancel = cancel; $f.client = client; $f.ctx = ctx; $f.err = err; $f.filename = filename; $f.job = job; $f.timeoutSeconds = timeoutSeconds; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
 	};
 	$pkg.RunHIDScript = RunHIDScript;
-	UpdateGadgetSettingsFromDeployed = function(jsGS) {
-		var _r$2, _r$3, _tuple, _tuple$1, cancel, ctx, deployedGs, err, jsGS, $s, $deferred, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; cancel = $f.cancel; ctx = $f.ctx; deployedGs = $f.deployedGs; err = $f.err; jsGS = $f.jsGS; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
-		console.log("UpdateGadgetSettingsFromDeployed called");
-		_r$2 = context.WithTimeout(context.Background(), new time.Duration(0, 3000000000)); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-		_tuple = _r$2;
-		ctx = _tuple[0];
-		cancel = _tuple[1];
-		$deferred.push([cancel, []]);
-		_r$3 = $pkg.Client.Client.GetDeployedGadgetSetting(ctx, new P4wnP1_grpc.Empty.ptr(), new sliceType$2([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-		_tuple$1 = _r$3;
-		deployedGs = _tuple$1[0];
-		err = _tuple$1[1];
-		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			console.log(err);
-			$s = -1; return;
-		}
-		jsGS.fromGS(deployedGs);
-		$s = -1; return;
-		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: UpdateGadgetSettingsFromDeployed }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.cancel = cancel; $f.ctx = ctx; $f.deployedGs = deployedGs; $f.err = err; $f.jsGS = jsGS; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
-	};
-	$pkg.UpdateGadgetSettingsFromDeployed = UpdateGadgetSettingsFromDeployed;
-	createGlobalStateStruct = function() {
-		var state, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; state = $f.state; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		state = new GlobalState.ptr(O(), "", "", ptrType$2.nil, ptrType$3.nil, 0, "");
-		state.Object.title = $externalize("P4wnP1 by MaMe82", $String);
-		state.Object.currentHIDScriptSource = $externalize("layout('us');\t\t\t// US keyboard layout\ntypingSpeed(100,150)\t// Wait 100ms between key strokes + an additional random value between 0ms and 150ms (natural)\n\nwaitLEDRepeat(NUM);\t\t// Wait till NUM LED of target changes frequently multiple times (doesn't work on OSX)\npress(\"GUI r\");\ndelay(500);\ntype(\"notepad\\n\")\ndelay(1000);\nfor (var i = 0; i < 3; i++) {\n  type(\"Hello from P4wnP1 run \" + i + \" !\\n\");\n  type(\"Moving mouse right ...\");\n  moveStepped(500,0);\n  type(\"and left\\n\");\n  moveStepped(-500,0);\n}\ntype(\"Let's type fast !!!!!!!!!!!!!!!\\n\")\ntypingSpeed(0,0);\nfor (var i = 3; i < 10; i++) {\n  type(\"Hello from P4wnP1 run \" + i + \" !\\n\");\n  type(\"Moving mouse right ...\");\n  moveStepped(500,0);\n  type(\"and left\\n\");\n  moveStepped(-500,0);\n}", $String);
-		state.Object.currentGadgetSettings = $externalize(NewUSBGadgetSettings(), ptrType$2);
-		$r = UpdateGadgetSettingsFromDeployed($internalize(state.Object.currentGadgetSettings, ptrType$2)); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		state.Object.eventLog = $externalize(NewLogger(500), ptrType$3);
-		state.Object.count = 1337;
-		state.Object.text = $externalize("Hi there says MaMe82", $String);
-		$s = -1; return state;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: createGlobalStateStruct }; } $f.state = state; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	initMVuex = function() {
-		var _arg, _arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9, _r$10, _r$11, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, state, store, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _arg$4 = $f._arg$4; _arg$5 = $f._arg$5; _arg$6 = $f._arg$6; _arg$7 = $f._arg$7; _arg$8 = $f._arg$8; _arg$9 = $f._arg$9; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; state = $f.state; store = $f.store; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		_r$2 = createGlobalStateStruct(); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-		state = $clone(_r$2, GlobalState);
-		_r$3 = mvuex.State(new state.constructor.elem(state)); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-		_arg = _r$3;
-		_r$4 = mvuex.Action("actiontest", new funcType((function(store, context$1, state$1) {
-			var context$1, state$1, store;
-			$go((function $b() {
-				var i, $s, $r;
-				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; i = $f.i; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-				i = 0;
-				/* while (true) { */ case 1:
-					/* if (!(i < 10)) { break; } */ if(!(i < 10)) { $s = 2; continue; }
-					console.log($parseInt(state$1.Object.count) >> 0);
-					$r = time.Sleep(new time.Duration(0, 1000000000)); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-					context$1.Object.commit($externalize("increment", $String), 5);
-					i = i + (1) >> 0;
-				/* } */ $s = 1; continue; case 2:
-				$s = -1; return;
-				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.i = i; $f.$s = $s; $f.$r = $r; return $f;
-			}), []);
-		}))); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
-		_arg$1 = _r$4;
-		_r$5 = mvuex.Mutation("increment", new funcType$1((function(store, state$1, add) {
-			var add, state$1, store;
-			state$1.Object.count = ($parseInt(state$1.Object.count) >> 0) + (add) >> 0;
-			return;
-		}))); /* */ $s = 4; case 4: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
-		_arg$2 = _r$5;
-		_r$6 = mvuex.Mutation("decrement", new funcType$2((function(store, state$1) {
-			var state$1, store;
-			$go((function $b() {
-				var i, $s, $r;
-				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; i = $f.i; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-				i = 0;
-				/* while (true) { */ case 1:
-					/* if (!(i < 10)) { break; } */ if(!(i < 10)) { $s = 2; continue; }
-					console.log($parseInt(state$1.Object.count) >> 0);
-					$r = time.Sleep(new time.Duration(0, 1000000000)); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-					state$1.Object.count = ($parseInt(state$1.Object.count) >> 0) - (1) >> 0;
-					i = i + (1) >> 0;
-				/* } */ $s = 1; continue; case 2:
-				$s = -1; return;
-				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.i = i; $f.$s = $s; $f.$r = $r; return $f;
-			}), []);
-			return;
-		}))); /* */ $s = 5; case 5: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
-		_arg$3 = _r$6;
-		_r$7 = mvuex.Mutation("setText", new funcType$3((function(store, state$1, newText) {
-			var newText, state$1, store;
-			state$1.Object.text = $externalize(newText, $String);
-			return;
-		}))); /* */ $s = 6; case 6: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
-		_arg$4 = _r$7;
-		_r$8 = mvuex.Mutation("setCurrentHIDScriptSource", new funcType$3((function(store, state$1, newText) {
-			var newText, state$1, store;
-			state$1.Object.currentHIDScriptSource = $externalize(newText, $String);
-			return;
-		}))); /* */ $s = 7; case 7: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
-		_arg$5 = _r$8;
-		_r$9 = mvuex.Mutation("setCurrentGadgetSettings", new funcType$4((function(store, state$1, newSettings) {
-			var newSettings, state$1, store;
-			state$1.Object.currentGadgetSettings = $externalize(newSettings, ptrType$2);
-			return;
-		}))); /* */ $s = 8; case 8: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
-		_arg$6 = _r$9;
-		_r$10 = mvuex.Mutation("setCurrentGadgetSettingsFromDeployed", new funcType$2((function(store, state$1) {
-			var state$1, store;
-			console.log("Store: commit setCurrentGadgetSettingsFromDeployed");
-			$go(UpdateGadgetSettingsFromDeployed, [$internalize(state$1.Object.currentGadgetSettings, ptrType$2)]);
-			return;
-		}))); /* */ $s = 9; case 9: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
-		_arg$7 = _r$10;
-		_arg$8 = mvuex.Mutation("startLogListening", new funcType$2((function $b(store, state$1) {
-			var state$1, store, $s, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; state$1 = $f.state$1; store = $f.store; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-			$r = $internalize(state$1.Object.eventLog, ptrType$3).StartListening(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			$s = -1; return;
-			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.state$1 = state$1; $f.store = store; $f.$s = $s; $f.$r = $r; return $f;
-		})));
-		_arg$9 = mvuex.Mutation("stopLogListening", new funcType$2((function $b(store, state$1) {
-			var state$1, store, $s, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; state$1 = $f.state$1; store = $f.store; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-			$r = $internalize(state$1.Object.eventLog, ptrType$3).StopListening(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			$s = -1; return;
-			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.state$1 = state$1; $f.store = store; $f.$s = $s; $f.$r = $r; return $f;
-		})));
-		_r$11 = mvuex.NewStore(new sliceType$3([_arg, _arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9])); /* */ $s = 10; case 10: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
-		store = _r$11;
-		$global.store = $externalize(store, ptrType$4);
-		$r = $internalize(state.Object.eventLog, ptrType$3).StartListening(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: initMVuex }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$2 = _arg$2; $f._arg$3 = _arg$3; $f._arg$4 = _arg$4; $f._arg$5 = _arg$5; $f._arg$6 = _arg$6; $f._arg$7 = _arg$7; $f._arg$8 = _arg$8; $f._arg$9 = _arg$9; $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f.state = state; $f.store = store; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	InitGlobalState = function() {
-		var $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = initMVuex(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: InitGlobalState }; } $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.InitGlobalState = InitGlobalState;
 	NewCodeEditorData = function(vm) {
 		var cmo, data, extraKeys, mode, vm;
-		data = new CompCodeEditorData.ptr(O(), "", ptrType$7.nil);
+		data = new CompCodeEditorData.ptr(O(), "", ptrType$2.nil);
 		data.Object.scriptContent = $externalize("", $String);
 		cmo = new CodeMirrorOptionsType.ptr(O(), $ifaceNil, false, false, false, $ifaceNil);
 		mode = new structType.ptr(O(), "", false);
@@ -52952,7 +52863,7 @@ $packages["."] = (function() {
 		cmo.Object.lineNumbers = $externalize(true, $Bool);
 		cmo.Object.lineWrapping = $externalize(true, $Bool);
 		cmo.Object.autoCloseBrackets = $externalize(true, $Bool);
-		data.Object.codemirrorOptions = $externalize(cmo, ptrType$7);
+		data.Object.codemirrorOptions = $externalize(cmo, ptrType$2);
 		return data;
 	};
 	$pkg.NewCodeEditorData = NewCodeEditorData;
@@ -52963,19 +52874,18 @@ $packages["."] = (function() {
 		editorEl = vm.Object.$el.querySelector($externalize("#CodeEditor", $String));
 		editor = $global.CodeMirror.fromTextArea(editorEl, vm.Object.codemirrorOptions);
 		editor.setValue(val);
-		$global.editor = editor;
 		editor.on($externalize("change", $String), $externalize((function(cm) {
 			var cm, newVal;
 			newVal = cm.getValue();
 			vm.Set("scriptContent", new $jsObjectPtr(newVal));
-			vm.Emit("change", new sliceType$4([new $jsObjectPtr(newVal)]));
-			vm.Emit("input", new sliceType$4([new $jsObjectPtr(newVal)]));
-		}), funcType$5));
+			vm.Emit("change", new sliceType$3([new $jsObjectPtr(newVal)]));
+			vm.Emit("input", new sliceType$3([new $jsObjectPtr(newVal)]));
+		}), funcType));
 	};
 	InitCompCodeEditor = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("code-editor", new sliceType$7([hvue.Template("\n<div>\n\t<textarea id=\"CodeEditor\"></textarea>\n</div>\n"), hvue.DataFunc(NewCodeEditorData), hvue.PropObj("value", new sliceType$6([hvue.Types(new sliceType$5([0])), hvue.Default(new $String("type('Hello');"))])), hvue.Mounted(initCodeMirror)])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("code-editor", new sliceType$6([hvue.Template("\n<div>\n\t<textarea id=\"CodeEditor\"></textarea>\n</div>\n"), hvue.DataFunc(NewCodeEditorData), hvue.PropObj("value", new sliceType$5([hvue.Types(new sliceType$4([0])), hvue.Default(new $String("type('Hello');"))])), hvue.Mounted(initCodeMirror)])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompCodeEditor }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -52988,7 +52898,7 @@ $packages["."] = (function() {
 	InitCompEthernetAddresses2 = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("ethernet-addresses", new sliceType$7([hvue.Template("\n<div>\n\t<table>\n\t<tr>\n\t\t<td>Host MAC address</td><td><input v-bind:value=\"settings.HostAddr\" v-on:input=\"$emit('hostAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t<tr>\n\t\t<td>Device MAC address</td><td><input v-bind:value=\"settings.DevAddr\" v-on:input=\"$emit('devAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t</table>\n</div>\n"), hvue.DataFunc(newCompEthernetAddressesData2), hvue.PropObj("settings", new sliceType$6([hvue.Types(new sliceType$5([4]))]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("ethernet-addresses", new sliceType$6([hvue.Template("\n<div>\n\t<table>\n\t<tr>\n\t\t<td>Host MAC address</td><td><input v-bind:value=\"settings.HostAddr\" v-on:input=\"$emit('hostAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t<tr>\n\t\t<td>Device MAC address</td><td><input v-bind:value=\"settings.DevAddr\" v-on:input=\"$emit('devAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t</table>\n</div>\n"), hvue.DataFunc(newCompEthernetAddressesData2), hvue.PropObj("settings", new sliceType$5([hvue.Types(new sliceType$4([4]))]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompEthernetAddresses2 }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -53044,12 +52954,12 @@ $packages["."] = (function() {
 	InitCompHIDScript = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("hid-script", new sliceType$7([hvue.Template("\n<div>\n\t<span>P4wnP1 HID Script</span>\n\t<button @click=\"SendAndRun()\">as Job</button><br>\n\t<code-editor v-model=\"scriptContent\"></code-editor>\n</div>\n"), hvue.DataFunc(newCompHIDScriptData), hvue.MethodsOf(new CompHIDScriptData.ptr(null)), hvue.ComputedWithGetSet("scriptContent", (function(vm) {
+		$r = hvue.NewComponent("hid-script", new sliceType$6([hvue.Template("\n<div>\n\t<span>P4wnP1 HID Script</span>\n\t<button @click=\"SendAndRun()\">as Job</button><br>\n\t<code-editor v-model=\"scriptContent\"></code-editor>\n</div>\n"), hvue.DataFunc(newCompHIDScriptData), hvue.MethodsOf(new CompHIDScriptData.ptr(null)), hvue.ComputedWithGetSet("scriptContent", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.$store.state.currentHIDScriptSource);
-		}), (function(vm, newValue) {
-			var newValue, vm;
-			vm.Object.$store.commit($externalize("setCurrentHIDScriptSource", $String), newValue);
+		}), (function(vm, newScriptContent) {
+			var newScriptContent, vm;
+			vm.Object.$store.commit($externalize("setCurrentHIDScriptSource", $String), newScriptContent);
 		}))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompHIDScript }; } $f.$s = $s; $f.$r = $r; return $f;
@@ -53077,7 +52987,7 @@ $packages["."] = (function() {
 	InitCompLogger = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("logger", new sliceType$7([hvue.Template("\n\t<div class=\"logger\">\n\t<table class=\"log-entries\">\n\t\t<tr>\n\t\t\t<th>time</th>\n\t\t\t<th>source</th>\n\t\t\t<th>level</th>\n\t\t\t<th>message</th>\n\t\t</tr>\n        <tr v-for=\"(logEntry,idx) in logArray\" :key=\"idx\" :class=\"logLevelClass(logEntry.level)\">\n\t\t\t<td class=\"log-entry-time\">{{ logEntry.time }}</td>\n\t        <td class=\"log-entry-source\">{{ logEntry.source }}</td>\n\t\t\t<td class=\"log-entry-level\">{{ logEntry.level }}</td>\n\t\t\t<td class=\"log-entry-message\">{{ logEntry.message }}</td>\n\t    </tr>\n\t</table>\n\t</div>\n\n"), hvue.Method("logLevelClass", new funcType$6(LogLevelClass)), hvue.PropObj("max-entries", new sliceType$6([hvue.Types(new sliceType$5([1])), hvue.Default(new $Int(5))])), hvue.Created((function(vm) {
+		$r = hvue.NewComponent("logger", new sliceType$6([hvue.Template("\n\t<div class=\"logger\">\n\t<table class=\"log-entries\">\n\t\t<tr>\n\t\t\t<th>time</th>\n\t\t\t<th>source</th>\n\t\t\t<th>level</th>\n\t\t\t<th>message</th>\n\t\t</tr>\n        <tr v-for=\"(logEntry,idx) in logArray\" :key=\"idx\" :class=\"logLevelClass(logEntry.level)\">\n\t\t\t<td class=\"log-entry-time\">{{ logEntry.time }}</td>\n\t        <td class=\"log-entry-source\">{{ logEntry.source }}</td>\n\t\t\t<td class=\"log-entry-level\">{{ logEntry.level }}</td>\n\t\t\t<td class=\"log-entry-message\">{{ logEntry.message }}</td>\n\t    </tr>\n\t</table>\n\t</div>\n\n"), hvue.Method("logLevelClass", new funcType$1(LogLevelClass)), hvue.PropObj("max-entries", new sliceType$5([hvue.Types(new sliceType$4([1])), hvue.Default(new $Int(5))])), hvue.Created((function(vm) {
 			var vm;
 			console.log("OnCreated");
 		})), hvue.Destroyed((function(vm) {
@@ -53094,6 +53004,14 @@ $packages["."] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompLogger }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.InitCompLogger = InitCompLogger;
+	InitCompModal = function() {
+		var $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = hvue.NewComponent("modal", new sliceType$6([hvue.Template("\n <transition name=\"modal\">\n    <div class=\"modal-mask\">\n      <div class=\"modal-wrapper\">\n        <div class=\"modal-container\">\n\n          <div class=\"modal-header\">\n            <slot name=\"header\">\n              Modal window header\n            </slot>\n          </div>\n\n          <div class=\"modal-body\">\n            <slot name=\"body\">\n              body\n            </slot>\n          </div>\n\n          <div class=\"modal-footer\">\n            <slot name=\"footer\">\n\t\t\t\tfooter\n              <button class=\"modal-default-button\" @click=\"$emit('close')\">\n                OK\n              </button>\n            </slot>\n          </div>\n        </div>\n      </div>\n    </div>\n  </transition>\n")])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompModal }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.InitCompModal = InitCompModal;
 	newCompStateData = function(vm) {
 		var newVM, vm;
 		newVM = new CompToggleSwitchData.ptr(O());
@@ -53102,7 +53020,7 @@ $packages["."] = (function() {
 	InitCompState = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("state", new sliceType$7([hvue.Template("\n<div>\n  <p>{{ count }}</p>\n  <p>{{ text }}</p>\n  <input v-model=\"text\"></input>\n  <p>\n    <button @click=\"increment(1,2,3)\">+</button>\n\t<button @click=\"increment(2)\">+2</button>\n\t<button @click=\"actionincrement\">+x</button>\n    <button @click=\"decrement\">-</button>\n  </p>\n</div>\n"), hvue.DataFunc(newCompStateData), hvue.Computed("count", (function(vm) {
+		$r = hvue.NewComponent("state", new sliceType$6([hvue.Template("\n<div>\n  <p>{{ count }}</p>\n  <p>{{ text }}</p>\n  <input v-model=\"text\"></input>\n  <p>\n    <button @click=\"increment(1,2,3)\">+</button>\n\t<button @click=\"increment(2)\">+2</button>\n\t<button @click=\"actionincrement\">+x</button>\n    <button @click=\"decrement\">-</button>\n  </p>\n</div>\n"), hvue.DataFunc(newCompStateData), hvue.Computed("count", (function(vm) {
 			var vm;
 			return new $jsObjectPtr($global.store.state.count);
 		})), hvue.ComputedWithGetSet("text", (function(vm) {
@@ -53111,13 +53029,13 @@ $packages["."] = (function() {
 		}), (function(vm, newValue) {
 			var newValue, vm;
 			$global.store.commit($externalize("setText", $String), newValue);
-		})), hvue.Method("actionincrement", new funcType$7((function(vm, count) {
+		})), hvue.Method("actionincrement", new funcType$2((function(vm, count) {
 			var count, vm;
 			$global.store.dispatch($externalize("actiontest", $String));
-		}))), hvue.Method("increment", new funcType$7((function(vm, count) {
+		}))), hvue.Method("increment", new funcType$2((function(vm, count) {
 			var count, vm;
 			$global.store.commit($externalize("increment", $String), count);
-		}))), hvue.Method("decrement", new funcType$8((function(vm) {
+		}))), hvue.Method("decrement", new funcType$3((function(vm) {
 			var vm;
 			$global.store.commit($externalize("decrement", $String));
 		})))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
@@ -53136,7 +53054,7 @@ $packages["."] = (function() {
 	InitCompTab = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("tab", new sliceType$7([hvue.Template("\n\t\t<div v-if=\"isActive\">\n\t\t\t<slot></slot>\n\t\t</div>\n\t\n"), hvue.DataFunc(NewCompTabData), hvue.PropObj("header", new sliceType$6([hvue.Types(new sliceType$5([0])), hvue.Default(new $String("tab name")), hvue.Required])), hvue.PropObj("disabled", new sliceType$6([hvue.Types(new sliceType$5([2])), hvue.Default(new $Bool(false))])), hvue.PropObj("selected", new sliceType$6([hvue.Types(new sliceType$5([2])), hvue.Default(new $Bool(false))])), hvue.Computed("_isTab", (function(vm) {
+		$r = hvue.NewComponent("tab", new sliceType$6([hvue.Template("\n\t\t<div v-if=\"isActive\">\n\t\t\t<slot></slot>\n\t\t</div>\n\t\n"), hvue.DataFunc(NewCompTabData), hvue.PropObj("header", new sliceType$5([hvue.Types(new sliceType$4([0])), hvue.Default(new $String("tab name")), hvue.Required])), hvue.PropObj("disabled", new sliceType$5([hvue.Types(new sliceType$4([2])), hvue.Default(new $Bool(false))])), hvue.PropObj("selected", new sliceType$5([hvue.Types(new sliceType$4([2])), hvue.Default(new $Bool(false))])), hvue.Computed("_isTab", (function(vm) {
 			var vm;
 			return new $Bool(true);
 		})), hvue.Computed("hasOverride", (function(vm) {
@@ -53152,16 +53070,16 @@ $packages["."] = (function() {
 	$pkg.InitCompTab = InitCompTab;
 	NewCompTabsData = function(vm) {
 		var cc, vm;
-		cc = new CompTabsData.ptr(new ($global.Object)(), sliceType$8.nil, sliceType$9.nil);
-		cc.Object.headers = $externalize(new sliceType$8([]), sliceType$8);
-		cc.Object.tabs = $externalize(new sliceType$9([]), sliceType$9);
+		cc = new CompTabsData.ptr(new ($global.Object)(), sliceType$7.nil, sliceType$8.nil);
+		cc.Object.headers = $externalize(new sliceType$7([]), sliceType$7);
+		cc.Object.tabs = $externalize(new sliceType$8([]), sliceType$8);
 		return cc;
 	};
 	$pkg.NewCompTabsData = NewCompTabsData;
 	initTabs = function(vm) {
 		var _i, _ref, child, id, isTab, vm;
 		id = 0;
-		_ref = $internalize(vm.Object.$children, sliceType$9);
+		_ref = $internalize(vm.Object.$children, sliceType$8);
 		_i = 0;
 		while (true) {
 			if (!(_i < _ref.$length)) { break; }
@@ -53179,7 +53097,7 @@ $packages["."] = (function() {
 		var _i, _ref, c, child, isTab, selectedID, vm;
 		c = this;
 		console.log("Update selected ID: ", selectedID);
-		_ref = $internalize(vm.Object.$children, sliceType$9);
+		_ref = $internalize(vm.Object.$children, sliceType$8);
 		_i = 0;
 		while (true) {
 			if (!(_i < _ref.$length)) { break; }
@@ -53195,7 +53113,7 @@ $packages["."] = (function() {
 	InitCompTabs = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("tabs", new sliceType$7([hvue.DataFunc(NewCompTabsData), hvue.Template("\n<div>\n\t<div>\n\t\t<ul class=\"nav nav-tabs\">\n\t        <li v-for=\"t in tabs\" :class=\"{ 'active' : t.isActive }\" :key=\"t.id\">\n\t          <a href=\"#\" @click=\"UpdateSelectedTab(t.id)\">{{ t.header }}</a>\n\t        </li>\n\t\t</ul>\n\t</div>\n\t<div class=\"tab-content\">\n\t\t<slot></slot>\n\t</div>\n</div>\n"), hvue.Mounted(initTabs), hvue.MethodsOf(new CompTabsData.ptr(null, sliceType$8.nil, sliceType$9.nil))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("tabs", new sliceType$6([hvue.DataFunc(NewCompTabsData), hvue.Template("\n<div>\n\t<div>\n\t\t<ul class=\"nav nav-tabs\">\n\t        <li v-for=\"t in tabs\" :class=\"{ 'active' : t.isActive }\" :key=\"t.id\">\n\t          <a href=\"#\" @click=\"UpdateSelectedTab(t.id)\">{{ t.header }}</a>\n\t        </li>\n\t\t</ul>\n\t</div>\n\t<div class=\"tab-content\">\n\t\t<slot></slot>\n\t</div>\n</div>\n"), hvue.Mounted(initTabs), hvue.MethodsOf(new CompTabsData.ptr(null, sliceType$7.nil, sliceType$8.nil))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompTabs }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -53208,7 +53126,7 @@ $packages["."] = (function() {
 	InitCompToggleSwitch = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("toggle-switch", new sliceType$7([hvue.Template("\n<label class=\"toggle-switch\">\n   \t<input type=\"checkbox\" v-bind:checked=\"value\" v-on:change=\"$emit('input', $event.target.checked)\">\n   \t<div><span class=\"on\">On</span><span class=\"off\">Off</span></div>\n\t<span class=\"toggle-switch-slider\"></span>\n</label>\n"), hvue.DataFunc(newCompToggleSwitchData), hvue.PropObj("value", new sliceType$6([hvue.Types(new sliceType$5([2])), hvue.Required]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("toggle-switch", new sliceType$6([hvue.Template("\n<label class=\"toggle-switch\">\n   \t<input type=\"checkbox\" v-bind:checked=\"value\" v-on:change=\"$emit('input', $event.target.checked)\">\n   \t<div><span class=\"on\">On</span><span class=\"off\">Off</span></div>\n\t<span class=\"toggle-switch-slider\"></span>\n</label>\n"), hvue.DataFunc(newCompToggleSwitchData), hvue.PropObj("value", new sliceType$5([hvue.Types(new sliceType$4([2])), hvue.Required]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompToggleSwitch }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -53216,68 +53134,19 @@ $packages["."] = (function() {
 	CompUSBSettingsData.ptr.prototype.UpdateFromDeployedGadgetSettings = function(vm) {
 		var c, vm;
 		c = this;
-		vm.Object.$store.commit($externalize("setCurrentGadgetSettingsFromDeployed", $String));
+		vm.Object.$store.dispatch($externalize("updateCurrentGadgetSettingsFromDeployed", $String));
 	};
 	CompUSBSettingsData.prototype.UpdateFromDeployedGadgetSettings = function(vm) { return this.$val.UpdateFromDeployedGadgetSettings(vm); };
 	CompUSBSettingsData.ptr.prototype.ApplyGadgetSettings = function(vm) {
-		var c, gs, vm;
+		var c, vm;
 		c = this;
-		console.log("Trying to deploy GadgetSettings...");
-		gs = new jsGadgetSettings.ptr(vm.Object.$store.state.currentGadgetSettings, false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$10.nil, ptrType$10.nil, ptrType$11.nil).toGS();
-		$go((function $b() {
-			var _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _tuple, _tuple$1, _tuple$2, cancel, ctx, deployedGs, err, newGs, $s, $deferred, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; _tuple$2 = $f._tuple$2; cancel = $f.cancel; ctx = $f.ctx; deployedGs = $f.deployedGs; err = $f.err; newGs = $f.newGs; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
-			c.Object.deployPending = $externalize(true, $Bool);
-			$deferred.push([(function() {
-				c.Object.deployPending = $externalize(false, $Bool);
-			}), []]);
-			_r$2 = context.WithTimeout(context.Background(), new time.Duration(6, 4230196224)); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-			_tuple = _r$2;
-			ctx = _tuple[0];
-			cancel = _tuple[1];
-			$deferred.push([cancel, []]);
-			_r$3 = $pkg.Client.Client.SetGadgetSettings(ctx, gs, new sliceType$2([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-			_tuple$1 = _r$3;
-			err = _tuple$1[1];
-			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 3; continue; }
-			/* */ $s = 4; continue;
-			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 3:
-				_r$4 = status.Convert(err); /* */ $s = 5; case 5: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
-				_r$5 = _r$4.Message(); /* */ $s = 6; case 6: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
-				$global.alert($externalize("Error setting given gadget settings: " + _r$5, $String));
-				console.log(err);
-				c.UpdateFromDeployedGadgetSettings(vm);
-				$s = -1; return;
-			/* } */ case 4:
-			console.log("New GadgetSettings have been set");
-			_r$6 = $pkg.Client.Client.DeployGadgetSetting(ctx, new P4wnP1_grpc.Empty.ptr(), new sliceType$2([])); /* */ $s = 7; case 7: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
-			_tuple$2 = _r$6;
-			deployedGs = _tuple$2[0];
-			err = _tuple$2[1];
-			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 8; continue; }
-			/* */ $s = 9; continue;
-			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 8:
-				_r$7 = status.Convert(err); /* */ $s = 10; case 10: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
-				_r$8 = _r$7.Message(); /* */ $s = 11; case 11: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
-				$global.alert($externalize("Error deploying gadget settings: " + _r$8, $String));
-				console.log(err);
-				c.UpdateFromDeployedGadgetSettings(vm);
-				$s = -1; return;
-			/* } */ case 9:
-			console.log("New GadgetSettings have been deployed");
-			$global.alert($externalize("New USB gadget settings deployed ", $String));
-			newGs = new jsGadgetSettings.ptr(new ($global.Object)(), false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$10.nil, ptrType$10.nil, ptrType$11.nil);
-			newGs.fromGS(deployedGs);
-			c.Object.gadgetSettings = $externalize(newGs, ptrType$2);
-			$s = -1; return;
-			/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: $b }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f._tuple$2 = _tuple$2; $f.cancel = cancel; $f.ctx = ctx; $f.deployedGs = deployedGs; $f.err = err; $f.newGs = newGs; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
-		}), []);
+		vm.Object.$store.dispatch($externalize("deployCurrentGadgetSettings", $String));
 	};
 	CompUSBSettingsData.prototype.ApplyGadgetSettings = function(vm) { return this.$val.ApplyGadgetSettings(vm); };
 	InitCompUSBSettings = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("usb-settings", new sliceType$7([hvue.Template("\n<div>\n\t<table>\n\t\t<tr>\n\t\t\t<td>USB gadget settings</td>\n\t\t\t<td><button @click=\"ApplyGadgetSettings\" :disabled=\"deployPending\">Apply</button>\n\t\t\t<button @click=\"UpdateFromDeployedGadgetSettings\">Deployed</button></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Gadget enabled</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Enabled\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Vendor ID</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Vid\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Product ID</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Pid\"/></td> \n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Manufacturer Name</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Manufacturer\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Product Name</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Product\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Serial number</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Serial\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>CDC ECM</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_CDC_ECM\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr v-if=\"currentGadgetSettings.Use_CDC_ECM\">\n\t\t\t<td></td>\n\t\t\t<td><ethernet-addresses v-bind:settings=\"currentGadgetSettings.CdcEcmSettings\" @hostAddrChange=\"currentGadgetSettings.CdcEcmSettings.HostAddr=$event\" @devAddrChange=\"currentGadgetSettings.CdcEcmSettings.DevAddr=$event\"></ethernet-addresses></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>RNDIS</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_RNDIS\"></toggle-switch></td>\n\t\t\t<td><input type=\"checkbox\" v-if=\"currentGadgetSettings.Use_RNDIS\" v-model=\"rndisDetails\"></td>\n\t\t</tr>\n\t\t<tr v-if=\"rndisDetails\">\n\t\t\t<td></td>\n\t\t\t<td><ethernet-addresses v-bind:settings=\"currentGadgetSettings.RndisSettings\" @hostAddrChange=\"currentGadgetSettings.RndisSettings.HostAddr=$event\" @devAddrChange=\"currentGadgetSettings.RndisSettings.DevAddr=$event\"></ethernet-addresses></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Keyboard</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_HID_KEYBOARD\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Mouse</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_HID_MOUSE\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Raw</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_HID_RAW\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Serial</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_SERIAL\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Mass Storage</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_UMS\"></toggle-switch></td>\n\t\t</tr>\n\t</table>\n</div>\n"), hvue.DataFunc(newCompUSBSettingsData), hvue.MethodsOf(new CompUSBSettingsData.ptr(null, ptrType$2.nil, false, false, false)), hvue.Computed("currentGadgetSettings", (function(vm) {
+		$r = hvue.NewComponent("usb-settings", new sliceType$6([hvue.Template("\n<div>\n\t<table>\n\t\t<tr>\n\t\t\t<td>USB gadget settings</td>\n\t\t\t<td><button @click=\"ApplyGadgetSettings\" :disabled=\"deployPending\">Apply</button>\n\t\t\t<button @click=\"UpdateFromDeployedGadgetSettings\">Deployed</button></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Gadget enabled</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Enabled\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Vendor ID</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Vid\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Product ID</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Pid\"/></td> \n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Manufacturer Name</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Manufacturer\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Product Name</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Product\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Serial number</td>\n\t\t\t<td><input v-model=\"currentGadgetSettings.Serial\"/></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>CDC ECM</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_CDC_ECM\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr v-if=\"currentGadgetSettings.Use_CDC_ECM\">\n\t\t\t<td></td>\n\t\t\t<td><ethernet-addresses v-bind:settings=\"currentGadgetSettings.CdcEcmSettings\" @hostAddrChange=\"currentGadgetSettings.CdcEcmSettings.HostAddr=$event\" @devAddrChange=\"currentGadgetSettings.CdcEcmSettings.DevAddr=$event\"></ethernet-addresses></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>RNDIS</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_RNDIS\"></toggle-switch></td>\n\t\t\t<td><input type=\"checkbox\" v-if=\"currentGadgetSettings.Use_RNDIS\" v-model=\"rndisDetails\"></td>\n\t\t</tr>\n\t\t<tr v-if=\"rndisDetails\">\n\t\t\t<td></td>\n\t\t\t<td><ethernet-addresses v-bind:settings=\"currentGadgetSettings.RndisSettings\" @hostAddrChange=\"currentGadgetSettings.RndisSettings.HostAddr=$event\" @devAddrChange=\"currentGadgetSettings.RndisSettings.DevAddr=$event\"></ethernet-addresses></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Keyboard</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_HID_KEYBOARD\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Mouse</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_HID_MOUSE\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>HID Raw</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_HID_RAW\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Serial</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_SERIAL\"></toggle-switch></td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>Mass Storage</td>\n\t\t\t<td><toggle-switch v-model=\"currentGadgetSettings.Use_UMS\"></toggle-switch></td>\n\t\t</tr>\n\t</table>\n</div>\n"), hvue.DataFunc(newCompUSBSettingsData), hvue.MethodsOf(new CompUSBSettingsData.ptr(null, ptrType$5.nil, false, false, false)), hvue.Computed("currentGadgetSettings", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.$store.state.currentGadgetSettings);
 		}))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
@@ -53287,9 +53156,8 @@ $packages["."] = (function() {
 	$pkg.InitCompUSBSettings = InitCompUSBSettings;
 	newCompUSBSettingsData = function(vm) {
 		var cc, vm;
-		cc = new CompUSBSettingsData.ptr(new ($global.Object)(), ptrType$2.nil, false, false, false);
-		cc.Object.gadgetSettings = $externalize(NewUSBGadgetSettings(), ptrType$2);
-		cc.UpdateFromDeployedGadgetSettings(vm);
+		cc = new CompUSBSettingsData.ptr(new ($global.Object)(), ptrType$5.nil, false, false, false);
+		cc.Object.gadgetSettings = $externalize(NewUSBGadgetSettings(), ptrType$5);
 		cc.Object.deployPending = $externalize(false, $Bool);
 		cc.Object.rndisDetails = $externalize(false, $Bool);
 		cc.Object.cdcEcmDetails = $externalize(false, $Bool);
@@ -53299,7 +53167,7 @@ $packages["."] = (function() {
 		var gs, jsGS;
 		gs = ptrType.nil;
 		jsGS = this;
-		gs = new P4wnP1_grpc.GadgetSettings.ptr(!!(jsGS.Object.Enabled), $internalize(jsGS.Object.Vid, $String), $internalize(jsGS.Object.Pid, $String), $internalize(jsGS.Object.Manufacturer, $String), $internalize(jsGS.Object.Product, $String), $internalize(jsGS.Object.Serial, $String), !!(jsGS.Object.Use_CDC_ECM), !!(jsGS.Object.Use_RNDIS), !!(jsGS.Object.Use_HID_KEYBOARD), !!(jsGS.Object.Use_HID_MOUSE), !!(jsGS.Object.Use_HID_RAW), !!(jsGS.Object.Use_UMS), !!(jsGS.Object.Use_SERIAL), new P4wnP1_grpc.GadgetSettingsEthernet.ptr($internalize($internalize(jsGS.Object.RndisSettings, ptrType$10).Object.HostAddr, $String), $internalize($internalize(jsGS.Object.RndisSettings, ptrType$10).Object.DevAddr, $String)), new P4wnP1_grpc.GadgetSettingsEthernet.ptr($internalize($internalize(jsGS.Object.CdcEcmSettings, ptrType$10).Object.HostAddr, $String), $internalize($internalize(jsGS.Object.CdcEcmSettings, ptrType$10).Object.DevAddr, $String)), new P4wnP1_grpc.GadgetSettingsUMS.ptr(!!($internalize(jsGS.Object.UmsSettings, ptrType$11).Object.Cdrom), $internalize($internalize(jsGS.Object.UmsSettings, ptrType$11).Object.File, $String)));
+		gs = new P4wnP1_grpc.GadgetSettings.ptr(!!(jsGS.Object.Enabled), $internalize(jsGS.Object.Vid, $String), $internalize(jsGS.Object.Pid, $String), $internalize(jsGS.Object.Manufacturer, $String), $internalize(jsGS.Object.Product, $String), $internalize(jsGS.Object.Serial, $String), !!(jsGS.Object.Use_CDC_ECM), !!(jsGS.Object.Use_RNDIS), !!(jsGS.Object.Use_HID_KEYBOARD), !!(jsGS.Object.Use_HID_MOUSE), !!(jsGS.Object.Use_HID_RAW), !!(jsGS.Object.Use_UMS), !!(jsGS.Object.Use_SERIAL), new P4wnP1_grpc.GadgetSettingsEthernet.ptr($internalize($internalize(jsGS.Object.RndisSettings, ptrType$9).Object.HostAddr, $String), $internalize($internalize(jsGS.Object.RndisSettings, ptrType$9).Object.DevAddr, $String)), new P4wnP1_grpc.GadgetSettingsEthernet.ptr($internalize($internalize(jsGS.Object.CdcEcmSettings, ptrType$9).Object.HostAddr, $String), $internalize($internalize(jsGS.Object.CdcEcmSettings, ptrType$9).Object.DevAddr, $String)), new P4wnP1_grpc.GadgetSettingsUMS.ptr(!!($internalize(jsGS.Object.UmsSettings, ptrType$8).Object.Cdrom), $internalize($internalize(jsGS.Object.UmsSettings, ptrType$8).Object.File, $String)));
 		return gs;
 	};
 	jsGadgetSettings.prototype.toGS = function() { return this.$val.toGS(); };
@@ -53320,86 +53188,118 @@ $packages["."] = (function() {
 		jsGS.Object.Use_HID_RAW = $externalize(gs.Use_HID_RAW, $Bool);
 		jsGS.Object.Use_UMS = $externalize(gs.Use_UMS, $Bool);
 		jsGS.Object.Use_SERIAL = $externalize(gs.Use_SERIAL, $Bool);
-		jsGS.Object.RndisSettings = $externalize(new VGadgetSettingsEthernet.ptr(O(), "", ""), ptrType$10);
-		if (!(gs.RndisSettings === ptrType$12.nil)) {
-			$internalize(jsGS.Object.RndisSettings, ptrType$10).Object.HostAddr = $externalize(gs.RndisSettings.HostAddr, $String);
-			$internalize(jsGS.Object.RndisSettings, ptrType$10).Object.DevAddr = $externalize(gs.RndisSettings.DevAddr, $String);
+		jsGS.Object.RndisSettings = $externalize(new VGadgetSettingsEthernet.ptr(O(), "", ""), ptrType$9);
+		if (!(gs.RndisSettings === ptrType$6.nil)) {
+			$internalize(jsGS.Object.RndisSettings, ptrType$9).Object.HostAddr = $externalize(gs.RndisSettings.HostAddr, $String);
+			$internalize(jsGS.Object.RndisSettings, ptrType$9).Object.DevAddr = $externalize(gs.RndisSettings.DevAddr, $String);
 		}
-		jsGS.Object.CdcEcmSettings = $externalize(new VGadgetSettingsEthernet.ptr(O(), "", ""), ptrType$10);
-		if (!(gs.CdcEcmSettings === ptrType$12.nil)) {
-			$internalize(jsGS.Object.CdcEcmSettings, ptrType$10).Object.HostAddr = $externalize(gs.CdcEcmSettings.HostAddr, $String);
-			$internalize(jsGS.Object.CdcEcmSettings, ptrType$10).Object.DevAddr = $externalize(gs.CdcEcmSettings.DevAddr, $String);
+		jsGS.Object.CdcEcmSettings = $externalize(new VGadgetSettingsEthernet.ptr(O(), "", ""), ptrType$9);
+		if (!(gs.CdcEcmSettings === ptrType$6.nil)) {
+			$internalize(jsGS.Object.CdcEcmSettings, ptrType$9).Object.HostAddr = $externalize(gs.CdcEcmSettings.HostAddr, $String);
+			$internalize(jsGS.Object.CdcEcmSettings, ptrType$9).Object.DevAddr = $externalize(gs.CdcEcmSettings.DevAddr, $String);
 		}
-		jsGS.Object.UmsSettings = $externalize(new VGadgetSettingsUMS.ptr(O(), false, ""), ptrType$11);
-		if (!(gs.UmsSettings === ptrType$13.nil)) {
-			$internalize(jsGS.Object.UmsSettings, ptrType$11).Object.File = $externalize(gs.UmsSettings.File, $String);
-			$internalize(jsGS.Object.UmsSettings, ptrType$11).Object.Cdrom = $externalize(gs.UmsSettings.Cdrom, $Bool);
+		jsGS.Object.UmsSettings = $externalize(new VGadgetSettingsUMS.ptr(O(), false, ""), ptrType$8);
+		if (!(gs.UmsSettings === ptrType$7.nil)) {
+			$internalize(jsGS.Object.UmsSettings, ptrType$8).Object.File = $externalize(gs.UmsSettings.File, $String);
+			$internalize(jsGS.Object.UmsSettings, ptrType$8).Object.Cdrom = $externalize(gs.UmsSettings.Cdrom, $Bool);
 		}
 	};
 	jsGadgetSettings.prototype.fromGS = function(gs) { return this.$val.fromGS(gs); };
 	NewUSBGadgetSettings = function() {
 		var gs;
-		gs = new jsGadgetSettings.ptr(O(), false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$10.nil, ptrType$10.nil, ptrType$11.nil);
-		gs.fromGS(new P4wnP1_grpc.GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$12.nil, ptrType$12.nil, ptrType$13.nil));
+		gs = new jsGadgetSettings.ptr(O(), false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$9.nil, ptrType$9.nil, ptrType$8.nil);
+		gs.fromGS(new P4wnP1_grpc.GadgetSettings.ptr(false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$6.nil, ptrType$6.nil, ptrType$7.nil));
 		return gs;
 	};
 	$pkg.NewUSBGadgetSettings = NewUSBGadgetSettings;
-	DeconstructEventLog = function(gRPCEv) {
-		var _ref, _ref$1, _ref$2, _ref$3, _tmp, _tmp$1, _tmp$10, _tmp$11, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tmp$9, err, gRPCEv, res, vT, vT$1, vT$2, vT$3, vT$4, vT$5, vT$6, vT$7, x, x$1, x$2, x$3, x$4, x$5;
+	NewJsEventFromNative = function(event) {
+		var _i, _ref, _ref$1, event, idx, res, val, valT, valT$1, valT$2, valT$3, x, x$1, x$2;
+		res = ptrType$10.nil;
+		res = new jsEvent.ptr(O(), new $Int64(0, 0), sliceType$3.nil, null);
+		res.Object.values = new ($global.Array)();
+		res.Object.type = $externalize(event.Type, $Int64);
+		res.Values = $makeSlice(sliceType$3, event.Values.$length);
+		_ref = event.Values;
+		_i = 0;
+		while (true) {
+			if (!(_i < _ref.$length)) { break; }
+			idx = _i;
+			val = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			_ref$1 = val.Val;
+			if ($assertType(_ref$1, ptrType$11, true)[1]) {
+				valT = _ref$1.$val;
+				(x = res.Values, ((idx < 0 || idx >= x.$length) ? ($throwRuntimeError("index out of range"), undefined) : x.$array[x.$offset + idx] = valT.Tint64));
+				res.Object.values.push($externalize(valT.Tint64, $Int64));
+			} else if ($assertType(_ref$1, ptrType$12, true)[1]) {
+				valT$1 = _ref$1.$val;
+				(x$1 = res.Values, ((idx < 0 || idx >= x$1.$length) ? ($throwRuntimeError("index out of range"), undefined) : x$1.$array[x$1.$offset + idx] = new $String(valT$1.Tstring)));
+				res.Object.values.push($externalize(valT$1.Tstring, $String));
+			} else if ($assertType(_ref$1, ptrType$13, true)[1]) {
+				valT$2 = _ref$1.$val;
+				(x$2 = res.Values, ((idx < 0 || idx >= x$2.$length) ? ($throwRuntimeError("index out of range"), undefined) : x$2.$array[x$2.$offset + idx] = new $Bool(valT$2.Tbool)));
+				res.Object.values.push($externalize(valT$2.Tbool, $Bool));
+			} else {
+				valT$3 = _ref$1;
+				console.log("error parsing event value", valT$3);
+			}
+			_i++;
+		}
+		console.log("result", res);
+		res = res;
+		return res;
+	};
+	$pkg.NewJsEventFromNative = NewJsEventFromNative;
+	jsEvent.ptr.prototype.toLogEvent = function() {
+		var _tmp, _tmp$1, _tmp$10, _tmp$11, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tmp$9, _tuple, _tuple$1, _tuple$2, _tuple$3, err, jsEv, ll, ok, res, x, x$1, x$2, x$3, x$4;
 		res = ptrType$14.nil;
 		err = $ifaceNil;
-		if (!((x = gRPCEv.Type, (x.$high === 0 && x.$low === 1)))) {
+		jsEv = this;
+		if (!((x = $internalize(jsEv.Object.type, $Int64), (x.$high === 0 && x.$low === 1))) || !((jsEv.Values.$length === 4))) {
 			_tmp = ptrType$14.nil;
-			_tmp$1 = errors.New("No log event");
+			_tmp$1 = eNoLogEvent;
 			res = _tmp;
 			err = _tmp$1;
 			return [res, err];
 		}
-		res = new jsEventLog.ptr(O(), "", 0, "", "");
-		_ref = (x$1 = gRPCEv.Values, (0 >= x$1.$length ? ($throwRuntimeError("index out of range"), undefined) : x$1.$array[x$1.$offset + 0])).Val;
-		if ($assertType(_ref, ptrType$15, true)[1]) {
-			vT = _ref.$val;
-			res.Object.source = $externalize(vT.Tstring, $String);
-		} else {
-			vT$1 = _ref;
+		res = new jsLogEvent.ptr(O(), "", 0, "", "");
+		ok = false;
+		_tuple = $assertType((x$1 = jsEv.Values, (0 >= x$1.$length ? ($throwRuntimeError("index out of range"), undefined) : x$1.$array[x$1.$offset + 0])), $String, true);
+		res.Object.source = $externalize(_tuple[0], $String);
+		ok = _tuple[1];
+		if (!ok) {
 			_tmp$2 = ptrType$14.nil;
-			_tmp$3 = errors.New("Value at position 0 has wrong type for a log event");
+			_tmp$3 = eNoLogEvent;
 			res = _tmp$2;
 			err = _tmp$3;
 			return [res, err];
 		}
-		_ref$1 = (x$2 = gRPCEv.Values, (1 >= x$2.$length ? ($throwRuntimeError("index out of range"), undefined) : x$2.$array[x$2.$offset + 1])).Val;
-		if ($assertType(_ref$1, ptrType$16, true)[1]) {
-			vT$2 = _ref$1.$val;
-			res.Object.level = (((x$3 = vT$2.Tint64, x$3.$low + ((x$3.$high >> 31) * 4294967296)) >> 0));
-		} else {
-			vT$3 = _ref$1;
+		_tuple$1 = $assertType((x$2 = jsEv.Values, (1 >= x$2.$length ? ($throwRuntimeError("index out of range"), undefined) : x$2.$array[x$2.$offset + 1])), $Int64, true);
+		ll = _tuple$1[0];
+		ok = _tuple$1[1];
+		if (!ok) {
 			_tmp$4 = ptrType$14.nil;
-			_tmp$5 = errors.New("Value at position 1 has wrong type for a log event");
+			_tmp$5 = eNoLogEvent;
 			res = _tmp$4;
 			err = _tmp$5;
 			return [res, err];
 		}
-		_ref$2 = (x$4 = gRPCEv.Values, (2 >= x$4.$length ? ($throwRuntimeError("index out of range"), undefined) : x$4.$array[x$4.$offset + 2])).Val;
-		if ($assertType(_ref$2, ptrType$15, true)[1]) {
-			vT$4 = _ref$2.$val;
-			res.Object.message = $externalize(vT$4.Tstring, $String);
-		} else {
-			vT$5 = _ref$2;
+		res.Object.level = (((ll.$low + ((ll.$high >> 31) * 4294967296)) >> 0));
+		_tuple$2 = $assertType((x$3 = jsEv.Values, (2 >= x$3.$length ? ($throwRuntimeError("index out of range"), undefined) : x$3.$array[x$3.$offset + 2])), $String, true);
+		res.Object.message = $externalize(_tuple$2[0], $String);
+		ok = _tuple$2[1];
+		if (!ok) {
 			_tmp$6 = ptrType$14.nil;
-			_tmp$7 = errors.New("Value at position 2 has wrong type for a log event");
+			_tmp$7 = eNoLogEvent;
 			res = _tmp$6;
 			err = _tmp$7;
 			return [res, err];
 		}
-		_ref$3 = (x$5 = gRPCEv.Values, (3 >= x$5.$length ? ($throwRuntimeError("index out of range"), undefined) : x$5.$array[x$5.$offset + 3])).Val;
-		if ($assertType(_ref$3, ptrType$15, true)[1]) {
-			vT$6 = _ref$3.$val;
-			res.Object.time = $externalize(vT$6.Tstring, $String);
-		} else {
-			vT$7 = _ref$3;
+		_tuple$3 = $assertType((x$4 = jsEv.Values, (3 >= x$4.$length ? ($throwRuntimeError("index out of range"), undefined) : x$4.$array[x$4.$offset + 3])), $String, true);
+		res.Object.time = $externalize(_tuple$3[0], $String);
+		ok = _tuple$3[1];
+		if (!ok) {
 			_tmp$8 = ptrType$14.nil;
-			_tmp$9 = errors.New("Value at position 3 has wrong type for a log event");
+			_tmp$9 = eNoLogEvent;
 			res = _tmp$8;
 			err = _tmp$9;
 			return [res, err];
@@ -53410,24 +53310,49 @@ $packages["."] = (function() {
 		err = _tmp$11;
 		return [res, err];
 	};
-	$pkg.DeconstructEventLog = DeconstructEventLog;
+	jsEvent.prototype.toLogEvent = function() { return this.$val.toLogEvent(); };
+	NewLogger = function(maxEntries) {
+		var loggerVmData, maxEntries;
+		loggerVmData = new jsLoggerData.ptr(new ($global.Object)(), null, null, $throwNilPointerError, ptrType$15.nil, 0);
+		loggerVmData.Mutex = new sync.Mutex.ptr(0, 0);
+		loggerVmData.Object.logArray = new ($global.Array)();
+		loggerVmData.Object.eventArray = new ($global.Array)();
+		loggerVmData.Object.maxEntries = maxEntries;
+		return loggerVmData;
+	};
+	$pkg.NewLogger = NewLogger;
 	jsLoggerData.ptr.prototype.AddEntry = function(ev) {
 		var data, ev;
 		data = this;
-		$go((function() {
-			var _tuple, err, logEv;
-			_tuple = DeconstructEventLog(ev);
-			logEv = _tuple[0];
-			err = _tuple[1];
-			if (!($interfaceIsEqual(err, $ifaceNil))) {
-				console.log("Logger: Error adding log entry, provided event couldn't be converted to log event");
-				return;
+		$go((function $b() {
+			var _r$2, _tuple, err, jsEv, logEv, x, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _tuple = $f._tuple; err = $f.err; jsEv = $f.jsEv; logEv = $f.logEv; x = $f.x; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			_r$2 = fmt.Println(new sliceType$3([new $String("LOOOOOG ENTRYYYYYYYYYYYYYYYYY")])); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+			_r$2;
+			jsEv = NewJsEventFromNative(ev);
+			console.log("JS from native", jsEv);
+			if ((x = $internalize(jsEv.Object.type, $Int64), (x.$high === 0 && x.$low === 1))) {
+				_tuple = jsEv.toLogEvent();
+				logEv = _tuple[0];
+				err = _tuple[1];
+				if ($interfaceIsEqual(err, $ifaceNil)) {
+					data.Object.logArray.push($externalize(logEv, ptrType$14));
+				} else {
+					console.log("couldn't convert to LogEvent: ", jsEv);
+				}
+			} else {
+				data.Object.eventArray.push($externalize(jsEv, ptrType$10));
 			}
-			data.Object.logArray.push($externalize(logEv, ptrType$14));
 			while (true) {
 				if (!($parseInt(data.Object.logArray.length) > ($parseInt(data.Object.maxEntries) >> 0))) { break; }
 				data.Object.logArray.shift();
 			}
+			while (true) {
+				if (!($parseInt(data.Object.eventArray.length) > ($parseInt(data.Object.maxEntries) >> 0))) { break; }
+				data.Object.eventArray.shift();
+			}
+			$s = -1; return;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$2 = _r$2; $f._tuple = _tuple; $f.err = err; $f.jsEv = jsEv; $f.logEv = logEv; $f.x = x; $f.$s = $s; $f.$r = $r; return $f;
 		}), []);
 	};
 	jsLoggerData.prototype.AddEntry = function(ev) { return this.$val.AddEntry(ev); };
@@ -53459,6 +53384,7 @@ $packages["."] = (function() {
 			var _r$4, _tuple$2, err$1, event, $s, $deferred, $r;
 			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$4 = $f._r$4; _tuple$2 = $f._tuple$2; err$1 = $f.err$1; event = $f.event; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
 			$deferred.push([cancel[0], []]);
+			console.log("EVENTLISTENING ENTERING LOOP");
 			/* while (true) { */ case 1:
 				_r$4 = evStream[0].Recv(); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
 				_tuple$2 = _r$4;
@@ -53471,7 +53397,9 @@ $packages["."] = (function() {
 					$s = -1; return;
 				}
 				data[0].AddEntry(event);
+				console.log(event);
 			/* } */ $s = 1; continue; case 2:
+			console.log("EVENTLISTENING ABORTED");
 			$s = -1; return;
 			/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: $b }; } $f._r$4 = _r$4; $f._tuple$2 = _tuple$2; $f.err$1 = err$1; $f.event = event; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
 		}; })(cancel, data, evStream), []);
@@ -53488,15 +53416,6 @@ $packages["."] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: jsLoggerData.ptr.prototype.StopListening }; } $f.data = data; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	jsLoggerData.prototype.StopListening = function() { return this.$val.StopListening(); };
-	NewLogger = function(maxEntries) {
-		var loggerVmData, maxEntries;
-		loggerVmData = new jsLoggerData.ptr(new ($global.Object)(), null, $throwNilPointerError, ptrType$17.nil, 0);
-		loggerVmData.Mutex = new sync.Mutex.ptr(0, 0);
-		loggerVmData.Object.logArray = new ($global.Array)();
-		loggerVmData.Object.maxEntries = maxEntries;
-		return loggerVmData;
-	};
-	$pkg.NewLogger = NewLogger;
 	GetBaseURL = function() {
 		var document$1, location, port, url;
 		document$1 = $global.window.document;
@@ -53514,16 +53433,17 @@ $packages["."] = (function() {
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; vm = $f.vm; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		console.log(GetBaseURL());
 		$r = InitGlobalState(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompEthernetAddresses2(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompToggleSwitch(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompUSBSettings(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompTab(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompTabs(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompCodeEditor(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompHIDScript(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompLogger(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = InitCompState(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_r$2 = hvue.NewVM(new sliceType$7([hvue.El("#app"), hvue.DataFunc((function(vm) {
+		$r = InitCompModal(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompEthernetAddresses2(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompToggleSwitch(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompUSBSettings(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompTab(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompTabs(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompCodeEditor(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompHIDScript(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompLogger(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = InitCompState(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		_r$2 = hvue.NewVM(new sliceType$6([hvue.El("#app"), hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$2.ptr(O(), "");
 			data.Object.testString = $externalize("type('hello');", $String);
@@ -53534,98 +53454,172 @@ $packages["."] = (function() {
 		})), hvue.Computed("state", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.$store.state);
-		})), hvue.Store()])); /* */ $s = 11; case 11: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		})), hvue.Store()])); /* */ $s = 12; case 12: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		vm = _r$2;
-		$global.vm = $externalize(vm, ptrType$9);
+		$global.vm = $externalize(vm, ptrType$4);
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: main }; } $f._r$2 = _r$2; $f.vm = vm; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	Rpc.ptr.prototype.StartListenEvents = function(evtType) {
-		var _r$2, _r$3, _tuple, _tuple$1, cancel, cancel$1, ctx, err, evStream, evtType, rpc, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; cancel = $f.cancel; cancel$1 = $f.cancel$1; ctx = $f.ctx; err = $f.err; evStream = $f.evStream; evtType = $f.evtType; rpc = $f.rpc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		cancel = [cancel];
-		ctx = [ctx];
-		evStream = [evStream];
-		rpc = [rpc];
-		err = $ifaceNil;
-		rpc[0] = this;
-		$r = rpc[0].Mutex.Lock(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		/* */ if (rpc[0].eventListeningOn) { $s = 2; continue; }
-		/* */ $s = 3; continue;
-		/* if (rpc[0].eventListeningOn) { */ case 2:
-			$r = rpc[0].Mutex.Unlock(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			err = errors.New("Already listening to events");
-			$s = -1; return err;
-		/* } */ case 3:
-		/* */ if (!(rpc[0].eventListeningCancel === ptrType$18.nil)) { $s = 5; continue; }
-		/* */ $s = 6; continue;
-		/* if (!(rpc[0].eventListeningCancel === ptrType$18.nil)) { */ case 5:
-			cancel$1 = rpc[0].eventListeningCancel.$get();
-			$r = cancel$1(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		/* } */ case 6:
-		_r$2 = context.WithCancel(context.Background()); /* */ $s = 8; case 8: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-		_tuple = _r$2;
-		ctx[0] = _tuple[0];
-		cancel[0] = _tuple[1];
-		rpc[0].eventListeningCtx = (ctx.$ptr || (ctx.$ptr = new ptrType$19(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, ctx)));
-		rpc[0].eventListeningCancel = (cancel.$ptr || (cancel.$ptr = new ptrType$18(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, cancel)));
-		rpc[0].eventListeningOn = true;
-		$r = rpc[0].Mutex.Unlock(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_r$3 = rpc[0].Client.EventListen(ctx[0], new P4wnP1_grpc.EventRequest.ptr(evtType), new sliceType$2([])); /* */ $s = 10; case 10: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-		_tuple$1 = _r$3;
-		evStream[0] = _tuple$1[0];
-		err = _tuple$1[1];
-		if (!($interfaceIsEqual(err, $ifaceNil))) {
-			err = err;
-			$s = -1; return err;
-		}
-		$go((function(cancel, ctx, evStream, rpc) { return function $b() {
-			var _r$4, _tuple$2, err$1, event, $s, $deferred, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$4 = $f._r$4; _tuple$2 = $f._tuple$2; err$1 = $f.err$1; event = $f.event; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
-			$deferred.push([$methodVal(rpc[0], "StopEventListening"), []]);
-			/* while (true) { */ case 1:
-				_r$4 = evStream[0].Recv(); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
-				_tuple$2 = _r$4;
-				event = _tuple$2[0];
-				err$1 = _tuple$2[1];
-				if ($interfaceIsEqual(err$1, io.EOF)) {
-					/* break; */ $s = 2; continue;
-				}
-				if (!($interfaceIsEqual(err$1, $ifaceNil))) {
-					$s = -1; return;
-				}
-				console.log("Event: ", event);
-			/* } */ $s = 1; continue; case 2:
+	createGlobalStateStruct = function() {
+		var state;
+		state = new GlobalState.ptr(O(), "", "", ptrType$5.nil, ptrType$16.nil, false, 0, "");
+		state.Object.title = $externalize("P4wnP1 by MaMe82", $String);
+		state.Object.currentHIDScriptSource = $externalize("layout('us');\t\t\t// US keyboard layout\ntypingSpeed(100,150)\t// Wait 100ms between key strokes + an additional random value between 0ms and 150ms (natural)\n\nwaitLEDRepeat(NUM);\t\t// Wait till NUM LED of target changes frequently multiple times (doesn't work on OSX)\npress(\"GUI r\");\ndelay(500);\ntype(\"notepad\\n\")\ndelay(1000);\nfor (var i = 0; i < 3; i++) {\n  type(\"Hello from P4wnP1 run \" + i + \" !\\n\");\n  type(\"Moving mouse right ...\");\n  moveStepped(500,0);\n  type(\"and left\\n\");\n  moveStepped(-500,0);\n}\ntype(\"Let's type fast !!!!!!!!!!!!!!!\\n\")\ntypingSpeed(0,0);\nfor (var i = 3; i < 10; i++) {\n  type(\"Hello from P4wnP1 run \" + i + \" !\\n\");\n  type(\"Moving mouse right ...\");\n  moveStepped(500,0);\n  type(\"and left\\n\");\n  moveStepped(-500,0);\n}", $String);
+		state.Object.currentGadgetSettings = $externalize(NewUSBGadgetSettings(), ptrType$5);
+		state.Object.eventLog = $externalize(NewLogger(500), ptrType$16);
+		state.Object.isModalEnabled = $externalize(true, $Bool);
+		state.Object.count = 1337;
+		state.Object.text = $externalize("Hi there says MaMe82", $String);
+		return state;
+	};
+	actionUpdateGadgetSettingsFromDeployed = function(store, context$1, state) {
+		var context$1, state, store;
+		$go((function $b() {
+			var _r$2, _tuple, dGS, err, jsGS, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _tuple = $f._tuple; dGS = $f.dGS; err = $f.err; jsGS = $f.jsGS; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			_r$2 = RpcGetDeployedGadgetSettings(new time.Duration(0, 3000000000)); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+			_tuple = _r$2;
+			dGS = _tuple[0];
+			err = _tuple[1];
+			if (!($interfaceIsEqual(err, $ifaceNil))) {
+				console.log("Couldn't retrieve deployed gadget settings");
+				$s = -1; return;
+			}
+			jsGS = new jsGadgetSettings.ptr(O(), false, "", "", "", "", "", false, false, false, false, false, false, false, ptrType$9.nil, ptrType$9.nil, ptrType$8.nil);
+			jsGS.fromGS(dGS);
+			context$1.Object.commit($externalize("setCurrentGadgetSettings", $String), $externalize(jsGS, ptrType$5));
 			$s = -1; return;
-			/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: $b }; } $f._r$4 = _r$4; $f._tuple$2 = _tuple$2; $f.err$1 = err$1; $f.event = event; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
-		}; })(cancel, ctx, evStream, rpc), []);
-		err = $ifaceNil;
-		$s = -1; return err;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: Rpc.ptr.prototype.StartListenEvents }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.cancel = cancel; $f.cancel$1 = cancel$1; $f.ctx = ctx; $f.err = err; $f.evStream = evStream; $f.evtType = evtType; $f.rpc = rpc; $f.$s = $s; $f.$r = $r; return $f;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$2 = _r$2; $f._tuple = _tuple; $f.dGS = dGS; $f.err = err; $f.jsGS = jsGS; $f.$s = $s; $f.$r = $r; return $f;
+		}), []);
+		return;
 	};
-	Rpc.prototype.StartListenEvents = function(evtType) { return this.$val.StartListenEvents(evtType); };
-	Rpc.ptr.prototype.StopEventListening = function() {
-		var rpc, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; rpc = $f.rpc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		rpc = this;
-		$r = rpc.Mutex.Lock(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		/* */ if (!(rpc.eventListeningCancel === ptrType$18.nil)) { $s = 2; continue; }
-		/* */ $s = 3; continue;
-		/* if (!(rpc.eventListeningCancel === ptrType$18.nil)) { */ case 2:
-			$r = rpc.eventListeningCancel.$get()(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		/* } */ case 3:
-		rpc.eventListeningCancel = ptrType$18.nil;
-		rpc.eventListeningCtx = ptrType$19.nil;
-		rpc.eventListeningOn = false;
-		$r = rpc.Mutex.Unlock(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+	actionDeployCurrentGadgetSettings = function(store, context$1, state) {
+		var context$1, state, store;
+		$go((function $b() {
+			var _r$2, _r$3, _r$4, _r$5, _tuple, curGS, err, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _tuple = $f._tuple; curGS = $f.curGS; err = $f.err; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			curGS = $clone($internalize(state.Object.currentGadgetSettings, ptrType$5), jsGadgetSettings).toGS();
+			_r$2 = RpcSetRemoteGadgetSettings(curGS, new time.Duration(0, 1000000000)); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+			err = _r$2;
+			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 2; continue; }
+			/* */ $s = 3; continue;
+			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 2:
+				_r$3 = err.Error(); /* */ $s = 4; case 4: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+				$r = Alert(new $String(_r$3)); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				$s = -1; return;
+			/* } */ case 3:
+			_r$4 = RpcDeployRemoteGadgetSettings(new time.Duration(2, 1410065408)); /* */ $s = 6; case 6: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+			_tuple = _r$4;
+			err = _tuple[1];
+			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 7; continue; }
+			/* */ $s = 8; continue;
+			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 7:
+				_r$5 = err.Error(); /* */ $s = 9; case 9: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+				$r = Alert(new $String(_r$5)); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				$s = -1; return;
+			/* } */ case 8:
+			Alert(new $String("GadgetSettings deployed successfully"));
+			$s = -1; return;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._tuple = _tuple; $f.curGS = curGS; $f.err = err; $f.$s = $s; $f.$r = $r; return $f;
+		}), []);
+		return;
+	};
+	initMVuex = function() {
+		var _arg, _arg$1, _arg$10, _arg$11, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9, _r$10, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, state, store, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$10 = $f._arg$10; _arg$11 = $f._arg$11; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _arg$4 = $f._arg$4; _arg$5 = $f._arg$5; _arg$6 = $f._arg$6; _arg$7 = $f._arg$7; _arg$8 = $f._arg$8; _arg$9 = $f._arg$9; _r$10 = $f._r$10; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; state = $f.state; store = $f.store; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		state = $clone(createGlobalStateStruct(), GlobalState);
+		_r$2 = mvuex.State(new state.constructor.elem(state)); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_arg = _r$2;
+		_r$3 = mvuex.Action("actiontest", new funcType$4((function(store, context$1, state$1) {
+			var context$1, state$1, store;
+			$go((function $b() {
+				var i, $s, $r;
+				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; i = $f.i; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+				i = 0;
+				/* while (true) { */ case 1:
+					/* if (!(i < 10)) { break; } */ if(!(i < 10)) { $s = 2; continue; }
+					console.log($parseInt(state$1.Object.count) >> 0);
+					$r = time.Sleep(new time.Duration(0, 1000000000)); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					context$1.Object.commit($externalize("increment", $String), 5);
+					i = i + (1) >> 0;
+				/* } */ $s = 1; continue; case 2:
+				$s = -1; return;
+				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.i = i; $f.$s = $s; $f.$r = $r; return $f;
+			}), []);
+		}))); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		_arg$1 = _r$3;
+		_r$4 = mvuex.Mutation("setModalEnabled", new funcType$5((function(store, state$1, enabled) {
+			var enabled, state$1, store;
+			state$1.Object.isModalEnabled = $externalize(enabled, $Bool);
+			return;
+		}))); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+		_arg$2 = _r$4;
+		_r$5 = mvuex.Mutation("increment", new funcType$6((function(store, state$1, add) {
+			var add, state$1, store;
+			state$1.Object.count = ($parseInt(state$1.Object.count) >> 0) + (add) >> 0;
+			return;
+		}))); /* */ $s = 4; case 4: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+		_arg$3 = _r$5;
+		_r$6 = mvuex.Mutation("decrement", new funcType$7((function(store, state$1) {
+			var state$1, store;
+			state$1.Object.count = ($parseInt(state$1.Object.count) >> 0) - (1) >> 0;
+			return;
+		}))); /* */ $s = 5; case 5: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
+		_arg$4 = _r$6;
+		_r$7 = mvuex.Mutation("setText", new funcType$8((function(store, state$1, newText) {
+			var newText, state$1, store;
+			state$1.Object.text = $externalize(newText, $String);
+			return;
+		}))); /* */ $s = 6; case 6: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
+		_arg$5 = _r$7;
+		_r$8 = mvuex.Mutation("setCurrentHIDScriptSource", new funcType$8((function(store, state$1, newText) {
+			var newText, state$1, store;
+			state$1.Object.currentHIDScriptSource = $externalize(newText, $String);
+			return;
+		}))); /* */ $s = 7; case 7: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
+		_arg$6 = _r$8;
+		_r$9 = mvuex.Mutation("setCurrentGadgetSettings", new funcType$9((function(store, state$1, settings) {
+			var settings, state$1, store;
+			state$1.Object.currentGadgetSettings = $externalize(settings, ptrType$5);
+			return;
+		}))); /* */ $s = 8; case 8: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
+		_arg$7 = _r$9;
+		_arg$8 = mvuex.Mutation("startLogListening", new funcType$7((function $b(store, state$1) {
+			var state$1, store, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; state$1 = $f.state$1; store = $f.store; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			$r = $internalize(state$1.Object.eventLog, ptrType$16).StartListening(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			$s = -1; return;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.state$1 = state$1; $f.store = store; $f.$s = $s; $f.$r = $r; return $f;
+		})));
+		_arg$9 = mvuex.Mutation("stopLogListening", new funcType$7((function $b(store, state$1) {
+			var state$1, store, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; state$1 = $f.state$1; store = $f.store; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			$r = $internalize(state$1.Object.eventLog, ptrType$16).StopListening(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			$s = -1; return;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.state$1 = state$1; $f.store = store; $f.$s = $s; $f.$r = $r; return $f;
+		})));
+		_arg$10 = mvuex.Action("updateCurrentGadgetSettingsFromDeployed", new funcType$4(actionUpdateGadgetSettingsFromDeployed));
+		_arg$11 = mvuex.Action("deployCurrentGadgetSettings", new funcType$4(actionDeployCurrentGadgetSettings));
+		_r$10 = mvuex.NewStore(new sliceType$9([_arg, _arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9, _arg$10, _arg$11])); /* */ $s = 9; case 9: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
+		store = _r$10;
+		store.Object.dispatch($externalize("updateCurrentGadgetSettingsFromDeployed", $String));
+		$global.store = $externalize(store, ptrType$17);
+		$r = $internalize(state.Object.eventLog, ptrType$16).StartListening(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: Rpc.ptr.prototype.StopEventListening }; } $f.rpc = rpc; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: initMVuex }; } $f._arg = _arg; $f._arg$1 = _arg$1; $f._arg$10 = _arg$10; $f._arg$11 = _arg$11; $f._arg$2 = _arg$2; $f._arg$3 = _arg$3; $f._arg$4 = _arg$4; $f._arg$5 = _arg$5; $f._arg$6 = _arg$6; $f._arg$7 = _arg$7; $f._arg$8 = _arg$8; $f._arg$9 = _arg$9; $f._r$10 = _r$10; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f.state = state; $f.store = store; $f.$s = $s; $f.$r = $r; return $f;
 	};
-	Rpc.prototype.StopEventListening = function() { return this.$val.StopEventListening(); };
+	InitGlobalState = function() {
+		var $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = initMVuex(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: InitGlobalState }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.InitGlobalState = InitGlobalState;
 	NewRpcClient = function(addr) {
 		var _r$2, addr, cl, rcl, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; addr = $f.addr; cl = $f.cl; rcl = $f.rcl; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		rcl = new Rpc.ptr(ptrType$17.nil, $ifaceNil, false, ptrType$19.nil, ptrType$18.nil);
+		rcl = new Rpc.ptr(ptrType$15.nil, $ifaceNil, false, ptrType$20.nil, ptrType$21.nil);
 		rcl.Mutex = new sync.Mutex.ptr(0, 0);
 		_r$2 = P4wnP1_grpc.NewP4WNP1Client(addr, new sliceType$1([grpcweb.WithDefaultCallOptions(new sliceType$2([grpcweb.ForceWebsocketTransport()]))])); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
 		cl = _r$2;
@@ -53634,28 +53628,79 @@ $packages["."] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: NewRpcClient }; } $f._r$2 = _r$2; $f.addr = addr; $f.cl = cl; $f.rcl = rcl; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.NewRpcClient = NewRpcClient;
-	ptrType$20.methods = [{prop: "SendAndRun", name: "SendAndRun", pkg: "", typ: $funcType([ptrType$9], [], false)}];
-	ptrType$21.methods = [{prop: "UpdateSelectedTab", name: "UpdateSelectedTab", pkg: "", typ: $funcType([ptrType$9, $Int], [], false)}];
-	ptrType$22.methods = [{prop: "UpdateFromDeployedGadgetSettings", name: "UpdateFromDeployedGadgetSettings", pkg: "", typ: $funcType([ptrType$9], [], false)}, {prop: "ApplyGadgetSettings", name: "ApplyGadgetSettings", pkg: "", typ: $funcType([ptrType$9], [], false)}];
+	RpcGetDeployedGadgetSettings = function(timeout) {
+		var _r$2, _r$3, _tuple, cancel, ctx, timeout, $s, $deferred, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _tuple = $f._tuple; cancel = $f.cancel; ctx = $f.ctx; timeout = $f.timeout; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		console.log("RpcGetDeployedGadgetSettings called");
+		_r$2 = context.WithTimeout(context.Background(), timeout); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_tuple = _r$2;
+		ctx = _tuple[0];
+		cancel = _tuple[1];
+		$deferred.push([cancel, []]);
+		_r$3 = $pkg.Client.Client.GetDeployedGadgetSetting(ctx, new P4wnP1_grpc.Empty.ptr(), new sliceType$2([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		$s = -1; return _r$3;
+		/* */ } return; } } catch(err) { $err = err; $s = -1; return [ptrType.nil, $ifaceNil]; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: RpcGetDeployedGadgetSettings }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._tuple = _tuple; $f.cancel = cancel; $f.ctx = ctx; $f.timeout = timeout; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+	};
+	$pkg.RpcGetDeployedGadgetSettings = RpcGetDeployedGadgetSettings;
+	RpcSetRemoteGadgetSettings = function(targetGS, timeout) {
+		var _r$2, _r$3, _tuple, _tuple$1, cancel, ctx, err, targetGS, timeout, $s, $deferred, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; cancel = $f.cancel; ctx = $f.ctx; err = $f.err; targetGS = $f.targetGS; timeout = $f.timeout; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		err = $ifaceNil;
+		console.log("RpcSetRemoteGadgetSettings called");
+		_r$2 = context.WithTimeout(context.Background(), timeout); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_tuple = _r$2;
+		ctx = _tuple[0];
+		cancel = _tuple[1];
+		$deferred.push([cancel, []]);
+		_r$3 = $pkg.Client.Client.SetGadgetSettings(ctx, targetGS, new sliceType$2([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		_tuple$1 = _r$3;
+		err = _tuple$1[1];
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			err = err;
+			$s = -1; return err;
+		}
+		err = $ifaceNil;
+		$s = -1; return err;
+		/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if (!$curGoroutine.asleep) { return  err; } if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: RpcSetRemoteGadgetSettings }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.cancel = cancel; $f.ctx = ctx; $f.err = err; $f.targetGS = targetGS; $f.timeout = timeout; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+	};
+	$pkg.RpcSetRemoteGadgetSettings = RpcSetRemoteGadgetSettings;
+	RpcDeployRemoteGadgetSettings = function(timeout) {
+		var _r$2, _r$3, _tuple, cancel, ctx, timeout, $s, $deferred, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _tuple = $f._tuple; cancel = $f.cancel; ctx = $f.ctx; timeout = $f.timeout; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		console.log("RpcDeployRemoteGadgetSettings called");
+		_r$2 = context.WithTimeout(context.Background(), timeout); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_tuple = _r$2;
+		ctx = _tuple[0];
+		cancel = _tuple[1];
+		$deferred.push([cancel, []]);
+		_r$3 = $pkg.Client.Client.DeployGadgetSetting(ctx, new P4wnP1_grpc.Empty.ptr(), new sliceType$2([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		$s = -1; return _r$3;
+		/* */ } return; } } catch(err) { $err = err; $s = -1; return [ptrType.nil, $ifaceNil]; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: RpcDeployRemoteGadgetSettings }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._tuple = _tuple; $f.cancel = cancel; $f.ctx = ctx; $f.timeout = timeout; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+	};
+	$pkg.RpcDeployRemoteGadgetSettings = RpcDeployRemoteGadgetSettings;
+	ptrType$22.methods = [{prop: "SendAndRun", name: "SendAndRun", pkg: "", typ: $funcType([ptrType$4], [], false)}];
+	ptrType$23.methods = [{prop: "UpdateSelectedTab", name: "UpdateSelectedTab", pkg: "", typ: $funcType([ptrType$4, $Int], [], false)}];
+	ptrType$24.methods = [{prop: "UpdateFromDeployedGadgetSettings", name: "UpdateFromDeployedGadgetSettings", pkg: "", typ: $funcType([ptrType$4], [], false)}, {prop: "ApplyGadgetSettings", name: "ApplyGadgetSettings", pkg: "", typ: $funcType([ptrType$4], [], false)}];
 	jsGadgetSettings.methods = [{prop: "toGS", name: "toGS", pkg: ".", typ: $funcType([], [ptrType], false)}];
-	ptrType$2.methods = [{prop: "fromGS", name: "fromGS", pkg: ".", typ: $funcType([ptrType], [], false)}];
-	ptrType$3.methods = [{prop: "AddEntry", name: "AddEntry", pkg: "", typ: $funcType([ptrType$23], [], false)}, {prop: "StartListening", name: "StartListening", pkg: "", typ: $funcType([], [], false)}, {prop: "StopListening", name: "StopListening", pkg: "", typ: $funcType([], [], false)}];
-	ptrType$24.methods = [{prop: "StartListenEvents", name: "StartListenEvents", pkg: "", typ: $funcType([$Int64], [$error], false)}, {prop: "StopEventListening", name: "StopEventListening", pkg: "", typ: $funcType([], [], false)}];
-	GlobalState.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "Title", name: "Title", anonymous: false, exported: true, typ: $String, tag: "js:\"title\""}, {prop: "CurrentHIDScriptSource", name: "CurrentHIDScriptSource", anonymous: false, exported: true, typ: $String, tag: "js:\"currentHIDScriptSource\""}, {prop: "CurrentGadgetSettings", name: "CurrentGadgetSettings", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"currentGadgetSettings\""}, {prop: "EventLog", name: "EventLog", anonymous: false, exported: true, typ: ptrType$3, tag: "js:\"eventLog\""}, {prop: "Counter", name: "Counter", anonymous: false, exported: true, typ: $Int, tag: "js:\"count\""}, {prop: "Text", name: "Text", anonymous: false, exported: true, typ: $String, tag: "js:\"text\""}]);
-	CodeMirrorOptionsType.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "Mode", name: "Mode", anonymous: false, exported: true, typ: $emptyInterface, tag: "js:\"mode\""}, {prop: "LineNumbers", name: "LineNumbers", anonymous: false, exported: true, typ: $Bool, tag: "js:\"lineNumbers\""}, {prop: "LineWrapping", name: "LineWrapping", anonymous: false, exported: true, typ: $Bool, tag: "js:\"lineWrapping\""}, {prop: "AutoCloseBrackets", name: "AutoCloseBrackets", anonymous: false, exported: true, typ: $Bool, tag: "js:\"autoCloseBrackets\""}, {prop: "ExtraKeys", name: "ExtraKeys", anonymous: false, exported: true, typ: $emptyInterface, tag: "js:\"extraKeys\""}]);
-	CompCodeEditorData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "ScriptContent", name: "ScriptContent", anonymous: false, exported: true, typ: $String, tag: "js:\"scriptContent\""}, {prop: "CodeMirrorOptions", name: "CodeMirrorOptions", anonymous: false, exported: true, typ: ptrType$7, tag: "js:\"codemirrorOptions\""}]);
-	CompEthernetAddressesData2.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}]);
-	CompHIDScriptData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}]);
-	CompTabData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "Id", name: "Id", anonymous: false, exported: true, typ: $Int, tag: "js:\"id\""}, {prop: "IsActive", name: "IsActive", anonymous: false, exported: true, typ: $Bool, tag: "js:\"isActive\""}]);
-	CompTabsData.init(".", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "headers", name: "headers", anonymous: false, exported: false, typ: sliceType$8, tag: "js:\"headers\""}, {prop: "tabs", name: "tabs", anonymous: false, exported: false, typ: sliceType$9, tag: "js:\"tabs\""}]);
-	CompToggleSwitchData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}]);
-	CompUSBSettingsData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "GadgetSettings", name: "GadgetSettings", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"gadgetSettings\""}, {prop: "DeployPending", name: "DeployPending", anonymous: false, exported: true, typ: $Bool, tag: "js:\"deployPending\""}, {prop: "CdcEcmDetails", name: "CdcEcmDetails", anonymous: false, exported: true, typ: $Bool, tag: "js:\"cdcEcmDetails\""}, {prop: "RndisDetails", name: "RndisDetails", anonymous: false, exported: true, typ: $Bool, tag: "js:\"rndisDetails\""}]);
-	jsGadgetSettings.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "Enabled", name: "Enabled", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Enabled\""}, {prop: "Vid", name: "Vid", anonymous: false, exported: true, typ: $String, tag: "js:\"Vid\""}, {prop: "Pid", name: "Pid", anonymous: false, exported: true, typ: $String, tag: "js:\"Pid\""}, {prop: "Manufacturer", name: "Manufacturer", anonymous: false, exported: true, typ: $String, tag: "js:\"Manufacturer\""}, {prop: "Product", name: "Product", anonymous: false, exported: true, typ: $String, tag: "js:\"Product\""}, {prop: "Serial", name: "Serial", anonymous: false, exported: true, typ: $String, tag: "js:\"Serial\""}, {prop: "Use_CDC_ECM", name: "Use_CDC_ECM", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_CDC_ECM\""}, {prop: "Use_RNDIS", name: "Use_RNDIS", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_RNDIS\""}, {prop: "Use_HID_KEYBOARD", name: "Use_HID_KEYBOARD", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_KEYBOARD\""}, {prop: "Use_HID_MOUSE", name: "Use_HID_MOUSE", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_MOUSE\""}, {prop: "Use_HID_RAW", name: "Use_HID_RAW", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_RAW\""}, {prop: "Use_UMS", name: "Use_UMS", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_UMS\""}, {prop: "Use_SERIAL", name: "Use_SERIAL", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_SERIAL\""}, {prop: "RndisSettings", name: "RndisSettings", anonymous: false, exported: true, typ: ptrType$10, tag: "js:\"RndisSettings\""}, {prop: "CdcEcmSettings", name: "CdcEcmSettings", anonymous: false, exported: true, typ: ptrType$10, tag: "js:\"CdcEcmSettings\""}, {prop: "UmsSettings", name: "UmsSettings", anonymous: false, exported: true, typ: ptrType$11, tag: "js:\"UmsSettings\""}]);
-	VGadgetSettingsEthernet.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "HostAddr", name: "HostAddr", anonymous: false, exported: true, typ: $String, tag: "js:\"HostAddr\""}, {prop: "DevAddr", name: "DevAddr", anonymous: false, exported: true, typ: $String, tag: "js:\"DevAddr\""}]);
-	VGadgetSettingsUMS.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "Cdrom", name: "Cdrom", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Cdrom\""}, {prop: "File", name: "File", anonymous: false, exported: true, typ: $String, tag: "js:\"File\""}]);
-	jsEventLog.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "EvLogSource", name: "EvLogSource", anonymous: false, exported: true, typ: $String, tag: "js:\"source\""}, {prop: "EvLogLevel", name: "EvLogLevel", anonymous: false, exported: true, typ: $Int, tag: "js:\"level\""}, {prop: "EvLogMessage", name: "EvLogMessage", anonymous: false, exported: true, typ: $String, tag: "js:\"message\""}, {prop: "EvLogTime", name: "EvLogTime", anonymous: false, exported: true, typ: $String, tag: "js:\"time\""}]);
-	jsLoggerData.init(".", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$8, tag: ""}, {prop: "LogArray", name: "LogArray", anonymous: false, exported: true, typ: ptrType$8, tag: "js:\"logArray\""}, {prop: "cancel", name: "cancel", anonymous: false, exported: false, typ: context.CancelFunc, tag: ""}, {prop: "Mutex", name: "Mutex", anonymous: true, exported: true, typ: ptrType$17, tag: ""}, {prop: "MaxEntries", name: "MaxEntries", anonymous: false, exported: true, typ: $Int, tag: "js:\"maxEntries\""}]);
-	Rpc.init(".", [{prop: "Mutex", name: "Mutex", anonymous: true, exported: true, typ: ptrType$17, tag: ""}, {prop: "Client", name: "Client", anonymous: false, exported: true, typ: P4wnP1_grpc.P4WNP1Client, tag: ""}, {prop: "eventListeningOn", name: "eventListeningOn", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "eventListeningCtx", name: "eventListeningCtx", anonymous: false, exported: false, typ: ptrType$19, tag: ""}, {prop: "eventListeningCancel", name: "eventListeningCancel", anonymous: false, exported: false, typ: ptrType$18, tag: ""}]);
+	ptrType$5.methods = [{prop: "fromGS", name: "fromGS", pkg: ".", typ: $funcType([ptrType], [], false)}];
+	ptrType$10.methods = [{prop: "toLogEvent", name: "toLogEvent", pkg: ".", typ: $funcType([], [ptrType$14, $error], false)}];
+	ptrType$16.methods = [{prop: "AddEntry", name: "AddEntry", pkg: "", typ: $funcType([ptrType$25], [], false)}, {prop: "StartListening", name: "StartListening", pkg: "", typ: $funcType([], [], false)}, {prop: "StopListening", name: "StopListening", pkg: "", typ: $funcType([], [], false)}];
+	CodeMirrorOptionsType.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Mode", name: "Mode", anonymous: false, exported: true, typ: $emptyInterface, tag: "js:\"mode\""}, {prop: "LineNumbers", name: "LineNumbers", anonymous: false, exported: true, typ: $Bool, tag: "js:\"lineNumbers\""}, {prop: "LineWrapping", name: "LineWrapping", anonymous: false, exported: true, typ: $Bool, tag: "js:\"lineWrapping\""}, {prop: "AutoCloseBrackets", name: "AutoCloseBrackets", anonymous: false, exported: true, typ: $Bool, tag: "js:\"autoCloseBrackets\""}, {prop: "ExtraKeys", name: "ExtraKeys", anonymous: false, exported: true, typ: $emptyInterface, tag: "js:\"extraKeys\""}]);
+	CompCodeEditorData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "ScriptContent", name: "ScriptContent", anonymous: false, exported: true, typ: $String, tag: "js:\"scriptContent\""}, {prop: "CodeMirrorOptions", name: "CodeMirrorOptions", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"codemirrorOptions\""}]);
+	CompEthernetAddressesData2.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}]);
+	CompHIDScriptData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}]);
+	CompTabData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Id", name: "Id", anonymous: false, exported: true, typ: $Int, tag: "js:\"id\""}, {prop: "IsActive", name: "IsActive", anonymous: false, exported: true, typ: $Bool, tag: "js:\"isActive\""}]);
+	CompTabsData.init(".", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "headers", name: "headers", anonymous: false, exported: false, typ: sliceType$7, tag: "js:\"headers\""}, {prop: "tabs", name: "tabs", anonymous: false, exported: false, typ: sliceType$8, tag: "js:\"tabs\""}]);
+	CompToggleSwitchData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}]);
+	CompUSBSettingsData.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "GadgetSettings", name: "GadgetSettings", anonymous: false, exported: true, typ: ptrType$5, tag: "js:\"gadgetSettings\""}, {prop: "DeployPending", name: "DeployPending", anonymous: false, exported: true, typ: $Bool, tag: "js:\"deployPending\""}, {prop: "CdcEcmDetails", name: "CdcEcmDetails", anonymous: false, exported: true, typ: $Bool, tag: "js:\"cdcEcmDetails\""}, {prop: "RndisDetails", name: "RndisDetails", anonymous: false, exported: true, typ: $Bool, tag: "js:\"rndisDetails\""}]);
+	jsGadgetSettings.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Enabled", name: "Enabled", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Enabled\""}, {prop: "Vid", name: "Vid", anonymous: false, exported: true, typ: $String, tag: "js:\"Vid\""}, {prop: "Pid", name: "Pid", anonymous: false, exported: true, typ: $String, tag: "js:\"Pid\""}, {prop: "Manufacturer", name: "Manufacturer", anonymous: false, exported: true, typ: $String, tag: "js:\"Manufacturer\""}, {prop: "Product", name: "Product", anonymous: false, exported: true, typ: $String, tag: "js:\"Product\""}, {prop: "Serial", name: "Serial", anonymous: false, exported: true, typ: $String, tag: "js:\"Serial\""}, {prop: "Use_CDC_ECM", name: "Use_CDC_ECM", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_CDC_ECM\""}, {prop: "Use_RNDIS", name: "Use_RNDIS", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_RNDIS\""}, {prop: "Use_HID_KEYBOARD", name: "Use_HID_KEYBOARD", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_KEYBOARD\""}, {prop: "Use_HID_MOUSE", name: "Use_HID_MOUSE", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_MOUSE\""}, {prop: "Use_HID_RAW", name: "Use_HID_RAW", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_HID_RAW\""}, {prop: "Use_UMS", name: "Use_UMS", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_UMS\""}, {prop: "Use_SERIAL", name: "Use_SERIAL", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Use_SERIAL\""}, {prop: "RndisSettings", name: "RndisSettings", anonymous: false, exported: true, typ: ptrType$9, tag: "js:\"RndisSettings\""}, {prop: "CdcEcmSettings", name: "CdcEcmSettings", anonymous: false, exported: true, typ: ptrType$9, tag: "js:\"CdcEcmSettings\""}, {prop: "UmsSettings", name: "UmsSettings", anonymous: false, exported: true, typ: ptrType$8, tag: "js:\"UmsSettings\""}]);
+	VGadgetSettingsEthernet.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "HostAddr", name: "HostAddr", anonymous: false, exported: true, typ: $String, tag: "js:\"HostAddr\""}, {prop: "DevAddr", name: "DevAddr", anonymous: false, exported: true, typ: $String, tag: "js:\"DevAddr\""}]);
+	VGadgetSettingsUMS.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Cdrom", name: "Cdrom", anonymous: false, exported: true, typ: $Bool, tag: "js:\"Cdrom\""}, {prop: "File", name: "File", anonymous: false, exported: true, typ: $String, tag: "js:\"File\""}]);
+	jsEvent.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Type", name: "Type", anonymous: false, exported: true, typ: $Int64, tag: "js:\"type\""}, {prop: "Values", name: "Values", anonymous: false, exported: true, typ: sliceType$3, tag: ""}, {prop: "JSValues", name: "JSValues", anonymous: false, exported: true, typ: ptrType$3, tag: "js:\"values\""}]);
+	jsLogEvent.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "EvLogSource", name: "EvLogSource", anonymous: false, exported: true, typ: $String, tag: "js:\"source\""}, {prop: "EvLogLevel", name: "EvLogLevel", anonymous: false, exported: true, typ: $Int, tag: "js:\"level\""}, {prop: "EvLogMessage", name: "EvLogMessage", anonymous: false, exported: true, typ: $String, tag: "js:\"message\""}, {prop: "EvLogTime", name: "EvLogTime", anonymous: false, exported: true, typ: $String, tag: "js:\"time\""}]);
+	jsLoggerData.init(".", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "LogArray", name: "LogArray", anonymous: false, exported: true, typ: ptrType$3, tag: "js:\"logArray\""}, {prop: "EventArray", name: "EventArray", anonymous: false, exported: true, typ: ptrType$3, tag: "js:\"eventArray\""}, {prop: "cancel", name: "cancel", anonymous: false, exported: false, typ: context.CancelFunc, tag: ""}, {prop: "Mutex", name: "Mutex", anonymous: true, exported: true, typ: ptrType$15, tag: ""}, {prop: "MaxEntries", name: "MaxEntries", anonymous: false, exported: true, typ: $Int, tag: "js:\"maxEntries\""}]);
+	GlobalState.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Title", name: "Title", anonymous: false, exported: true, typ: $String, tag: "js:\"title\""}, {prop: "CurrentHIDScriptSource", name: "CurrentHIDScriptSource", anonymous: false, exported: true, typ: $String, tag: "js:\"currentHIDScriptSource\""}, {prop: "CurrentGadgetSettings", name: "CurrentGadgetSettings", anonymous: false, exported: true, typ: ptrType$5, tag: "js:\"currentGadgetSettings\""}, {prop: "EventLog", name: "EventLog", anonymous: false, exported: true, typ: ptrType$16, tag: "js:\"eventLog\""}, {prop: "IsModalEnabled", name: "IsModalEnabled", anonymous: false, exported: true, typ: $Bool, tag: "js:\"isModalEnabled\""}, {prop: "Counter", name: "Counter", anonymous: false, exported: true, typ: $Int, tag: "js:\"count\""}, {prop: "Text", name: "Text", anonymous: false, exported: true, typ: $String, tag: "js:\"text\""}]);
+	Rpc.init(".", [{prop: "Mutex", name: "Mutex", anonymous: true, exported: true, typ: ptrType$15, tag: ""}, {prop: "Client", name: "Client", anonymous: false, exported: true, typ: P4wnP1_grpc.P4WNP1Client, tag: ""}, {prop: "eventListeningOn", name: "eventListeningOn", anonymous: false, exported: false, typ: $Bool, tag: ""}, {prop: "eventListeningCtx", name: "eventListeningCtx", anonymous: false, exported: false, typ: ptrType$20, tag: ""}, {prop: "eventListeningCancel", name: "eventListeningCancel", anonymous: false, exported: false, typ: ptrType$21, tag: ""}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -53666,26 +53711,28 @@ $packages["."] = (function() {
 		$r = md5.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = hex.$init(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = errors.$init(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = js.$init(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = grpcweb.$init(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.$init(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = status.$init(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = dom.$init(); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = io.$init(); /* */ $s = 13; case 13: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = strconv.$init(); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = sync.$init(); /* */ $s = 15; case 15: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = time.$init(); /* */ $s = 16; case 16: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_r = dom.GetWindow().Document(); /* */ $s = 17; case 17: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$r = fmt.$init(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = js.$init(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = grpcweb.$init(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.$init(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = status.$init(); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = dom.$init(); /* */ $s = 13; case 13: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = io.$init(); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = strconv.$init(); /* */ $s = 15; case 15: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = sync.$init(); /* */ $s = 16; case 16: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = time.$init(); /* */ $s = 17; case 17: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		eNoLogEvent = errors.New("No log event");
+		_r = dom.GetWindow().Document(); /* */ $s = 18; case 18: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		document = $assertType(_r, dom.HTMLDocument);
 		serverAddr = GetBaseURL();
-		_r$1 = NewRpcClient(serverAddr + ":80"); /* */ $s = 18; case 18: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		_r$1 = NewRpcClient(serverAddr + ":80"); /* */ $s = 19; case 19: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		$pkg.Client = $clone(_r$1, Rpc);
-		/* */ if ($pkg === $mainPkg) { $s = 19; continue; }
-		/* */ $s = 20; continue;
-		/* if ($pkg === $mainPkg) { */ case 19:
-			$r = main(); /* */ $s = 21; case 21: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* */ if ($pkg === $mainPkg) { $s = 20; continue; }
+		/* */ $s = 21; continue;
+		/* if ($pkg === $mainPkg) { */ case 20:
+			$r = main(); /* */ $s = 22; case 22: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$mainFinished = true;
-		/* } */ case 20:
+		/* } */ case 21:
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
