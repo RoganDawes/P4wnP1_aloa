@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"time"
-	"./mvuex"
+	"github.com/mame82/mvuex"
 )
 
 const (
