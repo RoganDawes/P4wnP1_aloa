@@ -6,6 +6,7 @@ all: compile
 test:
 #	export PATH="$$PATH:/usr/local/go/bin" # put into ~/.profile
 	echo $(CURDIR)
+	echo $(HOME)
 
 # make dep runs without sudo
 dep:
@@ -51,7 +52,8 @@ compile:
 
 	# compile the web app
 	# ToDo: (check if dependencies have been fetched by 'go get', even with the build js tags)
-	gopherjs build -m -o build/webapp.js web_client/*.go
+	$(HOME)/go/bin/gopherjs get github.com/mame82/P4wnP1_go/web_client/...
+	$(HOME)/go/bin/gopherjs build -m -o build/webapp.js web_client/*.go
 
 install:
 	cp build/P4wnP1_service /usr/local/bin/
