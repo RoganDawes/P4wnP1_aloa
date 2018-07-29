@@ -7,9 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"google.golang.org/grpc/status"
-	"github.com/mame82/P4wnP1_go/service"
+	//"github.com/mame82/P4wnP1_go/service"
 	"strings"
 	"strconv"
+	"github.com/mame82/P4wnP1_go/common"
 )
 
 //Empty settings used to store cobra flags
@@ -233,7 +234,7 @@ func createDHCPServerSettings(iface string, ip4 string, mask4 string, disabled b
 		Enabled: !disabled,
 		DhcpServerSettings: &pb.DHCPServerSettings{
 			ListenInterface:iface,
-			LeaseFile: service.NameLeaseFileDHCPSrv(iface),
+			LeaseFile: common.NameLeaseFileDHCPSrv(iface),
 			CallbackScript: "",
 			ListenPort: 0, //Disable DNS
 			DoNotBindInterface: false, //only listen on given interface

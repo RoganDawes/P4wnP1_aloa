@@ -1,14 +1,16 @@
+// +build js
+
 package main
 
 import (
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
-	"honnef.co/go/js/dom"
+//	"honnef.co/go/js/dom"
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/mame82/hvue"
 )
 
 var (
-	document   = dom.GetWindow().Document().(dom.HTMLDocument)
+//	document   = dom.GetWindow().Document().(dom.HTMLDocument)
 	serverAddr = GetBaseURL()
 	Client     = NewRpcClient(serverAddr + ":80")
 	GS *pb.GadgetSettings

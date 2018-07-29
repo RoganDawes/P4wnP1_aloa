@@ -1,14 +1,15 @@
+// +build js
+
 package main
 
 import (
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 	"github.com/gopherjs/gopherjs/js"
 	"errors"
-	"../common"
 	"sync"
 	"context"
 	"io"
-	"fmt"
+	"github.com/mame82/P4wnP1_go/common_web"
 )
 
 var eNoLogEvent = errors.New("No log event")
@@ -175,7 +176,7 @@ type jsLogEvent struct {
 }
 
 func (jsEv *jsEvent) toLogEvent() (res *jsLogEvent, err error) {
-	if jsEv.Type != common.EVT_LOG || len(jsEv.Values) != 4 { return nil,eNoLogEvent}
+	if jsEv.Type != common_web.EVT_LOG || len(jsEv.Values) != 4 { return nil,eNoLogEvent}
 	res = &jsLogEvent{Object:O()}
 
 	var ok bool
@@ -262,12 +263,10 @@ func (data *jsLoggerData) AddEntry(ev *pb.Event ) {
 		defer data.Unlock()
 */
 
-		fmt.Println("LOOOOOG ENTRYYYYYYYYYYYYYYYYY")
-
 		//if LOG event add to logArray
 		jsEv := NewJsEventFromNative(ev)
 		println("JS from native", jsEv)
-		if jsEv.Type == common.EVT_LOG {
+		if jsEv.Type == common_web.EVT_LOG {
 			if logEv,err := jsEv.toLogEvent(); err == nil {
 				data.LogArray.Call("push", logEv)
 			} else {
@@ -307,7 +306,7 @@ func (data *jsLoggerData) StartListening() {
 	ctx,cancel := context.WithCancel(context.Background())
 	data.cancel = cancel
 
-	evStream, err := Client.Client.EventListen(ctx, &pb.EventRequest{ListenType: common.EVT_LOG})
+	evStream, err := Client.Client.EventListen(ctx, &pb.EventRequest{ListenType: common_web.EVT_LOG})
 	if err != nil {
 		cancel()
 		println("Error listening fo Log events", err)

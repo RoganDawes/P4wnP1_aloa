@@ -1,5 +1,6 @@
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
+
 // Modified by Marcus Mengs to include keywords for P4wnP1 HIDScript
 
 (function(mod) {

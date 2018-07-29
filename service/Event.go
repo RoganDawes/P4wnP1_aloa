@@ -3,12 +3,12 @@ package service
 import (
 	"fmt"
 	pb "github.com/mame82/P4wnP1_go/proto"
-	"github.com/mame82/P4wnP1_go/common"
 	"context"
 	"sync"
 	"time"
 	"log"
 	"github.com/mame82/P4wnP1_go/hid"
+	"github.com/mame82/P4wnP1_go/common_web"
 )
 
 
@@ -94,7 +94,7 @@ func (em *EventManager) dispatch() {
 			// Note: no mutex on em.registeredReceivers needed, only accessed in this method
 			for receiver := range em.registeredReceivers {
 				// check if this receiver is listening for this event type
-				if receiver.FilterEventType == evToDispatch.Type || receiver.FilterEventType == common.EVT_ANY {
+				if receiver.FilterEventType == evToDispatch.Type || receiver.FilterEventType == common_web.EVT_ANY {
 					select {
 					case <-receiver.Ctx.Done():
 						//receiver canceled
@@ -151,7 +151,7 @@ type EventReceiver struct {
 func ConstructEventLog(source string, level int, message string) *pb.Event {
 
 	return &pb.Event{
-		Type: common.EVT_LOG,
+		Type: common_web.EVT_LOG,
 		Values: []*pb.EventValue{
 			{Val: &pb.EventValue_Tstring{Tstring:source} },
 			{Val: &pb.EventValue_Tint64{Tint64:int64(level)} },
@@ -180,7 +180,7 @@ func ConstructEventHID(hidEvent hid.Event) *pb.Event {
 	if eVM := hidEvent.Vm; eVM != nil { vmID = eVM.Id }
 
 	return &pb.Event{
-		Type: common.EVT_HID, //Type
+		Type: common_web.EVT_HID, //Type
 		Values: []*pb.EventValue{
 			{Val: &pb.EventValue_Tint64{Tint64:int64(hidEvent.Type)} }, 		//SubType = Type of hid.Event
 			{Val: &pb.EventValue_Tint64{Tint64:int64(vmID)} },			//ID of VM

@@ -1,4 +1,4 @@
-package common
+package common_web
 
 const (
 	EVT_ANY = int64(0)
