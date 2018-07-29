@@ -29123,659 +29123,6 @@ $packages["../proto/gopherjs"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
-$packages["./mvuex"] = (function() {
-	var $pkg = {}, $init, errors, js, reflect, strconv, ActionContext, StoreOption, Store, StoreConfig, sliceType, sliceType$1, ptrType, ptrType$1, ptrType$2, sliceType$2, funcType, sliceType$3, eTooFewMutationArgs, eTooManyMutationArgs, eWrongActionArgCount, eTooFewMutationArgsOnCall, eWrongFirstMutationArg, eWrongFirstActionArg, eWrongSecondActionArg, eWrongSecondMutationArg, eFirstFieldIsNotPtrJsObject, jsObjectType, jsStoreType, jsActioContextType, x, x$1, x$2, wrapGoActionFunc, Action, o, castToType, checkIfJSStruct, wrapGoMutationFunc, Mutation, State, NewStore;
-	errors = $packages["errors"];
-	js = $packages["github.com/gopherjs/gopherjs/js"];
-	reflect = $packages["reflect"];
-	strconv = $packages["strconv"];
-	ActionContext = $pkg.ActionContext = $newType(0, $kindStruct, "mvuex.ActionContext", true, "./mvuex", true, function(Object_, Getters_, Commit_, Dispatch_, State_, RootGetters_, RootState_) {
-		this.$val = this;
-		if (arguments.length === 0) {
-			this.Object = null;
-			this.Getters = null;
-			this.Commit = $throwNilPointerError;
-			this.Dispatch = $throwNilPointerError;
-			this.State = null;
-			this.RootGetters = null;
-			this.RootState = null;
-			return;
-		}
-		this.Object = Object_;
-		this.Getters = Getters_;
-		this.Commit = Commit_;
-		this.Dispatch = Dispatch_;
-		this.State = State_;
-		this.RootGetters = RootGetters_;
-		this.RootState = RootState_;
-	});
-	StoreOption = $pkg.StoreOption = $newType(4, $kindFunc, "mvuex.StoreOption", true, "./mvuex", true, null);
-	Store = $pkg.Store = $newType(0, $kindStruct, "mvuex.Store", true, "./mvuex", true, function(Object_, Getters_, Commit_, Dispatch_, Strict_) {
-		this.$val = this;
-		if (arguments.length === 0) {
-			this.Object = null;
-			this.Getters = null;
-			this.Commit = $throwNilPointerError;
-			this.Dispatch = $throwNilPointerError;
-			this.Strict = false;
-			return;
-		}
-		this.Object = Object_;
-		this.Getters = Getters_;
-		this.Commit = Commit_;
-		this.Dispatch = Dispatch_;
-		this.Strict = Strict_;
-	});
-	StoreConfig = $pkg.StoreConfig = $newType(0, $kindStruct, "mvuex.StoreConfig", true, "./mvuex", true, function(Object_, State_, Mutations_, Actions_, stateValue_) {
-		this.$val = this;
-		if (arguments.length === 0) {
-			this.Object = null;
-			this.State = null;
-			this.Mutations = null;
-			this.Actions = null;
-			this.stateValue = new reflect.Value.ptr(ptrType.nil, 0, 0);
-			return;
-		}
-		this.Object = Object_;
-		this.State = State_;
-		this.Mutations = Mutations_;
-		this.Actions = Actions_;
-		this.stateValue = stateValue_;
-	});
-	sliceType = $sliceType(reflect.Type);
-	sliceType$1 = $sliceType(reflect.Value);
-	ptrType = $ptrType(reflect.rtype);
-	ptrType$1 = $ptrType(StoreConfig);
-	ptrType$2 = $ptrType(js.Object);
-	sliceType$2 = $sliceType($emptyInterface);
-	funcType = $funcType([sliceType$2], [ptrType$2], true);
-	sliceType$3 = $sliceType(StoreOption);
-	wrapGoActionFunc = function(reflectedGoFunc) {
-		var _r, _r$1, _r$10, _r$11, _r$12, _r$13, _r$14, _r$15, _r$16, _r$17, _r$18, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tmp$9, _v, _v$1, _v$2, arg, arg$1, arg$2, err, goCallArgTargetTypes, goCallArgsTargetValues, i, i$1, jsFunc, numGoArgs, reflectedGoFunc, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$15 = $f._r$15; _r$16 = $f._r$16; _r$17 = $f._r$17; _r$18 = $f._r$18; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tmp$4 = $f._tmp$4; _tmp$5 = $f._tmp$5; _tmp$6 = $f._tmp$6; _tmp$7 = $f._tmp$7; _tmp$8 = $f._tmp$8; _tmp$9 = $f._tmp$9; _v = $f._v; _v$1 = $f._v$1; _v$2 = $f._v$2; arg = $f.arg; arg$1 = $f.arg$1; arg$2 = $f.arg$2; err = $f.err; goCallArgTargetTypes = $f.goCallArgTargetTypes; goCallArgsTargetValues = $f.goCallArgsTargetValues; i = $f.i; i$1 = $f.i$1; jsFunc = $f.jsFunc; numGoArgs = $f.numGoArgs; reflectedGoFunc = $f.reflectedGoFunc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		goCallArgTargetTypes = [goCallArgTargetTypes];
-		goCallArgsTargetValues = [goCallArgsTargetValues];
-		numGoArgs = [numGoArgs];
-		reflectedGoFunc = [reflectedGoFunc];
-		jsFunc = null;
-		err = $ifaceNil;
-		_r = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-		_r$1 = _r.NumIn(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-		numGoArgs[0] = _r$1;
-		if (numGoArgs[0] < 3 || numGoArgs[0] > 4) {
-			_tmp = null;
-			_tmp$1 = eWrongActionArgCount;
-			jsFunc = _tmp;
-			err = _tmp$1;
-			$s = -1; return [jsFunc, err];
-		}
-		_r$2 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-		_r$3 = _r$2.In(0); /* */ $s = 4; case 4: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-		arg = _r$3;
-		_r$4 = arg.Kind(); /* */ $s = 8; case 8: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
-		if (!((_r$4 === 22))) { _v = true; $s = 7; continue s; }
-		_r$5 = arg.Elem(); /* */ $s = 9; case 9: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
-		_v = !($interfaceIsEqual(_r$5, jsStoreType)); case 7:
-		/* */ if (_v) { $s = 5; continue; }
-		/* */ $s = 6; continue;
-		/* if (_v) { */ case 5:
-			_tmp$2 = null;
-			_tmp$3 = eWrongFirstActionArg;
-			jsFunc = _tmp$2;
-			err = _tmp$3;
-			$s = -1; return [jsFunc, err];
-		/* } */ case 6:
-		_r$6 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 10; case 10: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
-		_r$7 = _r$6.In(1); /* */ $s = 11; case 11: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
-		arg$1 = _r$7;
-		_r$8 = arg$1.Kind(); /* */ $s = 15; case 15: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
-		if (!((_r$8 === 22))) { _v$1 = true; $s = 14; continue s; }
-		_r$9 = arg$1.Elem(); /* */ $s = 16; case 16: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
-		_v$1 = !($interfaceIsEqual(_r$9, jsActioContextType)); case 14:
-		/* */ if (_v$1) { $s = 12; continue; }
-		/* */ $s = 13; continue;
-		/* if (_v$1) { */ case 12:
-			_tmp$4 = null;
-			_tmp$5 = eWrongSecondActionArg;
-			jsFunc = _tmp$4;
-			err = _tmp$5;
-			$s = -1; return [jsFunc, err];
-		/* } */ case 13:
-		i = 2;
-		/* while (true) { */ case 17:
-			/* if (!(i < numGoArgs[0])) { break; } */ if(!(i < numGoArgs[0])) { $s = 18; continue; }
-			_r$10 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 19; case 19: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
-			_r$11 = _r$10.In(i); /* */ $s = 20; case 20: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
-			arg$2 = _r$11;
-			_r$12 = arg$2.Kind(); /* */ $s = 24; case 24: if($c) { $c = false; _r$12 = _r$12.$blk(); } if (_r$12 && _r$12.$blk !== undefined) { break s; }
-			if (!((_r$12 === 22))) { _v$2 = true; $s = 23; continue s; }
-			_r$13 = arg$2.Elem(); /* */ $s = 25; case 25: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
-			_r$14 = checkIfJSStruct(_r$13); /* */ $s = 26; case 26: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
-			_v$2 = !_r$14; case 23:
-			/* */ if (_v$2) { $s = 21; continue; }
-			/* */ $s = 22; continue;
-			/* if (_v$2) { */ case 21:
-				_tmp$6 = null;
-				_tmp$7 = errors.New("Arg at position " + strconv.Itoa(i) + " isn't a pointer to a struct with *js.Object in first field");
-				jsFunc = _tmp$6;
-				err = _tmp$7;
-				$s = -1; return [jsFunc, err];
-			/* } */ case 22:
-			i = i + (1) >> 0;
-		/* } */ $s = 17; continue; case 18:
-		goCallArgTargetTypes[0] = $makeSlice(sliceType, numGoArgs[0]);
-		i$1 = 0;
-		/* while (true) { */ case 27:
-			_r$15 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 29; case 29: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
-			_r$16 = _r$15.NumIn(); /* */ $s = 30; case 30: if($c) { $c = false; _r$16 = _r$16.$blk(); } if (_r$16 && _r$16.$blk !== undefined) { break s; }
-			/* if (!(i$1 < _r$16)) { break; } */ if(!(i$1 < _r$16)) { $s = 28; continue; }
-			_r$17 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 31; case 31: if($c) { $c = false; _r$17 = _r$17.$blk(); } if (_r$17 && _r$17.$blk !== undefined) { break s; }
-			_r$18 = _r$17.In(i$1); /* */ $s = 32; case 32: if($c) { $c = false; _r$18 = _r$18.$blk(); } if (_r$18 && _r$18.$blk !== undefined) { break s; }
-			((i$1 < 0 || i$1 >= goCallArgTargetTypes[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + i$1] = _r$18);
-			i$1 = i$1 + (1) >> 0;
-		/* } */ $s = 27; continue; case 28:
-		goCallArgsTargetValues[0] = $makeSlice(sliceType$1, numGoArgs[0]);
-		jsFunc = js.MakeFunc((function(goCallArgTargetTypes, goCallArgsTargetValues, numGoArgs, reflectedGoFunc) { return function $b(this$1, arguments$1) {
-			var _r$19, _r$20, _r$21, _r$22, _r$23, _r$24, _r$25, _r$26, _r$27, _r$28, _r$29, _r$30, _r$31, _r$32, _tuple, _tuple$1, _tuple$2, _tuple$3, actionParamVal, arguments$1, contextVal, err$1, err$2, jsStateObj, stateVal, storeVal, this$1, $s, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$19 = $f._r$19; _r$20 = $f._r$20; _r$21 = $f._r$21; _r$22 = $f._r$22; _r$23 = $f._r$23; _r$24 = $f._r$24; _r$25 = $f._r$25; _r$26 = $f._r$26; _r$27 = $f._r$27; _r$28 = $f._r$28; _r$29 = $f._r$29; _r$30 = $f._r$30; _r$31 = $f._r$31; _r$32 = $f._r$32; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; _tuple$2 = $f._tuple$2; _tuple$3 = $f._tuple$3; actionParamVal = $f.actionParamVal; arguments$1 = $f.arguments$1; contextVal = $f.contextVal; err$1 = $f.err$1; err$2 = $f.err$2; jsStateObj = $f.jsStateObj; stateVal = $f.stateVal; storeVal = $f.storeVal; this$1 = $f.this$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-			_r$19 = castToType((0 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 0]), this$1); /* */ $s = 1; case 1: if($c) { $c = false; _r$19 = _r$19.$blk(); } if (_r$19 && _r$19.$blk !== undefined) { break s; }
-			_tuple = _r$19;
-			storeVal = _tuple[0];
-			err$1 = _tuple[1];
-			/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 2; continue; }
-			/* */ $s = 3; continue;
-			/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 2:
-				_r$20 = err$1.Error(); /* */ $s = 4; case 4: if($c) { $c = false; _r$20 = _r$20.$blk(); } if (_r$20 && _r$20.$blk !== undefined) { break s; }
-				$panic(new $String("Error converting JavaScript provided 'this' for action function to *Store: " + _r$20));
-			/* } */ case 3:
-			(0 >= goCallArgsTargetValues[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + 0] = storeVal);
-			_r$21 = castToType((1 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 1]), (0 >= arguments$1.$length ? ($throwRuntimeError("index out of range"), undefined) : arguments$1.$array[arguments$1.$offset + 0])); /* */ $s = 5; case 5: if($c) { $c = false; _r$21 = _r$21.$blk(); } if (_r$21 && _r$21.$blk !== undefined) { break s; }
-			_tuple$1 = _r$21;
-			contextVal = _tuple$1[0];
-			err$1 = _tuple$1[1];
-			/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 6; continue; }
-			/* */ $s = 7; continue;
-			/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 6:
-				_r$22 = err$1.Error(); /* */ $s = 8; case 8: if($c) { $c = false; _r$22 = _r$22.$blk(); } if (_r$22 && _r$22.$blk !== undefined) { break s; }
-				$panic(new $String("Error converting JavaScript provided first argument for action function to *ActionContext: " + _r$22));
-			/* } */ case 7:
-			(1 >= goCallArgsTargetValues[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + 1] = contextVal);
-			jsStateObj = (0 >= arguments$1.$length ? ($throwRuntimeError("index out of range"), undefined) : arguments$1.$array[arguments$1.$offset + 0]).state;
-			_r$23 = castToType((2 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 2]), jsStateObj); /* */ $s = 9; case 9: if($c) { $c = false; _r$23 = _r$23.$blk(); } if (_r$23 && _r$23.$blk !== undefined) { break s; }
-			_tuple$2 = _r$23;
-			stateVal = _tuple$2[0];
-			err$1 = _tuple$2[1];
-			/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 10; continue; }
-			/* */ $s = 11; continue;
-			/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 10:
-				_r$24 = (2 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 2]).Elem(); /* */ $s = 12; case 12: if($c) { $c = false; _r$24 = _r$24.$blk(); } if (_r$24 && _r$24.$blk !== undefined) { break s; }
-				_r$25 = _r$24.Name(); /* */ $s = 13; case 13: if($c) { $c = false; _r$25 = _r$25.$blk(); } if (_r$25 && _r$25.$blk !== undefined) { break s; }
-				_r$26 = err$1.Error(); /* */ $s = 14; case 14: if($c) { $c = false; _r$26 = _r$26.$blk(); } if (_r$26 && _r$26.$blk !== undefined) { break s; }
-				$panic(new $String("Error converting JavaScript provided context.state for action function to *" + _r$25 + ": " + _r$26));
-			/* } */ case 11:
-			(2 >= goCallArgsTargetValues[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + 2] = stateVal);
-			/* */ if (numGoArgs[0] === 4) { $s = 15; continue; }
-			/* */ $s = 16; continue;
-			/* if (numGoArgs[0] === 4) { */ case 15:
-				/* */ if ((1 >= arguments$1.$length ? ($throwRuntimeError("index out of range"), undefined) : arguments$1.$array[arguments$1.$offset + 1]) === undefined) { $s = 17; continue; }
-				/* */ $s = 18; continue;
-				/* if ((1 >= arguments$1.$length ? ($throwRuntimeError("index out of range"), undefined) : arguments$1.$array[arguments$1.$offset + 1]) === undefined) { */ case 17:
-					_r$27 = (3 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 3]).Name(); /* */ $s = 19; case 19: if($c) { $c = false; _r$27 = _r$27.$blk(); } if (_r$27 && _r$27.$blk !== undefined) { break s; }
-					$panic(new $String("The action handler awaits an argument of type " + _r$27 + " but the dispatched action doesn't provide this parameter"));
-				/* } */ case 18:
-				_r$28 = castToType((3 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 3]), (1 >= arguments$1.$length ? ($throwRuntimeError("index out of range"), undefined) : arguments$1.$array[arguments$1.$offset + 1])); /* */ $s = 20; case 20: if($c) { $c = false; _r$28 = _r$28.$blk(); } if (_r$28 && _r$28.$blk !== undefined) { break s; }
-				_tuple$3 = _r$28;
-				actionParamVal = _tuple$3[0];
-				err$2 = _tuple$3[1];
-				/* */ if (!($interfaceIsEqual(err$2, $ifaceNil))) { $s = 21; continue; }
-				/* */ $s = 22; continue;
-				/* if (!($interfaceIsEqual(err$2, $ifaceNil))) { */ case 21:
-					_r$29 = (3 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 3]).Elem(); /* */ $s = 23; case 23: if($c) { $c = false; _r$29 = _r$29.$blk(); } if (_r$29 && _r$29.$blk !== undefined) { break s; }
-					_r$30 = _r$29.Name(); /* */ $s = 24; case 24: if($c) { $c = false; _r$30 = _r$30.$blk(); } if (_r$30 && _r$30.$blk !== undefined) { break s; }
-					_r$31 = err$2.Error(); /* */ $s = 25; case 25: if($c) { $c = false; _r$31 = _r$31.$blk(); } if (_r$31 && _r$31.$blk !== undefined) { break s; }
-					$panic(new $String("Error converting JavaScript provided optional parameter for action function to *" + _r$30 + ": " + _r$31));
-				/* } */ case 22:
-				(3 >= goCallArgsTargetValues[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + 3] = actionParamVal);
-			/* } */ case 16:
-			_r$32 = $clone(reflectedGoFunc[0], reflect.Value).Call(goCallArgsTargetValues[0]); /* */ $s = 26; case 26: if($c) { $c = false; _r$32 = _r$32.$blk(); } if (_r$32 && _r$32.$blk !== undefined) { break s; }
-			$s = -1; return _r$32;
-			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$19 = _r$19; $f._r$20 = _r$20; $f._r$21 = _r$21; $f._r$22 = _r$22; $f._r$23 = _r$23; $f._r$24 = _r$24; $f._r$25 = _r$25; $f._r$26 = _r$26; $f._r$27 = _r$27; $f._r$28 = _r$28; $f._r$29 = _r$29; $f._r$30 = _r$30; $f._r$31 = _r$31; $f._r$32 = _r$32; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f._tuple$2 = _tuple$2; $f._tuple$3 = _tuple$3; $f.actionParamVal = actionParamVal; $f.arguments$1 = arguments$1; $f.contextVal = contextVal; $f.err$1 = err$1; $f.err$2 = err$2; $f.jsStateObj = jsStateObj; $f.stateVal = stateVal; $f.storeVal = storeVal; $f.this$1 = this$1; $f.$s = $s; $f.$r = $r; return $f;
-		}; })(goCallArgTargetTypes, goCallArgsTargetValues, numGoArgs, reflectedGoFunc));
-		_tmp$8 = jsFunc;
-		_tmp$9 = $ifaceNil;
-		jsFunc = _tmp$8;
-		err = _tmp$9;
-		$s = -1; return [jsFunc, err];
-		/* */ } return; } if ($f === undefined) { $f = { $blk: wrapGoActionFunc }; } $f._r = _r; $f._r$1 = _r$1; $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$14 = _r$14; $f._r$15 = _r$15; $f._r$16 = _r$16; $f._r$17 = _r$17; $f._r$18 = _r$18; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tmp$4 = _tmp$4; $f._tmp$5 = _tmp$5; $f._tmp$6 = _tmp$6; $f._tmp$7 = _tmp$7; $f._tmp$8 = _tmp$8; $f._tmp$9 = _tmp$9; $f._v = _v; $f._v$1 = _v$1; $f._v$2 = _v$2; $f.arg = arg; $f.arg$1 = arg$1; $f.arg$2 = arg$2; $f.err = err; $f.goCallArgTargetTypes = goCallArgTargetTypes; $f.goCallArgsTargetValues = goCallArgsTargetValues; $f.i = i; $f.i$1 = i$1; $f.jsFunc = jsFunc; $f.numGoArgs = numGoArgs; $f.reflectedGoFunc = reflectedGoFunc; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	Action = function(name, goFunc) {
-		var goFunc, name;
-		return (function $b(c) {
-			var _r, _r$1, _r$2, _tuple, c, err, jsFunc, reflectedGoFunc, $s, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _tuple = $f._tuple; c = $f.c; err = $f.err; jsFunc = $f.jsFunc; reflectedGoFunc = $f.reflectedGoFunc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-			if (c.Object.actions === undefined) {
-				c.Object.actions = o();
-			}
-			_r = reflect.ValueOf(goFunc); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			reflectedGoFunc = _r;
-			if (!(($clone(reflectedGoFunc, reflect.Value).Kind() === 19))) {
-				$panic(new $String("Action " + name + " is not a func"));
-			}
-			_r$1 = wrapGoActionFunc($clone(reflectedGoFunc, reflect.Value)); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-			_tuple = _r$1;
-			jsFunc = _tuple[0];
-			err = _tuple[1];
-			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 3; continue; }
-			/* */ $s = 4; continue;
-			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 3:
-				_r$2 = err.Error(); /* */ $s = 5; case 5: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-				$panic(new $String("Error exposing the action function '" + name + "' to JavaScript: " + _r$2));
-			/* } */ case 4:
-			c.Object.actions[$externalize(name, $String)] = jsFunc;
-			$s = -1; return;
-			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.err = err; $f.jsFunc = jsFunc; $f.reflectedGoFunc = reflectedGoFunc; $f.$s = $s; $f.$r = $r; return $f;
-		});
-	};
-	$pkg.Action = Action;
-	o = function() {
-		return new ($global.Object)();
-	};
-	castToType = function(targetType, sourceVal) {
-		var _1, _r, _r$1, _r$10, _r$11, _r$12, _r$13, _r$14, _r$15, _r$16, _r$17, _r$18, _r$19, _r$2, _r$20, _r$21, _r$22, _r$23, _r$24, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tuple, derefType, derefVal, err, err$1, kind, pStructInstance, result, sourceVal, targetType, x$3, x$4, x$5, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _1 = $f._1; _r = $f._r; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$15 = $f._r$15; _r$16 = $f._r$16; _r$17 = $f._r$17; _r$18 = $f._r$18; _r$19 = $f._r$19; _r$2 = $f._r$2; _r$20 = $f._r$20; _r$21 = $f._r$21; _r$22 = $f._r$22; _r$23 = $f._r$23; _r$24 = $f._r$24; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tmp$4 = $f._tmp$4; _tmp$5 = $f._tmp$5; _tuple = $f._tuple; derefType = $f.derefType; derefVal = $f.derefVal; err = $f.err; err$1 = $f.err$1; kind = $f.kind; pStructInstance = $f.pStructInstance; result = $f.result; sourceVal = $f.sourceVal; targetType = $f.targetType; x$3 = $f.x$3; x$4 = $f.x$4; x$5 = $f.x$5; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		result = new reflect.Value.ptr(ptrType.nil, 0, 0);
-		err = $ifaceNil;
-			_r = targetType.Kind(); /* */ $s = 2; case 2: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			kind = _r;
-			_1 = kind;
-			/* */ if (_1 === (2)) { $s = 3; continue; }
-			/* */ if (_1 === (3)) { $s = 4; continue; }
-			/* */ if (_1 === (4)) { $s = 5; continue; }
-			/* */ if (_1 === (5)) { $s = 6; continue; }
-			/* */ if (_1 === (6)) { $s = 7; continue; }
-			/* */ if (_1 === (14)) { $s = 8; continue; }
-			/* */ if (_1 === (13)) { $s = 9; continue; }
-			/* */ if (_1 === (1)) { $s = 10; continue; }
-			/* */ if (_1 === (7)) { $s = 11; continue; }
-			/* */ if (_1 === (11)) { $s = 12; continue; }
-			/* */ if (_1 === (10)) { $s = 13; continue; }
-			/* */ if (_1 === (9)) { $s = 14; continue; }
-			/* */ if (_1 === (8)) { $s = 15; continue; }
-			/* */ if (_1 === (12)) { $s = 16; continue; }
-			/* */ if (_1 === (24)) { $s = 17; continue; }
-			/* */ if (_1 === (25)) { $s = 18; continue; }
-			/* */ if (_1 === (22)) { $s = 19; continue; }
-			/* */ if (_1 === (20)) { $s = 20; continue; }
-			/* */ $s = 21; continue;
-			/* if (_1 === (2)) { */ case 3:
-				_r$1 = reflect.ValueOf(new $Int(($parseInt(sourceVal) >> 0))); /* */ $s = 23; case 23: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-				result = _r$1;
-				$s = 22; continue;
-			/* } else if (_1 === (3)) { */ case 4:
-				_r$2 = reflect.ValueOf(new $Int8((((x$3 = $internalize(sourceVal, $Int64), x$3.$low + ((x$3.$high >> 31) * 4294967296)) << 24 >> 24)))); /* */ $s = 24; case 24: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-				result = _r$2;
-				$s = 22; continue;
-			/* } else if (_1 === (4)) { */ case 5:
-				_r$3 = reflect.ValueOf(new $Int16((((x$4 = $internalize(sourceVal, $Int64), x$4.$low + ((x$4.$high >> 31) * 4294967296)) << 16 >> 16)))); /* */ $s = 25; case 25: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-				result = _r$3;
-				$s = 22; continue;
-			/* } else if (_1 === (5)) { */ case 6:
-				_r$4 = reflect.ValueOf(new $Int32((((x$5 = $internalize(sourceVal, $Int64), x$5.$low + ((x$5.$high >> 31) * 4294967296)) >> 0)))); /* */ $s = 26; case 26: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
-				result = _r$4;
-				$s = 22; continue;
-			/* } else if (_1 === (6)) { */ case 7:
-				_r$5 = reflect.ValueOf($internalize(sourceVal, $Int64)); /* */ $s = 27; case 27: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
-				result = _r$5;
-				$s = 22; continue;
-			/* } else if (_1 === (14)) { */ case 8:
-				_r$6 = reflect.ValueOf(new $Float64($parseFloat(sourceVal))); /* */ $s = 28; case 28: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
-				result = _r$6;
-				$s = 22; continue;
-			/* } else if (_1 === (13)) { */ case 9:
-				_r$7 = reflect.ValueOf(new $Float32(($fround($parseFloat(sourceVal))))); /* */ $s = 29; case 29: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
-				result = _r$7;
-				$s = 22; continue;
-			/* } else if (_1 === (1)) { */ case 10:
-				_r$8 = reflect.ValueOf(new $Bool(!!(sourceVal))); /* */ $s = 30; case 30: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
-				result = _r$8;
-				$s = 22; continue;
-			/* } else if (_1 === (7)) { */ case 11:
-				_r$9 = reflect.ValueOf(new $Uint((($internalize(sourceVal, $Uint64).$low >>> 0)))); /* */ $s = 31; case 31: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
-				result = _r$9;
-				$s = 22; continue;
-			/* } else if (_1 === (11)) { */ case 12:
-				_r$10 = reflect.ValueOf($internalize(sourceVal, $Uint64)); /* */ $s = 32; case 32: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
-				result = _r$10;
-				$s = 22; continue;
-			/* } else if (_1 === (10)) { */ case 13:
-				_r$11 = reflect.ValueOf(new $Uint32((($internalize(sourceVal, $Uint64).$low >>> 0)))); /* */ $s = 33; case 33: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
-				result = _r$11;
-				$s = 22; continue;
-			/* } else if (_1 === (9)) { */ case 14:
-				_r$12 = reflect.ValueOf(new $Uint16((($internalize(sourceVal, $Uint64).$low << 16 >>> 16)))); /* */ $s = 34; case 34: if($c) { $c = false; _r$12 = _r$12.$blk(); } if (_r$12 && _r$12.$blk !== undefined) { break s; }
-				result = _r$12;
-				$s = 22; continue;
-			/* } else if (_1 === (8)) { */ case 15:
-				_r$13 = reflect.ValueOf(new $Uint8((($internalize(sourceVal, $Uint64).$low << 24 >>> 24)))); /* */ $s = 35; case 35: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
-				result = _r$13;
-				$s = 22; continue;
-			/* } else if (_1 === (12)) { */ case 16:
-				_r$14 = reflect.ValueOf(new $Uintptr(sourceVal)); /* */ $s = 36; case 36: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
-				result = _r$14;
-				$s = 22; continue;
-			/* } else if (_1 === (24)) { */ case 17:
-				_r$15 = reflect.ValueOf(new $String($internalize(sourceVal, $String))); /* */ $s = 37; case 37: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
-				result = _r$15;
-				$s = 22; continue;
-			/* } else if (_1 === (25)) { */ case 18:
-				_r$16 = checkIfJSStruct(targetType); /* */ $s = 40; case 40: if($c) { $c = false; _r$16 = _r$16.$blk(); } if (_r$16 && _r$16.$blk !== undefined) { break s; }
-				/* */ if (!_r$16) { $s = 38; continue; }
-				/* */ $s = 39; continue;
-				/* if (!_r$16) { */ case 38:
-					_tmp = result;
-					_tmp$1 = eFirstFieldIsNotPtrJsObject;
-					result = _tmp;
-					err = _tmp$1;
-					$s = -1; return [result, err];
-				/* } */ case 39:
-				_r$17 = reflect.New(targetType); /* */ $s = 41; case 41: if($c) { $c = false; _r$17 = _r$17.$blk(); } if (_r$17 && _r$17.$blk !== undefined) { break s; }
-				pStructInstance = _r$17;
-				_r$18 = $clone(pStructInstance, reflect.Value).Elem(); /* */ $s = 42; case 42: if($c) { $c = false; _r$18 = _r$18.$blk(); } if (_r$18 && _r$18.$blk !== undefined) { break s; }
-				_r$19 = $clone(_r$18, reflect.Value).Field(0); /* */ $s = 43; case 43: if($c) { $c = false; _r$19 = _r$19.$blk(); } if (_r$19 && _r$19.$blk !== undefined) { break s; }
-				_r$20 = reflect.ValueOf(new $jsObjectPtr(sourceVal)); /* */ $s = 44; case 44: if($c) { $c = false; _r$20 = _r$20.$blk(); } if (_r$20 && _r$20.$blk !== undefined) { break s; }
-				$r = $clone(_r$19, reflect.Value).Set($clone(_r$20, reflect.Value)); /* */ $s = 45; case 45: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-				_r$21 = $clone(pStructInstance, reflect.Value).Elem(); /* */ $s = 46; case 46: if($c) { $c = false; _r$21 = _r$21.$blk(); } if (_r$21 && _r$21.$blk !== undefined) { break s; }
-				result = _r$21;
-				$s = 22; continue;
-			/* } else if (_1 === (22)) { */ case 19:
-				_r$22 = targetType.Elem(); /* */ $s = 47; case 47: if($c) { $c = false; _r$22 = _r$22.$blk(); } if (_r$22 && _r$22.$blk !== undefined) { break s; }
-				derefType = _r$22;
-				_r$23 = castToType(derefType, sourceVal); /* */ $s = 48; case 48: if($c) { $c = false; _r$23 = _r$23.$blk(); } if (_r$23 && _r$23.$blk !== undefined) { break s; }
-				_tuple = _r$23;
-				derefVal = _tuple[0];
-				err$1 = _tuple[1];
-				if (!($interfaceIsEqual(err$1, $ifaceNil))) {
-					_tmp$2 = result;
-					_tmp$3 = err$1;
-					result = _tmp$2;
-					err = _tmp$3;
-					$s = -1; return [result, err];
-				}
-				result = $clone(derefVal, reflect.Value).Addr();
-				$s = 22; continue;
-			/* } else if (_1 === (20)) { */ case 20:
-				_r$24 = reflect.ValueOf($internalize(sourceVal, $emptyInterface)); /* */ $s = 49; case 49: if($c) { $c = false; _r$24 = _r$24.$blk(); } if (_r$24 && _r$24.$blk !== undefined) { break s; }
-				result = _r$24;
-				$s = 22; continue;
-			/* } else { */ case 21:
-				console.log("No conversion for following type implemented", new reflect.Kind(kind).String(), " from ", sourceVal);
-			/* } */ case 22:
-		case 1:
-		_tmp$4 = result;
-		_tmp$5 = $ifaceNil;
-		result = _tmp$4;
-		err = _tmp$5;
-		$s = -1; return [result, err];
-		/* */ } return; } if ($f === undefined) { $f = { $blk: castToType }; } $f._1 = _1; $f._r = _r; $f._r$1 = _r$1; $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$14 = _r$14; $f._r$15 = _r$15; $f._r$16 = _r$16; $f._r$17 = _r$17; $f._r$18 = _r$18; $f._r$19 = _r$19; $f._r$2 = _r$2; $f._r$20 = _r$20; $f._r$21 = _r$21; $f._r$22 = _r$22; $f._r$23 = _r$23; $f._r$24 = _r$24; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tmp$4 = _tmp$4; $f._tmp$5 = _tmp$5; $f._tuple = _tuple; $f.derefType = derefType; $f.derefVal = derefVal; $f.err = err; $f.err$1 = err$1; $f.kind = kind; $f.pStructInstance = pStructInstance; $f.result = result; $f.sourceVal = sourceVal; $f.targetType = targetType; $f.x$3 = x$3; $f.x$4 = x$4; $f.x$5 = x$5; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	checkIfJSStruct = function(objType) {
-		var _r, _r$1, _r$2, _r$3, objType, typeField0, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; objType = $f.objType; typeField0 = $f.typeField0; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		_r = objType.Kind(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-		/* */ if (!((_r === 25))) { $s = 1; continue; }
-		/* */ $s = 2; continue;
-		/* if (!((_r === 25))) { */ case 1:
-			$s = -1; return false;
-		/* } */ case 2:
-		_r$1 = objType.Field(0); /* */ $s = 4; case 4: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-		typeField0 = _r$1.Type;
-		_r$2 = typeField0.Kind(); /* */ $s = 7; case 7: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-		/* */ if (!((_r$2 === 22))) { $s = 5; continue; }
-		/* */ $s = 6; continue;
-		/* if (!((_r$2 === 22))) { */ case 5:
-			$s = -1; return false;
-		/* } */ case 6:
-		_r$3 = typeField0.Elem(); /* */ $s = 10; case 10: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-		/* */ if (!($interfaceIsEqual(_r$3, jsObjectType))) { $s = 8; continue; }
-		/* */ $s = 9; continue;
-		/* if (!($interfaceIsEqual(_r$3, jsObjectType))) { */ case 8:
-			$s = -1; return false;
-		/* } */ case 9:
-		$s = -1; return true;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: checkIfJSStruct }; } $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f.objType = objType; $f.typeField0 = typeField0; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	wrapGoMutationFunc = function(reflectedGoFunc) {
-		var _r, _r$1, _r$10, _r$11, _r$12, _r$13, _r$14, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tmp$9, _v, _v$1, err, goArg0, goArg1, goCallArgTargetTypes, goCallArgsTargetValues, i, jsFunc, numGoArgs, reflectedGoFunc, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tmp$4 = $f._tmp$4; _tmp$5 = $f._tmp$5; _tmp$6 = $f._tmp$6; _tmp$7 = $f._tmp$7; _tmp$8 = $f._tmp$8; _tmp$9 = $f._tmp$9; _v = $f._v; _v$1 = $f._v$1; err = $f.err; goArg0 = $f.goArg0; goArg1 = $f.goArg1; goCallArgTargetTypes = $f.goCallArgTargetTypes; goCallArgsTargetValues = $f.goCallArgsTargetValues; i = $f.i; jsFunc = $f.jsFunc; numGoArgs = $f.numGoArgs; reflectedGoFunc = $f.reflectedGoFunc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		goCallArgTargetTypes = [goCallArgTargetTypes];
-		goCallArgsTargetValues = [goCallArgsTargetValues];
-		numGoArgs = [numGoArgs];
-		reflectedGoFunc = [reflectedGoFunc];
-		jsFunc = null;
-		err = $ifaceNil;
-		_r = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-		_r$1 = _r.NumIn(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-		numGoArgs[0] = _r$1;
-		if (numGoArgs[0] < 2) {
-			_tmp = null;
-			_tmp$1 = eTooFewMutationArgs;
-			jsFunc = _tmp;
-			err = _tmp$1;
-			$s = -1; return [jsFunc, err];
-		}
-		if (numGoArgs[0] > 3) {
-			_tmp$2 = null;
-			_tmp$3 = eTooManyMutationArgs;
-			jsFunc = _tmp$2;
-			err = _tmp$3;
-			$s = -1; return [jsFunc, err];
-		}
-		_r$2 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-		_r$3 = _r$2.In(0); /* */ $s = 4; case 4: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-		goArg0 = _r$3;
-		_r$4 = goArg0.Kind(); /* */ $s = 8; case 8: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
-		if (!((_r$4 === 22))) { _v = true; $s = 7; continue s; }
-		_r$5 = goArg0.Elem(); /* */ $s = 9; case 9: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
-		_v = !($interfaceIsEqual(_r$5, jsStoreType)); case 7:
-		/* */ if (_v) { $s = 5; continue; }
-		/* */ $s = 6; continue;
-		/* if (_v) { */ case 5:
-			_tmp$4 = null;
-			_tmp$5 = eWrongFirstMutationArg;
-			jsFunc = _tmp$4;
-			err = _tmp$5;
-			$s = -1; return [jsFunc, err];
-		/* } */ case 6:
-		_r$6 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 10; case 10: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
-		_r$7 = _r$6.In(1); /* */ $s = 11; case 11: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
-		goArg1 = _r$7;
-		_r$8 = goArg1.Kind(); /* */ $s = 15; case 15: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
-		if (!((_r$8 === 22))) { _v$1 = true; $s = 14; continue s; }
-		_r$9 = goArg1.Elem(); /* */ $s = 16; case 16: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
-		_r$10 = _r$9.Kind(); /* */ $s = 17; case 17: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
-		_v$1 = !((_r$10 === 25)); case 14:
-		/* */ if (_v$1) { $s = 12; continue; }
-		/* */ $s = 13; continue;
-		/* if (_v$1) { */ case 12:
-			_tmp$6 = null;
-			_tmp$7 = eWrongSecondMutationArg;
-			jsFunc = _tmp$6;
-			err = _tmp$7;
-			$s = -1; return [jsFunc, err];
-		/* } */ case 13:
-		goCallArgTargetTypes[0] = $makeSlice(sliceType, numGoArgs[0]);
-		goCallArgsTargetValues[0] = $makeSlice(sliceType$1, numGoArgs[0]);
-		i = 0;
-		/* while (true) { */ case 18:
-			_r$11 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 20; case 20: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
-			_r$12 = _r$11.NumIn(); /* */ $s = 21; case 21: if($c) { $c = false; _r$12 = _r$12.$blk(); } if (_r$12 && _r$12.$blk !== undefined) { break s; }
-			/* if (!(i < _r$12)) { break; } */ if(!(i < _r$12)) { $s = 19; continue; }
-			_r$13 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 22; case 22: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
-			_r$14 = _r$13.In(i); /* */ $s = 23; case 23: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
-			((i < 0 || i >= goCallArgTargetTypes[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + i] = _r$14);
-			i = i + (1) >> 0;
-		/* } */ $s = 18; continue; case 19:
-		jsFunc = js.MakeFunc((function(goCallArgTargetTypes, goCallArgsTargetValues, numGoArgs, reflectedGoFunc) { return function $b(this$1, arguments$1) {
-			var _i, _r$15, _r$16, _r$17, _r$18, _r$19, _r$20, _r$21, _ref, _tuple, _tuple$1, arguments$1, castedArg, err$1, err$2, goTargetArgT, idx, jsArg, results, storeVal, targetIdx, this$1, $s, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _r$15 = $f._r$15; _r$16 = $f._r$16; _r$17 = $f._r$17; _r$18 = $f._r$18; _r$19 = $f._r$19; _r$20 = $f._r$20; _r$21 = $f._r$21; _ref = $f._ref; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; arguments$1 = $f.arguments$1; castedArg = $f.castedArg; err$1 = $f.err$1; err$2 = $f.err$2; goTargetArgT = $f.goTargetArgT; idx = $f.idx; jsArg = $f.jsArg; results = $f.results; storeVal = $f.storeVal; targetIdx = $f.targetIdx; this$1 = $f.this$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-			/* */ if (arguments$1.$length < (numGoArgs[0] - 1 >> 0)) { $s = 1; continue; }
-			/* */ $s = 2; continue;
-			/* if (arguments$1.$length < (numGoArgs[0] - 1 >> 0)) { */ case 1:
-				_r$15 = eTooFewMutationArgsOnCall.Error(); /* */ $s = 3; case 3: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
-				$panic(new $String(_r$15));
-			/* } */ case 2:
-			_r$16 = castToType((0 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 0]), this$1); /* */ $s = 4; case 4: if($c) { $c = false; _r$16 = _r$16.$blk(); } if (_r$16 && _r$16.$blk !== undefined) { break s; }
-			_tuple = _r$16;
-			storeVal = _tuple[0];
-			err$1 = _tuple[1];
-			/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 5; continue; }
-			/* */ $s = 6; continue;
-			/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 5:
-				_r$17 = err$1.Error(); /* */ $s = 7; case 7: if($c) { $c = false; _r$17 = _r$17.$blk(); } if (_r$17 && _r$17.$blk !== undefined) { break s; }
-				$panic(new $String("Error converting JavaScript provided argument for mutation function to *Store: " + _r$17));
-			/* } */ case 6:
-			(0 >= goCallArgsTargetValues[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + 0] = storeVal);
-			_ref = arguments$1;
-			_i = 0;
-			/* while (true) { */ case 8:
-				/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 9; continue; }
-				idx = _i;
-				jsArg = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-				targetIdx = idx + 1 >> 0;
-				if (targetIdx >= numGoArgs[0]) {
-					/* break; */ $s = 9; continue;
-				}
-				goTargetArgT = ((targetIdx < 0 || targetIdx >= goCallArgTargetTypes[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + targetIdx]);
-				_r$18 = castToType(goTargetArgT, jsArg); /* */ $s = 10; case 10: if($c) { $c = false; _r$18 = _r$18.$blk(); } if (_r$18 && _r$18.$blk !== undefined) { break s; }
-				_tuple$1 = _r$18;
-				castedArg = _tuple$1[0];
-				err$2 = _tuple$1[1];
-				/* */ if (!($interfaceIsEqual(err$2, $ifaceNil))) { $s = 11; continue; }
-				/* */ $s = 12; continue;
-				/* if (!($interfaceIsEqual(err$2, $ifaceNil))) { */ case 11:
-					_r$19 = goTargetArgT.Kind(); /* */ $s = 13; case 13: if($c) { $c = false; _r$19 = _r$19.$blk(); } if (_r$19 && _r$19.$blk !== undefined) { break s; }
-					_r$20 = new reflect.Kind(_r$19).String(); /* */ $s = 14; case 14: if($c) { $c = false; _r$20 = _r$20.$blk(); } if (_r$20 && _r$20.$blk !== undefined) { break s; }
-					$panic(new $String("Error converting JS object to " + _r$20));
-				/* } */ case 12:
-				((targetIdx < 0 || targetIdx >= goCallArgsTargetValues[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + targetIdx] = castedArg);
-				_i++;
-			/* } */ $s = 8; continue; case 9:
-			_r$21 = $clone(reflectedGoFunc[0], reflect.Value).Call(goCallArgsTargetValues[0]); /* */ $s = 15; case 15: if($c) { $c = false; _r$21 = _r$21.$blk(); } if (_r$21 && _r$21.$blk !== undefined) { break s; }
-			results = _r$21;
-			$s = -1; return results;
-			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._i = _i; $f._r$15 = _r$15; $f._r$16 = _r$16; $f._r$17 = _r$17; $f._r$18 = _r$18; $f._r$19 = _r$19; $f._r$20 = _r$20; $f._r$21 = _r$21; $f._ref = _ref; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.arguments$1 = arguments$1; $f.castedArg = castedArg; $f.err$1 = err$1; $f.err$2 = err$2; $f.goTargetArgT = goTargetArgT; $f.idx = idx; $f.jsArg = jsArg; $f.results = results; $f.storeVal = storeVal; $f.targetIdx = targetIdx; $f.this$1 = this$1; $f.$s = $s; $f.$r = $r; return $f;
-		}; })(goCallArgTargetTypes, goCallArgsTargetValues, numGoArgs, reflectedGoFunc));
-		_tmp$8 = jsFunc;
-		_tmp$9 = $ifaceNil;
-		jsFunc = _tmp$8;
-		err = _tmp$9;
-		$s = -1; return [jsFunc, err];
-		/* */ } return; } if ($f === undefined) { $f = { $blk: wrapGoMutationFunc }; } $f._r = _r; $f._r$1 = _r$1; $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$14 = _r$14; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tmp$4 = _tmp$4; $f._tmp$5 = _tmp$5; $f._tmp$6 = _tmp$6; $f._tmp$7 = _tmp$7; $f._tmp$8 = _tmp$8; $f._tmp$9 = _tmp$9; $f._v = _v; $f._v$1 = _v$1; $f.err = err; $f.goArg0 = goArg0; $f.goArg1 = goArg1; $f.goCallArgTargetTypes = goCallArgTargetTypes; $f.goCallArgsTargetValues = goCallArgsTargetValues; $f.i = i; $f.jsFunc = jsFunc; $f.numGoArgs = numGoArgs; $f.reflectedGoFunc = reflectedGoFunc; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	Mutation = function(name, goFunc) {
-		var goFunc, name;
-		return (function $b(c) {
-			var _r, _r$1, _r$2, _tuple, c, err, jsFunc, reflectedGoFunc, $s, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _tuple = $f._tuple; c = $f.c; err = $f.err; jsFunc = $f.jsFunc; reflectedGoFunc = $f.reflectedGoFunc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-			if (c.Object.mutations === undefined) {
-				c.Object.mutations = o();
-			}
-			_r = reflect.ValueOf(goFunc); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-			reflectedGoFunc = _r;
-			if (!(($clone(reflectedGoFunc, reflect.Value).Kind() === 19))) {
-				$panic(new $String("Mutation " + name + " is not a func"));
-			}
-			_r$1 = wrapGoMutationFunc($clone(reflectedGoFunc, reflect.Value)); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-			_tuple = _r$1;
-			jsFunc = _tuple[0];
-			err = _tuple[1];
-			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 3; continue; }
-			/* */ $s = 4; continue;
-			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 3:
-				_r$2 = err.Error(); /* */ $s = 5; case 5: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-				$panic(new $String("Error exposing the mutation function '" + name + "' to JavaScript: " + _r$2));
-			/* } */ case 4:
-			c.Object.mutations[$externalize(name, $String)] = jsFunc;
-			$s = -1; return;
-			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.err = err; $f.jsFunc = jsFunc; $f.reflectedGoFunc = reflectedGoFunc; $f.$s = $s; $f.$r = $r; return $f;
-		});
-	};
-	$pkg.Mutation = Mutation;
-	State = function(value) {
-		var _r, value, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; value = $f.value; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		value = [value];
-		_r = checkIfJSStruct(reflect.TypeOf(value[0])); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
-		/* */ if (!_r) { $s = 1; continue; }
-		/* */ $s = 2; continue;
-		/* if (!_r) { */ case 1:
-			$panic(eFirstFieldIsNotPtrJsObject);
-		/* } */ case 2:
-		$s = -1; return (function(value) { return function(c) {
-			var c;
-			if (!(c.Object.state === undefined)) {
-				$panic(new $String("Cannot use mvuex.Sate more than once"));
-			}
-			c.Object.state = $externalize(value[0], $emptyInterface);
-		}; })(value);
-		/* */ } return; } if ($f === undefined) { $f = { $blk: State }; } $f._r = _r; $f.value = value; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.State = State;
-	StoreConfig.ptr.prototype.Option = function(opts) {
-		var _i, _ref, c, opt, opts, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _ref = $f._ref; c = $f.c; opt = $f.opt; opts = $f.opts; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		c = this;
-		_ref = opts;
-		_i = 0;
-		/* while (true) { */ case 1:
-			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 2; continue; }
-			opt = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-			$r = opt(c); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			_i++;
-		/* } */ $s = 1; continue; case 2:
-		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: StoreConfig.ptr.prototype.Option }; } $f._i = _i; $f._ref = _ref; $f.c = c; $f.opt = opt; $f.opts = opts; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	StoreConfig.prototype.Option = function(opts) { return this.$val.Option(opts); };
-	NewStore = function(opts) {
-		var c, opts, store, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; opts = $f.opts; store = $f.store; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		c = new StoreConfig.ptr(o(), null, null, null, new reflect.Value.ptr(ptrType.nil, 0, 0));
-		$r = c.Option(opts); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		store = new Store.ptr(new ($global.Vuex.Store)($externalize(c, ptrType$1)), null, $throwNilPointerError, $throwNilPointerError, false);
-		$s = -1; return store;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: NewStore }; } $f.c = c; $f.opts = opts; $f.store = store; $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.NewStore = NewStore;
-	ptrType$1.methods = [{prop: "Option", name: "Option", pkg: "", typ: $funcType([sliceType$3], [], true)}];
-	ActionContext.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "Getters", name: "Getters", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"getters\""}, {prop: "Commit", name: "Commit", anonymous: false, exported: true, typ: funcType, tag: "js:\"commit\""}, {prop: "Dispatch", name: "Dispatch", anonymous: false, exported: true, typ: funcType, tag: "js:\"dispatch\""}, {prop: "State", name: "State", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"state\""}, {prop: "RootGetters", name: "RootGetters", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"rootGetters\""}, {prop: "RootState", name: "RootState", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"rootState\""}]);
-	StoreOption.init([ptrType$1], [], false);
-	Store.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "Getters", name: "Getters", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"getters\""}, {prop: "Commit", name: "Commit", anonymous: false, exported: true, typ: funcType, tag: "js:\"commit\""}, {prop: "Dispatch", name: "Dispatch", anonymous: false, exported: true, typ: funcType, tag: "js:\"dispatch\""}, {prop: "Strict", name: "Strict", anonymous: false, exported: true, typ: $Bool, tag: "js:\"strict\""}]);
-	StoreConfig.init("./mvuex", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "State", name: "State", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"state\""}, {prop: "Mutations", name: "Mutations", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"mutations\""}, {prop: "Actions", name: "Actions", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"actions\""}, {prop: "stateValue", name: "stateValue", anonymous: false, exported: false, typ: reflect.Value, tag: ""}]);
-	$init = function() {
-		$pkg.$init = function() {};
-		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = errors.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = js.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = reflect.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = strconv.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		eTooFewMutationArgs = errors.New("Mutation function has too few arguments (min 2)");
-		eTooManyMutationArgs = errors.New("Mutation function has too many arguments (max 3)");
-		eWrongActionArgCount = errors.New("Wrong argument count! An action handler takes 3 or 4 args: actionHandler(store *Store, context *ActionContext, state *{CustomStateType} [, callArg *{CustomArgType])");
-		eTooFewMutationArgsOnCall = errors.New("Mutation function called with too few arguments from JavaScrip");
-		eWrongFirstMutationArg = errors.New("Mutation function has to have *Store as first argument type");
-		eWrongFirstActionArg = errors.New("Mutation function has to have *Store as first argument type");
-		eWrongSecondActionArg = errors.New("Mutation function has to have *ActionContext as second argument type");
-		eWrongSecondMutationArg = errors.New("The second argument of the mutation function has to be a pointer to a struct of the type used for state");
-		eFirstFieldIsNotPtrJsObject = errors.New("The first field of the struct has to be of type *js.Object");
-		jsObjectType = reflect.TypeOf((x = new js.Object.ptr(null), new x.constructor.elem(x)));
-		jsStoreType = reflect.TypeOf((x$1 = new Store.ptr(null, null, $throwNilPointerError, $throwNilPointerError, false), new x$1.constructor.elem(x$1)));
-		jsActioContextType = reflect.TypeOf((x$2 = new ActionContext.ptr(null, null, $throwNilPointerError, $throwNilPointerError, null, null, null), new x$2.constructor.elem(x$2)));
-		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.$init = $init;
-	return $pkg;
-})();
 $packages["hash"] = (function() {
 	var $pkg = {}, $init, io, Hash, sliceType;
 	io = $packages["io"];
@@ -30906,6 +30253,659 @@ $packages["github.com/mame82/hvue"] = (function() {
 		vmType = reflect.TypeOf(new VM.ptr(null, null, null, null, null, null, null, sliceType.nil, null, null, false, null, null));
 		dataObjects = $makeMap($Int.keyFor, []);
 		nextDataID = 1;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+$packages["github.com/mame82/mvuex"] = (function() {
+	var $pkg = {}, $init, errors, js, reflect, strconv, ActionContext, StoreOption, Store, StoreConfig, sliceType, sliceType$1, ptrType, ptrType$1, ptrType$2, sliceType$2, funcType, sliceType$3, eTooFewMutationArgs, eTooManyMutationArgs, eWrongActionArgCount, eTooFewMutationArgsOnCall, eWrongFirstMutationArg, eWrongFirstActionArg, eWrongSecondActionArg, eWrongSecondMutationArg, eFirstFieldIsNotPtrJsObject, jsObjectType, jsStoreType, jsActioContextType, x, x$1, x$2, wrapGoActionFunc, Action, o, castToType, checkIfJSStruct, wrapGoMutationFunc, Mutation, State, NewStore;
+	errors = $packages["errors"];
+	js = $packages["github.com/gopherjs/gopherjs/js"];
+	reflect = $packages["reflect"];
+	strconv = $packages["strconv"];
+	ActionContext = $pkg.ActionContext = $newType(0, $kindStruct, "mvuex.ActionContext", true, "github.com/mame82/mvuex", true, function(Object_, Getters_, Commit_, Dispatch_, State_, RootGetters_, RootState_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Object = null;
+			this.Getters = null;
+			this.Commit = $throwNilPointerError;
+			this.Dispatch = $throwNilPointerError;
+			this.State = null;
+			this.RootGetters = null;
+			this.RootState = null;
+			return;
+		}
+		this.Object = Object_;
+		this.Getters = Getters_;
+		this.Commit = Commit_;
+		this.Dispatch = Dispatch_;
+		this.State = State_;
+		this.RootGetters = RootGetters_;
+		this.RootState = RootState_;
+	});
+	StoreOption = $pkg.StoreOption = $newType(4, $kindFunc, "mvuex.StoreOption", true, "github.com/mame82/mvuex", true, null);
+	Store = $pkg.Store = $newType(0, $kindStruct, "mvuex.Store", true, "github.com/mame82/mvuex", true, function(Object_, Getters_, Commit_, Dispatch_, Strict_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Object = null;
+			this.Getters = null;
+			this.Commit = $throwNilPointerError;
+			this.Dispatch = $throwNilPointerError;
+			this.Strict = false;
+			return;
+		}
+		this.Object = Object_;
+		this.Getters = Getters_;
+		this.Commit = Commit_;
+		this.Dispatch = Dispatch_;
+		this.Strict = Strict_;
+	});
+	StoreConfig = $pkg.StoreConfig = $newType(0, $kindStruct, "mvuex.StoreConfig", true, "github.com/mame82/mvuex", true, function(Object_, State_, Mutations_, Actions_, stateValue_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Object = null;
+			this.State = null;
+			this.Mutations = null;
+			this.Actions = null;
+			this.stateValue = new reflect.Value.ptr(ptrType.nil, 0, 0);
+			return;
+		}
+		this.Object = Object_;
+		this.State = State_;
+		this.Mutations = Mutations_;
+		this.Actions = Actions_;
+		this.stateValue = stateValue_;
+	});
+	sliceType = $sliceType(reflect.Type);
+	sliceType$1 = $sliceType(reflect.Value);
+	ptrType = $ptrType(reflect.rtype);
+	ptrType$1 = $ptrType(StoreConfig);
+	ptrType$2 = $ptrType(js.Object);
+	sliceType$2 = $sliceType($emptyInterface);
+	funcType = $funcType([sliceType$2], [ptrType$2], true);
+	sliceType$3 = $sliceType(StoreOption);
+	wrapGoActionFunc = function(reflectedGoFunc) {
+		var _r, _r$1, _r$10, _r$11, _r$12, _r$13, _r$14, _r$15, _r$16, _r$17, _r$18, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tmp$9, _v, _v$1, _v$2, arg, arg$1, arg$2, err, goCallArgTargetTypes, goCallArgsTargetValues, i, i$1, jsFunc, numGoArgs, reflectedGoFunc, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$15 = $f._r$15; _r$16 = $f._r$16; _r$17 = $f._r$17; _r$18 = $f._r$18; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tmp$4 = $f._tmp$4; _tmp$5 = $f._tmp$5; _tmp$6 = $f._tmp$6; _tmp$7 = $f._tmp$7; _tmp$8 = $f._tmp$8; _tmp$9 = $f._tmp$9; _v = $f._v; _v$1 = $f._v$1; _v$2 = $f._v$2; arg = $f.arg; arg$1 = $f.arg$1; arg$2 = $f.arg$2; err = $f.err; goCallArgTargetTypes = $f.goCallArgTargetTypes; goCallArgsTargetValues = $f.goCallArgsTargetValues; i = $f.i; i$1 = $f.i$1; jsFunc = $f.jsFunc; numGoArgs = $f.numGoArgs; reflectedGoFunc = $f.reflectedGoFunc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		goCallArgTargetTypes = [goCallArgTargetTypes];
+		goCallArgsTargetValues = [goCallArgsTargetValues];
+		numGoArgs = [numGoArgs];
+		reflectedGoFunc = [reflectedGoFunc];
+		jsFunc = null;
+		err = $ifaceNil;
+		_r = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_r$1 = _r.NumIn(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		numGoArgs[0] = _r$1;
+		if (numGoArgs[0] < 3 || numGoArgs[0] > 4) {
+			_tmp = null;
+			_tmp$1 = eWrongActionArgCount;
+			jsFunc = _tmp;
+			err = _tmp$1;
+			$s = -1; return [jsFunc, err];
+		}
+		_r$2 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$3 = _r$2.In(0); /* */ $s = 4; case 4: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		arg = _r$3;
+		_r$4 = arg.Kind(); /* */ $s = 8; case 8: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+		if (!((_r$4 === 22))) { _v = true; $s = 7; continue s; }
+		_r$5 = arg.Elem(); /* */ $s = 9; case 9: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+		_v = !($interfaceIsEqual(_r$5, jsStoreType)); case 7:
+		/* */ if (_v) { $s = 5; continue; }
+		/* */ $s = 6; continue;
+		/* if (_v) { */ case 5:
+			_tmp$2 = null;
+			_tmp$3 = eWrongFirstActionArg;
+			jsFunc = _tmp$2;
+			err = _tmp$3;
+			$s = -1; return [jsFunc, err];
+		/* } */ case 6:
+		_r$6 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 10; case 10: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
+		_r$7 = _r$6.In(1); /* */ $s = 11; case 11: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
+		arg$1 = _r$7;
+		_r$8 = arg$1.Kind(); /* */ $s = 15; case 15: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
+		if (!((_r$8 === 22))) { _v$1 = true; $s = 14; continue s; }
+		_r$9 = arg$1.Elem(); /* */ $s = 16; case 16: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
+		_v$1 = !($interfaceIsEqual(_r$9, jsActioContextType)); case 14:
+		/* */ if (_v$1) { $s = 12; continue; }
+		/* */ $s = 13; continue;
+		/* if (_v$1) { */ case 12:
+			_tmp$4 = null;
+			_tmp$5 = eWrongSecondActionArg;
+			jsFunc = _tmp$4;
+			err = _tmp$5;
+			$s = -1; return [jsFunc, err];
+		/* } */ case 13:
+		i = 2;
+		/* while (true) { */ case 17:
+			/* if (!(i < numGoArgs[0])) { break; } */ if(!(i < numGoArgs[0])) { $s = 18; continue; }
+			_r$10 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 19; case 19: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
+			_r$11 = _r$10.In(i); /* */ $s = 20; case 20: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
+			arg$2 = _r$11;
+			_r$12 = arg$2.Kind(); /* */ $s = 24; case 24: if($c) { $c = false; _r$12 = _r$12.$blk(); } if (_r$12 && _r$12.$blk !== undefined) { break s; }
+			if (!((_r$12 === 22))) { _v$2 = true; $s = 23; continue s; }
+			_r$13 = arg$2.Elem(); /* */ $s = 25; case 25: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
+			_r$14 = checkIfJSStruct(_r$13); /* */ $s = 26; case 26: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
+			_v$2 = !_r$14; case 23:
+			/* */ if (_v$2) { $s = 21; continue; }
+			/* */ $s = 22; continue;
+			/* if (_v$2) { */ case 21:
+				_tmp$6 = null;
+				_tmp$7 = errors.New("Arg at position " + strconv.Itoa(i) + " isn't a pointer to a struct with *js.Object in first field");
+				jsFunc = _tmp$6;
+				err = _tmp$7;
+				$s = -1; return [jsFunc, err];
+			/* } */ case 22:
+			i = i + (1) >> 0;
+		/* } */ $s = 17; continue; case 18:
+		goCallArgTargetTypes[0] = $makeSlice(sliceType, numGoArgs[0]);
+		i$1 = 0;
+		/* while (true) { */ case 27:
+			_r$15 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 29; case 29: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
+			_r$16 = _r$15.NumIn(); /* */ $s = 30; case 30: if($c) { $c = false; _r$16 = _r$16.$blk(); } if (_r$16 && _r$16.$blk !== undefined) { break s; }
+			/* if (!(i$1 < _r$16)) { break; } */ if(!(i$1 < _r$16)) { $s = 28; continue; }
+			_r$17 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 31; case 31: if($c) { $c = false; _r$17 = _r$17.$blk(); } if (_r$17 && _r$17.$blk !== undefined) { break s; }
+			_r$18 = _r$17.In(i$1); /* */ $s = 32; case 32: if($c) { $c = false; _r$18 = _r$18.$blk(); } if (_r$18 && _r$18.$blk !== undefined) { break s; }
+			((i$1 < 0 || i$1 >= goCallArgTargetTypes[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + i$1] = _r$18);
+			i$1 = i$1 + (1) >> 0;
+		/* } */ $s = 27; continue; case 28:
+		goCallArgsTargetValues[0] = $makeSlice(sliceType$1, numGoArgs[0]);
+		jsFunc = js.MakeFunc((function(goCallArgTargetTypes, goCallArgsTargetValues, numGoArgs, reflectedGoFunc) { return function $b(this$1, arguments$1) {
+			var _r$19, _r$20, _r$21, _r$22, _r$23, _r$24, _r$25, _r$26, _r$27, _r$28, _r$29, _r$30, _r$31, _r$32, _tuple, _tuple$1, _tuple$2, _tuple$3, actionParamVal, arguments$1, contextVal, err$1, err$2, jsStateObj, stateVal, storeVal, this$1, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$19 = $f._r$19; _r$20 = $f._r$20; _r$21 = $f._r$21; _r$22 = $f._r$22; _r$23 = $f._r$23; _r$24 = $f._r$24; _r$25 = $f._r$25; _r$26 = $f._r$26; _r$27 = $f._r$27; _r$28 = $f._r$28; _r$29 = $f._r$29; _r$30 = $f._r$30; _r$31 = $f._r$31; _r$32 = $f._r$32; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; _tuple$2 = $f._tuple$2; _tuple$3 = $f._tuple$3; actionParamVal = $f.actionParamVal; arguments$1 = $f.arguments$1; contextVal = $f.contextVal; err$1 = $f.err$1; err$2 = $f.err$2; jsStateObj = $f.jsStateObj; stateVal = $f.stateVal; storeVal = $f.storeVal; this$1 = $f.this$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			_r$19 = castToType((0 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 0]), this$1); /* */ $s = 1; case 1: if($c) { $c = false; _r$19 = _r$19.$blk(); } if (_r$19 && _r$19.$blk !== undefined) { break s; }
+			_tuple = _r$19;
+			storeVal = _tuple[0];
+			err$1 = _tuple[1];
+			/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 2; continue; }
+			/* */ $s = 3; continue;
+			/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 2:
+				_r$20 = err$1.Error(); /* */ $s = 4; case 4: if($c) { $c = false; _r$20 = _r$20.$blk(); } if (_r$20 && _r$20.$blk !== undefined) { break s; }
+				$panic(new $String("Error converting JavaScript provided 'this' for action function to *Store: " + _r$20));
+			/* } */ case 3:
+			(0 >= goCallArgsTargetValues[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + 0] = storeVal);
+			_r$21 = castToType((1 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 1]), (0 >= arguments$1.$length ? ($throwRuntimeError("index out of range"), undefined) : arguments$1.$array[arguments$1.$offset + 0])); /* */ $s = 5; case 5: if($c) { $c = false; _r$21 = _r$21.$blk(); } if (_r$21 && _r$21.$blk !== undefined) { break s; }
+			_tuple$1 = _r$21;
+			contextVal = _tuple$1[0];
+			err$1 = _tuple$1[1];
+			/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 6; continue; }
+			/* */ $s = 7; continue;
+			/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 6:
+				_r$22 = err$1.Error(); /* */ $s = 8; case 8: if($c) { $c = false; _r$22 = _r$22.$blk(); } if (_r$22 && _r$22.$blk !== undefined) { break s; }
+				$panic(new $String("Error converting JavaScript provided first argument for action function to *ActionContext: " + _r$22));
+			/* } */ case 7:
+			(1 >= goCallArgsTargetValues[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + 1] = contextVal);
+			jsStateObj = (0 >= arguments$1.$length ? ($throwRuntimeError("index out of range"), undefined) : arguments$1.$array[arguments$1.$offset + 0]).state;
+			_r$23 = castToType((2 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 2]), jsStateObj); /* */ $s = 9; case 9: if($c) { $c = false; _r$23 = _r$23.$blk(); } if (_r$23 && _r$23.$blk !== undefined) { break s; }
+			_tuple$2 = _r$23;
+			stateVal = _tuple$2[0];
+			err$1 = _tuple$2[1];
+			/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 10; continue; }
+			/* */ $s = 11; continue;
+			/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 10:
+				_r$24 = (2 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 2]).Elem(); /* */ $s = 12; case 12: if($c) { $c = false; _r$24 = _r$24.$blk(); } if (_r$24 && _r$24.$blk !== undefined) { break s; }
+				_r$25 = _r$24.Name(); /* */ $s = 13; case 13: if($c) { $c = false; _r$25 = _r$25.$blk(); } if (_r$25 && _r$25.$blk !== undefined) { break s; }
+				_r$26 = err$1.Error(); /* */ $s = 14; case 14: if($c) { $c = false; _r$26 = _r$26.$blk(); } if (_r$26 && _r$26.$blk !== undefined) { break s; }
+				$panic(new $String("Error converting JavaScript provided context.state for action function to *" + _r$25 + ": " + _r$26));
+			/* } */ case 11:
+			(2 >= goCallArgsTargetValues[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + 2] = stateVal);
+			/* */ if (numGoArgs[0] === 4) { $s = 15; continue; }
+			/* */ $s = 16; continue;
+			/* if (numGoArgs[0] === 4) { */ case 15:
+				/* */ if ((1 >= arguments$1.$length ? ($throwRuntimeError("index out of range"), undefined) : arguments$1.$array[arguments$1.$offset + 1]) === undefined) { $s = 17; continue; }
+				/* */ $s = 18; continue;
+				/* if ((1 >= arguments$1.$length ? ($throwRuntimeError("index out of range"), undefined) : arguments$1.$array[arguments$1.$offset + 1]) === undefined) { */ case 17:
+					_r$27 = (3 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 3]).Name(); /* */ $s = 19; case 19: if($c) { $c = false; _r$27 = _r$27.$blk(); } if (_r$27 && _r$27.$blk !== undefined) { break s; }
+					$panic(new $String("The action handler awaits an argument of type " + _r$27 + " but the dispatched action doesn't provide this parameter"));
+				/* } */ case 18:
+				_r$28 = castToType((3 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 3]), (1 >= arguments$1.$length ? ($throwRuntimeError("index out of range"), undefined) : arguments$1.$array[arguments$1.$offset + 1])); /* */ $s = 20; case 20: if($c) { $c = false; _r$28 = _r$28.$blk(); } if (_r$28 && _r$28.$blk !== undefined) { break s; }
+				_tuple$3 = _r$28;
+				actionParamVal = _tuple$3[0];
+				err$2 = _tuple$3[1];
+				/* */ if (!($interfaceIsEqual(err$2, $ifaceNil))) { $s = 21; continue; }
+				/* */ $s = 22; continue;
+				/* if (!($interfaceIsEqual(err$2, $ifaceNil))) { */ case 21:
+					_r$29 = (3 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 3]).Elem(); /* */ $s = 23; case 23: if($c) { $c = false; _r$29 = _r$29.$blk(); } if (_r$29 && _r$29.$blk !== undefined) { break s; }
+					_r$30 = _r$29.Name(); /* */ $s = 24; case 24: if($c) { $c = false; _r$30 = _r$30.$blk(); } if (_r$30 && _r$30.$blk !== undefined) { break s; }
+					_r$31 = err$2.Error(); /* */ $s = 25; case 25: if($c) { $c = false; _r$31 = _r$31.$blk(); } if (_r$31 && _r$31.$blk !== undefined) { break s; }
+					$panic(new $String("Error converting JavaScript provided optional parameter for action function to *" + _r$30 + ": " + _r$31));
+				/* } */ case 22:
+				(3 >= goCallArgsTargetValues[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + 3] = actionParamVal);
+			/* } */ case 16:
+			_r$32 = $clone(reflectedGoFunc[0], reflect.Value).Call(goCallArgsTargetValues[0]); /* */ $s = 26; case 26: if($c) { $c = false; _r$32 = _r$32.$blk(); } if (_r$32 && _r$32.$blk !== undefined) { break s; }
+			$s = -1; return _r$32;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$19 = _r$19; $f._r$20 = _r$20; $f._r$21 = _r$21; $f._r$22 = _r$22; $f._r$23 = _r$23; $f._r$24 = _r$24; $f._r$25 = _r$25; $f._r$26 = _r$26; $f._r$27 = _r$27; $f._r$28 = _r$28; $f._r$29 = _r$29; $f._r$30 = _r$30; $f._r$31 = _r$31; $f._r$32 = _r$32; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f._tuple$2 = _tuple$2; $f._tuple$3 = _tuple$3; $f.actionParamVal = actionParamVal; $f.arguments$1 = arguments$1; $f.contextVal = contextVal; $f.err$1 = err$1; $f.err$2 = err$2; $f.jsStateObj = jsStateObj; $f.stateVal = stateVal; $f.storeVal = storeVal; $f.this$1 = this$1; $f.$s = $s; $f.$r = $r; return $f;
+		}; })(goCallArgTargetTypes, goCallArgsTargetValues, numGoArgs, reflectedGoFunc));
+		_tmp$8 = jsFunc;
+		_tmp$9 = $ifaceNil;
+		jsFunc = _tmp$8;
+		err = _tmp$9;
+		$s = -1; return [jsFunc, err];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: wrapGoActionFunc }; } $f._r = _r; $f._r$1 = _r$1; $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$14 = _r$14; $f._r$15 = _r$15; $f._r$16 = _r$16; $f._r$17 = _r$17; $f._r$18 = _r$18; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tmp$4 = _tmp$4; $f._tmp$5 = _tmp$5; $f._tmp$6 = _tmp$6; $f._tmp$7 = _tmp$7; $f._tmp$8 = _tmp$8; $f._tmp$9 = _tmp$9; $f._v = _v; $f._v$1 = _v$1; $f._v$2 = _v$2; $f.arg = arg; $f.arg$1 = arg$1; $f.arg$2 = arg$2; $f.err = err; $f.goCallArgTargetTypes = goCallArgTargetTypes; $f.goCallArgsTargetValues = goCallArgsTargetValues; $f.i = i; $f.i$1 = i$1; $f.jsFunc = jsFunc; $f.numGoArgs = numGoArgs; $f.reflectedGoFunc = reflectedGoFunc; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Action = function(name, goFunc) {
+		var goFunc, name;
+		return (function $b(c) {
+			var _r, _r$1, _r$2, _tuple, c, err, jsFunc, reflectedGoFunc, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _tuple = $f._tuple; c = $f.c; err = $f.err; jsFunc = $f.jsFunc; reflectedGoFunc = $f.reflectedGoFunc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			if (c.Object.actions === undefined) {
+				c.Object.actions = o();
+			}
+			_r = reflect.ValueOf(goFunc); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			reflectedGoFunc = _r;
+			if (!(($clone(reflectedGoFunc, reflect.Value).Kind() === 19))) {
+				$panic(new $String("Action " + name + " is not a func"));
+			}
+			_r$1 = wrapGoActionFunc($clone(reflectedGoFunc, reflect.Value)); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+			_tuple = _r$1;
+			jsFunc = _tuple[0];
+			err = _tuple[1];
+			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 3; continue; }
+			/* */ $s = 4; continue;
+			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 3:
+				_r$2 = err.Error(); /* */ $s = 5; case 5: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+				$panic(new $String("Error exposing the action function '" + name + "' to JavaScript: " + _r$2));
+			/* } */ case 4:
+			c.Object.actions[$externalize(name, $String)] = jsFunc;
+			$s = -1; return;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.err = err; $f.jsFunc = jsFunc; $f.reflectedGoFunc = reflectedGoFunc; $f.$s = $s; $f.$r = $r; return $f;
+		});
+	};
+	$pkg.Action = Action;
+	o = function() {
+		return new ($global.Object)();
+	};
+	castToType = function(targetType, sourceVal) {
+		var _1, _r, _r$1, _r$10, _r$11, _r$12, _r$13, _r$14, _r$15, _r$16, _r$17, _r$18, _r$19, _r$2, _r$20, _r$21, _r$22, _r$23, _r$24, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tuple, derefType, derefVal, err, err$1, kind, pStructInstance, result, sourceVal, targetType, x$3, x$4, x$5, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _1 = $f._1; _r = $f._r; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$15 = $f._r$15; _r$16 = $f._r$16; _r$17 = $f._r$17; _r$18 = $f._r$18; _r$19 = $f._r$19; _r$2 = $f._r$2; _r$20 = $f._r$20; _r$21 = $f._r$21; _r$22 = $f._r$22; _r$23 = $f._r$23; _r$24 = $f._r$24; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tmp$4 = $f._tmp$4; _tmp$5 = $f._tmp$5; _tuple = $f._tuple; derefType = $f.derefType; derefVal = $f.derefVal; err = $f.err; err$1 = $f.err$1; kind = $f.kind; pStructInstance = $f.pStructInstance; result = $f.result; sourceVal = $f.sourceVal; targetType = $f.targetType; x$3 = $f.x$3; x$4 = $f.x$4; x$5 = $f.x$5; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		result = new reflect.Value.ptr(ptrType.nil, 0, 0);
+		err = $ifaceNil;
+			_r = targetType.Kind(); /* */ $s = 2; case 2: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			kind = _r;
+			_1 = kind;
+			/* */ if (_1 === (2)) { $s = 3; continue; }
+			/* */ if (_1 === (3)) { $s = 4; continue; }
+			/* */ if (_1 === (4)) { $s = 5; continue; }
+			/* */ if (_1 === (5)) { $s = 6; continue; }
+			/* */ if (_1 === (6)) { $s = 7; continue; }
+			/* */ if (_1 === (14)) { $s = 8; continue; }
+			/* */ if (_1 === (13)) { $s = 9; continue; }
+			/* */ if (_1 === (1)) { $s = 10; continue; }
+			/* */ if (_1 === (7)) { $s = 11; continue; }
+			/* */ if (_1 === (11)) { $s = 12; continue; }
+			/* */ if (_1 === (10)) { $s = 13; continue; }
+			/* */ if (_1 === (9)) { $s = 14; continue; }
+			/* */ if (_1 === (8)) { $s = 15; continue; }
+			/* */ if (_1 === (12)) { $s = 16; continue; }
+			/* */ if (_1 === (24)) { $s = 17; continue; }
+			/* */ if (_1 === (25)) { $s = 18; continue; }
+			/* */ if (_1 === (22)) { $s = 19; continue; }
+			/* */ if (_1 === (20)) { $s = 20; continue; }
+			/* */ $s = 21; continue;
+			/* if (_1 === (2)) { */ case 3:
+				_r$1 = reflect.ValueOf(new $Int(($parseInt(sourceVal) >> 0))); /* */ $s = 23; case 23: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+				result = _r$1;
+				$s = 22; continue;
+			/* } else if (_1 === (3)) { */ case 4:
+				_r$2 = reflect.ValueOf(new $Int8((((x$3 = $internalize(sourceVal, $Int64), x$3.$low + ((x$3.$high >> 31) * 4294967296)) << 24 >> 24)))); /* */ $s = 24; case 24: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+				result = _r$2;
+				$s = 22; continue;
+			/* } else if (_1 === (4)) { */ case 5:
+				_r$3 = reflect.ValueOf(new $Int16((((x$4 = $internalize(sourceVal, $Int64), x$4.$low + ((x$4.$high >> 31) * 4294967296)) << 16 >> 16)))); /* */ $s = 25; case 25: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+				result = _r$3;
+				$s = 22; continue;
+			/* } else if (_1 === (5)) { */ case 6:
+				_r$4 = reflect.ValueOf(new $Int32((((x$5 = $internalize(sourceVal, $Int64), x$5.$low + ((x$5.$high >> 31) * 4294967296)) >> 0)))); /* */ $s = 26; case 26: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+				result = _r$4;
+				$s = 22; continue;
+			/* } else if (_1 === (6)) { */ case 7:
+				_r$5 = reflect.ValueOf($internalize(sourceVal, $Int64)); /* */ $s = 27; case 27: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+				result = _r$5;
+				$s = 22; continue;
+			/* } else if (_1 === (14)) { */ case 8:
+				_r$6 = reflect.ValueOf(new $Float64($parseFloat(sourceVal))); /* */ $s = 28; case 28: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
+				result = _r$6;
+				$s = 22; continue;
+			/* } else if (_1 === (13)) { */ case 9:
+				_r$7 = reflect.ValueOf(new $Float32(($fround($parseFloat(sourceVal))))); /* */ $s = 29; case 29: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
+				result = _r$7;
+				$s = 22; continue;
+			/* } else if (_1 === (1)) { */ case 10:
+				_r$8 = reflect.ValueOf(new $Bool(!!(sourceVal))); /* */ $s = 30; case 30: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
+				result = _r$8;
+				$s = 22; continue;
+			/* } else if (_1 === (7)) { */ case 11:
+				_r$9 = reflect.ValueOf(new $Uint((($internalize(sourceVal, $Uint64).$low >>> 0)))); /* */ $s = 31; case 31: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
+				result = _r$9;
+				$s = 22; continue;
+			/* } else if (_1 === (11)) { */ case 12:
+				_r$10 = reflect.ValueOf($internalize(sourceVal, $Uint64)); /* */ $s = 32; case 32: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
+				result = _r$10;
+				$s = 22; continue;
+			/* } else if (_1 === (10)) { */ case 13:
+				_r$11 = reflect.ValueOf(new $Uint32((($internalize(sourceVal, $Uint64).$low >>> 0)))); /* */ $s = 33; case 33: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
+				result = _r$11;
+				$s = 22; continue;
+			/* } else if (_1 === (9)) { */ case 14:
+				_r$12 = reflect.ValueOf(new $Uint16((($internalize(sourceVal, $Uint64).$low << 16 >>> 16)))); /* */ $s = 34; case 34: if($c) { $c = false; _r$12 = _r$12.$blk(); } if (_r$12 && _r$12.$blk !== undefined) { break s; }
+				result = _r$12;
+				$s = 22; continue;
+			/* } else if (_1 === (8)) { */ case 15:
+				_r$13 = reflect.ValueOf(new $Uint8((($internalize(sourceVal, $Uint64).$low << 24 >>> 24)))); /* */ $s = 35; case 35: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
+				result = _r$13;
+				$s = 22; continue;
+			/* } else if (_1 === (12)) { */ case 16:
+				_r$14 = reflect.ValueOf(new $Uintptr(sourceVal)); /* */ $s = 36; case 36: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
+				result = _r$14;
+				$s = 22; continue;
+			/* } else if (_1 === (24)) { */ case 17:
+				_r$15 = reflect.ValueOf(new $String($internalize(sourceVal, $String))); /* */ $s = 37; case 37: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
+				result = _r$15;
+				$s = 22; continue;
+			/* } else if (_1 === (25)) { */ case 18:
+				_r$16 = checkIfJSStruct(targetType); /* */ $s = 40; case 40: if($c) { $c = false; _r$16 = _r$16.$blk(); } if (_r$16 && _r$16.$blk !== undefined) { break s; }
+				/* */ if (!_r$16) { $s = 38; continue; }
+				/* */ $s = 39; continue;
+				/* if (!_r$16) { */ case 38:
+					_tmp = result;
+					_tmp$1 = eFirstFieldIsNotPtrJsObject;
+					result = _tmp;
+					err = _tmp$1;
+					$s = -1; return [result, err];
+				/* } */ case 39:
+				_r$17 = reflect.New(targetType); /* */ $s = 41; case 41: if($c) { $c = false; _r$17 = _r$17.$blk(); } if (_r$17 && _r$17.$blk !== undefined) { break s; }
+				pStructInstance = _r$17;
+				_r$18 = $clone(pStructInstance, reflect.Value).Elem(); /* */ $s = 42; case 42: if($c) { $c = false; _r$18 = _r$18.$blk(); } if (_r$18 && _r$18.$blk !== undefined) { break s; }
+				_r$19 = $clone(_r$18, reflect.Value).Field(0); /* */ $s = 43; case 43: if($c) { $c = false; _r$19 = _r$19.$blk(); } if (_r$19 && _r$19.$blk !== undefined) { break s; }
+				_r$20 = reflect.ValueOf(new $jsObjectPtr(sourceVal)); /* */ $s = 44; case 44: if($c) { $c = false; _r$20 = _r$20.$blk(); } if (_r$20 && _r$20.$blk !== undefined) { break s; }
+				$r = $clone(_r$19, reflect.Value).Set($clone(_r$20, reflect.Value)); /* */ $s = 45; case 45: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+				_r$21 = $clone(pStructInstance, reflect.Value).Elem(); /* */ $s = 46; case 46: if($c) { $c = false; _r$21 = _r$21.$blk(); } if (_r$21 && _r$21.$blk !== undefined) { break s; }
+				result = _r$21;
+				$s = 22; continue;
+			/* } else if (_1 === (22)) { */ case 19:
+				_r$22 = targetType.Elem(); /* */ $s = 47; case 47: if($c) { $c = false; _r$22 = _r$22.$blk(); } if (_r$22 && _r$22.$blk !== undefined) { break s; }
+				derefType = _r$22;
+				_r$23 = castToType(derefType, sourceVal); /* */ $s = 48; case 48: if($c) { $c = false; _r$23 = _r$23.$blk(); } if (_r$23 && _r$23.$blk !== undefined) { break s; }
+				_tuple = _r$23;
+				derefVal = _tuple[0];
+				err$1 = _tuple[1];
+				if (!($interfaceIsEqual(err$1, $ifaceNil))) {
+					_tmp$2 = result;
+					_tmp$3 = err$1;
+					result = _tmp$2;
+					err = _tmp$3;
+					$s = -1; return [result, err];
+				}
+				result = $clone(derefVal, reflect.Value).Addr();
+				$s = 22; continue;
+			/* } else if (_1 === (20)) { */ case 20:
+				_r$24 = reflect.ValueOf($internalize(sourceVal, $emptyInterface)); /* */ $s = 49; case 49: if($c) { $c = false; _r$24 = _r$24.$blk(); } if (_r$24 && _r$24.$blk !== undefined) { break s; }
+				result = _r$24;
+				$s = 22; continue;
+			/* } else { */ case 21:
+				console.log("No conversion for following type implemented", new reflect.Kind(kind).String(), " from ", sourceVal);
+			/* } */ case 22:
+		case 1:
+		_tmp$4 = result;
+		_tmp$5 = $ifaceNil;
+		result = _tmp$4;
+		err = _tmp$5;
+		$s = -1; return [result, err];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: castToType }; } $f._1 = _1; $f._r = _r; $f._r$1 = _r$1; $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$14 = _r$14; $f._r$15 = _r$15; $f._r$16 = _r$16; $f._r$17 = _r$17; $f._r$18 = _r$18; $f._r$19 = _r$19; $f._r$2 = _r$2; $f._r$20 = _r$20; $f._r$21 = _r$21; $f._r$22 = _r$22; $f._r$23 = _r$23; $f._r$24 = _r$24; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tmp$4 = _tmp$4; $f._tmp$5 = _tmp$5; $f._tuple = _tuple; $f.derefType = derefType; $f.derefVal = derefVal; $f.err = err; $f.err$1 = err$1; $f.kind = kind; $f.pStructInstance = pStructInstance; $f.result = result; $f.sourceVal = sourceVal; $f.targetType = targetType; $f.x$3 = x$3; $f.x$4 = x$4; $f.x$5 = x$5; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	checkIfJSStruct = function(objType) {
+		var _r, _r$1, _r$2, _r$3, objType, typeField0, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; objType = $f.objType; typeField0 = $f.typeField0; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		_r = objType.Kind(); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		/* */ if (!((_r === 25))) { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if (!((_r === 25))) { */ case 1:
+			$s = -1; return false;
+		/* } */ case 2:
+		_r$1 = objType.Field(0); /* */ $s = 4; case 4: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		typeField0 = _r$1.Type;
+		_r$2 = typeField0.Kind(); /* */ $s = 7; case 7: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		/* */ if (!((_r$2 === 22))) { $s = 5; continue; }
+		/* */ $s = 6; continue;
+		/* if (!((_r$2 === 22))) { */ case 5:
+			$s = -1; return false;
+		/* } */ case 6:
+		_r$3 = typeField0.Elem(); /* */ $s = 10; case 10: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		/* */ if (!($interfaceIsEqual(_r$3, jsObjectType))) { $s = 8; continue; }
+		/* */ $s = 9; continue;
+		/* if (!($interfaceIsEqual(_r$3, jsObjectType))) { */ case 8:
+			$s = -1; return false;
+		/* } */ case 9:
+		$s = -1; return true;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: checkIfJSStruct }; } $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f.objType = objType; $f.typeField0 = typeField0; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	wrapGoMutationFunc = function(reflectedGoFunc) {
+		var _r, _r$1, _r$10, _r$11, _r$12, _r$13, _r$14, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tmp$9, _v, _v$1, err, goArg0, goArg1, goCallArgTargetTypes, goCallArgsTargetValues, i, jsFunc, numGoArgs, reflectedGoFunc, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tmp$2 = $f._tmp$2; _tmp$3 = $f._tmp$3; _tmp$4 = $f._tmp$4; _tmp$5 = $f._tmp$5; _tmp$6 = $f._tmp$6; _tmp$7 = $f._tmp$7; _tmp$8 = $f._tmp$8; _tmp$9 = $f._tmp$9; _v = $f._v; _v$1 = $f._v$1; err = $f.err; goArg0 = $f.goArg0; goArg1 = $f.goArg1; goCallArgTargetTypes = $f.goCallArgTargetTypes; goCallArgsTargetValues = $f.goCallArgsTargetValues; i = $f.i; jsFunc = $f.jsFunc; numGoArgs = $f.numGoArgs; reflectedGoFunc = $f.reflectedGoFunc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		goCallArgTargetTypes = [goCallArgTargetTypes];
+		goCallArgsTargetValues = [goCallArgsTargetValues];
+		numGoArgs = [numGoArgs];
+		reflectedGoFunc = [reflectedGoFunc];
+		jsFunc = null;
+		err = $ifaceNil;
+		_r = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_r$1 = _r.NumIn(); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		numGoArgs[0] = _r$1;
+		if (numGoArgs[0] < 2) {
+			_tmp = null;
+			_tmp$1 = eTooFewMutationArgs;
+			jsFunc = _tmp;
+			err = _tmp$1;
+			$s = -1; return [jsFunc, err];
+		}
+		if (numGoArgs[0] > 3) {
+			_tmp$2 = null;
+			_tmp$3 = eTooManyMutationArgs;
+			jsFunc = _tmp$2;
+			err = _tmp$3;
+			$s = -1; return [jsFunc, err];
+		}
+		_r$2 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$3 = _r$2.In(0); /* */ $s = 4; case 4: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		goArg0 = _r$3;
+		_r$4 = goArg0.Kind(); /* */ $s = 8; case 8: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+		if (!((_r$4 === 22))) { _v = true; $s = 7; continue s; }
+		_r$5 = goArg0.Elem(); /* */ $s = 9; case 9: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+		_v = !($interfaceIsEqual(_r$5, jsStoreType)); case 7:
+		/* */ if (_v) { $s = 5; continue; }
+		/* */ $s = 6; continue;
+		/* if (_v) { */ case 5:
+			_tmp$4 = null;
+			_tmp$5 = eWrongFirstMutationArg;
+			jsFunc = _tmp$4;
+			err = _tmp$5;
+			$s = -1; return [jsFunc, err];
+		/* } */ case 6:
+		_r$6 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 10; case 10: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
+		_r$7 = _r$6.In(1); /* */ $s = 11; case 11: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
+		goArg1 = _r$7;
+		_r$8 = goArg1.Kind(); /* */ $s = 15; case 15: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
+		if (!((_r$8 === 22))) { _v$1 = true; $s = 14; continue s; }
+		_r$9 = goArg1.Elem(); /* */ $s = 16; case 16: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
+		_r$10 = _r$9.Kind(); /* */ $s = 17; case 17: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
+		_v$1 = !((_r$10 === 25)); case 14:
+		/* */ if (_v$1) { $s = 12; continue; }
+		/* */ $s = 13; continue;
+		/* if (_v$1) { */ case 12:
+			_tmp$6 = null;
+			_tmp$7 = eWrongSecondMutationArg;
+			jsFunc = _tmp$6;
+			err = _tmp$7;
+			$s = -1; return [jsFunc, err];
+		/* } */ case 13:
+		goCallArgTargetTypes[0] = $makeSlice(sliceType, numGoArgs[0]);
+		goCallArgsTargetValues[0] = $makeSlice(sliceType$1, numGoArgs[0]);
+		i = 0;
+		/* while (true) { */ case 18:
+			_r$11 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 20; case 20: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
+			_r$12 = _r$11.NumIn(); /* */ $s = 21; case 21: if($c) { $c = false; _r$12 = _r$12.$blk(); } if (_r$12 && _r$12.$blk !== undefined) { break s; }
+			/* if (!(i < _r$12)) { break; } */ if(!(i < _r$12)) { $s = 19; continue; }
+			_r$13 = $clone(reflectedGoFunc[0], reflect.Value).Type(); /* */ $s = 22; case 22: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
+			_r$14 = _r$13.In(i); /* */ $s = 23; case 23: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
+			((i < 0 || i >= goCallArgTargetTypes[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + i] = _r$14);
+			i = i + (1) >> 0;
+		/* } */ $s = 18; continue; case 19:
+		jsFunc = js.MakeFunc((function(goCallArgTargetTypes, goCallArgsTargetValues, numGoArgs, reflectedGoFunc) { return function $b(this$1, arguments$1) {
+			var _i, _r$15, _r$16, _r$17, _r$18, _r$19, _r$20, _r$21, _ref, _tuple, _tuple$1, arguments$1, castedArg, err$1, err$2, goTargetArgT, idx, jsArg, results, storeVal, targetIdx, this$1, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _r$15 = $f._r$15; _r$16 = $f._r$16; _r$17 = $f._r$17; _r$18 = $f._r$18; _r$19 = $f._r$19; _r$20 = $f._r$20; _r$21 = $f._r$21; _ref = $f._ref; _tuple = $f._tuple; _tuple$1 = $f._tuple$1; arguments$1 = $f.arguments$1; castedArg = $f.castedArg; err$1 = $f.err$1; err$2 = $f.err$2; goTargetArgT = $f.goTargetArgT; idx = $f.idx; jsArg = $f.jsArg; results = $f.results; storeVal = $f.storeVal; targetIdx = $f.targetIdx; this$1 = $f.this$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			/* */ if (arguments$1.$length < (numGoArgs[0] - 1 >> 0)) { $s = 1; continue; }
+			/* */ $s = 2; continue;
+			/* if (arguments$1.$length < (numGoArgs[0] - 1 >> 0)) { */ case 1:
+				_r$15 = eTooFewMutationArgsOnCall.Error(); /* */ $s = 3; case 3: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
+				$panic(new $String(_r$15));
+			/* } */ case 2:
+			_r$16 = castToType((0 >= goCallArgTargetTypes[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + 0]), this$1); /* */ $s = 4; case 4: if($c) { $c = false; _r$16 = _r$16.$blk(); } if (_r$16 && _r$16.$blk !== undefined) { break s; }
+			_tuple = _r$16;
+			storeVal = _tuple[0];
+			err$1 = _tuple[1];
+			/* */ if (!($interfaceIsEqual(err$1, $ifaceNil))) { $s = 5; continue; }
+			/* */ $s = 6; continue;
+			/* if (!($interfaceIsEqual(err$1, $ifaceNil))) { */ case 5:
+				_r$17 = err$1.Error(); /* */ $s = 7; case 7: if($c) { $c = false; _r$17 = _r$17.$blk(); } if (_r$17 && _r$17.$blk !== undefined) { break s; }
+				$panic(new $String("Error converting JavaScript provided argument for mutation function to *Store: " + _r$17));
+			/* } */ case 6:
+			(0 >= goCallArgsTargetValues[0].$length ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + 0] = storeVal);
+			_ref = arguments$1;
+			_i = 0;
+			/* while (true) { */ case 8:
+				/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 9; continue; }
+				idx = _i;
+				jsArg = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+				targetIdx = idx + 1 >> 0;
+				if (targetIdx >= numGoArgs[0]) {
+					/* break; */ $s = 9; continue;
+				}
+				goTargetArgT = ((targetIdx < 0 || targetIdx >= goCallArgTargetTypes[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : goCallArgTargetTypes[0].$array[goCallArgTargetTypes[0].$offset + targetIdx]);
+				_r$18 = castToType(goTargetArgT, jsArg); /* */ $s = 10; case 10: if($c) { $c = false; _r$18 = _r$18.$blk(); } if (_r$18 && _r$18.$blk !== undefined) { break s; }
+				_tuple$1 = _r$18;
+				castedArg = _tuple$1[0];
+				err$2 = _tuple$1[1];
+				/* */ if (!($interfaceIsEqual(err$2, $ifaceNil))) { $s = 11; continue; }
+				/* */ $s = 12; continue;
+				/* if (!($interfaceIsEqual(err$2, $ifaceNil))) { */ case 11:
+					_r$19 = goTargetArgT.Kind(); /* */ $s = 13; case 13: if($c) { $c = false; _r$19 = _r$19.$blk(); } if (_r$19 && _r$19.$blk !== undefined) { break s; }
+					_r$20 = new reflect.Kind(_r$19).String(); /* */ $s = 14; case 14: if($c) { $c = false; _r$20 = _r$20.$blk(); } if (_r$20 && _r$20.$blk !== undefined) { break s; }
+					$panic(new $String("Error converting JS object to " + _r$20));
+				/* } */ case 12:
+				((targetIdx < 0 || targetIdx >= goCallArgsTargetValues[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : goCallArgsTargetValues[0].$array[goCallArgsTargetValues[0].$offset + targetIdx] = castedArg);
+				_i++;
+			/* } */ $s = 8; continue; case 9:
+			_r$21 = $clone(reflectedGoFunc[0], reflect.Value).Call(goCallArgsTargetValues[0]); /* */ $s = 15; case 15: if($c) { $c = false; _r$21 = _r$21.$blk(); } if (_r$21 && _r$21.$blk !== undefined) { break s; }
+			results = _r$21;
+			$s = -1; return results;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._i = _i; $f._r$15 = _r$15; $f._r$16 = _r$16; $f._r$17 = _r$17; $f._r$18 = _r$18; $f._r$19 = _r$19; $f._r$20 = _r$20; $f._r$21 = _r$21; $f._ref = _ref; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.arguments$1 = arguments$1; $f.castedArg = castedArg; $f.err$1 = err$1; $f.err$2 = err$2; $f.goTargetArgT = goTargetArgT; $f.idx = idx; $f.jsArg = jsArg; $f.results = results; $f.storeVal = storeVal; $f.targetIdx = targetIdx; $f.this$1 = this$1; $f.$s = $s; $f.$r = $r; return $f;
+		}; })(goCallArgTargetTypes, goCallArgsTargetValues, numGoArgs, reflectedGoFunc));
+		_tmp$8 = jsFunc;
+		_tmp$9 = $ifaceNil;
+		jsFunc = _tmp$8;
+		err = _tmp$9;
+		$s = -1; return [jsFunc, err];
+		/* */ } return; } if ($f === undefined) { $f = { $blk: wrapGoMutationFunc }; } $f._r = _r; $f._r$1 = _r$1; $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$14 = _r$14; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tmp$4 = _tmp$4; $f._tmp$5 = _tmp$5; $f._tmp$6 = _tmp$6; $f._tmp$7 = _tmp$7; $f._tmp$8 = _tmp$8; $f._tmp$9 = _tmp$9; $f._v = _v; $f._v$1 = _v$1; $f.err = err; $f.goArg0 = goArg0; $f.goArg1 = goArg1; $f.goCallArgTargetTypes = goCallArgTargetTypes; $f.goCallArgsTargetValues = goCallArgsTargetValues; $f.i = i; $f.jsFunc = jsFunc; $f.numGoArgs = numGoArgs; $f.reflectedGoFunc = reflectedGoFunc; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	Mutation = function(name, goFunc) {
+		var goFunc, name;
+		return (function $b(c) {
+			var _r, _r$1, _r$2, _tuple, c, err, jsFunc, reflectedGoFunc, $s, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; _r$2 = $f._r$2; _tuple = $f._tuple; c = $f.c; err = $f.err; jsFunc = $f.jsFunc; reflectedGoFunc = $f.reflectedGoFunc; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+			if (c.Object.mutations === undefined) {
+				c.Object.mutations = o();
+			}
+			_r = reflect.ValueOf(goFunc); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			reflectedGoFunc = _r;
+			if (!(($clone(reflectedGoFunc, reflect.Value).Kind() === 19))) {
+				$panic(new $String("Mutation " + name + " is not a func"));
+			}
+			_r$1 = wrapGoMutationFunc($clone(reflectedGoFunc, reflect.Value)); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+			_tuple = _r$1;
+			jsFunc = _tuple[0];
+			err = _tuple[1];
+			/* */ if (!($interfaceIsEqual(err, $ifaceNil))) { $s = 3; continue; }
+			/* */ $s = 4; continue;
+			/* if (!($interfaceIsEqual(err, $ifaceNil))) { */ case 3:
+				_r$2 = err.Error(); /* */ $s = 5; case 5: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+				$panic(new $String("Error exposing the mutation function '" + name + "' to JavaScript: " + _r$2));
+			/* } */ case 4:
+			c.Object.mutations[$externalize(name, $String)] = jsFunc;
+			$s = -1; return;
+			/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._tuple = _tuple; $f.c = c; $f.err = err; $f.jsFunc = jsFunc; $f.reflectedGoFunc = reflectedGoFunc; $f.$s = $s; $f.$r = $r; return $f;
+		});
+	};
+	$pkg.Mutation = Mutation;
+	State = function(value) {
+		var _r, value, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; value = $f.value; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		value = [value];
+		_r = checkIfJSStruct(reflect.TypeOf(value[0])); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		/* */ if (!_r) { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if (!_r) { */ case 1:
+			$panic(eFirstFieldIsNotPtrJsObject);
+		/* } */ case 2:
+		$s = -1; return (function(value) { return function(c) {
+			var c;
+			if (!(c.Object.state === undefined)) {
+				$panic(new $String("Cannot use mvuex.Sate more than once"));
+			}
+			c.Object.state = $externalize(value[0], $emptyInterface);
+		}; })(value);
+		/* */ } return; } if ($f === undefined) { $f = { $blk: State }; } $f._r = _r; $f.value = value; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.State = State;
+	StoreConfig.ptr.prototype.Option = function(opts) {
+		var _i, _ref, c, opt, opts, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _i = $f._i; _ref = $f._ref; c = $f.c; opt = $f.opt; opts = $f.opts; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = this;
+		_ref = opts;
+		_i = 0;
+		/* while (true) { */ case 1:
+			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 2; continue; }
+			opt = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			$r = opt(c); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			_i++;
+		/* } */ $s = 1; continue; case 2:
+		$s = -1; return;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: StoreConfig.ptr.prototype.Option }; } $f._i = _i; $f._ref = _ref; $f.c = c; $f.opt = opt; $f.opts = opts; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	StoreConfig.prototype.Option = function(opts) { return this.$val.Option(opts); };
+	NewStore = function(opts) {
+		var c, opts, store, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; c = $f.c; opts = $f.opts; store = $f.store; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		c = new StoreConfig.ptr(o(), null, null, null, new reflect.Value.ptr(ptrType.nil, 0, 0));
+		$r = c.Option(opts); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		store = new Store.ptr(new ($global.Vuex.Store)($externalize(c, ptrType$1)), null, $throwNilPointerError, $throwNilPointerError, false);
+		$s = -1; return store;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: NewStore }; } $f.c = c; $f.opts = opts; $f.store = store; $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.NewStore = NewStore;
+	ptrType$1.methods = [{prop: "Option", name: "Option", pkg: "", typ: $funcType([sliceType$3], [], true)}];
+	ActionContext.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "Getters", name: "Getters", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"getters\""}, {prop: "Commit", name: "Commit", anonymous: false, exported: true, typ: funcType, tag: "js:\"commit\""}, {prop: "Dispatch", name: "Dispatch", anonymous: false, exported: true, typ: funcType, tag: "js:\"dispatch\""}, {prop: "State", name: "State", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"state\""}, {prop: "RootGetters", name: "RootGetters", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"rootGetters\""}, {prop: "RootState", name: "RootState", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"rootState\""}]);
+	StoreOption.init([ptrType$1], [], false);
+	Store.init("", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "Getters", name: "Getters", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"getters\""}, {prop: "Commit", name: "Commit", anonymous: false, exported: true, typ: funcType, tag: "js:\"commit\""}, {prop: "Dispatch", name: "Dispatch", anonymous: false, exported: true, typ: funcType, tag: "js:\"dispatch\""}, {prop: "Strict", name: "Strict", anonymous: false, exported: true, typ: $Bool, tag: "js:\"strict\""}]);
+	StoreConfig.init("github.com/mame82/mvuex", [{prop: "Object", name: "Object", anonymous: true, exported: true, typ: ptrType$2, tag: ""}, {prop: "State", name: "State", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"state\""}, {prop: "Mutations", name: "Mutations", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"mutations\""}, {prop: "Actions", name: "Actions", anonymous: false, exported: true, typ: ptrType$2, tag: "js:\"actions\""}, {prop: "stateValue", name: "stateValue", anonymous: false, exported: false, typ: reflect.Value, tag: ""}]);
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = errors.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = js.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = reflect.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = strconv.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		eTooFewMutationArgs = errors.New("Mutation function has too few arguments (min 2)");
+		eTooManyMutationArgs = errors.New("Mutation function has too many arguments (max 3)");
+		eWrongActionArgCount = errors.New("Wrong argument count! An action handler takes 3 or 4 args: actionHandler(store *Store, context *ActionContext, state *{CustomStateType} [, callArg *{CustomArgType])");
+		eTooFewMutationArgsOnCall = errors.New("Mutation function called with too few arguments from JavaScrip");
+		eWrongFirstMutationArg = errors.New("Mutation function has to have *Store as first argument type");
+		eWrongFirstActionArg = errors.New("Mutation function has to have *Store as first argument type");
+		eWrongSecondActionArg = errors.New("Mutation function has to have *ActionContext as second argument type");
+		eWrongSecondMutationArg = errors.New("The second argument of the mutation function has to be a pointer to a struct of the type used for state");
+		eFirstFieldIsNotPtrJsObject = errors.New("The first field of the struct has to be of type *js.Object");
+		jsObjectType = reflect.TypeOf((x = new js.Object.ptr(null), new x.constructor.elem(x)));
+		jsStoreType = reflect.TypeOf((x$1 = new Store.ptr(null, null, $throwNilPointerError, $throwNilPointerError, false), new x$1.constructor.elem(x$1)));
+		jsActioContextType = reflect.TypeOf((x$2 = new ActionContext.ptr(null, null, $throwNilPointerError, $throwNilPointerError, null, null, null), new x$2.constructor.elem(x$2)));
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
@@ -52477,10 +52477,9 @@ $packages["honnef.co/go/js/dom"] = (function() {
 	return $pkg;
 })();
 $packages["."] = (function() {
-	var $pkg = {}, $init, common, P4wnP1_grpc, mvuex, context, md5, hex, errors, fmt, js, grpcweb, hvue, status, dom, io, strconv, sync, time, CodeMirrorOptionsType, CompCodeEditorData, CompEthernetAddressesData2, CompHIDScriptData, CompTabData, CompTabsData, CompToggleSwitchData, CompUSBSettingsData, jsGadgetSettings, VGadgetSettingsEthernet, VGadgetSettingsUMS, jsEvent, jsLogEvent, jsLoggerData, GlobalState, Rpc, ptrType, sliceType, arrayType, sliceType$1, sliceType$2, ptrType$1, ptrType$2, ptrType$3, structType, structType$1, sliceType$3, funcType, sliceType$4, sliceType$5, sliceType$6, ptrType$4, funcType$1, funcType$2, funcType$3, sliceType$7, sliceType$8, ptrType$5, ptrType$6, ptrType$7, ptrType$8, ptrType$9, ptrType$10, ptrType$11, ptrType$12, ptrType$13, ptrType$14, ptrType$15, structType$2, ptrType$16, ptrType$17, ptrType$18, ptrType$19, funcType$4, funcType$5, funcType$6, funcType$7, funcType$8, funcType$9, sliceType$9, ptrType$20, ptrType$21, ptrType$22, ptrType$23, ptrType$24, ptrType$25, eNoLogEvent, document, serverAddr, _r, _r$1, O, Alert, StringToMD5, UploadHIDScript, RunHIDScript, NewCodeEditorData, initCodeMirror, InitCompCodeEditor, newCompEthernetAddressesData2, InitCompEthernetAddresses2, newCompHIDScriptData, InitCompHIDScript, LogLevelClass, InitCompLogger, InitCompModal, newCompStateData, InitCompState, NewCompTabData, InitCompTab, NewCompTabsData, initTabs, InitCompTabs, newCompToggleSwitchData, InitCompToggleSwitch, InitCompUSBSettings, newCompUSBSettingsData, NewUSBGadgetSettings, NewJsEventFromNative, NewLogger, GetBaseURL, main, createGlobalStateStruct, actionUpdateGadgetSettingsFromDeployed, actionDeployCurrentGadgetSettings, initMVuex, InitGlobalState, NewRpcClient, RpcGetDeployedGadgetSettings, RpcSetRemoteGadgetSettings, RpcDeployRemoteGadgetSettings;
+	var $pkg = {}, $init, common, P4wnP1_grpc, context, md5, hex, errors, fmt, js, grpcweb, hvue, mvuex, status, dom, io, strconv, sync, time, CodeMirrorOptionsType, CompCodeEditorData, CompEthernetAddressesData2, CompHIDScriptData, CompTabData, CompTabsData, CompToggleSwitchData, CompUSBSettingsData, jsGadgetSettings, VGadgetSettingsEthernet, VGadgetSettingsUMS, jsEvent, jsLogEvent, jsLoggerData, GlobalState, Rpc, ptrType, sliceType, arrayType, sliceType$1, sliceType$2, ptrType$1, ptrType$2, ptrType$3, structType, structType$1, sliceType$3, funcType, sliceType$4, sliceType$5, sliceType$6, ptrType$4, funcType$1, funcType$2, funcType$3, sliceType$7, sliceType$8, ptrType$5, ptrType$6, ptrType$7, ptrType$8, ptrType$9, ptrType$10, ptrType$11, ptrType$12, ptrType$13, ptrType$14, ptrType$15, structType$2, ptrType$16, ptrType$17, ptrType$18, ptrType$19, funcType$4, funcType$5, funcType$6, funcType$7, funcType$8, funcType$9, sliceType$9, ptrType$20, ptrType$21, ptrType$22, ptrType$23, ptrType$24, ptrType$25, eNoLogEvent, document, serverAddr, _r, _r$1, O, Alert, StringToMD5, UploadHIDScript, RunHIDScript, NewCodeEditorData, initCodeMirror, InitCompCodeEditor, newCompEthernetAddressesData2, InitCompEthernetAddresses2, newCompHIDScriptData, InitCompHIDScript, LogLevelClass, InitCompLogger, InitCompModal, newCompStateData, InitCompState, NewCompTabData, InitCompTab, NewCompTabsData, initTabs, InitCompTabs, newCompToggleSwitchData, InitCompToggleSwitch, InitCompUSBSettings, newCompUSBSettingsData, NewUSBGadgetSettings, NewJsEventFromNative, NewLogger, GetBaseURL, main, createGlobalStateStruct, actionUpdateGadgetSettingsFromDeployed, actionDeployCurrentGadgetSettings, initMVuex, InitGlobalState, NewRpcClient, RpcGetDeployedGadgetSettings, RpcSetRemoteGadgetSettings, RpcDeployRemoteGadgetSettings;
 	common = $packages["../common"];
 	P4wnP1_grpc = $packages["../proto/gopherjs"];
-	mvuex = $packages["./mvuex"];
 	context = $packages["context"];
 	md5 = $packages["crypto/md5"];
 	hex = $packages["encoding/hex"];
@@ -52489,6 +52488,7 @@ $packages["."] = (function() {
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	grpcweb = $packages["github.com/johanbrandhorst/protobuf/grpcweb"];
 	hvue = $packages["github.com/mame82/hvue"];
+	mvuex = $packages["github.com/mame82/mvuex"];
 	status = $packages["google.golang.org/grpc/status"];
 	dom = $packages["honnef.co/go/js/dom"];
 	io = $packages["io"];
@@ -53706,15 +53706,15 @@ $packages["."] = (function() {
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		$r = common.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = P4wnP1_grpc.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = mvuex.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = context.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = md5.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hex.$init(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = errors.$init(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = fmt.$init(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = js.$init(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = grpcweb.$init(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.$init(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = context.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = md5.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hex.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = errors.$init(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = fmt.$init(); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = js.$init(); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = grpcweb.$init(); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.$init(); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = mvuex.$init(); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = status.$init(); /* */ $s = 12; case 12: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = dom.$init(); /* */ $s = 13; case 13: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = io.$init(); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }

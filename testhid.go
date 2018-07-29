@@ -1,7 +1,7 @@
 package main
 
 import(
-	"./hid"
+	"github.com/mame82/P4wnP1_go/hid"
 
 	"log"
 	"fmt"

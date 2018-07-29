@@ -1,7 +1,7 @@
 package main
 
 import (
-	pb "../proto/gopherjs"
+	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 	"context"
 	"sync"
 	"github.com/johanbrandhorst/protobuf/grpcweb"

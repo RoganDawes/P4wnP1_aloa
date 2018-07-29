@@ -3,7 +3,7 @@ package service
 
 import (
 	"log"
-	pb "../proto"
+	pb "github.com/mame82/P4wnP1_go/proto"
 	"context"
 	"net"
 	"google.golang.org/grpc"

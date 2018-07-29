@@ -5,7 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"time"
-	pb "../proto/gopherjs"
+	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 	"context"
 )
 

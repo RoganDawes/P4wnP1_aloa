@@ -4,7 +4,7 @@ import (
 	"log"
 	"google.golang.org/grpc"
 
-	pb "../proto"
+	pb "github.com/mame82/P4wnP1_go/proto"
 	"time"
 	"golang.org/x/net/context"
 	"os"

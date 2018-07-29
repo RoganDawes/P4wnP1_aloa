@@ -1,7 +1,7 @@
 package service
 
 import (
-	pb "../proto"
+	pb "github.com/mame82/P4wnP1_go/proto"
 	"fmt"
 	"io/ioutil"
 	"os"

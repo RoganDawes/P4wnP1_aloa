@@ -7,7 +7,7 @@ import(
 	"time"
 	"sync/atomic"
 
-	pb "../proto"
+	pb "github.com/mame82/P4wnP1_go/proto"
 )
 
 const (

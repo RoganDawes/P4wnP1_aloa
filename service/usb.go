@@ -8,12 +8,12 @@ import (
 	"os/exec"
 	"strings"
 
-	pb "../proto"
+	pb "github.com/mame82/P4wnP1_go/proto"
 	"time"
 	"fmt"
 	"net"
 	"regexp"
-	"../hid"
+	"github.com/mame82/P4wnP1_go/hid"
 	"context"
 )
 

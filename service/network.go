@@ -2,14 +2,14 @@ package service
 
 import (
 	//"github.com/docker/libcontainer/netlink"
-	"../netlink"
+	"github.com/mame82/P4wnP1_go/netlink"
 	"net"
 	"log"
 	"io/ioutil"
 	"os"
 	"fmt"
 
-	pb "../proto"
+	pb "github.com/mame82/P4wnP1_go/proto"
 	"errors"
 )
 

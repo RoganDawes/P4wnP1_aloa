@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 	"fmt"
-	pb "./proto"
+	pb pb "github.com/mame82/P4wnP1_go/proto"
 	"./common"
 	"time"
 	"strconv"

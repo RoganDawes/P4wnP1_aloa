@@ -3,7 +3,7 @@ package cli_client
 import (
 	"github.com/spf13/cobra"
 
-	pb "../proto"
+	pb "github.com/mame82/P4wnP1_go/proto"
 	"fmt"
 	"log"
 )

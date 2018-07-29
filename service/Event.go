@@ -2,13 +2,13 @@ package service
 
 import (
 	"fmt"
-	pb "../proto"
+	pb "github.com/mame82/P4wnP1_go/proto"
 	"../common"
 	"context"
 	"sync"
 	"time"
 	"log"
-	"../hid"
+	"github.com/mame82/P4wnP1_go/hid"
 )
 
 
