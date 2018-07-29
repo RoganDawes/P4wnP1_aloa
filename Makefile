@@ -46,7 +46,8 @@ dep:
 
 compile:
 	go get -u github.com/mame82/P4wnP1_go/... # partially downloads again, but we need the library packages in go path to build
-	env GOBIN=$(CURDIR)/build go install ./... # compile all main packages to the build folder
+	# <--- second compilation, maybe -d flag on go get above is better
+	env GOBIN=$(CURDIR)/build go install ./cmd/... # compile all main packages to the build folder
 
 	# compile the web app
 	# ToDo: (check if dependencies have been fetched by 'go get', even with the build js tags)
