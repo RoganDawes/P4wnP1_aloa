@@ -34,10 +34,9 @@ func (s *server) EventListen(eReq *pb.EventRequest, eStream pb.P4WNP1_EventListe
 	rcv := ServiceState.EvMgr.RegisterReceiver(eReq.ListenType)
 
 	for {
-
 		select {
 			case ev := <- rcv.EventQueue:
-				fmt.Printf("Event dequed to send: %+v\n", ev)
+				//fmt.Printf("Event dequed to send: %+v\n", ev)
 
 				//send Event to stream
 				err = eStream.Send(ev)
@@ -97,9 +96,9 @@ func (s *server) FSCreateTempDirOrFile(ctx context.Context, req *pb.TempDirOrFil
 }
 
 func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) (jobs *pb.HIDScriptJobList, err error) {
-	if ServiceState.HidCtl == nil { return nil, rpcErrNoHid}
+	if ServiceState.UsbGM.HidCtl == nil { return nil, rpcErrNoHid}
 
-	retJobs,err := ServiceState.HidCtl.GetAllBackgroundJobs()
+	retJobs,err := ServiceState.UsbGM.HidCtl.GetAllBackgroundJobs()
 	if err != nil { return nil, err }
 	jobs = &pb.HIDScriptJobList{}
 	jobs.Ids = retJobs
@@ -108,10 +107,10 @@ func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) 
 
 func (s *server) HIDCancelAllScriptJobs(ctx context.Context, rEmpty *pb.Empty) (empty *pb.Empty, err error) {
 	empty = &pb.Empty{}
-	if ServiceState.HidCtl == nil { return empty, rpcErrNoHid}
+	if ServiceState.UsbGM.HidCtl == nil { return empty, rpcErrNoHid}
 
 	// Try to find script
-	ServiceState.HidCtl.CancelAllBackgroundJobs()
+	ServiceState.UsbGM.HidCtl.CancelAllBackgroundJobs()
 	return
 }
 
@@ -119,10 +118,10 @@ func (s *server) HIDCancelAllScriptJobs(ctx context.Context, rEmpty *pb.Empty) (
 
 func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) (empty *pb.Empty, err error) {
 	empty = &pb.Empty{}
-	if ServiceState.HidCtl == nil { return empty, rpcErrNoHid}
+	if ServiceState.UsbGM.HidCtl == nil { return empty, rpcErrNoHid}
 
 	// Try to find script
-	job,err := ServiceState.HidCtl.GetBackgroundJobByID(int(sJob.Id))
+	job,err := ServiceState.UsbGM.HidCtl.GetBackgroundJobByID(int(sJob.Id))
 	if err != nil { return empty, err }
 
 	job.Cancel()
@@ -130,7 +129,7 @@ func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) 
 }
 
 func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptRequest) (scriptRes *pb.HIDScriptResult, err error) {
-	if ServiceState.HidCtl == nil { return nil, rpcErrNoHid}
+	if ServiceState.UsbGM.HidCtl == nil { return nil, rpcErrNoHid}
 
 
 
@@ -143,7 +142,7 @@ func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptReques
 		if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
 
 
-		scriptVal,err := ServiceState.HidCtl.RunScript(jobCtx, string(scriptFile))
+		scriptVal,err := ServiceState.UsbGM.HidCtl.RunScript(jobCtx, string(scriptFile))
 		if err != nil { return nil,err }
 		val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
 		jsonVal,err := json.Marshal(val)
@@ -160,7 +159,7 @@ func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptReques
 }
 
 func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptRequest) (rJob *pb.HIDScriptJob, err error) {
-	if ServiceState.HidCtl == nil { return nil, rpcErrNoHid}
+	if ServiceState.UsbGM.HidCtl == nil { return nil, rpcErrNoHid}
 
 	if scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath); err != nil {
 		return nil, errors.New(fmt.Sprintf("Couldn't load HIDScript '%s': %v\n", scriptReq.ScriptPath, err))
@@ -169,7 +168,7 @@ func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptReq
 		jobCtx := context.Background()
 		// ToDo: we don't retrieve the cancelFunc which should be called to free resources. Solution: use withCancel context and call cancel by go routine on timeout
 		if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
-		job,err := ServiceState.HidCtl.StartScriptAsBackgroundJob(jobCtx, string(scriptFile))
+		job,err := ServiceState.UsbGM.HidCtl.StartScriptAsBackgroundJob(jobCtx, string(scriptFile))
 		if err != nil { return nil,err }
 
 		rJob = &pb.HIDScriptJob{
@@ -181,15 +180,15 @@ func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptReq
 }
 
 func (s *server) HIDGetScriptJobResult(ctx context.Context, sJob *pb.HIDScriptJob) (scriptRes *pb.HIDScriptResult, err error) {
-	if ServiceState.HidCtl == nil { return nil, rpcErrNoHid}
+	if ServiceState.UsbGM.HidCtl == nil { return nil, rpcErrNoHid}
 
 	// Try to find script
-	job,err := ServiceState.HidCtl.GetBackgroundJobByID(int(sJob.Id))
+	job,err := ServiceState.UsbGM.HidCtl.GetBackgroundJobByID(int(sJob.Id))
 	if err != nil { return scriptRes, err }
 
 
 	//ToDo: check impact/behavior, because ctx is provided by gRPC server
-	scriptVal,err := ServiceState.HidCtl.WaitBackgroundJobResult(ctx, job)
+	scriptVal,err := ServiceState.UsbGM.HidCtl.WaitBackgroundJobResult(ctx, job)
 	if err != nil { return nil,err }
 	val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
 	jsonVal,err := json.Marshal(val)
@@ -393,7 +392,7 @@ func StartRpcServerAndWeb(host string, gRPCPort string, webPort string, absWebRo
 		if strings.Contains(req.Header.Get("Content-Type"), "application/grpc") ||
 			req.Method == "OPTIONS" ||
 			strings.Contains(req.Header.Get("Sec-Websocket-Protocol"), "grpc-websockets") {
-			fmt.Printf("gRPC-web req:\n %v\n", req)
+			//fmt.Printf("gRPC-web req:\n %v\n", req)
 			grpc_web_srv.ServeHTTP(resp, req) // if content type indicates grpc or REQUEST METHOD IS OPTIONS (pre-flight) serve gRPC-web
 		} else {
 			fmt.Printf("legacy web req:\n %v\n", req)

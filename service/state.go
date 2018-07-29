@@ -1,7 +1,6 @@
 package service
 
 import (
-	"../hid"
 	pb "../proto"
 )
 
@@ -9,7 +8,6 @@ var ServiceState *GlobalServiceState
 
 type GlobalServiceState struct {
 	EvMgr    *EventManager
-	HidCtl 	  *hid.HIDController
 	UsbGM 	*UsbGadgetManager
 	Led 	*LedState
 	HidDevPath map[string]string //stores device path for HID devices

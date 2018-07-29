@@ -82,6 +82,11 @@ type UsbGadgetManager struct {
 	UndeployedGadgetSettings *pb.GadgetSettings
 }
 
+func (gm *UsbGadgetManager) HandleEvent(event hid.Event) {
+	fmt.Printf("GADGET MANAGER HID EVENT: %+v\n", event)
+	ServiceState.EvMgr.Emit(ConstructEventHID(event))
+}
+
 func NewUSBGadgetManager() (newUGM *UsbGadgetManager, err error) {
 	newUGM = &UsbGadgetManager{}
 	defGS := GetDefaultGadgetSettings()
@@ -631,6 +636,7 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 
 			var errH error
 			gm.HidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, USB_KEYBOARD_LANGUAGE_MAP_PATH, devPathMouse)
+			gm.HidCtl.SetEventHandler(gm)
 			if errH != nil {
 				log.Printf("ERROR: Couldn't bring up an instance of HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s'\nReason: %v\n", devPathKeyboard, devPathMouse, USB_KEYBOARD_LANGUAGE_MAP_PATH, errH)
 			} else {

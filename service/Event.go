@@ -8,18 +8,9 @@ import (
 	"sync"
 	"time"
 	"log"
-	"strconv"
+	"../hid"
 )
 
-/*
-var (
-	EvMgr    *EventManager
-	evmMutex  = &sync.Mutex{}
-)
-*/
-func pDEBUG(message string) {
-	fmt.Println("EVENT DEBUG: " + message)
-}
 
 type EventManager struct {
 	eventQueue chan *pb.Event
@@ -57,43 +48,9 @@ func (evm *EventManager) Stop() {
 	close(evm.eventQueue)
 }
 
-/*
-func StartEventManager(queueSize int) *EventManager {
-	if EvMgr != nil { StopEventManager() }
-
-	evmMutex.Lock()
-	defer evmMutex.Unlock()
-
-	EvMgr = &EventManager{
-		eventQueue: make(chan *pb.Event, queueSize),
-		receiverDelListMutex: &sync.Mutex{},
-		receiverRegListMutex: &sync.Mutex{},
-		receiverRegisterList: make(map[*EventReceiver]bool),
-		registeredReceivers: make(map[*EventReceiver]bool),
-		receiverDeleteList: make(map[*EventReceiver]bool),
-	}
-	EvMgr.ctx, EvMgr.cancel = context.WithCancel(context.Background())
-
-	pDEBUG("EvtMgr started")
-	go EvMgr.dispatch()
-
-	return EvMgr
-}
-
-func StopEventManager() {
-	evmMutex.Lock()
-	defer evmMutex.Unlock()
-
-	if EvMgr == nil { return }
-	EvMgr.cancel()
-	close(EvMgr.eventQueue)
-
-}
-*/
-
 func (em *EventManager) Emit(event *pb.Event) {
+	//fmt.Printf("Emitting event: %+v\n", event)
 	em.eventQueue <-event
-	//fmt.Println("Event enqueued")
 }
 
 func (em *EventManager) Write(p []byte) (n int, err error) {
@@ -104,7 +61,7 @@ func (em *EventManager) Write(p []byte) (n int, err error) {
 
 
 func (em *EventManager) RegisterReceiver(filterEventType int64) *EventReceiver {
-	fmt.Println("!!!Event listener registered for " + strconv.Itoa(int(filterEventType)))
+//	fmt.Println("!!!Event listener registered for " + strconv.Itoa(int(filterEventType)))
 
 	ctx,cancel := context.WithCancel(context.Background())
 	er := &EventReceiver{
@@ -113,6 +70,7 @@ func (em *EventManager) RegisterReceiver(filterEventType int64) *EventReceiver {
 		Cancel: cancel,
 		FilterEventType: filterEventType,
 	}
+	fmt.Printf("Registered receiver for %d\n", er.FilterEventType)
 	em.receiverRegListMutex.Lock()
 	em.receiverRegisterList[er] = true
 	em.receiverRegListMutex.Unlock()
@@ -128,7 +86,6 @@ func (em *EventManager) UnregisterReceiver(receiver *EventReceiver) {
 
 func (em *EventManager) dispatch() {
 	fmt.Println("Started event dispatcher")
-	pDEBUG("Started dispatcher")
 	loop:
 	for {
 		select {
@@ -173,12 +130,11 @@ func (em *EventManager) dispatch() {
 			//EventManage aborted
 
 			// ToDo: close all eventReceivers eventQueues, to notify them of the stopped dispatcher
-			pDEBUG("EvtMgr cancelled")
+			//fmt.Println("EvtMgr cancelled")
 			break loop
 		}
 	}
 	fmt.Println("Stopped event dispatcher")
-	pDEBUG("Stopped dispatcher")
 }
 
 
@@ -201,6 +157,39 @@ func ConstructEventLog(source string, level int, message string) *pb.Event {
 			{Val: &pb.EventValue_Tint64{Tint64:int64(level)} },
 			{Val: &pb.EventValue_Tstring{Tstring:message} },
 			{Val: &pb.EventValue_Tstring{Tstring:time.Now().String()} },
+		},
+	}
+}
+
+func ConstructEventHID(hidEvent hid.Event) *pb.Event {
+	//subType, vmID, jobID int, error bool, resString, errString, message string
+	vmID := -1
+	jobID := -1
+	hasError := false
+	errString := ""
+	message := hidEvent.Message
+	resString := ""
+	if job := hidEvent.Job; job != nil {
+		jobID = job.Id
+		if job.ResultErr != nil {
+			hasError = true
+			errString = job.ResultErr.Error()
+		}
+		resString,_ = job.ResultJsonString()
+	}
+	if eVM := hidEvent.Vm; eVM != nil { vmID = eVM.Id }
+
+	return &pb.Event{
+		Type: common.EVT_HID, //Type
+		Values: []*pb.EventValue{
+			{Val: &pb.EventValue_Tint64{Tint64:int64(hidEvent.Type)} }, 		//SubType = Type of hid.Event
+			{Val: &pb.EventValue_Tint64{Tint64:int64(vmID)} },			//ID of VM
+			{Val: &pb.EventValue_Tint64{Tint64:int64(jobID)} },			//ID of job
+			{Val: &pb.EventValue_Tbool{Tbool:hasError} },					//isError (f.e. if a job was interrupted)
+			{Val: &pb.EventValue_Tstring{Tstring:resString} },			//result String
+			{Val: &pb.EventValue_Tstring{Tstring:errString} },			//error String (message in case of error)
+			{Val: &pb.EventValue_Tstring{Tstring:message} },			//Mesage text of event
+			{Val: &pb.EventValue_Tstring{Tstring:time.Now().String()} },//Timestamp of event genration
 		},
 	}
 }
