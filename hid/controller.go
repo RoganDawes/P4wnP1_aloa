@@ -59,6 +59,7 @@ type HIDController struct {
 	vmMaster *otto.Otto
 	ctx context.Context
 	cancel context.CancelFunc
+	eventHandler EventHandler
 }
 
 func NewHIDController(ctx context.Context, keyboardDevicePath string, keyboardMapPath string, mouseDevicePath string) (ctl *HIDController, err error) {
@@ -98,7 +99,28 @@ func NewHIDController(ctx context.Context, keyboardDevicePath string, keyboardMa
 		if err != nil { return nil, err	}
 	}
 
+	hidControllerReuse.SetDefaultHandler()
 	return hidControllerReuse, nil
+}
+
+func (ctl *HIDController) SetEventHandler(handler EventHandler) {
+	ctl.eventHandler = handler
+	// set same handler for all child VMs
+	for _,vm := range ctl.vmPool { vm.SetEventHandler(handler) }
+}
+
+func  (ctl *HIDController) HandleEvent(event Event) {
+	fmt.Printf("!!! HID Controller Event: %+v\n", event)
+}
+
+func (ctl *HIDController) SetDefaultHandler() {
+	ctl.SetEventHandler(ctl)
+}
+
+func (ctl *HIDController) emitEvent(event Event) {
+	if ctl.eventHandler == nil { return }
+	ctl.eventHandler.HandleEvent(event)
+
 }
 
 func (ctl *HIDController) Abort()  {
@@ -113,6 +135,13 @@ func (ctl *HIDController) Abort()  {
 	// Interrupt all VMs already running
 	//hidControllerReuse.CancelAllBackgroundJobs()
 	hidControllerReuse.CancelAllBackgroundJobs()
+
+	ctl.emitEvent(Event{
+		Type:    EventType_CONTROLLER_ABORTED,
+		Message: "Called abort on HID Controller",
+		Job:     nil,
+		Vm:      nil,
+	})
 }
 
 func (ctl *HIDController) NextUnusedVM() (vm *AsyncOttoVM, err error) {
@@ -161,14 +190,51 @@ func (ctl *HIDController) GetBackgroundJobByID(id int) (job *AsyncOttoJob, err e
 	}
 }
 
+
+func (ctl *HIDController) retrieveJobFromOtto(vm *otto.Otto) (job *AsyncOttoJob, runVM *AsyncOttoVM, err error) {
+	found := false
+	globalJobListMutex.Lock()
+	for cJob,_ := range globalJobList {
+		vme := cJob.executingVM
+		if vme == nil { continue }
+		if vme.vm == vm {
+			found = true
+			job = cJob
+			runVM = vme
+		}
+
+	}
+	globalJobListMutex.Unlock()
+	if found {
+		return
+	} else {
+		return nil,nil,errors.New("Couldn't retrieve job of this Otto VM")
+	}
+}
+
 func (ctl *HIDController) StartScriptAsBackgroundJob(ctx context.Context,script string) (job *AsyncOttoJob, err error) {
 	//fetch next free vm from pool
 	avm,err := ctl.NextUnusedVM()
-	if err != nil { return nil, err }
+	if err != nil {
+		ctl.emitEvent(Event{
+			Job:job,
+			Message:"No free Java VM available to run the script",
+			Type:EventType_JOB_NO_FREE_VM,
+		})
+		return nil, err
+	}
 
 	//try to run script async
 	job,err = avm.RunAsync(ctx,script)
 	if err != nil { return nil, err }
+
+	ctl.emitEvent(Event{
+		Job:job,
+		Vm:avm,
+		Type:EventType_JOB_STARTED,
+		Message:"Script started",
+		//ScriptSource:script,
+	})
 
 	//add job to global list
 	globalJobListMutex.Lock()
@@ -177,10 +243,18 @@ func (ctl *HIDController) StartScriptAsBackgroundJob(ctx context.Context,script 
 
 	//ad go routine which monitors context of the job, to remove it from global list, once done or interrupted
 	go func() {
-		fmt.Printf("StartScriptAsBackgroundJob: started finish watcher for job %d\n",job.Id)
+		//fmt.Printf("StartScriptAsBackgroundJob: started finish watcher for job %d\n",job.Id)
 		select {
 		case <- job.ctx.Done():
 			fmt.Printf("StartScriptAsBackgroundJob: Job %d finished or interrupted, removing from global list\n",job.Id)
+
+			ctl.emitEvent(Event{
+				Job:job,
+				Vm:avm,
+				Type:EventType_JOB_STOPPED,
+				Message:"Script stopped",
+				//ScriptSource:script,
+			})
 
 			//remove job from global list after result has been retrieved
 			globalJobListMutex.Lock()
@@ -223,6 +297,12 @@ func (ctl *HIDController) CancelAllBackgroundJobs() {
 	for job,_ := range oldList {
 		fmt.Printf("Cancelling Job %d\n", job.Id)
 		job.Cancel()
+		ctl.emitEvent(Event{
+			Job:job,
+			Vm:job.executingVM,
+			Type:EventType_JOB_CANCELLED,
+			Message:"Script execution cancelled",
+		})
 	}
 	globalJobList = make(map[*AsyncOttoJob]bool) //Create new empty list
 	globalJobListMutex.Unlock()
@@ -419,7 +499,7 @@ func (ctl *HIDController) jsWaitLED(call otto.FunctionCall) (res otto.Value) {
 
 	errStr := ""
 	if err != nil {errStr = fmt.Sprintf("%v",err)}
-	res,_ = call.Otto.ToValue(struct{
+	resStruct := struct{
 		ERROR bool
 		ERRORTEXT string
 		TIMEOUT bool
@@ -437,7 +517,32 @@ func (ctl *HIDController) jsWaitLED(call otto.FunctionCall) (res otto.Value) {
 		SCROLL: err == nil && changed.ScrollLock,
 		COMPOSE: err == nil && changed.Compose,
 		KANA: err == nil && changed.Kana,
-	})
+	}
+	res,_ = call.Otto.ToValue(resStruct)
+
+	//Event generation
+	resText := "WaitLED ended:"
+	if resStruct.ERROR { resText = " ERROR " + errStr} else {
+		if resStruct.NUM { resText += " NUM" }
+		if resStruct.CAPS { resText += " CAPS" }
+		if resStruct.SCROLL { resText += " SCROLL" }
+		if resStruct.COMPOSE { resText += " COMPOSE" }
+		if resStruct.KANA { resText += " KANA" }
+	}
+	sJob, sVM, err := ctl.retrieveJobFromOtto(call.Otto)
+	if err == nil {
+		ctl.emitEvent(Event{
+			Type: EventType_JOB_WAIT_LED_FINISHED,
+			Job: sJob,
+			Vm: sVM,
+			Message: resText,
+		})
+	} else {
+		ctl.emitEvent(Event{
+			Type: EventType_JOB_WAIT_LED_FINISHED,
+			Message: resText + " (unknown Job)",
+		})
+	}
 	return
 }
 
@@ -530,7 +635,7 @@ func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Valu
 
 	errStr := ""
 	if err != nil {errStr = fmt.Sprintf("%v",err)}
-	res,_ = call.Otto.ToValue(struct{
+	resStruct := struct{
 		ERROR bool
 		ERRORTEXT string
 		TIMEOUT bool
@@ -548,7 +653,32 @@ func (ctl *HIDController) jsWaitLEDRepeat(call otto.FunctionCall) (res otto.Valu
 		SCROLL: err == nil && changed.ScrollLock,
 		COMPOSE: err == nil && changed.Compose,
 		KANA: err == nil && changed.Kana,
-	})
+	}
+	res,_ = call.Otto.ToValue(resStruct)
+
+	//Event generation
+	resText := "WaitLED ended:"
+	if resStruct.ERROR { resText = " ERROR " + errStr} else {
+		if resStruct.NUM { resText += " NUM" }
+		if resStruct.CAPS { resText += " CAPS" }
+		if resStruct.SCROLL { resText += " SCROLL" }
+		if resStruct.COMPOSE { resText += " COMPOSE" }
+		if resStruct.KANA { resText += " KANA" }
+	}
+	sJob, sVM, err := ctl.retrieveJobFromOtto(call.Otto)
+	if err == nil {
+		ctl.emitEvent(Event{
+			Type: EventType_JOB_WAIT_LED_REPEATED_FINISHED,
+			Job: sJob,
+			Vm: sVM,
+			Message: resText,
+		})
+	} else {
+		ctl.emitEvent(Event{
+			Type: EventType_JOB_WAIT_LED_REPEATED_FINISHED,
+			Message: resText + " (unknown Job)",
+		})
+	}
 	return
 }
 

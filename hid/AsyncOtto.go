@@ -57,13 +57,29 @@ func (job *AsyncOttoJob) ResultJsonString() (string, error) {
 	return string(json),nil
 }
 
-
-
 type AsyncOttoVM struct {
 	vm           *otto.Otto
 	isWorking    bool
 	sync.Mutex
 	Id int
+	eventHandler EventHandler
+}
+
+func (avm *AsyncOttoVM) HandleEvent(event Event) {
+	fmt.Printf("!!! AsyncOtto Event: %+v\n", event)
+}
+
+func (avm *AsyncOttoVM) SetEventHandler(handler EventHandler) {
+	avm.eventHandler = handler
+}
+
+func (avm *AsyncOttoVM) SetDefaultHandler() {
+	avm.SetEventHandler(avm)
+}
+
+func (avm *AsyncOttoVM) emitEvent(event Event) {
+	if avm.eventHandler == nil { return }
+	avm.eventHandler.HandleEvent(event)
 }
 
 func NewAsyncOttoVM(vm *otto.Otto) *AsyncOttoVM {
@@ -73,6 +89,7 @@ func NewAsyncOttoVM(vm *otto.Otto) *AsyncOttoVM {
 		vm:          vm,
 		Id:          vmNum,
 	}
+	res.SetDefaultHandler()
 	vmNum++
 	return res
 }
@@ -133,7 +150,7 @@ func (avm *AsyncOttoVM) RunAsync(ctx context.Context, src interface{}) (job *Asy
 	}(avm)
 
 	go func(avm *AsyncOttoVM) {
-		defer func() { //runs after avm.vm.Run() returns (because script finished a was interrupted)
+		defer func() { //runs after avm.vm.Run() returns (because script finished or was interrupted)
 			defer avm.SetWorking(false)
 			if caught := recover(); caught != nil {
 				fmt.Printf("VM %d CAUGHT INTERRUPT, ENDING JOB %d\n", avm.Id, job.Id)
@@ -157,17 +174,26 @@ func (avm *AsyncOttoVM) RunAsync(ctx context.Context, src interface{}) (job *Asy
 		job.ResultValue, job.ResultErr = avm.vm.Run(job.Source) //store result
 		job.SetFinished()                                       // signal job finished
 
-		//DEBUG
+		//Emit event + print DEBUG
+		evRes := Event{ Vm: avm, Job: job }
+		//evRes.ScriptSource,_ = job.Source.(string) //if string, attach source to event
 		if job.ResultErr == nil {
 			jRes,jErr := job.ResultJsonString()
 			if jErr == nil {
-				fmt.Printf("JOB %d on VM %d SUCCEEDED WITH RESULT: %s\n", job.Id, avm.Id, jRes)
+				evRes.Type = EventType_JOB_SUCCEEDED
+				evRes.Message = fmt.Sprintf("JOB %d on VM %d SUCCEEDED WITH RESULT: %s", job.Id, avm.Id, jRes)
+				fmt.Println(evRes.Message)
 			} else {
-				fmt.Printf("JOB %d on VM %d SUCCEEDED BUT RESULT COULDN'T BE MARSHALED TO JSON: %v\n", job.Id, avm.Id, jErr)
+				evRes.Type = EventType_JOB_SUCCEEDED
+				evRes.Message = fmt.Sprintf("JOB %d on VM %d SUCCEEDED BUT RESULT COULDN'T BE MARSHALED TO JSON: %v", job.Id, avm.Id, jErr)
+				fmt.Println(evRes.Message)
 			}
 		} else {
-			fmt.Printf("JOB %d on VM %d FAILED: %v\n", job.Id, avm.Id, job.ResultErr)
+			evRes.Type = EventType_JOB_FAILED
+			evRes.Message = fmt.Sprintf("JOB %d on VM %d FAILED: %v", job.Id, avm.Id, job.ResultErr)
+			fmt.Println(evRes.Message)
 		}
+		avm.emitEvent(evRes)
 
 	}(avm)
 
