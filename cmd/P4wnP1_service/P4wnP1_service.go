@@ -43,7 +43,7 @@ func main() {
 	*/
 
 	// ToDo: The webroot has to be changed to /usr/local/P4wnP1/www
-	service.StartRpcServerAndWeb("0.0.0.0", "50051", "80", "/home/pi/P4wnP1_go/dist/www") //start gRPC service
+	service.StartRpcServerAndWeb("0.0.0.0", "50051", "80", "/usr/local/P4wnP1/www") //start gRPC service
 
 	//Indicate servers up with LED blink count 1
 	state.Led.SetLed(&pb.LEDSettings{1})
