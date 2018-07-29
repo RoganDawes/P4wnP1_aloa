@@ -18,7 +18,7 @@ import (
 	"path"
 	"time"
 
-	"../common"
+	"github.com/mame82/P4wnP1_go/common"
 	"os"
 	"io/ioutil"
 )

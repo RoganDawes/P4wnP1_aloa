@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	pb "github.com/mame82/P4wnP1_go/proto"
-	"../common"
+	"github.com/mame82/P4wnP1_go/common"
 	"context"
 	"sync"
 	"time"
