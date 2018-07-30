@@ -91,6 +91,8 @@ func NewUSBGadgetManager() (newUGM *UsbGadgetManager, err error) {
 	newUGM = &UsbGadgetManager{}
 	defGS := GetDefaultGadgetSettings()
 	newUGM.UndeployedGadgetSettings = &defGS //preload state with default settings
+	err = CheckLibComposite()
+	if err != nil { return nil, errors.New(fmt.Sprintf("Couldn't load libcomposite: %v", err)) }
 	err = newUGM.DeployGadgetSettings(newUGM.UndeployedGadgetSettings)
 	if err != nil { return nil, err }
 	return

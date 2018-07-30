@@ -28,10 +28,7 @@ func main() {
 
 
 	//ToDo: Check for root privs
-	err = service.CheckLibComposite()
-	if err != nil {
-		log.Fatalf("Couldn't load libcomposite: %v", err)
-	}
+
 
 	//service.NewLed(false) //Set LED to manual trigger
 	//service.InitDefaultLEDSettings()
