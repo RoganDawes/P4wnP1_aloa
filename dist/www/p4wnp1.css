@@ -82,7 +82,7 @@ button {
 
 .toggle-switch {
     position: relative;
-    display: block;
+    display: inline-block;
     width: 80px;
     height: 30px;
     background-color: gray;
@@ -91,6 +91,7 @@ button {
     /* box-shadow: h-offset v-offset blur spread color inset initial inherit */
     box-shadow: 1px 1px 1px 0 #3f3f3f, -1px -1px 1px 0 #ffffff; /* 2px offset gray to top, white to bottom */
     cursor: pointer;
+    vertical-align: middle;
 }
 
 

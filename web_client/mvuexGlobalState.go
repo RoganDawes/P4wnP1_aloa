@@ -62,7 +62,7 @@ func createGlobalStateStruct() GlobalState {
 	state.CurrentGadgetSettings = NewUSBGadgetSettings()
 	//UpdateGadgetSettingsFromDeployed(state.CurrentGadgetSettings)
 	state.EventLog = NewLogger(maxLogEntries)
-	state.IsModalEnabled = true
+	state.IsModalEnabled = false
 
 	state.Counter = 1337
 	state.Text = "Hi there says MaMe82"

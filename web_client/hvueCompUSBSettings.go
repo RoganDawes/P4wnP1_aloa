@@ -61,7 +61,7 @@ func newCompUSBSettingsData(vm *hvue.VM) interface{} {
 const (
 	compUSBSettingsTemplate = `
 <div>
-	<table>
+	<table cellspacing="1">
 		<tr>
 			<td>USB gadget settings</td>
 			<td><button @click="ApplyGadgetSettings" :disabled="deployPending">Apply</button>
@@ -93,21 +93,26 @@ const (
 		</tr>
 		<tr>
 			<td>CDC ECM</td>
-			<td><toggle-switch v-model="currentGadgetSettings.Use_CDC_ECM"></toggle-switch></td>
+			<td>
+				<toggle-switch v-model="currentGadgetSettings.Use_CDC_ECM"></toggle-switch>
+				<a @click="cdcEcmDetails = !cdcEcmDetails" :class="{ 'toggle-collapse-closed': cdcEcmDetails, 'toggle-collapse-opened': !cdcEcmDetails } "></a>
+			</td>
 		</tr>
-		<tr v-if="currentGadgetSettings.Use_CDC_ECM">
-			<td></td>
-			<td><ethernet-addresses v-bind:settings="currentGadgetSettings.CdcEcmSettings" @hostAddrChange="currentGadgetSettings.CdcEcmSettings.HostAddr=$event" @devAddrChange="currentGadgetSettings.CdcEcmSettings.DevAddr=$event"></ethernet-addresses></td>
+		<tr v-if="cdcEcmDetails">
+			<td colspan="2"><ethernet-addresses v-bind:settings="currentGadgetSettings.CdcEcmSettings" @hostAddrChange="currentGadgetSettings.CdcEcmSettings.HostAddr=$event" @devAddrChange="currentGadgetSettings.CdcEcmSettings.DevAddr=$event"></ethernet-addresses></td>
 		</tr>
 		<tr>
 			<td>RNDIS</td>
-			<td><toggle-switch v-model="currentGadgetSettings.Use_RNDIS"></toggle-switch></td>
-			<td><input type="checkbox" v-if="currentGadgetSettings.Use_RNDIS" v-model="rndisDetails"></td>
+			<td>
+				<toggle-switch v-model="currentGadgetSettings.Use_RNDIS"></toggle-switch>
+				<a @click="rndisDetails = !rndisDetails" :class="{ 'toggle-collapse-closed': rndisDetails, 'toggle-collapse-opened': !rndisDetails } "></a>
+			</td>
 		</tr>
+
 		<tr v-if="rndisDetails">
-			<td></td>
-			<td><ethernet-addresses v-bind:settings="currentGadgetSettings.RndisSettings" @hostAddrChange="currentGadgetSettings.RndisSettings.HostAddr=$event" @devAddrChange="currentGadgetSettings.RndisSettings.DevAddr=$event"></ethernet-addresses></td>
+			<td colspan="2"><ethernet-addresses v-bind:settings="currentGadgetSettings.RndisSettings" @hostAddrChange="currentGadgetSettings.RndisSettings.HostAddr=$event" @devAddrChange="currentGadgetSettings.RndisSettings.DevAddr=$event"></ethernet-addresses></td>
 		</tr>
+
 		<tr>
 			<td>HID Keyboard</td>
 			<td><toggle-switch v-model="currentGadgetSettings.Use_HID_KEYBOARD"></toggle-switch></td>

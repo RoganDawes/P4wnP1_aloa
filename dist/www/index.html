@@ -5,7 +5,7 @@
         <script src="vue.js"></script>
         <script src="vuex.js"></script>
 
-
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
         <script src="codemirror/lib/codemirror.js"></script>
         <link rel="stylesheet" href="codemirror/lib/codemirror.css">
@@ -20,6 +20,20 @@
             .CodeMirror {
 
                 height: 60%;
+            }
+
+            .toggle-collapse-closed::after {
+                font-family: 'FontAwesome';
+                content: "\f077";
+                float: right;
+                cursor: pointer;
+            }
+
+            .toggle-collapse-opened::after {
+                font-family: 'FontAwesome';
+                content: "\f078";
+                float: right;
+                cursor: pointer;
             }
 
             .modal-mask {
@@ -96,23 +110,24 @@
 <div id="app">
     <h1>{{ state.title }}</h1>
     <p>{{ state.text }}</p>
-
+<!--
     <table>
         <tr>
             <td><state></state></td>
             <td><state></state></td>
         </tr>
     </table>
+-->
     <modal v-if="$store.state.isModalEnabled" @close="$store.commit('setModalEnabled',false)">
         <h3 slot="header">My header</h3>
         <p slot="body">Some body text</p>
     </modal>
 
     <tabs>
-        <tab header="USB">
+        <tab header="USB" :selected="true">
             <usb-settings></usb-settings>
         </tab>
-        <tab header="HID Script" :selected="true">
+        <tab header="HID Script">
             <hid-script v-model="testString"></hid-script>
         </tab>
         <tab header="Logger" >
