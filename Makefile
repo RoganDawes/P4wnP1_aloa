@@ -71,6 +71,7 @@ install:
 	# careful testing
 	#sudo update-rc.d dhcpcd disable
 	#sudo update-rc.d dnsmasq disable
+	systemctl disable networking.service # disable network service, relevant parts are wrapped by P4wnP1 (boottime below 20 seconds)
 
 	# reinit service daemon
 	systemctl daemon-reload
