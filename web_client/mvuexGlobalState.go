@@ -48,6 +48,7 @@ type GlobalState struct {
 	CurrentHIDScriptSource string `js:"currentHIDScriptSource"`
 	CurrentGadgetSettings *jsGadgetSettings `js:"currentGadgetSettings"`
 	EventLog *jsLoggerData `js:"eventLog"`
+	HidJobList *jsHidJobStateList `js:"hidJobList"`
 	IsModalEnabled bool `js:"isModalEnabled"`
 
 	Counter int `js:"count"`
@@ -62,6 +63,7 @@ func createGlobalStateStruct() GlobalState {
 	state.CurrentGadgetSettings = NewUSBGadgetSettings()
 	//UpdateGadgetSettingsFromDeployed(state.CurrentGadgetSettings)
 	state.EventLog = NewLogger(maxLogEntries)
+	state.HidJobList = NewHIDJobStateList()
 	state.IsModalEnabled = false
 
 	state.Counter = 1337

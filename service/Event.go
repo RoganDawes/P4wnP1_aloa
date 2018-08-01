@@ -150,13 +150,16 @@ type EventReceiver struct {
 
 func ConstructEventLog(source string, level int, message string) *pb.Event {
 
+	tJson,_ := time.Now().MarshalJSON()
+
+
 	return &pb.Event{
 		Type: common_web.EVT_LOG,
 		Values: []*pb.EventValue{
 			{Val: &pb.EventValue_Tstring{Tstring:source} },
 			{Val: &pb.EventValue_Tint64{Tint64:int64(level)} },
 			{Val: &pb.EventValue_Tstring{Tstring:message} },
-			{Val: &pb.EventValue_Tstring{Tstring:time.Now().String()} },
+			{Val: &pb.EventValue_Tstring{Tstring:string(tJson)} },
 		},
 	}
 }
@@ -179,6 +182,8 @@ func ConstructEventHID(hidEvent hid.Event) *pb.Event {
 	}
 	if eVM := hidEvent.Vm; eVM != nil { vmID = eVM.Id }
 
+	tJson,_ := time.Now().MarshalJSON()
+
 	return &pb.Event{
 		Type: common_web.EVT_HID, //Type
 		Values: []*pb.EventValue{
@@ -189,7 +194,7 @@ func ConstructEventHID(hidEvent hid.Event) *pb.Event {
 			{Val: &pb.EventValue_Tstring{Tstring:resString} },			//result String
 			{Val: &pb.EventValue_Tstring{Tstring:errString} },			//error String (message in case of error)
 			{Val: &pb.EventValue_Tstring{Tstring:message} },			//Mesage text of event
-			{Val: &pb.EventValue_Tstring{Tstring:time.Now().String()} },//Timestamp of event genration
+			{Val: &pb.EventValue_Tstring{Tstring:string(tJson)} },//Timestamp of event genration
 		},
 	}
 }

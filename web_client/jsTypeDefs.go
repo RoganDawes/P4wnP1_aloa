@@ -10,9 +10,11 @@ import (
 	"context"
 	"io"
 	"github.com/mame82/P4wnP1_go/common_web"
+	"strconv"
 )
 
 var eNoLogEvent = errors.New("No log event")
+var eNoHidEvent = errors.New("No HID event")
 
 /* USB Gadget types corresponding to gRPC messages */
 
@@ -175,6 +177,19 @@ type jsLogEvent struct {
 	EvLogTime string `js:"time"`
 }
 
+//HID event
+type jsHidEvent struct {
+	*js.Object
+	EvType int64 `js:"evtype"`
+	VMId   int64  `js:"vmId"`
+	JobId   int64  `js:"jobId"`
+	HasError  bool  `js:"hasError"`
+	Result string `js:"result"`
+	Error string `js:"error"`
+	Message string `js:"message"`
+	EvLogTime string `js:"time"`
+}
+
 func (jsEv *jsEvent) toLogEvent() (res *jsLogEvent, err error) {
 	if jsEv.Type != common_web.EVT_LOG || len(jsEv.Values) != 4 { return nil,eNoLogEvent}
 	res = &jsLogEvent{Object:O()}
@@ -196,49 +211,102 @@ func (jsEv *jsEvent) toLogEvent() (res *jsLogEvent, err error) {
 	return res,nil
 }
 
-/*
-func DeconstructEventLog(gRPCEv *pb.Event) (res *jsLogEvent, err error) {
-	if gRPCEv.Type != common.EVT_LOG { return nil,errors.New("No log event")}
+func (jsEv *jsEvent) toHidEvent() (res *jsHidEvent, err error) {
+	if jsEv.Type != common_web.EVT_HID || len(jsEv.Values) != 8 { return nil,eNoHidEvent}
+	res = &jsHidEvent{Object:O()}
 
-	res = &jsLogEvent{Object:O()}
-	switch vT := gRPCEv.Values[0].Val.(type) {
-	case *pb.EventValue_Tstring:
-		res.EvLogSource = vT.Tstring
-	default:
-		return nil, errors.New("Value at position 0 has wrong type for a log event")
-	}
-	switch vT := gRPCEv.Values[1].Val.(type) {
-	case *pb.EventValue_Tint64:
-		res.EvLogLevel = int(vT.Tint64)
-	default:
-		return nil, errors.New("Value at position 1 has wrong type for a log event")
-	}
-	switch vT := gRPCEv.Values[2].Val.(type) {
-	case *pb.EventValue_Tstring:
-		res.EvLogMessage = vT.Tstring
-	default:
-		return nil, errors.New("Value at position 2 has wrong type for a log event")
-	}
-	switch vT := gRPCEv.Values[3].Val.(type) {
-	case *pb.EventValue_Tstring:
-		res.EvLogTime = vT.Tstring
-	default:
-		return nil, errors.New("Value at position 3 has wrong type for a log event")
-	}
+	var ok bool
+	res.EvType,ok = jsEv.Values[0].(int64)
+	if !ok { return nil,eNoHidEvent }
 
-	return res, nil
+	res.VMId,ok = jsEv.Values[1].(int64)
+	if !ok { return nil,eNoHidEvent}
+
+	res.JobId,ok = jsEv.Values[2].(int64)
+	if !ok { return nil,eNoHidEvent}
+
+	res.HasError,ok = jsEv.Values[3].(bool)
+	if !ok { return nil,eNoHidEvent}
+
+	res.Result,ok = jsEv.Values[4].(string)
+	if !ok { return nil,eNoHidEvent}
+
+	res.Error,ok = jsEv.Values[5].(string)
+	if !ok { return nil,eNoHidEvent}
+
+	res.Message,ok = jsEv.Values[6].(string)
+	if !ok { return nil,eNoHidEvent}
+
+	res.EvLogTime,ok = jsEv.Values[7].(string)
+	if !ok { return nil,eNoLogEvent}
+
+	return res,nil
 }
-*/
+
+
+/* HIDJobList */
+type jsHidJobState struct {
+	*js.Object
+	Id             int64  `js:"id"`
+	VmId           int64  `js:"vmId"`
+	HasFailed      bool   `js:"hasFailed"`
+	HasSucceeded   bool   `js:"hasSucceeded"`
+	LastMessage    string `js:"lastMessage"`
+	TextResult     string `js:"textResult"`
+	TextError      string `js:"textError"`
+	LastUpdateTime string `js:"lastUpdateTime"` //JSON timestamp from server
+	ScriptSource   string `js:"textError"`
+}
+
+type jsHidJobStateList struct {
+	*js.Object
+	Jobs *js.Object `js:"jobs"`
+}
+
+func NewHIDJobStateList() *jsHidJobStateList {
+	jl := &jsHidJobStateList{Object:O()}
+	jl.Jobs = O()
+
+	//ToDo: Delete adding a test job
+	jl.UpdateEntry(99,1,false,false, "This is the latest event message", "current result", "current error","16:00", "type('hello world')")
+	jl.UpdateEntry(100,1,false,true, "SUCCESS", "current result", "current error","16:00", "type('hello world')")
+	jl.UpdateEntry(101,1,true,false, "FAIL", "current result", "current error","16:00", "type('hello world')")
+	jl.UpdateEntry(102,1,true,true, "Error and Success at same time --> UNKNOWN", "current result", "current error","16:00", "type('hello world')")
+	jl.UpdateEntry(102,1,true,true, "Error and Success at same time --> UNKNOWN, repeated ID", "current result", "current error","16:00", "type('hello world')")
+
+
+	return jl
+}
+
+func (jl *jsHidJobStateList) UpdateEntry(id, vmId int64, hasFailed, hasSucceeded bool, message, textResult, textError, lastUpdateTime, scriptSource string) {
+	//Create job object
+	j := &jsHidJobState{Object:O()}
+	j.Id = id
+	j.VmId = vmId
+	j.HasFailed = hasFailed
+	j.HasSucceeded = hasSucceeded
+	j.LastMessage = message
+	j.TextResult = textResult
+	j.TextError = textError
+	j.LastUpdateTime = textError
+	if len(scriptSource) > 0 {j.ScriptSource = scriptSource}
+
+	jl.Jobs.Set(strconv.Itoa(int(j.Id)), j) //jobs["j.ID"]=j
+}
+
+func (jl *jsHidJobStateList) DeleteEntry(id int64) {
+	jl.Delete(strconv.Itoa(int(id))) //JS version
+	//delete(jl.Jobs, strconv.Itoa(int(id)))
+}
 
 /* EVENT LOGGER */
-
 type jsLoggerData struct {
 	*js.Object
-	LogArray *js.Object `js:"logArray"`
-	EventArray *js.Object `js:"eventArray"`
-	cancel context.CancelFunc
+	LogArray      *js.Object `js:"logArray"`
+	HidEventArray *js.Object `js:"eventHidArray"`
+	cancel        context.CancelFunc
 	*sync.Mutex
-	MaxEntries int `js:"maxEntries"`
+	MaxEntries    int        `js:"maxEntries"`
 }
 
 func NewLogger(maxEntries int) *jsLoggerData {
@@ -248,7 +316,7 @@ func NewLogger(maxEntries int) *jsLoggerData {
 
 	loggerVmData.Mutex = &sync.Mutex{}
 	loggerVmData.LogArray = js.Global.Get("Array").New()
-	loggerVmData.EventArray = js.Global.Get("Array").New()
+	loggerVmData.HidEventArray = js.Global.Get("Array").New()
 	loggerVmData.MaxEntries = maxEntries
 
 	return loggerVmData
@@ -256,43 +324,38 @@ func NewLogger(maxEntries int) *jsLoggerData {
 
 /* This method gets internalized and therefor the mutex won't be accessible*/
 func (data *jsLoggerData) AddEntry(ev *pb.Event ) {
-//	println("ADD ENTRY", ev)
+	//	println("ADD ENTRY", ev)
 	go func() {
-/*
-		data.Lock()
-		defer data.Unlock()
-*/
+		/*
+				data.Lock()
+				defer data.Unlock()
+		*/
 
-		//if LOG event add to logArray
+
 		jsEv := NewJsEventFromNative(ev)
-		println("JS from native", jsEv)
-		if jsEv.Type == common_web.EVT_LOG {
+		switch jsEv.Type {
+		//if LOG event add to logArray
+		case common_web.EVT_LOG:
 			if logEv,err := jsEv.toLogEvent(); err == nil {
 				data.LogArray.Call("push", logEv)
 			} else {
 				println("couldn't convert to LogEvent: ", jsEv)
 			}
-		} else {
-			data.EventArray.Call("push", jsEv)
+			//if HID event add to eventHidArray
+		case common_web.EVT_HID:
+			if hidEv,err := jsEv.toHidEvent(); err == nil {
+				data.HidEventArray.Call("push", hidEv)
+			} else {
+				println("couldn't convert to HidEvent: ", jsEv)
+			}
 		}
-
-
-		/*
-		logEv, err := DeconstructEventLog(ev)
-		if err != nil {
-			println("Logger: Error adding log entry, provided event couldn't be converted to log event")
-			return
-		}
-
-		data.LogArray.Call("push", logEv)
-		*/
 
 		//reduce to length (note: kebab case 'max-entries' is translated to camel case 'maxEntries' by vue)
 		for data.LogArray.Length() > data.MaxEntries {
 			data.LogArray.Call("shift") // remove first element
 		}
-		for data.EventArray.Length() > data.MaxEntries {
-			data.EventArray.Call("shift") // remove first element
+		for data.HidEventArray.Length() > data.MaxEntries {
+			data.HidEventArray.Call("shift") // remove first element
 		}
 
 	}()
@@ -306,7 +369,7 @@ func (data *jsLoggerData) StartListening() {
 	ctx,cancel := context.WithCancel(context.Background())
 	data.cancel = cancel
 
-	evStream, err := Client.Client.EventListen(ctx, &pb.EventRequest{ListenType: common_web.EVT_LOG})
+	evStream, err := Client.Client.EventListen(ctx, &pb.EventRequest{ListenType: common_web.EVT_ANY})
 	if err != nil {
 		cancel()
 		println("Error listening fo Log events", err)

@@ -5,52 +5,73 @@ package main
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/mame82/hvue"
+	"github.com/mame82/P4wnP1_go/common_web"
 )
 
-type CompEthernetAddressesData2 struct {
+type CompHIDJobsData struct {
 	*js.Object
-
 }
 
-func newCompEthernetAddressesData2(vm *hvue.VM) interface{} {
+func newCompHIDJobsData(vm *hvue.VM) interface{} {
 
-	cc := &CompEthernetAddressesData2{
+	cc := &CompHIDJobsData{
 		Object: js.Global.Get("Object").New(),
 	}
-
 
 	return cc
 }
 
-func InitCompEthernetAddresses2() {
-	/*
-	o := vue.NewOption()
-	o.Name = "EthernetAddresses"
-	o.SetDataWithMethods(newCompEthernetAddressesData2)
-	o.Template = compEthernetAddressesTemplate2
-	o.AddProp("settings")
-	*/
-
+func InitCompHIDJobs() {
 	hvue.NewComponent(
-		"ethernet-addresses",
-		hvue.Template(compEthernetAddressesTemplate2),
-		hvue.DataFunc(newCompEthernetAddressesData2),
-		hvue.PropObj("settings", hvue.Types(hvue.PObject)),
+		"hidjobs",
+		hvue.Template(compHIDJobsTemplate),
+		hvue.DataFunc(newCompHIDJobsData),
+		hvue.Computed("events",
+			func(vm *hvue.VM) interface{} {
+				return vm.Store.Get("state").Get("eventLog").Get("eventHidArray")
+			}),
+		hvue.Computed("jobs",
+			func(vm *hvue.VM) interface{} {
+				jobList := vm.Store.Get("state").Get("hidJobList").Get("jobs")
+				return js.Global.Get("Object").Call("values",jobList)
+			}),
+		hvue.Method("evIdToString", func (vm *hvue.VM, evID int64) (res string) {
+			println("EvID",evID)
+			return common_web.EventType_name[evID]
+		}),
 	)
 }
 
 const (
-
-	compEthernetAddressesTemplate2 = `
+	//{ "evtype": 0, "vmId": 2, "jobId": 3, "hasError": false, "result": "null", "error": "", "message": "Script started", "time": "2018-07-30 04:56:42.297533 +0000 UTC m=+7625.097825001" }
+	compHIDJobsTemplate = `
 <div>
-	<table>
-	<tr>
-		<td>Host MAC address</td><td><input v-bind:value="settings.HostAddr" v-on:input="$emit('hostAddrChange', $event.target.value)"></td>
-	</tr>
-	<tr>
-		<td>Device MAC address</td><td><input v-bind:value="settings.DevAddr" v-on:input="$emit('devAddrChange', $event.target.value)"></td>
-	</tr>
-	</table>
+<ul>
+	<hidjob  v-for="job in jobs" :job="job"></hidjob>
+</ul>
+<table border="1">
+<tr>
+	<th>Event Type</th>
+	<th>VM ID</th>
+	<th>Job ID</th>
+	<th>Has error</th>
+	<th>Result</th>
+	<th>Error</th>
+	<th>Message</th>
+	<th>Time</th>
+</tr>
+<tr v-for="e in events">
+	<td>{{ evIdToString(e.evtype) }}</td>
+	<td>{{ e.vmId }}</td>
+	<td>{{ e.jobId }}</td>
+	<td>{{ e.hasError }}</td>
+	<td>{{ e.result }}</td>
+	<td>{{ e.error }}</td>
+	<td>{{ e.message }}</td>
+	<td>{{ e.time }}</td>
+</tr>
+
+</table>
 </div>
 `
 )
