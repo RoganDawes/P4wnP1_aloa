@@ -46,9 +46,9 @@ const (
 	//{ "evtype": 0, "vmId": 2, "jobId": 3, "hasError": false, "result": "null", "error": "", "message": "Script started", "time": "2018-07-30 04:56:42.297533 +0000 UTC m=+7625.097825001" }
 	compHIDJobsTemplate = `
 <div>
-<ul>
-	<hidjob  v-for="job in jobs" :job="job"></hidjob>
-</ul>
+<div>
+	<hidjob  v-for="job in jobs" :job="job" :key="job.id"></hidjob>
+</div>
 <table border="1">
 <tr>
 	<th>Event Type</th>

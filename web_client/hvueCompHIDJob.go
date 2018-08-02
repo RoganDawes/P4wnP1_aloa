@@ -44,12 +44,16 @@ LastMessage    string `js:"lastMessage"`
 TextResult     string `js:"textResult"`
 TextError      string `js:"textError"`
 LastUpdateTime string `js:"lastUpdateTime"` //JSON timestamp from server
-ScriptSource   string `js:"textError"`
+ScriptSource   string `js:"textSource"`
 }
  */
 
 	compHIDJobTemplate = `
-<li class="jobstate-entry" :class="jobstate">{{ job.id }}: {{ jobstate }}</li>
+<div :style="{ 'display': 'flex' }">
+<div class="jobstate-entry" :class="jobstate"><span>{{ job.vmId }}: {{ job.id }}</span></div>
+<div v-if="job.hasSucceeded">{{ job.textResult }}</div>
+<div v-if="job.hasFailed">{{ job.textError }}</div>
+</div>
 `
 )
 

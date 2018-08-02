@@ -11,6 +11,7 @@ import (
 	"io"
 	"github.com/mame82/P4wnP1_go/common_web"
 	"strconv"
+	"github.com/mame82/hvue"
 )
 
 var eNoLogEvent = errors.New("No log event")
@@ -238,7 +239,8 @@ func (jsEv *jsEvent) toHidEvent() (res *jsHidEvent, err error) {
 	if !ok { return nil,eNoHidEvent}
 
 	res.EvLogTime,ok = jsEv.Values[7].(string)
-	if !ok { return nil,eNoLogEvent}
+	if !ok { return nil,eNoHidEvent}
+
 
 	return res,nil
 }
@@ -255,7 +257,7 @@ type jsHidJobState struct {
 	TextResult     string `js:"textResult"`
 	TextError      string `js:"textError"`
 	LastUpdateTime string `js:"lastUpdateTime"` //JSON timestamp from server
-	ScriptSource   string `js:"textError"`
+	ScriptSource   string `js:"textSource"`
 }
 
 type jsHidJobStateList struct {
@@ -267,18 +269,21 @@ func NewHIDJobStateList() *jsHidJobStateList {
 	jl := &jsHidJobStateList{Object:O()}
 	jl.Jobs = O()
 
-	//ToDo: Delete adding a test job
+	/*
+	//ToDo: Delete added a test jobs
 	jl.UpdateEntry(99,1,false,false, "This is the latest event message", "current result", "current error","16:00", "type('hello world')")
 	jl.UpdateEntry(100,1,false,true, "SUCCESS", "current result", "current error","16:00", "type('hello world')")
 	jl.UpdateEntry(101,1,true,false, "FAIL", "current result", "current error","16:00", "type('hello world')")
 	jl.UpdateEntry(102,1,true,true, "Error and Success at same time --> UNKNOWN", "current result", "current error","16:00", "type('hello world')")
 	jl.UpdateEntry(102,1,true,true, "Error and Success at same time --> UNKNOWN, repeated ID", "current result", "current error","16:00", "type('hello world')")
-
+	*/
 
 	return jl
 }
 
 func (jl *jsHidJobStateList) UpdateEntry(id, vmId int64, hasFailed, hasSucceeded bool, message, textResult, textError, lastUpdateTime, scriptSource string) {
+	//ToDo: Cehck if key exists and retrieve former job, to preserve fields which aren't changed (f.e. ScriptSource)
+
 	//Create job object
 	j := &jsHidJobState{Object:O()}
 	j.Id = id
@@ -288,14 +293,14 @@ func (jl *jsHidJobStateList) UpdateEntry(id, vmId int64, hasFailed, hasSucceeded
 	j.LastMessage = message
 	j.TextResult = textResult
 	j.TextError = textError
-	j.LastUpdateTime = textError
+	j.LastUpdateTime = lastUpdateTime
 	if len(scriptSource) > 0 {j.ScriptSource = scriptSource}
-
-	jl.Jobs.Set(strconv.Itoa(int(j.Id)), j) //jobs["j.ID"]=j
+	//jl.Jobs.Set(strconv.Itoa(int(j.Id)), j) //jobs["j.ID"]=j <--Property addition/update can't be detected by Vue.js, see https://vuejs.org/v2/guide/list.html#Object-Change-Detection-Caveats
+	hvue.Set(jl.Jobs, strconv.Itoa(int(j.Id)), j)
 }
 
 func (jl *jsHidJobStateList) DeleteEntry(id int64) {
-	jl.Delete(strconv.Itoa(int(id))) //JS version
+	jl.Jobs.Delete(strconv.Itoa(int(id))) //JS version
 	//delete(jl.Jobs, strconv.Itoa(int(id)))
 }
 
@@ -307,9 +312,10 @@ type jsLoggerData struct {
 	cancel        context.CancelFunc
 	*sync.Mutex
 	MaxEntries    int        `js:"maxEntries"`
+	JobList       *jsHidJobStateList `js:"jobList"` //Needs to be exposed to JS in order to use JobList.UpdateEntry() from this JS object
 }
 
-func NewLogger(maxEntries int) *jsLoggerData {
+func NewLogger(maxEntries int, jobList *jsHidJobStateList) *jsLoggerData {
 	loggerVmData := &jsLoggerData{
 		Object: js.Global.Get("Object").New(),
 	}
@@ -318,9 +324,24 @@ func NewLogger(maxEntries int) *jsLoggerData {
 	loggerVmData.LogArray = js.Global.Get("Array").New()
 	loggerVmData.HidEventArray = js.Global.Get("Array").New()
 	loggerVmData.MaxEntries = maxEntries
+	loggerVmData.JobList = jobList
 
 	return loggerVmData
 }
+
+func (data *jsLoggerData) handleHidEvent(hEv *jsHidEvent ) {
+	if hEv.EvType == common_web.HidEventType_JOB_STARTED {
+		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, false, hEv.Message, hEv.Result, hEv.Error, hEv.EvLogTime,"")
+	}
+	if hEv.EvType == common_web.HidEventType_JOB_FAILED {
+		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, false, hEv.Message, hEv.Result, hEv.Error, hEv.EvLogTime,"")
+	}
+	if hEv.EvType == common_web.HidEventType_JOB_SUCCEEDED {
+		println("Updating job succeeded for", int(hEv.JobId))
+		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, true, hEv.Message, hEv.Result, hEv.Error, hEv.EvLogTime,"")
+	}
+}
+
 
 /* This method gets internalized and therefor the mutex won't be accessible*/
 func (data *jsLoggerData) AddEntry(ev *pb.Event ) {
@@ -345,6 +366,9 @@ func (data *jsLoggerData) AddEntry(ev *pb.Event ) {
 		case common_web.EVT_HID:
 			if hidEv,err := jsEv.toHidEvent(); err == nil {
 				data.HidEventArray.Call("push", hidEv)
+
+				//handle event
+				data.handleHidEvent(hidEv)
 			} else {
 				println("couldn't convert to HidEvent: ", jsEv)
 			}

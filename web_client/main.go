@@ -34,40 +34,6 @@ type appController struct {
 func main() {
 	println(GetBaseURL())
 
-	/*
-	println("Listening for RPC events ...")
-	err := Client.StartListenEvents(common.EVT_ANY)
-	if err != nil {println(err)}
-
-	time.Sleep(time.Second * 5)
-
-	Client.StopEventListening()
-	println("... done listening for RPC events")
-
-	time.Sleep(time.Second)
-
-	println("Listening for RPC events ...")
-	err := Client.StartListenEvents(common.EVT_LOG)
-	if err != nil {println(err)}
-	*/
-
-	/*
-	fmt.Printf("Address %v\n", strings.TrimSuffix(document.BaseURI(), "/"))
-	fmt.Printf("Client %v\n", Client)
-
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	gs, err := Client.GetDeployedGadgetSetting(ctx, &pb.Empty{})
-	if err == nil {
-		//export Gadget setting
-		js.Global.Set("gs", gs)
-		GS = gs
-	} else {
-		fmt.Printf("Error rpc call: %v\n", err)
-	}
-	*/
 
 	InitGlobalState() //sets Vuex store in JS window.store
 

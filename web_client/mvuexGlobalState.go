@@ -62,8 +62,9 @@ func createGlobalStateStruct() GlobalState {
 	state.CurrentHIDScriptSource = initHIDScript
 	state.CurrentGadgetSettings = NewUSBGadgetSettings()
 	//UpdateGadgetSettingsFromDeployed(state.CurrentGadgetSettings)
-	state.EventLog = NewLogger(maxLogEntries)
 	state.HidJobList = NewHIDJobStateList()
+	state.EventLog = NewLogger(maxLogEntries, state.HidJobList)
+
 	state.IsModalEnabled = false
 
 	state.Counter = 1337

@@ -17,6 +17,89 @@
 
 
         <style type="text/css">
+            /* Job Entry */
+
+            .jobstate-entry {
+                margin: 3px;
+                list-style-type: none;
+                list-style-position: outside;
+                position: relative;
+                display: block;
+                width: 6.5em;
+                height: 1.7em;
+                background-color: gray;
+                background: linear-gradient(to top, #f4f4f4, #9e9e9e 80%);
+                border-radius: 99999px;
+                box-shadow: 1px 1px 1px 0 #3f3f3f, -1px -1px 1px 0 #ffffff;
+                vertical-align: middle;
+                cursor: pointer;
+            }
+
+            .jobstate-entry::before {
+                content:"";
+                list-style-type: none;
+                list-style-position: outside;
+                position: absolute;
+                display: inline-block;
+                left: 4%;
+                right: 4%;
+                top: 10%;
+                bottom: 10%;
+                width: 92%;
+                height: 80%;
+                background-color: gray;
+                background: linear-gradient(to bottom, #f4f4f4, #9e9e9e 80%);
+                border-radius: 99999px;
+
+            }
+
+            .jobstate-entry > span {
+                left: 10%;
+                top: 8%;
+                position: relative;
+                display: inline-block;
+                text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+                font-size: 0.9em;
+                font-weight: 800;
+
+            }
+
+            .jobstate-entry > span::before {
+                content: "";
+                vertical-align: sub;
+                position: relative;
+                display:inline-block;
+                margin-right: 3px;
+                width: 1.1em;
+                height: 1.1em;
+                border-radius: 50%;
+                background: black;
+                left: 2%;
+                top: 5%;
+                bottom: 5%;
+                border-radius: 99999px;
+                background-color: #707070;
+                box-shadow: inset 0 0 10px 0 rgba(0, 0, 0, 0.7);
+            }
+
+            .jobstate-entry.SUCCEEDED > span::before {
+                background: rgb(150,255,0);
+                box-shadow: inset 0 0 4px 0 rgba(0, 0, 0, 0.5), 0 0 11px 1px rgb(150,255,0);
+            }
+
+
+            .jobstate-entry.FAILED > span::before {
+                background: rgb(255,160,130);
+                box-shadow: inset 0 0 7px 0 rgba(250, 50, 50, 1.0), 0 0 11px 2px rgb(255,160,130);
+            }
+
+            .jobstate-entry.RUNNING > span::before {
+                background: lightyellow;
+                box-shadow: inset 0 0 4px 0 rgba(0, 0, 0, 0.5), 0 0 11px 1px rgb(250,255,80);
+            }
+
+            /* CodeMirror */
+
             .CodeMirror {
 
                 height: 60%;
