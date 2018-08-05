@@ -8,6 +8,7 @@
 		grpc.proto
 
 	It has these top-level messages:
+		StringMessage
 		EventRequest
 		EventValue
 		Event
@@ -21,6 +22,7 @@
 		HIDScriptRequest
 		HIDScriptJob
 		HIDScriptJobList
+		HIDRunningJobStateResult
 		HIDScriptResult
 		LEDSettings
 		GadgetSettings
@@ -112,6 +114,70 @@ var WiFiSettings_APAuthMode_value = map[string]int{
 
 func (x WiFiSettings_APAuthMode) String() string {
 	return WiFiSettings_APAuthMode_name[int(x)]
+}
+
+// Alive check
+type StringMessage struct {
+	Msg string
+}
+
+// GetMsg gets the Msg of the StringMessage.
+func (m *StringMessage) GetMsg() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Msg
+}
+
+// MarshalToWriter marshals StringMessage to the provided writer.
+func (m *StringMessage) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.Msg) > 0 {
+		writer.WriteString(1, m.Msg)
+	}
+
+	return
+}
+
+// Marshal marshals StringMessage to a slice of bytes.
+func (m *StringMessage) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a StringMessage from the provided reader.
+func (m *StringMessage) UnmarshalFromReader(reader jspb.Reader) *StringMessage {
+	for reader.Next() {
+		if m == nil {
+			m = &StringMessage{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Msg = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a StringMessage from a slice of bytes.
+func (m *StringMessage) Unmarshal(rawBytes []byte) (*StringMessage, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
 
 // Events
@@ -1195,6 +1261,99 @@ func (m *HIDScriptJobList) UnmarshalFromReader(reader jspb.Reader) *HIDScriptJob
 
 // Unmarshal unmarshals a HIDScriptJobList from a slice of bytes.
 func (m *HIDScriptJobList) Unmarshal(rawBytes []byte) (*HIDScriptJobList, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type HIDRunningJobStateResult struct {
+	Id     int64
+	VmId   int64
+	Source string
+}
+
+// GetId gets the Id of the HIDRunningJobStateResult.
+func (m *HIDRunningJobStateResult) GetId() (x int64) {
+	if m == nil {
+		return x
+	}
+	return m.Id
+}
+
+// GetVmId gets the VmId of the HIDRunningJobStateResult.
+func (m *HIDRunningJobStateResult) GetVmId() (x int64) {
+	if m == nil {
+		return x
+	}
+	return m.VmId
+}
+
+// GetSource gets the Source of the HIDRunningJobStateResult.
+func (m *HIDRunningJobStateResult) GetSource() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Source
+}
+
+// MarshalToWriter marshals HIDRunningJobStateResult to the provided writer.
+func (m *HIDRunningJobStateResult) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if m.Id != 0 {
+		writer.WriteInt64(1, m.Id)
+	}
+
+	if m.VmId != 0 {
+		writer.WriteInt64(2, m.VmId)
+	}
+
+	if len(m.Source) > 0 {
+		writer.WriteString(3, m.Source)
+	}
+
+	return
+}
+
+// Marshal marshals HIDRunningJobStateResult to a slice of bytes.
+func (m *HIDRunningJobStateResult) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a HIDRunningJobStateResult from the provided reader.
+func (m *HIDRunningJobStateResult) UnmarshalFromReader(reader jspb.Reader) *HIDRunningJobStateResult {
+	for reader.Next() {
+		if m == nil {
+			m = &HIDRunningJobStateResult{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Id = reader.ReadInt64()
+		case 2:
+			m.VmId = reader.ReadInt64()
+		case 3:
+			m.Source = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a HIDRunningJobStateResult from a slice of bytes.
+func (m *HIDRunningJobStateResult) Unmarshal(rawBytes []byte) (*HIDRunningJobStateResult, error) {
 	reader := jspb.NewReader(rawBytes)
 
 	m = m.UnmarshalFromReader(reader)
@@ -2700,6 +2859,7 @@ type P4WNP1Client interface {
 	HIDCancelScriptJob(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*Empty, error)
 	HIDGetRunningScriptJobs(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*HIDScriptJobList, error)
 	HIDCancelAllScriptJobs(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*Empty, error)
+	HIDGetRunningJobState(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*HIDRunningJobStateResult, error)
 	// FileSystem
 	FSWriteFile(ctx context.Context, in *WriteFileRequest, opts ...grpcweb.CallOption) (*Empty, error)
 	FSReadFile(ctx context.Context, in *ReadFileRequest, opts ...grpcweb.CallOption) (*ReadFileResponse, error)
@@ -2707,6 +2867,8 @@ type P4WNP1Client interface {
 	FSCreateTempDirOrFile(ctx context.Context, in *TempDirOrFileRequest, opts ...grpcweb.CallOption) (*TempDirOrFileResponse, error)
 	// Events
 	EventListen(ctx context.Context, in *EventRequest, opts ...grpcweb.CallOption) (P4WNP1_EventListenClient, error)
+	// Alive check
+	EchoRequest(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*StringMessage, error)
 }
 
 type p4WNP1Client struct {
@@ -2855,6 +3017,15 @@ func (c *p4WNP1Client) HIDCancelAllScriptJobs(ctx context.Context, in *Empty, op
 	return new(Empty).Unmarshal(resp)
 }
 
+func (c *p4WNP1Client) HIDGetRunningJobState(ctx context.Context, in *HIDScriptJob, opts ...grpcweb.CallOption) (*HIDRunningJobStateResult, error) {
+	resp, err := c.client.RPCCall(ctx, "HIDGetRunningJobState", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(HIDRunningJobStateResult).Unmarshal(resp)
+}
+
 func (c *p4WNP1Client) FSWriteFile(ctx context.Context, in *WriteFileRequest, opts ...grpcweb.CallOption) (*Empty, error) {
 	resp, err := c.client.RPCCall(ctx, "FSWriteFile", in.Marshal(), opts...)
 	if err != nil {
@@ -2921,4 +3092,13 @@ func (x *p4WNP1EventListenClient) Recv() (*Event, error) {
 	}
 
 	return new(Event).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) EchoRequest(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*StringMessage, error) {
+	resp, err := c.client.RPCCall(ctx, "EchoRequest", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(StringMessage).Unmarshal(resp)
 }

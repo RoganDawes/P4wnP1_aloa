@@ -28,7 +28,7 @@ func InitCompHIDJobs() {
 		hvue.DataFunc(newCompHIDJobsData),
 		hvue.Computed("events",
 			func(vm *hvue.VM) interface{} {
-				return vm.Store.Get("state").Get("eventLog").Get("eventHidArray")
+				return vm.Store.Get("state").Get("eventReceiver").Get("eventHidArray")
 			}),
 		hvue.Computed("jobs",
 			func(vm *hvue.VM) interface{} {

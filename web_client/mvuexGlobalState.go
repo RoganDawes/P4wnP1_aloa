@@ -8,9 +8,12 @@ import (
 	"github.com/mame82/mvuex"
 )
 
+var globalState *GlobalState
+
 const (
 	maxLogEntries = 500
 
+	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS       = "updateRunningHidJobs"
 	VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS       = "deployCurrentGadgetSettings"
 	VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED = "updateCurrentGadgetSettingsFromDeployed"
 	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO     = "setCurrentGadgetSettings"
@@ -44,12 +47,15 @@ for (var i = 3; i < 10; i++) {
 
 type GlobalState struct {
 	*js.Object
-	Title string `js:"title"`
-	CurrentHIDScriptSource string `js:"currentHIDScriptSource"`
-	CurrentGadgetSettings *jsGadgetSettings `js:"currentGadgetSettings"`
-	EventLog *jsLoggerData `js:"eventLog"`
-	HidJobList *jsHidJobStateList `js:"hidJobList"`
-	IsModalEnabled bool `js:"isModalEnabled"`
+	Title                    string             `js:"title"`
+	CurrentHIDScriptSource   string             `js:"currentHIDScriptSource"`
+	CurrentGadgetSettings    *jsGadgetSettings  `js:"currentGadgetSettings"`
+	EventReceiver            *jsEventReceiver   `js:"eventReceiver"`
+	HidJobList               *jsHidJobStateList `js:"hidJobList"`
+	IsModalEnabled           bool               `js:"isModalEnabled"`
+	IsConnected              bool               `js:"isConnected"`
+	FailedConnectionAttempts int                `js:"failedConnectionAttempts"`
+
 
 	Counter int `js:"count"`
 	Text string `js:"text"`
@@ -63,9 +69,10 @@ func createGlobalStateStruct() GlobalState {
 	state.CurrentGadgetSettings = NewUSBGadgetSettings()
 	//UpdateGadgetSettingsFromDeployed(state.CurrentGadgetSettings)
 	state.HidJobList = NewHIDJobStateList()
-	state.EventLog = NewLogger(maxLogEntries, state.HidJobList)
-
+	state.EventReceiver = NewEventReceiver(maxLogEntries, state.HidJobList)
+	state.IsConnected = false
 	state.IsModalEnabled = false
+	state.FailedConnectionAttempts = 0
 
 	state.Counter = 1337
 	state.Text = "Hi there says MaMe82"
@@ -75,7 +82,7 @@ func createGlobalStateStruct() GlobalState {
 func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		//fetch deployed gadget settings
-		dGS,err := RpcGetDeployedGadgetSettings(time.Second * 3)
+		dGS,err := RpcGetDeployedGadgetSettings(time.Second * 5)
 		if err != nil {
 			println("Couldn't retrieve deployed gadget settings")
 			return
@@ -86,6 +93,24 @@ func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.A
 
 		//commit to current
 		context.Commit("setCurrentGadgetSettings", jsGS)
+	}()
+
+	return
+}
+
+func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		//fetch deployed gadget settings
+		jobstates,err := RpcGetRunningHidJobStates(time.Second * 10)
+		if err != nil {
+			println("Couldn't retrieve stateof running HID jobs", err)
+			return
+		}
+
+		for _,jobstate := range jobstates {
+			println("updateing jobstate", jobstate)
+			state.HidJobList.UpdateEntry(jobstate.Id, jobstate.VmId, false,false, "initial job state", "",time.Now().String(),jobstate.Source)
+		}
 	}()
 
 	return
@@ -114,8 +139,6 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 			return
 		}
 
-
-
 		//ToDo: If we're here, we succeeded and should indicate this via global state
 		Alert("GadgetSettings deployed successfully")
 
@@ -124,8 +147,9 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 	return
 }
 
-func initMVuex() {
+func initMVuex() GlobalState {
 	state := createGlobalStateStruct()
+	globalState = &state //make accessible through global var
 	store := mvuex.NewStore(
 		mvuex.State(state),
 		mvuex.Action("actiontest", func(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
@@ -164,29 +188,33 @@ func initMVuex() {
 			return
 		}),
 		mvuex.Mutation("startLogListening", func (store *mvuex.Store, state *GlobalState) {
-			state.EventLog.StartListening()
+			state.EventReceiver.StartListening()
 			return
 		}),
 		mvuex.Mutation("stopLogListening", func (store *mvuex.Store, state *GlobalState) {
-			state.EventLog.StopListening()
+			state.EventReceiver.StopListening()
 			return
 		}),
 		mvuex.Action(VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED, actionUpdateGadgetSettingsFromDeployed),
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS, actionDeployCurrentGadgetSettings),
+		mvuex.Action(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS, actionUpdateRunningHidJobs),
 	)
 
 	// fetch deployed gadget settings
-	store.Dispatch("updateCurrentGadgetSettingsFromDeployed")
+	store.Dispatch(VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED)
+
+	// Update already running HID jobs
+	store.Dispatch(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS)
 
 	// propagate Vuex store to global scope to allow injecting it to Vue by setting the "store" option
 	js.Global.Set("store", store)
 
 	// Start Event Listening
-	state.EventLog.StartListening()
+	state.EventReceiver.StartListening()
 
+	return state
 }
 
-func InitGlobalState() {
-	initMVuex()
-
+func InitGlobalState() GlobalState {
+	return initMVuex()
 }

@@ -48,7 +48,7 @@ func InitCompLogger()  {
 		}),
 		hvue.Computed("logArray",
 			func(vm *hvue.VM) interface{} {
-				return vm.Store.Get("state").Get("eventLog").Get("logArray")
+				return vm.Store.Get("state").Get("eventReceiver").Get("logArray")
 			}),
 	)
 	//return o.NewComponent()

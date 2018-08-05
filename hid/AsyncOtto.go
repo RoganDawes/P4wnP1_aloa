@@ -44,6 +44,16 @@ func (job *AsyncOttoJob) WaitFinished() {
 	<-job.finishedNotify
 }
 
+func (job *AsyncOttoJob) GetVMId() (vmID int, err error) {
+	if vm:=job.executingVM; vm == nil {
+		return -1, errors.New("Not assigned to VM")
+	} else {
+		return vm.Id, nil
+	}
+
+}
+
+
 func (job *AsyncOttoJob) WaitResult()  (otto.Value, error) {
 	job.WaitFinished()
 	return job.ResultValue, job.ResultErr

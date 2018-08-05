@@ -8,6 +8,7 @@ import (
 	"sync"
 	"github.com/johanbrandhorst/protobuf/grpcweb"
 	"time"
+	"errors"
 )
 
 type Rpc struct {
@@ -77,6 +78,27 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func RpcGetRunningHidJobStates(timeout time.Duration) (states []*pb.HIDRunningJobStateResult, err error) {
+	println("RpcGetRunningHidJobStates called")
+
+
+	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	// get running job IDs
+	joblist, err := Client.Client.HIDGetRunningScriptJobs(ctx,&pb.Empty{})
+	if err != nil { return nil, err }
+
+	states = make([]*pb.HIDRunningJobStateResult, len(joblist.Ids))
+	for idx,jobid := range joblist.Ids {
+		jobstate, err := Client.Client.HIDGetRunningJobState(ctx, &pb.HIDScriptJob{Id:jobid})
+		if err != nil { return nil, err }
+		states[idx] = jobstate
+	}
+
+	return states,nil
+}
+
 func RpcGetDeployedGadgetSettings(timeout time.Duration) (*pb.GadgetSettings, error) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
 	println("RpcGetDeployedGadgetSettings called")
@@ -120,4 +142,19 @@ func RpcDeployRemoteGadgetSettings(timeout time.Duration) (*pb.GadgetSettings, e
 
 	return Client.Client.DeployGadgetSetting(ctx, &pb.Empty{})
 
+}
+
+
+func ConnectionTest(timeout time.Duration) (err error) {
+	//gs := vue.GetVM(c).Get("gadgetSettings")
+	println("RpcDeployRemoteGadgetSettings called")
+
+	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	req := &pb.StringMessage{Msg:"ping"}
+	resp,err := Client.Client.EchoRequest(ctx, req)
+	if err != nil { return err }
+	if resp.Msg != req.Msg { errors.New("Unexpected response")}
+	return nil
 }

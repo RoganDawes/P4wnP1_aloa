@@ -1,4 +1,3 @@
-//package rpcserv
 package service
 
 import (
@@ -28,6 +27,10 @@ var (
 )
 
 type server struct {}
+
+func (s *server) EchoRequest(ctx context.Context, req *pb.StringMessage) (resp *pb.StringMessage, err error) {
+	return &pb.StringMessage{Msg:req.Msg}, nil
+}
 
 func (s *server) EventListen(eReq *pb.EventRequest, eStream pb.P4WNP1_EventListenServer) (err error) {
 	//ToDo: check dependency from state (EvMgr initialized)
@@ -87,12 +90,31 @@ func (s *server) FSCreateTempDirOrFile(ctx context.Context, req *pb.TempDirOrFil
 		resp.ResultPath = name
 		return resp, err
 	} else {
-		f,err := ioutil.TempFile(req.Dir, req.Prefix)
+		var f *os.File
+		f,err = ioutil.TempFile(req.Dir, req.Prefix)
 		if err != nil { return resp,err }
 		defer f.Close()
 		resp.ResultPath = f.Name()
 		return resp, err
 	}
+}
+
+func (s *server) HIDGetRunningJobState(ctx context.Context, req *pb.HIDScriptJob) (res *pb.HIDRunningJobStateResult, err error) {
+	targetJob,err := ServiceState.UsbGM.HidCtl.GetBackgroundJobByID(int(req.Id))
+	if err != nil { return nil, err }
+
+	vmID,_ := targetJob.GetVMId() // ignore error, as VM ID would be -1 in error case
+
+	//try to convert source to string
+	source,ok := targetJob.Source.(string)
+	if !ok { source = "Couldn't retrieve job's script source" }
+
+	return &pb.HIDRunningJobStateResult{
+		Id: int64(targetJob.Id),
+		VmId: int64(vmID),
+		Source: source,
+	}, nil
+
 }
 
 func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) (jobs *pb.HIDScriptJobList, err error) {
@@ -101,7 +123,9 @@ func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) 
 	retJobs,err := ServiceState.UsbGM.HidCtl.GetAllBackgroundJobs()
 	if err != nil { return nil, err }
 	jobs = &pb.HIDScriptJobList{}
-	jobs.Ids = retJobs
+	for _, aJob := range retJobs {
+		jobs.Ids = append(jobs.Ids, uint32(aJob.Id))
+	}
 	return
 }
 

@@ -42,7 +42,6 @@ HasFailed      bool   `js:"hasFailed"`
 HasSucceeded   bool   `js:"hasSucceeded"`
 LastMessage    string `js:"lastMessage"`
 TextResult     string `js:"textResult"`
-TextError      string `js:"textError"`
 LastUpdateTime string `js:"lastUpdateTime"` //JSON timestamp from server
 ScriptSource   string `js:"textSource"`
 }
@@ -51,8 +50,8 @@ ScriptSource   string `js:"textSource"`
 	compHIDJobTemplate = `
 <div :style="{ 'display': 'flex' }">
 <div class="jobstate-entry" :class="jobstate"><span>{{ job.vmId }}: {{ job.id }}</span></div>
-<div v-if="job.hasSucceeded">{{ job.textResult }}</div>
-<div v-if="job.hasFailed">{{ job.textError }}</div>
+<div v-if="job.hasSucceeded || job.hasFailed">{{ job.textResult }}</div>
+<div>{{ job.textSource }}</div>
 </div>
 `
 )

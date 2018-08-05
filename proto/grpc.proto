@@ -25,6 +25,7 @@ service P4WNP1 {
 	rpc HIDCancelScriptJob(HIDScriptJob) returns (Empty) {}
 	rpc HIDGetRunningScriptJobs(Empty) returns (HIDScriptJobList) {}
 	rpc HIDCancelAllScriptJobs(Empty) returns (Empty) {}
+	rpc HIDGetRunningJobState(HIDScriptJob) returns (HIDRunningJobStateResult) {}
 
 	//FileSystem
 	rpc FSWriteFile(WriteFileRequest) returns (Empty) {}
@@ -34,6 +35,14 @@ service P4WNP1 {
 
 	//Events
 	rpc EventListen(EventRequest) returns (stream Event) {}
+
+	//Alive check
+	rpc EchoRequest(StringMessage) returns (StringMessage) {}
+}
+
+/* Alive check  */
+message StringMessage {
+	string msg = 1;
 }
 
 /* Events */
@@ -106,6 +115,12 @@ message HIDScriptJob {
 
 message HIDScriptJobList {
 	repeated uint32 ids = 1;
+}
+
+message HIDRunningJobStateResult {
+	int64 id = 1;
+	int64 vmId = 2;
+	string source = 3;
 }
 
 message HIDScriptResult {

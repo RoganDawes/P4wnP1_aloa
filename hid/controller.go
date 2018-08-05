@@ -232,7 +232,8 @@ func (ctl *HIDController) StartScriptAsBackgroundJob(ctx context.Context,script 
 		Job:job,
 		Vm:avm,
 		Type:EventType_JOB_STARTED,
-		Message:"Script started",
+		Message:script, //pack script source into message
+
 		//ScriptSource:script,
 	})
 
@@ -310,11 +311,11 @@ func (ctl *HIDController) CancelAllBackgroundJobs() {
 }
 
 
-func (ctl *HIDController) GetAllBackgroundJobs() (jobs []uint32, err error) {
+func (ctl *HIDController) GetAllBackgroundJobs() (jobs []*AsyncOttoJob, err error) {
 	globalJobListMutex.Lock()
 
 	for job,_ := range globalJobList {
-		jobs = append(jobs, uint32(job.Id))
+		jobs = append(jobs, job)
 	}
 
 	globalJobListMutex.Unlock()

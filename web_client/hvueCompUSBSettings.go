@@ -95,7 +95,7 @@ const (
 			<td>CDC ECM</td>
 			<td>
 				<toggle-switch v-model="currentGadgetSettings.Use_CDC_ECM"></toggle-switch>
-				<a @click="cdcEcmDetails = !cdcEcmDetails" :class="{ 'toggle-collapse-closed': cdcEcmDetails, 'toggle-collapse-opened': !cdcEcmDetails } "></a>
+				<a @click="cdcEcmDetails = !cdcEcmDetails" :class="{ 'toggle-collapse-closed': cdcEcmDetails, 'toggle-collapse-opened': !cdcEcmDetails } ">	</a>
 			</td>
 		</tr>
 		<tr v-if="cdcEcmDetails">

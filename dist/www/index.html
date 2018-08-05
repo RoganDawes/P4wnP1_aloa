@@ -5,7 +5,12 @@
         <script src="vue.js"></script>
         <script src="vuex.js"></script>
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/fontawesome-free-5.2.0-web/css/solid.min.css">
+        <script>
+            window.FontAwesomeConfig = {
+                searchPseudoElements: true
+            }
+        </script>
 
         <script src="codemirror/lib/codemirror.js"></script>
         <link rel="stylesheet" href="codemirror/lib/codemirror.css">
@@ -106,14 +111,14 @@
             }
 
             .toggle-collapse-closed::after {
-                font-family: 'FontAwesome';
+                font-family: 'Font Awesome 5 Free';
                 content: "\f077";
                 float: right;
                 cursor: pointer;
             }
 
             .toggle-collapse-opened::after {
-                font-family: 'FontAwesome';
+                font-family: 'Font Awesome 5 Free';
                 content: "\f078";
                 float: right;
                 cursor: pointer;
@@ -201,9 +206,10 @@
         </tr>
     </table>
 -->
-    <modal v-if="$store.state.isModalEnabled" @close="$store.commit('setModalEnabled',false)">
-        <h3 slot="header">My header</h3>
-        <p slot="body">Some body text</p>
+    <modal v-if="!$store.state.isConnected">
+        <h3 slot="header">No connection to server</h3>
+        <p slot="body">Trying to reconnect ... (attempt {{ $store.state.failedConnectionAttempts }})</p>
+        <p slot="footer"></p>
     </modal>
 
     <tabs>
