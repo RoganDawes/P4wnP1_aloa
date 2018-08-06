@@ -51,17 +51,17 @@ LOGGING:
 
 Events:
 - remove debug out
-- proper unregister of event listeners from web app
+- Done: proper unregister of event listeners from web app
 
 OTHER:
-- extend installer to movee HIDScripts to a fixed absolute path
-- proper error extraction from gRPC calls
-
+- Done: extend installer to move HIDScripts to a fixed absolute path
+- Not possible (status isn't working here) proper error extraction from gRPC calls
+- set date from Browser
 
 TO FIX:
 - remove dependencies of CLI client on service package
 - debug out of HIDScript puts way to much CPU load on journaling daemon (floods logs)
-- allow gRPC server to abort Running HID scripts on context.Done() -> possible, testing needed
+- Done: allow gRPC server to abort Running HID scripts on context.Done() -> possible, testing needed
 - jobs aren't deleted from global job list, unless result is fetched with waitResult. This affects interrupted
 jobs (f.e. timeout) and jobs run as background job --> cancelled jobs need a way to communicate back to the controller,
 that they could be deleted (Solution: goroutine listening for context.Done() per job in controller)

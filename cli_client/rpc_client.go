@@ -32,7 +32,7 @@ func ClientConnectServer(rpcHost string, rpcPort string) (
 	client = pb.NewP4WNP1Client(connection)
 
 	// Contact the server
-	ctx, cancel = context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel = context.WithTimeout(context.Background(), time.Second*3)
 	//defer cancel()
 
 	err = nil

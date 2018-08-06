@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"syscall"
 	"strings"
-	"github.com/mame82/P4wnP1_go/common"
+	"github.com/mame82/P4wnP1_go/common_web"
 )
 
 /*
@@ -30,7 +30,7 @@ func pidFileDHCPClient(nameIface string) string {
 }
 
 func leaseFileDHCPSrv(s *pb.DHCPServerSettings) (lf string) {
-	return common.NameLeaseFileDHCPSrv(s.ListenInterface) //default lease file
+	return common_web.NameLeaseFileDHCPSrv(s.ListenInterface) //default lease file
 }
 
 
@@ -214,7 +214,7 @@ func StopDHCPServer(nameIface string) (err error)  {
 	os.Remove(pidFileDHCPSrv(nameIface))
 
 	//Deleting leaseFile
-	os.Remove(common.NameLeaseFileDHCPSrv(nameIface))
+	os.Remove(common_web.NameLeaseFileDHCPSrv(nameIface))
 	return nil
 }
 
