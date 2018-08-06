@@ -272,6 +272,10 @@ func DHCPCreateConfigFileString(s *pb.DHCPServerSettings) (config string, err er
 	config += fmt.Sprintf("log-dhcp\n") //extensive logging by default
 	if (!s.NotAuthoritative) { config += fmt.Sprintf("dhcp-authoritative\n") }
 
+	//Iterate over static hosts
+	for _,host := range s.StaticHosts {
+		config+=fmt.Sprintf("dhcp-host=%s,%s\n", host.Mac, host.Ip)
+	}
 
 	return
 }
