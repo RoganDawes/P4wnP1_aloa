@@ -6,11 +6,12 @@ import (
 //	"honnef.co/go/js/dom"
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/mame82/hvue"
+	"time"
 )
 
 var (
 	serverAddr = GetBaseURL()
-	Client     = NewRpcClient(serverAddr + ":80")
+	RpcClient     = NewRpcClient(serverAddr + ":80")
 
 )
 
@@ -34,6 +35,10 @@ func main() {
 
 
 	InitGlobalState() //sets Vuex store in JS window.store
+	RpcClient.StartListening() //Start event listening after global state is initiated (contains the event handlers)
+
+	// ToDo: delete because debug
+	RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second*10)
 
 	InitCompHIDJob()
 	InitCompHIDJobs()
@@ -47,6 +52,7 @@ func main() {
 	InitCompHIDScript()
 	InitCompLogger()
 	InitCompState()
+	InitComponentsNetwork()
 	vm := hvue.NewVM(
 		hvue.El("#app"),
 		//add "testString" to data

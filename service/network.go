@@ -200,6 +200,7 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 	}
 
 	//Store latest settings
+	settings.SettingsInUse = true
 	ServiceState.StoredNetworkSetting[settings.Name] = settings
 
 	return nil

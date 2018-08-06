@@ -28,6 +28,7 @@
 		GadgetSettings
 		GadgetSettingsEthernet
 		GadgetSettingsUMS
+		DeployedEthernetInterfaceSettings
 		EthernetInterfaceSettings
 		DHCPServerSettings
 		DHCPServerRange
@@ -56,17 +57,20 @@ const (
 	EthernetInterfaceSettings_MANUAL      EthernetInterfaceSettings_Mode = 0
 	EthernetInterfaceSettings_DHCP_CLIENT EthernetInterfaceSettings_Mode = 1
 	EthernetInterfaceSettings_DHCP_SERVER EthernetInterfaceSettings_Mode = 2
+	EthernetInterfaceSettings_UNMANAGED   EthernetInterfaceSettings_Mode = 3
 )
 
 var EthernetInterfaceSettings_Mode_name = map[int]string{
 	0: "MANUAL",
 	1: "DHCP_CLIENT",
 	2: "DHCP_SERVER",
+	3: "UNMANAGED",
 }
 var EthernetInterfaceSettings_Mode_value = map[string]int{
 	"MANUAL":      0,
 	"DHCP_CLIENT": 1,
 	"DHCP_SERVER": 2,
+	"UNMANAGED":   3,
 }
 
 func (x EthernetInterfaceSettings_Mode) String() string {
@@ -1983,6 +1987,74 @@ func (m *GadgetSettingsUMS) Unmarshal(rawBytes []byte) (*GadgetSettingsUMS, erro
 	return m, nil
 }
 
+// Ethernet Interface Settings
+type DeployedEthernetInterfaceSettings struct {
+	List []*EthernetInterfaceSettings
+}
+
+// GetList gets the List of the DeployedEthernetInterfaceSettings.
+func (m *DeployedEthernetInterfaceSettings) GetList() (x []*EthernetInterfaceSettings) {
+	if m == nil {
+		return x
+	}
+	return m.List
+}
+
+// MarshalToWriter marshals DeployedEthernetInterfaceSettings to the provided writer.
+func (m *DeployedEthernetInterfaceSettings) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	for _, msg := range m.List {
+		writer.WriteMessage(1, func() {
+			msg.MarshalToWriter(writer)
+		})
+	}
+
+	return
+}
+
+// Marshal marshals DeployedEthernetInterfaceSettings to a slice of bytes.
+func (m *DeployedEthernetInterfaceSettings) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a DeployedEthernetInterfaceSettings from the provided reader.
+func (m *DeployedEthernetInterfaceSettings) UnmarshalFromReader(reader jspb.Reader) *DeployedEthernetInterfaceSettings {
+	for reader.Next() {
+		if m == nil {
+			m = &DeployedEthernetInterfaceSettings{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			reader.ReadMessage(func() {
+				m.List = append(m.List, new(EthernetInterfaceSettings).UnmarshalFromReader(reader))
+			})
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a DeployedEthernetInterfaceSettings from a slice of bytes.
+func (m *DeployedEthernetInterfaceSettings) Unmarshal(rawBytes []byte) (*DeployedEthernetInterfaceSettings, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
 type EthernetInterfaceSettings struct {
 	Name               string
 	Mode               EthernetInterfaceSettings_Mode
@@ -1990,6 +2062,7 @@ type EthernetInterfaceSettings struct {
 	Netmask4           string
 	Enabled            bool
 	DhcpServerSettings *DHCPServerSettings
+	SettingsInUse      bool
 }
 
 // GetName gets the Name of the EthernetInterfaceSettings.
@@ -2040,6 +2113,14 @@ func (m *EthernetInterfaceSettings) GetDhcpServerSettings() (x *DHCPServerSettin
 	return m.DhcpServerSettings
 }
 
+// GetSettingsInUse gets the SettingsInUse of the EthernetInterfaceSettings.
+func (m *EthernetInterfaceSettings) GetSettingsInUse() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.SettingsInUse
+}
+
 // MarshalToWriter marshals EthernetInterfaceSettings to the provided writer.
 func (m *EthernetInterfaceSettings) MarshalToWriter(writer jspb.Writer) {
 	if m == nil {
@@ -2070,6 +2151,10 @@ func (m *EthernetInterfaceSettings) MarshalToWriter(writer jspb.Writer) {
 		writer.WriteMessage(6, func() {
 			m.DhcpServerSettings.MarshalToWriter(writer)
 		})
+	}
+
+	if m.SettingsInUse {
+		writer.WriteBool(7, m.SettingsInUse)
 	}
 
 	return
@@ -2104,6 +2189,8 @@ func (m *EthernetInterfaceSettings) UnmarshalFromReader(reader jspb.Reader) *Eth
 			reader.ReadMessage(func() {
 				m.DhcpServerSettings = m.DhcpServerSettings.UnmarshalFromReader(reader)
 			})
+		case 7:
+			m.SettingsInUse = reader.ReadBool()
 		default:
 			reader.SkipField()
 		}
@@ -2850,6 +2937,8 @@ type P4WNP1Client interface {
 	MountUMSFile(ctx context.Context, in *GadgetSettingsUMS, opts ...grpcweb.CallOption) (*Empty, error)
 	// Ethernet
 	DeployEthernetInterfaceSettings(ctx context.Context, in *EthernetInterfaceSettings, opts ...grpcweb.CallOption) (*Empty, error)
+	GetAllDeployedEthernetInterfaceSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*DeployedEthernetInterfaceSettings, error)
+	GetDeployedEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*EthernetInterfaceSettings, error)
 	// WiFi
 	DeployWifiSettings(ctx context.Context, in *WiFiSettings, opts ...grpcweb.CallOption) (*Empty, error)
 	// HIDScript / job management
@@ -2952,6 +3041,24 @@ func (c *p4WNP1Client) DeployEthernetInterfaceSettings(ctx context.Context, in *
 	}
 
 	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetAllDeployedEthernetInterfaceSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*DeployedEthernetInterfaceSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "GetAllDeployedEthernetInterfaceSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(DeployedEthernetInterfaceSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetDeployedEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*EthernetInterfaceSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "GetDeployedEthernetInterfaceSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(EthernetInterfaceSettings).Unmarshal(resp)
 }
 
 func (c *p4WNP1Client) DeployWifiSettings(ctx context.Context, in *WiFiSettings, opts ...grpcweb.CallOption) (*Empty, error) {

@@ -28,6 +28,25 @@ var (
 
 type server struct {}
 
+func (s *server) GetDeployedEthernetInterfaceSettings(ctx context.Context, req *pb.StringMessage) (resp *pb.EthernetInterfaceSettings, err error) {
+	if settings,exist := ServiceState.StoredNetworkSetting[req.Msg]; exist && settings.SettingsInUse {
+		return settings, nil
+	} else {
+		return nil, errors.New(fmt.Sprintf("No stored (or used) settings for ethernet interface '%s'", req.Msg))
+	}
+}
+
+func (s *server) GetAllDeployedEthernetInterfaceSettings(ctx context.Context, empty *pb.Empty) (resp *pb.DeployedEthernetInterfaceSettings, err error) {
+	deployed := make([]*pb.EthernetInterfaceSettings, len(ServiceState.StoredNetworkSetting))
+	var i = 0
+	for _,settings := range ServiceState.StoredNetworkSetting { deployed[i] = settings; i++ }
+
+	resp = &pb.DeployedEthernetInterfaceSettings{
+		List: deployed,
+	}
+	return resp, nil
+}
+
 func (s *server) EchoRequest(ctx context.Context, req *pb.StringMessage) (resp *pb.StringMessage, err error) {
 	return &pb.StringMessage{Msg:req.Msg}, nil
 }

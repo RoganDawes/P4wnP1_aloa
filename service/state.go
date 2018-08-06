@@ -19,10 +19,26 @@ func InitGlobalServiceState() (err error) {
 	ServiceState = state // store state in global variable
 
 	state.StoredNetworkSetting = make(map[string]*pb.EthernetInterfaceSettings)
-	//preinitialize Default settings for "wlan0" and USB_ETHERNET_BRIDGE_NAME ("usbeth")
+
+	/*
 	state.StoredNetworkSetting[USB_ETHERNET_BRIDGE_NAME] = GetDefaultNetworkSettingsUSB()
 	state.StoredNetworkSetting["wlan0"] = GetDefaultNetworkSettingsWiFi()
-
+	*/
+	//pre initialize Default settings for "wlan0" and USB_ETHERNET_BRIDGE_NAME ("usbeth")
+	state.StoredNetworkSetting[USB_ETHERNET_BRIDGE_NAME] = &pb.EthernetInterfaceSettings{
+		Name: USB_ETHERNET_BRIDGE_NAME,
+		Enabled: false,
+		Mode: pb.EthernetInterfaceSettings_MANUAL,
+		IpAddress4:         "172.16.0.1",
+		Netmask4:           "255.255.255.252",
+	}
+	state.StoredNetworkSetting["wlan0"] = &pb.EthernetInterfaceSettings{
+		Name: "wlan0",
+		Enabled: false,
+		Mode: pb.EthernetInterfaceSettings_MANUAL,
+		IpAddress4:         "172.24.0.1",
+		Netmask4:           "255.255.255.0",
+	}
 
 	state.HidDevPath  = make(map[string]string) //should be initialized BEFORE UsbGadgetManager uses it
 	state.EvMgr = NewEventManager(20)

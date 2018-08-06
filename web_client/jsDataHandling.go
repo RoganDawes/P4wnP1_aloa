@@ -6,13 +6,9 @@ import (
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 	"github.com/gopherjs/gopherjs/js"
 	"errors"
-	"sync"
-	"context"
 	"github.com/mame82/P4wnP1_go/common_web"
 	"strconv"
 	"github.com/mame82/hvue"
-	"io"
-	"time"
 )
 
 var eNoLogEvent = errors.New("No log event")
@@ -338,13 +334,136 @@ func (jl *jsHidJobStateList) DeleteEntry(id int64) {
 	//delete(jl.Jobs, strconv.Itoa(int(id)))
 }
 
+
+/* Network Settings */
+type jsEthernetSettingsList struct {
+	*js.Object
+	Interfaces *js.Object `js:"interfaces"` //every object property represents an EthernetSettings struct, the key is the interface name
+}
+
+func (isl *jsEthernetSettingsList) fromGo(src *pb.DeployedEthernetInterfaceSettings) {
+	//Options array (converted from map)
+	isl.Interfaces = js.Global.Get("Array").New()
+	for _, ifSets := range src.List {
+		jsIfSets := &jsEthernetInterfaceSettings{Object:O()}
+		jsIfSets.fromGo(ifSets)
+		isl.Interfaces.Call("push", jsIfSets)
+	}
+
+}
+
+type jsEthernetInterfaceSettings struct {
+	*js.Object
+	Name string `js:"name"`
+	Mode int `js:"mode"`
+	IpAddress4 string `js:"ipAddress4"`
+	Netmask4 string `js:"netmask4"`
+	Enabled bool `js:"enabled"`
+	DhcpServerSettings *jsDHCPServerSettings `js:"dhcpServerSettings"`
+	SettingsInUse      bool `js:"settingsInUse"`
+}
+
+func (target *jsEthernetInterfaceSettings) fromGo(src *pb.EthernetInterfaceSettings) {
+	target.Name = src.Name
+	target.Mode = int(src.Mode)
+	target.IpAddress4 = src.IpAddress4
+	target.Netmask4 = src.Netmask4
+	target.Enabled = src.Enabled
+	target.SettingsInUse = src.SettingsInUse
+
+	if src.DhcpServerSettings != nil {
+		target.DhcpServerSettings = &jsDHCPServerSettings{Object:O()}
+		target.DhcpServerSettings.fromGo(src.DhcpServerSettings)
+	}
+}
+
+type jsDHCPServerSettings struct {
+	*js.Object
+	ListenPort         int `js:"listenPort"`
+	ListenInterface    string `js:"listenInterface"`
+	LeaseFile          string `js:"jsLeaseFile"`
+	NotAuthoritative   bool `js:"nonAuthoritative"`
+	DoNotBindInterface bool `js:"doNotBindInterface"`
+	CallbackScript     string `js:"callbackScript"`
+	Ranges             *js.Object `js:"ranges"`//[]*DHCPServerRange
+	Options            *js.Object `js:"options"`	//map[uint32]string
+	StaticHosts        *js.Object `js:"staticHosts"`//[]*DHCPServerStaticHost
+}
+
+func (target *jsDHCPServerSettings) fromGo(src *pb.DHCPServerSettings) {
+	target.ListenPort = int(src.ListenPort)
+	target.ListenInterface = src.ListenInterface
+	target.LeaseFile = src.LeaseFile
+	target.NotAuthoritative = src.NotAuthoritative
+	target.DoNotBindInterface = src.DoNotBindInterface
+	target.CallbackScript = src.CallbackScript
+
+	//Ranges array
+	target.Ranges = js.Global.Get("Array").New(	)
+	for _,dhcpRange := range src.Ranges {
+		jsRange := &jsDHCPServerRange{Object:O()}
+		jsRange.fromGo(dhcpRange)
+		target.Ranges.Call("push", jsRange)
+	}
+
+	//Options array (converted from map)
+	target.Options = js.Global.Get("Array").New(	)
+	for optId, optVal := range src.Options {
+		jsOption := &jsDHCPServerOption{Object:O()}
+		jsOption.fromGo(optId, optVal)
+		target.Options.Call("push", jsOption)
+	}
+
+	//StaticHosts array
+	target.StaticHosts = js.Global.Get("Array").New(	)
+	for _,staticHost := range src.StaticHosts {
+		jsStaticHost := &jsDHCPServerStaticHost{Object:O()}
+		jsStaticHost.fromGo(staticHost)
+		target.Ranges.Call("push", jsStaticHost)
+	}
+}
+
+type jsDHCPServerRange struct {
+	*js.Object
+	RangeLower string `js:"rangeLower"`
+	RangeUpper string `js:"rangeUpper"`
+	LeaseTime  string `js:"leaseTime"`
+}
+
+func (target *jsDHCPServerRange) fromGo(src *pb.DHCPServerRange) {
+	target.RangeLower = src.RangeLower
+	target.RangeUpper = src.RangeUpper
+	target.LeaseTime = src.LeaseTime
+}
+
+
+type jsDHCPServerOption struct {
+	*js.Object
+	Option int `js:"option"`
+	Value string `js:"value"`
+}
+
+func (target *jsDHCPServerOption) fromGo(srcID uint32, srcVal string) {
+	target.Option = int(srcID)
+	target.Value = srcVal
+}
+
+type jsDHCPServerStaticHost struct {
+	*js.Object
+	Mac string `js:"mac"`
+	Ip string `js:"ip"`
+}
+
+func (target *jsDHCPServerStaticHost) fromGo(src *pb.DHCPServerStaticHost) {
+	target.Mac = src.Mac
+	target.Ip = src.Ip
+}
+
 /* EVENT LOGGER */
 type jsEventReceiver struct {
 	*js.Object
 	LogArray      *js.Object `js:"logArray"`
 	HidEventArray *js.Object `js:"eventHidArray"`
-	cancel        context.CancelFunc
-	*sync.Mutex
 	MaxEntries    int        `js:"maxEntries"`
 	JobList       *jsHidJobStateList `js:"jobList"` //Needs to be exposed to JS in order to use JobList.UpdateEntry() from this JS object
 }
@@ -354,7 +473,6 @@ func NewEventReceiver(maxEntries int, jobList *jsHidJobStateList) *jsEventReceiv
 		Object: js.Global.Get("Object").New(),
 	}
 
-	eventReceiver.Mutex = &sync.Mutex{}
 	eventReceiver.LogArray = js.Global.Get("Array").New()
 	eventReceiver.HidEventArray = js.Global.Get("Array").New()
 	eventReceiver.MaxEntries = maxEntries
@@ -385,14 +503,7 @@ func (data *jsEventReceiver) handleHidEvent(hEv *jsHidEvent ) {
 
 /* This method gets internalized and therefor the mutex won't be accessible*/
 func (data *jsEventReceiver) HandleEvent(ev *pb.Event ) {
-	//	println("ADD ENTRY", ev)
 	go func() {
-		/*
-				data.Lock()
-				defer data.Unlock()
-		*/
-
-
 		jsEv := NewJsEventFromNative(ev)
 		switch jsEv.Type {
 		//if LOG event add to logArray
@@ -423,85 +534,4 @@ func (data *jsEventReceiver) HandleEvent(ev *pb.Event ) {
 		}
 
 	}()
-
-
 }
-
-
-func (data *jsEventReceiver) StartListening() {
-
-	println("Start listening called", data)
-
-
-	//Note: This method is responsible for handling server streaming of events
-	// It isn't possible to use the stream for connection watching (heartbeat), for the following reasons
-	// 1) A connection loss can be detected in case `evStream.Recv()` fails with an error, but a successful websocket
-	// connection can't be detected with this method, as it blocks till a message is received (in case the connection
-	// succeeds). Thus `evStream.Recv()` could be used to indicate connection error, but not to indicate successful
-	// connections.
-	// 2) The initial call to `Client.EventListen` seems to be another place to distinguish between successful and
-	// failed Websocket connection establishment. Unfortunately this method doesn't return an error for a failed
-	// Websocket connection attempt, even if the target host isn't reachable at all.
-	// --> Solution: A unary call is used to check if the server is reachable
-
-	go func() {
-		for {
-			println("Try to connect server ...")
-			for ConnectionTest(time.Second * 3) != nil {
-				println("... failed, retry for 3 seconds")
-				globalState.FailedConnectionAttempts++
-			}
-			println("... success")
-			globalState.IsConnected = true
-			globalState.FailedConnectionAttempts = 0
-
-			ctx,cancel := context.WithCancel(context.Background())
-			data.cancel = cancel
-
-			// try RPC call
-			evStream, err := Client.Client.EventListen(ctx, &pb.EventRequest{ListenType: common_web.EVT_ANY}) //No error if Websocket connection fails
-			if err == nil {
-				println("EVENTLISTENING ENTERING LOOP")
-			Inner:
-				for {
-					//Note:
-					event, err := evStream.Recv() //Error if Websocket connection fails/aborts, but success is indicated only if stream data is received
-					if err == io.EOF {
-						break Inner
-					}
-					if err != nil {
-						println("EVENTLISTENING ERROR", err)
-						break Inner
-					}
-
-					//println("Event: ", event)
-					data.HandleEvent(event)
-				}
-				// we end here on connection error
-				cancel()
-				println("EVENTLISTENING ABORTED")
-
-			} else {
-				globalState.IsConnected = false
-				// Note: This error case isn't reached when the websocket based RPC call can't establish a connection,
-				// instead the error occurs when the evStream.Recv() method is called
-				cancel()
-				println("Error listening for Log events", err)
-			}
-			println("Connection to server lost, reconnecting ...")
-			globalState.IsConnected = false
-
-
-			//retry to connect (outer loop)
-		}
-
-
-		return
-	}()
-}
-
-
-func (data *jsEventReceiver) StopListening() {
-	data.cancel()
-}
-

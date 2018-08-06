@@ -55,6 +55,7 @@ type GlobalState struct {
 	IsModalEnabled           bool               `js:"isModalEnabled"`
 	IsConnected              bool               `js:"isConnected"`
 	FailedConnectionAttempts int                `js:"failedConnectionAttempts"`
+	InterfaceSettings        *jsEthernetSettingsList `js:"InterfaceSettings"`
 
 
 	Counter int `js:"count"`
@@ -73,6 +74,10 @@ func createGlobalStateStruct() GlobalState {
 	state.IsConnected = false
 	state.IsModalEnabled = false
 	state.FailedConnectionAttempts = 0
+	//Retrieve Interface settings
+	ifSettings,err := RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second*5)
+	if err != nil { panic("Couldn't retrieveinterface settings") }
+	state.InterfaceSettings = ifSettings
 
 	state.Counter = 1337
 	state.Text = "Hi there says MaMe82"
@@ -82,7 +87,7 @@ func createGlobalStateStruct() GlobalState {
 func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		//fetch deployed gadget settings
-		dGS,err := RpcGetDeployedGadgetSettings(time.Second * 5)
+		dGS,err := RpcClient.RpcGetDeployedGadgetSettings(time.Second * 5)
 		if err != nil {
 			println("Couldn't retrieve deployed gadget settings")
 			return
@@ -101,7 +106,7 @@ func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.A
 func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		//fetch deployed gadget settings
-		jobstates,err := RpcGetRunningHidJobStates(time.Second * 10)
+		jobstates,err := RpcClient.RpcGetRunningHidJobStates(time.Second * 10)
 		if err != nil {
 			println("Couldn't retrieve stateof running HID jobs", err)
 			return
@@ -124,7 +129,7 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		curGS := state.CurrentGadgetSettings.toGS()
 
 		//try to set them via gRPC (the server holds an internal state, setting != deploying)
-		err := RpcSetRemoteGadgetSettings(curGS, time.Second)
+		err := RpcClient.RpcSetRemoteGadgetSettings(curGS, time.Second)
 		if err != nil {
 			//ToDo: use global store to return something, or allow actions to return promises (latter is too much JavaScript)
 			Alert(err.Error())
@@ -132,7 +137,7 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		}
 
 		//try to deploy the, now set, remote GadgetSettings via gRPC
-		_,err = RpcDeployRemoteGadgetSettings(time.Second*10)
+		_,err = RpcClient.RpcDeployRemoteGadgetSettings(time.Second*10)
 		if err != nil {
 			//ToDo: use global store to return something, or allow actions to return promises (latter is too much JavaScript)
 			Alert(err.Error())
@@ -187,6 +192,7 @@ func initMVuex() GlobalState {
 			state.CurrentGadgetSettings = settings
 			return
 		}),
+		/*
 		mvuex.Mutation("startLogListening", func (store *mvuex.Store, state *GlobalState) {
 			state.EventReceiver.StartListening()
 			return
@@ -195,6 +201,7 @@ func initMVuex() GlobalState {
 			state.EventReceiver.StopListening()
 			return
 		}),
+		*/
 		mvuex.Action(VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED, actionUpdateGadgetSettingsFromDeployed),
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS, actionDeployCurrentGadgetSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS, actionUpdateRunningHidJobs),
@@ -209,8 +216,10 @@ func initMVuex() GlobalState {
 	// propagate Vuex store to global scope to allow injecting it to Vue by setting the "store" option
 	js.Global.Set("store", store)
 
+	/*
 	// Start Event Listening
 	state.EventReceiver.StartListening()
+	*/
 
 	return state
 }
