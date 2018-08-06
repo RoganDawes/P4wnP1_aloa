@@ -377,11 +377,62 @@ func (target *jsEthernetInterfaceSettings) fromGo(src *pb.EthernetInterfaceSetti
 	}
 }
 
+func (src *jsEthernetInterfaceSettings) toGo() (target *pb.EthernetInterfaceSettings) {
+	target = &pb.EthernetInterfaceSettings{
+		Name: src.Name,
+		Mode: pb.EthernetInterfaceSettings_Mode(src.Mode),
+		IpAddress4: src.IpAddress4,
+		Netmask4: src.Netmask4,
+		Enabled: src.Enabled,
+		SettingsInUse: src.SettingsInUse,
+	}
+
+	if src.DhcpServerSettings.Object == js.Undefined {
+		println("DHCPServerSettings on JS object undefined")
+		target.DhcpServerSettings = nil
+	} else {
+		target.DhcpServerSettings = src.DhcpServerSettings.toGo()
+	}
+	return
+}
+
+func (iface *jsEthernetInterfaceSettings) CreateDhcpSettingsForInterface() {
+	//create dhcp server settings
+	settings := &jsDHCPServerSettings{Object:O()}
+	settings.ListenInterface = iface.Name
+	settings.ListenPort = 0 // 0 means DNS is disabled
+	settings.LeaseFile = common_web.NameLeaseFileDHCPSrv(iface.Name)
+	settings.NotAuthoritative = false
+	settings.DoNotBindInterface = false
+	settings.CallbackScript = ""
+	//ToDo: add missing fields
+
+
+	//Ranges array
+	settings.Ranges = js.Global.Get("Array").New()
+	settings.Options = js.Global.Get("Array").New()
+	settings.StaticHosts = js.Global.Get("Array").New()
+
+	//add empty option for router and DNS to prevent netmask from promoting itself via DHCP
+	optNoRouter := &jsDHCPServerOption{Object:O()}
+	optNoRouter.Option = 3
+	optNoRouter.Value = ""
+	settings.AddOption(optNoRouter)
+	optNoDNS := &jsDHCPServerOption{Object:O()}
+	optNoDNS.Option = 6
+	optNoDNS.Value = ""
+	settings.AddOption(optNoDNS)
+
+	//iface.DhcpServerSettings = settings
+	// Update the field with Vue in order to have proper setters in place
+	hvue.Set(iface,"dhcpServerSettings", settings)
+}
+
 type jsDHCPServerSettings struct {
 	*js.Object
 	ListenPort         int `js:"listenPort"`
 	ListenInterface    string `js:"listenInterface"`
-	LeaseFile          string `js:"jsLeaseFile"`
+	LeaseFile          string `js:"leaseFile"`
 	NotAuthoritative   bool `js:"nonAuthoritative"`
 	DoNotBindInterface bool `js:"doNotBindInterface"`
 	CallbackScript     string `js:"callbackScript"`
@@ -389,6 +440,115 @@ type jsDHCPServerSettings struct {
 	Options            *js.Object `js:"options"`	//map[uint32]string
 	StaticHosts        *js.Object `js:"staticHosts"`//[]*DHCPServerStaticHost
 }
+
+func (src *jsDHCPServerSettings) toGo() (target *pb.DHCPServerSettings) {
+	target = &pb.DHCPServerSettings{}
+
+	target.ListenPort = uint32(src.ListenPort)
+	target.ListenInterface = src.ListenInterface
+	target.LeaseFile = src.LeaseFile
+	target.NotAuthoritative = src.NotAuthoritative
+	target.DoNotBindInterface = src.DoNotBindInterface
+	target.CallbackScript = src.CallbackScript
+
+	println("jsRanges", src.Ranges)
+
+
+	//Check if ranges are present
+	if src.Ranges != js.Undefined {
+		if numRanges := src.Ranges.Length(); numRanges > 0 {
+			target.Ranges = make([]*pb.DHCPServerRange, numRanges)
+			//iterate over JS array
+			for i:= 0; i < numRanges; i++ {
+				jsRange := &jsDHCPServerRange{Object: src.Ranges.Index(i)}
+				target.Ranges[i] = &pb.DHCPServerRange{}
+				target.Ranges[i].RangeUpper = jsRange.RangeUpper
+				target.Ranges[i].RangeLower = jsRange.RangeLower
+				target.Ranges[i].LeaseTime = jsRange.LeaseTime
+			}
+		}
+	}
+
+	//Check if options are present
+	if src.Options != js.Undefined {
+		if numOptions := src.Options.Length(); numOptions > 0 {
+			target.Options = make(map[uint32]string)
+			//iterate over JS array
+			for i:= 0; i < numOptions; i++ {
+				jsOption := &jsDHCPServerOption{Object: src.Options.Index(i)}
+				target.Options[uint32(jsOption.Option)] = jsOption.Value
+			}
+		}
+	}
+
+	//Check if SaticHosts are present
+	if src.StaticHosts != js.Undefined {
+		if numStaticHosts := src.StaticHosts.Length(); numStaticHosts > 0 {
+			target.StaticHosts = make([]*pb.DHCPServerStaticHost, numStaticHosts)
+			//iterate over JS array
+			for i:= 0; i < numStaticHosts; i++ {
+				jsStaticHost := &jsDHCPServerStaticHost{Object: src.StaticHosts.Index(i)}
+				target.StaticHosts[i] = &pb.DHCPServerStaticHost{}
+				target.StaticHosts[i].Mac = jsStaticHost.Mac
+				target.StaticHosts[i].Ip = jsStaticHost.Ip
+			}
+		}
+	}
+	return target
+}
+
+
+func (settings *jsDHCPServerSettings) AddRange(dhcpRange *jsDHCPServerRange) {
+	if settings.Ranges == js.Undefined {
+		settings.Ranges = js.Global.Get("Array").New()
+	}
+	settings.Ranges.Call("push", dhcpRange)
+}
+
+func (settings *jsDHCPServerSettings) RemoveRange(dhcpRange *jsDHCPServerRange) {
+	if settings.Ranges == js.Undefined { return	}
+
+	//Check if in array
+	if idx := settings.Ranges.Call("indexOf", dhcpRange).Int(); idx > -1 {
+		settings.Ranges.Call("splice", idx, 1)
+	}
+}
+
+
+func (settings *jsDHCPServerSettings) AddOption(dhcpOption *jsDHCPServerOption) {
+	if settings.Options == js.Undefined {
+		settings.Options = js.Global.Get("Array").New()
+	}
+	settings.Options.Call("push", dhcpOption)
+}
+
+
+func (settings *jsDHCPServerSettings) RemoveOption(dhcpOption *jsDHCPServerOption) {
+	if settings.Options == js.Undefined { return	}
+
+	//Check if in array
+	if idx := settings.Options.Call("indexOf", dhcpOption).Int(); idx > -1 {
+		settings.Options.Call("splice", idx, 1)
+	}
+}
+
+func (settings *jsDHCPServerSettings) AddStaticHost(dhcpStaticHost *jsDHCPServerStaticHost) {
+	if settings.StaticHosts == js.Undefined {
+		settings.StaticHosts = js.Global.Get("Array").New()
+	}
+	settings.StaticHosts.Call("push", dhcpStaticHost)
+}
+
+
+func (settings *jsDHCPServerSettings) RemoveStaticHost(dhcpStaticHost *jsDHCPServerStaticHost) {
+	if settings.StaticHosts == js.Undefined { return	}
+
+	//Check if in array
+	if idx := settings.StaticHosts.Call("indexOf", dhcpStaticHost).Int(); idx > -1 {
+		settings.StaticHosts.Call("splice", idx, 1)
+	}
+}
+
 
 func (target *jsDHCPServerSettings) fromGo(src *pb.DHCPServerSettings) {
 	target.ListenPort = int(src.ListenPort)

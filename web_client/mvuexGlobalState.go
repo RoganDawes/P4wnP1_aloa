@@ -16,6 +16,7 @@ const (
 	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS       = "updateRunningHidJobs"
 	VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS       = "deployCurrentGadgetSettings"
 	VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED = "updateCurrentGadgetSettingsFromDeployed"
+	VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS       = "deployEthernetInterfaceSettings"
 	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO     = "setCurrentGadgetSettings"
 	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO   = "setCurrentHIDScriptSource"
 
@@ -121,6 +122,7 @@ func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext
 	return
 }
 
+
 func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		// ToDo: Indicate deployment process via global state
@@ -150,6 +152,18 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 	}()
 
 	return
+}
+
+
+func actionDeployEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settings *jsEthernetInterfaceSettings) {
+	go func() {
+		println("Vuex dispatch deploy ethernet interface settings")
+		// convert to Go type
+		goSettings := settings.toGo()
+
+		err := RpcClient.DeployedEthernetInterfaceSettings(time.Second*3, goSettings)
+		if err != nil {Alert(err)}
+	}()
 }
 
 func initMVuex() GlobalState {
@@ -205,6 +219,7 @@ func initMVuex() GlobalState {
 		mvuex.Action(VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED, actionUpdateGadgetSettingsFromDeployed),
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS, actionDeployCurrentGadgetSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS, actionUpdateRunningHidJobs),
+		mvuex.Action(VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS, actionDeployEthernetInterfaceSettings),
 	)
 
 	// fetch deployed gadget settings

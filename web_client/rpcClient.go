@@ -29,6 +29,15 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) DeployedEthernetInterfaceSettings(timeout time.Duration, settings *pb.EthernetInterfaceSettings) (err error) {
+	// ToDo: The RPC call has to return an error in case deployment fails
+	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_,err = rpc.Client.DeployEthernetInterfaceSettings(ctx, settings)
+	return
+}
+
 func (rpc *Rpc) GetAllDeployedEthernetInterfaceSettings(timeout time.Duration) (settingsList *jsEthernetSettingsList, err error) {
 	ctx,cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
