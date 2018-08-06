@@ -136,11 +136,17 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 		if settings.Enabled {
 			log.Printf("Setting Interface %s to UP\n", iface.Name)
 			err = netlink.NetworkLinkUp(iface)
+			if err != nil { return err }
+			log.Printf("Setting Interface %s to MULTICAST to ON\n", iface.Name)
+			err = netlink.NetworkSetMulticast(iface, true)
+			if err != nil { return err }
+
 		} else {
 			log.Printf("Setting Interface %s to DOWN\n", iface.Name)
 			err = netlink.NetworkLinkDown(iface)
+			if err != nil { return err }
 		}
-		if err != nil { return err }
+
 	case pb.EthernetInterfaceSettings_DHCP_SERVER:
 		//Generate net
 		ipNet, err := IpNetFromIPv4AndNetmask(settings.IpAddress4, settings.Netmask4)
@@ -155,6 +161,11 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 		if settings.Enabled {
 			log.Printf("Setting Interface %s to UP\n", iface.Name)
 			err = netlink.NetworkLinkUp(iface)
+			if err != nil { return err }
+			log.Printf("Setting Interface %s to MULTICAST to ON\n", iface.Name)
+			err = netlink.NetworkSetMulticast(iface, true)
+			if err != nil { return err }
+
 
 			//check DhcpServerSettings
 			if settings.DhcpServerSettings == nil {
@@ -194,7 +205,18 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 	case pb.EthernetInterfaceSettings_DHCP_CLIENT:
 		netlink.NetworkLinkFlush(iface)
 		if settings.Enabled {
+			log.Printf("Setting Interface %s to UP\n", iface.Name)
+			err = netlink.NetworkLinkUp(iface)
+			if err != nil { return err }
+			log.Printf("Setting Interface %s to MULTICAST to ON\n", iface.Name)
+			err = netlink.NetworkSetMulticast(iface, true)
+			if err != nil { return err }
+
 			StartDHCPClient(settings.Name)
+		} else {
+			log.Printf("Setting Interface %s to DOWN\n", iface.Name)
+			err = netlink.NetworkLinkDown(iface)
+			if err != nil { return err }
 		}
 
 	}

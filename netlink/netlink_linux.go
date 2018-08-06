@@ -587,6 +587,38 @@ func NetworkSetMacAddress(iface *net.Interface, macaddr string) error {
 	return s.HandleAck(wb.Seq)
 }
 
+//Added by MaMe82
+// Bring down a particular network interface.
+// This is identical to running: ip link set $name down
+func NetworkSetMulticast(iface *net.Interface, enable bool) error {
+	s, err := getNetlinkSocket()
+	if err != nil {
+		return err
+	}
+	defer s.Close()
+
+	wb := newNetlinkRequest(syscall.RTM_SETLINK, syscall.NLM_F_ACK)
+
+	msg := newIfInfomsg(syscall.AF_UNSPEC)
+	msg.Index = int32(iface.Index)
+	msg.Flags = syscall.NLM_F_REQUEST
+	msg.Change = DEFAULT_CHANGE
+	msg.IfInfomsg.Change |= syscall.IFF_MULTICAST
+	if enable {
+		msg.IfInfomsg.Flags |= syscall.IFF_MULTICAST
+	} else {
+		msg.IfInfomsg.Flags = uint32(int(msg.IfInfomsg.Flags) & ^syscall.IFF_MULTICAST)
+	}
+
+	wb.AddData(msg)
+
+	if err := s.Send(wb); err != nil {
+		return err
+	}
+
+	return s.HandleAck(wb.Seq)
+}
+
 // Set link Maximum Transmission Unit
 // This is identical to running: ip link set dev $name mtu $MTU
 // bridge is a bitch here https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=292088
@@ -615,6 +647,7 @@ func NetworkSetMTU(iface *net.Interface, mtu int) error {
 	}
 	return s.HandleAck(wb.Seq)
 }
+
 
 // Set link queue length
 // This is identical to running: ip link set dev $name txqueuelen $QLEN
