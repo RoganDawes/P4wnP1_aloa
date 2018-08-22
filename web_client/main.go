@@ -11,7 +11,8 @@ import (
 
 var (
 	serverAddr = GetBaseURL()
-	RpcClient     = NewRpcClient(serverAddr + ":80")
+	//RpcClient     = NewRpcClient(serverAddr + ":80")
+	RpcClient     = NewRpcClient(serverAddr)
 
 )
 
@@ -53,6 +54,7 @@ func main() {
 	InitCompLogger()
 	InitCompState()
 	InitComponentsNetwork()
+	InitComponentsWiFi()
 	vm := hvue.NewVM(
 		hvue.El("#app"),
 		//add "testString" to data
@@ -60,7 +62,9 @@ func main() {
 			data := struct{
 				*js.Object
 				TestString string `js:"testString"`
+				SelectedTab string `js:"selectedTab"`
 			}{Object: O()}
+			data.SelectedTab = "USB"
 			data.TestString = "type('hello');"
 			return &data
 		}),

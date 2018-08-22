@@ -22,6 +22,7 @@ type Rpc struct {
 }
 
 func NewRpcClient(addr string) Rpc {
+	println("Bringing up RPC client for address:", addr)
 	rcl := Rpc{}
 	rcl.Mutex = &sync.Mutex{}
 	cl := pb.NewP4WNP1Client(addr, grpcweb.WithDefaultCallOptions(grpcweb.ForceWebsocketTransport()))
@@ -36,6 +37,30 @@ func (rpc *Rpc) DeployedEthernetInterfaceSettings(timeout time.Duration, setting
 
 	_,err = rpc.Client.DeployEthernetInterfaceSettings(ctx, settings)
 	return
+}
+
+func (rpc *Rpc) GetDeployedWiFiSettings(timeout time.Duration) (settingsList *jsWiFiSettings, err error) {
+ //ToDo: Only placeholde, replace with real "get deployed" RPC
+ ws := &pb.WiFiSettings{
+ 	BssCfgAP: &pb.BSSCfg{
+ 		PSK: "somesecretPSK",
+ 		SSID: "TheAP-SSID",
+	},
+	BssCfgClient: &pb.BSSCfg{
+		PSK: "somesecretPSKForExistingAP",
+		SSID: "ExistingSSID",
+	},
+	Mode: pb.WiFiSettings_STA_FAILOVER_AP,
+	DisableNexmon: false,
+	ApHideSsid: false,
+	ApChannel: 13,
+	AuthMode: pb.WiFiSettings_WPA2_PSK,
+	Reg: "DE",
+	Disabled: false,
+ }
+ jsWs := &jsWiFiSettings{Object: O()}
+ jsWs.fromGo(ws)
+ return jsWs, nil
 }
 
 func (rpc *Rpc) GetAllDeployedEthernetInterfaceSettings(timeout time.Duration) (settingsList *jsEthernetSettingsList, err error) {

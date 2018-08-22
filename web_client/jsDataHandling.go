@@ -334,6 +334,60 @@ func (jl *jsHidJobStateList) DeleteEntry(id int64) {
 	//delete(jl.Jobs, strconv.Itoa(int(id)))
 }
 
+/* WiFi settings */
+/*
+type WiFiSettings struct {
+	Disabled      bool
+	Reg           string
+	Mode          WiFiSettings_Mode
+	AuthMode      WiFiSettings_APAuthMode
+	ApChannel     uint32
+	BssCfgAP      *BSSCfg
+	BssCfgClient  *BSSCfg
+	ApHideSsid    bool
+	DisableNexmon bool
+}
+
+ */
+type jsWiFiSettings struct {
+	*js.Object
+	Disabled bool `js:"disabled"`
+	Reg string `js:"reg"`
+	Mode int  `js:"mode"` //AP, STA, Failover
+	AuthMode int  `js:"authMode"` //WPA2_PSK, OPEN
+	Channel int  `js:"channel"`
+	// next two fields are interpreted as BssCfgAp or BssCfgClient, depending on Mode
+	AP_SSID string `js:"apSsid"`
+	AP_PSK string `js:"apPsk"`
+	STA_SSID string `js:"staSsid"`
+	STA_PSK string `js:"staPsk"`
+	HideSsid bool `js:"hideSsid"`
+	DisableNexmon bool `js:"disableNexmon"`
+}
+
+func (target *jsWiFiSettings) fromGo(src *pb.WiFiSettings) {
+	target.Disabled = src.Disabled
+	target.Reg = src.Reg
+	target.Mode = int(src.Mode)
+	target.AuthMode = int(src.AuthMode)
+	target.Channel = int(src.ApChannel)
+	target.HideSsid = src.ApHideSsid
+	target.DisableNexmon = src.DisableNexmon
+
+	switch src.Mode {
+	case pb.WiFiSettings_AP:
+		target.AP_SSID = src.BssCfgAP.SSID
+		target.AP_PSK = src.BssCfgAP.PSK
+	case pb.WiFiSettings_STA:
+		target.STA_SSID = src.BssCfgClient.SSID
+		target.STA_PSK = src.BssCfgClient.PSK
+	case pb.WiFiSettings_STA_FAILOVER_AP:
+		target.STA_SSID = src.BssCfgClient.SSID
+		target.STA_PSK = src.BssCfgClient.PSK
+		target.AP_SSID = src.BssCfgAP.SSID
+		target.AP_PSK = src.BssCfgAP.PSK
+	}
+}
 
 /* Network Settings */
 type jsEthernetSettingsList struct {

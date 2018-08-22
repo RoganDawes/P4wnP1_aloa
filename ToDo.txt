@@ -57,6 +57,10 @@ OTHER:
 - Done: extend installer to move HIDScripts to a fixed absolute path
 - Not possible (status isn't working here) proper error extraction from gRPC calls
 - set date from Browser
+- Load&Store runtime configuration from/to templates (accessible via web client)
+- Network events (interface down, DHCP lease/release)
+- add classes to all html elements of web client, to allow styling by sbd. who's able to do it better than me
+
 
 TO FIX:
 - remove dependencies of CLI client on service package

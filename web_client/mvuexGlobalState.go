@@ -57,7 +57,7 @@ type GlobalState struct {
 	IsConnected              bool               `js:"isConnected"`
 	FailedConnectionAttempts int                `js:"failedConnectionAttempts"`
 	InterfaceSettings        *jsEthernetSettingsList `js:"InterfaceSettings"`
-
+	WiFiSettings             *jsWiFiSettings `js:"wifiSettings"`
 
 	Counter int `js:"count"`
 	Text string `js:"text"`
@@ -77,8 +77,11 @@ func createGlobalStateStruct() GlobalState {
 	state.FailedConnectionAttempts = 0
 	//Retrieve Interface settings
 	ifSettings,err := RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second*5)
-	if err != nil { panic("Couldn't retrieveinterface settings") }
+	if err != nil { panic("Couldn't retrieve interface settings") }
 	state.InterfaceSettings = ifSettings
+	wifiSettings,err := RpcClient.GetDeployedWiFiSettings(time.Second * 5)
+	if err != nil { panic("Couldn't retrieve WiFi settings") }
+	state.WiFiSettings = wifiSettings
 
 	state.Counter = 1337
 	state.Text = "Hi there says MaMe82"
