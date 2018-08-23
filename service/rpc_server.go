@@ -432,6 +432,7 @@ func StartRpcServerAndWeb(host string, gRPCPort string, webPort string, absWebRo
 	grpc_web_srv := grpcweb.WrapServer(s, grpcweb.WithWebsockets(true)) //Wrap server to improbable grpc-web with websockets
 	//define a handler for a HTTP web server using the gRPC-web proxy
 	http_gRPC_web_handler := func(resp http.ResponseWriter, req *http.Request) {
+		//fmt.Printf("===========\nRequest: %s\n %v\n=============\n", req)
 		if strings.Contains(req.Header.Get("Content-Type"), "application/grpc") ||
 			req.Method == "OPTIONS" ||
 			strings.Contains(req.Header.Get("Sec-Websocket-Protocol"), "grpc-websockets") {
