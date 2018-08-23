@@ -4,7 +4,7 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/mame82/hvue"
+	"github.com/HuckRidgeSW/hvue"
 )
 
 //https://github.com/cnu4/vue-codemirror-lite/blob/master/codemirror.vue

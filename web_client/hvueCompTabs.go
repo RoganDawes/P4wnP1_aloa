@@ -4,7 +4,7 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/mame82/hvue"
+	"github.com/HuckRidgeSW/hvue"
 )
 
 type CompTabsData struct {

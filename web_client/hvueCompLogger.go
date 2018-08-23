@@ -3,7 +3,7 @@
 package main
 
 import (
-	"github.com/mame82/hvue"
+	"github.com/HuckRidgeSW/hvue"
 )
 
 func LogLevelClass(vm *hvue.VM, level int) string {
@@ -48,7 +48,7 @@ func InitCompLogger()  {
 		}),
 		hvue.Computed("logArray",
 			func(vm *hvue.VM) interface{} {
-				return vm.Store.Get("state").Get("eventReceiver").Get("logArray")
+				return vm.Get("$store").Get("state").Get("eventReceiver").Get("logArray")
 			}),
 	)
 	//return o.NewComponent()

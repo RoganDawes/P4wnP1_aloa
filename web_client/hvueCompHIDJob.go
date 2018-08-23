@@ -3,7 +3,7 @@
 package main
 
 import (
-	"github.com/mame82/hvue"
+	"github.com/HuckRidgeSW/hvue"
 )
 
 

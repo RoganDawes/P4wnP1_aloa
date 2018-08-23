@@ -4,7 +4,7 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/mame82/hvue"
+	"github.com/HuckRidgeSW/hvue"
 	"strconv"
 	"google.golang.org/grpc/status"
 )
@@ -51,10 +51,10 @@ func InitCompHIDScript() {
 		hvue.ComputedWithGetSet(
 			"scriptContent",
 			func(vm *hvue.VM) interface{} {
-				return vm.Store.Get("state").Get("currentHIDScriptSource")
+				return vm.Get("$store").Get("state").Get("currentHIDScriptSource")
 			},
 			func(vm *hvue.VM, newScriptContent *js.Object) {
-				vm.Store.Call("commit", VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO, newScriptContent)
+				vm.Get("$store").Call("commit", VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO, newScriptContent)
 			}),
 		)
 }

@@ -8,7 +8,7 @@ import (
 	"errors"
 	"github.com/mame82/P4wnP1_go/common_web"
 	"strconv"
-	"github.com/mame82/hvue"
+	"github.com/HuckRidgeSW/hvue"
 )
 
 var eNoLogEvent = errors.New("No log event")

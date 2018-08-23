@@ -5,8 +5,9 @@ package main
 import (
 //	"honnef.co/go/js/dom"
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/mame82/hvue"
+	"github.com/HuckRidgeSW/hvue"
 	"time"
+	"github.com/mame82/mvuex"
 )
 
 var (
@@ -31,15 +32,37 @@ type appController struct {
 	*js.Object
 }
 
+func Store(store *mvuex.Store) hvue.ComponentOption {
+	return func(config *hvue.Config) {
+		config.Set("store", store)
+	}
+}
+
+func Router(router *js.Object) hvue.ComponentOption {
+	return func(config *hvue.Config) {
+		config.Set("router", router)
+	}
+}
+
+
 func main() {
 	println(GetBaseURL())
 
 
-	InitGlobalState() //sets Vuex store in JS window.store
+	store := InitGlobalState() //sets Vuex store in JS window.store
 	RpcClient.StartListening() //Start event listening after global state is initiated (contains the event handlers)
 
 	// ToDo: delete because debug
 	RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second*10)
+
+	router := NewVueRouter(
+		VueRouterRoute("/usb","", "<usb-settings></usb-settings>"),
+		VueRouterRoute("/hid","", "<hid-script></hid-script>"),
+		VueRouterRoute("/hidjobs","", "<hidjobs></hidjobs>"),
+		VueRouterRoute("/logger","", "<logger :max-entries='7'></logger>"),
+		VueRouterRoute("/network","", "<network></network>"),
+		VueRouterRoute("/wifi","", "<wifi></wifi>"),
+	)
 
 	InitCompHIDJob()
 	InitCompHIDJobs()
@@ -47,8 +70,8 @@ func main() {
 	InitCompEthernetAddresses2()
 	InitCompToggleSwitch()
 	InitCompUSBSettings()
-	InitCompTab()
-	InitCompTabs()
+//	InitCompTab()
+//	InitCompTabs()
 	InitCompCodeEditor()
 	InitCompHIDScript()
 	InitCompLogger()
@@ -75,9 +98,10 @@ func main() {
 			return js.Global.Get("console")
 		}),
 		hvue.Computed("state", func(vm *hvue.VM) interface{} {
-			return vm.Store.Get("state") //works only with Vuex store option added
+			return vm.Get("$store").Get("state") //works only with Vuex store option added
 		}),
-		hvue.Store(), //include Vuex store in global scope, using own hvue fork, see here: https://github.com/HuckRidgeSW/hvue/pull/6
+		Store(store), //include Vuex store in global scope, using own hvue fork, see here: https://github.com/HuckRidgeSW/hvue/pull/6
+		Router(router),
 	)
 	js.Global.Set("vm",vm)
 

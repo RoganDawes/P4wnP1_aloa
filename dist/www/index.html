@@ -42,40 +42,19 @@
                 </q-toolbar-title>
             </q-toolbar>
 
-            <q-tabs v-model="selectedTab">
-                <q-tab default slot="title" name="tab-usb" icon="usb" label="USB Settings"></q-tab>
-                <q-tab slot="title" name="tab-hid-script" icon="code" label="HID Script"></q-tab>
-                <q-tab slot="title" name="tab-hid-jobs" icon="schedule" label="HID Jobs"></q-tab>
-                <q-tab slot="title" name="tab-logger" icon="message" label="Event Log"></q-tab>
-                <q-tab slot="title" name="tab-network" icon="settings_ethernet" label="Network settings"></q-tab>
-                <q-tab slot="title" name="tab-wifi" icon="wifi" label="WiFi settings"></q-tab>
+            <q-tabs>
+                <q-route-tab default slot="title" to="usb" name="tab-usb" icon="usb" label="USB Settings"></q-route-tab>
+                <q-route-tab slot="title" to="hid" name="tab-hid-script" icon="code" label="HID Script"></q-route-tab>
+                <q-route-tab slot="title" to="hidjobs" name="tab-hid-jobs" icon="schedule" label="HID Jobs"></q-route-tab>
+                <q-route-tab slot="title" to="logger" name="tab-logger" icon="message" label="Event Log"></q-route-tab>
+                <q-route-tab slot="title" to="network" name="tab-network" icon="settings_ethernet" label="Network settings"></q-route-tab>
+                <q-route-tab slot="title" to="wifi" name="tab-wifi" icon="wifi" label="WiFi settings"></q-route-tab>
             </q-tabs>
 
         </q-layout-header>
 
         <q-page-container>
-            <q-page>
-                <q-tabs v-model="selectedTab">
-                    <q-tab-pane name="tab-usb">
-                        <usb-settings></usb-settings>
-                    </q-tab-pane>
-                    <q-tab-pane name="tab-hid-script">
-                        <hid-script></hid-script>
-                    </q-tab-pane>
-                    <q-tab-pane name="tab-hid-jobs">
-                        <hidjobs></hidjobs>
-                    </q-tab-pane>
-                    <q-tab-pane name="tab-logger">
-                        <logger :max-entries="7"></logger>
-                    </q-tab-pane>
-                    <q-tab-pane name="tab-network">
-                        <network></network>
-                    </q-tab-pane>
-                    <q-tab-pane name="tab-wifi">
-                        <wifi></wifi>
-                    </q-tab-pane>
-                </q-tabs>
-
+            <router-view></router-view>
 
                 <modal v-if="!$store.state.isConnected">
                     <h3 slot="header">No connection to server</h3>
@@ -83,38 +62,18 @@
                     <p slot="footer"></p>
                 </modal>
 
-<!--
-                <tabs>
-                    <tab header="USB" :selected="true">
-                        <usb-settings></usb-settings>
-                    </tab>
-                    <tab header="HID Script">
-                        <hid-script v-model="testString"></hid-script>
-                    </tab>
-                    <tab header="Logger" >
-                        <logger :max-entries="7"></logger>
-                    </tab>
-                    <tab header="bar">
-                        <hidjobs></hidjobs>
-                    </tab>
-                    <tab header="network">
-                        <network></network>
-                    </tab>
-                    <tab header="WiFi">
-                        <wifi></wifi>
-                    </tab>
-                </tabs>
--->
+
             </q-page>
 
         </q-page-container>
 
     </q-layout>
-
 </div>
 
 <script src="vuex.js"></script>
 <script src="lib/vue.js"></script>
+
+<script src="lib/vue-router.js"></script>
 
 <script src="lib/umd/quasar.ie.polyfills.umd.min.js"></script>
 <script src="lib/umd/quasar.mat.umd.min.js"></script>

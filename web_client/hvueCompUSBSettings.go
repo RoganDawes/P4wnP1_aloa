@@ -4,7 +4,7 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/mame82/hvue"
+	"github.com/HuckRidgeSW/hvue"
 )
 
 
@@ -19,12 +19,12 @@ type CompUSBSettingsData struct {
 
 //This becomes a method of the Vue Component and encapsulates dispatching of a Vuex action
 func (c *CompUSBSettingsData) UpdateFromDeployedGadgetSettings(vm *hvue.VM) {
-	vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED)
+	vm.Get("$store").Call("dispatch", VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED)
 }
 
 //This becomes a method of the Vue Component and encapsulates dispatching of a Vuex action
 func (c *CompUSBSettingsData) ApplyGadgetSettings(vm *hvue.VM) {
-	vm.Store.Call("dispatch", VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS)
+	vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS)
 }
 
 func InitCompUSBSettings() {
@@ -36,7 +36,7 @@ func InitCompUSBSettings() {
 		hvue.Computed(
 			"currentGadgetSettings",
 			func(vm *hvue.VM) interface{} {
-				return vm.Store.Get("state").Get("currentGadgetSettings")
+				return vm.Get("$store").Get("state").Get("currentGadgetSettings")
 			}),
 
 	)

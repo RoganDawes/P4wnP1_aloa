@@ -4,7 +4,7 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/mame82/hvue"
+	"github.com/HuckRidgeSW/hvue"
 	"github.com/mame82/P4wnP1_go/common_web"
 )
 
@@ -28,11 +28,11 @@ func InitCompHIDJobs() {
 		hvue.DataFunc(newCompHIDJobsData),
 		hvue.Computed("events",
 			func(vm *hvue.VM) interface{} {
-				return vm.Store.Get("state").Get("eventReceiver").Get("eventHidArray")
+				return vm.Get("$store").Get("state").Get("eventReceiver").Get("eventHidArray")
 			}),
 		hvue.Computed("jobs",
 			func(vm *hvue.VM) interface{} {
-				jobList := vm.Store.Get("state").Get("hidJobList").Get("jobs")
+				jobList := vm.Get("$store").Get("state").Get("hidJobList").Get("jobs")
 				return js.Global.Get("Object").Call("values",jobList)
 			}),
 		hvue.Method("evIdToString", func (vm *hvue.VM, evID int64) (res string) {

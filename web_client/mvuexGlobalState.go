@@ -169,7 +169,7 @@ func actionDeployEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.Ac
 	}()
 }
 
-func initMVuex() GlobalState {
+func initMVuex() *mvuex.Store {
 	state := createGlobalStateStruct()
 	globalState = &state //make accessible through global var
 	store := mvuex.NewStore(
@@ -239,9 +239,9 @@ func initMVuex() GlobalState {
 	state.EventReceiver.StartListening()
 	*/
 
-	return state
+	return store
 }
 
-func InitGlobalState() GlobalState {
+func InitGlobalState() *mvuex.Store {
 	return initMVuex()
 }
