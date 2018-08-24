@@ -6,11 +6,11 @@ body {
     font-family: "Open Sans", sans-serif;
     font-size: 1em;
     line-height: 1.6;
-    background: linear-gradient(45deg, #9e9e9e, #c4c4c4 66%, #9e9e9e);
+/*    background: linear-gradient(45deg, #9e9e9e, #c4c4c4 66%, #9e9e9e); */
 }
 
+/*
 input {
-    /*border-radius: 99999px;*/
     background-color: #707070;
     background: linear-gradient(to top, #9e9e9e, #f4f4f4);
     height: 30px;
@@ -21,6 +21,7 @@ input {
     font-weight: 600;
 
 }
+*/
 
 button {
     border-radius: 99999px;

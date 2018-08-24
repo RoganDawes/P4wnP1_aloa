@@ -13,8 +13,10 @@
         <link rel="icon" href="favicon.png" type="image/x-icon">
         <link href="lib/umd/quasar.mat.min.css" rel="stylesheet" type="text/css">
 
+        <!--
         <link rel="stylesheet" type="text/css" href="p4wnp1.css">
         <link rel="stylesheet" href="/fontawesome-free-5.2.0-web/css/solid.min.css">
+        -->
         <script>
             window.FontAwesomeConfig = {
                 searchPseudoElements: true
@@ -32,10 +34,7 @@
 <div id="app">
     <q-layout view="lHh Lpr fff">
         <q-layout-header>
-            <q-toolbar
-                    :glossy="$q.theme === 'mat'"
-                    :inverted="$q.theme === 'ios'"
-            >
+            <q-toolbar>
                 <q-toolbar-title>
                     P4wnP1 web-frontend
                     <div slot="subtitle">by MaMe82</div>
@@ -54,7 +53,8 @@
         </q-layout-header>
 
         <q-page-container>
-            <router-view></router-view>
+            <q-page padding>
+                <router-view></router-view>
 
                 <modal v-if="!$store.state.isConnected">
                     <h3 slot="header">No connection to server</h3>

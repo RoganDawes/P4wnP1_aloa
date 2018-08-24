@@ -38,7 +38,10 @@ func InitCompUSBSettings() {
 			func(vm *hvue.VM) interface{} {
 				return vm.Get("$store").Get("state").Get("currentGadgetSettings")
 			}),
-
+		hvue.Computed("deploying",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("$store").Get("state").Get("deployingGadgetSettings")
+			}),
 	)
 }
 
@@ -60,37 +63,142 @@ func newCompUSBSettingsData(vm *hvue.VM) interface{} {
 
 const (
 	compUSBSettingsTemplate = `
+<q-page class="row justify gutter-sm">
 <div>
+	<q-btn :loading="deploying" color="primary" @click="ApplyGadgetSettings" label="deploy"></q-btn>
+	<q-btn color="secondary" @click="UpdateFromDeployedGadgetSettings" label="reset"></q-btn>
+	<br><br>
+	
+	<q-list link>
+		<q-list-header>Generic Gadget Settings</q-list-header>
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="currentGadgetSettings.Enabled"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>Enabled</q-item-tile>
+				<q-item-tile sublabel>Enable/Disable USB gadget (if enabled, at least one function has to be turned on)</q-item-tile>
+			</q-item-main>
+		</q-item>
+		<q-item tag="label">
+			<q-item-main>
+				<q-item-tile label>Vendor ID</q-item-tile>
+				<q-item-tile sublabel>Example: 0x1d6b</q-item-tile>
+				<q-item-tile>
+					<q-input v-model="currentGadgetSettings.Vid" inverted></q-input>
+				</q-item-tile>
+			</q-item-main>
+		</q-item>
+		<q-item tag="label">
+			<q-item-main>
+				<q-item-tile label>Product ID</q-item-tile>
+				<q-item-tile sublabel>Example: 0x1337</q-item-tile>
+				<q-item-tile>
+					<q-input v-model="currentGadgetSettings.Pid" inverted></q-input>
+				</q-item-tile>
+			</q-item-main>
+		</q-item>
+		<q-item tag="label">
+			<q-item-main>
+				<q-item-tile label>Manufacturer Name</q-item-tile>
+				<q-item-tile sublabel></q-item-tile>
+				<q-item-tile>
+					<q-input v-model="currentGadgetSettings.Manufacturer" inverted></q-input>
+				</q-item-tile>
+			</q-item-main>
+		</q-item>
+		<q-item tag="label">
+			<q-item-main>
+				<q-item-tile label>Product Name</q-item-tile>
+				<q-item-tile sublabel></q-item-tile>
+				<q-item-tile>
+					<q-input v-model="currentGadgetSettings.Product" inverted></q-input>
+				</q-item-tile>
+			</q-item-main>
+		</q-item>
+		<q-item tag="label">
+			<q-item-main>
+				<q-item-tile label>Serial Number</q-item-tile>
+				<q-item-tile sublabel></q-item-tile>
+				<q-item-tile>
+					<q-input v-model="currentGadgetSettings.Serial" inverted></q-input>
+				</q-item-tile>
+			</q-item-main>
+		</q-item>
+
+ 		<q-item-separator />
+
+		<q-list-header>Gadget functions</q-list-header>
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="currentGadgetSettings.Use_CDC_ECM"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>CDC ECM</q-item-tile>
+				<q-item-tile sublabel>Ethernet over USB for Linux, Unix and OSX</q-item-tile>
+			</q-item-main>
+		</q-item>
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="currentGadgetSettings.Use_RNDIS"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>RNDIS</q-item-tile>
+				<q-item-tile sublabel>Ethernet over USB for Windows (and some Linux kernels)</q-item-tile>
+			</q-item-main>
+		</q-item>
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="currentGadgetSettings.Use_HID_KEYBOARD"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>Keyboard</q-item-tile>
+				<q-item-tile sublabel>HID Keyboard functionality (needed for HID Script)</q-item-tile>
+			</q-item-main>
+		</q-item>
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="currentGadgetSettings.Use_HID_MOUSE"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>Mouse</q-item-tile>
+				<q-item-tile sublabel>HID Mouse functionality (needed for HID Script)</q-item-tile>
+			</q-item-main>
+		</q-item>
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="currentGadgetSettings.Use_HID_RAW"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>Custom HID device</q-item-tile>
+				<q-item-tile sublabel>Raw HID device function, used for covert channel</q-item-tile>
+			</q-item-main>
+		</q-item>
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="currentGadgetSettings.Use_Serial"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>Serial Interface</q-item-tile>
+				<q-item-tile sublabel>Provides a serial port over USB</q-item-tile>
+			</q-item-main>
+		</q-item>
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="currentGadgetSettings.Use_UMS"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>Mass Storage</q-item-tile>
+				<q-item-tile sublabel>Emulates USB flash drive or CD-ROM</q-item-tile>
+			</q-item-main>
+		</q-item>
+	<q-list>	
+</div>
+	
+	
+	
+<!--
 	<table cellspacing="1">
-		<tr>
-			<td>USB gadget settings</td>
-			<td><button @click="ApplyGadgetSettings" :disabled="deployPending">Apply</button>
-			<button @click="UpdateFromDeployedGadgetSettings">Deployed</button></td>
-		</tr>
-		<tr>
-			<td>Gadget enabled</td>
-			<td><toggle-switch v-model="currentGadgetSettings.Enabled"></toggle-switch></td>
-		</tr>
-		<tr>
-			<td>Vendor ID</td>
-			<td><input v-model="currentGadgetSettings.Vid"/></td>
-		</tr>
-		<tr>
-			<td>Product ID</td>
-			<td><input v-model="currentGadgetSettings.Pid"/></td> 
-		</tr>
-		<tr>
-			<td>Manufacturer Name</td>
-			<td><input v-model="currentGadgetSettings.Manufacturer"/></td>
-		</tr>
-		<tr>
-			<td>Product Name</td>
-			<td><input v-model="currentGadgetSettings.Product"/></td>
-		</tr>
-		<tr>
-			<td>Serial number</td>
-			<td><input v-model="currentGadgetSettings.Serial"/></td>
-		</tr>
 		<tr>
 			<td>CDC ECM</td>
 			<td>
@@ -134,6 +242,7 @@ const (
 			<td><toggle-switch v-model="currentGadgetSettings.Use_UMS"></toggle-switch></td>
 		</tr>
 	</table>
-</div>
+-->
+</q-page>
 `
 )

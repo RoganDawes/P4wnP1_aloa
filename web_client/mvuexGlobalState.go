@@ -51,6 +51,7 @@ type GlobalState struct {
 	Title                    string             `js:"title"`
 	CurrentHIDScriptSource   string             `js:"currentHIDScriptSource"`
 	CurrentGadgetSettings    *jsGadgetSettings  `js:"currentGadgetSettings"`
+	CurrentlyDeployingGadgetSettings bool `js:"deployingGadgetSettings"`
 	EventReceiver            *jsEventReceiver   `js:"eventReceiver"`
 	HidJobList               *jsHidJobStateList `js:"hidJobList"`
 	IsModalEnabled           bool               `js:"isModalEnabled"`
@@ -69,6 +70,7 @@ func createGlobalStateStruct() GlobalState {
 	state.Title = "P4wnP1 by MaMe82"
 	state.CurrentHIDScriptSource = initHIDScript
 	state.CurrentGadgetSettings = NewUSBGadgetSettings()
+	state.CurrentlyDeployingGadgetSettings = false
 	//UpdateGadgetSettingsFromDeployed(state.CurrentGadgetSettings)
 	state.HidJobList = NewHIDJobStateList()
 	state.EventReceiver = NewEventReceiver(maxLogEntries, state.HidJobList)
@@ -129,6 +131,8 @@ func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext
 func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		// ToDo: Indicate deployment process via global state
+		state.CurrentlyDeployingGadgetSettings = true
+		defer func() {state.CurrentlyDeployingGadgetSettings = false}()
 
 		//get current GadgetSettings
 		curGS := state.CurrentGadgetSettings.toGS()
@@ -136,6 +140,7 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		//try to set them via gRPC (the server holds an internal state, setting != deploying)
 		err := RpcClient.RpcSetRemoteGadgetSettings(curGS, time.Second)
 		if err != nil {
+
 			//ToDo: use global store to return something, or allow actions to return promises (latter is too much JavaScript)
 			Alert(err.Error())
 			return
