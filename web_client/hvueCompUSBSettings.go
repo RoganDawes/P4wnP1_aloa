@@ -63,14 +63,23 @@ func newCompUSBSettingsData(vm *hvue.VM) interface{} {
 
 const (
 	compUSBSettingsTemplate = `
-<q-page class="row justify gutter-sm">
-<div>
-	<q-btn :loading="deploying" color="primary" @click="ApplyGadgetSettings" label="deploy"></q-btn>
-	<q-btn color="secondary" @click="UpdateFromDeployedGadgetSettings" label="reset"></q-btn>
-	<br><br>
-	
+<q-page>
+<q-card inline class="q-ma-sm">
+	<q-card-title>
+    	USB Gadget Settings
+	</q-card-title>
+	<q-card-actions>
+		<q-btn :loading="deploying" color="primary" @click="ApplyGadgetSettings" label="deploy"></q-btn>
+		<q-btn color="secondary" @click="UpdateFromDeployedGadgetSettings" label="reset"></q-btn>
+
+	</q-card-actions>
+
+	<q-alert v-show="deploying" type="warning">If you're connected via Ethernet over USB, you will loose connection during deployment (deadline exceeded error)"</q-alert>
+
 	<q-list link>
-		<q-list-header>Generic Gadget Settings</q-list-header>
+		<q-item-separator />
+
+		<q-list-header>Generic</q-list-header>
 		<q-item tag="label">
 			<q-item-side>
 				<q-toggle v-model="currentGadgetSettings.Enabled"></q-toggle>
@@ -128,7 +137,7 @@ const (
 
  		<q-item-separator />
 
-		<q-list-header>Gadget functions</q-list-header>
+		<q-list-header>Functions</q-list-header>
 		<q-item tag="label">
 			<q-item-side>
 				<q-toggle v-model="currentGadgetSettings.Use_CDC_ECM"></q-toggle>
@@ -138,6 +147,29 @@ const (
 				<q-item-tile sublabel>Ethernet over USB for Linux, Unix and OSX</q-item-tile>
 			</q-item-main>
 		</q-item>
+
+
+		<q-collapsible icon="settings_ethernet" label="MAC addresses for CDC ECM" v-show="currentGadgetSettings.Use_CDC_ECM" indent>
+			<q-item tag="label" indent>
+				<q-item-main>
+					<q-item-tile label>Host Address</q-item-tile>
+					<q-item-tile sublabel>MAC of USB adapter on remote host (format: AA:BB:CC:DD:EE:FF)</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="currentGadgetSettings.CdcEcmSettings.HostAddr" inverted></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+			<q-item tag="label" indent>
+				<q-item-main>
+					<q-item-tile label>Device Address</q-item-tile>
+					<q-item-tile sublabel>MAC address on P4wnP1's end (format: AA:BB:CC:DD:EE:FF)</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="currentGadgetSettings.CdcEcmSettings.DevAddr" inverted></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+		</q-collapsible>
+
 		<q-item tag="label">
 			<q-item-side>
 				<q-toggle v-model="currentGadgetSettings.Use_RNDIS"></q-toggle>
@@ -147,6 +179,29 @@ const (
 				<q-item-tile sublabel>Ethernet over USB for Windows (and some Linux kernels)</q-item-tile>
 			</q-item-main>
 		</q-item>
+
+		<q-collapsible icon="settings_ethernet" label="MAC addresses for RNDIS" v-show="currentGadgetSettings.Use_RNDIS" indent>
+			<q-item tag="label" ident>
+				<q-item-main>
+					<q-item-tile label>Host Address</q-item-tile>
+					<q-item-tile sublabel>MAC of USB adapter on remote host - could get overwritten by host (format: AA:BB:CC:DD:EE:FF)</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="currentGadgetSettings.RndisSettings.HostAddr" inverted></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+			<q-item tag="label" ident>
+				<q-item-main>
+					<q-item-tile label>Device Address</q-item-tile>
+					<q-item-tile sublabel>MAC address on P4wnP1's end (format: AA:BB:CC:DD:EE:FF)</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="currentGadgetSettings.RndisSettings.DevAddr" inverted></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+		</q-collapsible>
+
+
 		<q-item tag="label">
 			<q-item-side>
 				<q-toggle v-model="currentGadgetSettings.Use_HID_KEYBOARD"></q-toggle>
@@ -192,57 +247,11 @@ const (
 				<q-item-tile sublabel>Emulates USB flash drive or CD-ROM</q-item-tile>
 			</q-item-main>
 		</q-item>
-	<q-list>	
-</div>
+	</q-list>	
+</q-card>
 	
 	
 	
-<!--
-	<table cellspacing="1">
-		<tr>
-			<td>CDC ECM</td>
-			<td>
-				<toggle-switch v-model="currentGadgetSettings.Use_CDC_ECM"></toggle-switch>
-				<a @click="cdcEcmDetails = !cdcEcmDetails" :class="{ 'toggle-collapse-closed': cdcEcmDetails, 'toggle-collapse-opened': !cdcEcmDetails } ">	</a>
-			</td>
-		</tr>
-		<tr v-if="cdcEcmDetails">
-			<td colspan="2"><ethernet-addresses v-bind:settings="currentGadgetSettings.CdcEcmSettings" @hostAddrChange="currentGadgetSettings.CdcEcmSettings.HostAddr=$event" @devAddrChange="currentGadgetSettings.CdcEcmSettings.DevAddr=$event"></ethernet-addresses></td>
-		</tr>
-		<tr>
-			<td>RNDIS</td>
-			<td>
-				<toggle-switch v-model="currentGadgetSettings.Use_RNDIS"></toggle-switch>
-				<a @click="rndisDetails = !rndisDetails" :class="{ 'toggle-collapse-closed': rndisDetails, 'toggle-collapse-opened': !rndisDetails } "></a>
-			</td>
-		</tr>
-
-		<tr v-if="rndisDetails">
-			<td colspan="2"><ethernet-addresses v-bind:settings="currentGadgetSettings.RndisSettings" @hostAddrChange="currentGadgetSettings.RndisSettings.HostAddr=$event" @devAddrChange="currentGadgetSettings.RndisSettings.DevAddr=$event"></ethernet-addresses></td>
-		</tr>
-
-		<tr>
-			<td>HID Keyboard</td>
-			<td><toggle-switch v-model="currentGadgetSettings.Use_HID_KEYBOARD"></toggle-switch></td>
-		</tr>
-		<tr>
-			<td>HID Mouse</td>
-			<td><toggle-switch v-model="currentGadgetSettings.Use_HID_MOUSE"></toggle-switch></td>
-		</tr>
-		<tr>
-			<td>HID Raw</td>
-			<td><toggle-switch v-model="currentGadgetSettings.Use_HID_RAW"></toggle-switch></td>
-		</tr>
-		<tr>
-			<td>Serial</td>
-			<td><toggle-switch v-model="currentGadgetSettings.Use_SERIAL"></toggle-switch></td>
-		</tr>
-		<tr>
-			<td>Mass Storage</td>
-			<td><toggle-switch v-model="currentGadgetSettings.Use_UMS"></toggle-switch></td>
-		</tr>
-	</table>
--->
 </q-page>
 `
 )

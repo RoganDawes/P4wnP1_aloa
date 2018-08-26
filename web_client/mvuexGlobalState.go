@@ -130,6 +130,7 @@ func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext
 
 func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
+
 		// ToDo: Indicate deployment process via global state
 		state.CurrentlyDeployingGadgetSettings = true
 		defer func() {state.CurrentlyDeployingGadgetSettings = false}()
@@ -142,7 +143,14 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		if err != nil {
 
 			//ToDo: use global store to return something, or allow actions to return promises (latter is too much JavaScript)
-			Alert(err.Error())
+			//Alert(err.Error())
+			notification := &QuasarNotification{Object: O()}
+			notification.Message = "Error in pre-check of new USB gadget settings"
+			notification.Detail = err.Error()
+			notification.Position = QUASAR_NOTIFICATION_POSITION_TOP
+			notification.Type = QUASAR_NOTIFICATION_TYPE_NEGATIVE
+			notification.Timeout = 5000
+			QuasarNotify(notification)
 			return
 		}
 
@@ -150,12 +158,25 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		_,err = RpcClient.RpcDeployRemoteGadgetSettings(time.Second*10)
 		if err != nil {
 			//ToDo: use global store to return something, or allow actions to return promises (latter is too much JavaScript)
-			Alert(err.Error())
+			//Alert(err.Error())
+			notification := &QuasarNotification{Object: O()}
+			notification.Message = "Error while deploying new USB gadget settings"
+			notification.Detail = err.Error()
+			notification.Position = QUASAR_NOTIFICATION_POSITION_TOP
+			notification.Type = QUASAR_NOTIFICATION_TYPE_NEGATIVE
+			notification.Timeout = 5000
+			QuasarNotify(notification)
 			return
 		}
 
 		//ToDo: If we're here, we succeeded and should indicate this via global state
-		Alert("GadgetSettings deployed successfully")
+		//Alert("GadgetSettings deployed successfully")
+		notification := &QuasarNotification{Object: O()}
+		notification.Message = "New Gadget Settings deployed successfully"
+		notification.Position = QUASAR_NOTIFICATION_POSITION_TOP
+		notification.Type = QUASAR_NOTIFICATION_TYPE_POSITIVE
+		notification.Timeout = 2000
+		QuasarNotify(notification)
 
 	}()
 

@@ -56,12 +56,12 @@
             <q-page padding>
                 <router-view></router-view>
 
-                <modal v-if="!$store.state.isConnected">
-                    <h3 slot="header">No connection to server</h3>
-                    <p slot="body">Trying to reconnect ... (attempt {{ $store.state.failedConnectionAttempts }})</p>
-                    <p slot="footer"></p>
-                </modal>
-
+                <q-modal v-model="!$store.state.isConnected" minimized no-route-dismiss no-esc-dismiss no-backdrop-dismiss>
+                    <div style="padding: 50px">
+                        <div class="q-display-1 q-mb-md">No connection to server</div>
+                        <p>Trying to reconnect ... (attempt {{ $store.state.failedConnectionAttempts }})</p>
+                    </div>
+                </q-modal>
 
             </q-page>
 

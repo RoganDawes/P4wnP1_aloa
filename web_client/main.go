@@ -57,6 +57,7 @@ func main() {
 
 	router := NewVueRouter(
 		VueRouterRoute("/usb","", "<usb-settings></usb-settings>"),
+		VueRouterRoute("/","", "<usb-settings></usb-settings>"),
 		VueRouterRoute("/hid","", "<hid-script></hid-script>"),
 		VueRouterRoute("/hidjobs","", "<hidjobs></hidjobs>"),
 		VueRouterRoute("/logger","", "<logger :max-entries='7'></logger>"),
