@@ -39,3 +39,15 @@ const (
 `
 )
 
+/*
+<script src="Vue.js"></script>
+
+<script>Vue.Register()</script>
+
+
+<div id="app">
+	<toggle-switch ledcolor="colorvar">
+
+</div>
+Vue.Register("#app")
+ */

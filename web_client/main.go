@@ -71,8 +71,6 @@ func main() {
 	InitCompEthernetAddresses2()
 	InitCompToggleSwitch()
 	InitCompUSBSettings()
-//	InitCompTab()
-//	InitCompTabs()
 	InitCompCodeEditor()
 	InitCompHIDScript()
 	InitCompLogger()
