@@ -39,6 +39,10 @@ const (
 	WPA_SUPPLICANT_CONNECT_TIMEOUT = time.Second * 20
 )
 
+type WifiState struct {
+	Settings *pb.WiFiSettings
+}
+
 type BSS struct {
 	SSID string
 	BSSID net.HardwareAddr
@@ -48,7 +52,14 @@ type BSS struct {
 	Signal float32 //Signal strength in dBm
 }
 
-func DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
+func (state WifiState) GetDeployWifiSettings() (ws *pb.WiFiSettings,err error) {
+	return state.Settings, nil
+}
+
+
+func (state *WifiState) DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
+	// ToDo: Lock state while setting up
+
 	log.Printf("Trying to deploy WiFi settings:\n%v\n", ws)
 	ifName := wifi_if_name
 
@@ -143,6 +154,10 @@ func DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
 	}
 
 	log.Printf("... WiFi settings deployed successfully, checking for stored interface configuration...\n")
+
+	// store new state
+	state.Settings = ws
+
 	ReInitNetworkInterface(ifName)
 	return nil
 }

@@ -15,9 +15,9 @@ import (
 
 type Rpc struct {
 	*sync.Mutex
-	Client pb.P4WNP1Client
-	eventListeningOn bool
-	eventListeningCtx *context.Context
+	Client               pb.P4WNP1Client
+	eventListeningOn     bool
+	eventListeningCtx    *context.Context
 	eventListeningCancel context.CancelFunc
 }
 
@@ -32,49 +32,71 @@ func NewRpcClient(addr string) Rpc {
 
 func (rpc *Rpc) DeployedEthernetInterfaceSettings(timeout time.Duration, settings *pb.EthernetInterfaceSettings) (err error) {
 	// ToDo: The RPC call has to return an error in case deployment fails
-	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	_,err = rpc.Client.DeployEthernetInterfaceSettings(ctx, settings)
+	_, err = rpc.Client.DeployEthernetInterfaceSettings(ctx, settings)
+	return
+}
+
+func (rpc *Rpc) DeployeWifiSettings(timeout time.Duration, settings *pb.WiFiSettings) (err error) {
+	// ToDo: The RPC call has to return an error in case deployment fails
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_, err = rpc.Client.DeployWifiSettings(ctx, settings)
 	return
 }
 
 func (rpc *Rpc) GetDeployedWiFiSettings(timeout time.Duration) (settingsList *jsWiFiSettings, err error) {
- //ToDo: Only placeholde, replace with real "get deployed" RPC
- ws := &pb.WiFiSettings{
- 	BssCfgAP: &pb.BSSCfg{
- 		PSK: "somesecretPSK",
- 		SSID: "TheAP-SSID",
-	},
-	BssCfgClient: &pb.BSSCfg{
-		PSK: "somesecretPSKForExistingAP",
-		SSID: "ExistingSSID",
-	},
-	Mode: pb.WiFiSettings_STA_FAILOVER_AP,
-	DisableNexmon: false,
-	ApHideSsid: false,
-	ApChannel: 13,
-	AuthMode: pb.WiFiSettings_WPA2_PSK,
-	Reg: "DE",
-	Disabled: false,
- }
- jsWs := &jsWiFiSettings{Object: O()}
- jsWs.fromGo(ws)
- return jsWs, nil
+	/*
+	//ToDo: Only placeholder, replace with real "get deployed" RPC
+	ws := &pb.WiFiSettings{
+		BssCfgAP: &pb.BSSCfg{
+			PSK:  "somesecretPSK",
+			SSID: "TheAP-SSID",
+		},
+		BssCfgClient: &pb.BSSCfg{
+			PSK:  "somesecretPSKForExistingAP",
+			SSID: "ExistingSSID",
+		},
+		Mode:          pb.WiFiSettings_STA_FAILOVER_AP,
+		DisableNexmon: false,
+		ApHideSsid:    false,
+		ApChannel:     13,
+		AuthMode:      pb.WiFiSettings_WPA2_PSK,
+		Reg:           "DE",
+		Disabled:      false,
+	}
+	*/
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	ws,err := rpc.Client.GetDeployedWifiSettings(ctx, &pb.Empty{})
+	if err != nil {
+		println("Error GetDeployedWifiSettings", err)
+		return nil, err
+	}
+
+	jsWs := &jsWiFiSettings{Object: O()}
+	jsWs.fromGo(ws)
+	return jsWs, nil
+
+
+
 }
 
 func (rpc *Rpc) GetAllDeployedEthernetInterfaceSettings(timeout time.Duration) (settingsList *jsEthernetSettingsList, err error) {
-	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	deployedSettings,err := rpc.Client.GetAllDeployedEthernetInterfaceSettings(ctx,&pb.Empty{})
+	deployedSettings, err := rpc.Client.GetAllDeployedEthernetInterfaceSettings(ctx, &pb.Empty{})
 	if err != nil {
 		println("Error GetAllDeployedEthernetInterfaceSettings", err)
 		return nil, err
 	}
 
-
-	settingsList = &jsEthernetSettingsList{Object:O()}
+	settingsList = &jsEthernetSettingsList{Object: O()}
 	settingsList.fromGo(deployedSettings)
 
 	return settingsList, nil
@@ -95,44 +117,44 @@ func (rpc *Rpc) GetAllDeployedEthernetInterfaceSettings(timeout time.Duration) (
 func (rpc *Rpc) RpcGetRunningHidJobStates(timeout time.Duration) (states []*pb.HIDRunningJobStateResult, err error) {
 	println("RpcGetRunningHidJobStates called")
 
-
-	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	// get running job IDs
-	joblist, err := rpc.Client.HIDGetRunningScriptJobs(ctx,&pb.Empty{})
-	if err != nil { return nil, err }
+	joblist, err := rpc.Client.HIDGetRunningScriptJobs(ctx, &pb.Empty{})
+	if err != nil {
+		return nil, err
+	}
 
 	states = make([]*pb.HIDRunningJobStateResult, len(joblist.Ids))
-	for idx,jobid := range joblist.Ids {
-		jobstate, err := rpc.Client.HIDGetRunningJobState(ctx, &pb.HIDScriptJob{Id:jobid})
-		if err != nil { return nil, err }
+	for idx, jobid := range joblist.Ids {
+		jobstate, err := rpc.Client.HIDGetRunningJobState(ctx, &pb.HIDScriptJob{Id: jobid})
+		if err != nil {
+			return nil, err
+		}
 		states[idx] = jobstate
 	}
 
-	return states,nil
+	return states, nil
 }
 
 func (rpc *Rpc) RpcGetDeployedGadgetSettings(timeout time.Duration) (*pb.GadgetSettings, error) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
 	println("RpcGetDeployedGadgetSettings called")
 
-	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-
 
 	return rpc.Client.GetDeployedGadgetSetting(ctx, &pb.Empty{})
 
 }
 
-
 func (rpc *Rpc) RpcSetRemoteGadgetSettings(targetGS *pb.GadgetSettings, timeout time.Duration) (err error) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
 	println("RpcSetRemoteGadgetSettings called")
 
-	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-
 
 	//Set gadget settings
 	_, err = rpc.Client.SetGadgetSettings(ctx, targetGS)
@@ -150,33 +172,34 @@ func (rpc *Rpc) RpcDeployRemoteGadgetSettings(timeout time.Duration) (*pb.Gadget
 	//gs := vue.GetVM(c).Get("gadgetSettings")
 	println("RpcDeployRemoteGadgetSettings called")
 
-	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-
 
 	return rpc.Client.DeployGadgetSetting(ctx, &pb.Empty{})
 
 }
 
-
 func (rpc *Rpc) ConnectionTest(timeout time.Duration) (err error) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
 	println("RpcDeployRemoteGadgetSettings called")
 
-	ctx,cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	req := &pb.StringMessage{Msg:"ping"}
-	resp,err := rpc.Client.EchoRequest(ctx, req)
-	if err != nil { return err }
-	if resp.Msg != req.Msg { errors.New("Unexpected response")}
+	req := &pb.StringMessage{Msg: "ping"}
+	resp, err := rpc.Client.EchoRequest(ctx, req)
+	if err != nil {
+		return err
+	}
+	if resp.Msg != req.Msg {
+		errors.New("Unexpected response")
+	}
 	return nil
 }
 
 func (rpc *Rpc) StartListening() {
 
 	println("Start listening called", globalState.EventReceiver)
-
 
 	//Note: This method is responsible for handling server streaming of events
 	// It isn't possible to use the stream for connection watching (heartbeat), for the following reasons
@@ -192,7 +215,7 @@ func (rpc *Rpc) StartListening() {
 	go func() {
 		for {
 			println("Try to connect server ...")
-			for RpcClient.ConnectionTest(time.Second * 3) != nil {
+			for RpcClient.ConnectionTest(time.Second*3) != nil {
 				println("... failed, retry for 3 seconds")
 				globalState.FailedConnectionAttempts++
 			}
@@ -200,7 +223,7 @@ func (rpc *Rpc) StartListening() {
 			globalState.IsConnected = true
 			globalState.FailedConnectionAttempts = 0
 
-			ctx,cancel := context.WithCancel(context.Background())
+			ctx, cancel := context.WithCancel(context.Background())
 			rpc.eventListeningCancel = cancel
 
 			// try RPC call
@@ -236,15 +259,12 @@ func (rpc *Rpc) StartListening() {
 			println("Connection to server lost, reconnecting ...")
 			globalState.IsConnected = false
 
-
 			//retry to connect (outer loop)
 		}
-
 
 		return
 	}()
 }
-
 
 func (rpc *Rpc) StopListening() {
 	rpc.eventListeningCancel()

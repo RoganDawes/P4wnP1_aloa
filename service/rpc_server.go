@@ -28,6 +28,21 @@ var (
 
 type server struct {}
 
+func (s *server) GetDeployedWifiSettings(ctx context.Context, req *pb.Empty) (resp *pb.WiFiSettings, err error) {
+	return ServiceState.Wifi.GetDeployWifiSettings()
+}
+
+
+func (s *server) DeployWifiSettings(ctx context.Context, ws *pb.WiFiSettings) (empty *pb.Empty, err error) {
+	log.Printf("Trying to deploy WiFi settings %v", ws)
+	empty = &pb.Empty{}
+	err = ServiceState.Wifi.DeployWifiSettings(ws)
+	if err != nil {
+		log.Printf("Error deploying WiFi settings settings %v", err)
+	}
+	return
+}
+
 func (s *server) GetDeployedEthernetInterfaceSettings(ctx context.Context, req *pb.StringMessage) (resp *pb.EthernetInterfaceSettings, err error) {
 	if settings,exist := ServiceState.StoredNetworkSetting[req.Msg]; exist && settings.SettingsInUse {
 		return settings, nil
@@ -247,15 +262,6 @@ func (s *server) HIDGetScriptJobResult(ctx context.Context, sJob *pb.HIDScriptJo
 	return
 }
 
-func (s *server) DeployWifiSettings(ctx context.Context, ws *pb.WiFiSettings) (empty *pb.Empty, err error) {
-	log.Printf("Trying to deploy WiFi settings %v", ws)
-	empty = &pb.Empty{}
-	err = DeployWifiSettings(ws)
-	if err != nil {
-		log.Printf("Error deploying WiFi settings settings %v", err)
-	}
-	return
-}
 
 func (s *server) DeployEthernetInterfaceSettings(ctx context.Context, es *pb.EthernetInterfaceSettings) (empty *pb.Empty, err error) {
 	log.Printf("Trying to deploy ethernet interface settings %v", es)

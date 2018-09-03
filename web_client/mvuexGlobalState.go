@@ -17,7 +17,12 @@ const (
 	VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS       = "deployCurrentGadgetSettings"
 	VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED = "updateCurrentGadgetSettingsFromDeployed"
 	VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS       = "deployEthernetInterfaceSettings"
+	VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED = "updateCurrentWifiSettingsFromDeployed"
+	VUEX_ACTION_DEPLOY_WIFI_SETTINGS       = "deployWifiSettings"
+
+
 	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO     = "setCurrentGadgetSettings"
+	VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS     = "setCurrentWifiSettings"
 	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO   = "setCurrentHIDScriptSource"
 
 	initHIDScript = `layout('us');			// US keyboard layout
@@ -78,6 +83,7 @@ func createGlobalStateStruct() GlobalState {
 	state.IsModalEnabled = false
 	state.FailedConnectionAttempts = 0
 	//Retrieve Interface settings
+	// ToDo: Replace panics by default values
 	ifSettings,err := RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second*5)
 	if err != nil { panic("Couldn't retrieve interface settings") }
 	state.InterfaceSettings = ifSettings
@@ -107,6 +113,34 @@ func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.A
 	}()
 
 	return
+}
+
+func actionUpdateWifiSettingsFromDeployed(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		//fetch deployed gadget settings
+		dWS,err := RpcClient.GetDeployedWiFiSettings(time.Second * 5)
+		if err != nil {
+			println("Couldn't retrieve deployed WiFi settings")
+			return
+		}
+
+		//commit to current
+		context.Commit(VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS, dWS)
+	}()
+
+	return
+}
+
+
+func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settings *jsWiFiSettings) {
+	go func() {
+		println("Vuex dispatch deploy WiFi settings")
+		// convert to Go type
+		goSettings := settings.toGo()
+
+		err := RpcClient.DeployeWifiSettings(time.Second*3, goSettings)
+		if err != nil {Alert(err)}
+	}()
 }
 
 func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
@@ -235,6 +269,10 @@ func initMVuex() *mvuex.Store {
 			state.CurrentGadgetSettings = settings
 			return
 		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS, func (store *mvuex.Store, state *GlobalState, settings *jsWiFiSettings) {
+			state.WiFiSettings = settings
+			return
+		}),
 		/*
 		mvuex.Mutation("startLogListening", func (store *mvuex.Store, state *GlobalState) {
 			state.EventReceiver.StartListening()
@@ -249,6 +287,8 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS, actionDeployCurrentGadgetSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS, actionUpdateRunningHidJobs),
 		mvuex.Action(VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS, actionDeployEthernetInterfaceSettings),
+		mvuex.Action(VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED, actionUpdateWifiSettingsFromDeployed),
+		mvuex.Action(VUEX_ACTION_DEPLOY_WIFI_SETTINGS, actionDeployWifiSettings),
 	)
 
 	// fetch deployed gadget settings

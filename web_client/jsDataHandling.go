@@ -389,6 +389,28 @@ func (target *jsWiFiSettings) fromGo(src *pb.WiFiSettings) {
 	}
 }
 
+func (src *jsWiFiSettings) toGo() (target *pb.WiFiSettings) {
+	target = &pb.WiFiSettings{
+		Disabled: src.Disabled,
+		Reg: src.Reg,
+		Mode: pb.WiFiSettings_Mode(src.Mode),
+		AuthMode: pb.WiFiSettings_APAuthMode(src.AuthMode),
+		DisableNexmon: src.DisableNexmon,
+		ApChannel: uint32(src.Channel),
+		ApHideSsid: src.HideSsid,
+		BssCfgClient: &pb.BSSCfg{
+			SSID: src.STA_SSID,
+			PSK: src.STA_PSK,
+		},
+		BssCfgAP: &pb.BSSCfg{
+			SSID: src.AP_SSID,
+			PSK: src.AP_PSK,
+		},
+
+	}
+	return target
+}
+
 /* Network Settings */
 type jsEthernetSettingsList struct {
 	*js.Object

@@ -2941,6 +2941,7 @@ type P4WNP1Client interface {
 	GetDeployedEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*EthernetInterfaceSettings, error)
 	// WiFi
 	DeployWifiSettings(ctx context.Context, in *WiFiSettings, opts ...grpcweb.CallOption) (*Empty, error)
+	GetDeployedWifiSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFiSettings, error)
 	// HIDScript / job management
 	HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error)
 	HIDRunScriptJob(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptJob, error)
@@ -3068,6 +3069,15 @@ func (c *p4WNP1Client) DeployWifiSettings(ctx context.Context, in *WiFiSettings,
 	}
 
 	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetDeployedWifiSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFiSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "GetDeployedWifiSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(WiFiSettings).Unmarshal(resp)
 }
 
 func (c *p4WNP1Client) HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error) {

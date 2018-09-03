@@ -19,6 +19,7 @@ service P4WNP1 {
 
 	// WiFi
 	rpc DeployWifiSettings(WiFiSettings) returns (Empty) {}
+	rpc GetDeployedWifiSettings(Empty) returns (WiFiSettings) {}
 
 	//HIDScript / job management
 	rpc HIDRunScript(HIDScriptRequest) returns (HIDScriptResult) {}

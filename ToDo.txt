@@ -28,6 +28,9 @@ impact reasonable)
 WIFI
 - implement connection to OPEN-AUTH network as STA
 - implement nexmon firmware support (not for first release)
+- implement failover from STA to AP (if connection fails)
+- add Option to reconfigure Wifi Ethernet Interface settings to DHCP client mode, when WiFi mode is station
+- fall back to old settings, if deployment of WiFi settings fails
 
 BLUETOOTH:
 - configuration cpabilities for BNEP/NAP on server, keep in mind BLE use cases (idea of stand-alone proxy)
