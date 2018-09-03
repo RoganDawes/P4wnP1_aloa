@@ -1,5 +1,5 @@
 /*
- * Quasar Framework v0.17.9
+ * Quasar Framework v0.17.12
  * (c) 2016-present Razvan Stoenescu
  * Released under the MIT License.
  */
@@ -920,8 +920,11 @@ body.desktop .q-carousel-thumbnails img:hover {
   font-size: 16px;
 }
 .q-input-chips {
-  margin-top: -6px;
-  margin-bottom: -6px;
+  margin-top: -1px;
+  margin-bottom: -1px;
+}
+.q-input-chips .q-chip {
+  margin: 1px;
 }
 .q-input-chips input.q-input-target {
   min-width: 70px !important;
@@ -1108,6 +1111,7 @@ body.desktop .q-carousel-thumbnails img:hover {
   padding-top: 8px;
 }
 .q-datetime-header {
+  pointer-events: none;
   background: currentColor;
 }
 .q-datetime-header > div {
@@ -1134,7 +1138,6 @@ div + .q-datetime-time {
   font-size: 1.2rem;
 }
 .q-datetime-link {
-  pointer-events: none;
   opacity: 0.6;
 }
 .q-datetime-link > span {
@@ -1370,101 +1373,101 @@ body.desktop .q-datetime-dark .q-datetime-clock-position:not(.active):hover {
   top: 0%;
   left: 50% /* rtl:ignore */;
 }
-.q-datetime-clock-pos-0.fmt24 {
-  top: 0%;
-  left: 50% /* rtl:ignore */;
-}
 .q-datetime-clock-pos-1.fmt24 {
-  top: 1.7%;
-  left: 62.94% /* rtl:ignore */;
-}
-.q-datetime-clock-pos-2.fmt24 {
   top: 6.7%;
   left: 75% /* rtl:ignore */;
 }
-.q-datetime-clock-pos-3.fmt24 {
-  top: 14.64%;
-  left: 85.36% /* rtl:ignore */;
-}
-.q-datetime-clock-pos-4.fmt24 {
+.q-datetime-clock-pos-2.fmt24 {
   top: 25%;
   left: 93.3% /* rtl:ignore */;
 }
-.q-datetime-clock-pos-5.fmt24 {
-  top: 37.06%;
-  left: 98.3% /* rtl:ignore */;
-}
-.q-datetime-clock-pos-6.fmt24 {
+.q-datetime-clock-pos-3.fmt24 {
   top: 50%;
   left: 100% /* rtl:ignore */;
 }
-.q-datetime-clock-pos-7.fmt24 {
-  top: 62.94%;
-  left: 98.3% /* rtl:ignore */;
-}
-.q-datetime-clock-pos-8.fmt24 {
+.q-datetime-clock-pos-4.fmt24 {
   top: 75%;
   left: 93.3% /* rtl:ignore */;
 }
-.q-datetime-clock-pos-9.fmt24 {
-  top: 85.36%;
-  left: 85.36% /* rtl:ignore */;
-}
-.q-datetime-clock-pos-10.fmt24 {
+.q-datetime-clock-pos-5.fmt24 {
   top: 93.3%;
   left: 75% /* rtl:ignore */;
 }
-.q-datetime-clock-pos-11.fmt24 {
-  top: 98.3%;
-  left: 62.94% /* rtl:ignore */;
-}
-.q-datetime-clock-pos-12.fmt24 {
+.q-datetime-clock-pos-6.fmt24 {
   top: 100%;
   left: 50% /* rtl:ignore */;
 }
-.q-datetime-clock-pos-13.fmt24 {
-  top: 98.3%;
-  left: 37.06% /* rtl:ignore */;
-}
-.q-datetime-clock-pos-14.fmt24 {
+.q-datetime-clock-pos-7.fmt24 {
   top: 93.3%;
   left: 25% /* rtl:ignore */;
 }
-.q-datetime-clock-pos-15.fmt24 {
-  top: 85.36%;
-  left: 14.64% /* rtl:ignore */;
-}
-.q-datetime-clock-pos-16.fmt24 {
+.q-datetime-clock-pos-8.fmt24 {
   top: 75%;
   left: 6.7% /* rtl:ignore */;
 }
-.q-datetime-clock-pos-17.fmt24 {
-  top: 62.94%;
-  left: 1.7% /* rtl:ignore */;
-}
-.q-datetime-clock-pos-18.fmt24 {
+.q-datetime-clock-pos-9.fmt24 {
   top: 50%;
   left: 0% /* rtl:ignore */;
 }
-.q-datetime-clock-pos-19.fmt24 {
-  top: 37.06%;
-  left: 1.7% /* rtl:ignore */;
-}
-.q-datetime-clock-pos-20.fmt24 {
+.q-datetime-clock-pos-10.fmt24 {
   top: 25%;
   left: 6.7% /* rtl:ignore */;
 }
-.q-datetime-clock-pos-21.fmt24 {
-  top: 14.64%;
-  left: 14.64% /* rtl:ignore */;
-}
-.q-datetime-clock-pos-22.fmt24 {
+.q-datetime-clock-pos-11.fmt24 {
   top: 6.7%;
   left: 25% /* rtl:ignore */;
 }
+.q-datetime-clock-pos-12.fmt24 {
+  top: 0%;
+  left: 50% /* rtl:ignore */;
+}
+.q-datetime-clock-pos-13.fmt24 {
+  top: 19.69%;
+  left: 67.5% /* rtl:ignore */;
+}
+.q-datetime-clock-pos-14.fmt24 {
+  top: 32.5%;
+  left: 80.31% /* rtl:ignore */;
+}
+.q-datetime-clock-pos-15.fmt24 {
+  top: 50%;
+  left: 85% /* rtl:ignore */;
+}
+.q-datetime-clock-pos-16.fmt24 {
+  top: 67.5%;
+  left: 80.31% /* rtl:ignore */;
+}
+.q-datetime-clock-pos-17.fmt24 {
+  top: 80.31%;
+  left: 67.5% /* rtl:ignore */;
+}
+.q-datetime-clock-pos-18.fmt24 {
+  top: 85%;
+  left: 50% /* rtl:ignore */;
+}
+.q-datetime-clock-pos-19.fmt24 {
+  top: 80.31%;
+  left: 32.5% /* rtl:ignore */;
+}
+.q-datetime-clock-pos-20.fmt24 {
+  top: 67.5%;
+  left: 19.69% /* rtl:ignore */;
+}
+.q-datetime-clock-pos-21.fmt24 {
+  top: 50%;
+  left: 15% /* rtl:ignore */;
+}
+.q-datetime-clock-pos-22.fmt24 {
+  top: 32.5%;
+  left: 19.69% /* rtl:ignore */;
+}
 .q-datetime-clock-pos-23.fmt24 {
-  top: 1.7%;
-  left: 37.06% /* rtl:ignore */;
+  top: 19.69%;
+  left: 32.5% /* rtl:ignore */;
+}
+.q-datetime-clock-pos-0.fmt24 {
+  top: 15%;
+  left: 50% /* rtl:ignore */;
 }
 .q-datetime-range.row .q-datetime-range-left {
   border-top-right-radius: 0;
@@ -1996,7 +1999,6 @@ body.desktop .q-datetime-dark .q-datetime-clock-position:not(.active):hover {
   width: 24px;
   height: 24px;
   cursor: pointer;
-  z-index: 2;
 }
 .q-if-control + .q-if-control,
 .q-if-control + .q-if-inner,
@@ -2029,6 +2031,7 @@ body.desktop .q-datetime-dark .q-datetime-clock-position:not(.active):hover {
   white-space: nowrap;
 }
 .q-if-label {
+  cursor: text;
   max-width: 100%;
   overflow: hidden;
 }
@@ -2049,8 +2052,8 @@ body.desktop .q-datetime-dark .q-datetime-clock-position:not(.active):hover {
   color: #656565;
 }
 .q-if-addon {
-  pointer-events: none;
   opacity: 0;
+  cursor: inherit;
 }
 .q-if-addon:not(.q-if-addon-visible) {
   display: none;
@@ -2081,26 +2084,21 @@ body.desktop .q-datetime-dark .q-datetime-clock-position:not(.active):hover {
           align-items: center;
   color: #000;
 }
-.q-input-target:-webkit-autofill,
-.q-input-shadow:-webkit-autofill {
+.q-input-target:-webkit-autofill {
   -webkit-animation-name: webkit-autofill-on;
   -webkit-animation-fill-mode: both;
 }
-.q-input-target.q-input-autofill:not(:-webkit-autofill),
-.q-input-shadow.q-input-autofill:not(:-webkit-autofill) {
+.q-input-target.q-input-autofill:not(:-webkit-autofill) {
   -webkit-animation-name: webkit-autofill-off;
   -webkit-animation-fill-mode: both;
 }
 .q-input-target::-ms-clear,
-.q-input-shadow::-ms-clear,
-.q-input-target::-ms-reveal,
-.q-input-shadow::-ms-reveal {
+.q-input-target::-ms-reveal {
   display: none;
   width: 0;
   height: 0;
 }
-.q-input-target:invalid,
-.q-input-shadow:invalid {
+.q-input-target:invalid {
   -webkit-box-shadow: inherit;
           box-shadow: inherit;
 }
@@ -2204,12 +2202,16 @@ input.q-input-target {
   width: 100%;
   min-height: 100vh;
 }
-.q-layout-container {
+.q-layout-container .q-layout {
+  min-height: 100%;
+}
+.q-layout-container > div {
   -webkit-transform: translate3d(0, 0, 0);
           transform: translate3d(0, 0, 0);
 }
-.q-layout-container .q-layout {
+.q-layout-container > div > div {
   min-height: 0;
+  max-height: 100%;
 }
 .q-layout-header {
   -webkit-box-shadow: 0 1px 8px rgba(0,0,0,0.2), 0 3px 4px rgba(0,0,0,0.14), 0 3px 3px -2px rgba(0,0,0,0.12);
@@ -2291,8 +2293,12 @@ input.q-input-target {
 }
 .q-layout-drawer-opener {
   z-index: 2001;
-  height: 100vh;
+  height: 100%;
   width: 15px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 .q-page-sticky-shrink {
   pointer-events: none;
@@ -3872,9 +3878,6 @@ body.desktop .q-tab:hover:before {
   height: 48px;
   font-weight: 400;
   font-size: 13px;
-}
-.q-table .q-radial-ripple {
-  margin-bottom: -100%;
 }
 .q-table-col-auto-width {
   width: 1px;
@@ -8532,26 +8535,22 @@ a.q-link {
 }
 .q-radial-ripple {
   overflow: hidden;
-  -webkit-transform: translate3d(-25%, -25%, 0);
-          transform: translate3d(-25%, -25%, 0);
-  width: 200%;
-  height: 200%;
   border-radius: 50%;
   pointer-events: none;
-}
-.q-radial-ripple,
-.q-radial-ripple:after {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
 }
 .q-radial-ripple:after {
   content: '';
   display: block;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image: radial-gradient(circle, currentColor 10%, transparent 10.01%);
   background-repeat: no-repeat;
   background-position: 50%;
@@ -9436,7 +9435,6 @@ body.ios .q-hoverable:active .q-focus-helper {
   }
   .q-toolbar,
   .q-actionsheet-title,
-  .q-layout-page,
   .q-field-label-inner {
     height: 0px;
   }
@@ -9525,7 +9523,6 @@ body.ios .q-hoverable:active .q-focus-helper {
   }
   .q-toolbar,
   .q-actionsheet-title,
-  .q-layout-page,
   .q-field-label-inner {
     height: 0px;
   }

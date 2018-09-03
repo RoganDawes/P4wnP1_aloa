@@ -1,5 +1,5 @@
 /*
- * Quasar Framework v0.17.9
+ * Quasar Framework v0.17.12
  * (c) 2016-present Razvan Stoenescu
  * Released under the MIT License.
  */
@@ -903,8 +903,11 @@ body.desktop .q-carousel-thumbnails img:hover {
   font-size: 16px;
 }
 .q-input-chips {
-  margin-top: -6px;
-  margin-bottom: -6px;
+  margin-top: -1px;
+  margin-bottom: -1px;
+}
+.q-input-chips .q-chip {
+  margin: 1px;
 }
 .q-input-chips input.q-input-target {
   min-width: 70px !important;
@@ -1667,7 +1670,6 @@ body.desktop .q-carousel-thumbnails img:hover {
   width: 24px;
   height: 24px;
   cursor: pointer;
-  z-index: 2;
 }
 .q-if-control + .q-if-control,
 .q-if-control + .q-if-inner,
@@ -1700,6 +1702,7 @@ body.desktop .q-carousel-thumbnails img:hover {
   white-space: nowrap;
 }
 .q-if-label {
+  cursor: text;
   max-width: 100%;
   overflow: hidden;
 }
@@ -1720,8 +1723,8 @@ body.desktop .q-carousel-thumbnails img:hover {
   color: #656565;
 }
 .q-if-addon {
-  pointer-events: none;
   opacity: 0;
+  cursor: inherit;
 }
 .q-if-addon:not(.q-if-addon-visible) {
   display: none;
@@ -1752,26 +1755,21 @@ body.desktop .q-carousel-thumbnails img:hover {
           align-items: center;
   color: #000;
 }
-.q-input-target:-webkit-autofill,
-.q-input-shadow:-webkit-autofill {
+.q-input-target:-webkit-autofill {
   -webkit-animation-name: webkit-autofill-on;
   -webkit-animation-fill-mode: both;
 }
-.q-input-target.q-input-autofill:not(:-webkit-autofill),
-.q-input-shadow.q-input-autofill:not(:-webkit-autofill) {
+.q-input-target.q-input-autofill:not(:-webkit-autofill) {
   -webkit-animation-name: webkit-autofill-off;
   -webkit-animation-fill-mode: both;
 }
 .q-input-target::-ms-clear,
-.q-input-shadow::-ms-clear,
-.q-input-target::-ms-reveal,
-.q-input-shadow::-ms-reveal {
+.q-input-target::-ms-reveal {
   display: none;
   width: 0;
   height: 0;
 }
-.q-input-target:invalid,
-.q-input-shadow:invalid {
+.q-input-target:invalid {
   -webkit-box-shadow: inherit;
           box-shadow: inherit;
 }
@@ -1875,12 +1873,16 @@ input.q-input-target {
   width: 100%;
   min-height: 100vh;
 }
-.q-layout-container {
+.q-layout-container .q-layout {
+  min-height: 100%;
+}
+.q-layout-container > div {
   -webkit-transform: translate3d(0, 0, 0);
           transform: translate3d(0, 0, 0);
 }
-.q-layout-container .q-layout {
+.q-layout-container > div > div {
   min-height: 0;
+  max-height: 100%;
 }
 .q-layout-header {
   border-bottom: 1px solid #e0e0e0;
@@ -1962,8 +1964,12 @@ input.q-input-target {
 }
 .q-layout-drawer-opener {
   z-index: 2001;
-  height: 100vh;
+  height: 100%;
   width: 15px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 .q-page-sticky-shrink {
   pointer-events: none;
@@ -3533,9 +3539,6 @@ body.desktop .q-tab:hover:before {
   height: 48px;
   font-weight: 400;
   font-size: 13px;
-}
-.q-table .q-radial-ripple {
-  margin-bottom: -100%;
 }
 .q-table-col-auto-width {
   width: 1px;
@@ -8208,26 +8211,22 @@ a.q-link {
 }
 .q-radial-ripple {
   overflow: hidden;
-  -webkit-transform: translate3d(-25%, -25%, 0);
-          transform: translate3d(-25%, -25%, 0);
-  width: 200%;
-  height: 200%;
   border-radius: 50%;
   pointer-events: none;
-}
-.q-radial-ripple,
-.q-radial-ripple:after {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
 }
 .q-radial-ripple:after {
   content: '';
   display: block;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image: radial-gradient(circle, currentColor 10%, transparent 10.01%);
   background-repeat: no-repeat;
   background-position: 50%;
@@ -9112,7 +9111,6 @@ body.ios .q-hoverable:active .q-focus-helper {
   }
   .q-toolbar,
   .q-actionsheet-title,
-  .q-layout-page,
   .q-field-label-inner {
     height: 0px;
   }
@@ -9201,7 +9199,6 @@ body.ios .q-hoverable:active .q-focus-helper {
   }
   .q-toolbar,
   .q-actionsheet-title,
-  .q-layout-page,
   .q-field-label-inner {
     height: 0px;
   }

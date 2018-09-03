@@ -1,5 +1,5 @@
 /*!
- * Quasar Framework v0.17.9
+ * Quasar Framework v0.17.12
  * (c) 2016-present Razvan Stoenescu
  * Released under the MIT License.
  */
@@ -427,7 +427,7 @@
     });
   }
 
-  var version = "0.17.9";
+  var version = "0.17.12";
 
   var History = {
     __history: [],
@@ -1363,9 +1363,7 @@
       if (this.showing) {
         this.showPromise && this.showPromiseReject();
         this.hidePromise && this.hidePromiseReject();
-        this.$emit('input', false);
         this.__removeHistory();
-        this.__hide && this.__hide();
       }
     }
   };
@@ -1487,60 +1485,25 @@
 
   // Reasonable defaults
   var
-    PIXEL_STEP = 10,
     LINE_HEIGHT = 40,
     PAGE_HEIGHT = 800;
 
   function getMouseWheelDistance (e) {
-    var
-      sX = 0, sY = 0, // spinX, spinY
-      pX = 0, pY = 0; // pixelX, pixelY
+    var assign;
 
-    // Legacy
-    if ('detail' in e) { sY = e.detail; }
-    if ('wheelDelta' in e) { sY = -e.wheelDelta / 120; }
-    if ('wheelDeltaY' in e) { sY = -e.wheelDeltaY / 120; }
-    if ('wheelDeltaX' in e) { sX = -e.wheelDeltaX / 120; }
+    var x = e.deltaX, y = e.deltaY;
 
-    // side scrolling on FF with DOMMouseScroll
-    if ('axis' in e && e.axis === e.HORIZONTAL_AXIS) {
-      sX = sY;
-      sY = 0;
+    if ((x || y) && e.deltaMode) {
+      var multiplier = e.deltaMode === 1 ? LINE_HEIGHT : PAGE_HEIGHT;
+      x *= multiplier;
+      y *= multiplier;
     }
 
-    pX = sX * PIXEL_STEP;
-    pY = sY * PIXEL_STEP;
-
-    if ('deltaY' in e) { pY = e.deltaY; }
-    if ('deltaX' in e) { pX = e.deltaX; }
-
-    if ((pX || pY) && e.deltaMode) {
-      if (e.deltaMode === 1) { // delta in LINE units
-        pX *= LINE_HEIGHT;
-        pY *= LINE_HEIGHT;
-      }
-      else { // delta in PAGE units
-        pX *= PAGE_HEIGHT;
-        pY *= PAGE_HEIGHT;
-      }
+    if (e.shiftKey && !x) {
+      (assign = [x, y], y = assign[0], x = assign[1]);
     }
 
-    // Fall-back if spin cannot be determined
-    if (pX && !sX) { sX = (pX < 1) ? -1 : 1; }
-    if (pY && !sY) { sY = (pY < 1) ? -1 : 1; }
-
-    /*
-     * spinX  -- normalized spin speed (use for zoom) - x plane
-     * spinY  -- " - y plane
-     * pixelX -- normalized distance (to pixels) - x plane
-     * pixelY -- " - y plane
-     */
-    return {
-      spinX: sX,
-      spinY: sY,
-      pixelX: pX,
-      pixelY: pY
-    }
+    return { x: x, y: y }
   }
 
   function stopAndPrevent (e) {
@@ -1725,16 +1688,28 @@
     return size
   }
 
-  function hasScrollbar (el) {
+  function hasScrollbar (el, onY) {
+    if ( onY === void 0 ) onY = true;
+
     if (!el || el.nodeType !== Node.ELEMENT_NODE) {
       return false
     }
 
-    return el.scrollHeight > el.clientHeight && (
-      el.classList.contains('scroll') ||
-      el.classList.contains('overflow-auto') ||
-      ['auto', 'scroll'].includes(window.getComputedStyle(el)['overflow-y'])
-    )
+    return onY
+      ? (
+        el.scrollHeight > el.clientHeight && (
+          el.classList.contains('scroll') ||
+          el.classList.contains('overflow-auto') ||
+          ['auto', 'scroll'].includes(window.getComputedStyle(el)['overflow-y'])
+        )
+      )
+      : (
+        el.scrollWidth > el.clientWidth && (
+          el.classList.contains('scroll') ||
+          el.classList.contains('overflow-auto') ||
+          ['auto', 'scroll'].includes(window.getComputedStyle(el)['overflow-x'])
+        )
+      )
   }
 
   var scroll = {
@@ -1762,15 +1737,25 @@
 
     var
       path = getEventPath(e),
-      delta = e.deltaY || -e.wheelDelta;
+      shift = e.shiftKey && !e.deltaX,
+      scrollY = !shift && Math.abs(e.deltaX) <= Math.abs(e.deltaY),
+      delta = shift || scrollY ? e.deltaY : e.deltaX;
 
     for (var index = 0; index < path.length; index++) {
       var el = path[index];
 
-      if (hasScrollbar(el)) {
-        return delta < 0 && el.scrollTop === 0
-          ? true
-          : delta > 0 && el.scrollTop + el.clientHeight === el.scrollHeight
+      if (hasScrollbar(el, scrollY)) {
+        return scrollY
+          ? (
+            delta < 0 && el.scrollTop === 0
+              ? true
+              : delta > 0 && el.scrollTop + el.clientHeight === el.scrollHeight
+          )
+          : (
+            delta < 0 && el.scrollLeft === 0
+              ? true
+              : delta > 0 && el.scrollLeft + el.clientWidth === el.scrollWidth
+          )
       }
     }
 
@@ -2000,10 +1985,16 @@
         this.$nextTick(function () { return content && content.focus(); });
       },
       __hide: function __hide () {
+        this.__cleanup();
+        if (!this.noRefocus && this.__refocusTarget) {
+          this.__refocusTarget.focus();
+          !this.__refocusTarget.classList.contains('q-if') && this.__refocusTarget.blur();
+        }
+      },
+      __cleanup: function __cleanup () {
         EscapeKey.pop();
         preventScroll(false);
         this.__register(false);
-        !this.noRefocus && this.__refocusTarget && this.__refocusTarget.focus();
       },
       __stopPropagation: function __stopPropagation (e) {
         e.stopPropagation();
@@ -2050,6 +2041,7 @@
     beforeDestroy: function beforeDestroy () {
       clearTimeout(this.shakeTimeout);
       this.$el.remove();
+      this.showing && this.__cleanup();
     },
     render: function render (h) {
       var this$1 = this;
@@ -2429,8 +2421,11 @@
     n = parseInt(n, 10);
     return h('div', {
       staticClass: ("q-item-" + name + (n === 1 ? ' ellipsis' : '')),
-      style: textStyle(n)
-    }, [ val ])
+      style: textStyle(n),
+      domProps: {
+        innerHTML: val
+      }
+    })
   }
 
   var QItemMain = {
@@ -4073,6 +4068,7 @@
       }
     },
     beforeDestroy: function beforeDestroy () {
+      this.showing && this.__cleanup();
       if (this.anchorClick && this.anchorEl) {
         this.anchorEl.removeEventListener('click', this.toggle);
         this.anchorEl.removeEventListener('keyup', this.__toggleKey);
@@ -4102,7 +4098,6 @@
         this.timer = setTimeout(function () {
           document.body.addEventListener('click', this$1.__bodyHide, true);
           document.body.addEventListener('touchstart', this$1.__bodyHide, true);
-          this$1.$emit('show', evt);
           this$1.showPromise && this$1.showPromiseResolve();
         }, 0);
       },
@@ -4124,6 +4119,14 @@
         this.hide(evt);
       },
       __hide: function __hide () {
+        this.__cleanup();
+        this.hidePromise && this.hidePromiseResolve();
+        if (!this.noRefocus && this.__refocusTarget) {
+          this.__refocusTarget.focus();
+          !this.__refocusTarget.classList.contains('q-if') && this.__refocusTarget.blur();
+        }
+      },
+      __cleanup: function __cleanup () {
         clearTimeout(this.timer);
 
         document.body.removeEventListener('click', this.__bodyHide, true);
@@ -4136,11 +4139,6 @@
         EscapeKey.pop();
 
         this.$el.remove();
-        this.hidePromise && this.hidePromiseResolve();
-        if (!this.noRefocus && this.__refocusTarget) {
-          this.__refocusTarget.focus();
-        }
-        this.$emit('hide');
       },
       reposition: function reposition (event$$1, animate) {
         var ref = this.anchorEl.getBoundingClientRect();
@@ -6821,7 +6819,11 @@
       fakeInputValue: function fakeInputValue () {
         return this.actualValue || this.actualValue === 0
           ? this.actualValue
-          : this.placeholder
+          : (
+            this.placeholder || this.placeholder === 0
+              ? this.placeholder
+              : ''
+          )
       },
       fakeInputClasses: function fakeInputClasses () {
         var hasValue = this.actualValue || this.actualValue === 0;
@@ -6890,14 +6892,14 @@
           this$1.__onBlur(e);
         }, 200);
       },
-      __onBlur: function __onBlur (e) {
+      __onBlur: function __onBlur (e, destroy) {
         if (this.focused) {
           this.focused = false;
           this.$emit('blur', e);
         }
-        this.__emit();
+        this.__emit(destroy);
       },
-      __emit: function __emit () {
+      __emit: function __emit (destroy) {
         var this$1 = this;
 
         var isNumberError = this.isNumber && this.isNumberError;
@@ -6908,7 +6910,7 @@
         if (isNumberError) {
           this.$emit('input', value);
         }
-        this.$nextTick(function () {
+        var emit = function () {
           if (this$1.isNumber) {
             if (String(1 / value) !== String(1 / this$1.value)) {
               this$1.$emit('change', value);
@@ -6917,11 +6919,17 @@
           else if (JSON.stringify(value) !== JSON.stringify(this$1.value)) {
             this$1.$emit('change', value);
           }
-        });
+        };
+        destroy ? emit() : this.$nextTick(emit);
       },
       __onKeydown: function __onKeydown (e) {
-        if (this.type !== 'textarea' && e.keyCode === 13) {
-          this.__emit();
+        if (e.keyCode === 13) {
+          if (this.type === 'textarea') {
+            e.stopPropagation();
+          }
+          else {
+            this.__emit();
+          }
         }
         this.$emit('keydown', e);
       },
@@ -6931,6 +6939,9 @@
       __onClick: function __onClick (e) {
         this.focus();
         this.$emit('click', e);
+      },
+      __onPaste: function __onPaste (e) {
+        this.$emit('paste', e);
       }
     },
     mounted: function mounted () {
@@ -6948,6 +6959,7 @@
     },
     beforeDestroy: function beforeDestroy () {
       clearTimeout(this.timer);
+      this.focused && this.__onBlur(void 0, true);
     }
   };
 
@@ -7095,9 +7107,9 @@
         })) || void 0,
 
         h('div', {
-          staticClass: 'q-if-inner col row'
+          staticClass: 'q-if-inner col column'
         }, [
-          h('div', { staticClass: 'col-12 row no-wrap relative-position' }, [
+          h('div', { staticClass: 'row no-wrap relative-position' }, [
             (this.prefix && h('span', {
               staticClass: 'q-if-addon q-if-addon-left',
               'class': this.addonClass,
@@ -7125,7 +7137,7 @@
             })) || void 0
           ])),
           (this.hasLabel && h('div', {
-            staticClass: 'q-if-label-spacer col-12',
+            staticClass: 'q-if-label-spacer',
             domProps: {
               innerHTML: this.label
             }
@@ -7385,7 +7397,7 @@
         on: { click: this.__onClick }
       }, [
         h('div', {
-          staticClass: 'col row items-center group q-input-chips'
+          staticClass: 'col row items-center q-input-chips'
         },
         this.model.map(function (label, index) {
           return h(QChip, {
@@ -9129,6 +9141,7 @@
       validator: modelValidator,
       default: null
     },
+    headerLabel: String,
     firstDayOfWeek: Number,
     formatModel: {
       type: String,
@@ -9857,19 +9870,19 @@
 
       __parseTypeValue: function __parseTypeValue (type, value) {
         if (type === 'month') {
-          return between(value, 1, 12)
+          return normalizeToInterval(value, 1, 12)
         }
         if (type === 'date') {
-          return between(value, 1, this.daysInMonth)
+          return normalizeToInterval(value, 1, this.daysInMonth)
         }
         if (type === 'year') {
-          return between(value, this.yearInterval.min, this.yearInterval.max)
+          return normalizeToInterval(value, this.yearInterval.min, this.yearInterval.max)
         }
         if (type === 'hour') {
-          return between(value, 0, 23)
+          return normalizeToInterval(value, 0, 23)
         }
         if (type === 'minute') {
-          return between(value, 0, 59)
+          return normalizeToInterval(value, 0, 59)
         }
       }
     }
@@ -10418,6 +10431,7 @@
               type: this.type,
               min: this.min,
               max: this.max,
+              headerLabel: this.headerLabel,
               minimal: this.minimal,
               formatModel: this.formatModel,
               format24h: this.format24h,
@@ -10748,6 +10762,9 @@
       },
       isTextarea: function isTextarea (v) {
         this[v ? '__watcherRegister' : '__watcherUnregister']();
+      },
+      '$attrs.rows': function $attrs_rows () {
+        this.isTextarea && this.__updateArea();
       }
     },
     provide: function provide () {
@@ -10918,9 +10935,11 @@
           shadow = this.$refs.shadow,
           input = this.$refs.input;
         if (shadow && input) {
-          var h = shadow.scrollHeight;
-          input.style.height = (between(h, shadow.offsetHeight, this.maxHeight || h)) + "px";
-          input.style.overflowY = this.maxHeight && this.maxHeight < h ? 'scroll' : 'hidden';
+          var
+            sH = shadow.scrollHeight,
+            h = between(sH, shadow.offsetHeight, this.maxHeight || sH);
+          input.style.height = h + "px";
+          input.style.overflowY = this.maxHeight && h < sH ? 'scroll' : 'hidden';
         }
       },
       __watcher: function __watcher (value) {
@@ -10977,7 +10996,8 @@
               focus: this.__onFocus,
               blur: this.__onInputBlur,
               keydown: this.__onKeydown,
-              keyup: this.__onKeyup
+              keyup: this.__onKeyup,
+              paste: this.__onPaste
             }
           })
         ])
@@ -11002,6 +11022,7 @@
             blur: this.__onInputBlur,
             keydown: this.__onKeydown,
             keyup: this.__onKeyup,
+            paste: this.__onPaste,
             animationstart: this.__onAnimationStart
           }
         })
@@ -11024,7 +11045,8 @@
         props: this.frameProps,
         on: {
           click: this.__onClick,
-          focus: this.__onFocus
+          focus: this.__onFocus,
+          paste: this.__onPaste
         }
       },
       [].concat(this.$slots.before).concat([
@@ -11643,6 +11665,10 @@
         this.showPromise && this.showPromiseResolve();
       },
       __hide: function __hide () {
+        this.__cleanup();
+        this.hidePromise && this.hidePromiseResolve();
+      },
+      __cleanup: function __cleanup () {
         clearTimeout(this.timer);
 
         this.scrollTarget.removeEventListener('scroll', this.hide, listenOpts.passive);
@@ -11652,8 +11678,6 @@
         if (this.$q.platform.is.mobile) {
           document.body.removeEventListener('click', this.hide, true);
         }
-
-        this.hidePromise && this.hidePromiseResolve();
       },
       __updatePosition: function __updatePosition () {
         setPosition({
@@ -11722,6 +11746,7 @@
     },
     beforeDestroy: function beforeDestroy () {
       clearTimeout(this.timer);
+      this.showing && this.__cleanup();
       if (!this.anchorEl) {
         return
       }
@@ -13017,7 +13042,7 @@
             : null,
 
           h('div', {
-            staticClass: 'q-field-content ellipsis',
+            staticClass: 'q-field-content',
             'class': this.inputClasses
           }, [
             this.$slots.default,
@@ -13136,136 +13161,6 @@
           ? h('div', { staticClass: 'q-infinite-scroll-message' }, this.$slots.message)
           : null
       ])
-    }
-  };
-
-  var QInlineEdit = {
-    name: 'QInlineEdit',
-    props: {
-      value: {},
-      persistent: Boolean,
-      title: String,
-      buttons: Boolean,
-      labelSet: String,
-      labelCancel: String,
-      color: {
-        type: String,
-        default: 'primary'
-      },
-      validate: {
-        type: Function,
-        default: function () { return true; }
-      }
-    },
-    data: function data () {
-      return {
-        initialValue: ''
-      }
-    },
-    watch: {
-      value: function value () {
-        var this$1 = this;
-
-        this.$nextTick(function () {
-          this$1.$refs.popover.reposition();
-        });
-      }
-    },
-    methods: {
-      cancel: function cancel () {
-        if (this.__hasChanged()) {
-          this.$emit('cancel', this.value, this.initialValue);
-          this.$emit('input', this.initialValue);
-        }
-        this.$nextTick(this.__close);
-      },
-      set: function set () {
-        if (this.__hasChanged() && this.validate(this.value)) {
-          this.$emit('save', this.value);
-        }
-        this.__close();
-      },
-
-      __hasChanged: function __hasChanged () {
-        return JSON.stringify(this.value) !== JSON.stringify(this.initialValue)
-      },
-      __close: function __close () {
-        this.validated = true;
-        this.$refs.popover.hide();
-      },
-      __getContent: function __getContent (h) {
-        var title = this.$slots.title || this.title;
-        return [
-          (title && h('div', { staticClass: 'q-title q-mt-sm q-mb-sm' }, [ title ])) || void 0
-        ].concat(this.$slots.default).concat([
-          (this.buttons && h('div', { staticClass: 'row justify-center no-wrap q-mt-sm' }, [
-            h(QBtn, {
-              props: {
-                flat: true,
-                color: this.color,
-                label: this.labelCancel || this.$q.i18n.label.cancel
-              },
-              on: {
-                click: this.cancel
-              }
-            }),
-            h(QBtn, {
-              staticClass: 'q-ml-sm',
-              props: {
-                flat: true,
-                color: this.color,
-                label: this.labelSet || this.$q.i18n.label.set
-              },
-              on: {
-                click: this.set
-              }
-            })
-          ])) || void 0
-        ])
-      }
-    },
-    render: function render (h) {
-      var this$1 = this;
-
-      return h(QPopover, {
-        staticClass: 'q-table-edit q-px-md q-py-sm',
-        ref: 'popover',
-        props: {
-          cover: true,
-          persistent: this.persistent
-        },
-        on: {
-          show: function () {
-            var input = this$1.$el.querySelector('input');
-            input && input.focus();
-            this$1.$emit('show');
-            this$1.initialValue = clone(this$1.value);
-            this$1.validated = false;
-          },
-          hide: function () {
-            if (this$1.validated) { return }
-
-            if (this$1.__hasChanged()) {
-              if (this$1.validate(this$1.value)) {
-                this$1.$emit('save', this$1.value);
-              }
-              else {
-                this$1.$emit('cancel', this$1.value, this$1.initialValue);
-                this$1.$emit('input', this$1.initialValue);
-              }
-            }
-
-            this$1.$emit('hide');
-          }
-        },
-        nativeOn: {
-          keydown: function (e) {
-            if (getEventKey(e) === 13) {
-              this$1.$refs.popover.hide();
-            }
-          }
-        }
-      }, this.__getContent(h))
     }
   };
 
@@ -13733,11 +13628,13 @@
     },
     data: function data () {
       return {
+        // page related
         height: onSSR ? 0 : window.innerHeight,
-        width: onSSR ? 0 : window.innerWidth,
+        width: onSSR || this.container ? 0 : window.innerWidth,
 
         // container only prop
         containerHeight: 0,
+        scrollbarWidth: onSSR ? 0 : getScrollbarWidth(),
 
         header: {
           size: 0,
@@ -13774,6 +13671,22 @@
           middle: rows[1].split(''),
           bottom: rows[2].split('')
         }
+      },
+
+      // used by container only
+      targetStyle: function targetStyle () {
+        var obj;
+
+        if (this.scrollbarWidth !== 0) {
+          return ( obj = {}, obj[this.$q.i18n.rtl ? 'left' : 'right'] = ((this.scrollbarWidth) + "px"), obj )
+        }
+      },
+      targetChildStyle: function targetChildStyle () {
+        var obj;
+
+        if (this.scrollbarWidth !== 0) {
+          return ( obj = {}, obj[this.$q.i18n.rtl ? 'right' : 'left'] = 0, obj[this.$q.i18n.rtl ? 'left' : 'right'] = ("-" + (this.scrollbarWidth) + "px"), obj.width = ("calc(100% + " + (this.scrollbarWidth) + "px)"), obj )
+        }
       }
     },
     created: function created () {
@@ -13790,22 +13703,27 @@
           on: { scroll: this.__onPageScroll }
         }),
         h(QResizeObservable, {
-          on: { resize: this.__onLayoutResize }
+          on: { resize: this.__onPageResize }
         }),
         this.$slots.default
       ]);
 
       return this.container
         ? h('div', {
-          staticClass: 'relative-position overflow-hidden q-layout-container'
+          staticClass: 'q-layout-container relative-position overflow-hidden'
         }, [
           h(QResizeObservable, {
             on: { resize: this.__onContainerResize }
           }),
           h('div', {
-            ref: 'content',
-            staticClass: 'fullscreen overflow-auto z-inherit'
-          }, [ layout ])
+            staticClass: 'absolute-full',
+            style: this.targetStyle
+          }, [
+            h('div', {
+              staticClass: 'overflow-auto',
+              style: this.targetChildStyle
+            }, [ layout ])
+          ])
         ])
         : layout
     },
@@ -13828,7 +13746,7 @@
         this.scroll = data;
         this.$emit('scroll', data);
       },
-      __onLayoutResize: function __onLayoutResize (ref) {
+      __onPageResize: function __onPageResize (ref) {
         var height = ref.height;
         var width = ref.width;
 
@@ -13838,6 +13756,7 @@
           resized = true;
           this.height = height;
           this.$emit('scrollHeight', height);
+          this.__updateScrollbarWidth();
         }
         if (this.width !== width) {
           resized = true;
@@ -13851,6 +13770,18 @@
 
         if (this.containerHeight !== height) {
           this.containerHeight = height;
+          this.__updateScrollbarWidth();
+        }
+      },
+      __updateScrollbarWidth: function __updateScrollbarWidth () {
+        if (this.container) {
+          var width = this.height > this.containerHeight
+            ? getScrollbarWidth()
+            : 0;
+
+          if (this.scrollbarWidth !== width) {
+            this.scrollbarWidth = width;
+          }
         }
       }
     }
@@ -13896,6 +13827,7 @@
         validator: function (v) { return ['default', 'desktop', 'mobile'].includes(v); },
         default: 'default'
       },
+      showIfAbove: Boolean,
       contentStyle: Object,
       contentClass: [String, Object, Array],
       noHideOnRouteChange: Boolean,
@@ -13904,7 +13836,9 @@
     },
     data: function data () {
       var
-        largeScreenState = this.value !== void 0 ? this.value : true,
+        largeScreenState = this.showIfAbove || (
+          this.value !== void 0 ? this.value : true
+        ),
         showing = this.behavior !== 'mobile' && this.breakpoint < this.layout.width && !this.overlay
           ? largeScreenState
           : false;
@@ -13924,7 +13858,7 @@
       }
     },
     watch: {
-      belowBreakpoint: function belowBreakpoint (val, old) {
+      belowBreakpoint: function belowBreakpoint (val) {
         if (this.mobileOpened) {
           return
         }
@@ -13939,6 +13873,10 @@
         else if (!this.overlay) { // from xs to lg
           this[this.largeScreenState ? 'show' : 'hide'](false);
         }
+      },
+      side: function side (_, oldSide) {
+        this.layout[oldSide].space = false;
+        this.layout[oldSide].offset = 0;
       },
       behavior: function behavior (val) {
         this.__updateLocal('belowBreakpoint', (
@@ -13957,6 +13895,9 @@
           this.behavior === 'mobile' ||
           (this.behavior !== 'desktop' && this.breakpoint >= val)
         ));
+      },
+      'layout.scrollbarWidth': function layout_scrollbarWidth () {
+        this.applyPosition(this.showing ? 0 : void 0);
       },
       offset: function offset$$1 (val) {
         this.__update('offset', val);
@@ -14115,15 +14056,17 @@
 
         if (position === void 0) {
           this.$nextTick(function () {
-            position = this$1.showing
-              ? 0
-              : (this$1.$q.i18n.rtl ? -1 : 1) * (this$1.rightSide ? 1 : -1) * this$1.size;
+            position = this$1.showing ? 0 : this$1.size;
 
-            this$1.applyPosition(position);
+            this$1.applyPosition(this$1.stateDirection * position);
           });
-          return
         }
-        this.$refs.content && css(this.$refs.content, cssTransform(("translateX(" + position + "px)")));
+        else if (this.$refs.content) {
+          if (this.layout.container && this.rightSide && (this.mobileView || Math.abs(position) === this.size)) {
+            position += this.stateDirection * this.layout.scrollbarWidth;
+          }
+          css(this.$refs.content, cssTransform(("translateX(" + position + "px)")));
+        }
       },
       applyBackdrop: function applyBackdrop (x) {
         this.$refs.backdrop && css(this.$refs.backdrop, { backgroundColor: ("rgba(0,0,0," + (x * 0.4) + ")") });
@@ -14227,9 +14170,13 @@
         if (this.belowBreakpoint) {
           this.mobileOpened = true;
           this.applyBackdrop(1);
-          !this.layout.container && preventScroll(true);
+          if (!this.layout.container) {
+            this.preventedScroll = true;
+            preventScroll(true);
+          }
         }
         else {
+          console.log('set scrollable');
           this.__setScrollable(true);
         }
 
@@ -14250,19 +14197,25 @@
         animate && this.layout.__animate();
 
         if (this.mobileOpened) {
-          !this.layout.container && preventScroll(false);
           this.mobileOpened = false;
         }
 
-        this.applyPosition((this.$q.i18n.rtl ? -1 : 1) * (this.rightSide ? 1 : -1) * this.size);
+        this.applyPosition(this.stateDirection * this.size);
         this.applyBackdrop(0);
 
-        this.__setScrollable(false);
+        this.__cleanup();
 
         clearTimeout(this.timer);
         this.timer = setTimeout(function () {
           this$1.hidePromise && this$1.hidePromiseResolve();
         }, duration);
+      },
+      __cleanup: function __cleanup () {
+        if (this.preventedScroll) {
+          this.preventedScroll = false;
+          preventScroll(false);
+        }
+        this.__setScrollable(false);
       },
 
       __update: function __update (prop, val) {
@@ -14283,12 +14236,11 @@
       this.__update('offset', this.offset);
     },
     mounted: function mounted () {
-      if (this.showing) {
-        this.applyPosition(0);
-      }
+      this.applyPosition(this.showing ? 0 : void 0);
     },
     beforeDestroy: function beforeDestroy () {
       clearTimeout(this.timer);
+      this.showing && this.__cleanup();
       if (this.layout.instances[this.side] === this) {
         this.layout.instances[this.side] = null;
         this.__update('size', 0);
@@ -14705,9 +14657,15 @@
           (this.layout.header.space ? this.layout.header.size : 0) +
           (this.layout.footer.space ? this.layout.footer.size : 0);
 
-        return typeof this.styleFn === 'function'
-          ? this.styleFn(offset)
-          : { minHeight: offset ? ("calc(100vh - " + offset + "px)") : '100vh' }
+        if (typeof this.styleFn === 'function') {
+          return this.styleFn(offset)
+        }
+
+        var minHeight = this.layout.container
+          ? (this.layout.containerHeight - offset) + 'px'
+          : (offset ? ("calc(100vh - " + offset + "px)") : "100vh");
+
+        return { minHeight: minHeight }
       },
       classes: function classes () {
         if (this.padding) {
@@ -15441,6 +15399,136 @@
     }
   };
 
+  var QPopupEdit = {
+    name: 'QPopupEdit',
+    props: {
+      value: {},
+      persistent: Boolean,
+      title: String,
+      buttons: Boolean,
+      labelSet: String,
+      labelCancel: String,
+      color: {
+        type: String,
+        default: 'primary'
+      },
+      validate: {
+        type: Function,
+        default: function () { return true; }
+      }
+    },
+    data: function data () {
+      return {
+        initialValue: ''
+      }
+    },
+    watch: {
+      value: function value () {
+        var this$1 = this;
+
+        this.$nextTick(function () {
+          this$1.$refs.popover.reposition();
+        });
+      }
+    },
+    methods: {
+      cancel: function cancel () {
+        if (this.__hasChanged()) {
+          this.$emit('cancel', this.value, this.initialValue);
+          this.$emit('input', this.initialValue);
+        }
+        this.$nextTick(this.__close);
+      },
+      set: function set () {
+        if (this.__hasChanged() && this.validate(this.value)) {
+          this.$emit('save', this.value);
+        }
+        this.__close();
+      },
+
+      __hasChanged: function __hasChanged () {
+        return JSON.stringify(this.value) !== JSON.stringify(this.initialValue)
+      },
+      __close: function __close () {
+        this.validated = true;
+        this.$refs.popover.hide();
+      },
+      __getContent: function __getContent (h) {
+        var title = this.$slots.title || this.title;
+        return [
+          (title && h('div', { staticClass: 'q-title q-mt-sm q-mb-sm' }, [ title ])) || void 0
+        ].concat(this.$slots.default).concat([
+          (this.buttons && h('div', { staticClass: 'row justify-center no-wrap q-mt-sm' }, [
+            h(QBtn, {
+              props: {
+                flat: true,
+                color: this.color,
+                label: this.labelCancel || this.$q.i18n.label.cancel
+              },
+              on: {
+                click: this.cancel
+              }
+            }),
+            h(QBtn, {
+              staticClass: 'q-ml-sm',
+              props: {
+                flat: true,
+                color: this.color,
+                label: this.labelSet || this.$q.i18n.label.set
+              },
+              on: {
+                click: this.set
+              }
+            })
+          ])) || void 0
+        ])
+      }
+    },
+    render: function render (h) {
+      var this$1 = this;
+
+      return h(QPopover, {
+        staticClass: 'q-table-edit q-px-md q-py-sm',
+        ref: 'popover',
+        props: {
+          cover: true,
+          persistent: this.persistent
+        },
+        on: {
+          show: function () {
+            var input = this$1.$el.querySelector('.q-input-target, input');
+            input && input.focus();
+            this$1.$emit('show');
+            this$1.initialValue = clone(this$1.value);
+            this$1.validated = false;
+          },
+          hide: function () {
+            if (this$1.validated) { return }
+
+            if (this$1.__hasChanged()) {
+              if (this$1.validate(this$1.value)) {
+                this$1.$emit('save', this$1.value);
+              }
+              else {
+                this$1.$emit('cancel', this$1.value, this$1.initialValue);
+                this$1.$emit('input', this$1.initialValue);
+              }
+            }
+
+            this$1.$emit('hide');
+          }
+        },
+        nativeOn: {
+          keydown: function (e) {
+            if (getEventKey(e) === 13) {
+              this$1.$refs.popover.hide();
+            }
+          }
+        }
+      }, this.__getContent(h))
+    }
+  };
+
   function width$1 (val) {
     return { width: (val + "%") }
   }
@@ -16162,7 +16250,7 @@
       for (var i = 1; i <= this.max; i++) loop( i );
 
       return h('div', {
-        staticClass: 'q-rating row inline items-center no-wrap',
+        staticClass: 'q-rating row inline items-center',
         'class': this.classes,
         style: this.size ? ("font-size: " + (this.size)) : ''
       }, child)
@@ -16290,7 +16378,7 @@
       },
       __mouseWheel: function __mouseWheel (e) {
         var el = this.$refs.target;
-        el.scrollTop += getMouseWheelDistance(e).pixelY;
+        el.scrollTop += getMouseWheelDistance(e).y;
         if (el.scrollTop > 0 && el.scrollTop + this.containerHeight < this.scrollHeight) {
           e.preventDefault();
         }
@@ -16535,6 +16623,7 @@
           keyup: this.__onKeyup,
           keydown: this.__onKeydown,
           click: this.__onClick,
+          paste: this.__onPaste,
           clear: function (val) {
             this$1.$emit('clear', val);
             this$1.__emit();
@@ -16632,7 +16721,7 @@
         return opt.length ? opt.join(', ') : ''
       },
       computedClearValue: function computedClearValue () {
-        return this.clearValue || (this.multiple ? [] : null)
+        return this.clearValue === void 0 ? (this.multiple ? [] : null) : this.clearValue
       },
       isClearable: function isClearable () {
         return this.editable && this.clearable && JSON.stringify(this.computedClearValue) !== JSON.stringify(this.model)
@@ -16855,7 +16944,7 @@
 
       if (this.hasChips) {
         var el = h('div', {
-          staticClass: 'col row items-center group q-input-chips',
+          staticClass: 'col row items-center q-input-chips',
           'class': this.alignClass
         }, this.selectedOptions.map(function (opt, index) {
           return h(QChip, {
@@ -16874,16 +16963,18 @@
             },
             nativeOn: {
               click: function (e) { e.stopPropagation(); }
-            }
-          }, [ opt.label ])
+            },
+            domProps: { innerHTML: opt.label }
+          })
         }));
         child.push(el);
       }
       else {
         var el$1 = h('div', {
           staticClass: 'col q-input-target ellipsis',
-          'class': this.fakeInputClasses
-        }, [ this.fakeInputValue ]);
+          'class': this.fakeInputClasses,
+          domProps: { innerHTML: this.fakeInputValue }
+        });
         child.push(el$1);
       }
 
@@ -19133,6 +19224,14 @@
           '-ms-flex-order': ord,
           order: ord
         }
+      },
+      classes: function classes () {
+        if (!this.__stepper.vertical) {
+          var cls = [];
+          !this.active && cls.push('hidden');
+          this.__stepper.animation !== null && cls.push(this.__stepper.animation);
+          return cls
+        }
       }
     },
     methods: {
@@ -19140,6 +19239,23 @@
         if (this.done) {
           this.__stepper.goToStep(this.name);
         }
+      },
+
+      __getContainer: function __getContainer (h) {
+        var content = this.active
+          ? h('div', {
+            staticClass: 'q-stepper-step-content',
+            'class': this.classes
+          }, [
+            h('div', {
+              staticClass: 'q-stepper-step-inner'
+            }, this.$slots.default)
+          ])
+          : null;
+
+        return this.__stepper.vertical
+          ? h(QSlideTransition, [ content ])
+          : content
       }
     },
     mounted: function mounted () {
@@ -19159,17 +19275,7 @@
         this.__stepper.vertical
           ? h(StepTab, { props: { vm: this } })
           : null,
-        h(QSlideTransition, [
-          this.active
-            ? h('div', {
-              staticClass: 'q-stepper-step-content'
-            }, [
-              h('div', {
-                staticClass: 'q-stepper-step-inner'
-              }, this.$slots.default)
-            ])
-            : null
-        ])
+        this.__getContainer(h)
       ])
     }
   };
@@ -19192,6 +19298,7 @@
     },
     data: function data () {
       return {
+        animation: null,
         step: this.value || null,
         steps: []
       }
@@ -19204,6 +19311,17 @@
     watch: {
       value: function value (v) {
         this.goToStep(v);
+      },
+      step: function step (cur, old) {
+        if (!this.vertical) {
+          var
+            curIndex = this.steps.findIndex(function (step) { return step.name === cur; }),
+            oldIndex = this.steps.findIndex(function (step) { return step.name === old; });
+
+          this.animation = curIndex < oldIndex
+            ? 'animate-fade-left'
+            : (curIndex > oldIndex ? 'animate-fade-right' : null);
+        }
       }
     },
     computed: {
@@ -19645,6 +19763,12 @@
     scrollNavigationSpeed = 5, // in pixels
     debounceDelay = 50; // in ms
 
+  function getUnderlineClass (v) {
+    if (v) {
+      return ("text-" + v)
+    }
+  }
+
   var QTabs = {
     name: 'QTabs',
     provide: function provide () {
@@ -19678,8 +19802,9 @@
       twoLines: Boolean,
       glossy: Boolean,
       animated: Boolean,
-      swipable: Boolean,
-      panesContainerClass: String
+      swipeable: Boolean,
+      panesContainerClass: String,
+      underlineColor: String
     },
     data: function data () {
       return {
@@ -19694,6 +19819,7 @@
           color: this.color,
           textColor: this.textColor,
           inverted: this.inverted,
+          underlineClass: getUnderlineClass(this.underlineColor),
           direction: null
         }
       }
@@ -19710,6 +19836,9 @@
       },
       inverted: function inverted (v) {
         this.data.inverted = v;
+      },
+      underlineColor: function underlineColor (v) {
+        this.data.underlineClass = getUnderlineClass(v);
       }
     },
     computed: {
@@ -20080,7 +20209,7 @@
         h('div', {
           staticClass: 'q-tabs-panes',
           'class': this.panesContainerClass,
-          directives: this.swipable
+          directives: this.swipeable
             ? [{
               name: 'touch-swipe',
               value: this.__swipe
@@ -20528,7 +20657,7 @@
             ])
           ]),
           h('div', { staticClass: 'q-table-separator col' }),
-          h('div', { staticClass: 'q-table-control' }, [
+          (this.rowsPerPageOptions.length > 1 && h('div', { staticClass: 'q-table-control' }, [
             h('span', { staticClass: 'q-table-bottom-item' }, [
               this.rowsPerPageLabel || this.$q.i18n.table.recordsPerPage
             ]),
@@ -20550,7 +20679,7 @@
                 }
               }
             })
-          ]),
+          ])) || void 0,
           h('div', { staticClass: 'q-table-control' }, [
             paginationSlot
               ? paginationSlot(this.marginalsProps)
@@ -20668,11 +20797,18 @@
           sortBy = col;
           descending = false;
         }
-        else if (descending) {
-          sortBy = null;
-        }
         else {
-          descending = true;
+          if (this.binaryStateSort) {
+            descending = !descending;
+          }
+          else {
+            if (descending) {
+              sortBy = null;
+            }
+            else {
+              descending = true;
+            }
+          }
         }
 
         this.setPagination({ sortBy: sortBy, descending: descending, page: 1 });
@@ -21004,6 +21140,7 @@
         default: 'horizontal',
         validator: function (v) { return ['horizontal', 'vertical', 'cell', 'none'].includes(v); }
       },
+      binaryStateSort: Boolean,
       noDataLabel: String,
       noResultsLabel: String,
       loadingLabel: String,
@@ -21411,6 +21548,10 @@
         type: String,
         required: true
       },
+      labelKey: {
+        type: String,
+        default: 'label'
+      },
 
       color: {
         type: String,
@@ -21439,7 +21580,8 @@
         type: Function,
         default: function default$1 (node, filter) {
           var filt = filter.toLowerCase();
-          return node.label && node.label.toLowerCase().indexOf(filt) > -1
+          return node[this.labelKey] &&
+            node[this.labelKey].toLowerCase().indexOf(filt) > -1
         }
       },
 
@@ -21897,7 +22039,7 @@
                 ? header(slotScope)
                 : [
                   this.__getNodeMedia(h, node),
-                  h('span', node.label)
+                  h('span', node[this.labelKey])
                 ]
             ])
           ]),
@@ -22674,7 +22816,6 @@
     QField: QField,
     QIcon: QIcon,
     QInfiniteScroll: QInfiniteScroll,
-    QInlineEdit: QInlineEdit,
     QInnerLoading: QInnerLoading,
     QInput: QInput,
     QInputFrame: QInputFrame,
@@ -22705,6 +22846,7 @@
     QPagination: QPagination,
     QParallax: QParallax,
     QPopover: QPopover,
+    QPopupEdit: QPopupEdit,
     QProgress: QProgress,
     QPullToRefresh: QPullToRefresh,
     QRadio: QRadio,
@@ -24164,6 +24306,8 @@
     }
   };
 
+  var SIZE_LIST = ['sm', 'md', 'lg', 'xl'];
+
   var screen = {
     width: 0,
 
@@ -24226,8 +24370,10 @@
       var updateEvt, updateSizes = {}, updateDebounce;
 
       this.setSizes = function (sizes) {
-        sizes.forEach(function (name) {
-          updateSizes[name] = sizes[name];
+        SIZE_LIST.forEach(function (name) {
+          if (sizes[name]) {
+            updateSizes[name] = sizes[name];
+          }
         });
       };
       this.setDebounce = function (deb) {
@@ -24239,13 +24385,13 @@
 
         // if css props available
         if (style.getPropertyValue('--q-size-sm')) {
-          ['sm', 'md', 'lg', 'xl'].forEach(function (name) {
+          SIZE_LIST.forEach(function (name) {
             this$1.sizes[name] = parseInt(style.getPropertyValue(("--q-size-" + name)), 10);
           });
         }
 
         this$1.setSizes = function (sizes) {
-          ['sm', 'md', 'lg', 'xl'].forEach(function (name) {
+          SIZE_LIST.forEach(function (name) {
             if (sizes[name]) {
               this$1.sizes[name] = sizes[name];
             }
