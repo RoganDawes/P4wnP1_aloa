@@ -1,3 +1,5 @@
+// +build js
+
 package main
 
 import "github.com/gopherjs/gopherjs/js"

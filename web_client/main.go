@@ -59,13 +59,13 @@ func main() {
 		VueRouterRoute("/usb","", "<usb-settings></usb-settings>"),
 		VueRouterRoute("/","", "<usb-settings></usb-settings>"),
 		VueRouterRoute("/hid","", "<hid-script></hid-script>"),
-		VueRouterRoute("/hidjobs","", "<hidjobs></hidjobs>"),
+		VueRouterRoute("/hidjobs","", "<hid-job-event-overview></hid-job-event-overview>"),
 		VueRouterRoute("/logger","", "<logger :max-entries='7'></logger>"),
 		VueRouterRoute("/network","", "<network></network>"),
 		VueRouterRoute("/wifi","", "<wifi></wifi>"),
 	)
 
-	InitCompHIDJob()
+
 	InitCompHIDJobs()
 	InitCompModal()
 	InitCompEthernetAddresses2()
