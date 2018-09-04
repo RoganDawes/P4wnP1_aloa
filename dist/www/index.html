@@ -15,7 +15,6 @@
 
         <!--
         <link rel="stylesheet" type="text/css" href="p4wnp1.css">
-        <link rel="stylesheet" href="/fontawesome-free-5.2.0-web/css/solid.min.css">
         -->
         <script>
             window.FontAwesomeConfig = {
@@ -27,7 +26,7 @@
         <style>
             .CodeMirror {
                 font-family: monospace;
-                height: 500px;
+                height: auto;
                 color: black;
                 direction: ltr;
             }
@@ -40,15 +39,13 @@
 
 
 <div id="app">
-    <q-layout view="lHh Lpr fff">
+    <q-layout view="lHh Lpr fFf">
         <q-layout-header>
             <q-toolbar>
                 <q-toolbar-title>
                     P4wnP1 web-frontend
-                    <div slot="subtitle">by MaMe82</div>
                 </q-toolbar-title>
             </q-toolbar>
-
             <q-tabs>
                 <q-route-tab default slot="title" to="usb" name="tab-usb" icon="usb" label="USB Settings"></q-route-tab>
                 <q-route-tab slot="title" to="hid" name="tab-hid-script" icon="code" label="HID Script"></q-route-tab>
@@ -57,23 +54,28 @@
                 <q-route-tab slot="title" to="network" name="tab-network" icon="settings_ethernet" label="Network settings"></q-route-tab>
                 <q-route-tab slot="title" to="wifi" name="tab-wifi" icon="wifi" label="WiFi settings"></q-route-tab>
             </q-tabs>
-
         </q-layout-header>
 
+
+        <q-layout-footer>
+            <q-toolbar>
+                <q-toolbar-title>
+                    <div slot="subtitle">by MaMe82</div>
+                </q-toolbar-title>
+            </q-toolbar>
+        </q-layout-footer>
+
         <q-page-container>
-            <q-page padding>
-                <router-view></router-view>
+            <router-view></router-view>
 
-                <q-modal v-model="!$store.state.isConnected" minimized no-route-dismiss no-esc-dismiss no-backdrop-dismiss>
-                    <div style="padding: 50px">
-                        <div class="q-display-1 q-mb-md">No connection to server</div>
-                        <p>Trying to reconnect ... (attempt {{ $store.state.failedConnectionAttempts }})</p>
-                    </div>
-                </q-modal>
-
-            </q-page>
-
+            <q-modal v-model="!$store.state.isConnected" minimized no-route-dismiss no-esc-dismiss no-backdrop-dismiss>
+                <div style="padding: 50px">
+                    <div class="q-display-1 q-mb-md">No connection to server</div>
+                    <p>Trying to reconnect ... (attempt {{ $store.state.failedConnectionAttempts }})</p>
+                </div>
+            </q-modal>
         </q-page-container>
+
 
     </q-layout>
 </div>
@@ -89,6 +91,10 @@
 <script src="codemirror/mode/javascript/javascript.js"></script>
 <script src="codemirror/addon/edit/closebrackets.js"></script>
 <script src="codemirror/addon/hint/show-hint.js"></script>
+<script type="text/javascript" src="lib/vue-codemirror.js"></script>
+<script type="text/javascript">
+    Vue.use(window.VueCodemirror)
+</script>
 <script src="javascript-p4wnp1-hint.js"></script>
 <script type="text/javascript" src="webapp.js"></script>
 

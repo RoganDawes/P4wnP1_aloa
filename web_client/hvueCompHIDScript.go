@@ -8,66 +8,79 @@ import (
 	"strconv"
 )
 
-type CompHIDScriptData struct {
+type CompHIDScriptCodeEditorData struct {
 	*js.Object
-	//ScriptContent string `js:"scriptContent"`
+	CodeMirrorOptions *CodeMirrorOptionsType `js:"codemirrorOptions"`
 }
 
-func (data *CompHIDScriptData) SendAndRun(vm *hvue.VM) {
+func (data *CompHIDScriptCodeEditorData) SendAndRun(vm *hvue.VM) {
 	sourceCode := vm.Get("scriptContent").String()
 
 	md5 := StringToMD5(sourceCode) //Calculate MD5 hexstring of current script content
-	//js.Global.Call("alert", md5)
 
 	go func() {
 		timeout := uint32(0)
 		err := UploadHIDScript(md5, sourceCode)
 		if err != nil {
-			notification := &QuasarNotification{Object: O()}
-			notification.Message = "Error uploading script"
-			notification.Detail = err.Error()
-			notification.Position = QUASAR_NOTIFICATION_POSITION_TOP
-			notification.Type = QUASAR_NOTIFICATION_TYPE_NEGATIVE
-			notification.Timeout = 5000
-			QuasarNotify(notification)
+			QuasarNotifyError("Error uploading script", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			return
 		}
 		job,err := RunHIDScript(md5, timeout)
 		if err != nil {
-			notification := &QuasarNotification{Object: O()}
-			notification.Message = "Error starting script as background job"
-			notification.Detail = err.Error()
-			notification.Position = QUASAR_NOTIFICATION_POSITION_TOP
-			notification.Type = QUASAR_NOTIFICATION_TYPE_NEGATIVE
-			notification.Timeout = 5000
-			QuasarNotify(notification)
+			QuasarNotifyError("Error starting script as background job", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			return
 		}
 
-		notification := &QuasarNotification{Object: O()}
-		notification.Message = "Script started successfully"
-		notification.Detail = "Job ID " + strconv.Itoa(int(job.Id))
-		notification.Position = QUASAR_NOTIFICATION_POSITION_TOP
-		notification.Type = QUASAR_NOTIFICATION_TYPE_POSITIVE
-		notification.Timeout = 5000
-		QuasarNotify(notification)
+		QuasarNotifySuccess("Script started successfully", "Job ID " + strconv.Itoa(int(job.Id)), QUASAR_NOTIFICATION_POSITION_TOP)
 	}()
 }
 
-func newCompHIDScriptData(vm *hvue.VM) interface{} {
-	newVM := &CompHIDScriptData{
-		Object: js.Global.Get("Object").New(),
-	}
-	//newVM.ScriptContent = "layout('us');\ntype('hello');"
-	return newVM
+type CodeMirrorMode struct {
+	*js.Object
+	Name string `js:"name"`
+	GlobalVars bool `js:"globalVars"`
 }
 
-func InitCompHIDScript() {
+type CodeMirrorExtraKeys struct {
+	*js.Object
+	CtrlSpace string `js:"Ctrl-Space"`
+}
+
+type CodeMirrorOptionsType struct {
+	*js.Object
+	Mode *CodeMirrorMode `js:"mode"`
+	LineNumbers bool `js:"lineNumbers"`
+	LineWrapping bool `js:"lineWrapping"`
+	AutoCloseBrackets bool `js:"autoCloseBrackets"`
+	ExtraKeys *CodeMirrorExtraKeys `js:"extraKeys"`
+}
+
+func newCompHIDScriptCodeEditorData(vm *hvue.VM) interface{} {
+	data := &CompHIDScriptCodeEditorData{ Object: O() }
+
+	data.CodeMirrorOptions = &CodeMirrorOptionsType{Object: O()}
+
+	data.CodeMirrorOptions.Mode = &CodeMirrorMode{ Object: O() }
+	data.CodeMirrorOptions.Mode.Name = "text/javascript"
+	data.CodeMirrorOptions.Mode.GlobalVars = true //expose globalVars of mode for auto-complete with addon/hint/show-hint.js, addon/hint/javascript-hint.js"
+
+	data.CodeMirrorOptions.ExtraKeys = &CodeMirrorExtraKeys{ Object: O() }
+	data.CodeMirrorOptions.ExtraKeys.CtrlSpace = "autocomplete"
+
+	data.CodeMirrorOptions.LineNumbers = true
+	//data.CodeMirrorOptions.LineWrapping = true
+	data.CodeMirrorOptions.AutoCloseBrackets = true
+
+	return data
+}
+
+
+func InitComponentsHIDScript() {
 	hvue.NewComponent(
-		"hid-script",
-		hvue.Template(compHIDScriptTemplate),
-		hvue.DataFunc(newCompHIDScriptData),
-		hvue.MethodsOf(&CompHIDScriptData{}),
+		"hid-script-code-editor",
+		hvue.Template(compHIDScriptCodeEditorTemplate),
+		hvue.DataFunc(newCompHIDScriptCodeEditorData),
+		hvue.MethodsOf(&CompHIDScriptCodeEditorData{}),
 		hvue.ComputedWithGetSet(
 			"scriptContent",
 			func(vm *hvue.VM) interface{} {
@@ -77,15 +90,34 @@ func InitCompHIDScript() {
 				vm.Get("$store").Call("commit", VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO, newScriptContent)
 			}),
 		)
+
+	hvue.NewComponent(
+		"hid-script",
+		hvue.Template(compHIDScriptTemplate),
+	)
 }
 
 const (
 
 	compHIDScriptTemplate = `
-<q-page class="row item-start">
+<q-page>
+<div class="row content-stretch">
+	<div class="col-10 self-stretch">
+		<hid-script-code-editor></hid-script-code-editor>
+	</div>
+	<div class="col-2">
+		<hid-job-overview></hid-job-overview>
+	</div>
+</div>
+<div class="row content-stretch">
+	<hid-job-event-overview></hid-job-event-overview>
+</div>
 
-	
-	<q-card class="q-ma-sm" :inline="$q.platform.is.desktop">
+
+</q-page>
+`
+	compHIDScriptCodeEditorTemplate = `
+	<q-card class="q-ma-sm">
   		<q-card-title>
     		HIDScript editor
   		</q-card-title>
@@ -99,15 +131,10 @@ const (
 		<q-card-separator />
 
 		<q-card-main>
-	    	<code-editor v-model="scriptContent"></code-editor>
+			<codemirror v-model="scriptContent" :options="codemirrorOptions"></codemirror>
 	  	</q-card-main>
+	
 	</q-card>
-
-
-	<hid-job-overview></hid-job-overview>
-
-
-<q-page>
 `
 )
 

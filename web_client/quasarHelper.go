@@ -21,6 +21,8 @@ const (
 	QUASAR_NOTIFICATION_POSITION_BOTTOM = "bottom"
 	QUASAR_NOTIFICATION_POSITION_BOTTOM_LEFT = "bottom-left"
 	QUASAR_NOTIFICATION_POSITION_BOTTOM_RIGHT = "bottom-right"
+
+	QUASAR_NOTIFICATION_TIMEOUT = 5000
 )
 
 type Quasar struct {
@@ -59,3 +61,22 @@ func QuasarNotify(notification *QuasarNotification) {
 	GlobalQuasar.Plugins["Notify"].Call("create", notification)
 }
 
+func QuasarNotifyError(errorMessage string, messageDetails string, position string) {
+	notification := &QuasarNotification{Object: O()}
+	notification.Message = errorMessage
+	notification.Detail = messageDetails
+	notification.Position = position
+	notification.Type = QUASAR_NOTIFICATION_TYPE_NEGATIVE
+	notification.Timeout = QUASAR_NOTIFICATION_TIMEOUT
+	QuasarNotify(notification)
+}
+
+func QuasarNotifySuccess(message string, detailMessage string, position string) {
+	notification := &QuasarNotification{Object: O()}
+	notification.Message = message
+	notification.Detail = detailMessage
+	notification.Position = position
+	notification.Type = QUASAR_NOTIFICATION_TYPE_POSITIVE
+	notification.Timeout = QUASAR_NOTIFICATION_TIMEOUT
+	QuasarNotify(notification)
+}

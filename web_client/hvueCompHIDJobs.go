@@ -142,7 +142,7 @@ ScriptSource   string `js:"textSource"`
 
 	//{ "evtype": 0, "vmId": 2, "jobId": 3, "hasError": false, "result": "null", "error": "", "message": "Script started", "time": "2018-07-30 04:56:42.297533 +0000 UTC m=+7625.097825001" }
 	compHIDJobOverviewTemplate = `
-	<q-card class="q-ma-sm" :inline="$q.platform.is.desktop">
+	<q-card class="q-ma-sm">
 		<q-list>
 			<q-list-header>HID Script jobs</q-list-header>
 			<hid-job-overview-item v-for="job in jobs" :job="job" :key="job.id"></hid-job-overview-item>
@@ -153,9 +153,6 @@ ScriptSource   string `js:"textSource"`
 	//{ "evtype": 0, "vmId": 2, "jobId": 3, "hasError": false, "result": "null", "error": "", "message": "Script started", "time": "2018-07-30 04:56:42.297533 +0000 UTC m=+7625.097825001" }
 	compHIDJobEventOverviewTemplate = `
 <q-page>
-	<hid-job-overview></hid-job-overview>	
-
-
 <div>
 <table border="1">
 <tr>

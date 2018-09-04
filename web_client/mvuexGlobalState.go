@@ -13,17 +13,16 @@ var globalState *GlobalState
 const (
 	maxLogEntries = 500
 
-	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS       = "updateRunningHidJobs"
+	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS              = "updateRunningHidJobs"
 	VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS       = "deployCurrentGadgetSettings"
 	VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED = "updateCurrentGadgetSettingsFromDeployed"
-	VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS       = "deployEthernetInterfaceSettings"
-	VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED = "updateCurrentWifiSettingsFromDeployed"
-	VUEX_ACTION_DEPLOY_WIFI_SETTINGS       = "deployWifiSettings"
+	VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS   = "deployEthernetInterfaceSettings"
+	VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED   = "updateCurrentWifiSettingsFromDeployed"
+	VUEX_ACTION_DEPLOY_WIFI_SETTINGS                 = "deployWifiSettings"
 
-
-	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO     = "setCurrentGadgetSettings"
-	VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS     = "setCurrentWifiSettings"
-	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO   = "setCurrentHIDScriptSource"
+	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO   = "setCurrentGadgetSettings"
+	VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS        = "setCurrentWifiSettings"
+	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO = "setCurrentHIDScriptSource"
 
 	initHIDScript = `layout('us');			// US keyboard layout
 typingSpeed(100,150)	// Wait 100ms between key strokes + an additional random value between 0ms and 150ms (natural)
@@ -53,25 +52,24 @@ for (var i = 3; i < 10; i++) {
 
 type GlobalState struct {
 	*js.Object
-	Title                    string             `js:"title"`
-	CurrentHIDScriptSource   string             `js:"currentHIDScriptSource"`
-	CurrentGadgetSettings    *jsGadgetSettings  `js:"currentGadgetSettings"`
-	CurrentlyDeployingGadgetSettings bool `js:"deployingGadgetSettings"`
-	EventReceiver            *jsEventReceiver   `js:"eventReceiver"`
-	HidJobList               *jsHidJobStateList `js:"hidJobList"`
-	IsModalEnabled           bool               `js:"isModalEnabled"`
-	IsConnected              bool               `js:"isConnected"`
-	FailedConnectionAttempts int                `js:"failedConnectionAttempts"`
-	InterfaceSettings        *jsEthernetSettingsList `js:"InterfaceSettings"`
-	WiFiSettings             *jsWiFiSettings `js:"wifiSettings"`
+	Title                            string                  `js:"title"`
+	CurrentHIDScriptSource           string                  `js:"currentHIDScriptSource"`
+	CurrentGadgetSettings            *jsGadgetSettings       `js:"currentGadgetSettings"`
+	CurrentlyDeployingGadgetSettings bool                    `js:"deployingGadgetSettings"`
+	EventReceiver                    *jsEventReceiver        `js:"eventReceiver"`
+	HidJobList                       *jsHidJobStateList      `js:"hidJobList"`
+	IsModalEnabled                   bool                    `js:"isModalEnabled"`
+	IsConnected                      bool                    `js:"isConnected"`
+	FailedConnectionAttempts         int                     `js:"failedConnectionAttempts"`
+	InterfaceSettings                *jsEthernetSettingsList `js:"InterfaceSettings"`
+	WiFiSettings                     *jsWiFiSettings         `js:"wifiSettings"`
 
-	Counter int `js:"count"`
-	Text string `js:"text"`
+	Counter int    `js:"count"`
+	Text    string `js:"text"`
 }
 
-
 func createGlobalStateStruct() GlobalState {
-	state := GlobalState{Object:O()}
+	state := GlobalState{Object: O()}
 	state.Title = "P4wnP1 by MaMe82"
 	state.CurrentHIDScriptSource = initHIDScript
 	state.CurrentGadgetSettings = NewUSBGadgetSettings()
@@ -84,11 +82,15 @@ func createGlobalStateStruct() GlobalState {
 	state.FailedConnectionAttempts = 0
 	//Retrieve Interface settings
 	// ToDo: Replace panics by default values
-	ifSettings,err := RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second*5)
-	if err != nil { panic("Couldn't retrieve interface settings") }
+	ifSettings, err := RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second * 5)
+	if err != nil {
+		panic("Couldn't retrieve interface settings")
+	}
 	state.InterfaceSettings = ifSettings
-	wifiSettings,err := RpcClient.GetDeployedWiFiSettings(time.Second * 5)
-	if err != nil { panic("Couldn't retrieve WiFi settings") }
+	wifiSettings, err := RpcClient.GetDeployedWiFiSettings(time.Second * 5)
+	if err != nil {
+		panic("Couldn't retrieve WiFi settings")
+	}
 	state.WiFiSettings = wifiSettings
 
 	state.Counter = 1337
@@ -99,13 +101,13 @@ func createGlobalStateStruct() GlobalState {
 func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		//fetch deployed gadget settings
-		dGS,err := RpcClient.RpcGetDeployedGadgetSettings(time.Second * 5)
+		dGS, err := RpcClient.RpcGetDeployedGadgetSettings(time.Second * 5)
 		if err != nil {
 			println("Couldn't retrieve deployed gadget settings")
 			return
 		}
 		//convert to JS version
-		jsGS := &jsGadgetSettings{Object:O()}
+		jsGS := &jsGadgetSettings{Object: O()}
 		jsGS.fromGS(dGS)
 
 		//commit to current
@@ -118,7 +120,7 @@ func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.A
 func actionUpdateWifiSettingsFromDeployed(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		//fetch deployed gadget settings
-		dWS,err := RpcClient.GetDeployedWiFiSettings(time.Second * 5)
+		dWS, err := RpcClient.GetDeployedWiFiSettings(time.Second * 5)
 		if err != nil {
 			println("Couldn't retrieve deployed WiFi settings")
 			return
@@ -131,7 +133,6 @@ func actionUpdateWifiSettingsFromDeployed(store *mvuex.Store, context *mvuex.Act
 	return
 }
 
-
 func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settings *jsWiFiSettings) {
 	go func() {
 		println("Vuex dispatch deploy WiFi settings")
@@ -139,35 +140,36 @@ func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, 
 		goSettings := settings.toGo()
 
 		err := RpcClient.DeployeWifiSettings(time.Second*3, goSettings)
-		if err != nil {Alert(err)}
+		if err != nil {
+			Alert(err)
+		}
 	}()
 }
 
 func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		//fetch deployed gadget settings
-		jobstates,err := RpcClient.RpcGetRunningHidJobStates(time.Second * 10)
+		jobstates, err := RpcClient.RpcGetRunningHidJobStates(time.Second * 10)
 		if err != nil {
 			println("Couldn't retrieve stateof running HID jobs", err)
 			return
 		}
 
-		for _,jobstate := range jobstates {
+		for _, jobstate := range jobstates {
 			println("updateing jobstate", jobstate)
-			state.HidJobList.UpdateEntry(jobstate.Id, jobstate.VmId, false,false, "initial job state", "",time.Now().String(),jobstate.Source)
+			state.HidJobList.UpdateEntry(jobstate.Id, jobstate.VmId, false, false, "initial job state", "", time.Now().String(), jobstate.Source)
 		}
 	}()
 
 	return
 }
 
-
 func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 
 		// ToDo: Indicate deployment process via global state
 		state.CurrentlyDeployingGadgetSettings = true
-		defer func() {state.CurrentlyDeployingGadgetSettings = false}()
+		defer func() { state.CurrentlyDeployingGadgetSettings = false }()
 
 		//get current GadgetSettings
 		curGS := state.CurrentGadgetSettings.toGS()
@@ -175,36 +177,17 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		//try to set them via gRPC (the server holds an internal state, setting != deploying)
 		err := RpcClient.RpcSetRemoteGadgetSettings(curGS, time.Second)
 		if err != nil {
-
-			//ToDo: use global store to return something, or allow actions to return promises (latter is too much JavaScript)
-			//Alert(err.Error())
-			notification := &QuasarNotification{Object: O()}
-			notification.Message = "Error in pre-check of new USB gadget settings"
-			notification.Detail = err.Error()
-			notification.Position = QUASAR_NOTIFICATION_POSITION_TOP
-			notification.Type = QUASAR_NOTIFICATION_TYPE_NEGATIVE
-			notification.Timeout = 5000
-			QuasarNotify(notification)
+			QuasarNotifyError("Error in pre-check of new USB gadget settings", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			return
 		}
 
 		//try to deploy the, now set, remote GadgetSettings via gRPC
-		_,err = RpcClient.RpcDeployRemoteGadgetSettings(time.Second*10)
+		_, err = RpcClient.RpcDeployRemoteGadgetSettings(time.Second * 10)
 		if err != nil {
-			//ToDo: use global store to return something, or allow actions to return promises (latter is too much JavaScript)
-			//Alert(err.Error())
-			notification := &QuasarNotification{Object: O()}
-			notification.Message = "Error while deploying new USB gadget settings"
-			notification.Detail = err.Error()
-			notification.Position = QUASAR_NOTIFICATION_POSITION_TOP
-			notification.Type = QUASAR_NOTIFICATION_TYPE_NEGATIVE
-			notification.Timeout = 5000
-			QuasarNotify(notification)
+			QuasarNotifyError("Error while deploying new USB gadget settings", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			return
 		}
 
-		//ToDo: If we're here, we succeeded and should indicate this via global state
-		//Alert("GadgetSettings deployed successfully")
 		notification := &QuasarNotification{Object: O()}
 		notification.Message = "New Gadget Settings deployed successfully"
 		notification.Position = QUASAR_NOTIFICATION_POSITION_TOP
@@ -217,7 +200,6 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 	return
 }
 
-
 func actionDeployEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settings *jsEthernetInterfaceSettings) {
 	go func() {
 		println("Vuex dispatch deploy ethernet interface settings")
@@ -225,7 +207,9 @@ func actionDeployEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.Ac
 		goSettings := settings.toGo()
 
 		err := RpcClient.DeployedEthernetInterfaceSettings(time.Second*3, goSettings)
-		if err != nil {Alert(err)}
+		if err != nil {
+			Alert(err)
+		}
 	}()
 }
 
@@ -236,40 +220,40 @@ func initMVuex() *mvuex.Store {
 		mvuex.State(state),
 		mvuex.Action("actiontest", func(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 			go func() {
-				for i:=0; i<10; i++ {
+				for i := 0; i < 10; i++ {
 					println(state.Counter)
-					time.Sleep(1*time.Second)
-					context.Commit("increment",5)
+					time.Sleep(1 * time.Second)
+					context.Commit("increment", 5)
 				}
 
 			}()
 
 		}),
-		mvuex.Mutation("setModalEnabled", func (store *mvuex.Store, state *GlobalState, enabled bool) {
+		mvuex.Mutation("setModalEnabled", func(store *mvuex.Store, state *GlobalState, enabled bool) {
 			state.IsModalEnabled = enabled
 			return
 		}),
-		mvuex.Mutation("increment", func (store *mvuex.Store, state *GlobalState, add int) {
+		mvuex.Mutation("increment", func(store *mvuex.Store, state *GlobalState, add int) {
 			state.Counter += add
 			return
 		}),
-		mvuex.Mutation("decrement", func (store *mvuex.Store, state *GlobalState) {
+		mvuex.Mutation("decrement", func(store *mvuex.Store, state *GlobalState) {
 			state.Counter--
 			return
 		}),
-		mvuex.Mutation("setText", func (store *mvuex.Store, state *GlobalState, newText string) {
+		mvuex.Mutation("setText", func(store *mvuex.Store, state *GlobalState, newText string) {
 			state.Text = newText
 			return
 		}),
-		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO, func (store *mvuex.Store, state *GlobalState, newText string) {
+		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO, func(store *mvuex.Store, state *GlobalState, newText string) {
 			state.CurrentHIDScriptSource = newText
 			return
 		}),
-		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO, func (store *mvuex.Store, state *GlobalState, settings *jsGadgetSettings) {
+		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO, func(store *mvuex.Store, state *GlobalState, settings *jsGadgetSettings) {
 			state.CurrentGadgetSettings = settings
 			return
 		}),
-		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS, func (store *mvuex.Store, state *GlobalState, settings *jsWiFiSettings) {
+		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS, func(store *mvuex.Store, state *GlobalState, settings *jsWiFiSettings) {
 			state.WiFiSettings = settings
 			return
 		}),
@@ -289,6 +273,28 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS, actionDeployEthernetInterfaceSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED, actionUpdateWifiSettingsFromDeployed),
 		mvuex.Action(VUEX_ACTION_DEPLOY_WIFI_SETTINGS, actionDeployWifiSettings),
+
+		mvuex.Getter("testgetterProperty", func(state *GlobalState) interface{} {
+			//Note: GlobalState is a custom struct, used for the vuex store state
+			println("getter returning a property, for given state", state)
+			return state
+		}),
+
+		mvuex.Getter("testgetterPropertyMulti", func(state *GlobalState) (string, int) {
+			println("getter returning a property with multiple results converted to an array, for given state", state)
+			return "two", 2
+		}),
+
+		mvuex.Getter("testgetterMethodWithArg", func(state interface{}) interface{} {
+			println("getter returning a function which takes an argument, input state isn't casted to known struct", state)
+			return func(i int) int { return i * 2 } // function returning given int multiplied by two
+		}),
+		mvuex.Getter("testgetterConsumeGetters", func(state *GlobalState, getters *js.Object) interface{} {
+			println("getter consuming state and getters as input", state)
+			println("getter3 getters", getters)
+			return getters
+		}),
+
 	)
 
 	// fetch deployed gadget settings

@@ -63,7 +63,7 @@ OTHER:
 - Load&Store runtime configuration from/to templates (accessible via web client)
 - Network events (interface down, DHCP lease/release)
 - add classes to all html elements of web client, to allow styling by sbd. who's able to do it better than me
-
+- add reboot/shutdown option accessible from webclient
 
 TO FIX:
 - remove dependencies of CLI client on service package

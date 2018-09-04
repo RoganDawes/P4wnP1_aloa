@@ -57,6 +57,7 @@ func InitCompLogger()  {
 const (
 
 	compLoggerTemplate = `
+<q-page>
 	<div class="logger">
 	<table class="log-entries">
 		<tr>
@@ -73,7 +74,7 @@ const (
 	    </tr>
 	</table>
 	</div>
-
+</q-page>
 `
 )
 
