@@ -67,6 +67,7 @@ func main() {
 
 
 	InitCompHIDJobs()
+	InitCompHIDEvents()
 	InitCompModal()
 	InitCompEthernetAddresses2()
 	InitCompToggleSwitch()

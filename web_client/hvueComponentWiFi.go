@@ -88,8 +88,10 @@ func InitComponentsWiFi() {
 }
 
 const templateWiFi = `
-<q-page>
-	<q-card inline class="q-ma-sm">
+<q-page padding>
+<div class="row gutter-sm">
+	<div class="col-lg-4">
+	<q-card class="full-height">
 		<q-card-title>
 			WiFi settings
 		</q-card-title>
@@ -139,9 +141,18 @@ const templateWiFi = `
 				</q-item-main>
 			</q-item>
 
-			<template v-if="settings.mode != 0">
+		</q-list>
+	</q-card>
+	</div>
+
+	<div class="col-lg-4" v-if="settings.mode != 0">
+	<q-card class="full-height">
+		<q-card-title>
+			WiFi client settings
+		</q-card-title>
+
+		<q-list link>
 				<q-item-separator />
-				<q-list-header>WiFi client settings (station mode)</q-list-header>
 				<q-item tag="label">
 					<q-item-main>
 						<q-item-tile label>SSID</q-item-tile>
@@ -160,20 +171,30 @@ const templateWiFi = `
 						</q-item-tile>
 					</q-item-main>
 				</q-item>
-			</template>
 
 			<template v-if="settings.mode == 2">
-				<q-item-separator />
 				<q-item>
 					<q-item-main>
 	  				<q-alert type="warning">
-						If the SSID provided for station mode couldn't be connected, an attempt is started to failo-over to Access Point mode with settings below
+						If the SSID provided for client mode couldn't be connected, an attempt is started to fail over to Access Point mode with the respective settings.
 					</q-alert>
 					</q-item-main>
 				</q-item>
 			</template>
+		</q-list>
+	</q-card>
+	</div>
 
-			<template v-if="settings.mode != 1">
+	<div class="col-lg-4" v-if="settings.mode != 1">
+	<q-card class="full-height">
+		<q-card-title>
+			WiFi Access Point settings
+		</q-card-title>
+
+		<q-list link>
+
+
+			<template>
 				<q-item-separator />
 				<q-list-header>Access Point settings</q-list-header>
 				<q-item tag="label">
@@ -225,6 +246,8 @@ const templateWiFi = `
 			</template>
 		</q-list>
 	</q-card>
+	</div>
+</div>
 </q-page>	
 
 `

@@ -100,24 +100,22 @@ func InitComponentsHIDScript() {
 const (
 
 	compHIDScriptTemplate = `
-<q-page>
-<div class="row content-stretch">
-	<div class="col-10 self-stretch">
-		<hid-script-code-editor></hid-script-code-editor>
+<q-page padding>
+	<div class="row gutter-sm">
+		<div class="col-12 col-md-7 col-lg-8 col-xl-9">
+			<hid-script-code-editor></hid-script-code-editor>
+		</div>
+		<div class="col-12 col-md-5 col-lg-4 col-xl-3">
+			<hid-job-overview></hid-job-overview>
+		</div>
+		<div class="col-12" style="overflow: auto; max-height: 40vh;">
+			<hid-job-event-overview></hid-job-event-overview>
+		</div>
 	</div>
-	<div class="col-2">
-		<hid-job-overview></hid-job-overview>
-	</div>
-</div>
-<div class="row content-stretch">
-	<hid-job-event-overview></hid-job-event-overview>
-</div>
-
-
 </q-page>
 `
 	compHIDScriptCodeEditorTemplate = `
-	<q-card class="q-ma-sm">
+	<q-card class="full-height">
   		<q-card-title>
     		HIDScript editor
   		</q-card-title>

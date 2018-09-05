@@ -63,9 +63,6 @@ type GlobalState struct {
 	FailedConnectionAttempts         int                     `js:"failedConnectionAttempts"`
 	InterfaceSettings                *jsEthernetSettingsList `js:"InterfaceSettings"`
 	WiFiSettings                     *jsWiFiSettings         `js:"wifiSettings"`
-
-	Counter int    `js:"count"`
-	Text    string `js:"text"`
 }
 
 func createGlobalStateStruct() GlobalState {
@@ -93,8 +90,6 @@ func createGlobalStateStruct() GlobalState {
 	}
 	state.WiFiSettings = wifiSettings
 
-	state.Counter = 1337
-	state.Text = "Hi there says MaMe82"
 	return state
 }
 
@@ -218,31 +213,8 @@ func initMVuex() *mvuex.Store {
 	globalState = &state //make accessible through global var
 	store := mvuex.NewStore(
 		mvuex.State(state),
-		mvuex.Action("actiontest", func(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
-			go func() {
-				for i := 0; i < 10; i++ {
-					println(state.Counter)
-					time.Sleep(1 * time.Second)
-					context.Commit("increment", 5)
-				}
-
-			}()
-
-		}),
 		mvuex.Mutation("setModalEnabled", func(store *mvuex.Store, state *GlobalState, enabled bool) {
 			state.IsModalEnabled = enabled
-			return
-		}),
-		mvuex.Mutation("increment", func(store *mvuex.Store, state *GlobalState, add int) {
-			state.Counter += add
-			return
-		}),
-		mvuex.Mutation("decrement", func(store *mvuex.Store, state *GlobalState) {
-			state.Counter--
-			return
-		}),
-		mvuex.Mutation("setText", func(store *mvuex.Store, state *GlobalState, newText string) {
-			state.Text = newText
 			return
 		}),
 		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO, func(store *mvuex.Store, state *GlobalState, newText string) {
@@ -274,26 +246,37 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED, actionUpdateWifiSettingsFromDeployed),
 		mvuex.Action(VUEX_ACTION_DEPLOY_WIFI_SETTINGS, actionDeployWifiSettings),
 
-		mvuex.Getter("testgetterProperty", func(state *GlobalState) interface{} {
-			//Note: GlobalState is a custom struct, used for the vuex store state
-			println("getter returning a property, for given state", state)
-			return state
+		mvuex.Getter("hidjobs", func(state *GlobalState) interface{} {
+			return state.HidJobList.Jobs
 		}),
 
-		mvuex.Getter("testgetterPropertyMulti", func(state *GlobalState) (string, int) {
-			println("getter returning a property with multiple results converted to an array, for given state", state)
-			return "two", 2
+		mvuex.Getter("hidjobsRunning", func(state *GlobalState) interface{} {
+			vJobs := state.HidJobList.Jobs //vue object, no real array --> values have to be extracted to filter
+			jobs := js.Global.Get("Object").Call("values", vJobs) //converted to native JS array (has filter method available
+			filtered := jobs.Call("filter", func(job *jsHidJobState) bool {
+				return !(job.HasSucceeded || job.HasFailed)
+			})
+			return filtered
 		}),
 
-		mvuex.Getter("testgetterMethodWithArg", func(state interface{}) interface{} {
-			println("getter returning a function which takes an argument, input state isn't casted to known struct", state)
-			return func(i int) int { return i * 2 } // function returning given int multiplied by two
+		mvuex.Getter("hidjobsFailed", func(state *GlobalState) interface{} {
+			vJobs := state.HidJobList.Jobs //vue object, no real array --> values have to be extracted to filter
+			jobs := js.Global.Get("Object").Call("values", vJobs) //converted to native JS array (has filter method available
+			filtered := jobs.Call("filter", func(job *jsHidJobState) bool {
+				return job.HasFailed
+			})
+			return filtered
 		}),
-		mvuex.Getter("testgetterConsumeGetters", func(state *GlobalState, getters *js.Object) interface{} {
-			println("getter consuming state and getters as input", state)
-			println("getter3 getters", getters)
-			return getters
+
+		mvuex.Getter("hidjobsSucceeded", func(state *GlobalState) interface{} {
+			vJobs := state.HidJobList.Jobs //vue object, no real array --> values have to be extracted to filter
+			jobs := js.Global.Get("Object").Call("values", vJobs) //converted to native JS array (has filter method available
+			filtered := jobs.Call("filter", func(job *jsHidJobState) bool {
+				return job.HasSucceeded
+			})
+			return filtered
 		}),
+
 
 	)
 

@@ -5,7 +5,6 @@ package main
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/HuckRidgeSW/hvue"
-	"github.com/mame82/P4wnP1_go/common_web"
 )
 
 type CompHIDJobsData struct {
@@ -28,23 +27,9 @@ func InitCompHIDJobs() {
 		hvue.DataFunc(newCompHIDJobsData),
 		hvue.Computed("jobs",
 			func(vm *hvue.VM) interface{} {
-				jobList := vm.Get("$store").Get("state").Get("hidJobList").Get("jobs")
-				return js.Global.Get("Object").Call("values",jobList)
+				//return vm.Get("$store").Get("state").Get("hidJobList").Get("jobs")
+				return vm.Get("$store").Get("getters").Get("hidjobs")
 			}),
-	)
-
-	hvue.NewComponent(
-		"hid-job-event-overview",
-		hvue.Template(compHIDJobEventOverviewTemplate),
-		hvue.DataFunc(newCompHIDJobsData),
-		hvue.Computed("events",
-			func(vm *hvue.VM) interface{} {
-				return vm.Get("$store").Get("state").Get("eventReceiver").Get("eventHidArray")
-			}),
-		hvue.Method("evIdToString", func (vm *hvue.VM, evID int64) (res string) {
-			println("EvID",evID)
-			return common_web.EventType_name[evID]
-		}),
 	)
 
 	hvue.NewComponent(
@@ -142,44 +127,21 @@ ScriptSource   string `js:"textSource"`
 
 	//{ "evtype": 0, "vmId": 2, "jobId": 3, "hasError": false, "result": "null", "error": "", "message": "Script started", "time": "2018-07-30 04:56:42.297533 +0000 UTC m=+7625.097825001" }
 	compHIDJobOverviewTemplate = `
-	<q-card class="q-ma-sm">
+	<q-card class="full-height">
+  		<q-card-title>
+    		HIDScript jobs
+  		</q-card-title>
+
 		<q-list>
-			<q-list-header>HID Script jobs</q-list-header>
-			<hid-job-overview-item v-for="job in jobs" :job="job" :key="job.id"></hid-job-overview-item>
+			<q-list-header>Running</q-list-header>
+			<hid-job-overview-item v-for="job in $store.getters.hidjobsRunning" :job="job" :key="job.id"></hid-job-overview-item>
+			<q-list-header>Succeeded</q-list-header>
+			<hid-job-overview-item v-for="job in $store.getters.hidjobsSucceeded" :job="job" :key="job.id"></hid-job-overview-item>
+			<q-list-header>Failed</q-list-header>
+			<hid-job-overview-item v-for="job in $store.getters.hidjobsFailed" :job="job" :key="job.id"></hid-job-overview-item>
 		</q-list>
 	</q-card>
 
-`
-	//{ "evtype": 0, "vmId": 2, "jobId": 3, "hasError": false, "result": "null", "error": "", "message": "Script started", "time": "2018-07-30 04:56:42.297533 +0000 UTC m=+7625.097825001" }
-	compHIDJobEventOverviewTemplate = `
-<q-page>
-<div>
-<table border="1">
-<tr>
-	<th>Event Type</th>
-	<th>VM ID</th>
-	<th>Job ID</th>
-	<th>Has error</th>
-	<th>Result</th>
-	<th>Error</th>
-	<th>Message</th>
-	<th>Time</th>
-</tr>
-<tr v-for="e in events">
-	<td>{{ evIdToString(e.evtype) }}</td>
-	<td>{{ e.vmId }}</td>
-	<td>{{ e.jobId }}</td>
-	<td>{{ e.hasError }}</td>
-	<td>{{ e.result }}</td>
-	<td>{{ e.error }}</td>
-	<td>{{ e.message }}</td>
-	<td>{{ e.time }}</td>
-</tr>
-
-</table>
-</div>
-
-</q-page>
 `
 )
 

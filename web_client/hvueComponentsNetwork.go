@@ -219,39 +219,45 @@ func InitComponentsNetwork() {
 }
 
 const templateNetwork = `
-<q-page>
-<q-card class="q-ma-sm" :inline="$q.platform.is.desktop">
-	<q-card-title>
-    	Network interface settings
-	</q-card-title>
+<q-page padding>
+	<div class="row gutter-sm">
+		<div class="col-xl-3">
+		<q-card class="full-height">
+			<q-card-title>
+		    	Network interface settings
+			</q-card-title>
 
-	<q-card-actions>
-		<q-btn color="primary" @click="deploy(current)" label="deploy"></q-btn>
-	</q-card-actions>
+			<q-card-actions>
+				<q-btn color="primary" @click="deploy(current)" label="deploy"></q-btn>
+			</q-card-actions>
 
-	<q-list link>
-		<q-item-separator />
-		<q-item tag="label">
-			<q-item-main>
-				<q-item-tile label>Interface</q-item-tile>
-				<q-item-tile sublabel>Select which interface to configure</q-item-tile>
-				<q-item-tile>
-					<q-select v-model="current" :options="selectOptionsInterface" color="secondary" inverted></q-select>
-				</q-item-tile>
-			</q-item-main>
-		</q-item>
-	</q-list>
+			<q-list link>
+				<q-item-separator />
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile label>Interface</q-item-tile>
+						<q-item-tile sublabel>Select which interface to configure</q-item-tile>
+						<q-item-tile>
+							<q-select v-model="current" :options="selectOptionsInterface" color="secondary" inverted></q-select>
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</q-list>
 
-	<network-interface-settings v-if="current" :interface="current"></network-interface-settings>
+			<network-interface-settings v-if="current" :interface="current"></network-interface-settings>
+		</q-card>
+		</div>
 
-</q-card>
-<dhcp-config :interface="current" v-if="currentWithDhcp"></dhcp-config>
+		<div class="col-xl-9">
+			<dhcp-config :interface="current" v-if="currentWithDhcp"></dhcp-config>
+		</div>
+	</div>
 </q-page>
 
 `
 
 const templateDHCPConfig = `
-<q-card class="q-ma-sm" :inline="$q.platform.is.desktop">
+<q-card>
 	<q-card-title>
     	DHCP Server settings for {{ interface.name }}
 	</q-card-title>
