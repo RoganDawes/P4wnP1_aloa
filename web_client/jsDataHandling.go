@@ -378,7 +378,11 @@ func (target *jsWiFiSettings) fromGo(src *pb.WiFiSettings) {
 	case pb.WiFiSettings_AP:
 		target.AP_SSID = src.BssCfgAP.SSID
 		target.AP_PSK = src.BssCfgAP.PSK
+		target.STA_SSID = ""
+		target.STA_PSK = ""
 	case pb.WiFiSettings_STA:
+		target.AP_SSID = ""
+		target.AP_PSK = ""
 		target.STA_SSID = src.BssCfgClient.SSID
 		target.STA_PSK = src.BssCfgClient.PSK
 	case pb.WiFiSettings_STA_FAILOVER_AP:
@@ -390,6 +394,8 @@ func (target *jsWiFiSettings) fromGo(src *pb.WiFiSettings) {
 }
 
 func (src *jsWiFiSettings) toGo() (target *pb.WiFiSettings) {
+	// assure undefined strings end up as empty strings
+
 	target = &pb.WiFiSettings{
 		Disabled: src.Disabled,
 		Reg: src.Reg,

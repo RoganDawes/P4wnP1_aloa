@@ -98,6 +98,13 @@ func (state *WifiState) DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
 		log.Printf("Error setting WiFi regulatory domain '%s': %v\n", ws.Reg, err) //we don't abort on error here
 	}
 
+	//stop wpa_supplicant if needed
+	wifiStopWpaSupplicant(wifi_if_name)
+	//kill hostapd in case it is still running
+	err = wifiStopHostapd(ifName)
+	if err != nil { return err } // ToDo: returning at this point is a bit harsh
+
+
 	switch ws.Mode {
 	case pb.WiFiSettings_AP:
 		//generate hostapd.conf (overwrite old one)
@@ -107,15 +114,8 @@ func (state *WifiState) DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
 		err = wifiStartHostapd(ifName)
 		if err != nil { return err }
 	case pb.WiFiSettings_STA:
-		//kill hostapd in case it is still running
-		err = wifiStopHostapd(ifName)
-		if err != nil { return err }
-
 		if ws.BssCfgClient == nil  { return errors.New("Error: WiFi mode set to station (STA) but no BSS configuration for target WiFi provided")}
 		if len(ws.BssCfgClient.SSID) == 0 { return errors.New("Error: WiFi mode set to station (STA) but no SSID provided to identify BSS to join")}
-
-		//stop wpa_supplicant if needed (avoid conflicts with scanning)
-		wifiStopWpaSupplicant(wifi_if_name)
 
 		//scan for provided wifi
 		scanres, err := WifiScan(ifName)
@@ -134,13 +134,9 @@ func (state *WifiState) DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
 		}
 
 
-		if len(ws.BssCfgClient.PSK) == 0 {
-			//seems we should connect an OPEN AUTHENTICATION network
-			if matchingBss.AuthMode != WiFiAuthMode_OPEN {
-				return errors.New(fmt.Sprintf("WiFi SSID '%s' found during scan, but authentication mode isn't OPEN and no PSK was provided", ws.BssCfgClient.SSID))
-			}
-
-			//ToDo: try to connect open network
+		if len(ws.BssCfgClient.PSK) == 0 && matchingBss.AuthMode != WiFiAuthMode_OPEN {
+			//seems we try to connect an OPEN AUTHENTICATION network, but the existing BSS isn't OPEN AUTH
+			return errors.New(fmt.Sprintf("WiFi SSID '%s' found during scan, but authentication mode isn't OPEN and no PSK was provided", ws.BssCfgClient.SSID))
 		} else {
 			err = WifiCreateWpaSupplicantConfigFile(ws.BssCfgClient.SSID, ws.BssCfgClient.PSK, confFileWpaSupplicant(wifi_if_name))
 			if err != nil { return err }
@@ -219,13 +215,26 @@ func wifiCreateWpaSupplicantConfString(ssid string, psk string) (config string, 
 	if !wifiWpaPassphraseAvailable() { return "",errors.New("The tool 'wpa_passphrase' is missing, please install it to make this work")}
 
 
-	proc := exec.Command("/usr/bin/wpa_passphrase", ssid, psk)
-	cres, err := proc.CombinedOutput()
+	// if a PSK is provided, we assume it is needed, otherwise we assum OPEN AUTHENTICATION
+	if len(psk) > 0 {
+fmt.Println("Connecting WiFi with PSK")
+		proc := exec.Command("/usr/bin/wpa_passphrase", ssid, psk)
+		cres, err := proc.CombinedOutput()
 
-	if err != nil {
-		return "",errors.New(fmt.Sprintf("Error craeting wpa_supplicant.conf for SSID '%s' with PSK '%s': %s", ssid, psk, string(cres)))
+		if err != nil {
+			return "",errors.New(fmt.Sprintf("Error craeting wpa_supplicant.conf for SSID '%s' with PSK '%s': %s", ssid, psk, string(cres)))
+		}
+		config = string(cres)
+	} else {
+fmt.Println("Connecting WiFi with OPEN AUTH")
+		config = fmt.Sprintf(
+		`network={
+			ssid="%s"
+			key_mgmt=NONE
+		}`, ssid)
+
 	}
-	config = string(cres)
+
 	config = "ctrl_interface=/run/wpa_supplicant\n" + config
 
 
