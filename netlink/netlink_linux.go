@@ -32,12 +32,11 @@ const (
 )
 
 const (
-	MACVLAN_MODE_PRIVATE = 1 << iota
+	MACVLAN_MODE_PRIVATE  = 1 << iota
 	MACVLAN_MODE_VEPA
 	MACVLAN_MODE_BRIDGE
 	MACVLAN_MODE_PASSTHRU
 )
-
 
 const (
 	// See linux/if_arp.h.
@@ -499,6 +498,78 @@ func NetworkLinkDel(name string) error {
 	return s.HandleAck(wb.Seq)
 }
 
+// see https://www.infradead.org/~tgr/libnl/doc/route.html
+
+// Returns an array of IPNet for all the currently routed subnets on ipv4
+// This is similar to the first column of "ip route" output
+func NetworkLinkGetStateUp(iface *net.Interface) (err error, res bool) {
+	//fmt.Println("Needed if idx", iface.Index)
+
+	s, err := getNetlinkSocket()
+	if err != nil {
+		return err, false
+	}
+	defer s.Close()
+
+	wb := newNetlinkRequest(syscall.RTM_GETLINK, syscall.NLM_F_DUMP)
+
+	msg := newIfInfomsg(syscall.AF_UNSPEC)
+	msg.Index = int32(iface.Index)
+
+	wb.AddData(msg)
+
+	if err := s.Send(wb); err != nil {
+		return err, false
+	}
+
+	// retrieve PID
+	pid, err := s.GetPid()
+	if err != nil {
+		return err, false
+	}
+
+outer:
+// Receive loop
+	for {
+		msgs, err := s.Receive()
+		if err != nil {
+			return err, false
+		}
+		// loop over incoming NL messages
+		for _, m := range msgs {
+			//			fmt.Printf("Message %+v\n", m)
+
+			// check if seq number and receiver PID are correct, abort receive loop on Type == NLMSG_DONE (translated to EOF)
+			if err := s.CheckMessage(m, wb.Seq, pid); err != nil {
+				if err == io.EOF {
+					break outer // abort receive loop if multipart messages reached eof
+				}
+				return err, false
+			}
+
+			// the result we want to fetch
+			if m.Header.Type != syscall.RTM_NEWLINK {
+				continue
+			}
+
+			//Cast first part to IfInfoMsg
+			msg := (*IfInfomsg)(unsafe.Pointer(&m.Data[0:syscall.SizeofIfInfomsg][0]))
+
+			// Ignore message for different interface
+			if msg.Index != int32(iface.Index) {
+				continue
+			}
+
+			if_up := msg.Flags&syscall.IFF_UP != 0
+			//fmt.Printf("Message: %+v\n", msg)
+			//fmt.Printf("Flag IFF_UP: %+v\n", if_up)
+			return nil, if_up
+		}
+	}
+
+	return errors.New("Couldn't retreive link state"), false
+}
+
 // Bring up a particular network interface.
 // This is identical to running: ip link set dev $name up
 func NetworkLinkUp(iface *net.Interface) error {
@@ -647,7 +718,6 @@ func NetworkSetMTU(iface *net.Interface, mtu int) error {
 	}
 	return s.HandleAck(wb.Seq)
 }
-
 
 // Set link queue length
 // This is identical to running: ip link set dev $name txqueuelen $QLEN
@@ -997,7 +1067,6 @@ func networkLinkIpAction4(action, flags int, ifa IfAddr, ifa_broadcast IfAddr) e
 	msg.Prefixlen = uint8(prefixLen)
 	wb.AddData(msg)
 
-
 	ipData := ifa.IP.To4()
 
 	localData := newRtAttr(syscall.IFA_LOCAL, ipData)
@@ -1005,7 +1074,6 @@ func networkLinkIpAction4(action, flags int, ifa IfAddr, ifa_broadcast IfAddr) e
 
 	addrData := newRtAttr(syscall.IFA_ADDRESS, ipData)
 	wb.AddData(addrData)
-
 
 	ipBcData := ifa_broadcast.IP.To4()
 	brAddrData := newRtAttr(syscall.IFA_BROADCAST, ipBcData)
@@ -1028,7 +1096,7 @@ func NetworkLinkDelIp(iface *net.Interface, ip net.IP, ipNet *net.IPNet) error {
 	)
 }
 
-func IpBroadcast4(n *net.IPNet) (net.IP, error)  {
+func IpBroadcast4(n *net.IPNet) (net.IP, error) {
 	ipv4 := n.IP.To4()
 	if ipv4 == nil {
 		return nil, errors.New("No IPv4 net")
@@ -1038,12 +1106,12 @@ func IpBroadcast4(n *net.IPNet) (net.IP, error)  {
 		maskv4 = maskv4[12:]
 	}
 
-	res := net.IPv4(0xff,0xff,0xff,0xff).To4()
-	for i:=0; i<net.IPv4len; i++ {
-		res[i] = (res[i]^maskv4[i]) + ipv4[i]
+	res := net.IPv4(0xff, 0xff, 0xff, 0xff).To4()
+	for i := 0; i < net.IPv4len; i++ {
+		res[i] = (res[i] ^ maskv4[i]) + ipv4[i]
 	}
 	//log.Printf("Calculated broadcast %s", res)
-	return res,nil
+	return res, nil
 }
 
 // Add an Ip address to an interface. This is identical to:
@@ -1061,7 +1129,9 @@ func NetworkLinkAddIp(iface *net.Interface, ip net.IP, ipNet *net.IPNet) error {
 		//For IPv4 calculate broadcast
 		ipBc, err := IpBroadcast4(ipNet)
 		//log.Printf("Adding with broadcast ip %v", ipBc)
-		if err != nil {return errors.New(fmt.Sprintf("Errof calculating braodcast IP: %v", err))}
+		if err != nil {
+			return errors.New(fmt.Sprintf("Errof calculating braodcast IP: %v", err))
+		}
 		return networkLinkIpAction4(
 			syscall.RTM_NEWADDR,
 			syscall.NLM_F_CREATE|syscall.NLM_F_EXCL|syscall.NLM_F_ACK,
@@ -1069,7 +1139,6 @@ func NetworkLinkAddIp(iface *net.Interface, ip net.IP, ipNet *net.IPNet) error {
 			IfAddr{iface, ipBc, ipNet},
 		)
 	}
-
 
 }
 
@@ -1272,12 +1341,18 @@ func NetworkLinkList(iface *net.Interface) ([]net.Addr, error) {
 
 func NetworkLinkFlush(iface *net.Interface) (error) {
 	at, err := NetworkLinkList(iface)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	for _, a := range at {
 		ip, ipnet, err := net.ParseCIDR(a.String())
-		if err != nil { return err }
+		if err != nil {
+			return err
+		}
 		err = NetworkLinkDelIp(iface, ip, ipnet)
-		if err != nil { return err }
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -1472,7 +1547,6 @@ func AddRoute(destination, source, gateway, device string) error {
 		return err
 	}
 	wb.AddData(uint32Attr(syscall.RTA_OIF, uint32(iface.Index)))
-
 
 	//Send the message
 	if err := s.Send(wb); err != nil {
