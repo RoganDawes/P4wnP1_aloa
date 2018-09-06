@@ -502,12 +502,12 @@ func NetworkLinkDel(name string) error {
 
 // Returns an array of IPNet for all the currently routed subnets on ipv4
 // This is similar to the first column of "ip route" output
-func NetworkLinkGetStateUp(iface *net.Interface) (err error, res bool) {
+func NetworkLinkGetStateUp(iface *net.Interface) (res bool,err error) {
 	//fmt.Println("Needed if idx", iface.Index)
 
 	s, err := getNetlinkSocket()
 	if err != nil {
-		return err, false
+		return false,err
 	}
 	defer s.Close()
 
@@ -519,13 +519,13 @@ func NetworkLinkGetStateUp(iface *net.Interface) (err error, res bool) {
 	wb.AddData(msg)
 
 	if err := s.Send(wb); err != nil {
-		return err, false
+		return false, err
 	}
 
 	// retrieve PID
 	pid, err := s.GetPid()
 	if err != nil {
-		return err, false
+		return false, err
 	}
 
 outer:
@@ -533,7 +533,7 @@ outer:
 	for {
 		msgs, err := s.Receive()
 		if err != nil {
-			return err, false
+			return false, err
 		}
 		// loop over incoming NL messages
 		for _, m := range msgs {
@@ -544,7 +544,7 @@ outer:
 				if err == io.EOF {
 					break outer // abort receive loop if multipart messages reached eof
 				}
-				return err, false
+				return false, err
 			}
 
 			// the result we want to fetch
@@ -563,11 +563,11 @@ outer:
 			if_up := msg.Flags&syscall.IFF_UP != 0
 			//fmt.Printf("Message: %+v\n", msg)
 			//fmt.Printf("Flag IFF_UP: %+v\n", if_up)
-			return nil, if_up
+			return if_up, nil
 		}
 	}
 
-	return errors.New("Couldn't retreive link state"), false
+	return false, errors.New("Couldn't retreive link state")
 }
 
 // Bring up a particular network interface.
