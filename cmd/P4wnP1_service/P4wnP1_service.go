@@ -46,7 +46,7 @@ func main() {
 	state.Led.SetLed(&pb.LEDSettings{1})
 
 	//service.StartEventManager(20)
-	log.SetOutput(state.EvMgr)
+//	log.SetOutput(state.EvMgr)
 	log.Println("TESTMESSAGE")
 	go func() {
 		err := common.RunBashScript("/usr/local/P4wnP1/scripts/servicestart.sh")

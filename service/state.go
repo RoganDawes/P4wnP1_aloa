@@ -40,9 +40,7 @@ func InitGlobalServiceState() (err error) {
 		IpAddress4:         "172.24.0.1",
 		Netmask4:           "255.255.255.0",
 	}
-	state.Wifi = &WifiState{
-		Settings: GetDefaultWiFiSettings(),
-	}
+	state.Wifi = NewWifiState(GetDefaultWiFiSettings(), wifi_if_name)
 
 	state.HidDevPath  = make(map[string]string) //should be initialized BEFORE UsbGadgetManager uses it
 	state.EvMgr = NewEventManager(20)
