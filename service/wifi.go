@@ -399,26 +399,31 @@ func (state *WifiState) DeployWifiSettings(newWifiSettings *pb.WiFiSettings) (er
 
 	switch newWifiSettings.Mode {
 	case pb.WiFiSettings_AP:
-		//generate hostapd.conf (overwrite old one)
-		hostapdCreateConfigFile(newWifiSettings, state.PathHostapdConf)
-
-		//start hostapd
-		err = state.StartHostapd()
+		err = state.runAPMode(newWifiSettings)
 		if err != nil {
 			return err
 		}
-	case pb.WiFiSettings_STA:
+	case pb.WiFiSettings_STA, pb.WiFiSettings_STA_FAILOVER_AP:
 		if newWifiSettings.BssCfgClient == nil {
-			return errors.New("Error: WiFi mode set to station (STA) but no BSS configuration for target WiFi provided")
+			return state.apFailoverOrError(
+				newWifiSettings,
+				errors.New("Error: WiFi mode set to station (STA) but no BSS configuration for target WiFi provided"),
+			)
 		}
 		if len(newWifiSettings.BssCfgClient.SSID) == 0 {
-			return errors.New("Error: WiFi mode set to station (STA) but no SSID provided to identify BSS to join")
+			return state.apFailoverOrError(
+				newWifiSettings,
+				errors.New("Error: WiFi mode set to station (STA) but no SSID provided to identify BSS to join"),
+			)
 		}
 
 		//scan for provided wifi
 		scanres, err := WifiScan(ifName)
 		if err != nil {
-			return errors.New(fmt.Sprintf("Scanning for existing WiFi networks failed: %v", err))
+			return state.apFailoverOrError(
+				newWifiSettings,
+				errors.New(fmt.Sprintf("Scanning for existing WiFi networks failed: %v", err)),
+			)
 		}
 		var matchingBss *BSS = nil
 		for _, bss := range scanres {
@@ -428,21 +433,33 @@ func (state *WifiState) DeployWifiSettings(newWifiSettings *pb.WiFiSettings) (er
 			}
 		}
 		if matchingBss == nil {
-			return errors.New(fmt.Sprintf("SSID not found during scan: '%s'", newWifiSettings.BssCfgClient.SSID))
+			return state.apFailoverOrError(
+				newWifiSettings,
+				errors.New(fmt.Sprintf("SSID not found during scan: '%s'", newWifiSettings.BssCfgClient.SSID)),
+			)
 		}
 
 		if len(newWifiSettings.BssCfgClient.PSK) == 0 && matchingBss.AuthMode != WiFiAuthMode_OPEN {
 			//seems we try to connect an OPEN AUTHENTICATION network, but the existing BSS isn't OPEN AUTH
-			return errors.New(fmt.Sprintf("WiFi SSID '%s' found during scan, but authentication mode isn't OPEN and no PSK was provided", newWifiSettings.BssCfgClient.SSID))
+			return state.apFailoverOrError(
+				newWifiSettings,
+				errors.New(fmt.Sprintf("WiFi SSID '%s' found during scan, but authentication mode isn't OPEN and no PSK was provided", newWifiSettings.BssCfgClient.SSID)),
+			)
 		} else {
 			err = WifiCreateWpaSupplicantConfigFile(newWifiSettings.BssCfgClient.SSID, newWifiSettings.BssCfgClient.PSK, state.PathWpaSupplicantConf)
 			if err != nil {
-				return err
+				return state.apFailoverOrError(
+					newWifiSettings,
+					err,
+				)
 			}
 			//ToDo: proper error handling, in case connection not possible
 			err = state.StartWpaSupplicant(WPA_SUPPLICANT_CONNECT_TIMEOUT)
 			if err != nil {
-				return err
+				return state.apFailoverOrError(
+					newWifiSettings,
+					err,
+				)
 			}
 		}
 
@@ -454,6 +471,24 @@ func (state *WifiState) DeployWifiSettings(newWifiSettings *pb.WiFiSettings) (er
 	state.Settings = newWifiSettings
 
 	return nil
+}
+
+func (state *WifiState) runAPMode(newWifiSettings *pb.WiFiSettings) (err error) {
+	//generate hostapd.conf (overwrite old one)
+	hostapdCreateConfigFile(newWifiSettings, state.PathHostapdConf)
+
+	//start hostapd
+	return state.StartHostapd()
+}
+
+func (state *WifiState) apFailoverOrError(newWifiSettings *pb.WiFiSettings, givenErr error) (err error) {
+	if newWifiSettings.Mode == pb.WiFiSettings_STA_FAILOVER_AP {
+		log.Println(givenErr)
+		log.Printf("Trying to fail over to Access Point Mode...")
+		return state.runAPMode(newWifiSettings)
+	} else {
+		return givenErr
+	}
 }
 
 //check if nexmon driver + firmware is active is loaded
