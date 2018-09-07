@@ -3,7 +3,8 @@ package service
 import (
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"log"
-	"github.com/docker/libcontainer/netlink"
+	"github.com/mame82/P4wnP1_go/netlink"
+	"github.com/mame82/P4wnP1_go/service/util"
 	"net"
 	"errors"
 	"fmt"
@@ -11,13 +12,11 @@ import (
 	"strings"
 	"os"
 	"io/ioutil"
-	"strconv"
 	"syscall"
 	"time"
-	"bufio"
-	"io"
-	"regexp"
 	"sync"
+	"regexp"
+	"strconv"
 )
 
 const (
@@ -28,6 +27,7 @@ const (
 //VERY LOW PRIORITY, as this basically means reimplementing the whole toolset for a way too small benefit
 
 type WiFiAuthMode int
+
 const (
 	WiFiAuthMode_OPEN WiFiAuthMode = iota
 	//WiFiAuthMode_WEP
@@ -41,28 +41,180 @@ const (
 )
 
 type WifiState struct {
-	Settings *pb.WiFiSettings
-	CmdWpaSupplicant *exec.Cmd
-	mutexWpaSupplicant *sync.Mutex
-	IfaceName string
-	PathWpaSupplicantConf string
+	mutexSettings           *sync.Mutex
+	Settings                *pb.WiFiSettings
+	CmdWpaSupplicant        *exec.Cmd
+	mutexWpaSupplicant      *sync.Mutex
+	CmdHostapd              *exec.Cmd
+	mutexHostapd            *sync.Mutex
+	IfaceName               string
+	PathWpaSupplicantConf   string
+	PathHostapdConf         string
+	LoggerHostapd           *util.TeeLogger
+	LoggerWpaSupplicant     *util.TeeLogger
+	OutMonitorWpaSupplicant *wpaSupplicantOutMonitor
 }
 
-func NewWifiState(startupSettings *pb.WiFiSettings, ifName string) (res *WifiState) {
-	if !wifiWpaSupplicantAvailable() {
-		panic("wpa_supplicant seems to be missing, please install it")
+type wpaSupplicantOutMonitor struct {
+	resultReceived *util.Signal
+	result         bool
+	*sync.Mutex
+}
+
+func (m *wpaSupplicantOutMonitor) Write(p []byte) (n int, err error) {
+	// if result already received, the write could exit (early out)
+	if m.resultReceived.IsSet() {
+		return n, nil
 	}
 
-	res = &WifiState{
-		IfaceName: ifName,
-		Settings: startupSettings,
-		CmdWpaSupplicant: nil,
-		mutexWpaSupplicant: &sync.Mutex{},
-		PathWpaSupplicantConf: confFileWpaSupplicant(ifName),
+	// check if buffer contains relevant strings (assume write is called line wise by the hosted process
+	// otherwise we'd need to utilize an io.Reader
+	line := string(p)
+
+	switch {
+	case strings.Contains(line, "WRONG_KEY"):
+		log.Printf("Seems the provided PSK doesn't match\n")
+		m.Lock()
+		defer m.Unlock()
+		m.result = false
+		m.resultReceived.Set()
+	case strings.Contains(line, "CTRL-EVENT-CONNECTED"):
+		log.Printf("Connected to target network\n")
+		m.Lock()
+		defer m.Unlock()
+		m.result = true
+		m.resultReceived.Set()
 	}
+	return len(p), nil
+}
+
+func (m *wpaSupplicantOutMonitor) WaitConnectResultOnce(timeout time.Duration) (connected bool, err error) {
+	err = m.resultReceived.WaitTimeout(timeout)
+	if err != nil {
+		return false, errors.New("Couldn't retrieve wpa_supplicant connection state before timeout")
+	}
+
+	m.Lock()
+	defer m.Unlock()
+	connected = m.result
+	m.resultReceived.Reset() //Disable result received, for next use
 	return
 }
 
+func NewWpaSupplicantOutMonitor() *wpaSupplicantOutMonitor {
+	return &wpaSupplicantOutMonitor{
+		resultReceived: util.NewSignal(false, false),
+		Mutex:          &sync.Mutex{},
+	}
+}
+
+func NewWifiState(startupSettings *pb.WiFiSettings, ifName string) (res *WifiState) {
+	if !binaryAvailable("wpa_supplicant") {
+		panic("wpa_supplicant seems to be missing, please install it")
+	}
+	// to create wpa_supplicant.conf
+	if !binaryAvailable("wpa_passphrase") {
+		panic("wpa_passphrase seems to be missing, please install it")
+	}
+	if !binaryAvailable("hostapd") {
+		panic("hostapd seems to be missing, please install it")
+	}
+	// for wifiScan
+	if !binaryAvailable("iw") {
+		panic("The tool 'iw' seems to be missing, please install it")
+	}
+
+	res = &WifiState{
+		mutexSettings:         &sync.Mutex{},
+		IfaceName:             ifName,
+		Settings:              startupSettings,
+		CmdWpaSupplicant:      nil,
+		mutexWpaSupplicant:    &sync.Mutex{},
+		CmdHostapd:            nil,
+		mutexHostapd:          &sync.Mutex{},
+		PathWpaSupplicantConf: fmt.Sprintf("/tmp/wpa_supplicant_%s.conf", ifName),
+		PathHostapdConf:       fmt.Sprintf("/tmp/hostapd_%s.conf", ifName),
+	}
+
+	res.OutMonitorWpaSupplicant = NewWpaSupplicantOutMonitor()
+	res.LoggerHostapd = util.NewTeeLogger(true)
+	res.LoggerHostapd.SetPrefix("hostapd: ")
+	res.LoggerWpaSupplicant = util.NewTeeLogger(true)
+	res.LoggerWpaSupplicant.SetPrefix("wpa_supplicant: ")
+	res.LoggerWpaSupplicant.AddOutput(res.OutMonitorWpaSupplicant) // add watcher too tee'ed output writers
+
+	return
+}
+
+func (wifiState *WifiState) StartHostapd() (err error) {
+	log.Printf("Starting hostapd for interface '%s'...\n", wifiState.IfaceName)
+
+	wifiState.mutexHostapd.Lock()
+	defer wifiState.mutexHostapd.Unlock()
+
+	//check if interface is valid
+	if_exists, _ := CheckInterfaceExistence(wifiState.IfaceName)
+	if !if_exists {
+		return errors.New(fmt.Sprintf("The given interface '%s' doesn't exist", wifiState.IfaceName))
+	}
+
+	//stop hostapd if already running
+	if wifiState.CmdHostapd != nil {
+		// avoid deadlock
+		wifiState.mutexHostapd.Unlock()
+		wifiState.StopHostapd()
+		wifiState.mutexHostapd.Lock()
+	}
+
+	//We use the run command and allow hostapd to daemonize
+	//wifiState.CmdHostapd = exec.Command("/usr/sbin/hostapd", "-f", logFileHostapd(wifiState.IfaceName), wifiState.PathHostapdConf)
+	wifiState.CmdHostapd = exec.Command("/usr/sbin/hostapd", wifiState.PathHostapdConf)
+	wifiState.CmdHostapd.Stdout = wifiState.LoggerHostapd.LogWriter
+	wifiState.CmdHostapd.Stderr = wifiState.LoggerHostapd.LogWriter
+	err = wifiState.CmdHostapd.Start()
+	if err != nil {
+		//bytes, _ := wifiState.CmdHostapd.CombinedOutput()
+		//println(string(bytes))
+		wifiState.CmdHostapd.Wait()
+		return errors.New(fmt.Sprintf("Error starting hostapd '%v'", err))
+	}
+	log.Printf("... hostapd for interface '%s' started\n", wifiState.IfaceName)
+	return nil
+}
+
+func (wifiState *WifiState) StopHostapd() (err error) {
+	eSuccess := fmt.Sprintf("... hostapd for interface '%s' stopped", wifiState.IfaceName)
+	eCantStop := fmt.Sprintf("... couldn't terminate hostapd for interface '%s'", wifiState.IfaceName)
+
+	wifiState.mutexHostapd.Lock()
+	defer wifiState.mutexHostapd.Unlock()
+
+	if wifiState.CmdHostapd == nil {
+		log.Printf("... hostapd for interface '%s' isn't running, no need to stop it\n", wifiState.IfaceName)
+		return nil
+	}
+
+	wifiState.CmdHostapd.Process.Signal(syscall.SIGTERM)
+	wifiState.CmdHostapd.Wait()
+	if !wifiState.CmdHostapd.ProcessState.Exited() {
+		log.Printf("... hostapd didn't react on SIGTERM for interface '%s', trying SIGKILL\n", wifiState.IfaceName)
+		wifiState.CmdHostapd.Process.Kill()
+
+		time.Sleep(500 * time.Millisecond)
+		if wifiState.CmdHostapd.ProcessState.Exited() {
+			wifiState.CmdHostapd = nil
+			log.Println(eSuccess)
+			return nil
+		} else {
+			log.Println(eCantStop)
+			return errors.New(eCantStop)
+		}
+	}
+
+	wifiState.CmdHostapd = nil
+	log.Println(eSuccess)
+	return nil
+}
 
 func (wifiState *WifiState) StopWpaSupplicant() (err error) {
 	eSuccess := fmt.Sprintf("... wpa_supplicant for interface '%s' stopped", wifiState.IfaceName)
@@ -78,13 +230,14 @@ func (wifiState *WifiState) StopWpaSupplicant() (err error) {
 		return nil
 	}
 
+	log.Printf("... sending SIGTERM for wpa_supplicant on interface '%s' with PID\n", wifiState.IfaceName, wifiState.CmdWpaSupplicant.Process.Pid)
 	wifiState.CmdWpaSupplicant.Process.Signal(syscall.SIGTERM)
 	wifiState.CmdWpaSupplicant.Wait()
 	if !wifiState.CmdWpaSupplicant.ProcessState.Exited() {
 		log.Printf("... wpa_supplicant didn't react on SIGTERM for interface '%s', trying SIGKILL\n", wifiState.IfaceName)
 		wifiState.CmdWpaSupplicant.Process.Kill()
 
-		time.Sleep(500*time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		if wifiState.CmdWpaSupplicant.ProcessState.Exited() {
 			wifiState.CmdWpaSupplicant = nil
 			log.Println(eSuccess)
@@ -100,7 +253,6 @@ func (wifiState *WifiState) StopWpaSupplicant() (err error) {
 	return nil
 }
 
-
 func (wifiState *WifiState) StartWpaSupplicant(timeout time.Duration) (err error) {
 	log.Printf("Starting wpa_supplicant for interface '%s'...\n", wifiState.IfaceName)
 
@@ -108,85 +260,78 @@ func (wifiState *WifiState) StartWpaSupplicant(timeout time.Duration) (err error
 	defer wifiState.mutexWpaSupplicant.Unlock()
 
 	//check if interface is valid
-	if_exists,_ := CheckInterfaceExistence(wifiState.IfaceName)
+	if_exists, _ := CheckInterfaceExistence(wifiState.IfaceName)
 	if !if_exists {
 		return errors.New(fmt.Sprintf("The given interface '%s' doesn't exist", wifiState.IfaceName))
 	}
 
-
-
 	//stop wpa_supplicant if already running
 	if wifiState.CmdWpaSupplicant != nil {
+		// avoid dead lock
+		wifiState.mutexWpaSupplicant.Unlock()
 		wifiState.StopWpaSupplicant()
+		wifiState.mutexWpaSupplicant.Lock()
 	}
 
 	//we monitor output of wpa_supplicant till we are connected, fail due to wrong PSK or timeout is reached
 	//Note: PID file creation doesn't work when not started as daemon, so we do it manually, later on
 	wifiState.CmdWpaSupplicant = exec.Command("/sbin/wpa_supplicant", "-c", wifiState.PathWpaSupplicantConf, "-i", wifiState.IfaceName)
-
-	wpa_stdout, err := wifiState.CmdWpaSupplicant.StdoutPipe()
-	if err != nil { return err}
+	wifiState.CmdWpaSupplicant.Stdout = wifiState.LoggerWpaSupplicant.LogWriter
 
 	err = wifiState.CmdWpaSupplicant.Start()
-	if err != nil { return err}
-
-	//result channel
-	wpa_res := make(chan string, 1)
-	defer close(wpa_res)
-
-	//start output parser
-	wpa_stdout_reader := bufio.NewReader(wpa_stdout)
-
-	go wifiWpaSupplicantOutParser(wpa_res, wpa_stdout_reader)
-
-	//analyse output
-	select {
-	case res := <-wpa_res:
-		if strings.Contains(res, "CONNECTED") {
-			//We could return success and keep wpa_supplicant running
-			log.Println("... connected to given WiFi network, wpa_supplicant running")
-			return nil
-		}
-		if strings.Contains(res, "WRONG_KEY") {
-			//we stop wpa_supplicant and return err
-			log.Println("... seems the wrong PSK wwas provided for the given WiFi network, stopping wpa_supplicant ...")
-			//wifiStopWpaSupplicant(nameIface)
-			log.Println("... killing wpa_supplicant")
-			wifiState.StopWpaSupplicant()
-			return errors.New("Wrong PSK")
-		}
-	case <- time.After(timeout):
-		//we stop wpa_supplicant and return err
-		log.Printf("... wpa_supplicant reached timeout of '%v' without beeing able to connect to given network\n", timeout)
-		log.Println("... killing wpa_supplicant")
-		wifiState.StopWpaSupplicant()
-		return errors.New("TIMEOUT REACHED")
+	if err != nil {
+		return err
 	}
 
+	//wait for result in output
+	connected, errcon := wifiState.OutMonitorWpaSupplicant.WaitConnectResultOnce(timeout)
+	if errcon != nil {
+		log.Printf("... wpa_supplicant reached timeout of '%v' without beeing able to connect to given network\n", timeout)
+		log.Println("... killing wpa_supplicant")
+		// avoid dead lock
+		wifiState.mutexWpaSupplicant.Unlock()
+		wifiState.StopWpaSupplicant()
+		wifiState.mutexWpaSupplicant.Lock()
+		return errors.New("TIMEOUT REACHED")
+	}
+	if connected {
+		//We could return success and keep wpa_supplicant running
+		log.Println("... connected to given WiFi network, wpa_supplicant running")
+		return nil
+	} else {
+		//we stop wpa_supplicant and return err
+		log.Println("... seems the wrong PSK was provided for the given WiFi network, stopping wpa_supplicant ...")
+		//wifiStopWpaSupplicant(nameIface)
+		log.Println("... killing wpa_supplicant")
+		// avoid dead lock
+		wifiState.mutexWpaSupplicant.Unlock()
+		wifiState.StopWpaSupplicant()
+		wifiState.mutexWpaSupplicant.Lock()
+		return errors.New("Wrong PSK")
+	}
 
 	return nil
 }
 
-
 type BSS struct {
-	SSID string
-	BSSID net.HardwareAddr
-	Frequency int
+	SSID           string
+	BSSID          net.HardwareAddr
+	Frequency      int
 	BeaconInterval time.Duration //carefull, on IE level beacon interval isn't meassured in milliseconds
-	AuthMode WiFiAuthMode
-	Signal float32 //Signal strength in dBm
+	AuthMode       WiFiAuthMode
+	Signal         float32 //Signal strength in dBm
 }
 
-func (state WifiState) GetDeployWifiSettings() (ws *pb.WiFiSettings,err error) {
+func (state WifiState) GetDeployWifiSettings() (ws *pb.WiFiSettings, err error) {
 	return state.Settings, nil
 }
 
-
-func (state *WifiState) DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
-	// ToDo: Lock state while setting up
-
-	log.Printf("Trying to deploy WiFi settings:\n%v\n", ws)
+func (state *WifiState) DeployWifiSettings(newWifiSettings *pb.WiFiSettings) (err error) {
+	log.Printf("Trying to deploy WiFi settings:\n%v\n", newWifiSettings)
 	ifName := wifi_if_name
+
+	state.mutexSettings.Lock()
+	defer state.mutexSettings.Unlock()
 
 	//Get Interface
 	iface, err := net.InterfaceByName(ifName)
@@ -194,53 +339,81 @@ func (state *WifiState) DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
 		return errors.New(fmt.Sprintf("No WiFi interface present: %v\n", err))
 	}
 
-
-	if ws.DisableNexmon {
+	firmwareChange := false
+	if newWifiSettings.DisableNexmon {
 		//load legacy driver + firmware
 		if wifiIsNexmonLoaded() {
 			err = wifiLoadLegacy()
-			if err != nil {return}
+			if err != nil {
+				return
+			}
+			firmwareChange = true
 		}
 	} else {
 		//load nexmon driver + firmware
 		if !wifiIsNexmonLoaded() {
 			err = wifiLoadNexmon()
-			if err != nil {return}
+			if err != nil {
+				return
+			}
+			firmwareChange = true
 		}
 	}
 
-	if ws.Disabled {
-		log.Printf("Setting WiFi interface %s to DOWN\n", iface.Name)
-		err = netlink.NetworkLinkDown(iface)
-	} else {
-		log.Printf("Setting WiFi interface %s to UP\n", iface.Name)
-		err = netlink.NetworkLinkUp(iface)
+	if firmwareChange {
+		ReInitNetworkInterface(ifName)
+	}
+
+	linkStateChange := false
+	currentlyEnabled, errstate := netlink.NetworkLinkGetStateUp(iface)
+	if errstate != nil {
+		linkStateChange = true
+	} // current link state couldn't be retireved, regard as changed
+	if currentlyEnabled == newWifiSettings.Disabled {
+		linkStateChange = true
+	} //Is disabled and should be enabled, or the other way around
+	if linkStateChange || firmwareChange { // Enable/Disable if only if needed
+		// ToDo: the new interface state isn't reflected to respective ethernet settings
+		if newWifiSettings.Disabled {
+			log.Printf("Setting WiFi interface %s to DOWN\n", iface.Name)
+			err = netlink.NetworkLinkDown(iface)
+		} else {
+			log.Printf("Setting WiFi interface %s to UP\n", iface.Name)
+			err = netlink.NetworkLinkUp(iface)
+		}
 	}
 
 	//set proper regulatory dom
-	err = wifiSetReg(ws.Reg)
+	err = wifiSetReg(newWifiSettings.Reg)
 	if err != nil {
-		log.Printf("Error setting WiFi regulatory domain '%s': %v\n", ws.Reg, err) //we don't abort on error here
+		log.Printf("Error setting WiFi regulatory domain '%s': %v\n", newWifiSettings.Reg, err) //we don't abort on error here
 	}
 
 	//stop wpa_supplicant if needed
 	state.StopWpaSupplicant()
 	//kill hostapd in case it is still running
-	err = wifiStopHostapd(ifName)
-	if err != nil { return err } // ToDo: returning at this point is a bit harsh
+	err = state.StopHostapd()
+	if err != nil {
+		return err // ToDo: returning at this point is a bit harsh
+	}
 
-
-	switch ws.Mode {
+	switch newWifiSettings.Mode {
 	case pb.WiFiSettings_AP:
 		//generate hostapd.conf (overwrite old one)
-		hostapdCreateConfigFile(ws, confFileHostapd(ifName))
+		hostapdCreateConfigFile(newWifiSettings, state.PathHostapdConf)
 
 		//start hostapd
-		err = wifiStartHostapd(ifName)
-		if err != nil { return err }
+		err = state.StartHostapd()
+		if err != nil {
+			return err
+		}
 	case pb.WiFiSettings_STA:
-		if ws.BssCfgClient == nil  { return errors.New("Error: WiFi mode set to station (STA) but no BSS configuration for target WiFi provided")}
-		if len(ws.BssCfgClient.SSID) == 0 { return errors.New("Error: WiFi mode set to station (STA) but no SSID provided to identify BSS to join")}
+		if newWifiSettings.BssCfgClient == nil {
+			return errors.New("Error: WiFi mode set to station (STA) but no BSS configuration for target WiFi provided")
+		}
+		if len(newWifiSettings.BssCfgClient.SSID) == 0 {
+			return errors.New("Error: WiFi mode set to station (STA) but no SSID provided to identify BSS to join")
+		}
 
 		//scan for provided wifi
 		scanres, err := WifiScan(ifName)
@@ -248,38 +421,38 @@ func (state *WifiState) DeployWifiSettings(ws *pb.WiFiSettings) (err error) {
 			return errors.New(fmt.Sprintf("Scanning for existing WiFi networks failed: %v", err))
 		}
 		var matchingBss *BSS = nil
-		for _,bss := range scanres {
-			if bss.SSID == ws.BssCfgClient.SSID {
+		for _, bss := range scanres {
+			if bss.SSID == newWifiSettings.BssCfgClient.SSID {
 				matchingBss = &bss
 				break
 			}
 		}
 		if matchingBss == nil {
-			return errors.New(fmt.Sprintf("SSID not found during scan: '%s'", ws.BssCfgClient.SSID))
+			return errors.New(fmt.Sprintf("SSID not found during scan: '%s'", newWifiSettings.BssCfgClient.SSID))
 		}
 
-
-		if len(ws.BssCfgClient.PSK) == 0 && matchingBss.AuthMode != WiFiAuthMode_OPEN {
+		if len(newWifiSettings.BssCfgClient.PSK) == 0 && matchingBss.AuthMode != WiFiAuthMode_OPEN {
 			//seems we try to connect an OPEN AUTHENTICATION network, but the existing BSS isn't OPEN AUTH
-			return errors.New(fmt.Sprintf("WiFi SSID '%s' found during scan, but authentication mode isn't OPEN and no PSK was provided", ws.BssCfgClient.SSID))
+			return errors.New(fmt.Sprintf("WiFi SSID '%s' found during scan, but authentication mode isn't OPEN and no PSK was provided", newWifiSettings.BssCfgClient.SSID))
 		} else {
-			err = WifiCreateWpaSupplicantConfigFile(ws.BssCfgClient.SSID, ws.BssCfgClient.PSK, confFileWpaSupplicant(wifi_if_name))
-			if err != nil { return err }
+			err = WifiCreateWpaSupplicantConfigFile(newWifiSettings.BssCfgClient.SSID, newWifiSettings.BssCfgClient.PSK, state.PathWpaSupplicantConf)
+			if err != nil {
+				return err
+			}
 			//ToDo: proper error handling, in case connection not possible
 			err = state.StartWpaSupplicant(WPA_SUPPLICANT_CONNECT_TIMEOUT)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 		}
-
-
 
 	}
 
 	log.Printf("... WiFi settings deployed successfully, checking for stored interface configuration...\n")
 
 	// store new state
-	state.Settings = ws
+	state.Settings = newWifiSettings
 
-	ReInitNetworkInterface(ifName)
 	return nil
 }
 
@@ -300,7 +473,7 @@ func wifiLoadLegacy() error {
 
 func wifiSetReg(reg string) (err error) {
 	if len(reg) == 0 {
-		reg = "US"  //default
+		reg = "US" //default
 		log.Printf("No ISO/IEC 3166-1 alpha2 regulatory domain provided, defaulting to '%s'\n", reg)
 	}
 
@@ -308,19 +481,19 @@ func wifiSetReg(reg string) (err error) {
 
 	proc := exec.Command("/sbin/iw", "reg", "set", reg)
 	err = proc.Run()
-	if err != nil { return err}
+	if err != nil {
+		return err
+	}
 
 	log.Printf("Notified kernel to use ISO/IEC 3166-1 alpha2 regulatory domain '%s'\n", reg)
 	return nil
 }
 
 func WifiScan(ifName string) (result []BSS, err error) {
-	if !wifiIwAvailable() { return nil,errors.New("The tool 'iw' is missing, please install it to make this work")}
-
 	proc := exec.Command("/sbin/iw", ifName, "scan")
 	res, err := proc.CombinedOutput()
 	if err != nil {
-		return nil,errors.New(fmt.Sprintf("Error running scan: '%s'\niw outpur: %s", err, res))
+		return nil, errors.New(fmt.Sprintf("Error running scan: '%s'\niw outpur: %s", err, res))
 	}
 
 	result, err = ParseIwScan(string(res))
@@ -331,29 +504,28 @@ func WifiScan(ifName string) (result []BSS, err error) {
 func WifiCreateWpaSupplicantConfigFile(ssid string, psk string, filename string) (err error) {
 	log.Printf("Creating wpa_suuplicant configuration file at '%s'\n", filename)
 	fileContent, err := wifiCreateWpaSupplicantConfString(ssid, psk)
-	if err != nil {return}
+	if err != nil {
+		return
+	}
 	err = ioutil.WriteFile(filename, []byte(fileContent), os.ModePerm)
 	return
 }
 
 func wifiCreateWpaSupplicantConfString(ssid string, psk string) (config string, err error) {
-	if !wifiWpaPassphraseAvailable() { return "",errors.New("The tool 'wpa_passphrase' is missing, please install it to make this work")}
-
-
 	// if a PSK is provided, we assume it is needed, otherwise we assum OPEN AUTHENTICATION
 	if len(psk) > 0 {
-fmt.Println("Connecting WiFi with PSK")
+		fmt.Println("Connecting WiFi with PSK")
 		proc := exec.Command("/usr/bin/wpa_passphrase", ssid, psk)
 		cres, err := proc.CombinedOutput()
 
 		if err != nil {
-			return "",errors.New(fmt.Sprintf("Error craeting wpa_supplicant.conf for SSID '%s' with PSK '%s': %s", ssid, psk, string(cres)))
+			return "", errors.New(fmt.Sprintf("Error craeting wpa_supplicant.conf for SSID '%s' with PSK '%s': %s", ssid, psk, string(cres)))
 		}
 		config = string(cres)
 	} else {
-fmt.Println("Connecting WiFi with OPEN AUTH")
+		fmt.Println("Connecting WiFi with OPEN AUTH")
 		config = fmt.Sprintf(
-		`network={
+			`network={
 			ssid="%s"
 			key_mgmt=NONE
 		}`, ssid)
@@ -361,7 +533,6 @@ fmt.Println("Connecting WiFi with OPEN AUTH")
 	}
 
 	config = "ctrl_interface=/run/wpa_supplicant\n" + config
-
 
 	return
 }
@@ -377,24 +548,24 @@ func wifiCreateHostapdConfString(ws *pb.WiFiSettings) (config string, err error)
 
 	config = fmt.Sprintf("interface=%s\n", wifi_if_name)
 
-	config += fmt.Sprintf("driver=nl80211\n") //netlink capable driver
-	config += fmt.Sprintf("hw_mode=g\n") //Use 2.4GHz band
-	config += fmt.Sprintf("ieee80211n=1\n") //Enable 802.111n
-	config += fmt.Sprintf("wmm_enabled=1\n") //Enable WMM
+	config += fmt.Sprintf("driver=nl80211\n")                            //netlink capable driver
+	config += fmt.Sprintf("hw_mode=g\n")                                 //Use 2.4GHz band
+	config += fmt.Sprintf("ieee80211n=1\n")                              //Enable 802.111n
+	config += fmt.Sprintf("wmm_enabled=1\n")                             //Enable WMM
 	config += fmt.Sprintf("ht_capab=[HT40][SHORT-GI-20][DSSS_CCK-40]\n") // 40MHz channels with 20ns guard interval
-	config += fmt.Sprintf("macaddr_acl=0\n") //Accept all MAC addresses
+	config += fmt.Sprintf("macaddr_acl=0\n")                             //Accept all MAC addresses
 
 	config += fmt.Sprintf("ssid=%s\n", ws.BssCfgAP.SSID)
 	config += fmt.Sprintf("channel=%d\n", ws.ApChannel)
 
 	if ws.AuthMode == pb.WiFiSettings_WPA2_PSK {
 		config += fmt.Sprintf("auth_algs=1\n") //Use WPA authentication
-		config += fmt.Sprintf("wpa=2\n") //Use WPA2
+		config += fmt.Sprintf("wpa=2\n")       //Use WPA2
 		//ToDo: check if PSK could be provided encrypted
 		config += fmt.Sprintf("wpa_key_mgmt=WPA-PSK\n") //Use a pre-shared key
 
 		config += fmt.Sprintf("wpa_passphrase=%s\n", ws.BssCfgAP.PSK) //Set PSK
-		config += fmt.Sprintf("rsn_pairwise=CCMP\n") //Use Use AES, instead of TKIP
+		config += fmt.Sprintf("rsn_pairwise=CCMP\n")                  //Use Use AES, instead of TKIP
 	} else {
 		config += fmt.Sprintf("auth_algs=3\n") //Both, open and shared auth
 	}
@@ -408,213 +579,15 @@ func wifiCreateHostapdConfString(ws *pb.WiFiSettings) (config string, err error)
 	return
 }
 
-
 func hostapdCreateConfigFile(s *pb.WiFiSettings, filename string) (err error) {
 	log.Printf("Creating hostapd configuration file at '%s'\n", filename)
 	fileContent, err := wifiCreateHostapdConfString(s)
-	if err != nil {return}
+	if err != nil {
+		return
+	}
 	err = ioutil.WriteFile(filename, []byte(fileContent), os.ModePerm)
 	return
 }
-
-func wifiWpaSupplicantAvailable() bool {
-	return binaryAvailable("wpa_supplicant")
-}
-
-func wifiWpaPassphraseAvailable() bool {
-	return binaryAvailable("wpa_passphrase")
-}
-
-func wifiHostapdAvailable() bool {
-	return binaryAvailable("hostapd")
-}
-
-func wifiIwAvailable() bool {
-	return binaryAvailable("iw")
-}
-
-func wifiStartHostapd(nameIface string) (err error) {
-	log.Printf("Starting hostapd for interface '%s'...\n", nameIface)
-
-	//check if interface is valid
-	if_exists,_ := CheckInterfaceExistence(nameIface)
-	if !if_exists {
-		return errors.New(fmt.Sprintf("The given interface '%s' doesn't exist", nameIface))
-	}
-
-	if !wifiHostapdAvailable() {
-		return errors.New("hostapd seems to be missing, please install it")
-	}
-
-	confpath := confFileHostapd(nameIface)
-
-	//stop hostapd if already running
-	wifiStopHostapd(nameIface)
-
-
-	//We use the run command and allow hostapd to daemonize
-	proc := exec.Command("/usr/sbin/hostapd", "-B", "-P", pidFileHostapd(nameIface), "-f", logFileHostapd(nameIface), confpath)
-	err = proc.Run()
-	if err != nil {
-		return errors.New(fmt.Sprintf("Error starting hostapd '%v'", err))
-	}
-
-
-	log.Printf("... hostapd for interface '%s' started\n", nameIface)
-	return nil
-}
-
-func wifiStopHostapd(nameIface string) (err error) {
-	log.Printf("... stop running hostapd processes for interface '%s'\n", nameIface)
-	running,pid,err := wifiIsHostapdRunning(wifi_if_name)
-	if err != nil { return err }
-	if !running {
-		log.Printf("... hostapd for interface '%s' isn't running, no need to stop it\n", nameIface)
-		return nil
-	}
-	//kill the pid
-	err = syscall.Kill(pid, syscall.SIGTERM)
-	if err != nil { return }
-
-	time.Sleep(500*time.Millisecond)
-
-	//check if stopped
-	running,pid,err = wifiIsHostapdRunning(nameIface)
-	if err != nil { return }
-	if (running) {
-		log.Printf("... couldn't terminate hostapd for interface '%s'\n", nameIface)
-	} else {
-		log.Printf("... hostapd for interface '%s' stopped\n", nameIface)
-	}
-
-	//Delete PID file
-	os.Remove(pidFileHostapd(nameIface))
-
-	return nil
-}
-
-
-func wifiWpaSupplicantOutParser(chanResult chan string, reader *bufio.Reader) {
-	log.Println("... Start monitoring wpa_supplicant output")
-
-	for {
-		line, _, err := reader.ReadLine()
-		if err != nil {
-			//in case wpa_supplicant is killed, we should land here, which ends the goroutine
-			if err != io.EOF {
-				log.Printf("Can't read wpa_supplicant output: %s\n", err)
-			}
-
-			break
-		}
-		strLine := string(line)
-
-		//fmt.Printf("Read:\n%s\n", strLine)
-
-		switch {
-		case strings.Contains(strLine, "WRONG_KEY"):
-			log.Printf("Seems the provided PSK doesn't match\n")
-			chanResult <- "WRONG_KEY"
-			break
-		case strings.Contains(strLine, "CTRL-EVENT-CONNECTED"):
-			log.Printf("Connected to target network\n")
-			chanResult <- "CONNECTED"
-			break // stop loop
-		}
-	}
-	log.Println("... stopped monitoring wpa_supplicant output")
-}
-
-
-
-func pidFileHostapd(nameIface string) string {
-	return fmt.Sprintf("/var/run/hostapd_%s.pid", nameIface)
-}
-
-func logFileHostapd(nameIface string) string {
-	return fmt.Sprintf("/tmp/hostapd_%s.log", nameIface)
-}
-
-func confFileHostapd(nameIface string) string {
-	return fmt.Sprintf("/tmp/hostapd_%s.conf", nameIface)
-}
-
-
-func confFileWpaSupplicant(nameIface string) string {
-	return fmt.Sprintf("/tmp/wpa_supplicant_%s.conf", nameIface)
-}
-
-func logFileWpaSupplicant(nameIface string) string {
-	return fmt.Sprintf("/tmp/wpa_supplicant_%s.log", nameIface)
-}
-
-func pidFileWpaSupplicant(nameIface string) string {
-	return fmt.Sprintf("/var/run/wpa_supplicant_%s.pid", nameIface)
-}
-
-
-func wifiIsHostapdRunning(nameIface string) (running bool, pid int, err error) {
-	pid_file := pidFileHostapd(nameIface)
-
-	//Check if the pidFile exists
-	if _, err := os.Stat(pid_file); os.IsNotExist(err) {
-		return false, 0,nil //file doesn't exist, so we assume hostapd isn't running
-	}
-
-	//File exists, read the PID
-	content, err := ioutil.ReadFile(pid_file)
-	if err != nil { return false, 0, err}
-	pid, err = strconv.Atoi(strings.TrimSuffix(string(content), "\n"))
-	if err != nil { return false, 0, errors.New(fmt.Sprintf("Error parsing PID file %s: %v", pid_file, err))}
-
-	//With PID given, check if the process is indeed running (pid_file could stay, even if the hostapd process has died already)
-	err_kill := syscall.Kill(pid, 0) //sig 0: doesn't send a signal, but error checking is still performed
-	switch err_kill{
-	case nil:
-		//ToDo: Check if the running process image is indeed hostapd
-		return true, pid, nil //Process is running
-	case syscall.ESRCH:
-		//Process doesn't exist
-		return false, pid, nil
-	case syscall.EPERM:
-		//process exists, but we have no access permission
-		return true, pid, err_kill
-	default:
-		return false, pid, err_kill
-	}
-}
-
-func wifiIsWpaSupplicantRunning(nameIface string) (running bool, pid int, err error) {
-	pid_file := pidFileWpaSupplicant(nameIface)
-
-	//Check if the pidFile exists
-	if _, err := os.Stat(pid_file); os.IsNotExist(err) {
-		return false, 0,nil //file doesn't exist, so we assume wpa_supplicant isn't running
-	}
-
-	//File exists, read the PID
-	content, err := ioutil.ReadFile(pid_file)
-	if err != nil { return false, 0, err}
-	pid, err = strconv.Atoi(strings.TrimSuffix(string(content), "\n"))
-	if err != nil { return false, 0, errors.New(fmt.Sprintf("Error parsing PID file %s: %v", pid_file, err))}
-
-	//With PID given, check if the process is indeed running (pid_file could stay, even if the wpa_supplicant process has died already)
-	err_kill := syscall.Kill(pid, 0) //sig 0: doesn't send a signal, but error checking is still performed
-	switch err_kill{
-	case nil:
-		//ToDo: Check if the running process image is indeed wpa_supplicant
-		return true, pid, nil //Process is running
-	case syscall.ESRCH:
-		//Process doesn't exist
-		return false, pid, nil
-	case syscall.EPERM:
-		//process exists, but we have no access permission
-		return true, pid, err_kill
-	default:
-		return false, pid, err_kill
-	}
-}
-
 
 //ToDo: Create netlink based implementation (not relying on 'iw'): low priority
 func ParseIwScan(scanresult string) (bsslist []BSS, err error) {
@@ -650,32 +623,44 @@ func ParseIwScan(scanresult string) (bsslist []BSS, err error) {
 		strBSSID := rp_bssid.FindString(strBSS)
 		fmt.Printf("BSSID: %s\n", strBSSID)
 		currentBSS.BSSID, err = net.ParseMAC(strBSSID)
-		if err != nil { return nil,err}
+		if err != nil {
+			return nil, err
+		}
 
 		//freq
 		strFreq_sub := rp_freq.FindStringSubmatch(strBSS)
 		strFreq := "0"
-		if len(strFreq_sub) > 1 { strFreq = strFreq_sub[1]}
+		if len(strFreq_sub) > 1 {
+			strFreq = strFreq_sub[1]
+		}
 		fmt.Printf("Freq: %s\n", strFreq)
-		tmpI64, err := strconv.ParseInt(strFreq, 10,32)
-		if err != nil { return nil, err }
+		tmpI64, err := strconv.ParseInt(strFreq, 10, 32)
+		if err != nil {
+			return nil, err
+		}
 		currentBSS.Frequency = int(tmpI64)
 
 		//ssid
 		strSsid_sub := rp_ssid.FindStringSubmatch(strBSS)
 		strSSID := ""
-		if len(strSsid_sub) > 1 { strSSID = strSsid_sub[1]}
+		if len(strSsid_sub) > 1 {
+			strSSID = strSsid_sub[1]
+		}
 		fmt.Printf("SSID: '%s'\n", strSSID)
 		currentBSS.SSID = strSSID
 
 		//beacon interval
 		strBI_sub := rp_beacon_intv.FindStringSubmatch(strBSS)
 		strBI := "100"
-		if len(strBI_sub) > 1 { strBI = strBI_sub[1]}
+		if len(strBI_sub) > 1 {
+			strBI = strBI_sub[1]
+		}
 		fmt.Printf("Beacon Interval: %s\n", strBI)
-		tmpI64, err = strconv.ParseInt(strBI, 10,32)
-		if err != nil { return nil, err }
-		currentBSS.BeaconInterval = time.Microsecond * time.Duration(tmpI64 * 1024) //1TU = 1024 microseconds (not 1000)
+		tmpI64, err = strconv.ParseInt(strBI, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		currentBSS.BeaconInterval = time.Microsecond * time.Duration(tmpI64*1024) //1TU = 1024 microseconds (not 1000)
 
 		//auth type
 		//assume OPEN
@@ -684,11 +669,19 @@ func ParseIwScan(scanresult string) (bsslist []BSS, err error) {
 		//if "RSN:" is present assume WPA2 (overwrite WPA/UNSUPPORTED)
 		//in case of WPA/WPA2 check for presence of "Authentication suites: PSK" to assure PSK support, otherwise assume unsupported (no EAP/CHAP support for now)
 		currentBSS.AuthMode = WiFiAuthMode_OPEN
-		if rp_WEP.MatchString(strBSS) {currentBSS.AuthMode = WiFiAuthMode_UNSUPPORTED}
-		if rp_WPA.MatchString(strBSS) {currentBSS.AuthMode = WiFiAuthMode_WPA_PSK}
-		if rp_WPA2.MatchString(strBSS) {currentBSS.AuthMode = WiFiAuthMode_WPA2_PSK}
+		if rp_WEP.MatchString(strBSS) {
+			currentBSS.AuthMode = WiFiAuthMode_UNSUPPORTED
+		}
+		if rp_WPA.MatchString(strBSS) {
+			currentBSS.AuthMode = WiFiAuthMode_WPA_PSK
+		}
+		if rp_WPA2.MatchString(strBSS) {
+			currentBSS.AuthMode = WiFiAuthMode_WPA2_PSK
+		}
 		if currentBSS.AuthMode == WiFiAuthMode_WPA_PSK || currentBSS.AuthMode == WiFiAuthMode_WPA2_PSK {
-			if !rp_PSK.MatchString(strBSS) {currentBSS.AuthMode = WiFiAuthMode_UNSUPPORTED}
+			if !rp_PSK.MatchString(strBSS) {
+				currentBSS.AuthMode = WiFiAuthMode_UNSUPPORTED
+			}
 		}
 		switch currentBSS.AuthMode {
 		case WiFiAuthMode_UNSUPPORTED:
@@ -704,14 +697,18 @@ func ParseIwScan(scanresult string) (bsslist []BSS, err error) {
 		//signal
 		strSignal_sub := rp_signal.FindStringSubmatch(strBSS)
 		strSignal := "0.0"
-		if len(strSignal_sub) > 1 { strSignal = strSignal_sub[1]}
+		if len(strSignal_sub) > 1 {
+			strSignal = strSignal_sub[1]
+		}
 		tmpFloat, err := strconv.ParseFloat(strSignal, 32)
-		if err != nil { return nil, err }
+		if err != nil {
+			return nil, err
+		}
 		currentBSS.Signal = float32(tmpFloat)
 		fmt.Printf("Signal: %s dBm\n", strSignal)
 
 		bsslist = append(bsslist, currentBSS)
 	}
 
-	return bsslist,nil
+	return bsslist, nil
 }
