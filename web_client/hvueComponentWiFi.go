@@ -41,10 +41,10 @@ func InitComponentsWiFi() {
 					Value int  `js:"value"`
 				}{Object:O()}
 				mode.Value = val
-				switch pb.WiFiSettings_APAuthMode(val) {
-				case pb.WiFiSettings_WPA2_PSK:
+				switch pb.WiFi2AuthMode(val) {
+				case pb.WiFi2AuthMode_WPA2_PSK:
 					mode.Label = "WPA2"
-				case pb.WiFiSettings_OPEN:
+				case pb.WiFi2AuthMode_OPEN:
 					mode.Label = "Open"
 				default:
 					mode.Label = "Unknown"
@@ -55,27 +55,30 @@ func InitComponentsWiFi() {
 		}),
 		hvue.Computed("wifiModes", func(vm *hvue.VM) interface{} {
 			modes := js.Global.Get("Array").New()
-			for val,_ := range pb.WiFiSettings_Mode_name {
+			for val,_ := range pb.WiFi2WorkingMode_name {
 				mode := struct {
 					*js.Object
 					Label string `js:"label"`
 					Value int  `js:"value"`
 				}{Object:O()}
 				mode.Value = val
-				switch pb.WiFiSettings_Mode(val) {
-				case pb.WiFiSettings_AP:
+				switch pb.WiFi2WorkingMode(val) {
+				case pb.WiFi2WorkingMode_AP:
 					mode.Label = "Access Point (AP)"
-				case pb.WiFiSettings_STA:
+				case pb.WiFi2WorkingMode_STA:
 					mode.Label = "Station (Client)"
-				case pb.WiFiSettings_STA_FAILOVER_AP:
+				case pb.WiFi2WorkingMode_STA_FAILOVER_AP:
 					mode.Label = "Client with Failover to AP"
 				default:
-					mode.Label = "Unknown"
+					continue
 				}
 				modes.Call("push", mode)
 			}
 			return modes
 		}),
+		hvue.Computed("mode_ap", func(vm *hvue.VM) interface{} {return pb.WiFi2WorkingMode_AP}),
+		hvue.Computed("mode_sta", func(vm *hvue.VM) interface{} {return pb.WiFi2WorkingMode_STA_FAILOVER_AP}),
+		hvue.Computed("mode_failover", func(vm *hvue.VM) interface{} {return pb.WiFi2WorkingMode_STA_FAILOVER_AP}),
 		hvue.Method("reset",
 			func(vm *hvue.VM) {
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED)
@@ -145,7 +148,7 @@ const templateWiFi = `
 	</q-card>
 	</div>
 
-	<div class="col-lg-4" v-if="settings.mode != 0">
+	<div class="col-lg-4" v-if="settings.mode == mode_sta || settings.mode == mode_failover">
 	<q-card class="full-height">
 		<q-card-title>
 			WiFi client settings
@@ -172,7 +175,7 @@ const templateWiFi = `
 					</q-item-main>
 				</q-item>
 
-			<template v-if="settings.mode == 2">
+			<template v-if="settings.mode == mode_failover">
 				<q-item>
 					<q-item-main>
 	  				<q-alert type="warning">
@@ -185,7 +188,7 @@ const templateWiFi = `
 	</q-card>
 	</div>
 
-	<div class="col-lg-4" v-if="settings.mode != 1">
+	<div class="col-lg-4" v-if="settings.mode == mode_ap || settings.mode == mode_failover">
 	<q-card class="full-height">
 		<q-card-title>
 			WiFi Access Point settings
@@ -247,6 +250,17 @@ const templateWiFi = `
 		</q-list>
 	</q-card>
 	</div>
+
+	<div class="col-lg-12">
+	<q-card class="full-height">
+		<q-card-title>
+			<q-icon name="alarm" /><q-icon name="alarm" />
+		</q-card-title>
+
+		WiFiState {{ $store.state.wifiConnectionState }} 
+	</q-card>
+	</div>
+
 </div>
 </q-page>	
 

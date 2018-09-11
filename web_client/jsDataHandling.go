@@ -18,22 +18,22 @@ var eNoHidEvent = errors.New("No HID event")
 
 type jsGadgetSettings struct {
 	*js.Object
-	Enabled          bool  `js:"Enabled"`
-	Vid              string  `js:"Vid"`
-	Pid              string  `js:"Pid"`
-	Manufacturer     string `js:"Manufacturer"`
-	Product          string `js:"Product"`
-	Serial           string `js:"Serial"`
-	Use_CDC_ECM      bool `js:"Use_CDC_ECM"`
-	Use_RNDIS        bool `js:"Use_RNDIS"`
-	Use_HID_KEYBOARD bool `js:"Use_HID_KEYBOARD"`
-	Use_HID_MOUSE    bool `js:"Use_HID_MOUSE"`
-	Use_HID_RAW      bool `js:"Use_HID_RAW"`
-	Use_UMS          bool `js:"Use_UMS"`
-	Use_SERIAL       bool `js:"Use_SERIAL"`
+	Enabled          bool                     `js:"Enabled"`
+	Vid              string                   `js:"Vid"`
+	Pid              string                   `js:"Pid"`
+	Manufacturer     string                   `js:"Manufacturer"`
+	Product          string                   `js:"Product"`
+	Serial           string                   `js:"Serial"`
+	Use_CDC_ECM      bool                     `js:"Use_CDC_ECM"`
+	Use_RNDIS        bool                     `js:"Use_RNDIS"`
+	Use_HID_KEYBOARD bool                     `js:"Use_HID_KEYBOARD"`
+	Use_HID_MOUSE    bool                     `js:"Use_HID_MOUSE"`
+	Use_HID_RAW      bool                     `js:"Use_HID_RAW"`
+	Use_UMS          bool                     `js:"Use_UMS"`
+	Use_SERIAL       bool                     `js:"Use_SERIAL"`
 	RndisSettings    *VGadgetSettingsEthernet `js:"RndisSettings"`
 	CdcEcmSettings   *VGadgetSettingsEthernet `js:"CdcEcmSettings"`
-	UmsSettings      *VGadgetSettingsUMS `js:"UmsSettings"`
+	UmsSettings      *VGadgetSettingsUMS      `js:"UmsSettings"`
 }
 
 type VGadgetSettingsEthernet struct {
@@ -42,10 +42,9 @@ type VGadgetSettingsEthernet struct {
 	DevAddr  string `js:"DevAddr"`
 }
 
-
 type VGadgetSettingsUMS struct {
 	*js.Object
-	Cdrom bool `js:"Cdrom"`
+	Cdrom bool   `js:"Cdrom"`
 	File  string `js:"File"`
 }
 
@@ -121,7 +120,6 @@ func (jsGS *jsGadgetSettings) fromGS(gs *pb.GadgetSettings) {
 	}
 }
 
-
 func NewUSBGadgetSettings() *jsGadgetSettings {
 	gs := &jsGadgetSettings{
 		Object: O(),
@@ -135,18 +133,17 @@ func NewUSBGadgetSettings() *jsGadgetSettings {
 
 type jsEvent struct {
 	*js.Object
-	Type   int64 `js:"type"`
-	Values []interface{}
+	Type     int64      `js:"type"`
+	Values   []interface{}
 	JSValues *js.Object `js:"values"`
 }
 
-
 func NewJsEventFromNative(event *pb.Event) (res *jsEvent) {
-	res = &jsEvent{Object:O()}
+	res = &jsEvent{Object: O()}
 	res.JSValues = js.Global.Get("Array").New()
 	res.Type = event.Type
 	res.Values = make([]interface{}, len(event.Values))
-	for idx,val := range event.Values {
+	for idx, val := range event.Values {
 		switch valT := val.Val.(type) {
 		case *pb.EventValue_Tint64:
 			res.Values[idx] = valT.Tint64
@@ -170,89 +167,115 @@ func NewJsEventFromNative(event *pb.Event) (res *jsEvent) {
 type jsLogEvent struct {
 	*js.Object
 	EvLogSource  string `js:"source"`
-	EvLogLevel   int  `js:"level"`
+	EvLogLevel   int    `js:"level"`
 	EvLogMessage string `js:"message"`
-	EvLogTime string `js:"time"`
+	EvLogTime    string `js:"time"`
 }
 
 //HID event
 type jsHidEvent struct {
 	*js.Object
-	EvType int64 `js:"evtype"`
-	VMId   int64  `js:"vmId"`
-	JobId   int64  `js:"jobId"`
-	HasError  bool  `js:"hasError"`
-	Result string `js:"result"`
-	Error string `js:"error"`
-	Message string `js:"message"`
+	EvType    int64  `js:"evtype"`
+	VMId      int64  `js:"vmId"`
+	JobId     int64  `js:"jobId"`
+	HasError  bool   `js:"hasError"`
+	Result    string `js:"result"`
+	Error     string `js:"error"`
+	Message   string `js:"message"`
 	EvLogTime string `js:"time"`
 }
 
 func (jsEv *jsEvent) toLogEvent() (res *jsLogEvent, err error) {
-	if jsEv.Type != common_web.EVT_LOG || len(jsEv.Values) != 4 { return nil,eNoLogEvent}
-	res = &jsLogEvent{Object:O()}
+	if jsEv.Type != common_web.EVT_LOG || len(jsEv.Values) != 4 {
+		return nil, eNoLogEvent
+	}
+	res = &jsLogEvent{Object: O()}
 
 	var ok bool
-	res.EvLogSource,ok = jsEv.Values[0].(string)
-	if !ok { return nil,eNoLogEvent }
+	res.EvLogSource, ok = jsEv.Values[0].(string)
+	if !ok {
+		return nil, eNoLogEvent
+	}
 
-	ll,ok := jsEv.Values[1].(int64)
-	if !ok { return nil,eNoLogEvent}
+	ll, ok := jsEv.Values[1].(int64)
+	if !ok {
+		return nil, eNoLogEvent
+	}
 	res.EvLogLevel = int(ll)
 
-	res.EvLogMessage,ok = jsEv.Values[2].(string)
-	if !ok { return nil,eNoLogEvent}
+	res.EvLogMessage, ok = jsEv.Values[2].(string)
+	if !ok {
+		return nil, eNoLogEvent
+	}
 
-	res.EvLogTime,ok = jsEv.Values[3].(string)
-	if !ok { return nil,eNoLogEvent}
+	res.EvLogTime, ok = jsEv.Values[3].(string)
+	if !ok {
+		return nil, eNoLogEvent
+	}
 
-	return res,nil
+	return res, nil
 }
 
 func (jsEv *jsEvent) toHidEvent() (res *jsHidEvent, err error) {
-	if jsEv.Type != common_web.EVT_HID || len(jsEv.Values) != 8 { return nil,eNoHidEvent}
-	res = &jsHidEvent{Object:O()}
+	if jsEv.Type != common_web.EVT_HID || len(jsEv.Values) != 8 {
+		return nil, eNoHidEvent
+	}
+	res = &jsHidEvent{Object: O()}
 
 	var ok bool
-	res.EvType,ok = jsEv.Values[0].(int64)
-	if !ok { return nil,eNoHidEvent }
+	res.EvType, ok = jsEv.Values[0].(int64)
+	if !ok {
+		return nil, eNoHidEvent
+	}
 
-	res.VMId,ok = jsEv.Values[1].(int64)
-	if !ok { return nil,eNoHidEvent}
+	res.VMId, ok = jsEv.Values[1].(int64)
+	if !ok {
+		return nil, eNoHidEvent
+	}
 
-	res.JobId,ok = jsEv.Values[2].(int64)
-	if !ok { return nil,eNoHidEvent}
+	res.JobId, ok = jsEv.Values[2].(int64)
+	if !ok {
+		return nil, eNoHidEvent
+	}
 
-	res.HasError,ok = jsEv.Values[3].(bool)
-	if !ok { return nil,eNoHidEvent}
+	res.HasError, ok = jsEv.Values[3].(bool)
+	if !ok {
+		return nil, eNoHidEvent
+	}
 
-	res.Result,ok = jsEv.Values[4].(string)
-	if !ok { return nil,eNoHidEvent}
+	res.Result, ok = jsEv.Values[4].(string)
+	if !ok {
+		return nil, eNoHidEvent
+	}
 
-	res.Error,ok = jsEv.Values[5].(string)
-	if !ok { return nil,eNoHidEvent}
+	res.Error, ok = jsEv.Values[5].(string)
+	if !ok {
+		return nil, eNoHidEvent
+	}
 
-	res.Message,ok = jsEv.Values[6].(string)
-	if !ok { return nil,eNoHidEvent}
+	res.Message, ok = jsEv.Values[6].(string)
+	if !ok {
+		return nil, eNoHidEvent
+	}
 
-	res.EvLogTime,ok = jsEv.Values[7].(string)
-	if !ok { return nil,eNoHidEvent}
+	res.EvLogTime, ok = jsEv.Values[7].(string)
+	if !ok {
+		return nil, eNoHidEvent
+	}
 
-
-	return res,nil
+	return res, nil
 }
-
 
 /* HIDJobList */
 type jsHidJobState struct {
 	*js.Object
-	Id             int64  `js:"id"`
-	VmId           int64  `js:"vmId"`
-	HasFailed      bool   `js:"hasFailed"`
-	HasSucceeded   bool   `js:"hasSucceeded"`
-	LastMessage    string `js:"lastMessage"`
-	TextResult     string `js:"textResult"`
-//	TextError      string `js:"textError"`
+	Id           int64  `js:"id"`
+	VmId         int64  `js:"vmId"`
+	HasFailed    bool   `js:"hasFailed"`
+	HasSucceeded bool   `js:"hasSucceeded"`
+	LastMessage  string `js:"lastMessage"`
+	TextResult   string `js:"textResult"`
+	//	TextError      string `js:"textError"`
 	LastUpdateTime string `js:"lastUpdateTime"` //JSON timestamp from server
 	ScriptSource   string `js:"textSource"`
 }
@@ -263,7 +286,7 @@ type jsHidJobStateList struct {
 }
 
 func NewHIDJobStateList() *jsHidJobStateList {
-	jl := &jsHidJobStateList{Object:O()}
+	jl := &jsHidJobStateList{Object: O()}
 	jl.Jobs = O()
 
 	/*
@@ -309,10 +332,10 @@ func (jl *jsHidJobStateList) UpdateEntry(id, vmId int64, hasFailed, hasSucceeded
 
 	//Check if job exists, update existing one if already present
 	var j *jsHidJobState
-	if res := jl.Jobs.Get(key);res == js.Undefined {
-		j = &jsHidJobState{Object:O()}
+	if res := jl.Jobs.Get(key); res == js.Undefined {
+		j = &jsHidJobState{Object: O()}
 	} else {
-		j = &jsHidJobState{Object:res}
+		j = &jsHidJobState{Object: res}
 	}
 
 	//Create job object
@@ -324,7 +347,9 @@ func (jl *jsHidJobStateList) UpdateEntry(id, vmId int64, hasFailed, hasSucceeded
 	j.LastMessage = message
 	j.TextResult = textResult
 	j.LastUpdateTime = lastUpdateTime
-	if len(scriptSource) > 0 {j.ScriptSource = scriptSource}
+	if len(scriptSource) > 0 {
+		j.ScriptSource = scriptSource
+	}
 	//jl.Jobs.Set(strconv.Itoa(int(j.Id)), j) //jobs["j.ID"]=j <--Property addition/update can't be detected by Vue.js, see https://vuejs.org/v2/guide/list.html#Object-Change-Detection-Caveats
 	hvue.Set(jl.Jobs, key, j)
 }
@@ -335,34 +360,85 @@ func (jl *jsHidJobStateList) DeleteEntry(id int64) {
 }
 
 /* WiFi settings */
-/*
-type WiFiSettings struct {
-	Disabled      bool
-	Reg           string
-	Mode          WiFiSettings_Mode
-	AuthMode      WiFiSettings_APAuthMode
-	ApChannel     uint32
-	BssCfgAP      *BSSCfg
-	BssCfgClient  *BSSCfg
-	ApHideSsid    bool
-	DisableNexmon bool
+
+type jsWiFiConnectionState struct {
+	*js.Object
+	Mode     int    `js:"mode"`
+	Reg      string `js:"reg"`
+	Channel  uint32 `js:"channel"`
+	SSID     string `js:"SSID"`
+	Hidden   bool   `js:"hidden"`
+	Nexmon   bool   `js:"nexmon"`
+	Disabled bool   `js:"disabled"`
 }
 
- */
+func (target *jsWiFiConnectionState) fromGo(src *pb.WiFi2State) {
+	target.Mode = int(src.WorkingMode)
+
+	target.Reg = src.Regulatory
+	target.Channel = src.Channel
+	target.SSID = src.Bss.SSID
+	target.Hidden = src.HideSsid
+	target.Nexmon = src.Nexmon
+	target.Disabled = src.Disabled
+	return
+}
+
+func (src *jsWiFiConnectionState) toGo() (target *pb.WiFi2State) {
+	target = &pb.WiFi2State{
+		Regulatory: src.Reg,
+		Channel: src.Channel,
+		Bss: &pb.WiFi2BSSCfg{
+			SSID: src.SSID,
+			PSK: "",
+		},
+		HideSsid:  src.Hidden,
+		Nexmon:  src.Nexmon,
+		WorkingMode: pb.WiFi2WorkingMode(src.Mode),
+		Disabled: src.Disabled,
+		Name: "",
+	}
+
+	return
+}
+
+func (src jsWiFiConnectionState) ModeString() (strMode string) {
+	switch src.Mode {
+	case 1:
+		return "Access Point"
+	case 2:
+		return "Station"
+	default:
+		return "UNKNOWN"
+
+	}
+}
+
+func NewWiFiConnectionState() *jsWiFiConnectionState {
+	res := &jsWiFiConnectionState{Object: O()}
+	res.SSID = "Unknown SSID"
+	res.Channel = 0
+	res.Mode = 0
+	res.Hidden = false
+	res.Reg = "Unknown reg"
+	res.Nexmon = false
+	return res
+}
+
 type jsWiFiSettings struct {
 	*js.Object
-	Disabled bool `js:"disabled"`
-	Reg string `js:"reg"`
-	Mode int  `js:"mode"` //AP, STA, Failover
-	AuthMode int  `js:"authMode"` //WPA2_PSK, OPEN
-	Channel int  `js:"channel"`
+	Disabled bool   `js:"disabled"`
+	Reg      string `js:"reg"`
+	Mode     int    `js:"mode"`     //AP, STA, Failover
+	AuthMode int    `js:"authMode"` //WPA2_PSK, OPEN
+	Channel  int    `js:"channel"`
 	// next two fields are interpreted as BssCfgAp or BssCfgClient, depending on Mode
-	AP_SSID string `js:"apSsid"`
-	AP_PSK string `js:"apPsk"`
-	STA_SSID string `js:"staSsid"`
-	STA_PSK string `js:"staPsk"`
-	HideSsid bool `js:"hideSsid"`
-	DisableNexmon bool `js:"disableNexmon"`
+	AP_SSID       string `js:"apSsid"`
+	AP_PSK        string `js:"apPsk"`
+	STA_SSID      string `js:"staSsid"`
+	STA_PSK       string `js:"staPsk"`
+	HideSsid      bool   `js:"hideSsid"`
+	DisableNexmon bool   `js:"disableNexmon"`
 }
 
 func (target *jsWiFiSettings) fromGo(src *pb.WiFiSettings) {
@@ -397,22 +473,47 @@ func (src *jsWiFiSettings) toGo() (target *pb.WiFiSettings) {
 	// assure undefined strings end up as empty strings
 
 	target = &pb.WiFiSettings{
-		Disabled: src.Disabled,
-		Reg: src.Reg,
-		Mode: pb.WiFiSettings_Mode(src.Mode),
-		AuthMode: pb.WiFiSettings_APAuthMode(src.AuthMode),
+		Disabled:      src.Disabled,
+		Reg:           src.Reg,
+		Mode:          pb.WiFiSettings_Mode(src.Mode),
+		AuthMode:      pb.WiFiSettings_APAuthMode(src.AuthMode),
 		DisableNexmon: src.DisableNexmon,
-		ApChannel: uint32(src.Channel),
-		ApHideSsid: src.HideSsid,
+		ApChannel:     uint32(src.Channel),
+		ApHideSsid:    src.HideSsid,
 		BssCfgClient: &pb.BSSCfg{
 			SSID: src.STA_SSID,
-			PSK: src.STA_PSK,
+			PSK:  src.STA_PSK,
 		},
 		BssCfgAP: &pb.BSSCfg{
 			SSID: src.AP_SSID,
-			PSK: src.AP_PSK,
+			PSK:  src.AP_PSK,
 		},
+	}
+	return target
+}
 
+func (src *jsWiFiSettings) toGo2() (target *pb.WiFi2Settings) {
+	// assure undefined strings end up as empty strings
+
+	target = &pb.WiFi2Settings{
+		Name:        "mainconfig",
+		Disabled:    src.Disabled,
+		Regulatory:  src.Reg,
+		WorkingMode: pb.WiFi2WorkingMode(src.Mode),
+		AuthMode:    pb.WiFi2AuthMode(src.AuthMode),
+		Nexmon:      !src.DisableNexmon,
+		Channel:     uint32(src.Channel),
+		HideSsid:    src.HideSsid,
+		Ap_BSS: &pb.WiFi2BSSCfg{
+			SSID: src.AP_SSID,
+			PSK:  src.AP_PSK,
+		},
+		Client_BSSList: []*pb.WiFi2BSSCfg{
+			&pb.WiFi2BSSCfg{
+				SSID: src.STA_SSID,
+				PSK:  src.STA_PSK,
+			},
+		},
 	}
 	return target
 }
@@ -427,7 +528,7 @@ func (isl *jsEthernetSettingsList) fromGo(src *pb.DeployedEthernetInterfaceSetti
 	//Options array (converted from map)
 	isl.Interfaces = js.Global.Get("Array").New()
 	for _, ifSets := range src.List {
-		jsIfSets := &jsEthernetInterfaceSettings{Object:O()}
+		jsIfSets := &jsEthernetInterfaceSettings{Object: O()}
 		jsIfSets.fromGo(ifSets)
 		isl.Interfaces.Call("push", jsIfSets)
 	}
@@ -436,13 +537,13 @@ func (isl *jsEthernetSettingsList) fromGo(src *pb.DeployedEthernetInterfaceSetti
 
 type jsEthernetInterfaceSettings struct {
 	*js.Object
-	Name string `js:"name"`
-	Mode int `js:"mode"`
-	IpAddress4 string `js:"ipAddress4"`
-	Netmask4 string `js:"netmask4"`
-	Enabled bool `js:"enabled"`
+	Name               string                `js:"name"`
+	Mode               int                   `js:"mode"`
+	IpAddress4         string                `js:"ipAddress4"`
+	Netmask4           string                `js:"netmask4"`
+	Enabled            bool                  `js:"enabled"`
 	DhcpServerSettings *jsDHCPServerSettings `js:"dhcpServerSettings"`
-	SettingsInUse      bool `js:"settingsInUse"`
+	SettingsInUse      bool                  `js:"settingsInUse"`
 }
 
 func (target *jsEthernetInterfaceSettings) fromGo(src *pb.EthernetInterfaceSettings) {
@@ -454,18 +555,18 @@ func (target *jsEthernetInterfaceSettings) fromGo(src *pb.EthernetInterfaceSetti
 	target.SettingsInUse = src.SettingsInUse
 
 	if src.DhcpServerSettings != nil {
-		target.DhcpServerSettings = &jsDHCPServerSettings{Object:O()}
+		target.DhcpServerSettings = &jsDHCPServerSettings{Object: O()}
 		target.DhcpServerSettings.fromGo(src.DhcpServerSettings)
 	}
 }
 
 func (src *jsEthernetInterfaceSettings) toGo() (target *pb.EthernetInterfaceSettings) {
 	target = &pb.EthernetInterfaceSettings{
-		Name: src.Name,
-		Mode: pb.EthernetInterfaceSettings_Mode(src.Mode),
-		IpAddress4: src.IpAddress4,
-		Netmask4: src.Netmask4,
-		Enabled: src.Enabled,
+		Name:          src.Name,
+		Mode:          pb.EthernetInterfaceSettings_Mode(src.Mode),
+		IpAddress4:    src.IpAddress4,
+		Netmask4:      src.Netmask4,
+		Enabled:       src.Enabled,
 		SettingsInUse: src.SettingsInUse,
 	}
 
@@ -480,7 +581,7 @@ func (src *jsEthernetInterfaceSettings) toGo() (target *pb.EthernetInterfaceSett
 
 func (iface *jsEthernetInterfaceSettings) CreateDhcpSettingsForInterface() {
 	//create dhcp server settings
-	settings := &jsDHCPServerSettings{Object:O()}
+	settings := &jsDHCPServerSettings{Object: O()}
 	settings.ListenInterface = iface.Name
 	settings.ListenPort = 0 // 0 means DNS is disabled
 	settings.LeaseFile = common_web.NameLeaseFileDHCPSrv(iface.Name)
@@ -489,38 +590,37 @@ func (iface *jsEthernetInterfaceSettings) CreateDhcpSettingsForInterface() {
 	settings.CallbackScript = ""
 	//ToDo: add missing fields
 
-
 	//Ranges array
 	settings.Ranges = js.Global.Get("Array").New()
 	settings.Options = js.Global.Get("Array").New()
 	settings.StaticHosts = js.Global.Get("Array").New()
 
 	//add empty option for router and DNS to prevent netmask from promoting itself via DHCP
-	optNoRouter := &jsDHCPServerOption{Object:O()}
+	optNoRouter := &jsDHCPServerOption{Object: O()}
 	optNoRouter.Option = 3
 	optNoRouter.Value = ""
 	settings.AddOption(optNoRouter)
-	optNoDNS := &jsDHCPServerOption{Object:O()}
+	optNoDNS := &jsDHCPServerOption{Object: O()}
 	optNoDNS.Option = 6
 	optNoDNS.Value = ""
 	settings.AddOption(optNoDNS)
 
 	//iface.DhcpServerSettings = settings
 	// Update the field with Vue in order to have proper setters in place
-	hvue.Set(iface,"dhcpServerSettings", settings)
+	hvue.Set(iface, "dhcpServerSettings", settings)
 }
 
 type jsDHCPServerSettings struct {
 	*js.Object
-	ListenPort         int `js:"listenPort"`
-	ListenInterface    string `js:"listenInterface"`
-	LeaseFile          string `js:"leaseFile"`
-	NotAuthoritative   bool `js:"nonAuthoritative"`
-	DoNotBindInterface bool `js:"doNotBindInterface"`
-	CallbackScript     string `js:"callbackScript"`
-	Ranges             *js.Object `js:"ranges"`//[]*DHCPServerRange
-	Options            *js.Object `js:"options"`	//map[uint32]string
-	StaticHosts        *js.Object `js:"staticHosts"`//[]*DHCPServerStaticHost
+	ListenPort         int        `js:"listenPort"`
+	ListenInterface    string     `js:"listenInterface"`
+	LeaseFile          string     `js:"leaseFile"`
+	NotAuthoritative   bool       `js:"nonAuthoritative"`
+	DoNotBindInterface bool       `js:"doNotBindInterface"`
+	CallbackScript     string     `js:"callbackScript"`
+	Ranges             *js.Object `js:"ranges"`      //[]*DHCPServerRange
+	Options            *js.Object `js:"options"`     //map[uint32]string
+	StaticHosts        *js.Object `js:"staticHosts"` //[]*DHCPServerStaticHost
 }
 
 func (src *jsDHCPServerSettings) toGo() (target *pb.DHCPServerSettings) {
@@ -535,13 +635,12 @@ func (src *jsDHCPServerSettings) toGo() (target *pb.DHCPServerSettings) {
 
 	println("jsRanges", src.Ranges)
 
-
 	//Check if ranges are present
 	if src.Ranges != js.Undefined {
 		if numRanges := src.Ranges.Length(); numRanges > 0 {
 			target.Ranges = make([]*pb.DHCPServerRange, numRanges)
 			//iterate over JS array
-			for i:= 0; i < numRanges; i++ {
+			for i := 0; i < numRanges; i++ {
 				jsRange := &jsDHCPServerRange{Object: src.Ranges.Index(i)}
 				target.Ranges[i] = &pb.DHCPServerRange{}
 				target.Ranges[i].RangeUpper = jsRange.RangeUpper
@@ -556,7 +655,7 @@ func (src *jsDHCPServerSettings) toGo() (target *pb.DHCPServerSettings) {
 		if numOptions := src.Options.Length(); numOptions > 0 {
 			target.Options = make(map[uint32]string)
 			//iterate over JS array
-			for i:= 0; i < numOptions; i++ {
+			for i := 0; i < numOptions; i++ {
 				jsOption := &jsDHCPServerOption{Object: src.Options.Index(i)}
 				target.Options[uint32(jsOption.Option)] = jsOption.Value
 			}
@@ -568,7 +667,7 @@ func (src *jsDHCPServerSettings) toGo() (target *pb.DHCPServerSettings) {
 		if numStaticHosts := src.StaticHosts.Length(); numStaticHosts > 0 {
 			target.StaticHosts = make([]*pb.DHCPServerStaticHost, numStaticHosts)
 			//iterate over JS array
-			for i:= 0; i < numStaticHosts; i++ {
+			for i := 0; i < numStaticHosts; i++ {
 				jsStaticHost := &jsDHCPServerStaticHost{Object: src.StaticHosts.Index(i)}
 				target.StaticHosts[i] = &pb.DHCPServerStaticHost{}
 				target.StaticHosts[i].Mac = jsStaticHost.Mac
@@ -579,7 +678,6 @@ func (src *jsDHCPServerSettings) toGo() (target *pb.DHCPServerSettings) {
 	return target
 }
 
-
 func (settings *jsDHCPServerSettings) AddRange(dhcpRange *jsDHCPServerRange) {
 	if settings.Ranges == js.Undefined {
 		settings.Ranges = js.Global.Get("Array").New()
@@ -588,14 +686,15 @@ func (settings *jsDHCPServerSettings) AddRange(dhcpRange *jsDHCPServerRange) {
 }
 
 func (settings *jsDHCPServerSettings) RemoveRange(dhcpRange *jsDHCPServerRange) {
-	if settings.Ranges == js.Undefined { return	}
+	if settings.Ranges == js.Undefined {
+		return
+	}
 
 	//Check if in array
 	if idx := settings.Ranges.Call("indexOf", dhcpRange).Int(); idx > -1 {
 		settings.Ranges.Call("splice", idx, 1)
 	}
 }
-
 
 func (settings *jsDHCPServerSettings) AddOption(dhcpOption *jsDHCPServerOption) {
 	if settings.Options == js.Undefined {
@@ -604,9 +703,10 @@ func (settings *jsDHCPServerSettings) AddOption(dhcpOption *jsDHCPServerOption) 
 	settings.Options.Call("push", dhcpOption)
 }
 
-
 func (settings *jsDHCPServerSettings) RemoveOption(dhcpOption *jsDHCPServerOption) {
-	if settings.Options == js.Undefined { return	}
+	if settings.Options == js.Undefined {
+		return
+	}
 
 	//Check if in array
 	if idx := settings.Options.Call("indexOf", dhcpOption).Int(); idx > -1 {
@@ -621,16 +721,16 @@ func (settings *jsDHCPServerSettings) AddStaticHost(dhcpStaticHost *jsDHCPServer
 	settings.StaticHosts.Call("push", dhcpStaticHost)
 }
 
-
 func (settings *jsDHCPServerSettings) RemoveStaticHost(dhcpStaticHost *jsDHCPServerStaticHost) {
-	if settings.StaticHosts == js.Undefined { return	}
+	if settings.StaticHosts == js.Undefined {
+		return
+	}
 
 	//Check if in array
 	if idx := settings.StaticHosts.Call("indexOf", dhcpStaticHost).Int(); idx > -1 {
 		settings.StaticHosts.Call("splice", idx, 1)
 	}
 }
-
 
 func (target *jsDHCPServerSettings) fromGo(src *pb.DHCPServerSettings) {
 	target.ListenPort = int(src.ListenPort)
@@ -641,25 +741,25 @@ func (target *jsDHCPServerSettings) fromGo(src *pb.DHCPServerSettings) {
 	target.CallbackScript = src.CallbackScript
 
 	//Ranges array
-	target.Ranges = js.Global.Get("Array").New(	)
-	for _,dhcpRange := range src.Ranges {
-		jsRange := &jsDHCPServerRange{Object:O()}
+	target.Ranges = js.Global.Get("Array").New()
+	for _, dhcpRange := range src.Ranges {
+		jsRange := &jsDHCPServerRange{Object: O()}
 		jsRange.fromGo(dhcpRange)
 		target.Ranges.Call("push", jsRange)
 	}
 
 	//Options array (converted from map)
-	target.Options = js.Global.Get("Array").New(	)
+	target.Options = js.Global.Get("Array").New()
 	for optId, optVal := range src.Options {
-		jsOption := &jsDHCPServerOption{Object:O()}
+		jsOption := &jsDHCPServerOption{Object: O()}
 		jsOption.fromGo(optId, optVal)
 		target.Options.Call("push", jsOption)
 	}
 
 	//StaticHosts array
-	target.StaticHosts = js.Global.Get("Array").New(	)
-	for _,staticHost := range src.StaticHosts {
-		jsStaticHost := &jsDHCPServerStaticHost{Object:O()}
+	target.StaticHosts = js.Global.Get("Array").New()
+	for _, staticHost := range src.StaticHosts {
+		jsStaticHost := &jsDHCPServerStaticHost{Object: O()}
 		jsStaticHost.fromGo(staticHost)
 		target.Ranges.Call("push", jsStaticHost)
 	}
@@ -678,11 +778,10 @@ func (target *jsDHCPServerRange) fromGo(src *pb.DHCPServerRange) {
 	target.LeaseTime = src.LeaseTime
 }
 
-
 type jsDHCPServerOption struct {
 	*js.Object
-	Option int `js:"option"`
-	Value string `js:"value"`
+	Option int    `js:"option"`
+	Value  string `js:"value"`
 }
 
 func (target *jsDHCPServerOption) fromGo(srcID uint32, srcVal string) {
@@ -693,7 +792,7 @@ func (target *jsDHCPServerOption) fromGo(srcID uint32, srcVal string) {
 type jsDHCPServerStaticHost struct {
 	*js.Object
 	Mac string `js:"mac"`
-	Ip string `js:"ip"`
+	Ip  string `js:"ip"`
 }
 
 func (target *jsDHCPServerStaticHost) fromGo(src *pb.DHCPServerStaticHost) {
@@ -704,9 +803,9 @@ func (target *jsDHCPServerStaticHost) fromGo(src *pb.DHCPServerStaticHost) {
 /* EVENT LOGGER */
 type jsEventReceiver struct {
 	*js.Object
-	LogArray      *js.Object `js:"logArray"`
-	HidEventArray *js.Object `js:"eventHidArray"`
-	MaxEntries    int        `js:"maxEntries"`
+	LogArray      *js.Object         `js:"logArray"`
+	HidEventArray *js.Object         `js:"eventHidArray"`
+	MaxEntries    int                `js:"maxEntries"`
 	JobList       *jsHidJobStateList `js:"jobList"` //Needs to be exposed to JS in order to use JobList.UpdateEntry() from this JS object
 }
 
@@ -723,15 +822,15 @@ func NewEventReceiver(maxEntries int, jobList *jsHidJobStateList) *jsEventReceiv
 	return eventReceiver
 }
 
-func (data *jsEventReceiver) handleHidEvent(hEv *jsHidEvent ) {
+func (data *jsEventReceiver) handleHidEvent(hEv *jsHidEvent) {
 	println("Received HID EVENT", hEv)
 	switch hEv.EvType {
 	case common_web.HidEventType_JOB_STARTED:
 		// Note: the JOB_STARTED event carries the script source in the message field, (no need to re-request the job
 		// state in order to retrieve the source code of the job, when adding it to the job state list)
-		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, false, "Script started", "", hEv.EvLogTime,hEv.Message)
+		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, false, "Script started", "", hEv.EvLogTime, hEv.Message)
 	case common_web.HidEventType_JOB_FAILED:
-		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, false, hEv.Message, hEv.Error, hEv.EvLogTime,"")
+		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, false, hEv.Message, hEv.Error, hEv.EvLogTime, "")
 
 		notification := &QuasarNotification{Object: O()}
 		notification.Message = "HIDScript job " + strconv.Itoa(int(hEv.JobId)) + " failed"
@@ -741,7 +840,7 @@ func (data *jsEventReceiver) handleHidEvent(hEv *jsHidEvent ) {
 		notification.Timeout = 5000
 		QuasarNotify(notification)
 	case common_web.HidEventType_JOB_SUCCEEDED:
-		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, true, hEv.Message, hEv.Result, hEv.EvLogTime,"")
+		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, true, hEv.Message, hEv.Result, hEv.EvLogTime, "")
 
 		notification := &QuasarNotification{Object: O()}
 		notification.Message = "HIDScript job " + strconv.Itoa(int(hEv.JobId)) + " succeeded"
@@ -752,29 +851,28 @@ func (data *jsEventReceiver) handleHidEvent(hEv *jsHidEvent ) {
 		QuasarNotify(notification)
 
 	case common_web.HidEventType_JOB_CANCELLED:
-		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, true, false, hEv.Message, hEv.Message, hEv.EvLogTime,"")
+		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, true, false, hEv.Message, hEv.Message, hEv.EvLogTime, "")
 	default:
-		println("unhandled hid event " + common_web.EventType_name[hEv.EvType], hEv)
+		println("unhandled hid event "+common_web.EventType_name[hEv.EvType], hEv)
 	}
 
 }
 
-
 /* This method gets internalized and therefor the mutex won't be accessible*/
-func (data *jsEventReceiver) HandleEvent(ev *pb.Event ) {
+func (data *jsEventReceiver) HandleEvent(ev *pb.Event) {
 	go func() {
 		jsEv := NewJsEventFromNative(ev)
 		switch jsEv.Type {
 		//if LOG event add to logArray
 		case common_web.EVT_LOG:
-			if logEv,err := jsEv.toLogEvent(); err == nil {
+			if logEv, err := jsEv.toLogEvent(); err == nil {
 				data.LogArray.Call("push", logEv)
 			} else {
 				println("couldn't convert to LogEvent: ", jsEv)
 			}
 			//if HID event add to eventHidArray
 		case common_web.EVT_HID:
-			if hidEv,err := jsEv.toHidEvent(); err == nil {
+			if hidEv, err := jsEv.toHidEvent(); err == nil {
 				data.HidEventArray.Call("push", hidEv)
 
 				//handle event

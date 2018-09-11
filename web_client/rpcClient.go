@@ -39,14 +39,23 @@ func (rpc *Rpc) DeployedEthernetInterfaceSettings(timeout time.Duration, setting
 	return
 }
 
-func (rpc *Rpc) DeployeWifiSettings(timeout time.Duration, settings *pb.WiFiSettings) (err error) {
+func (rpc *Rpc) DeployWifiSettings(timeout time.Duration, settings *pb.WiFiSettings) (state *pb.WiFiConnectionState, err error) {
 	// ToDo: The RPC call has to return an error in case deployment fails
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	_, err = rpc.Client.DeployWifiSettings(ctx, settings)
+	state, err = rpc.Client.DeployWifiSettings(ctx, settings)
 	return
 }
+
+func (rpc *Rpc) DeployWifiSettings2(timeout time.Duration, settings *pb.WiFi2Settings) (state *pb.WiFi2State, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	state, err = rpc.Client.DeployWiFiSettings2(ctx, settings)
+	return
+}
+
 
 func (rpc *Rpc) GetDeployedWiFiSettings(timeout time.Duration) (settingsList *jsWiFiSettings, err error) {
 	/*

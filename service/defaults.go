@@ -118,6 +118,7 @@ func GetDefaultGadgetSettings() (res pb.GadgetSettings) {
 	return res
 }
 
+/*
 func GetDefaultWiFiSettings() (res *pb.WiFiSettings) {
 	res = &pb.WiFiSettings{
 		Mode: pb.WiFiSettings_AP,
@@ -135,3 +136,4 @@ func GetDefaultWiFiSettings() (res *pb.WiFiSettings) {
 	}
 	return
 }
+*/

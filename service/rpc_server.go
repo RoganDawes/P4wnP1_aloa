@@ -1,3 +1,5 @@
+// +build linux
+
 package service
 
 import (
@@ -28,20 +30,34 @@ var (
 
 type server struct {}
 
+func (s *server) DeployWiFiSettings2(ctx context.Context, wset *pb.WiFi2Settings) (wstate *pb.WiFi2State, err error) {
+	return ServiceState.WifiSvc.DeploySettings(wset)
+}
+
+func (s *server) GetWiFiState2(ctx context.Context, empty *pb.Empty) (wstate *pb.WiFi2State, err error) {
+	st := ServiceState.WifiSvc.GetState()
+	return &st, nil
+}
+
+func (s *server) ListenWiFiStateChanges2(ctx context.Context, empty *pb.Empty) (wstate *pb.WiFi2State, err error) {
+	panic("implement me")
+}
+
+/*
 func (s *server) GetDeployedWifiSettings(ctx context.Context, req *pb.Empty) (resp *pb.WiFiSettings, err error) {
 	return ServiceState.Wifi.GetDeployWifiSettings()
 }
 
 
-func (s *server) DeployWifiSettings(ctx context.Context, ws *pb.WiFiSettings) (empty *pb.Empty, err error) {
+func (s *server) DeployWifiSettings(ctx context.Context, ws *pb.WiFiSettings) (wifiConState *pb.WiFiConnectionState, err error) {
 	log.Printf("Trying to deploy WiFi settings %v", ws)
-	empty = &pb.Empty{}
 	err = ServiceState.Wifi.DeployWifiSettings(ws)
 	if err != nil {
 		log.Printf("Error deploying WiFi settings settings %v", err)
 	}
-	return
+	return ServiceState.Wifi.ConState, err
 }
+*/
 
 func (s *server) GetDeployedEthernetInterfaceSettings(ctx context.Context, req *pb.StringMessage) (resp *pb.EthernetInterfaceSettings, err error) {
 	if settings,exist := ServiceState.StoredNetworkSetting[req.Msg]; exist && settings.SettingsInUse {

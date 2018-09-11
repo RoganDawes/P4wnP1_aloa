@@ -258,7 +258,7 @@ func ClientDeployEthernetInterfaceSettings(host string, port string, settings *p
 
 }
 
-func ClientDeployWifiSettings(host string, port string, settings *pb.WiFiSettings) (err error) {
+func ClientDeployWifiSettings(host string, port string, settings *pb.WiFi2Settings) (state *pb.WiFi2State, err error) {
 	// Set up a connection to the server.
 	address := host + ":" + port
 	//log.Printf("Connecting %s ...", address)
@@ -274,10 +274,8 @@ func ClientDeployWifiSettings(host string, port string, settings *pb.WiFiSetting
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
 	defer cancel()
 
-	_,err = rpcClient.DeployWifiSettings(ctx, settings)
-
-
-	return err
+	state,err = rpcClient.DeployWiFiSettings2(ctx, settings)
+	return
 }
 
 func ClientHIDRunScript(host string, port string, scriptPath string, timeoutSeconds uint32) (scriptRes *pb.HIDScriptResult, err error) {

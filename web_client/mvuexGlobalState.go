@@ -63,6 +63,7 @@ type GlobalState struct {
 	FailedConnectionAttempts         int                     `js:"failedConnectionAttempts"`
 	InterfaceSettings                *jsEthernetSettingsList `js:"InterfaceSettings"`
 	WiFiSettings                     *jsWiFiSettings         `js:"wifiSettings"`
+	WiFiState                        *jsWiFiConnectionState  `js:"wifiConnectionState"`
 }
 
 func createGlobalStateStruct() GlobalState {
@@ -89,7 +90,7 @@ func createGlobalStateStruct() GlobalState {
 		panic("Couldn't retrieve WiFi settings")
 	}
 	state.WiFiSettings = wifiSettings
-
+	state.WiFiState = NewWiFiConnectionState()
 	return state
 }
 
@@ -128,16 +129,32 @@ func actionUpdateWifiSettingsFromDeployed(store *mvuex.Store, context *mvuex.Act
 	return
 }
 
+/*
 func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settings *jsWiFiSettings) {
 	go func() {
 		println("Vuex dispatch deploy WiFi settings")
 		// convert to Go type
 		goSettings := settings.toGo()
 
-		err := RpcClient.DeployeWifiSettings(time.Second*3, goSettings)
+		wstate, err := RpcClient.DeployWifiSettings(time.Second*20, goSettings)
 		if err != nil {
-			Alert(err)
+			QuasarNotifyError("Error deploying WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 		}
+		state.WiFiState.fromGo(wstate)
+	}()
+}
+*/
+func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settings *jsWiFiSettings) {
+	go func() {
+		println("Vuex dispatch deploy WiFi settings")
+		// convert to Go type
+		goSettings := settings.toGo2()
+
+		wstate, err := RpcClient.DeployWifiSettings2(time.Second*20, goSettings)
+		if err != nil {
+			QuasarNotifyError("Error deploying WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		state.WiFiState.fromGo(wstate)
 	}()
 }
 
@@ -251,7 +268,7 @@ func initMVuex() *mvuex.Store {
 		}),
 
 		mvuex.Getter("hidjobsRunning", func(state *GlobalState) interface{} {
-			vJobs := state.HidJobList.Jobs //vue object, no real array --> values have to be extracted to filter
+			vJobs := state.HidJobList.Jobs                        //vue object, no real array --> values have to be extracted to filter
 			jobs := js.Global.Get("Object").Call("values", vJobs) //converted to native JS array (has filter method available
 			filtered := jobs.Call("filter", func(job *jsHidJobState) bool {
 				return !(job.HasSucceeded || job.HasFailed)
@@ -260,7 +277,7 @@ func initMVuex() *mvuex.Store {
 		}),
 
 		mvuex.Getter("hidjobsFailed", func(state *GlobalState) interface{} {
-			vJobs := state.HidJobList.Jobs //vue object, no real array --> values have to be extracted to filter
+			vJobs := state.HidJobList.Jobs                        //vue object, no real array --> values have to be extracted to filter
 			jobs := js.Global.Get("Object").Call("values", vJobs) //converted to native JS array (has filter method available
 			filtered := jobs.Call("filter", func(job *jsHidJobState) bool {
 				return job.HasFailed
@@ -269,7 +286,7 @@ func initMVuex() *mvuex.Store {
 		}),
 
 		mvuex.Getter("hidjobsSucceeded", func(state *GlobalState) interface{} {
-			vJobs := state.HidJobList.Jobs //vue object, no real array --> values have to be extracted to filter
+			vJobs := state.HidJobList.Jobs                        //vue object, no real array --> values have to be extracted to filter
 			jobs := js.Global.Get("Object").Call("values", vJobs) //converted to native JS array (has filter method available
 			filtered := jobs.Call("filter", func(job *jsHidJobState) bool {
 				return job.HasSucceeded

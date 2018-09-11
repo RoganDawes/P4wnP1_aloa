@@ -12,7 +12,8 @@ type GlobalServiceState struct {
 	Led 	*LedState
 	HidDevPath map[string]string //stores device path for HID devices
 	StoredNetworkSetting map[string]*pb.EthernetInterfaceSettings
-	Wifi *WifiState
+//	Wifi *WifiState
+	WifiSvc *WiFiService
 }
 
 func InitGlobalServiceState() (err error) {
@@ -40,7 +41,9 @@ func InitGlobalServiceState() (err error) {
 		IpAddress4:         "172.24.0.1",
 		Netmask4:           "255.255.255.0",
 	}
-	state.Wifi = NewWifiState(GetDefaultWiFiSettings(), wifi_if_name)
+//	state.Wifi = NewWifiState(GetDefaultWiFiSettings(), wifi_if_name)
+	state.WifiSvc = NewWifiService()
+
 
 	state.HidDevPath  = make(map[string]string) //should be initialized BEFORE UsbGadgetManager uses it
 	state.EvMgr = NewEventManager(20)
@@ -52,7 +55,6 @@ func InitGlobalServiceState() (err error) {
 
 	return nil
 }
-
 
 func (state *GlobalServiceState) StartService() {
 	state.EvMgr.Start()

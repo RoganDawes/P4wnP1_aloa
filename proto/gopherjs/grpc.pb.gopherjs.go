@@ -8,6 +8,9 @@
 		grpc.proto
 
 	It has these top-level messages:
+		WiFi2Settings
+		WiFi2State
+		WiFi2BSSCfg
 		StringMessage
 		EventRequest
 		EventValue
@@ -33,8 +36,6 @@
 		DHCPServerSettings
 		DHCPServerRange
 		DHCPServerStaticHost
-		WiFiSettings
-		BSSCfg
 		Empty
 */
 package P4wnP1_grpc
@@ -50,6 +51,53 @@ import (
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the jspb package it is being compiled against.
 const _ = jspb.JspbPackageIsVersion2
+
+// WiFi2 (distinguish state and settings)
+type WiFi2WorkingMode int
+
+const (
+	WiFi2WorkingMode_UNKNOWN         WiFi2WorkingMode = 0
+	WiFi2WorkingMode_AP              WiFi2WorkingMode = 1
+	WiFi2WorkingMode_STA             WiFi2WorkingMode = 2
+	WiFi2WorkingMode_STA_FAILOVER_AP WiFi2WorkingMode = 3
+)
+
+var WiFi2WorkingMode_name = map[int]string{
+	0: "UNKNOWN",
+	1: "AP",
+	2: "STA",
+	3: "STA_FAILOVER_AP",
+}
+var WiFi2WorkingMode_value = map[string]int{
+	"UNKNOWN":         0,
+	"AP":              1,
+	"STA":             2,
+	"STA_FAILOVER_AP": 3,
+}
+
+func (x WiFi2WorkingMode) String() string {
+	return WiFi2WorkingMode_name[int(x)]
+}
+
+type WiFi2AuthMode int
+
+const (
+	WiFi2AuthMode_WPA2_PSK WiFi2AuthMode = 0
+	WiFi2AuthMode_OPEN     WiFi2AuthMode = 1
+)
+
+var WiFi2AuthMode_name = map[int]string{
+	0: "WPA2_PSK",
+	1: "OPEN",
+}
+var WiFi2AuthMode_value = map[string]int{
+	"WPA2_PSK": 0,
+	"OPEN":     1,
+}
+
+func (x WiFi2AuthMode) String() string {
+	return WiFi2AuthMode_name[int(x)]
+}
 
 type EthernetInterfaceSettings_Mode int
 
@@ -77,47 +125,476 @@ func (x EthernetInterfaceSettings_Mode) String() string {
 	return EthernetInterfaceSettings_Mode_name[int(x)]
 }
 
-type WiFiSettings_Mode int
-
-const (
-	WiFiSettings_AP              WiFiSettings_Mode = 0
-	WiFiSettings_STA             WiFiSettings_Mode = 1
-	WiFiSettings_STA_FAILOVER_AP WiFiSettings_Mode = 2
-)
-
-var WiFiSettings_Mode_name = map[int]string{
-	0: "AP",
-	1: "STA",
-	2: "STA_FAILOVER_AP",
-}
-var WiFiSettings_Mode_value = map[string]int{
-	"AP":              0,
-	"STA":             1,
-	"STA_FAILOVER_AP": 2,
+type WiFi2Settings struct {
+	// Generic
+	Name           string
+	Disabled       bool
+	Regulatory     string
+	WorkingMode    WiFi2WorkingMode
+	AuthMode       WiFi2AuthMode
+	Channel        uint32
+	Ap_BSS         *WiFi2BSSCfg
+	Client_BSSList []*WiFi2BSSCfg
+	HideSsid       bool
+	Nexmon         bool
 }
 
-func (x WiFiSettings_Mode) String() string {
-	return WiFiSettings_Mode_name[int(x)]
+// GetName gets the Name of the WiFi2Settings.
+func (m *WiFi2Settings) GetName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Name
 }
 
-type WiFiSettings_APAuthMode int
-
-const (
-	WiFiSettings_WPA2_PSK WiFiSettings_APAuthMode = 0
-	WiFiSettings_OPEN     WiFiSettings_APAuthMode = 1
-)
-
-var WiFiSettings_APAuthMode_name = map[int]string{
-	0: "WPA2_PSK",
-	1: "OPEN",
-}
-var WiFiSettings_APAuthMode_value = map[string]int{
-	"WPA2_PSK": 0,
-	"OPEN":     1,
+// GetDisabled gets the Disabled of the WiFi2Settings.
+func (m *WiFi2Settings) GetDisabled() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Disabled
 }
 
-func (x WiFiSettings_APAuthMode) String() string {
-	return WiFiSettings_APAuthMode_name[int(x)]
+// GetRegulatory gets the Regulatory of the WiFi2Settings.
+func (m *WiFi2Settings) GetRegulatory() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Regulatory
+}
+
+// GetWorkingMode gets the WorkingMode of the WiFi2Settings.
+func (m *WiFi2Settings) GetWorkingMode() (x WiFi2WorkingMode) {
+	if m == nil {
+		return x
+	}
+	return m.WorkingMode
+}
+
+// GetAuthMode gets the AuthMode of the WiFi2Settings.
+func (m *WiFi2Settings) GetAuthMode() (x WiFi2AuthMode) {
+	if m == nil {
+		return x
+	}
+	return m.AuthMode
+}
+
+// GetChannel gets the Channel of the WiFi2Settings.
+func (m *WiFi2Settings) GetChannel() (x uint32) {
+	if m == nil {
+		return x
+	}
+	return m.Channel
+}
+
+// GetAp_BSS gets the Ap_BSS of the WiFi2Settings.
+func (m *WiFi2Settings) GetAp_BSS() (x *WiFi2BSSCfg) {
+	if m == nil {
+		return x
+	}
+	return m.Ap_BSS
+}
+
+// GetClient_BSSList gets the Client_BSSList of the WiFi2Settings.
+func (m *WiFi2Settings) GetClient_BSSList() (x []*WiFi2BSSCfg) {
+	if m == nil {
+		return x
+	}
+	return m.Client_BSSList
+}
+
+// GetHideSsid gets the HideSsid of the WiFi2Settings.
+func (m *WiFi2Settings) GetHideSsid() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.HideSsid
+}
+
+// GetNexmon gets the Nexmon of the WiFi2Settings.
+func (m *WiFi2Settings) GetNexmon() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Nexmon
+}
+
+// MarshalToWriter marshals WiFi2Settings to the provided writer.
+func (m *WiFi2Settings) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.Name) > 0 {
+		writer.WriteString(1, m.Name)
+	}
+
+	if m.Disabled {
+		writer.WriteBool(2, m.Disabled)
+	}
+
+	if len(m.Regulatory) > 0 {
+		writer.WriteString(3, m.Regulatory)
+	}
+
+	if int(m.WorkingMode) != 0 {
+		writer.WriteEnum(4, int(m.WorkingMode))
+	}
+
+	if int(m.AuthMode) != 0 {
+		writer.WriteEnum(5, int(m.AuthMode))
+	}
+
+	if m.Channel != 0 {
+		writer.WriteUint32(6, m.Channel)
+	}
+
+	if m.Ap_BSS != nil {
+		writer.WriteMessage(7, func() {
+			m.Ap_BSS.MarshalToWriter(writer)
+		})
+	}
+
+	for _, msg := range m.Client_BSSList {
+		writer.WriteMessage(8, func() {
+			msg.MarshalToWriter(writer)
+		})
+	}
+
+	if m.HideSsid {
+		writer.WriteBool(9, m.HideSsid)
+	}
+
+	if m.Nexmon {
+		writer.WriteBool(13, m.Nexmon)
+	}
+
+	return
+}
+
+// Marshal marshals WiFi2Settings to a slice of bytes.
+func (m *WiFi2Settings) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a WiFi2Settings from the provided reader.
+func (m *WiFi2Settings) UnmarshalFromReader(reader jspb.Reader) *WiFi2Settings {
+	for reader.Next() {
+		if m == nil {
+			m = &WiFi2Settings{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Name = reader.ReadString()
+		case 2:
+			m.Disabled = reader.ReadBool()
+		case 3:
+			m.Regulatory = reader.ReadString()
+		case 4:
+			m.WorkingMode = WiFi2WorkingMode(reader.ReadEnum())
+		case 5:
+			m.AuthMode = WiFi2AuthMode(reader.ReadEnum())
+		case 6:
+			m.Channel = reader.ReadUint32()
+		case 7:
+			reader.ReadMessage(func() {
+				m.Ap_BSS = m.Ap_BSS.UnmarshalFromReader(reader)
+			})
+		case 8:
+			reader.ReadMessage(func() {
+				m.Client_BSSList = append(m.Client_BSSList, new(WiFi2BSSCfg).UnmarshalFromReader(reader))
+			})
+		case 9:
+			m.HideSsid = reader.ReadBool()
+		case 13:
+			m.Nexmon = reader.ReadBool()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a WiFi2Settings from a slice of bytes.
+func (m *WiFi2Settings) Unmarshal(rawBytes []byte) (*WiFi2Settings, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type WiFi2State struct {
+	Name        string
+	Regulatory  string
+	WorkingMode WiFi2WorkingMode
+	AuthMode    WiFi2AuthMode
+	Channel     uint32
+	Bss         *WiFi2BSSCfg
+	HideSsid    bool
+	Nexmon      bool
+	Disabled    bool
+}
+
+// GetName gets the Name of the WiFi2State.
+func (m *WiFi2State) GetName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Name
+}
+
+// GetRegulatory gets the Regulatory of the WiFi2State.
+func (m *WiFi2State) GetRegulatory() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Regulatory
+}
+
+// GetWorkingMode gets the WorkingMode of the WiFi2State.
+func (m *WiFi2State) GetWorkingMode() (x WiFi2WorkingMode) {
+	if m == nil {
+		return x
+	}
+	return m.WorkingMode
+}
+
+// GetAuthMode gets the AuthMode of the WiFi2State.
+func (m *WiFi2State) GetAuthMode() (x WiFi2AuthMode) {
+	if m == nil {
+		return x
+	}
+	return m.AuthMode
+}
+
+// GetChannel gets the Channel of the WiFi2State.
+func (m *WiFi2State) GetChannel() (x uint32) {
+	if m == nil {
+		return x
+	}
+	return m.Channel
+}
+
+// GetBss gets the Bss of the WiFi2State.
+func (m *WiFi2State) GetBss() (x *WiFi2BSSCfg) {
+	if m == nil {
+		return x
+	}
+	return m.Bss
+}
+
+// GetHideSsid gets the HideSsid of the WiFi2State.
+func (m *WiFi2State) GetHideSsid() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.HideSsid
+}
+
+// GetNexmon gets the Nexmon of the WiFi2State.
+func (m *WiFi2State) GetNexmon() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Nexmon
+}
+
+// GetDisabled gets the Disabled of the WiFi2State.
+func (m *WiFi2State) GetDisabled() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Disabled
+}
+
+// MarshalToWriter marshals WiFi2State to the provided writer.
+func (m *WiFi2State) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.Name) > 0 {
+		writer.WriteString(1, m.Name)
+	}
+
+	if len(m.Regulatory) > 0 {
+		writer.WriteString(2, m.Regulatory)
+	}
+
+	if int(m.WorkingMode) != 0 {
+		writer.WriteEnum(3, int(m.WorkingMode))
+	}
+
+	if int(m.AuthMode) != 0 {
+		writer.WriteEnum(4, int(m.AuthMode))
+	}
+
+	if m.Channel != 0 {
+		writer.WriteUint32(5, m.Channel)
+	}
+
+	if m.Bss != nil {
+		writer.WriteMessage(6, func() {
+			m.Bss.MarshalToWriter(writer)
+		})
+	}
+
+	if m.HideSsid {
+		writer.WriteBool(7, m.HideSsid)
+	}
+
+	if m.Nexmon {
+		writer.WriteBool(8, m.Nexmon)
+	}
+
+	if m.Disabled {
+		writer.WriteBool(9, m.Disabled)
+	}
+
+	return
+}
+
+// Marshal marshals WiFi2State to a slice of bytes.
+func (m *WiFi2State) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a WiFi2State from the provided reader.
+func (m *WiFi2State) UnmarshalFromReader(reader jspb.Reader) *WiFi2State {
+	for reader.Next() {
+		if m == nil {
+			m = &WiFi2State{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Name = reader.ReadString()
+		case 2:
+			m.Regulatory = reader.ReadString()
+		case 3:
+			m.WorkingMode = WiFi2WorkingMode(reader.ReadEnum())
+		case 4:
+			m.AuthMode = WiFi2AuthMode(reader.ReadEnum())
+		case 5:
+			m.Channel = reader.ReadUint32()
+		case 6:
+			reader.ReadMessage(func() {
+				m.Bss = m.Bss.UnmarshalFromReader(reader)
+			})
+		case 7:
+			m.HideSsid = reader.ReadBool()
+		case 8:
+			m.Nexmon = reader.ReadBool()
+		case 9:
+			m.Disabled = reader.ReadBool()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a WiFi2State from a slice of bytes.
+func (m *WiFi2State) Unmarshal(rawBytes []byte) (*WiFi2State, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type WiFi2BSSCfg struct {
+	SSID string
+	PSK  string
+}
+
+// GetSSID gets the SSID of the WiFi2BSSCfg.
+func (m *WiFi2BSSCfg) GetSSID() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.SSID
+}
+
+// GetPSK gets the PSK of the WiFi2BSSCfg.
+func (m *WiFi2BSSCfg) GetPSK() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.PSK
+}
+
+// MarshalToWriter marshals WiFi2BSSCfg to the provided writer.
+func (m *WiFi2BSSCfg) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.SSID) > 0 {
+		writer.WriteString(1, m.SSID)
+	}
+
+	if len(m.PSK) > 0 {
+		writer.WriteString(2, m.PSK)
+	}
+
+	return
+}
+
+// Marshal marshals WiFi2BSSCfg to a slice of bytes.
+func (m *WiFi2BSSCfg) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a WiFi2BSSCfg from the provided reader.
+func (m *WiFi2BSSCfg) UnmarshalFromReader(reader jspb.Reader) *WiFi2BSSCfg {
+	for reader.Next() {
+		if m == nil {
+			m = &WiFi2BSSCfg{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.SSID = reader.ReadString()
+		case 2:
+			m.PSK = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a WiFi2BSSCfg from a slice of bytes.
+func (m *WiFi2BSSCfg) Unmarshal(rawBytes []byte) (*WiFi2BSSCfg, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
 
 // Alive check
@@ -2598,276 +3075,6 @@ func (m *DHCPServerStaticHost) Unmarshal(rawBytes []byte) (*DHCPServerStaticHost
 	return m, nil
 }
 
-// WiFi
-type WiFiSettings struct {
-	Disabled      bool
-	Reg           string
-	Mode          WiFiSettings_Mode
-	AuthMode      WiFiSettings_APAuthMode
-	ApChannel     uint32
-	BssCfgAP      *BSSCfg
-	BssCfgClient  *BSSCfg
-	ApHideSsid    bool
-	DisableNexmon bool
-}
-
-// GetDisabled gets the Disabled of the WiFiSettings.
-func (m *WiFiSettings) GetDisabled() (x bool) {
-	if m == nil {
-		return x
-	}
-	return m.Disabled
-}
-
-// GetReg gets the Reg of the WiFiSettings.
-func (m *WiFiSettings) GetReg() (x string) {
-	if m == nil {
-		return x
-	}
-	return m.Reg
-}
-
-// GetMode gets the Mode of the WiFiSettings.
-func (m *WiFiSettings) GetMode() (x WiFiSettings_Mode) {
-	if m == nil {
-		return x
-	}
-	return m.Mode
-}
-
-// GetAuthMode gets the AuthMode of the WiFiSettings.
-func (m *WiFiSettings) GetAuthMode() (x WiFiSettings_APAuthMode) {
-	if m == nil {
-		return x
-	}
-	return m.AuthMode
-}
-
-// GetApChannel gets the ApChannel of the WiFiSettings.
-func (m *WiFiSettings) GetApChannel() (x uint32) {
-	if m == nil {
-		return x
-	}
-	return m.ApChannel
-}
-
-// GetBssCfgAP gets the BssCfgAP of the WiFiSettings.
-func (m *WiFiSettings) GetBssCfgAP() (x *BSSCfg) {
-	if m == nil {
-		return x
-	}
-	return m.BssCfgAP
-}
-
-// GetBssCfgClient gets the BssCfgClient of the WiFiSettings.
-func (m *WiFiSettings) GetBssCfgClient() (x *BSSCfg) {
-	if m == nil {
-		return x
-	}
-	return m.BssCfgClient
-}
-
-// GetApHideSsid gets the ApHideSsid of the WiFiSettings.
-func (m *WiFiSettings) GetApHideSsid() (x bool) {
-	if m == nil {
-		return x
-	}
-	return m.ApHideSsid
-}
-
-// GetDisableNexmon gets the DisableNexmon of the WiFiSettings.
-func (m *WiFiSettings) GetDisableNexmon() (x bool) {
-	if m == nil {
-		return x
-	}
-	return m.DisableNexmon
-}
-
-// MarshalToWriter marshals WiFiSettings to the provided writer.
-func (m *WiFiSettings) MarshalToWriter(writer jspb.Writer) {
-	if m == nil {
-		return
-	}
-
-	if m.Disabled {
-		writer.WriteBool(1, m.Disabled)
-	}
-
-	if len(m.Reg) > 0 {
-		writer.WriteString(2, m.Reg)
-	}
-
-	if int(m.Mode) != 0 {
-		writer.WriteEnum(3, int(m.Mode))
-	}
-
-	if int(m.AuthMode) != 0 {
-		writer.WriteEnum(4, int(m.AuthMode))
-	}
-
-	if m.ApChannel != 0 {
-		writer.WriteUint32(5, m.ApChannel)
-	}
-
-	if m.BssCfgAP != nil {
-		writer.WriteMessage(6, func() {
-			m.BssCfgAP.MarshalToWriter(writer)
-		})
-	}
-
-	if m.BssCfgClient != nil {
-		writer.WriteMessage(7, func() {
-			m.BssCfgClient.MarshalToWriter(writer)
-		})
-	}
-
-	if m.ApHideSsid {
-		writer.WriteBool(8, m.ApHideSsid)
-	}
-
-	if m.DisableNexmon {
-		writer.WriteBool(10, m.DisableNexmon)
-	}
-
-	return
-}
-
-// Marshal marshals WiFiSettings to a slice of bytes.
-func (m *WiFiSettings) Marshal() []byte {
-	writer := jspb.NewWriter()
-	m.MarshalToWriter(writer)
-	return writer.GetResult()
-}
-
-// UnmarshalFromReader unmarshals a WiFiSettings from the provided reader.
-func (m *WiFiSettings) UnmarshalFromReader(reader jspb.Reader) *WiFiSettings {
-	for reader.Next() {
-		if m == nil {
-			m = &WiFiSettings{}
-		}
-
-		switch reader.GetFieldNumber() {
-		case 1:
-			m.Disabled = reader.ReadBool()
-		case 2:
-			m.Reg = reader.ReadString()
-		case 3:
-			m.Mode = WiFiSettings_Mode(reader.ReadEnum())
-		case 4:
-			m.AuthMode = WiFiSettings_APAuthMode(reader.ReadEnum())
-		case 5:
-			m.ApChannel = reader.ReadUint32()
-		case 6:
-			reader.ReadMessage(func() {
-				m.BssCfgAP = m.BssCfgAP.UnmarshalFromReader(reader)
-			})
-		case 7:
-			reader.ReadMessage(func() {
-				m.BssCfgClient = m.BssCfgClient.UnmarshalFromReader(reader)
-			})
-		case 8:
-			m.ApHideSsid = reader.ReadBool()
-		case 10:
-			m.DisableNexmon = reader.ReadBool()
-		default:
-			reader.SkipField()
-		}
-	}
-
-	return m
-}
-
-// Unmarshal unmarshals a WiFiSettings from a slice of bytes.
-func (m *WiFiSettings) Unmarshal(rawBytes []byte) (*WiFiSettings, error) {
-	reader := jspb.NewReader(rawBytes)
-
-	m = m.UnmarshalFromReader(reader)
-
-	if err := reader.Err(); err != nil {
-		return nil, err
-	}
-
-	return m, nil
-}
-
-type BSSCfg struct {
-	SSID string
-	PSK  string
-}
-
-// GetSSID gets the SSID of the BSSCfg.
-func (m *BSSCfg) GetSSID() (x string) {
-	if m == nil {
-		return x
-	}
-	return m.SSID
-}
-
-// GetPSK gets the PSK of the BSSCfg.
-func (m *BSSCfg) GetPSK() (x string) {
-	if m == nil {
-		return x
-	}
-	return m.PSK
-}
-
-// MarshalToWriter marshals BSSCfg to the provided writer.
-func (m *BSSCfg) MarshalToWriter(writer jspb.Writer) {
-	if m == nil {
-		return
-	}
-
-	if len(m.SSID) > 0 {
-		writer.WriteString(1, m.SSID)
-	}
-
-	if len(m.PSK) > 0 {
-		writer.WriteString(2, m.PSK)
-	}
-
-	return
-}
-
-// Marshal marshals BSSCfg to a slice of bytes.
-func (m *BSSCfg) Marshal() []byte {
-	writer := jspb.NewWriter()
-	m.MarshalToWriter(writer)
-	return writer.GetResult()
-}
-
-// UnmarshalFromReader unmarshals a BSSCfg from the provided reader.
-func (m *BSSCfg) UnmarshalFromReader(reader jspb.Reader) *BSSCfg {
-	for reader.Next() {
-		if m == nil {
-			m = &BSSCfg{}
-		}
-
-		switch reader.GetFieldNumber() {
-		case 1:
-			m.SSID = reader.ReadString()
-		case 2:
-			m.PSK = reader.ReadString()
-		default:
-			reader.SkipField()
-		}
-	}
-
-	return m
-}
-
-// Unmarshal unmarshals a BSSCfg from a slice of bytes.
-func (m *BSSCfg) Unmarshal(rawBytes []byte) (*BSSCfg, error) {
-	reader := jspb.NewReader(rawBytes)
-
-	m = m.UnmarshalFromReader(reader)
-
-	if err := reader.Err(); err != nil {
-		return nil, err
-	}
-
-	return m, nil
-}
-
 type Empty struct {
 }
 
@@ -2939,9 +3146,6 @@ type P4WNP1Client interface {
 	DeployEthernetInterfaceSettings(ctx context.Context, in *EthernetInterfaceSettings, opts ...grpcweb.CallOption) (*Empty, error)
 	GetAllDeployedEthernetInterfaceSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*DeployedEthernetInterfaceSettings, error)
 	GetDeployedEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*EthernetInterfaceSettings, error)
-	// WiFi
-	DeployWifiSettings(ctx context.Context, in *WiFiSettings, opts ...grpcweb.CallOption) (*Empty, error)
-	GetDeployedWifiSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFiSettings, error)
 	// HIDScript / job management
 	HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error)
 	HIDRunScriptJob(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptJob, error)
@@ -2959,6 +3163,9 @@ type P4WNP1Client interface {
 	EventListen(ctx context.Context, in *EventRequest, opts ...grpcweb.CallOption) (P4WNP1_EventListenClient, error)
 	// Alive check
 	EchoRequest(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*StringMessage, error)
+	DeployWiFiSettings2(ctx context.Context, in *WiFi2Settings, opts ...grpcweb.CallOption) (*WiFi2State, error)
+	GetWiFiState2(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFi2State, error)
+	ListenWiFiStateChanges2(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFi2State, error)
 }
 
 type p4WNP1Client struct {
@@ -3060,24 +3267,6 @@ func (c *p4WNP1Client) GetDeployedEthernetInterfaceSettings(ctx context.Context,
 	}
 
 	return new(EthernetInterfaceSettings).Unmarshal(resp)
-}
-
-func (c *p4WNP1Client) DeployWifiSettings(ctx context.Context, in *WiFiSettings, opts ...grpcweb.CallOption) (*Empty, error) {
-	resp, err := c.client.RPCCall(ctx, "DeployWifiSettings", in.Marshal(), opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return new(Empty).Unmarshal(resp)
-}
-
-func (c *p4WNP1Client) GetDeployedWifiSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFiSettings, error) {
-	resp, err := c.client.RPCCall(ctx, "GetDeployedWifiSettings", in.Marshal(), opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return new(WiFiSettings).Unmarshal(resp)
 }
 
 func (c *p4WNP1Client) HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error) {
@@ -3218,4 +3407,31 @@ func (c *p4WNP1Client) EchoRequest(ctx context.Context, in *StringMessage, opts 
 	}
 
 	return new(StringMessage).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployWiFiSettings2(ctx context.Context, in *WiFi2Settings, opts ...grpcweb.CallOption) (*WiFi2State, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployWiFiSettings2", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(WiFi2State).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetWiFiState2(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFi2State, error) {
+	resp, err := c.client.RPCCall(ctx, "GetWiFiState2", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(WiFi2State).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) ListenWiFiStateChanges2(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFi2State, error) {
+	resp, err := c.client.RPCCall(ctx, "ListenWiFiStateChanges2", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(WiFi2State).Unmarshal(resp)
 }

@@ -3,256 +3,281 @@ syntax = "proto3";
 package P4wnP1_grpc;
 
 service P4WNP1 {
-	//USB gadget
-	rpc GetDeployedGadgetSetting (Empty) returns (GadgetSettings) {}
-	rpc DeployGadgetSetting (Empty) returns (GadgetSettings) {}
-	rpc GetGadgetSettings (Empty) returns (GadgetSettings) {}
-	rpc SetGadgetSettings (GadgetSettings) returns (GadgetSettings) {}
-	rpc GetLEDSettings (Empty) returns (LEDSettings) {}
-	rpc SetLEDSettings (LEDSettings) returns (Empty) {}
-	rpc MountUMSFile (GadgetSettingsUMS) returns (Empty) {}
+    //USB gadget
+    rpc GetDeployedGadgetSetting (Empty) returns (GadgetSettings) {    }
+    rpc DeployGadgetSetting (Empty) returns (GadgetSettings) {    }
+    rpc GetGadgetSettings (Empty) returns (GadgetSettings) {    }
+    rpc SetGadgetSettings (GadgetSettings) returns (GadgetSettings) {    }
+    rpc GetLEDSettings (Empty) returns (LEDSettings) {    }
+    rpc SetLEDSettings (LEDSettings) returns (Empty) {    }
+    rpc MountUMSFile (GadgetSettingsUMS) returns (Empty) {    }
 
-	//Ethernet
-	rpc DeployEthernetInterfaceSettings(EthernetInterfaceSettings) returns (Empty) {}
-	rpc GetAllDeployedEthernetInterfaceSettings(Empty) returns (DeployedEthernetInterfaceSettings) {}
-	rpc GetDeployedEthernetInterfaceSettings(StringMessage) returns (EthernetInterfaceSettings) {} //StringMessage has to contain the interface name
+    //Ethernet
+    rpc DeployEthernetInterfaceSettings (EthernetInterfaceSettings) returns (Empty) {    }
+    rpc GetAllDeployedEthernetInterfaceSettings (Empty) returns (DeployedEthernetInterfaceSettings) {    }
+    rpc GetDeployedEthernetInterfaceSettings (StringMessage) returns (EthernetInterfaceSettings) {    } //StringMessage has to contain the interface name
 
-	// WiFi
-	rpc DeployWifiSettings(WiFiSettings) returns (Empty) {}
-	rpc GetDeployedWifiSettings(Empty) returns (WiFiSettings) {}
+/*
+    // WiFi
+    rpc DeployWifiSettings (WiFiSettings) returns (WiFiConnectionState) {}
+    rpc GetDeployedWifiSettings (Empty) returns (WiFiSettings) {}
+*/
+    //HIDScript / job management
+    rpc HIDRunScript (HIDScriptRequest) returns (HIDScriptResult) {    }
+    rpc HIDRunScriptJob (HIDScriptRequest) returns (HIDScriptJob) {    }
+    rpc HIDGetScriptJobResult (HIDScriptJob) returns (HIDScriptResult) {    }
+    rpc HIDCancelScriptJob (HIDScriptJob) returns (Empty) {    }
+    rpc HIDGetRunningScriptJobs (Empty) returns (HIDScriptJobList) {    }
+    rpc HIDCancelAllScriptJobs (Empty) returns (Empty) {    }
+    rpc HIDGetRunningJobState (HIDScriptJob) returns (HIDRunningJobStateResult) {    }
 
-	//HIDScript / job management
-	rpc HIDRunScript(HIDScriptRequest) returns (HIDScriptResult) {}
-	rpc HIDRunScriptJob(HIDScriptRequest) returns (HIDScriptJob) {}
-	rpc HIDGetScriptJobResult(HIDScriptJob) returns (HIDScriptResult) {}
-	rpc HIDCancelScriptJob(HIDScriptJob) returns (Empty) {}
-	rpc HIDGetRunningScriptJobs(Empty) returns (HIDScriptJobList) {}
-	rpc HIDCancelAllScriptJobs(Empty) returns (Empty) {}
-	rpc HIDGetRunningJobState(HIDScriptJob) returns (HIDRunningJobStateResult) {}
+    //FileSystem
+    rpc FSWriteFile (WriteFileRequest) returns (Empty) {    }
+    rpc FSReadFile (ReadFileRequest) returns (ReadFileResponse) {    }
+    rpc FSGetFileInfo (FileInfoRequest) returns (FileInfoResponse) {    }
+    rpc FSCreateTempDirOrFile (TempDirOrFileRequest) returns (TempDirOrFileResponse) {    }
 
-	//FileSystem
-	rpc FSWriteFile(WriteFileRequest) returns (Empty) {}
-	rpc FSReadFile(ReadFileRequest) returns (ReadFileResponse) {}
-	rpc FSGetFileInfo(FileInfoRequest) returns (FileInfoResponse) {}
-	rpc FSCreateTempDirOrFile(TempDirOrFileRequest) returns (TempDirOrFileResponse) {}
+    //Events
+    rpc EventListen (EventRequest) returns (stream Event) {    }
 
-	//Events
-	rpc EventListen(EventRequest) returns (stream Event) {}
+    //Alive check
+    rpc EchoRequest (StringMessage) returns (StringMessage) {    }
 
-	//Alive check
-	rpc EchoRequest(StringMessage) returns (StringMessage) {}
+    rpc DeployWiFiSettings2 (WiFi2Settings) returns (WiFi2State) {}
+    rpc GetWiFiState2 (Empty) returns (WiFi2State) {}
+    rpc ListenWiFiStateChanges2 (Empty) returns (WiFi2State) {}
+    // ToDo: Template requests (store, load, listStored)
 }
+
+
+/* WiFi2 (distinguish state and settings) */
+enum WiFi2WorkingMode {
+    UNKNOWN = 0;
+    AP = 1; //acts as access point
+    STA = 2; //acts as station for an existing access point
+    STA_FAILOVER_AP = 3; //acts as station, if connection to the given AP isn't possible spawns an own AP
+}
+
+enum WiFi2AuthMode {
+    WPA2_PSK = 0; //AP uses WPA2 pre-shared key
+    OPEN = 1; //Open System Authentication (no authentication)
+}
+
+
+message WiFi2Settings {
+    /* Generic */
+    string name = 1; //for template storage
+    bool disabled = 2; //disabled means neither hostapd, nor wpa_supplicant are running, the interface could still be enabled
+    string regulatory = 3; //Regulatory domain per ISO/IEC 3166-1 alpha2
+    WiFi2WorkingMode working_mode = 4;
+    WiFi2AuthMode auth_mode = 5;
+    uint32 channel = 6;
+
+
+    WiFi2BSSCfg ap_BSS = 7; //SSID of AP to spawn + PSK if needed
+    repeated WiFi2BSSCfg client_BSS_list = 8; //SSID of Infra to join + PSK if needed
+    bool hide_ssid = 9; //if true, SSID gets hidden for spawned AP
+
+    bool nexmon = 13;
+}
+
+message WiFi2State {
+    string name = 1; //name of template in use
+    string regulatory = 2; //Regulatory domain per ISO/IEC 3166-1 alpha2
+    WiFi2WorkingMode working_mode = 3;
+    WiFi2AuthMode auth_mode = 4;
+    uint32 channel = 5;
+    WiFi2BSSCfg bss = 6; //SSID currently connected (STA) or spawned (AP)
+    bool hide_ssid = 7;
+    bool nexmon = 8;
+
+    bool disabled = 9;
+}
+
+message WiFi2BSSCfg {
+    string SSID = 1;
+    string PSK = 2;
+}
+
+
 
 /* Alive check  */
 message StringMessage {
-	string msg = 1;
+    string msg = 1;
 }
 
 /* Events */
 message EventRequest {
-	int64 listenType = 1;
+    int64 listenType = 1;
 }
 
 message EventValue {
-	oneof val {
-		string tstring = 1;
-		bool tbool = 2;
-		int64 tint64 = 3;
-	}
+    oneof val {
+        string tstring = 1;
+        bool tbool = 2;
+        int64 tint64 = 3;
+    }
 }
 
 message Event {
-	int64 type = 1;
-	repeated EventValue values = 2;
+    int64 type = 1;
+    repeated EventValue values = 2;
 }
 
 /* File System */
 message TempDirOrFileRequest {
-	string dir = 1;
-	string prefix = 2;
-	bool onlyFolder = 3;
+    string dir = 1;
+    string prefix = 2;
+    bool onlyFolder = 3;
 }
 
 message TempDirOrFileResponse {
-	string resultPath = 1;
+    string resultPath = 1;
 }
 
 message ReadFileRequest {
-	string path = 1;
-	int64 start = 2;
-	bytes data = 3;
+    string path = 1;
+    int64 start = 2;
+    bytes data = 3;
 }
 
 message ReadFileResponse {
-	int64 readCount = 1;
+    int64 readCount = 1;
 }
 
 message WriteFileRequest {
-	string path = 1;
-	bool append = 2;
-	bool mustNotExist = 3;
-	bytes data = 4;
+    string path = 1;
+    bool append = 2;
+    bool mustNotExist = 3;
+    bytes data = 4;
 }
 
 message FileInfoRequest {
-	string path = 1;
+    string path = 1;
 }
 
 message FileInfoResponse {
-	string name = 1;
-	int64 size = 2;
-	uint32 mode = 3;
-	int64 modTime = 4; //unused
-	bool isDir = 5;
+    string name = 1;
+    int64 size = 2;
+    uint32 mode = 3;
+    int64 modTime = 4; //unused
+    bool isDir = 5;
 }
 
 /* HID */
 message HIDScriptRequest {
-	string scriptPath = 1;
-	uint32 timeoutSeconds = 2; //a timeout > 0 interrupts the HIDScript when reached, meassurement in seconds
+    string scriptPath = 1;
+    uint32 timeoutSeconds = 2; //a timeout > 0 interrupts the HIDScript when reached, meassurement in seconds
 }
 
 message HIDScriptJob {
-	uint32 id = 1;
+    uint32 id = 1;
 }
 
 message HIDScriptJobList {
-	repeated uint32 ids = 1;
+    repeated uint32 ids = 1;
 }
 
 message HIDRunningJobStateResult {
-	int64 id = 1;
-	int64 vmId = 2;
-	string source = 3;
+    int64 id = 1;
+    int64 vmId = 2;
+    string source = 3;
 }
 
 message HIDScriptResult {
-	HIDScriptJob job = 1;
-	bool isFinished = 2;
-	string resultJson = 3;
-	//string logOutput = 4; //will be used to retrieve log output of unfinished scripts, better implemented in dedicated method with stream
+    HIDScriptJob job = 1;
+    bool isFinished = 2;
+    string resultJson = 3;
+    //string logOutput = 4; //will be used to retrieve log output of unfinished scripts, better implemented in dedicated method with stream
 }
 
 /* LED */
 message LEDSettings {
-	uint32 blink_count = 1;
+    uint32 blink_count = 1;
 }
 /* End LED */
 
 /* USB Gadget */
 message GadgetSettings {
-	bool enabled = 1;
-	string vid = 2;
-	string pid = 3;
-	string manufacturer = 4;
-	string product = 5;
-	string serial = 6;
-	bool use_CDC_ECM = 7;
-	bool use_RNDIS = 8;
-	bool use_HID_KEYBOARD = 9;
-	bool use_HID_MOUSE = 10;
-	bool use_HID_RAW = 11;
-	bool use_UMS = 12;
-	bool use_SERIAL = 13;
-	GadgetSettingsEthernet rndis_settings = 14; //Only applicable if RNDIS on
-	GadgetSettingsEthernet cdc_ecm_settings = 15; //Only applicable if CDC ECM on
-	GadgetSettingsUMS ums_settings = 16;
-	//EthernetInterfaceSettings ethernet_settings = 17; //only applicable if RNDIS or CDC ECM on
+    bool enabled = 1;
+    string vid = 2;
+    string pid = 3;
+    string manufacturer = 4;
+    string product = 5;
+    string serial = 6;
+    bool use_CDC_ECM = 7;
+    bool use_RNDIS = 8;
+    bool use_HID_KEYBOARD = 9;
+    bool use_HID_MOUSE = 10;
+    bool use_HID_RAW = 11;
+    bool use_UMS = 12;
+    bool use_SERIAL = 13;
+    GadgetSettingsEthernet rndis_settings = 14; //Only applicable if RNDIS on
+    GadgetSettingsEthernet cdc_ecm_settings = 15; //Only applicable if CDC ECM on
+    GadgetSettingsUMS ums_settings = 16;
+    //EthernetInterfaceSettings ethernet_settings = 17; //only applicable if RNDIS or CDC ECM on
 }
 
 message GadgetSettingsEthernet {
-	string host_addr = 1;
-	string dev_addr = 2;
+    string host_addr = 1;
+    string dev_addr = 2;
 }
 
 message GadgetSettingsUMS {
-	bool cdrom = 1;
-	string file = 2;
+    bool cdrom = 1;
+    string file = 2;
 }
 /* End USB Gadget */
 
 /* Ethernet Interface Settings */
 message DeployedEthernetInterfaceSettings {
-	repeated EthernetInterfaceSettings list = 1;
+    repeated EthernetInterfaceSettings list = 1;
 }
 
 message EthernetInterfaceSettings {
-	string name = 1;
-	enum Mode {
-		MANUAL = 0;
-		DHCP_CLIENT = 1;
-		DHCP_SERVER = 2;
-		UNMANAGED = 3; // Indicates that the settings aren't known, as they aren't managed by the service
-	}
-	Mode mode = 2;
-	string ipAddress4 = 3;
-	string netmask4 = 4;
-	bool enabled = 5;
-	DHCPServerSettings dhcpServerSettings = 6;
-	bool settingsInUse = 7; //indicates if the given settings are applied to the interface
+    string name = 1;
+    enum Mode {
+        MANUAL = 0;
+        DHCP_CLIENT = 1;
+        DHCP_SERVER = 2;
+        UNMANAGED = 3; // Indicates that the settings aren't known, as they aren't managed by the service
+    }
+    Mode mode = 2;
+    string ipAddress4 = 3;
+    string netmask4 = 4;
+    bool enabled = 5;
+    DHCPServerSettings dhcpServerSettings = 6;
+    bool settingsInUse = 7; //indicates if the given settings are applied to the interface
 }
 
 /* DHCP */
 message DHCPServerSettings {
-	uint32 listenPort = 1;		//if a port other thaan 0 is provided, a DNS server is bound to this port in addition to DHCP
-	string listenInterface = 2;
-	string leaseFile = 3;
-	bool notAuthoritative = 4;
-	bool doNotBindInterface = 5; //if true, DHCP server binds to 0.0.0.0, no matter which interface is given (no restart needed on interface up/down)
-	string callbackScript = 6; //Script executes when lease is added/deleted `scriptname <add|del> <MAC> <IP> <HOSTNAME>`
+    uint32 listenPort = 1; //if a port other thaan 0 is provided, a DNS server is bound to this port in addition to DHCP
+    string listenInterface = 2;
+    string leaseFile = 3;
+    bool notAuthoritative = 4;
+    bool doNotBindInterface = 5; //if true, DHCP server binds to 0.0.0.0, no matter which interface is given (no restart needed on interface up/down)
+    string callbackScript = 6; //Script executes when lease is added/deleted `scriptname <add|del> <MAC> <IP> <HOSTNAME>`
 
-	repeated DHCPServerRange ranges = 7;
+    repeated DHCPServerRange ranges = 7;
     //repeated DHCPServerOption options = 8;
     map<uint32, string> options = 8; //Replaced by map (dealing with key duplicates is ONLY PARTIALY handled by proto3), See RFC 2132 for details of available options
-	repeated DHCPServerStaticHost staticHosts = 9;
+    repeated DHCPServerStaticHost staticHosts = 9;
 }
 
 //Could be used for IPv4 or IPv6 (refer dnsmasq docs), nor field for prefix length (default is 64)
 message DHCPServerRange {
-	string rangeLower = 1; //Lowest IP of DHCP range
-	string rangeUpper = 2; //Highest IP of DHCP range
-	string leaseTime = 3;
+    string rangeLower = 1; //Lowest IP of DHCP range
+    string rangeUpper = 2; //Highest IP of DHCP range
+    string leaseTime = 3;
 }
-
 
 //Used for static leases
 message DHCPServerStaticHost {
-	string mac = 1;
-	string ip = 2;
+    string mac = 1;
+    string ip = 2;
 }
 
-/* End DHCP */
 
-/* WiFi */
-message WiFiSettings {
-	enum Mode {
-		AP = 0;					//acts as access point
-		STA = 1;				//acts as station for an existing access point
-		STA_FAILOVER_AP = 2;	//acts as station, if connection to the given AP isn't possible spawns an own AP
-	}
-
-	enum APAuthMode {
-		WPA2_PSK = 0;			//AP uses WPA2 pre-shared key
-		OPEN = 1;				//Open System Authentication (no authentication)
-	}
-
-	bool disabled = 1;
-	string reg = 2;				//Regulatory domain per ISO/IEC 3166-1 alpha2
-	Mode mode = 3;
-	APAuthMode auth_mode = 4;
-	uint32 ap_channel = 5;
-
-	BSSCfg BssCfgAP = 6;		//SSID of AP to spawn + PSK if needed
-	BSSCfg BssCfgClient = 7;	//SSID of Infra to join + PSK if needed
-	bool ap_hide_ssid = 8;		//if true, SSID gets hidden for spawned AP
-
-	bool disable_nexmon = 10;	//if true, legacy driver / firmware is used instead of nexmon
+message Empty {
 }
-
-message BSSCfg {
-	string SSID = 1;
-	string PSK = 2;
-}
-/* End WiFI */
-
-message Empty {}
