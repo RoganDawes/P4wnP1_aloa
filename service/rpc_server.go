@@ -30,16 +30,16 @@ var (
 
 type server struct {}
 
-func (s *server) DeployWiFiSettings2(ctx context.Context, wset *pb.WiFi2Settings) (wstate *pb.WiFi2State, err error) {
+func (s *server) DeployWiFiSettings(ctx context.Context, wset *pb.WiFiSettings) (wstate *pb.WiFiState, err error) {
 	return ServiceState.WifiSvc.DeploySettings(wset)
 }
 
-func (s *server) GetWiFiState2(ctx context.Context, empty *pb.Empty) (wstate *pb.WiFi2State, err error) {
-	st := ServiceState.WifiSvc.GetState()
-	return &st, nil
+func (s *server) GetWiFiState(ctx context.Context, empty *pb.Empty) (wstate *pb.WiFiState, err error) {
+	st := ServiceState.WifiSvc.State
+	return st, nil
 }
 
-func (s *server) ListenWiFiStateChanges2(ctx context.Context, empty *pb.Empty) (wstate *pb.WiFi2State, err error) {
+func (s *server) ListenWiFiStateChanges(ctx context.Context, empty *pb.Empty) (wstate *pb.WiFiState, err error) {
 	panic("implement me")
 }
 
@@ -60,7 +60,7 @@ func (s *server) DeployWifiSettings(ctx context.Context, ws *pb.WiFiSettings) (w
 */
 
 func (s *server) GetDeployedEthernetInterfaceSettings(ctx context.Context, req *pb.StringMessage) (resp *pb.EthernetInterfaceSettings, err error) {
-	if settings,exist := ServiceState.StoredNetworkSetting[req.Msg]; exist && settings.SettingsInUse {
+	if settings,exist := ServiceState.StoredNetworkSettings[req.Msg]; exist && settings.SettingsInUse {
 		return settings, nil
 	} else {
 		return nil, errors.New(fmt.Sprintf("No stored (or used) settings for ethernet interface '%s'", req.Msg))
@@ -68,9 +68,9 @@ func (s *server) GetDeployedEthernetInterfaceSettings(ctx context.Context, req *
 }
 
 func (s *server) GetAllDeployedEthernetInterfaceSettings(ctx context.Context, empty *pb.Empty) (resp *pb.DeployedEthernetInterfaceSettings, err error) {
-	deployed := make([]*pb.EthernetInterfaceSettings, len(ServiceState.StoredNetworkSetting))
+	deployed := make([]*pb.EthernetInterfaceSettings, len(ServiceState.StoredNetworkSettings))
 	var i = 0
-	for _,settings := range ServiceState.StoredNetworkSetting { deployed[i] = settings; i++ }
+	for _,settings := range ServiceState.StoredNetworkSettings { deployed[i] = settings; i++ }
 
 	resp = &pb.DeployedEthernetInterfaceSettings{
 		List: deployed,

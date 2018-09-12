@@ -56,6 +56,7 @@ type GlobalState struct {
 	CurrentHIDScriptSource           string                  `js:"currentHIDScriptSource"`
 	CurrentGadgetSettings            *jsGadgetSettings       `js:"currentGadgetSettings"`
 	CurrentlyDeployingGadgetSettings bool                    `js:"deployingGadgetSettings"`
+	CurrentlyDeployingWifiSettings   bool                    `js:"deployingWifiSettings"`
 	EventReceiver                    *jsEventReceiver        `js:"eventReceiver"`
 	HidJobList                       *jsHidJobStateList      `js:"hidJobList"`
 	IsModalEnabled                   bool                    `js:"isModalEnabled"`
@@ -71,8 +72,7 @@ func createGlobalStateStruct() GlobalState {
 	state.Title = "P4wnP1 by MaMe82"
 	state.CurrentHIDScriptSource = initHIDScript
 	state.CurrentGadgetSettings = NewUSBGadgetSettings()
-	state.CurrentlyDeployingGadgetSettings = false
-	//UpdateGadgetSettingsFromDeployed(state.CurrentGadgetSettings)
+	state.CurrentlyDeployingWifiSettings = false
 	state.HidJobList = NewHIDJobStateList()
 	state.EventReceiver = NewEventReceiver(maxLogEntries, state.HidJobList)
 	state.IsConnected = false
@@ -85,11 +85,14 @@ func createGlobalStateStruct() GlobalState {
 		panic("Couldn't retrieve interface settings")
 	}
 	state.InterfaceSettings = ifSettings
+
+	/*
 	wifiSettings, err := RpcClient.GetDeployedWiFiSettings(time.Second * 5)
 	if err != nil {
 		panic("Couldn't retrieve WiFi settings")
 	}
-	state.WiFiSettings = wifiSettings
+	*/
+	state.WiFiSettings = NewWifiSettings()
 	state.WiFiState = NewWiFiConnectionState()
 	return state
 }
@@ -146,14 +149,20 @@ func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, 
 */
 func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settings *jsWiFiSettings) {
 	go func() {
+
+		state.CurrentlyDeployingWifiSettings = true
+		defer func() { state.CurrentlyDeployingWifiSettings = false }()
+
+
 		println("Vuex dispatch deploy WiFi settings")
 		// convert to Go type
-		goSettings := settings.toGo2()
+		goSettings := settings.toGo()
 
-		wstate, err := RpcClient.DeployWifiSettings2(time.Second*20, goSettings)
+		wstate, err := RpcClient.DeployWifiSettings(time.Second*30, goSettings)
 		if err != nil {
 			QuasarNotifyError("Error deploying WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 		}
+		QuasarNotifySuccess("New WiFi settings deployed","", QUASAR_NOTIFICATION_POSITION_TOP)
 		state.WiFiState.fromGo(wstate)
 	}()
 }
@@ -179,7 +188,6 @@ func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext
 func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 
-		// ToDo: Indicate deployment process via global state
 		state.CurrentlyDeployingGadgetSettings = true
 		defer func() { state.CurrentlyDeployingGadgetSettings = false }()
 
@@ -302,6 +310,9 @@ func initMVuex() *mvuex.Store {
 
 	// Update already running HID jobs
 	store.Dispatch(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS)
+
+	// Update WiFi state
+	store.Dispatch(VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED)
 
 	// propagate Vuex store to global scope to allow injecting it to Vue by setting the "store" option
 	js.Global.Set("store", store)

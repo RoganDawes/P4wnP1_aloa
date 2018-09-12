@@ -17,11 +17,6 @@ service P4WNP1 {
     rpc GetAllDeployedEthernetInterfaceSettings (Empty) returns (DeployedEthernetInterfaceSettings) {    }
     rpc GetDeployedEthernetInterfaceSettings (StringMessage) returns (EthernetInterfaceSettings) {    } //StringMessage has to contain the interface name
 
-/*
-    // WiFi
-    rpc DeployWifiSettings (WiFiSettings) returns (WiFiConnectionState) {}
-    rpc GetDeployedWifiSettings (Empty) returns (WiFiSettings) {}
-*/
     //HIDScript / job management
     rpc HIDRunScript (HIDScriptRequest) returns (HIDScriptResult) {    }
     rpc HIDRunScriptJob (HIDScriptRequest) returns (HIDScriptJob) {    }
@@ -43,58 +38,54 @@ service P4WNP1 {
     //Alive check
     rpc EchoRequest (StringMessage) returns (StringMessage) {    }
 
-    rpc DeployWiFiSettings2 (WiFi2Settings) returns (WiFi2State) {}
-    rpc GetWiFiState2 (Empty) returns (WiFi2State) {}
-    rpc ListenWiFiStateChanges2 (Empty) returns (WiFi2State) {}
+    // WiFi
+    rpc DeployWiFiSettings (WiFiSettings) returns (WiFiState) {}
+    rpc GetWiFiState (Empty) returns (WiFiState) {}
+    rpc ListenWiFiStateChanges (Empty) returns (WiFiState) {}
     // ToDo: Template requests (store, load, listStored)
 }
 
 
 /* WiFi2 (distinguish state and settings) */
-enum WiFi2WorkingMode {
+enum WiFiWorkingMode {
     UNKNOWN = 0;
     AP = 1; //acts as access point
     STA = 2; //acts as station for an existing access point
     STA_FAILOVER_AP = 3; //acts as station, if connection to the given AP isn't possible spawns an own AP
 }
 
-enum WiFi2AuthMode {
+enum WiFiAuthMode {
     WPA2_PSK = 0; //AP uses WPA2 pre-shared key
     OPEN = 1; //Open System Authentication (no authentication)
 }
 
 
-message WiFi2Settings {
+message WiFiSettings {
     /* Generic */
     string name = 1; //for template storage
     bool disabled = 2; //disabled means neither hostapd, nor wpa_supplicant are running, the interface could still be enabled
     string regulatory = 3; //Regulatory domain per ISO/IEC 3166-1 alpha2
-    WiFi2WorkingMode working_mode = 4;
-    WiFi2AuthMode auth_mode = 5;
+    WiFiWorkingMode working_mode = 4;
+    WiFiAuthMode auth_mode = 5;
     uint32 channel = 6;
 
 
-    WiFi2BSSCfg ap_BSS = 7; //SSID of AP to spawn + PSK if needed
-    repeated WiFi2BSSCfg client_BSS_list = 8; //SSID of Infra to join + PSK if needed
+    WiFiBSSCfg ap_BSS = 7; //SSID of AP to spawn + PSK if needed
+    repeated WiFiBSSCfg client_BSS_list = 8; //SSID of Infra to join + PSK if needed
     bool hide_ssid = 9; //if true, SSID gets hidden for spawned AP
 
     bool nexmon = 13;
 }
 
-message WiFi2State {
-    string name = 1; //name of template in use
-    string regulatory = 2; //Regulatory domain per ISO/IEC 3166-1 alpha2
-    WiFi2WorkingMode working_mode = 3;
-    WiFi2AuthMode auth_mode = 4;
-    uint32 channel = 5;
-    WiFi2BSSCfg bss = 6; //SSID currently connected (STA) or spawned (AP)
-    bool hide_ssid = 7;
-    bool nexmon = 8;
-
-    bool disabled = 9;
+message WiFiState {
+    WiFiWorkingMode working_mode = 1;
+    WiFiAuthMode auth_mode = 2;
+    uint32 channel = 3;
+    WiFiBSSCfg bss = 4; //SSID currently connected (STA) or spawned (AP)
+    WiFiSettings currentSettings = 5;
 }
 
-message WiFi2BSSCfg {
+message WiFiBSSCfg {
     string SSID = 1;
     string PSK = 2;
 }

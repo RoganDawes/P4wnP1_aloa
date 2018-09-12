@@ -12,7 +12,8 @@ P4wnP1_cli NET set server -i usbeth -a 172.16.0.1 -m 255.255.255.252 -o "3:" -o 
 
 # Enable WiFi AP (reg US, channel 6, SSID/AP name: "P4wnP1", pre shared key: "MaMe82-P4wnP1", don't use nexmon firmware)
 # Note: As a pre-shared key is given, P4wnP1 assume the AP should use WPA2-PSK
-P4wnP1_cli WIFI set ap -r US -c 6 -s "P4wnP1" -k "MaMe82-P4wnP1" --nonexmon
+# Note 2: The SSID uses Unicode characters not necessarily supported by the console, but P4wnP1 supports UTF-8 ;-)
+P4wnP1_cli WIFI set ap -r US -c 6 -s "💥🖥💥 Ⓟ➃ⓌⓃ🅟❶" -k "MaMe82-P4wnP1" --nonexmon
 
 # Configure USB ethernet interface "wlan0" to run a DHCP server
 #   - use IPv4 172.24.0.1 for interface with netmask 255.255.255.0

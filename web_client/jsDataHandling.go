@@ -133,7 +133,7 @@ func NewUSBGadgetSettings() *jsGadgetSettings {
 
 type jsEvent struct {
 	*js.Object
-	Type     int64      `js:"type"`
+	Type     int64 `js:"type"`
 	Values   []interface{}
 	JSValues *js.Object `js:"values"`
 }
@@ -363,40 +363,37 @@ func (jl *jsHidJobStateList) DeleteEntry(id int64) {
 
 type jsWiFiConnectionState struct {
 	*js.Object
-	Mode     int    `js:"mode"`
-	Reg      string `js:"reg"`
-	Channel  uint32 `js:"channel"`
-	SSID     string `js:"SSID"`
-	Hidden   bool   `js:"hidden"`
-	Nexmon   bool   `js:"nexmon"`
-	Disabled bool   `js:"disabled"`
+	Mode     int          `js:"mode"`
+	AuthMode int          `js:"authMode"`
+	Channel  uint32       `js:"channel"`
+	BSSCfg   *jsWiFiBSSCfg `js:"bss"`
 }
 
-func (target *jsWiFiConnectionState) fromGo(src *pb.WiFi2State) {
+func (target *jsWiFiConnectionState) fromGo(src *pb.WiFiState) {
 	target.Mode = int(src.WorkingMode)
-
-	target.Reg = src.Regulatory
+	target.AuthMode = int(src.AuthMode)
 	target.Channel = src.Channel
-	target.SSID = src.Bss.SSID
-	target.Hidden = src.HideSsid
-	target.Nexmon = src.Nexmon
-	target.Disabled = src.Disabled
+	target.BSSCfg = &jsWiFiBSSCfg{Object:O()}
+	if src.Bss == nil {
+		target.BSSCfg.PSK = ""
+		target.BSSCfg.SSID = ""
+	} else {
+		target.BSSCfg.PSK = src.Bss.PSK
+		target.BSSCfg.SSID = src.Bss.SSID
+	}
+
 	return
 }
 
-func (src *jsWiFiConnectionState) toGo() (target *pb.WiFi2State) {
-	target = &pb.WiFi2State{
-		Regulatory: src.Reg,
-		Channel: src.Channel,
-		Bss: &pb.WiFi2BSSCfg{
-			SSID: src.SSID,
-			PSK: "",
+func (src *jsWiFiConnectionState) toGo() (target *pb.WiFiState) {
+	target = &pb.WiFiState{
+		Channel:     src.Channel,
+		WorkingMode: pb.WiFiWorkingMode(src.Mode),
+		AuthMode:    pb.WiFiAuthMode(src.AuthMode),
+		Bss: &pb.WiFiBSSCfg{
+			SSID: src.BSSCfg.SSID,
+			PSK: src.BSSCfg.PSK,
 		},
-		HideSsid:  src.Hidden,
-		Nexmon:  src.Nexmon,
-		WorkingMode: pb.WiFi2WorkingMode(src.Mode),
-		Disabled: src.Disabled,
-		Name: "",
 	}
 
 	return
@@ -416,106 +413,145 @@ func (src jsWiFiConnectionState) ModeString() (strMode string) {
 
 func NewWiFiConnectionState() *jsWiFiConnectionState {
 	res := &jsWiFiConnectionState{Object: O()}
-	res.SSID = "Unknown SSID"
 	res.Channel = 0
-	res.Mode = 0
-	res.Hidden = false
-	res.Reg = "Unknown reg"
-	res.Nexmon = false
+	res.Mode = int(pb.WiFiWorkingMode_UNKNOWN)
+	res.AuthMode = int(pb.WiFiAuthMode_OPEN)
+
+	res.BSSCfg = &jsWiFiBSSCfg{Object:O()}
+	res.BSSCfg.PSK = ""
+	res.BSSCfg.SSID = ""
+
 	return res
+}
+
+type jsWiFiBSSCfg struct {
+	*js.Object
+	SSID string `js:"ssid"`
+	PSK  string `js:"psk"`
 }
 
 type jsWiFiSettings struct {
 	*js.Object
+	Name     string `js:"name"`
 	Disabled bool   `js:"disabled"`
 	Reg      string `js:"reg"`
 	Mode     int    `js:"mode"`     //AP, STA, Failover
 	AuthMode int    `js:"authMode"` //WPA2_PSK, OPEN
 	Channel  int    `js:"channel"`
-	// next two fields are interpreted as BssCfgAp or BssCfgClient, depending on Mode
-	AP_SSID       string `js:"apSsid"`
-	AP_PSK        string `js:"apPsk"`
-	STA_SSID      string `js:"staSsid"`
-	STA_PSK       string `js:"staPsk"`
-	HideSsid      bool   `js:"hideSsid"`
-	DisableNexmon bool   `js:"disableNexmon"`
-}
+	HideSsid bool   `js:"hideSsid"`
+	Nexmon   bool   `js:"nexmon"`
 
-func (target *jsWiFiSettings) fromGo(src *pb.WiFiSettings) {
-	target.Disabled = src.Disabled
-	target.Reg = src.Reg
-	target.Mode = int(src.Mode)
-	target.AuthMode = int(src.AuthMode)
-	target.Channel = int(src.ApChannel)
-	target.HideSsid = src.ApHideSsid
-	target.DisableNexmon = src.DisableNexmon
-
-	switch src.Mode {
-	case pb.WiFiSettings_AP:
-		target.AP_SSID = src.BssCfgAP.SSID
-		target.AP_PSK = src.BssCfgAP.PSK
-		target.STA_SSID = ""
-		target.STA_PSK = ""
-	case pb.WiFiSettings_STA:
-		target.AP_SSID = ""
-		target.AP_PSK = ""
-		target.STA_SSID = src.BssCfgClient.SSID
-		target.STA_PSK = src.BssCfgClient.PSK
-	case pb.WiFiSettings_STA_FAILOVER_AP:
-		target.STA_SSID = src.BssCfgClient.SSID
-		target.STA_PSK = src.BssCfgClient.PSK
-		target.AP_SSID = src.BssCfgAP.SSID
-		target.AP_PSK = src.BssCfgAP.PSK
-	}
+	Ap_BSS         *jsWiFiBSSCfg `js:"apBss"`
+	Client_BSSList *js.Object    `js:"staBssList"` //pointer to js array
 }
 
 func (src *jsWiFiSettings) toGo() (target *pb.WiFiSettings) {
 	// assure undefined strings end up as empty strings
 
 	target = &pb.WiFiSettings{
-		Disabled:      src.Disabled,
-		Reg:           src.Reg,
-		Mode:          pb.WiFiSettings_Mode(src.Mode),
-		AuthMode:      pb.WiFiSettings_APAuthMode(src.AuthMode),
-		DisableNexmon: src.DisableNexmon,
-		ApChannel:     uint32(src.Channel),
-		ApHideSsid:    src.HideSsid,
-		BssCfgClient: &pb.BSSCfg{
-			SSID: src.STA_SSID,
-			PSK:  src.STA_PSK,
-		},
-		BssCfgAP: &pb.BSSCfg{
-			SSID: src.AP_SSID,
-			PSK:  src.AP_PSK,
+		Name:        src.Name,
+		Disabled:    src.Disabled,
+		Regulatory:  src.Reg,
+		WorkingMode: pb.WiFiWorkingMode(src.Mode),
+		AuthMode:    pb.WiFiAuthMode(src.AuthMode),
+		Nexmon:      src.Nexmon,
+		Channel:     uint32(src.Channel),
+		HideSsid:    src.HideSsid,
+		Ap_BSS: &pb.WiFiBSSCfg{
+			SSID: src.Ap_BSS.SSID,
+			PSK:  src.Ap_BSS.PSK,
 		},
 	}
+
+	//Check if ranges are present
+	if src.Client_BSSList != js.Undefined {
+		if numClientBss := src.Client_BSSList.Length(); numClientBss > 0 {
+			target.Client_BSSList = make([]*pb.WiFiBSSCfg, numClientBss)
+			//iterate over JS array
+			for i := 0; i < numClientBss; i++ {
+				jsBsscfg := &jsWiFiBSSCfg{Object: src.Client_BSSList.Index(i)}
+				target.Client_BSSList[i] = &pb.WiFiBSSCfg{
+					SSID: jsBsscfg.SSID,
+					PSK:  jsBsscfg.PSK,
+				}
+			}
+		}
+	} else {
+		// at least on empty entry
+		target.Client_BSSList = []*pb.WiFiBSSCfg{
+			&pb.WiFiBSSCfg{},
+		}
+	}
+
 	return target
 }
 
-func (src *jsWiFiSettings) toGo2() (target *pb.WiFi2Settings) {
+func (target *jsWiFiSettings) fromGo(src *pb.WiFiSettings) {
 	// assure undefined strings end up as empty strings
 
-	target = &pb.WiFi2Settings{
-		Name:        "mainconfig",
-		Disabled:    src.Disabled,
-		Regulatory:  src.Reg,
-		WorkingMode: pb.WiFi2WorkingMode(src.Mode),
-		AuthMode:    pb.WiFi2AuthMode(src.AuthMode),
-		Nexmon:      !src.DisableNexmon,
-		Channel:     uint32(src.Channel),
-		HideSsid:    src.HideSsid,
-		Ap_BSS: &pb.WiFi2BSSCfg{
-			SSID: src.AP_SSID,
-			PSK:  src.AP_PSK,
-		},
-		Client_BSSList: []*pb.WiFi2BSSCfg{
-			&pb.WiFi2BSSCfg{
-				SSID: src.STA_SSID,
-				PSK:  src.STA_PSK,
-			},
-		},
+	target.Name = src.Name
+	target.Mode = int(src.WorkingMode)
+	target.Disabled = src.Disabled
+	target.Reg = src.Regulatory
+	target.AuthMode = int(src.AuthMode)
+	target.Nexmon = src.Nexmon
+	target.Channel = int(src.Channel)
+	target.HideSsid = src.HideSsid
+	// ToDo: Errorcheck existence of nested structs
+	target.Ap_BSS = &jsWiFiBSSCfg{Object: O()}
+	if src.Ap_BSS != nil {
+		target.Ap_BSS.SSID = src.Ap_BSS.SSID
+		target.Ap_BSS.PSK = src.Ap_BSS.PSK
+	} else {
+		target.Ap_BSS.SSID = ""
+		target.Ap_BSS.PSK = ""
 	}
-	return target
+
+	target.Client_BSSList = js.Global.Get("Array").New()
+	for _, clientBSS := range src.Client_BSSList {
+		jsClBSS := jsWiFiBSSCfg{Object: O()}
+		jsClBSS.SSID = clientBSS.SSID
+		jsClBSS.PSK = clientBSS.PSK
+		target.Client_BSSList.Call("push", jsClBSS)
+	}
+	//if no entry in array, push at least one (needed in vue model)
+	if target.Client_BSSList.Length() == 0 {
+		jsClBSS := jsWiFiBSSCfg{Object: O()}
+		jsClBSS.SSID = ""
+		jsClBSS.PSK = ""
+		target.Client_BSSList.Call("push", jsClBSS)
+	}
+
+	/*
+	target.AP_SSID = src.Ap_BSS.SSID
+	target.AP_PSK = src.Ap_BSS.PSK
+	// ToDo: change STA settings to array
+	target.STA_SSID = src.Client_BSSList[0].SSID
+	target.STA_PSK = src.Client_BSSList[0].PSK
+	*/
+}
+
+func NewWifiSettings() *jsWiFiSettings {
+	res := &jsWiFiSettings{Object: O()}
+	res.Disabled = true
+	res.Mode = int(pb.WiFiWorkingMode_UNKNOWN)
+	res.Name = "default"
+	res.Ap_BSS = &jsWiFiBSSCfg{Object: O()}
+	res.Ap_BSS.PSK = ""
+	res.Ap_BSS.SSID = ""
+	res.AuthMode = int(pb.WiFiAuthMode_OPEN)
+	res.Channel = 1
+	res.Nexmon = false
+	res.Client_BSSList = js.Global.Get("Array").New()
+	//no entry in array, push one (needed in vue model)
+	jsClBSS := jsWiFiBSSCfg{Object: O()}
+	jsClBSS.SSID = ""
+	jsClBSS.PSK = ""
+	res.Client_BSSList.Call("push", jsClBSS)
+	res.HideSsid = false
+	res.Reg = "US"
+
+	return res
 }
 
 /* Network Settings */
@@ -532,7 +568,6 @@ func (isl *jsEthernetSettingsList) fromGo(src *pb.DeployedEthernetInterfaceSetti
 		jsIfSets.fromGo(ifSets)
 		isl.Interfaces.Call("push", jsIfSets)
 	}
-
 }
 
 type jsEthernetInterfaceSettings struct {

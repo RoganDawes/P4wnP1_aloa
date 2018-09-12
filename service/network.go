@@ -16,7 +16,7 @@ import (
 
 
 func ReInitNetworkInterface(ifName string) (err error) {
-	if settings, existing := ServiceState.StoredNetworkSetting[ifName]; existing {
+	if settings, existing := ServiceState.StoredNetworkSettings[ifName]; existing {
 		log.Printf("Redeploying stored Network settings for interface '%s' ...\n", ifName)
 		return ConfigureInterface(settings)
 	} else {
@@ -223,7 +223,7 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 
 	//Store latest settings
 	settings.SettingsInUse = true
-	ServiceState.StoredNetworkSetting[settings.Name] = settings
+	ServiceState.StoredNetworkSettings[settings.Name] = settings
 
 	return nil
 }

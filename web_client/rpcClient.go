@@ -39,61 +39,36 @@ func (rpc *Rpc) DeployedEthernetInterfaceSettings(timeout time.Duration, setting
 	return
 }
 
-func (rpc *Rpc) DeployWifiSettings(timeout time.Duration, settings *pb.WiFiSettings) (state *pb.WiFiConnectionState, err error) {
-	// ToDo: The RPC call has to return an error in case deployment fails
+
+func (rpc *Rpc) DeployWifiSettings(timeout time.Duration, settings *pb.WiFiSettings) (state *pb.WiFiState, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	state, err = rpc.Client.DeployWifiSettings(ctx, settings)
-	return
-}
-
-func (rpc *Rpc) DeployWifiSettings2(timeout time.Duration, settings *pb.WiFi2Settings) (state *pb.WiFi2State, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	state, err = rpc.Client.DeployWiFiSettings2(ctx, settings)
+	state, err = rpc.Client.DeployWiFiSettings(ctx, settings)
 	return
 }
 
 
 func (rpc *Rpc) GetDeployedWiFiSettings(timeout time.Duration) (settingsList *jsWiFiSettings, err error) {
-	/*
-	//ToDo: Only placeholder, replace with real "get deployed" RPC
-	ws := &pb.WiFiSettings{
-		BssCfgAP: &pb.BSSCfg{
-			PSK:  "somesecretPSK",
-			SSID: "TheAP-SSID",
-		},
-		BssCfgClient: &pb.BSSCfg{
-			PSK:  "somesecretPSKForExistingAP",
-			SSID: "ExistingSSID",
-		},
-		Mode:          pb.WiFiSettings_STA_FAILOVER_AP,
-		DisableNexmon: false,
-		ApHideSsid:    false,
-		ApChannel:     13,
-		AuthMode:      pb.WiFiSettings_WPA2_PSK,
-		Reg:           "DE",
-		Disabled:      false,
-	}
-	*/
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	ws,err := rpc.Client.GetDeployedWifiSettings(ctx, &pb.Empty{})
+	ws,err := rpc.Client.GetWiFiState(ctx, &pb.Empty{})
 	if err != nil {
 		println("Error GetDeployedWifiSettings", err)
 		return nil, err
 	}
 
+	println("GetDeployedWifiSettings: ", ws)
+
+	// Update state
+
 	jsWs := &jsWiFiSettings{Object: O()}
-	jsWs.fromGo(ws)
+	jsWs.fromGo(ws.CurrentSettings)
 	return jsWs, nil
 
-
-
 }
+
 
 func (rpc *Rpc) GetAllDeployedEthernetInterfaceSettings(timeout time.Duration) (settingsList *jsEthernetSettingsList, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)

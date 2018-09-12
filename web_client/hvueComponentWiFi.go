@@ -25,26 +25,26 @@ func InitComponentsWiFi() {
 		),
 		hvue.ComputedWithGetSet("enableNexmon",
 			func(vm *hvue.VM) interface{} {
-				return !vm.Get("settings").Get("disableNexmon").Bool()
+				return vm.Get("settings").Get("nexmon").Bool()
 			},
 			func(vm *hvue.VM, newValue *js.Object) {
-				vm.Get("settings").Set("disableNexmon", !newValue.Bool())
+				vm.Get("settings").Set("nexmon", newValue.Bool())
 			},
 		),
 
 		hvue.Computed("wifiAuthModes", func(vm *hvue.VM) interface{} {
 			modes := js.Global.Get("Array").New()
-			for val,_ := range pb.WiFiSettings_APAuthMode_name {
+			for val,_ := range pb.WiFiAuthMode_name {
 				mode := struct {
 					*js.Object
 					Label string `js:"label"`
 					Value int  `js:"value"`
 				}{Object:O()}
 				mode.Value = val
-				switch pb.WiFi2AuthMode(val) {
-				case pb.WiFi2AuthMode_WPA2_PSK:
+				switch pb.WiFiAuthMode(val) {
+				case pb.WiFiAuthMode_WPA2_PSK:
 					mode.Label = "WPA2"
-				case pb.WiFi2AuthMode_OPEN:
+				case pb.WiFiAuthMode_OPEN:
 					mode.Label = "Open"
 				default:
 					mode.Label = "Unknown"
@@ -55,19 +55,19 @@ func InitComponentsWiFi() {
 		}),
 		hvue.Computed("wifiModes", func(vm *hvue.VM) interface{} {
 			modes := js.Global.Get("Array").New()
-			for val,_ := range pb.WiFi2WorkingMode_name {
+			for val,_ := range pb.WiFiWorkingMode_name {
 				mode := struct {
 					*js.Object
 					Label string `js:"label"`
 					Value int  `js:"value"`
 				}{Object:O()}
 				mode.Value = val
-				switch pb.WiFi2WorkingMode(val) {
-				case pb.WiFi2WorkingMode_AP:
+				switch pb.WiFiWorkingMode(val) {
+				case pb.WiFiWorkingMode_AP:
 					mode.Label = "Access Point (AP)"
-				case pb.WiFi2WorkingMode_STA:
+				case pb.WiFiWorkingMode_STA:
 					mode.Label = "Station (Client)"
-				case pb.WiFi2WorkingMode_STA_FAILOVER_AP:
+				case pb.WiFiWorkingMode_STA_FAILOVER_AP:
 					mode.Label = "Client with Failover to AP"
 				default:
 					continue
@@ -76,9 +76,9 @@ func InitComponentsWiFi() {
 			}
 			return modes
 		}),
-		hvue.Computed("mode_ap", func(vm *hvue.VM) interface{} {return pb.WiFi2WorkingMode_AP}),
-		hvue.Computed("mode_sta", func(vm *hvue.VM) interface{} {return pb.WiFi2WorkingMode_STA_FAILOVER_AP}),
-		hvue.Computed("mode_failover", func(vm *hvue.VM) interface{} {return pb.WiFi2WorkingMode_STA_FAILOVER_AP}),
+		hvue.Computed("mode_ap", func(vm *hvue.VM) interface{} {return pb.WiFiWorkingMode_AP}),
+		hvue.Computed("mode_sta", func(vm *hvue.VM) interface{} {return pb.WiFiWorkingMode_STA}),
+		hvue.Computed("mode_failover", func(vm *hvue.VM) interface{} {return pb.WiFiWorkingMode_STA_FAILOVER_AP}),
 		hvue.Method("reset",
 			func(vm *hvue.VM) {
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED)
@@ -87,6 +87,11 @@ func InitComponentsWiFi() {
 			func(vm *hvue.VM, wifiSettings *jsWiFiSettings) {
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_WIFI_SETTINGS, wifiSettings)
 			}),
+		hvue.Computed("deploying",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("$store").Get("state").Get("deployingWifiSettings")
+			}),
+
 	)
 }
 
@@ -100,7 +105,7 @@ const templateWiFi = `
 		</q-card-title>
 	
 		<q-card-actions>
-			<q-btn color="primary" @click="deploy(settings)" label="deploy"></q-btn>
+			<q-btn :loading="deploying" color="primary" @click="deploy(settings)" label="deploy"></q-btn>
 			<q-btn color="secondary" @click="reset" label="reset"></q-btn>
 		</q-card-actions>
 
@@ -161,7 +166,7 @@ const templateWiFi = `
 						<q-item-tile label>SSID</q-item-tile>
 						<q-item-tile sublabel>Network name to connect</q-item-tile>
 						<q-item-tile>
-							<q-input v-model="settings.staSsid" color="primary" inverted></q-input>
+							<q-input v-model="settings.staBssList[0].ssid" color="primary" inverted></q-input>
 						</q-item-tile>
 					</q-item-main>
 				</q-item>
@@ -170,7 +175,7 @@ const templateWiFi = `
 						<q-item-tile label>Pre shared key</q-item-tile>
 						<q-item-tile sublabel>If empty, a network with Open Authentication is assumed (Warning: PLAIN TRANSMISSION)</q-item-tile>
 						<q-item-tile>
-							<q-input v-model="settings.staPsk" type="password" color="primary" inverted></q-input>
+							<q-input v-model="settings.staBssList[0].psk" type="password" color="primary" inverted></q-input>
 						</q-item-tile>
 					</q-item-main>
 				</q-item>
@@ -224,7 +229,7 @@ const templateWiFi = `
 						<q-item-tile label>SSID</q-item-tile>
 						<q-item-tile sublabel>Network name (Service Set Identifier)</q-item-tile>
 						<q-item-tile>
-							<q-input v-model="settings.apSsid" color="primary" inverted></q-input>
+							<q-input v-model="settings.apBss.ssid" color="primary" inverted></q-input>
 						</q-item-tile>
 					</q-item-main>
 				</q-item>
@@ -242,7 +247,7 @@ const templateWiFi = `
 						<q-item-tile label>Pre shared key</q-item-tile>
 						<q-item-tile sublabel>Warning: PLAIN TRANSMISSION</q-item-tile>
 						<q-item-tile>
-							<q-input v-model="settings.apPsk" type="password" color="primary" inverted></q-input>
+							<q-input v-model="settings.apBss.psk" type="password" color="primary" inverted></q-input>
 						</q-item-tile>
 					</q-item-main>
 				</q-item>
@@ -256,7 +261,7 @@ const templateWiFi = `
 		<q-card-title>
 			<q-icon name="alarm" /><q-icon name="alarm" />
 		</q-card-title>
-
+		WiFiSettings {{ settings }} <br> 
 		WiFiState {{ $store.state.wifiConnectionState }} 
 	</q-card>
 	</div>

@@ -258,7 +258,7 @@ func ClientDeployEthernetInterfaceSettings(host string, port string, settings *p
 
 }
 
-func ClientDeployWifiSettings(host string, port string, settings *pb.WiFi2Settings) (state *pb.WiFi2State, err error) {
+func ClientDeployWifiSettings(host string, port string, settings *pb.WiFiSettings) (state *pb.WiFiState, err error) {
 	// Set up a connection to the server.
 	address := host + ":" + port
 	//log.Printf("Connecting %s ...", address)
@@ -274,7 +274,7 @@ func ClientDeployWifiSettings(host string, port string, settings *pb.WiFi2Settin
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
 	defer cancel()
 
-	state,err = rpcClient.DeployWiFiSettings2(ctx, settings)
+	state,err = rpcClient.DeployWiFiSettings(ctx, settings)
 	return
 }
 

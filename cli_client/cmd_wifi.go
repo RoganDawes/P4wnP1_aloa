@@ -109,7 +109,7 @@ func cobraWifiSetSta(cmd *cobra.Command, args []string) {
 	return
 }
 
-func createWifiAPSettings(channel uint8, reg string, strSSID string, strPSK string, hideSsid bool, nonexmon bool, disabled bool) (settings *pb.WiFi2Settings, err error) {
+func createWifiAPSettings(channel uint8, reg string, strSSID string, strPSK string, hideSsid bool, nonexmon bool, disabled bool) (settings *pb.WiFiSettings, err error) {
 	if channel < 1 || channel > 14 {
 		return nil, errors.New(fmt.Sprintf("Only 2.4GHz channels between 1 and 14 are supported, but '%d' was given\n", channel))
 	}
@@ -127,30 +127,30 @@ func createWifiAPSettings(channel uint8, reg string, strSSID string, strPSK stri
 		return nil, errors.New(fmt.Sprintf("A non-empty PSK implies WPA2 and has to have a minimum of 8 characters, but given PSK has '%d' charactres\n", len(strPSK)))
 	}
 
-	settings = &pb.WiFi2Settings{
-		WorkingMode: pb.WiFi2WorkingMode_AP,
-		AuthMode:    pb.WiFi2AuthMode_OPEN,
+	settings = &pb.WiFiSettings{
+		WorkingMode: pb.WiFiWorkingMode_AP,
+		AuthMode:    pb.WiFiAuthMode_OPEN,
 		Disabled:    disabled,
 		Regulatory:  reg,
 		Channel:     uint32(channel),
 		HideSsid:    hideSsid,
-		Ap_BSS: &pb.WiFi2BSSCfg{
+		Ap_BSS: &pb.WiFiBSSCfg{
 			SSID: strSSID,
 			PSK:  strPSK,
 		},
-		Client_BSSList: []*pb.WiFi2BSSCfg{},
+		Client_BSSList: []*pb.WiFiBSSCfg{},
 		Nexmon:         !nonexmon,
 		Name:           "default",
 	}
 
 	if len(strPSK) > 0 {
-		settings.AuthMode = pb.WiFi2AuthMode_WPA2_PSK //if PSK is given use WPA2
+		settings.AuthMode = pb.WiFiAuthMode_WPA2_PSK //if PSK is given use WPA2
 	}
 
 	return settings, err
 }
 
-func createWifiStaSettings(reg string, strSSID string, strPSK string, nonexmon bool, disabled bool) (settings *pb.WiFi2Settings, err error) {
+func createWifiStaSettings(reg string, strSSID string, strPSK string, nonexmon bool, disabled bool) (settings *pb.WiFiSettings, err error) {
 	if len(reg) != 2 {
 		return nil, errors.New(fmt.Sprintf("Regulatory domain has to consist of two uppercase letters (ISO/IEC 3166-1 alpha2), but '%s' was given\n", reg))
 	}
@@ -164,25 +164,25 @@ func createWifiStaSettings(reg string, strSSID string, strPSK string, nonexmon b
 		return nil, errors.New(fmt.Sprintf("A non-empty PSK implies WPA2 and has to have a minimum of 8 characters, but given PSK has '%d' charactres\n", len(strPSK)))
 	}
 
-	settings = &pb.WiFi2Settings{
-		WorkingMode: pb.WiFi2WorkingMode_STA,
-		AuthMode:    pb.WiFi2AuthMode_OPEN,
+	settings = &pb.WiFiSettings{
+		WorkingMode: pb.WiFiWorkingMode_STA,
+		AuthMode:    pb.WiFiAuthMode_OPEN,
 		Disabled:    disabled,
 		Regulatory:  reg,
-		Client_BSSList: []*pb.WiFi2BSSCfg{
-			&pb.WiFi2BSSCfg{
+		Client_BSSList: []*pb.WiFiBSSCfg{
+			&pb.WiFiBSSCfg{
 				SSID: strSSID,
 				PSK:  strPSK,
 			},
 		},
 		Nexmon: !nonexmon,
-		Ap_BSS: &pb.WiFi2BSSCfg{}, //not needed
+		Ap_BSS: &pb.WiFiBSSCfg{}, //not needed
 		Name: "default",
 		HideSsid: false,
 	}
 
 	if len(strPSK) > 0 {
-		settings.AuthMode = pb.WiFi2AuthMode_WPA2_PSK //if PSK is given use WPA2
+		settings.AuthMode = pb.WiFiAuthMode_WPA2_PSK //if PSK is given use WPA2
 	}
 
 	return settings, err
