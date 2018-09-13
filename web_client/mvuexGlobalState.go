@@ -17,11 +17,11 @@ const (
 	VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS       = "deployCurrentGadgetSettings"
 	VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED = "updateCurrentGadgetSettingsFromDeployed"
 	VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS   = "deployEthernetInterfaceSettings"
-	VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED   = "updateCurrentWifiSettingsFromDeployed"
+	VUEX_ACTION_UPDATE_WIFI_STATE                    = "updateCurrentWifiSettingsFromDeployed"
 	VUEX_ACTION_DEPLOY_WIFI_SETTINGS                 = "deployWifiSettings"
 
 	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO   = "setCurrentGadgetSettings"
-	VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS        = "setCurrentWifiSettings"
+	VUEX_MUTATION_SET_WIFI_STATE                   = "setCurrentWifiSettings"
 	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO = "setCurrentHIDScriptSource"
 
 	initHIDScript = `layout('us');			// US keyboard layout
@@ -63,8 +63,8 @@ type GlobalState struct {
 	IsConnected                      bool                    `js:"isConnected"`
 	FailedConnectionAttempts         int                     `js:"failedConnectionAttempts"`
 	InterfaceSettings                *jsEthernetSettingsList `js:"InterfaceSettings"`
-	WiFiSettings                     *jsWiFiSettings         `js:"wifiSettings"`
-	WiFiState                        *jsWiFiConnectionState  `js:"wifiConnectionState"`
+	//WiFiSettings                     *jsWiFiSettings         `js:"wifiSettings"`
+	WiFiState                        *jsWiFiState            `js:"wifiState"`
 }
 
 func createGlobalStateStruct() GlobalState {
@@ -87,13 +87,13 @@ func createGlobalStateStruct() GlobalState {
 	state.InterfaceSettings = ifSettings
 
 	/*
-	wifiSettings, err := RpcClient.GetDeployedWiFiSettings(time.Second * 5)
+	wifiSettings, err := RpcClient.GetWifiState(time.Second * 5)
 	if err != nil {
 		panic("Couldn't retrieve WiFi settings")
 	}
 	*/
-	state.WiFiSettings = NewWifiSettings()
-	state.WiFiState = NewWiFiConnectionState()
+	//state.WiFiSettings = NewWifiSettings()
+	state.WiFiState = NewWiFiState()
 	return state
 }
 
@@ -116,37 +116,22 @@ func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.A
 	return
 }
 
-func actionUpdateWifiSettingsFromDeployed(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+func actionUpdateWifiState(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		//fetch deployed gadget settings
-		dWS, err := RpcClient.GetDeployedWiFiSettings(time.Second * 5)
+		state, err := RpcClient.GetWifiState(time.Second * 5)
 		if err != nil {
 			println("Couldn't retrieve deployed WiFi settings")
 			return
 		}
 
 		//commit to current
-		context.Commit(VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS, dWS)
+		context.Commit(VUEX_MUTATION_SET_WIFI_STATE, state)
 	}()
 
 	return
 }
 
-/*
-func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settings *jsWiFiSettings) {
-	go func() {
-		println("Vuex dispatch deploy WiFi settings")
-		// convert to Go type
-		goSettings := settings.toGo()
-
-		wstate, err := RpcClient.DeployWifiSettings(time.Second*20, goSettings)
-		if err != nil {
-			QuasarNotifyError("Error deploying WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
-		}
-		state.WiFiState.fromGo(wstate)
-	}()
-}
-*/
 func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settings *jsWiFiSettings) {
 	go func() {
 
@@ -250,8 +235,8 @@ func initMVuex() *mvuex.Store {
 			state.CurrentGadgetSettings = settings
 			return
 		}),
-		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS, func(store *mvuex.Store, state *GlobalState, settings *jsWiFiSettings) {
-			state.WiFiSettings = settings
+		mvuex.Mutation(VUEX_MUTATION_SET_WIFI_STATE, func(store *mvuex.Store, state *GlobalState, wifiState *jsWiFiState) {
+			state.WiFiState = wifiState
 			return
 		}),
 		/*
@@ -268,7 +253,7 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS, actionDeployCurrentGadgetSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS, actionUpdateRunningHidJobs),
 		mvuex.Action(VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS, actionDeployEthernetInterfaceSettings),
-		mvuex.Action(VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED, actionUpdateWifiSettingsFromDeployed),
+		mvuex.Action(VUEX_ACTION_UPDATE_WIFI_STATE, actionUpdateWifiState),
 		mvuex.Action(VUEX_ACTION_DEPLOY_WIFI_SETTINGS, actionDeployWifiSettings),
 
 		mvuex.Getter("hidjobs", func(state *GlobalState) interface{} {
@@ -312,7 +297,7 @@ func initMVuex() *mvuex.Store {
 	store.Dispatch(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS)
 
 	// Update WiFi state
-	store.Dispatch(VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED)
+	store.Dispatch(VUEX_ACTION_UPDATE_WIFI_STATE)
 
 	// propagate Vuex store to global scope to allow injecting it to Vue by setting the "store" option
 	js.Global.Set("store", store)

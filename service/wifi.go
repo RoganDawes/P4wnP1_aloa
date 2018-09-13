@@ -359,12 +359,8 @@ func (wSvc *WiFiService) DeploySettings(newWifiSettings *pb.WiFiSettings) (wstat
 	wSvc.State.CurrentSettings = newWifiSettings
 
 	// update rest of state
-	if newState,serr := wSvc.RetrieveIwState(); serr == nil {
-		wSvc.State.Ssid = newState.Ssid
-		wSvc.State.Mode = newState.Mode
-		wSvc.State.Channel = newState.Channel
-	} else {
-		log.Println("Couldn't retrieve new Interface state:", serr)
+	if serr := wSvc.UpdateStateFromIw(); serr != nil {
+		log.Println("Couldn't update internal WiFi state:", serr)
 	}
 	return wSvc.State, nil
 }
@@ -712,11 +708,11 @@ func ParseIwScan(scanresult string) (bsslist []BSS, err error) {
 	return bsslist, nil
 }//ToDo: Create netlink based implementation (not relying on 'iw'): low priority
 
-func (wsvc WiFiService) RetrieveIwState() (state *pb.WiFiState, err error) {
+func (wsvc WiFiService) UpdateStateFromIw() (err error) {
 	proc := exec.Command("/sbin/iw", "dev", wsvc.IfaceName, "info")
 	res, err := proc.CombinedOutput()
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Error fetching wifi info: '%s'\niw output: %s", err, res))
+		return errors.New(fmt.Sprintf("Error fetching wifi info: '%s'\niw output: %s", err, res))
 	}
 
 
@@ -791,29 +787,26 @@ func (wsvc WiFiService) RetrieveIwState() (state *pb.WiFiState, err error) {
 	if len(strMode_sub) > 1 {
 		strMode = strMode_sub[1]
 	}
-//	fmt.Printf("Mode: %s\n", strMode)
 
-
-	state = &pb.WiFiState{}
 	switch strings.ToLower(strMode) {
 	case "ap":
-		state.Mode = pb.WiFiStateMode_AP_UP
+		wsvc.State.Mode = pb.WiFiStateMode_AP_UP
 	default:
-		state.Mode = pb.WiFiStateMode_STA_NOT_CONNECTED
+		wsvc.State.Mode = pb.WiFiStateMode_STA_NOT_CONNECTED
 	}
 
 	if len(strSsid) > 0 {
-		state.Ssid = strSsid
-		if state.Mode == pb.WiFiStateMode_STA_NOT_CONNECTED {
-			state.Mode = pb.WiFiStateMode_STA_CONNECTED // when a SSID is present, the wifi interface is conected to an AP
+		wsvc.State.Ssid = strSsid
+		if wsvc.State.Mode == pb.WiFiStateMode_STA_NOT_CONNECTED {
+			wsvc.State.Mode = pb.WiFiStateMode_STA_CONNECTED // when a SSID is present, the wifi interface is conected to an AP
 		}
 	}
 
 	intCh := 0
 	intCh,_ = strconv.Atoi(strChannel)
-	state.Channel = uint32(intCh)
+	wsvc.State.Channel = uint32(intCh)
 
-	return state, nil
+	return nil
 }
 
 func wifiSetReg(reg string) (err error) {

@@ -361,31 +361,35 @@ func (jl *jsHidJobStateList) DeleteEntry(id int64) {
 
 /* WiFi settings */
 
-type jsWiFiConnectionState struct {
+type jsWiFiState struct {
 	*js.Object
 	Mode     int          `js:"mode"`
 	Channel  uint32       `js:"channel"`
 	Ssid   string `js:"ssid"`
+	CurrentSettings *jsWiFiSettings `js:"CurrentSettings"`
 }
 
-func (target *jsWiFiConnectionState) fromGo(src *pb.WiFiState) {
+func (target *jsWiFiState) fromGo(src *pb.WiFiState) {
 	target.Mode = int(src.Mode)
 	target.Channel = src.Channel
 	target.Ssid = src.Ssid
+	target.CurrentSettings = NewWifiSettings()
+	target.CurrentSettings.fromGo(src.CurrentSettings)
 	return
 }
 
-func (src *jsWiFiConnectionState) toGo() (target *pb.WiFiState) {
+func (src *jsWiFiState) toGo() (target *pb.WiFiState) {
 	target = &pb.WiFiState{
 		Channel:     src.Channel,
 		Mode: pb.WiFiStateMode(src.Mode),
 		Ssid: src.Ssid,
+		CurrentSettings: src.CurrentSettings.toGo(),
 	}
 
 	return
 }
 
-func (src jsWiFiConnectionState) ModeString() (strMode string) {
+func (src jsWiFiState) ModeString() (strMode string) {
 	switch src.Mode {
 	case int(pb.WiFiStateMode_STA_NOT_CONNECTED):
 		return "Not connected"
@@ -399,12 +403,12 @@ func (src jsWiFiConnectionState) ModeString() (strMode string) {
 	}
 }
 
-func NewWiFiConnectionState() *jsWiFiConnectionState {
-	res := &jsWiFiConnectionState{Object: O()}
+func NewWiFiState() *jsWiFiState {
+	res := &jsWiFiState{Object: O()}
 	res.Channel = 0
 	res.Mode = int(pb.WiFiStateMode_STA_NOT_CONNECTED)
 	res.Ssid = ""
-
+	res.CurrentSettings = NewWifiSettings()
 	return res
 }
 

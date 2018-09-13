@@ -35,6 +35,9 @@ func (s *server) DeployWiFiSettings(ctx context.Context, wset *pb.WiFiSettings) 
 }
 
 func (s *server) GetWiFiState(ctx context.Context, empty *pb.Empty) (wstate *pb.WiFiState, err error) {
+	// Update state before transmitting back
+	ServiceState.WifiSvc.UpdateStateFromIw()
+
 	st := ServiceState.WifiSvc.State
 	return st, nil
 }
@@ -42,22 +45,6 @@ func (s *server) GetWiFiState(ctx context.Context, empty *pb.Empty) (wstate *pb.
 func (s *server) ListenWiFiStateChanges(ctx context.Context, empty *pb.Empty) (wstate *pb.WiFiState, err error) {
 	panic("implement me")
 }
-
-/*
-func (s *server) GetDeployedWifiSettings(ctx context.Context, req *pb.Empty) (resp *pb.WiFiSettings, err error) {
-	return ServiceState.Wifi.GetDeployWifiSettings()
-}
-
-
-func (s *server) DeployWifiSettings(ctx context.Context, ws *pb.WiFiSettings) (wifiConState *pb.WiFiConnectionState, err error) {
-	log.Printf("Trying to deploy WiFi settings %v", ws)
-	err = ServiceState.Wifi.DeployWifiSettings(ws)
-	if err != nil {
-		log.Printf("Error deploying WiFi settings settings %v", err)
-	}
-	return ServiceState.Wifi.ConState, err
-}
-*/
 
 func (s *server) GetDeployedEthernetInterfaceSettings(ctx context.Context, req *pb.StringMessage) (resp *pb.EthernetInterfaceSettings, err error) {
 	if settings,exist := ServiceState.StoredNetworkSettings[req.Msg]; exist && settings.SettingsInUse {

@@ -13,7 +13,40 @@ func InitComponentsWiFi() {
 		"wifi",
 		hvue.Template(templateWiFi),
 		hvue.Computed("settings", func(vm *hvue.VM) interface{} {
-			return vm.Get("$store").Get("state").Get("wifiSettings")
+			return vm.Get("$store").Get("state").Get("wifiState").Get("CurrentSettings")
+		}),
+		hvue.Computed("wifiState", func(vm *hvue.VM) interface{} {
+			return vm.Get("$store").Get("state").Get("wifiState")
+		}),
+		hvue.Computed("wifiStateIcon", func(vm *hvue.VM) interface{} {
+			mode := vm.Get("$store").Get("state").Get("wifiState").Get("mode").Int()
+			switch mode {
+			case int(pb.WiFiStateMode_STA_CONNECTED):
+				// Client mode, connected
+				return "wifi"
+			case int(pb.WiFiStateMode_AP_UP):
+				// Access Point running
+				return "wifi_tethering"
+			default:
+				return "portable_wifi_off"
+			}
+		}),
+		hvue.Computed("wifiStateText", func(vm *hvue.VM) interface{} {
+			mode := vm.Get("$store").Get("state").Get("wifiState").Get("mode").Int()
+			ssid := vm.Get("$store").Get("state").Get("wifiState").Get("ssid").String()
+			channel := vm.Get("$store").Get("state").Get("wifiState").Get("channel").String()
+			switch mode {
+			case int(pb.WiFiStateMode_STA_CONNECTED):
+				res := "Connected to network"
+				if len(ssid) > 0 { res += ": '" + ssid + "' on channel " + channel}
+				return res
+			case int(pb.WiFiStateMode_AP_UP):
+				res := "Access Point running on channel " + channel
+				if len(ssid) > 0 { res += ": '" + ssid + "'"}
+				return res
+			default:
+				return "Not connected"
+			}
 		}),
 		hvue.ComputedWithGetSet("enabled",
 			func(vm *hvue.VM) interface{} {
@@ -81,7 +114,7 @@ func InitComponentsWiFi() {
 		hvue.Computed("mode_failover", func(vm *hvue.VM) interface{} {return pb.WiFiWorkingMode_STA_FAILOVER_AP}),
 		hvue.Method("reset",
 			func(vm *hvue.VM) {
-				vm.Get("$store").Call("dispatch", VUEX_ACTION_UPDATE_WIFI_SETTINGS_FROM_DEPLOYED)
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_UPDATE_WIFI_STATE)
 			}),
 		hvue.Method("deploy",
 			func(vm *hvue.VM, wifiSettings *jsWiFiSettings) {
@@ -103,6 +136,13 @@ const templateWiFi = `
 		<q-card-title>
 			WiFi settings
 		</q-card-title>
+
+		<q-item>
+        	<q-item-side :icon="wifiStateIcon" color="primary"></q-item-side>
+			<q-item-main>
+				<q-item-tile label>{{ wifiStateText }}</q-item-tile>
+			</q-item-main>
+		</q-item>
 	
 		<q-card-actions>
 			<q-btn :loading="deploying" color="primary" @click="deploy(settings)" label="deploy"></q-btn>
@@ -256,15 +296,6 @@ const templateWiFi = `
 	</q-card>
 	</div>
 
-	<div class="col-lg-12">
-	<q-card class="full-height">
-		<q-card-title>
-			<q-icon name="alarm" /><q-icon name="alarm" />
-		</q-card-title>
-		WiFiSettings {{ settings }} <br> 
-		WiFiState {{ $store.state.wifiConnectionState }} 
-	</q-card>
-	</div>
 
 </div>
 </q-page>	

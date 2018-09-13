@@ -49,7 +49,7 @@ func (rpc *Rpc) DeployWifiSettings(timeout time.Duration, settings *pb.WiFiSetti
 }
 
 
-func (rpc *Rpc) GetDeployedWiFiSettings(timeout time.Duration) (settingsList *jsWiFiSettings, err error) {
+func (rpc *Rpc) GetWifiState(timeout time.Duration) (state *jsWiFiState, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -59,13 +59,14 @@ func (rpc *Rpc) GetDeployedWiFiSettings(timeout time.Duration) (settingsList *js
 		return nil, err
 	}
 
-	println("GetDeployedWifiSettings: ", ws)
+	println("GetWifiState: ", ws)
 
 	// Update state
 
-	jsWs := &jsWiFiSettings{Object: O()}
-	jsWs.fromGo(ws.CurrentSettings)
-	return jsWs, nil
+	state = &jsWiFiState{Object:O()}
+	state.fromGo(ws)
+
+	return
 
 }
 
