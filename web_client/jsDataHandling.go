@@ -8,7 +8,7 @@ import (
 	"errors"
 	"github.com/mame82/P4wnP1_go/common_web"
 	"strconv"
-	"github.com/HuckRidgeSW/hvue"
+	"github.com/mame82/hvue"
 )
 
 var eNoLogEvent = errors.New("No log event")
@@ -23,26 +23,26 @@ type jsGadgetSettings struct {
 	Pid              string                   `js:"Pid"`
 	Manufacturer     string                   `js:"Manufacturer"`
 	Product          string                   `js:"Product"`
-	Serial           string                   `js:"Serial"`
-	Use_CDC_ECM      bool                     `js:"Use_CDC_ECM"`
-	Use_RNDIS        bool                     `js:"Use_RNDIS"`
-	Use_HID_KEYBOARD bool                     `js:"Use_HID_KEYBOARD"`
-	Use_HID_MOUSE    bool                     `js:"Use_HID_MOUSE"`
-	Use_HID_RAW      bool                     `js:"Use_HID_RAW"`
-	Use_UMS          bool                     `js:"Use_UMS"`
-	Use_SERIAL       bool                     `js:"Use_SERIAL"`
-	RndisSettings    *VGadgetSettingsEthernet `js:"RndisSettings"`
-	CdcEcmSettings   *VGadgetSettingsEthernet `js:"CdcEcmSettings"`
-	UmsSettings      *VGadgetSettingsUMS      `js:"UmsSettings"`
+	Serial           string                    `js:"Serial"`
+	Use_CDC_ECM      bool                      `js:"Use_CDC_ECM"`
+	Use_RNDIS        bool                      `js:"Use_RNDIS"`
+	Use_HID_KEYBOARD bool                      `js:"Use_HID_KEYBOARD"`
+	Use_HID_MOUSE    bool                      `js:"Use_HID_MOUSE"`
+	Use_HID_RAW      bool                      `js:"Use_HID_RAW"`
+	Use_UMS          bool                      `js:"Use_UMS"`
+	Use_SERIAL       bool                      `js:"Use_SERIAL"`
+	RndisSettings    *jsGadgetSettingsEthernet `js:"RndisSettings"`
+	CdcEcmSettings   *jsGadgetSettingsEthernet `js:"CdcEcmSettings"`
+	UmsSettings      *jsGadgetSettingsUMS      `js:"UmsSettings"`
 }
 
-type VGadgetSettingsEthernet struct {
+type jsGadgetSettingsEthernet struct {
 	*js.Object
 	HostAddr string `js:"HostAddr"`
 	DevAddr  string `js:"DevAddr"`
 }
 
-type VGadgetSettingsUMS struct {
+type jsGadgetSettingsUMS struct {
 	*js.Object
 	Cdrom bool   `js:"Cdrom"`
 	File  string `js:"File"`
@@ -95,7 +95,7 @@ func (jsGS *jsGadgetSettings) fromGS(gs *pb.GadgetSettings) {
 	jsGS.Use_UMS = gs.Use_UMS
 	jsGS.Use_SERIAL = gs.Use_SERIAL
 
-	jsGS.RndisSettings = &VGadgetSettingsEthernet{
+	jsGS.RndisSettings = &jsGadgetSettingsEthernet{
 		Object: O(),
 	}
 	if gs.RndisSettings != nil {
@@ -103,7 +103,7 @@ func (jsGS *jsGadgetSettings) fromGS(gs *pb.GadgetSettings) {
 		jsGS.RndisSettings.DevAddr = gs.RndisSettings.DevAddr
 	}
 
-	jsGS.CdcEcmSettings = &VGadgetSettingsEthernet{
+	jsGS.CdcEcmSettings = &jsGadgetSettingsEthernet{
 		Object: O(),
 	}
 	if gs.CdcEcmSettings != nil {
@@ -111,7 +111,7 @@ func (jsGS *jsGadgetSettings) fromGS(gs *pb.GadgetSettings) {
 		jsGS.CdcEcmSettings.DevAddr = gs.CdcEcmSettings.DevAddr
 	}
 
-	jsGS.UmsSettings = &VGadgetSettingsUMS{
+	jsGS.UmsSettings = &jsGadgetSettingsUMS{
 		Object: O(),
 	}
 	if gs.UmsSettings != nil {
@@ -364,36 +364,22 @@ func (jl *jsHidJobStateList) DeleteEntry(id int64) {
 type jsWiFiConnectionState struct {
 	*js.Object
 	Mode     int          `js:"mode"`
-	AuthMode int          `js:"authMode"`
 	Channel  uint32       `js:"channel"`
-	BSSCfg   *jsWiFiBSSCfg `js:"bss"`
+	Ssid   string `js:"ssid"`
 }
 
 func (target *jsWiFiConnectionState) fromGo(src *pb.WiFiState) {
-	target.Mode = int(src.WorkingMode)
-	target.AuthMode = int(src.AuthMode)
+	target.Mode = int(src.Mode)
 	target.Channel = src.Channel
-	target.BSSCfg = &jsWiFiBSSCfg{Object:O()}
-	if src.Bss == nil {
-		target.BSSCfg.PSK = ""
-		target.BSSCfg.SSID = ""
-	} else {
-		target.BSSCfg.PSK = src.Bss.PSK
-		target.BSSCfg.SSID = src.Bss.SSID
-	}
-
+	target.Ssid = src.Ssid
 	return
 }
 
 func (src *jsWiFiConnectionState) toGo() (target *pb.WiFiState) {
 	target = &pb.WiFiState{
 		Channel:     src.Channel,
-		WorkingMode: pb.WiFiWorkingMode(src.Mode),
-		AuthMode:    pb.WiFiAuthMode(src.AuthMode),
-		Bss: &pb.WiFiBSSCfg{
-			SSID: src.BSSCfg.SSID,
-			PSK: src.BSSCfg.PSK,
-		},
+		Mode: pb.WiFiStateMode(src.Mode),
+		Ssid: src.Ssid,
 	}
 
 	return
@@ -401,10 +387,12 @@ func (src *jsWiFiConnectionState) toGo() (target *pb.WiFiState) {
 
 func (src jsWiFiConnectionState) ModeString() (strMode string) {
 	switch src.Mode {
-	case 1:
+	case int(pb.WiFiStateMode_STA_NOT_CONNECTED):
+		return "Not connected"
+	case int(pb.WiFiStateMode_AP_UP):
 		return "Access Point"
-	case 2:
-		return "Station"
+	case int(pb.WiFiStateMode_STA_CONNECTED):
+		return "Connected"
 	default:
 		return "UNKNOWN"
 
@@ -414,12 +402,8 @@ func (src jsWiFiConnectionState) ModeString() (strMode string) {
 func NewWiFiConnectionState() *jsWiFiConnectionState {
 	res := &jsWiFiConnectionState{Object: O()}
 	res.Channel = 0
-	res.Mode = int(pb.WiFiWorkingMode_UNKNOWN)
-	res.AuthMode = int(pb.WiFiAuthMode_OPEN)
-
-	res.BSSCfg = &jsWiFiBSSCfg{Object:O()}
-	res.BSSCfg.PSK = ""
-	res.BSSCfg.SSID = ""
+	res.Mode = int(pb.WiFiStateMode_STA_NOT_CONNECTED)
+	res.Ssid = ""
 
 	return res
 }

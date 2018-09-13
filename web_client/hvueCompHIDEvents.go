@@ -3,7 +3,7 @@
 package main
 
 import (
-	"github.com/HuckRidgeSW/hvue"
+	"github.com/mame82/hvue"
 	"github.com/mame82/P4wnP1_go/common_web"
 	"github.com/gopherjs/gopherjs/js"
 )

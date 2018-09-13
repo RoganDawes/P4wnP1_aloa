@@ -266,9 +266,6 @@ func (wSvc *WiFiService) runStaMode(newWifiSettings *pb.WiFiSettings) (err error
 		return err
 	}
 
-	wSvc.State.Bss.SSID = "unknown SSID"
-	wSvc.State.Channel = newWifiSettings.Channel
-	wSvc.State.WorkingMode = pb.WiFiWorkingMode_STA
 
 	return nil
 }
@@ -281,14 +278,11 @@ func (wSvc *WiFiService) runAPMode(newWifiSettings *pb.WiFiSettings) (err error)
 	//start hostapd
 	err = wSvc.StartHostapd()
 	if err != nil {
-		wSvc.State.WorkingMode = pb.WiFiWorkingMode_UNKNOWN
 		return err
 	}
 
-	// update Connection wSvc
-	wSvc.State.Bss.SSID = newWifiSettings.Ap_BSS.SSID
-	wSvc.State.Channel = newWifiSettings.Channel
-	wSvc.State.WorkingMode = pb.WiFiWorkingMode_AP
+	time.Sleep(2 * time.Second) // ToDo: replace by output monitor, waiting till hostapd is up
+
 	return nil
 }
 
@@ -299,8 +293,6 @@ func (wSvc *WiFiService) DeploySettings(newWifiSettings *pb.WiFiSettings) (wstat
 	wSvc.mutexSettings.Lock()
 	defer wSvc.mutexSettings.Unlock()
 
-	// Reset wSvc to unknown, if something goes wrong, there's no wpa_supplicant or hostapd
-	wSvc.State.WorkingMode = pb.WiFiWorkingMode_UNKNOWN
 
 	//ToDo: Dis/Enable nexmon if needed
 
@@ -366,6 +358,14 @@ func (wSvc *WiFiService) DeploySettings(newWifiSettings *pb.WiFiSettings) (wstat
 	// update settings (wSvc is updated by runAPMode/runStaMode)
 	wSvc.State.CurrentSettings = newWifiSettings
 
+	// update rest of state
+	if newState,serr := wSvc.RetrieveIwState(); serr == nil {
+		wSvc.State.Ssid = newState.Ssid
+		wSvc.State.Mode = newState.Mode
+		wSvc.State.Channel = newState.Channel
+	} else {
+		log.Println("Couldn't retrieve new Interface state:", serr)
+	}
 	return wSvc.State, nil
 }
 
@@ -405,8 +405,9 @@ func NewWifiService() (res *WiFiService) {
 	// Initial settings and state on service start
 
 	res.State = &pb.WiFiState{
-		WorkingMode: pb.WiFiWorkingMode_UNKNOWN,
-		Bss:         &pb.WiFiBSSCfg{},
+		Mode: pb.WiFiStateMode_STA_NOT_CONNECTED,
+		Channel: 0,
+		Ssid: "",
 	}
 
 	res.State.CurrentSettings = &pb.WiFiSettings{
@@ -442,6 +443,7 @@ func (m *wpaSupplicantOutMonitor) Write(p []byte) (n int, err error) {
 		m.result = false
 		m.resultReceived.Set()
 	case strings.Contains(line, "CTRL-EVENT-CONNECTED"):
+		// CTRL-EVENT-CONNECTED - Connection to 4e:66:41:a0:5b:35 completed
 		log.Printf("Connected to target network\n")
 		m.Lock()
 		defer m.Unlock()
@@ -708,6 +710,110 @@ func ParseIwScan(scanresult string) (bsslist []BSS, err error) {
 	}
 
 	return bsslist, nil
+}//ToDo: Create netlink based implementation (not relying on 'iw'): low priority
+
+func (wsvc WiFiService) RetrieveIwState() (state *pb.WiFiState, err error) {
+	proc := exec.Command("/sbin/iw", "dev", wsvc.IfaceName, "info")
+	res, err := proc.CombinedOutput()
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Error fetching wifi info: '%s'\niw output: %s", err, res))
+	}
+
+
+	/*
+	AP
+	--
+	Interface wlan0
+	ifindex 2
+	wdev 0x1
+	addr b8:27:eb:71:bb:bc
+	ssid \xf0\x9f\x92\xa5\xf0\x9f\x96\xa5\xf0\x9f\x92\xa5 \xe2\x93\x85\xe2\x9e\x83\xe2\x93\x8c\xe2\x93\x83\xf0\x9f\x85\x9f\xe2\x9d\xb6
+	type AP
+	wiphy 0
+	channel 2 (2417 MHz), width: 20 MHz, center1: 2417 MHz
+	txpower 31.00 dBm
+
+	NOT CONNECTED
+	-------------
+	Interface wlan0
+	ifindex 2
+	wdev 0x1
+	addr b8:27:eb:71:bb:bc
+	type managed
+	wiphy 0
+	channel 2 (2417 MHz), width: 20 MHz, center1: 2417 MHz
+	txpower 31.00 dBm
+
+	CONNECTED
+	-----------
+	Interface wlan0
+	ifindex 2
+	wdev 0x1
+	addr b8:27:eb:71:bb:bc
+	ssid WLAN-579086
+	type managed
+	wiphy 0
+	channel 6 (2437 MHz), width: 20 MHz, center1: 2437 MHz
+	txpower 31.00 dBm
+
+
+	 */
+
+	 output := string(res)
+
+	//split into BSS sections
+	reSsid := regexp.MustCompile("(?m)ssid (.*)\n")
+	reMode := regexp.MustCompile("(?m)type (.*)\n")
+	reChannel := regexp.MustCompile("(?m)channel ([0-9]+) .*\n")
+
+	strSsid_sub := reSsid.FindStringSubmatch(output)
+	strSsid := ""
+	if len(strSsid_sub) > 1 {
+		unSsid,uerr := strconv.Unquote(fmt.Sprintf("\"%s\"", strSsid_sub[1]))
+		if uerr == nil {
+			strSsid = unSsid
+		} else {
+			fmt.Println("Unquote error", uerr)
+		}
+
+	}
+//	fmt.Printf("SSID: %s\n", strSsid)
+
+	strChannel_sub := reChannel.FindStringSubmatch(output)
+	strChannel := "0"
+	if len(strChannel_sub) > 1 {
+		strChannel = strChannel_sub[1]
+	}
+//	fmt.Printf("Channel: %s\n", strChannel)
+
+	strMode_sub := reMode.FindStringSubmatch(output)
+	strMode := "0"
+	if len(strMode_sub) > 1 {
+		strMode = strMode_sub[1]
+	}
+//	fmt.Printf("Mode: %s\n", strMode)
+
+
+	state = &pb.WiFiState{}
+	switch strings.ToLower(strMode) {
+	case "ap":
+		state.Mode = pb.WiFiStateMode_AP_UP
+	default:
+		state.Mode = pb.WiFiStateMode_STA_NOT_CONNECTED
+	}
+
+	if len(strSsid) > 0 {
+		state.Ssid = strSsid
+		if state.Mode == pb.WiFiStateMode_STA_NOT_CONNECTED {
+			state.Mode = pb.WiFiStateMode_STA_CONNECTED // when a SSID is present, the wifi interface is conected to an AP
+		}
+	}
+
+	intCh := 0
+	intCh,_ = strconv.Atoi(strChannel)
+	state.Channel = uint32(intCh)
+
+	return state, nil
 }
 
 func wifiSetReg(reg string) (err error) {

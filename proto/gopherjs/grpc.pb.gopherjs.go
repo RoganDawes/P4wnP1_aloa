@@ -79,6 +79,29 @@ func (x WiFiWorkingMode) String() string {
 	return WiFiWorkingMode_name[int(x)]
 }
 
+type WiFiStateMode int
+
+const (
+	WiFiStateMode_STA_NOT_CONNECTED WiFiStateMode = 0
+	WiFiStateMode_AP_UP             WiFiStateMode = 1
+	WiFiStateMode_STA_CONNECTED     WiFiStateMode = 2
+)
+
+var WiFiStateMode_name = map[int]string{
+	0: "STA_NOT_CONNECTED",
+	1: "AP_UP",
+	2: "STA_CONNECTED",
+}
+var WiFiStateMode_value = map[string]int{
+	"STA_NOT_CONNECTED": 0,
+	"AP_UP":             1,
+	"STA_CONNECTED":     2,
+}
+
+func (x WiFiStateMode) String() string {
+	return WiFiStateMode_name[int(x)]
+}
+
 type WiFiAuthMode int
 
 const (
@@ -333,27 +356,18 @@ func (m *WiFiSettings) Unmarshal(rawBytes []byte) (*WiFiSettings, error) {
 }
 
 type WiFiState struct {
-	WorkingMode     WiFiWorkingMode
-	AuthMode        WiFiAuthMode
+	Mode            WiFiStateMode
 	Channel         uint32
-	Bss             *WiFiBSSCfg
+	Ssid            string
 	CurrentSettings *WiFiSettings
 }
 
-// GetWorkingMode gets the WorkingMode of the WiFiState.
-func (m *WiFiState) GetWorkingMode() (x WiFiWorkingMode) {
+// GetMode gets the Mode of the WiFiState.
+func (m *WiFiState) GetMode() (x WiFiStateMode) {
 	if m == nil {
 		return x
 	}
-	return m.WorkingMode
-}
-
-// GetAuthMode gets the AuthMode of the WiFiState.
-func (m *WiFiState) GetAuthMode() (x WiFiAuthMode) {
-	if m == nil {
-		return x
-	}
-	return m.AuthMode
+	return m.Mode
 }
 
 // GetChannel gets the Channel of the WiFiState.
@@ -364,12 +378,12 @@ func (m *WiFiState) GetChannel() (x uint32) {
 	return m.Channel
 }
 
-// GetBss gets the Bss of the WiFiState.
-func (m *WiFiState) GetBss() (x *WiFiBSSCfg) {
+// GetSsid gets the Ssid of the WiFiState.
+func (m *WiFiState) GetSsid() (x string) {
 	if m == nil {
 		return x
 	}
-	return m.Bss
+	return m.Ssid
 }
 
 // GetCurrentSettings gets the CurrentSettings of the WiFiState.
@@ -386,26 +400,20 @@ func (m *WiFiState) MarshalToWriter(writer jspb.Writer) {
 		return
 	}
 
-	if int(m.WorkingMode) != 0 {
-		writer.WriteEnum(1, int(m.WorkingMode))
-	}
-
-	if int(m.AuthMode) != 0 {
-		writer.WriteEnum(2, int(m.AuthMode))
+	if int(m.Mode) != 0 {
+		writer.WriteEnum(1, int(m.Mode))
 	}
 
 	if m.Channel != 0 {
-		writer.WriteUint32(3, m.Channel)
+		writer.WriteUint32(2, m.Channel)
 	}
 
-	if m.Bss != nil {
-		writer.WriteMessage(4, func() {
-			m.Bss.MarshalToWriter(writer)
-		})
+	if len(m.Ssid) > 0 {
+		writer.WriteString(3, m.Ssid)
 	}
 
 	if m.CurrentSettings != nil {
-		writer.WriteMessage(5, func() {
+		writer.WriteMessage(4, func() {
 			m.CurrentSettings.MarshalToWriter(writer)
 		})
 	}
@@ -429,16 +437,12 @@ func (m *WiFiState) UnmarshalFromReader(reader jspb.Reader) *WiFiState {
 
 		switch reader.GetFieldNumber() {
 		case 1:
-			m.WorkingMode = WiFiWorkingMode(reader.ReadEnum())
+			m.Mode = WiFiStateMode(reader.ReadEnum())
 		case 2:
-			m.AuthMode = WiFiAuthMode(reader.ReadEnum())
-		case 3:
 			m.Channel = reader.ReadUint32()
+		case 3:
+			m.Ssid = reader.ReadString()
 		case 4:
-			reader.ReadMessage(func() {
-				m.Bss = m.Bss.UnmarshalFromReader(reader)
-			})
-		case 5:
 			reader.ReadMessage(func() {
 				m.CurrentSettings = m.CurrentSettings.UnmarshalFromReader(reader)
 			})

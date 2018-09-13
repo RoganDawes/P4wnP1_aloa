@@ -54,6 +54,12 @@ enum WiFiWorkingMode {
     STA_FAILOVER_AP = 3; //acts as station, if connection to the given AP isn't possible spawns an own AP
 }
 
+enum WiFiStateMode {
+    STA_NOT_CONNECTED = 0;
+    AP_UP = 1; //acts as access point
+    STA_CONNECTED = 2; //acts as station for an existing access point
+}
+
 enum WiFiAuthMode {
     WPA2_PSK = 0; //AP uses WPA2 pre-shared key
     OPEN = 1; //Open System Authentication (no authentication)
@@ -78,11 +84,10 @@ message WiFiSettings {
 }
 
 message WiFiState {
-    WiFiWorkingMode working_mode = 1;
-    WiFiAuthMode auth_mode = 2;
-    uint32 channel = 3;
-    WiFiBSSCfg bss = 4; //SSID currently connected (STA) or spawned (AP)
-    WiFiSettings currentSettings = 5;
+    WiFiStateMode mode = 1;
+    uint32 channel = 2;
+    string ssid = 3; //SSID currently connected (STA) or spawned (AP)
+    WiFiSettings currentSettings = 4;
 }
 
 message WiFiBSSCfg {

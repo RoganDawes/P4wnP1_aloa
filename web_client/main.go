@@ -5,7 +5,7 @@ package main
 import (
 //	"honnef.co/go/js/dom"
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/HuckRidgeSW/hvue"
+	"github.com/mame82/hvue"
 	"time"
 	"github.com/mame82/mvuex"
 )
