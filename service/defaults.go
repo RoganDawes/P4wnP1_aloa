@@ -11,6 +11,9 @@ const (
 	DEFAULT_RNDIS_DEV_ADDR    = "42:63:65:56:34:12"
 	USB_ETHERNET_BRIDGE_MAC   = "24:22:26:12:14:16"
 	USB_ETHERNET_BRIDGE_NAME  = "usbeth"
+	BT_ETHERNET_BRIDGE_MAC   = "44:22:26:12:14:16"
+	BT_ETHERNET_BRIDGE_NAME  = "bteth"
+
 )
 
 func GetDefaultNetworkSettingsUSB() (*pb.EthernetInterfaceSettings) {

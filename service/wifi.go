@@ -798,7 +798,7 @@ func (wsvc WiFiService) UpdateStateFromIw() (err error) {
 	if len(strSsid) > 0 {
 		wsvc.State.Ssid = strSsid
 		if wsvc.State.Mode == pb.WiFiStateMode_STA_NOT_CONNECTED {
-			wsvc.State.Mode = pb.WiFiStateMode_STA_CONNECTED // when a SSID is present, the wifi interface is conected to an AP
+			wsvc.State.Mode = pb.WiFiStateMode_STA_CONNECTED // when a SSID is present, the wifi interface is connected to an AP
 		}
 	}
 
