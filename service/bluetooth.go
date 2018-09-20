@@ -3,335 +3,57 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/mame82/P4wnP1_go/service/util"
+	"github.com/mame82/P4wnP1_go/service/bluetooth"
+	"github.com/mame82/mblue-toolz/toolz"
 	"log"
-	"net"
 	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 const (
-	bt_dev_name                    string = "hci0"
 	BT_MINIMUM_BLUEZ_VERSION_MAJOR        = 5
 	BT_MINIMUM_BLUEZ_VERSION_MINOR        = 43
 )
 
-const (
-	BT_AGENT_MODE_DISPLAY_YES_NO     = BtAgentMode("DisplayYesNo")
-	BT_AGENT_MODE_DISPLAY_ONLY       = BtAgentMode("DisplayOnly")
-	BT_AGENT_MODE_KEYBOARD_ONLY      = BtAgentMode("KeyboardOnly")
-	BT_AGENT_MODE_NO_INPUT_NO_OUTPUT = BtAgentMode("NoInputNoOutput")
-)
-
-type BtAgentMode string
-
 type BtService struct {
-	DevName          string
+	ServiceAvailable bool
+	Controller       *bluetooth.Controller
 	BrName           string
-	PathBtConf       string
 	bridgeIfDeployed bool
 
-	Agent   *BtAgent
-	Adapter *BtAdapter
+	Agent   *bluetooth.DefaultAgent
 }
 
-type BtAdapter struct {
-	/*
-	  --set <property> <value>
-  Where `property` is one of:
-     Name
-     Discoverable
-     DiscoverableTimeout
-     Pairable
-     PairableTimeout
-     Powered
-
-
-	root@raspberrypi:~# bt-adapter -i
-[hci0]
-  Name: raspberrypi
-  Address: B8:27:EB:8E:44:43
-  Alias: raspberrypi [rw]
-  Class: 0x0
-  Discoverable: 0 [rw]
-  DiscoverableTimeout: 180 [rw]
-  Discovering: 0
-  Pairable: 1 [rw]
-  PairableTimeout: 0 [rw]
-  Powered: 1 [rw]
-  UUIDs: [00001801-0000-1000-8000-00805f9b34fb, AVRemoteControl, PnPInformation, 00001800-0000-1000-8000-00805f9b34fb, AVRemoteControlTarget]
-
-	 */
-
-	*sync.Mutex
-	Address             net.HardwareAddr
-	DeviceName          string
-	Name                string // Not changeable
-	Alias               string
-	Discoverable        bool
-	DiscoverableTimeout uint64
-	Pairable            bool
-	PairableTimeout     uint64
-	Powered             bool
-}
-
-var (
-	reAdapterAddress             = regexp.MustCompile("(?m)Address: ([0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2})")
-	reAdapterName                = regexp.MustCompile("(?m)Name: (.*)\n")
-	reAdapterAlias               = regexp.MustCompile("(?m)Alias: (.*) \\[")
-	reAdapterDiscoverable        = regexp.MustCompile("(?m)Discoverable: ([01])")
-	reAdapterDiscoverableTimeout = regexp.MustCompile("(?m)DiscoverableTimeout: ([0-9]+)")
-	reAdapterPairable            = regexp.MustCompile("(?m)Pairable: ([01])")
-	reAdapterPairableTimeout     = regexp.MustCompile("(?m)PairableTimeout: ([0-9]+)")
-	reAdapterPowered             = regexp.MustCompile("(?m)Powered: ([01])")
-
-	eAdapterParseOutput = errors.New("Error parsing output of `bt-adapter -i`")
-	eAdapterSetAdapter  = errors.New("Error setting adapter options with `bt-adapter -s`")
-)
-
-func (bAd *BtAdapter) DeploySate() (err error) {
-	proc := exec.Command("/usr/bin/bt-adapter", "-s", "Alias", bAd.Alias, "-a", bAd.DeviceName)
-	if proc.Run() != nil {
-		return eAdapterSetAdapter
-	}
-	proc = exec.Command("/usr/bin/bt-adapter", "-s", "Discoverable", BoolToIntStr(bAd.Discoverable), "-a", bAd.DeviceName)
-	if proc.Run() != nil {
-		return eAdapterSetAdapter
-	}
-	proc = exec.Command("/usr/bin/bt-adapter", "-s", "DiscoverableTimeout", strconv.Itoa(int(bAd.DiscoverableTimeout)), "-a", bAd.DeviceName)
-	if proc.Run() != nil {
-		return eAdapterSetAdapter
-	}
-	proc = exec.Command("/usr/bin/bt-adapter", "-s", "Pairable", BoolToIntStr(bAd.Pairable), "-a", bAd.DeviceName)
-	if proc.Run() != nil {
-		return eAdapterSetAdapter
-	}
-	proc = exec.Command("/usr/bin/bt-adapter", "-s", "PairableTimeout", strconv.Itoa(int(bAd.PairableTimeout)), "-a", bAd.DeviceName)
-	if proc.Run() != nil {
-		return eAdapterSetAdapter
-	}
-	proc = exec.Command("/usr/bin/bt-adapter", "-s", "Powered", BoolToIntStr(bAd.Powered), "-a", bAd.DeviceName)
-	if proc.Run() != nil {
-		return eAdapterSetAdapter
-	}
-	bAd.updateMembers()
-	return
-}
-
-// Updates members via `bt-adapter -i`
-func (bAd *BtAdapter) updateMembers() (err error) {
-	proc := exec.Command("/usr/bin/bt-adapter", "-i", "-a", bAd.DeviceName)
-	res, err := proc.CombinedOutput()
-	if err != nil {
-		return errors.New(fmt.Sprintf("Error running `bt-adapter -i -a %s`: %s\niw output: %s", bAd.DeviceName, err, res))
-	}
-	output := string(res)
-
-	strAdapterAddress := ""
-	strAdapterName := ""
-	strAdapterAlias := ""
-	strAdapterDiscoverable := ""
-	strAdapterDiscoverableTimeout := ""
-	strAdapterPairable := ""
-	strAdapterPairableTimeout := ""
-	strAdapterPowered := ""
-
-	if matches := reAdapterAddress.FindStringSubmatch(output); len(matches) > 1 {
-		strAdapterAddress = matches[1]
-	} else {
-		return eAdapterParseOutput
-	}
-
-	if matches := reAdapterName.FindStringSubmatch(output); len(matches) > 1 {
-		strAdapterName = matches[1]
-	} else {
-		return eAdapterParseOutput
-	}
-
-	if matches := reAdapterAlias.FindStringSubmatch(output); len(matches) > 1 {
-		strAdapterAlias = matches[1]
-	} else {
-		return eAdapterParseOutput
-	}
-
-	if matches := reAdapterDiscoverable.FindStringSubmatch(output); len(matches) > 1 {
-		strAdapterDiscoverable = matches[1]
-	} else {
-		return eAdapterParseOutput
-	}
-
-	if matches := reAdapterDiscoverableTimeout.FindStringSubmatch(output); len(matches) > 1 {
-		strAdapterDiscoverableTimeout = matches[1]
-	} else {
-		return eAdapterParseOutput
-	}
-
-	if matches := reAdapterPairable.FindStringSubmatch(output); len(matches) > 1 {
-		strAdapterPairable = matches[1]
-	} else {
-		return eAdapterParseOutput
-	}
-
-	if matches := reAdapterPairableTimeout.FindStringSubmatch(output); len(matches) > 1 {
-		strAdapterPairableTimeout = matches[1]
-	} else {
-		return eAdapterParseOutput
-	}
-
-	if matches := reAdapterPowered.FindStringSubmatch(output); len(matches) > 1 {
-		strAdapterPowered = matches[1]
-	} else {
-		return eAdapterParseOutput
-	}
-
-	/*
-	fmt.Println("strAdapterAddress", strAdapterAddress)
-	fmt.Println("strAdapterName", strAdapterName)
-	fmt.Println("strAdapterAlias", strAdapterAlias)
-	fmt.Println("strAdapterDiscoverable", strAdapterDiscoverable)
-	fmt.Println("strAdapterDiscoverableTimeout", strAdapterDiscoverableTimeout)
-	fmt.Println("strAdapterPairable", strAdapterPairable)
-	fmt.Println("strAdapterPairableTimeout", strAdapterPairableTimeout)
-	fmt.Println("strAdapterPowered", strAdapterPowered)
-	*/
-
-	if bAd.Address, err = net.ParseMAC(strAdapterAddress); err != nil {
-		return err
-	}
-	if bAd.Discoverable, err = strconv.ParseBool(strAdapterDiscoverable); err != nil {
-		return err
-	}
-	if bAd.DiscoverableTimeout, err = strconv.ParseUint(strAdapterDiscoverableTimeout, 10, 64); err != nil {
-		return err
-	}
-	if bAd.Pairable, err = strconv.ParseBool(strAdapterPairable); err != nil {
-		return err
-	}
-	if bAd.PairableTimeout, err = strconv.ParseUint(strAdapterPairableTimeout, 10, 64); err != nil {
-		return err
-	}
-	if bAd.Powered, err = strconv.ParseBool(strAdapterPowered); err != nil {
-		return err
-	}
-	bAd.Name = strAdapterName
-	bAd.Alias = strAdapterAlias
-
-	/*
-	log.Printf("adapter: %+v\n", bAd)
-	*/
-
-	return
-}
-
-func NewBtAdapter() (bAd *BtAdapter, err error) {
-	bAd = &BtAdapter{
-		Mutex: &sync.Mutex{},
-	}
-	err = bAd.updateMembers()
-	if err != nil {
-		return nil, err
-	}
-	return
-}
-
-type BtAgent struct {
-	*exec.Cmd
-	*sync.Mutex //mutex for wpa-supplicant proc
-	mode        BtAgentMode
-	pinFilePath string
-	logger      *util.TeeLogger
-}
-
-func (ba *BtAgent) Start(mode BtAgentMode) (err error) {
-	log.Printf("Starting bt-agent with mode '%s'...\n", ba.mode)
-
-	ba.Lock()
-	defer ba.Unlock()
-
-	ba.mode = mode
-
-	//stop if already running
-	if ba.Cmd != nil {
-		// avoid deadlock
-		ba.Unlock()
-		ba.Stop()
-		ba.Lock()
-	}
-
-	ba.Cmd = exec.Command("/usr/bin/bt-agent", "-c", string(ba.mode))
-	ba.Cmd.Stdout = ba.logger.LogWriter
-	ba.Cmd.Stderr = ba.logger.LogWriter
-	err = ba.Cmd.Start()
-	if err != nil {
-		ba.Cmd.Wait()
-		return errors.New(fmt.Sprintf("Error starting bt-agent '%v'", err))
-	}
-	log.Println("... bt-agent started")
-	return nil
-
-}
-
-func (ba *BtAgent) Stop() (err error) {
-	log.Println("Stopping bt-agent...")
-	ba.Lock()
-	defer ba.Unlock()
-	if ba.Cmd == nil {
-		log.Println("bt-agent already stopped")
-	}
-	if ba.Process == nil {
-		return errors.New("Couldn't access bt-agent process")
-	}
-	ba.Process.Kill()
-	ba.Process.Wait()
-	if ba.ProcessState == nil {
-		return errors.New("Couldn't access bt-agent process state")
-	}
-	if !ba.ProcessState.Exited() {
-		return errors.New("bt-agent didn't terminate after SIGKILL")
-	}
-	ba.Cmd = nil
-	return nil
-}
-
-func NewBtAgent() (res *BtAgent) {
-	res = &BtAgent{
-		Mutex:       &sync.Mutex{},
-		mode:        BT_AGENT_MODE_NO_INPUT_NO_OUTPUT,
-		pinFilePath: "",
-		logger:      util.NewTeeLogger(true),
-	}
-	res.logger.SetPrefix("bt-agent: ")
-
-	return res
-}
 
 func NewBtService() (res *BtService) {
 	res = &BtService{
-		Agent:      NewBtAgent(),
-		DevName:    bt_dev_name,
+		Agent:      bluetooth.NewDefaultAgent("4321"),
 		BrName:     BT_ETHERNET_BRIDGE_NAME,
-		PathBtConf: "",
 	}
-	if err := res.CheckExternalBinaries(); err != nil {
-		panic(err)
+
+	// ToDo Check if bluetooth service is loaded
+	if c,err := bluetooth.FindFirstAvailableController(); err == nil {
+		res.ServiceAvailable = true
+		res.Controller = c
+	} else {
+		res.ServiceAvailable = false
+		return
 	}
 	if err := CheckBluezVersion(); err != nil {
-		panic(err)
-	}
-	// ToDo Check if bluetooth service is loaded
-	if btAdp, errAd := NewBtAdapter(); errAd != nil {
-		panic(errAd)
-	} else {
-		res.Adapter = btAdp
+		fmt.Println(err)
+		res.ServiceAvailable = false
+		return
 	}
 
 	return
 }
 
+// ToDo: Move all controller specific tasks to controller
 func (bt *BtService) StartNAP() (err error) {
+	if !bt.ServiceAvailable { return bluetooth.ErrBtSvcNotAvailable
+	}
 	log.Println("Bluetooth: starting NAP...")
 	// assure bnep module is loaded
 	if err = CheckBnep(); err != nil {
@@ -343,27 +65,40 @@ func (bt *BtService) StartNAP() (err error) {
 		log.Println("Bridge exists already")
 	}
 
-	// start bt-agent with "No Input, No Output" capabilities
-	if err = bt.Agent.Start(BT_AGENT_MODE_NO_INPUT_NO_OUTPUT); err != nil {
+	// Register custom agent bt-agent with "No Input, No Output" capabilities
+	if err = bt.Agent.Start(toolz.AGENT_CAP_NO_INPUT_NO_OUTPUT); err != nil {
 		return err
 	}
 
+	// Disable simple secure pairing to make PIN requests work
+	bt.Controller.SetPowered(false)
+	bt.Controller.SetSSP(false)
+	bt.Controller.SetPowered(true)
+
+	// Configure adapter
 	fmt.Println("Reconfigure adapter to be discoverable and pairable")
-	bt.Adapter.Alias = "P4wnP1"
-	bt.Adapter.Discoverable = true
-	bt.Adapter.DiscoverableTimeout = 0
-	bt.Adapter.Pairable = true
-	bt.Adapter.PairableTimeout = 0
-	if err = bt.Adapter.DeploySate(); err != nil {
-		return err
-	} else {
-		log.Printf("... reconfiguration succeeded: %+v\n", bt.Adapter)
-	}
+	err = bt.Controller.SetAlias("P4wnP1")
+	if err != nil { return }
+	err = bt.Controller.SetDiscoverableTimeout(0)
+	if err != nil { return }
+	err = bt.Controller.SetPairableTimeout(0)
+	if err != nil { return }
+	err = bt.Controller.SetDiscoverable(true)
+	if err != nil { return }
+	err = bt.Controller.SetPairable(true)
+
+	// Enable PAN networking for bridge
+	nw,err := toolz.NetworkServer(bt.Controller.DBusPath)
+	if err != nil { return }
+	//defer nw.Close()
+	err = nw.Register(toolz.UUID_NETWORK_SERVER_NAP, BT_ETHERNET_BRIDGE_NAME)
+	if err != nil { return }
 
 	return
 }
 
 func (bt *BtService) StopNAP() (err error) {
+	if !bt.ServiceAvailable { return bluetooth.ErrBtSvcNotAvailable	}
 	log.Println("Bluetooth: stopping NAP...")
 
 	//Stop bt-agent
@@ -371,6 +106,18 @@ func (bt *BtService) StopNAP() (err error) {
 
 	// Delete bridge interface
 	bt.DisableBridge()
+
+	// Unregister pan service
+	nw,err := toolz.NetworkServer(bt.Controller.DBusPath)
+	//if err != nil { return }
+	defer nw.Close()
+	err = nw.Unregister("pan")
+	//if err != nil { return }
+
+	err = bt.Controller.SetDiscoverable(false)
+	//if err != nil { return }
+	err = bt.Controller.SetPairable(false)
+	//if err != nil { return }
 
 	return
 }
@@ -437,6 +184,8 @@ func CheckBnep() error {
 ToDo: The binaries used (bluez-tools) should be replaced by custom functions interfacing with bluez D-Bus API, later on.
 Example: https://github.com/muka/go-bluetooth
  */
+
+/*
 func (bt BtService) CheckExternalBinaries() error {
 	bins := []string{"modprobe", "lsmod", "bt-adapter", "bt-agent", "bt-device", "bt-network", "bluetoothd"}
 	for _, bin := range bins {
@@ -447,7 +196,10 @@ func (bt BtService) CheckExternalBinaries() error {
 	}
 	return nil
 }
+*/
 
+// ToDo: Get rid of this as soon as an API function is found
+// btmgt tool is able to determine Bluez version, mgmt-api is only able to determine Management version (which should be 1.14)
 func GetBluezVersion() (major int, minor int, err error) {
 	eGeneral := errors.New("Couldn't retrieve bluez version")
 	proc := exec.Command("/usr/sbin/bluetoothd", "-v")

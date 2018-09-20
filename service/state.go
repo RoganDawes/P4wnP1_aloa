@@ -17,6 +17,7 @@ type GlobalServiceState struct {
 	StoredNetworkSettings map[string]*pb.EthernetInterfaceSettings
 //	Wifi *WifiState
 	WifiSvc *WiFiService
+	BtSvc *BtService
 }
 
 func InitGlobalServiceState() (err error) {
@@ -44,7 +45,14 @@ func InitGlobalServiceState() (err error) {
 		IpAddress4:         "172.24.0.1",
 		Netmask4:           "255.255.255.0",
 	}
-//	state.Wifi = NewWifiState(GetDefaultWiFiSettings(), wifi_if_name)
+	state.StoredNetworkSettings[BT_ETHERNET_BRIDGE_NAME] = &pb.EthernetInterfaceSettings{
+		Name: BT_ETHERNET_BRIDGE_NAME,
+		Enabled: true,
+		Mode: pb.EthernetInterfaceSettings_MANUAL,
+		IpAddress4:         "172.26.0.1",
+		Netmask4:           "255.255.255.0",
+	}
+
 	state.WifiSvc = NewWifiService()
 
 
@@ -52,9 +60,13 @@ func InitGlobalServiceState() (err error) {
 	state.EvMgr = NewEventManager(20)
 	state.UsbGM,err = NewUSBGadgetManager()
 	if err != nil { return }
+
+	state.BtSvc = NewBtService()
+
 	ledState, err := NewLed(false)
 	if err != nil { return }
 	state.Led = ledState
+
 
 	return nil
 }
@@ -70,6 +82,8 @@ func (state *GlobalServiceState) GetInterfaceSettingsByInterfaceName(ifname stri
 
 func (state *GlobalServiceState) StartService() {
 	state.EvMgr.Start()
+	// ToDo: Remove this, till the service is able to deploy startup settings
+	state.BtSvc.StartNAP()
 }
 
 func (state *GlobalServiceState) StopService() {
