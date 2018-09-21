@@ -24,6 +24,7 @@ import (
 const (
 	wifi_if_name                   string = "wlan0"
 	WPA_SUPPLICANT_CONNECT_TIMEOUT        = time.Second * 20
+	HOSTAPD_WAIT_AP_UP_TIMEOUT        = time.Second * 20
 )
 
 func wifiCheckExternalBinaries() error {
@@ -60,9 +61,10 @@ type WiFiService struct {
 	LoggerHostapd           *util.TeeLogger          //logger for hostapd
 	LoggerWpaSupplicant     *util.TeeLogger          //logger for WPA supplicant
 	OutMonitorWpaSupplicant *wpaSupplicantOutMonitor //Monitors wpa_supplicant output and sets signals where needed
+	OutMonitorHostapd       *hostapdOutMonitor //Monitors hostapd output and sets signals where needed
 }
 
-func (wSvc *WiFiService) StartHostapd() (err error) {
+func (wSvc *WiFiService) StartHostapd(timeout time.Duration) (err error) {
 	log.Printf("Starting hostapd for interface '%s'...\n", wSvc.IfaceName)
 
 	wSvc.mutexHostapd.Lock()
@@ -84,7 +86,34 @@ func (wSvc *WiFiService) StartHostapd() (err error) {
 		wSvc.CmdHostapd.Wait()
 		return errors.New(fmt.Sprintf("Error starting hostapd '%v'", err))
 	}
-	log.Printf("... hostapd for interface '%s' started\n", wSvc.IfaceName)
+
+	//wait for result in output
+	apUp, errcon := wSvc.OutMonitorHostapd.WaitConnectResultOnce(timeout)
+	if errcon != nil {
+		log.Printf("... hostapd reached timeout of '%v' without beeing able to bring up an Access Point\n", timeout)
+		log.Println("... killing hostapd")
+		// avoid dead lock
+		wSvc.mutexHostapd.Unlock()
+		wSvc.StopHostapd()
+		wSvc.mutexHostapd.Lock()
+		return errors.New("TIMEOUT REACHED")
+	}
+
+	if apUp {
+		//We could return success and keep wpa_supplicant running
+		log.Printf("... hostapd AP for interface '%s' started\n", wSvc.IfaceName)
+		return nil
+	} else {
+		log.Println("... hostapd failed to bring up an Access Point, stopping ...")
+		//wifiStopWpaSupplicant(nameIface)
+		log.Println("... killing hostapd")
+		// avoid dead lock
+		wSvc.mutexHostapd.Unlock()
+		wSvc.StopHostapd()
+		wSvc.mutexHostapd.Lock()
+		return errors.New("Hostapd failed to bring up Access Point")
+	}
+
 	return nil
 }
 
@@ -276,12 +305,17 @@ func (wSvc *WiFiService) runAPMode(newWifiSettings *pb.WiFiSettings) (err error)
 	hostapdCreateConfigFile2(newWifiSettings, wSvc.PathHostapdConf)
 
 	//start hostapd
-	err = wSvc.StartHostapd()
+	err = wSvc.StartHostapd(HOSTAPD_WAIT_AP_UP_TIMEOUT)
 	if err != nil {
-		return err
+		fmt.Println("Wait 2 seconds and retry to to start hostapd once...")
+		time.Sleep(2 * time.Second) // ToDo: replace by output monitor, waiting till hostapd is up
+		err = wSvc.StartHostapd(HOSTAPD_WAIT_AP_UP_TIMEOUT)
+		if err != nil {
+			return err
+		}
 	}
 
-	time.Sleep(2 * time.Second) // ToDo: replace by output monitor, waiting till hostapd is up
+
 
 	return nil
 }
@@ -390,9 +424,11 @@ func NewWifiService() (res *WiFiService) {
 	}
 
 	res.OutMonitorWpaSupplicant = NewWpaSupplicantOutMonitor()
+	res.OutMonitorHostapd = NewHostapdOutMonitor()
 
 	res.LoggerHostapd = util.NewTeeLogger(true)
 	res.LoggerHostapd.SetPrefix("hostapd: ")
+	res.LoggerHostapd.AddOutput(res.OutMonitorHostapd)
 
 	res.LoggerWpaSupplicant = util.NewTeeLogger(true)
 	res.LoggerWpaSupplicant.SetPrefix("wpa_supplicant: ")
@@ -413,6 +449,60 @@ func NewWifiService() (res *WiFiService) {
 		Ap_BSS:         &pb.WiFiBSSCfg{},
 	}
 	return res
+}
+
+// io.Writer firing a signal if predefined output arrives
+type hostapdOutMonitor struct {
+	resultReceived *util.Signal
+	result         bool
+	*sync.Mutex
+}
+
+func (m *hostapdOutMonitor) Write(p []byte) (n int, err error) {
+	// if result already received, the write could exit (early out)
+	if m.resultReceived.IsSet() {
+		return n, nil
+	}
+
+	// check if buffer contains relevant strings (assume write is called line wise by the hosted process
+	// otherwise we'd need to utilize an io.Reader
+	line := string(p)
+
+	switch {
+	case strings.Contains(line, "->DISABLED"):
+		log.Printf("Starting Access Point failed\n")
+		m.Lock()
+		defer m.Unlock()
+		m.result = false
+		m.resultReceived.Set()
+	case strings.Contains(line, "AP-ENABLED"):
+		log.Printf("Access point is up\n")
+		m.Lock()
+		defer m.Unlock()
+		m.result = true
+		m.resultReceived.Set()
+	}
+	return len(p), nil
+}
+
+func (m *hostapdOutMonitor) WaitConnectResultOnce(timeout time.Duration) (connected bool, err error) {
+	err = m.resultReceived.WaitTimeout(timeout)
+	if err != nil {
+		return false, errors.New("Couldn't retrieve hostapd connection state before timeout")
+	}
+
+	m.Lock()
+	defer m.Unlock()
+	connected = m.result
+	m.resultReceived.Reset() //Disable result received, for next use
+	return
+}
+
+func NewHostapdOutMonitor() *hostapdOutMonitor {
+	return &hostapdOutMonitor{
+		resultReceived: util.NewSignal(false, false),
+		Mutex:          &sync.Mutex{},
+	}
 }
 
 type wpaSupplicantOutMonitor struct {
