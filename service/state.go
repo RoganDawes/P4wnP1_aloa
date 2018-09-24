@@ -14,11 +14,16 @@ const (
 
 var ServiceState *GlobalServiceState
 
+
+type SubSysState struct {
+	Led *LedState
+}
+
 type GlobalServiceState struct {
 	Store                 *datastore.Store
 	EvMgr                 *EventManager
 	UsbGM                 *UsbGadgetManager
-	Led                   *LedState
+//	Led                   *LedState
 	HidDevPath            map[string]string //stores device path for HID devices
 	StoredNetworkSettings map[string]*pb.EthernetInterfaceSettings
 	WifiSvc               *WiFiService
@@ -70,13 +75,13 @@ func InitGlobalServiceState() (err error) {
 	}
 
 	state.BtSvc = NewBtService()
-
+/*
 	ledState, err := NewLed(false)
 	if err != nil {
 		return
 	}
 	state.Led = ledState
-
+*/
 	return nil
 }
 

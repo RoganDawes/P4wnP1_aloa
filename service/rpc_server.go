@@ -31,7 +31,26 @@ const (
 	cSTORE_PREFIX_WIFI_SETTINGS = "ws_"
 )
 
-type server struct {}
+type server struct {
+	rootSvc *Service
+
+	listenAddrGrpc string
+	listenAddrWeb string
+}
+
+func NewRpcServerService(root *Service) *server {
+	return &server{
+		rootSvc:root,
+	}
+}
+
+func (s *server) Start() error {
+	return nil
+}
+
+func (s *server) Stop() error {
+	return nil
+}
 
 func (s *server) StoreDeployedWifiSettings(ctx context.Context, m *pb.StringMessage) (e *pb.Empty, err error) {
 	return s.StoreWifiSettings(ctx, &pb.WifiRequestSettingsStorage{
@@ -366,18 +385,22 @@ func (s *server) SetGadgetSettings(ctx context.Context, gs *pb.GadgetSettings) (
 }
 
 func (s *server) GetLEDSettings(context.Context, *pb.Empty) (res *pb.LEDSettings, err error) {
-	res, err = ServiceState.Led.GetLed()
+//	res, err = ServiceState.Led.GetLed()
+	state := s.rootSvc.SubSysLed.GetState()
+	res = &pb.LEDSettings{
+		BlinkCount: *state.BlinkCount,
+	}
 	log.Printf("GetLEDSettings, result: %+v", res)
 	return
 }
 
 func (s *server) SetLEDSettings(ctx context.Context, ls *pb.LEDSettings) (*pb.Empty, error) {
 	log.Printf("SetLEDSettings %+v", ls)
-	ServiceState.Led.SetLed(ls)
+	s.rootSvc.SubSysLed.DeploySettings(ls)
 	return &pb.Empty{}, nil
 }
 
-
+/*
 func StartRpcServer(host string, port string) {
 	listen_address := host + ":" + port
 	//Open TCP listener
@@ -390,14 +413,11 @@ func StartRpcServer(host string, port string) {
 	//Create gRPC Server
 	s := grpc.NewServer()
 	pb.RegisterP4WNP1Server(s, &server{})
-	/*
-	// Register reflection service on gRPC server.
-	reflection.Register(s)
-	*/
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
 }
+*/
 
 func folderReader(fn http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
@@ -409,6 +429,7 @@ func folderReader(fn http.Handler) http.HandlerFunc {
 	}
 }
 
+/*
 func StartRpcWebServer(host string, port string) {
 	//Create gRPC Server
 	s := grpc.NewServer()
@@ -416,18 +437,6 @@ func StartRpcWebServer(host string, port string) {
 
 	//grpc_web_srv := grpcweb.WrapServer(s, grpcweb.WithWebsockets(true)) //Wrap server to improbable grpc-web with websockets
 	grpc_web_srv := grpcweb.WrapServer(s) //Wrap server to improbable grpc-web with websockets
-
-	/*
-	http_handler := func(resp http.ResponseWriter, req *http.Request) {
-		if req.ProtoMajor == 2 && strings.Contains(req.Header.Get("Content-Type"), "application/grpc") ||
-			websocket.IsWebSocketUpgrade(req) {
-			grpc_web_srv.ServeHTTP(resp, req)
-		} else {
-			//No gRPC request
-			folderReader(http.FileServer(http.Dir("/home/pi/P4wnP1_go"))).ServeHTTP(resp, req)
-		}
-	}
-	*/
 
 	http_handler := func(resp http.ResponseWriter, req *http.Request) {
 		grpc_web_srv.ServeHTTP(resp, req)
@@ -446,8 +455,9 @@ func StartRpcWebServer(host string, port string) {
 	log.Printf("P4wnP1 gRPC-web server listening on " + listen_address)
 	log.Fatal(http_srv.ListenAndServe())
 }
+*/
 
-func StartRpcServerAndWeb(host string, gRPCPort string, webPort string, absWebRoot string) () {
+func (srv *server) StartRpcServerAndWeb(host string, gRPCPort string, webPort string, absWebRoot string) () {
 	//ToDo: Return servers/TCP listener to allow closing from caller
 	listen_address_grpc := host + ":" + gRPCPort
 	listen_address_web := host + ":" + webPort
@@ -455,7 +465,7 @@ func StartRpcServerAndWeb(host string, gRPCPort string, webPort string, absWebRo
 
 	//Create gRPC Server
 	s := grpc.NewServer()
-	pb.RegisterP4WNP1Server(s, &server{})
+	pb.RegisterP4WNP1Server(s, srv)
 
 
 

@@ -3,17 +3,16 @@
 package main
 
 import (
+	"github.com/mame82/P4wnP1_go/common"
 	"log"
+	"strconv"
+	"time"
 
+	"fmt"
 	"github.com/mame82/P4wnP1_go/service"
 	"os"
 	"os/signal"
 	"syscall"
-	"fmt"
-	pb "github.com/mame82/P4wnP1_go/proto"
-	"github.com/mame82/P4wnP1_go/common"
-	"time"
-	"strconv"
 )
 
 
@@ -40,13 +39,25 @@ func main() {
 	*/
 
 	// ToDo: The webroot has to be changed to /usr/local/P4wnP1/www
-	service.StartRpcServerAndWeb("0.0.0.0", "50051", "8000", "/usr/local/P4wnP1/www") //start gRPC service
+	//service.StartRpcServerAndWeb("0.0.0.0", "50051", "8000", "/usr/local/P4wnP1/www") //start gRPC service
 
+	/*
 	//Indicate servers up with LED blink count 1
 	state.Led.SetLed(&pb.LEDSettings{1})
+	*/
+
+
+
+
+	svc,err := service.NewService()
+	if err != nil {
+		panic(err)
+	}
+	svc.Start()
+
 
 	//service.StartEventManager(20)
-//	log.SetOutput(state.EvMgr)
+	//	log.SetOutput(state.EvMgr)
 	go func() {
 		err := common.RunBashScript("/usr/local/P4wnP1/scripts/servicestart.sh")
 		if err != nil { log.Printf("Error executing service startup script: %v\n", err) }
@@ -64,7 +75,6 @@ func main() {
 			i++
 		}
 	}()
-
 
 
 	//use a channel to wait for SIGTERM or SIGINT
