@@ -1,5 +1,5 @@
 /*
- * Quasar Framework v0.17.12
+ * Quasar Framework v0.17.16
  * (c) 2016-present Razvan Stoenescu
  * Released under the MIT License.
  */
@@ -277,9 +277,6 @@ input[type='search']::-webkit-search-decoration {
 }
 .q-alert-detail {
   font-size: 12px;
-}
-[dir] body.desktop .q-select-highlight {
-  background: rgba(189,189,189,0.5) !important;
 }
 .q-breadcrumbs .q-icon,
 .q-breadcrumbs .q-breadcrumbs-separator {
@@ -1467,14 +1464,19 @@ body.desktop .q-carousel-thumbnails img:hover {
 [dir] .q-datetime .modal-buttons {
   padding-top: 8px;
 }
-.q-datetime-header {
-  pointer-events: none;
+[dir] .q-datetime:not(.no-border):not(.q-datetime-dark) .q-datetime-content {
+  border: 1px solid #e0e0e0;
+}
+[dir] .q-datetime:not(.no-border).q-datetime-dark {
+  border: 1px solid #424242;
+  border: 1px solid var(--q-color-dark);
 }
 [dir] .q-datetime-header {
   background: currentColor;
 }
 .q-datetime-header > div {
   color: #fff;
+  width: 100%;
 }
 .q-datetime-weekdaystring {
   font-size: 0.8rem;
@@ -1483,28 +1485,45 @@ body.desktop .q-carousel-thumbnails img:hover {
   background: rgba(0,0,0,0.1);
   padding: 5px 0;
 }
+.q-datetime-time {
+  will-change: scroll-position;
+  overflow: auto;
+}
 [dir] .q-datetime-time {
   padding: 10px 0;
-}
-[dir] div + .q-datetime-time {
-  padding-top: 0;
 }
 .q-datetime-ampm {
   font-size: 0.9rem;
 }
-.q-datetime-datestring {
+[dir] .q-datetime-ampm {
+  padding: 5px;
+}
+[dir] .q-datetime-datestring {
+  padding: 10px 0;
+}
+.q-datetime-datestring .q-datetime-link {
   font-size: 2.7rem;
 }
-.q-datetime-datestring span.small {
+.q-datetime-datestring .q-datetime-link span {
+  width: 100%;
+}
+[dir] .q-datetime-datestring .q-datetime-link span {
+  padding: 0 5px;
+}
+.q-datetime-datestring .q-datetime-link.small {
   font-size: 1.2rem;
+}
+[dir] .q-datetime-datestring .q-datetime-link.small {
+  margin: 0 5px;
+}
+[dir] .q-datetime-datestring .q-datetime-link.small span {
+  padding: 5px;
 }
 .q-datetime-link {
   opacity: 0.6;
 }
 .q-datetime-link > span {
-  pointer-events: all;
   display: inline-block;
-  width: 100%;
   outline: 0;
 }
 [dir] .q-datetime-link > span {
@@ -1514,10 +1533,12 @@ body.desktop .q-carousel-thumbnails img:hover {
   opacity: 1;
 }
 .q-datetime-clockstring {
+  min-width: 210px;
   font-size: 2.7rem;
   direction: ltr /* rtl:ignore */;
 }
 .q-datetime-selector {
+  min-width: 290px;
   height: 310px;
   overflow: auto;
 }
@@ -1888,85 +1909,23 @@ body.desktop .q-datetime-dark .q-datetime-clock-position:not(.active):hover {
   margin-top: 10px;
 }
 @media (max-width: 767px) {
-  [dir=ltr] .q-datetime-ampm {
-    margin-left: 1.5rem;
-  }
-  [dir=rtl] .q-datetime-ampm {
-    margin-right: 1.5rem;
-  }
-  [dir] .q-datetime-datestring span {
-    margin: 10px 5px;
-  }
-  [dir] .q-datetime-datestring span.small {
-    margin-top: 1.3rem;
-  }
   .q-datetime {
-    min-width: 290px;
-  }
-  [dir] .q-datetime:not(.no-border):not(.q-datetime-dark) .q-datetime-content {
-    border-width: 0 1px 1px 1px;
-    border-style: solid;
-    border-color: #e0e0e0;
-  }
-  [dir] .q-datetime:not(.no-border).q-datetime-dark {
-    border: 1px solid #424242;
-    border: 1px solid var(--q-color-dark);
-  }
-  .q-datetime-modal .q-datetime {
-    width: 290px;
+    -webkit-box-orient: vertical !important;
+    -webkit-box-direction: normal !important;
+        -ms-flex-direction: column !important;
+            flex-direction: column !important;
   }
 }
 @media (min-width: 768px) {
-  [dir] .q-datetime-datestring {
-    padding: 10px 0;
-  }
-  [dir] .q-datetime-ampm {
-    margin-top: 5px;
-  }
-  [dir] .q-datetime-ampm div {
-    margin: 2px 0;
-  }
   .q-datetime-header {
-    width: 170px;
-    position: relative;
-  }
-  .q-datetime-weekdaystring {
-    position: absolute;
-    top: 0;
-  }
-  [dir=ltr] .q-datetime-weekdaystring {
-    left: 0;
-    right: 0;
-  }
-  [dir=rtl] .q-datetime-weekdaystring {
-    right: 0;
-    left: 0;
+    -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
   }
   .q-datetime-content {
-    width: 290px;
-  }
-  .q-datetime {
-    min-width: 480px;
-  }
-  [dir] .q-datetime:not(.no-border):not(.q-datetime-dark) .q-datetime-content {
-    border-style: solid;
-    border-color: #e0e0e0;
-  }
-  [dir=ltr] .q-datetime:not(.no-border):not(.q-datetime-dark) .q-datetime-content {
-    border-width: 1px 1px 1px 0;
-  }
-  [dir=rtl] .q-datetime:not(.no-border):not(.q-datetime-dark) .q-datetime-content {
-    border-width: 1px 0 1px 1px;
-  }
-  [dir] .q-datetime:not(.no-border).q-datetime-dark {
-    border: 1px solid #424242;
-    border: 1px solid var(--q-color-dark);
-  }
-  .q-datetime-modal .q-datetime {
-    width: 480px;
-  }
-  .q-datetime-minimal {
-    width: 320px;
+    -webkit-box-flex: 2;
+        -ms-flex: 2 2 auto;
+            flex: 2 2 auto;
   }
 }
 .q-dot {
@@ -2581,9 +2540,6 @@ body.desktop .q-datetime-dark .q-datetime-clock-position:not(.active):hover {
 }
 .q-if-control:hover {
   opacity: 0.7;
-}
-[dir] .q-if-control.q-icon {
-  cursor: pointer;
 }
 .q-if-baseline {
   line-height: 24px;
@@ -3269,6 +3225,12 @@ body.with-loading {
   text-align: center;
   text-shadow: 0 0 7px #000;
 }
+[dir] .modal-backdrop {
+  background: rgba(0,0,0,0.4);
+}
+.modal.maximized .modal-backdrop {
+  display: none;
+}
 .modal-content {
   position: relative;
   -webkit-box-shadow: 0 1px 5px rgba(0,0,0,0.2), 0 2px 2px rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12);
@@ -3286,9 +3248,6 @@ body.with-loading {
 }
 .modal {
   z-index: 5000;
-}
-[dir] .modal.minimized, [dir] .modal.with-backdrop {
-  background: rgba(0,0,0,0.4);
 }
 .modal.minimized .modal-content {
   max-width: 80vw;
@@ -3311,9 +3270,6 @@ body.with-loading {
   opacity: 0;
 }
 @media (min-width: 768px) {
-  [dir] .modal:not(.maximized) {
-    background: rgba(0,0,0,0.4);
-  }
   .modal:not(.maximized).q-modal-enter .modal-content {
     -webkit-transform: scale(1.2);
   }
@@ -3923,15 +3879,6 @@ body div .q-popover {
 [dir] .q-toolbar .q-search {
   background: rgba(255,255,255,0.25);
 }
-[dir] body.desktop .q-select-highlight {
-  background: rgba(189,189,189,0.5) !important;
-}
-.q-slide-transition {
-  transition: height 0.3s cubic-bezier(0.25, 0.8, 0.5, 1) !important;
-}
-[dir] .q-slide-transition {
-  -webkit-transition: height 0.3s cubic-bezier(0.25, 0.8, 0.5, 1) !important;
-}
 .q-slider-track,
 .q-slider-mark {
   opacity: 0.4;
@@ -4126,13 +4073,13 @@ body div .q-popover {
 [dir=rtl] .q-slider-ring {
   right: -50%;
 }
+.q-slider:not(.disabled):not(.readonly) .q-slider-handle.dragging .q-slider-ring,
 .q-slider:not(.disabled):not(.readonly) .q-slider-handle:focus .q-slider-ring,
-.q-slider:not(.disabled):not(.readonly):focus .q-slider-ring,
-.q-slider:not(.disabled):not(.readonly):hover .q-slider-ring {
+body.desktop .q-slider:not(.disabled):not(.readonly):hover .q-slider-ring {
   opacity: 0.4;
   -webkit-transform: scale(1);
 }
-[dir] .q-slider:not(.disabled):not(.readonly) .q-slider-handle:focus .q-slider-ring, [dir] .q-slider:not(.disabled):not(.readonly):focus .q-slider-ring, [dir] .q-slider:not(.disabled):not(.readonly):hover .q-slider-ring {
+[dir] .q-slider:not(.disabled):not(.readonly) .q-slider-handle.dragging .q-slider-ring, [dir] .q-slider:not(.disabled):not(.readonly) .q-slider-handle:focus .q-slider-ring, [dir] body.desktop .q-slider:not(.disabled):not(.readonly):hover .q-slider-ring {
           transform: scale(1);
 }
 [dir] .q-slider.disabled .q-slider-handle {
@@ -9771,7 +9718,7 @@ img.avatar {
   overflow: hidden !important;
 }
 .q-no-input-spinner {
-  -moz-appearance: textfield;
+  -moz-appearance: textfield !important;
 }
 .q-no-input-spinner::-webkit-outer-spin-button,
 .q-no-input-spinner::-webkit-inner-spin-button {
@@ -9784,6 +9731,9 @@ a.q-link {
   outline: 0;
   color: inherit;
   text-decoration: none;
+}
+[dir] .q-select-highlight {
+  background: rgba(189,189,189,0.5) !important;
 }
 .highlight-and-fade {
   -webkit-animation: q-highlight 2s /* rtl:ignore */;

@@ -1,5 +1,5 @@
 /*!
- * Quasar Framework v0.17.12
+ * Quasar Framework v0.17.16
  * (c) 2016-present Razvan Stoenescu
  * Released under the MIT License.
  */
@@ -427,7 +427,7 @@
     });
   }
 
-  var version = "0.17.12";
+  var version = "0.17.16";
 
   var History = {
     __history: [],
@@ -1963,8 +1963,8 @@
             this$1.__shake();
           }
           else {
+            this$1.$emit('escape-key');
             this$1.hide().then(function () {
-              this$1.$emit('escape-key');
               this$1.$emit('dismiss');
             });
           }
@@ -2033,9 +2033,7 @@
       }
     },
     mounted: function mounted () {
-      if (this.value) {
-        this.show();
-      }
+      this.value && this.show();
     },
     beforeDestroy: function beforeDestroy () {
       clearTimeout(this.shakeTimeout);
@@ -2067,14 +2065,15 @@
         h('div', {
           staticClass: 'modal fullscreen row',
           'class': this.modalClasses,
-          on: {
-            click: this.__dismiss
-          },
           directives: [{
             name: 'show',
             value: this.showing
           }]
         }, [
+          h('div', {
+            staticClass: 'modal-backdrop absolute-full',
+            on: { click: this.__dismiss }
+          }),
           h('div', {
             ref: 'content',
             staticClass: 'modal-content',
@@ -2683,12 +2682,12 @@
     if (horiz) {
       if (reverse) { x = -1; }
       if (pos === 'bottom') { y = -1; }
-      return cssTransform(("translate3d(" + (x * (p - 100)) + "%," + (active ? 0 : y * -200) + "%,0)"))
+      return { transform: ("translate3d(" + (x * (p - 100)) + "%," + (active ? 0 : y * -200) + "%,0)") }
     }
 
     if (reverse) { y = -1; }
     if (pos === 'right') { x = -1; }
-    return cssTransform(("translate3d(" + (active ? 0 : dir * x * -200) + "%," + (y * (p - 100)) + "%,0)"))
+    return { transform: ("translate3d(" + (active ? 0 : dir * x * -200) + "%," + (y * (p - 100)) + "%,0)") }
   }
 
   function inc (p, amount) {
@@ -2787,7 +2786,7 @@
           this.animate ? '' : 'no-transition'
         ]
       },
-      style: function style$$1 () {
+      style: function style () {
         var active = this.onScreen;
 
         var o = translate({
@@ -2905,7 +2904,7 @@
       animNode = document.createElement('span'),
       size = el.clientWidth > el.clientHeight ? el.clientWidth : el.clientHeight,
       unit = (center ? size : size * 2) + "px",
-      offset$$1 = el.getBoundingClientRect();
+      offset = el.getBoundingClientRect();
 
     container.appendChild(animNode);
     container.className = 'q-ripple-container';
@@ -2922,17 +2921,17 @@
     }
     else {
       var pos = position(evt);
-      x = pos.left - offset$$1.left - size;
-      y = pos.top - offset$$1.top - size;
+      x = pos.left - offset.left - size;
+      y = pos.top - offset.top - size;
     }
 
     animNode.classList.add('q-ripple-animation-enter');
     animNode.classList.add('q-ripple-animation-visible');
-    css(animNode, cssTransform(("translate(" + x + "px, " + y + "px) scale3d(0, 0, 0)")));
+    animNode.style.transform = "translate(" + x + "px, " + y + "px) scale3d(0, 0, 0)";
 
     setTimeout(function () {
       animNode.classList.remove('q-ripple-animation-enter');
-      css(animNode, cssTransform(("translate(" + x + "px, " + y + "px) scale3d(1, 1, 1)")));
+      animNode.style.transform = "translate(" + x + "px, " + y + "px) scale3d(1, 1, 1)";
       setTimeout(function () {
         animNode.classList.remove('q-ripple-animation-visible');
         setTimeout(function () { container.remove(); }, 300);
@@ -3591,65 +3590,46 @@
     }
   }
 
-  function getPositions (anchor, target) {
-    var
-      a = Object.assign({}, anchor),
-      t = Object.assign({}, target);
+  function repositionIfNeeded (anchor, target, selfOrigin, anchorOrigin, targetPosition, cover) {
+    var margin = getScrollbarWidth();
+    var innerHeight = window.innerHeight;
+    var innerWidth = window.innerWidth;
+    // don't go bellow scrollbars
+    innerHeight -= margin;
+    innerWidth -= margin;
 
-    var positions = {
-      x: ['left', 'right'].filter(function (p) { return p !== t.horizontal; }),
-      y: ['top', 'bottom'].filter(function (p) { return p !== t.vertical; })
-    };
-
-    var overlapAuto = {
-      x: [a.horizontal, t.horizontal].indexOf('middle') !== -1,
-      y: [a.vertical, t.vertical].indexOf('center') !== -1
-    };
-
-    positions.x.splice(overlapAuto.x ? 0 : 1, 0, 'middle');
-    positions.y.splice(overlapAuto.y ? 0 : 1, 0, 'center');
-
-    if (!overlapAuto.y) {
-      a.vertical = a.vertical === 'top' ? 'bottom' : 'top';
-    }
-
-    if (!overlapAuto.x) {
-      a.horizontal = a.horizontal === 'left' ? 'right' : 'left';
-    }
-
-    return {
-      positions: positions,
-      anchorPos: a
-    }
-  }
-
-  function repositionIfNeeded (anchor, target, selfOrigin, anchorOrigin, targetPosition) {
-    var ref = getPositions(anchorOrigin, selfOrigin);
-    var positions = ref.positions;
-    var anchorPos = ref.anchorPos;
-
-    if (targetPosition.top < 0 || targetPosition.top + target.bottom > window.innerHeight) {
-      var newTop = anchor[anchorPos.vertical] - target[positions.y[0]];
-      if (newTop + target.bottom <= window.innerHeight) {
-        targetPosition.top = newTop;
+    if (targetPosition.top < 0 || targetPosition.top + target.bottom > innerHeight) {
+      if (selfOrigin.vertical === 'center') {
+        targetPosition.top = anchor[selfOrigin.vertical] > innerHeight / 2 ? innerHeight - target.bottom : 0;
+        targetPosition.maxHeight = Math.min(target.bottom, innerHeight);
+      }
+      else if (anchor[selfOrigin.vertical] > innerHeight / 2) {
+        var anchorY = Math.min(innerHeight, anchorOrigin.vertical === 'center' ? anchor.center : (anchorOrigin.vertical === selfOrigin.vertical ? anchor.bottom : anchor.top));
+        targetPosition.maxHeight = Math.min(target.bottom, anchorY);
+        targetPosition.top = Math.max(0, anchorY - targetPosition.maxHeight);
       }
       else {
-        newTop = anchor[anchorPos.vertical] - target[positions.y[1]];
-        if (newTop + target.bottom <= window.innerHeight) {
-          targetPosition.top = newTop;
-        }
+        targetPosition.top = anchorOrigin.vertical === 'center' ? anchor.center : (anchorOrigin.vertical === selfOrigin.vertical ? anchor.top : anchor.bottom);
+        targetPosition.maxHeight = Math.min(target.bottom, innerHeight - targetPosition.top);
       }
     }
-    if (targetPosition.left < 0 || targetPosition.left + target.right > window.innerWidth) {
-      var newLeft = anchor[anchorPos.horizontal] - target[positions.x[0]];
-      if (newLeft + target.right <= window.innerWidth) {
-        targetPosition.left = newLeft;
+
+    if (targetPosition.left < 0 || targetPosition.left + target.right > innerWidth) {
+      targetPosition.maxWidth = Math.min(target.right, innerWidth);
+      if (selfOrigin.horizontal === 'middle') {
+        targetPosition.left = anchor[selfOrigin.horizontal] > innerWidth / 2 ? innerWidth - target.right : 0;
+      }
+      else if (cover) {
+        targetPosition.left = targetPosition.left < 0 ? 0 : innerWidth - target.right;
+      }
+      else if (anchor[selfOrigin.horizontal] > innerWidth / 2) {
+        var anchorY$1 = Math.min(innerWidth, anchorOrigin.horizontal === 'middle' ? anchor.center : (anchorOrigin.horizontal === selfOrigin.horizontal ? anchor.right : anchor.left));
+        targetPosition.maxWidth = Math.min(target.right, anchorY$1);
+        targetPosition.left = Math.max(0, anchorY$1 - targetPosition.maxWidth);
       }
       else {
-        newLeft = anchor[anchorPos.horizontal] - target[positions.x[1]];
-        if (newLeft + target.right <= window.innerWidth) {
-          targetPosition.left = newLeft;
-        }
+        targetPosition.left = anchorOrigin.horizontal === 'middle' ? anchor.center : (anchorOrigin.horizontal === selfOrigin.horizontal ? anchor.left : anchor.right);
+        targetPosition.maxWidth = Math.min(target.right, innerWidth - targetPosition.left);
       }
     }
 
@@ -3667,9 +3647,12 @@
     var anchorClick = ref.anchorClick;
     var touchPosition = ref.touchPosition;
     var offset = ref.offset;
+    var touchOffset = ref.touchOffset;
+    var cover = ref.cover;
 
     var anchor;
     el.style.maxHeight = maxHeight || '65vh';
+    el.style.maxWidth = '100vw';
 
     if (event$$1 && (!anchorClick || touchPosition)) {
       var ref$1 = position(event$$1);
@@ -3678,7 +3661,17 @@
       anchor = {top: top, left: left, width: 1, height: 1, right: left + 1, center: top, middle: left, bottom: top + 1};
     }
     else {
-      anchor = getAnchorPosition(anchorEl, offset);
+      if (touchOffset) {
+        var ref$2 = anchorEl.getBoundingClientRect();
+        var anchorTop = ref$2.top;
+        var anchorLeft = ref$2.left;
+        var top$1 = anchorTop + touchOffset.top,
+          left$1 = anchorLeft + touchOffset.left;
+        anchor = {top: top$1, left: left$1, width: 1, height: 1, right: left$1 + 1, center: top$1, middle: left$1, bottom: top$1 + 1};
+      }
+      else {
+        anchor = getAnchorPosition(anchorEl, offset);
+      }
     }
 
     var target = getTargetPosition(el);
@@ -3687,10 +3680,16 @@
       left: anchor[anchorOrigin.horizontal] - target[selfOrigin.horizontal]
     };
 
-    targetPosition = repositionIfNeeded(anchor, target, selfOrigin, anchorOrigin, targetPosition);
+    targetPosition = repositionIfNeeded(anchor, target, selfOrigin, anchorOrigin, targetPosition, cover);
 
     el.style.top = Math.max(0, targetPosition.top) + 'px';
     el.style.left = Math.max(0, targetPosition.left) + 'px';
+    if (targetPosition.maxHeight) {
+      el.style.maxHeight = (targetPosition.maxHeight) + "px";
+    }
+    if (targetPosition.maxWidth) {
+      el.style.maxWidth = (targetPosition.maxWidth) + "px";
+    }
 
     if (animate) {
       var directions = targetPosition.top < anchor.top ? ['up', 'down'] : ['down', 'up'];
@@ -3782,6 +3781,7 @@
       fit: Boolean,
       cover: Boolean,
       persistent: Boolean,
+      keepOnScreen: Boolean,
       maxHeight: String,
       touchPosition: Boolean,
       anchorClick: {
@@ -3839,18 +3839,23 @@
       this.$nextTick(function () {
         this$1.anchorEl = this$1.$el.parentNode;
         this$1.anchorEl.removeChild(this$1.$el);
-        if (this$1.anchorEl.classList.contains('q-btn-inner') || this$1.anchorEl.classList.contains('q-if-inner')) {
+
+        if (
+          this$1.anchorEl.classList.contains('q-btn-inner') ||
+          this$1.anchorEl.classList.contains('q-if-inner') ||
+          this$1.anchorEl.classList.contains('no-pointer-events')
+        ) {
           this$1.anchorEl = this$1.anchorEl.parentNode;
         }
+
         if (this$1.anchorClick) {
           this$1.anchorEl.classList.add('cursor-pointer');
           this$1.anchorEl.addEventListener('click', this$1.toggle);
           this$1.anchorEl.addEventListener('keyup', this$1.__toggleKey);
         }
       });
-      if (this.value) {
-        this.show();
-      }
+
+      this.value && this.show();
     },
     beforeDestroy: function beforeDestroy () {
       this.showing && this.__cleanup();
@@ -3867,7 +3872,10 @@
           this.__refocusTarget = (this.anchorClick && this.anchorEl) || document.activeElement;
         }
         document.body.appendChild(this.$el);
-        EscapeKey.register(function () { !this$1.persistent && this$1.hide(); });
+        EscapeKey.register(function () {
+          this$1.$emit('escape-key');
+          this$1.hide();
+        });
         this.scrollTarget = getScrollTarget(this.anchorEl);
         this.scrollTarget.addEventListener('scroll', this.__updatePosition, listenOpts.passive);
         if (this.scrollTarget !== window) {
@@ -3881,7 +3889,7 @@
           this.$refs.content.focus();
         }
         this.timer = setTimeout(function () {
-          document.body.addEventListener('click', this$1.__bodyHide, true);
+          document.body.addEventListener('mousedown', this$1.__bodyHide, true);
           document.body.addEventListener('touchstart', this$1.__bodyHide, true);
           this$1.showPromise && this$1.showPromiseResolve();
         }, 0);
@@ -3914,7 +3922,7 @@
       __cleanup: function __cleanup () {
         clearTimeout(this.timer);
 
-        document.body.removeEventListener('click', this.__bodyHide, true);
+        document.body.removeEventListener('mousedown', this.__bodyHide, true);
         document.body.removeEventListener('touchstart', this.__bodyHide, true);
         this.scrollTarget.removeEventListener('scroll', this.__updatePosition, listenOpts.passive);
         if (this.scrollTarget !== window) {
@@ -3929,8 +3937,13 @@
         var ref = this.anchorEl.getBoundingClientRect();
         var top = ref.top;
         var bottom = ref.bottom;
+        var left = ref.left;
+        var right = ref.right;
 
-        if (bottom < 0 || top > window.innerHeight) {
+        if (
+          !this.keepOnScreen &&
+          (bottom < 0 || top > window.innerHeight || right < 0 || left > window.innerWidth)
+        ) {
           return this.hide()
         }
 
@@ -3939,6 +3952,18 @@
           this.$el.style.minWidth = style.getPropertyValue('width');
           if (this.cover) {
             this.$el.style.minHeight = style.getPropertyValue('height');
+          }
+        }
+
+        if (animate) {
+          if (this.touchPosition) {
+            var ref$1 = position(event$$1);
+            var eventTop = ref$1.top;
+            var eventLeft = ref$1.left;
+            this.touchOffset = { left: eventLeft - left, top: eventTop - top };
+          }
+          else {
+            delete this.touchOffset;
           }
         }
 
@@ -3952,7 +3977,9 @@
           selfOrigin: this.selfOrigin,
           maxHeight: this.maxHeight,
           anchorClick: this.anchorClick,
-          touchPosition: this.touchPosition
+          touchPosition: this.touchPosition,
+          touchOffset: this.touchOffset,
+          cover: this.cover
         });
       }
     }
@@ -4777,6 +4804,7 @@
   var QCard = {
     name: 'QCard',
     props: {
+      dark: Boolean,
       square: Boolean,
       flat: Boolean,
       inline: Boolean,
@@ -4788,12 +4816,12 @@
         var cls = [{
           'no-border-radius': this.square,
           'no-shadow': this.flat,
-          'inline-block': this.inline
+          'inline-block': this.inline,
+          'q-card-dark': this.dark
         }];
 
         if (this.color) {
           cls.push(("bg-" + (this.color)));
-          cls.push("q-card-dark");
           cls.push(("text-" + (this.textColor || 'white')));
         }
         else if (this.textColor) {
@@ -5382,7 +5410,7 @@
           : ico
       },
       trackPosition: function trackPosition () {
-        return cssTransform(("translateX(" + (this.rtlDir * this.position) + "%)"))
+        return { transform: ("translateX(" + (this.rtlDir * this.position) + "%)") }
       },
       infiniteLeft: function infiniteLeft () {
         return this.infinite && this.slidesNumber > 1 && this.positionSlide < 0
@@ -6840,7 +6868,7 @@
       __onMouseDown: function __onMouseDown (e) {
         var this$1 = this;
 
-        this.$nextTick(function () { return this$1.$emit('focus', e); });
+        !this.disable && this.$nextTick(function () { return this$1.$emit('focus', e); });
       },
       __additionalHidden: function __additionalHidden (item, hasError, hasWarning, length) {
         if (item.condition !== void 0) {
@@ -7230,11 +7258,18 @@
         ])),
 
         this.isLoading
-          ? h(QSpinner, {
-            slot: 'after',
-            staticClass: 'q-if-control',
-            props: { size: '24px' }
-          })
+          ? (
+            this.$slots.loading
+              ? h('div', {
+                staticClass: 'q-if-control',
+                slot: 'after'
+              }, this.$slots.loading)
+              : h(QSpinner, {
+                slot: 'after',
+                staticClass: 'q-if-control',
+                props: { size: '24px' }
+              })
+          )
           : ((this.editable && h(QIcon, {
             slot: 'after',
             staticClass: 'q-if-control',
@@ -7352,7 +7387,11 @@
   var QSlideTransition = {
     name: 'QSlideTransition',
     props: {
-      appear: Boolean
+      appear: Boolean,
+      duration: {
+        type: Number,
+        default: 300
+      }
     },
     methods: {
       __begin: function __begin (el, height) {
@@ -7360,13 +7399,13 @@
         if (height !== void 0) {
           el.style.height = height + "px";
         }
-        el.classList.add('q-slide-transition');
+        el.style.transition = "height " + (this.duration) + "ms cubic-bezier(.25, .8, .50, 1)";
         this.animating = true;
       },
       __end: function __end (el, event) {
         el.style.overflowY = null;
         el.style.height = null;
-        el.classList.remove('q-slide-transition');
+        el.style.transition = null;
         this.__cleanup();
         event !== this.lastEvent && this.$emit(event);
         this.animating = false;
@@ -7459,6 +7498,7 @@
       iconToggle: Boolean,
       collapseIcon: String,
       opened: Boolean,
+      duration: Number,
 
       headerStyle: [Array, String, Object],
       headerClass: [Array, String, Object]
@@ -7556,7 +7596,9 @@
             ])
             : h(QItemWrapper, this.__getItemProps(true), this.__getToggleSide(h, true)),
 
-          h(QSlideTransition, [
+          h(QSlideTransition, {
+            props: { duration: this.duration }
+          }, [
             h('div', {
               directives: [{ name: 'show', value: this.showing }]
             }, [
@@ -7918,7 +7960,7 @@
               dragging: this.dragging,
               'handle-at-minimum': !this.fillHandleAlways && this.model === this.min
             },
-            attrs: { tabindex: this.editable ? 0 : -1 },
+            attrs: { tabindex: this.$q.platform.is.desktop ? (this.editable ? 0 : -1) : void 0 },
             on: {
               keydown: this.__onKeyDown,
               keyup: this.__onKeyUp
@@ -8701,6 +8743,7 @@
             ref: 'popup',
             props: {
               cover: true,
+              keepOnScreen: true,
               disable: this.disable,
               anchorClick: false,
               maxHeight: '100vh'
@@ -8848,7 +8891,8 @@
       return h(QPopover, {
         ref: 'popup',
         props: {
-          anchorClick: false
+          anchorClick: false,
+          touchPosition: true
         },
         on: {
           show: this.__desktopOnShow,
@@ -9556,15 +9600,9 @@
       },
       model: {
         get: function get () {
-          var date$$1 = isValid(this.computedValue)
+          return isValid(this.computedValue)
             ? new Date(this.computedValue)
-            : (this.computedDefaultValue ? new Date(this.computedDefaultValue) : startOfDate(new Date(), 'day'));
-
-          return getDateBetween(
-            date$$1,
-            this.pmin,
-            this.pmax
-          )
+            : (this.computedDefaultValue ? new Date(this.computedDefaultValue) : startOfDate(new Date(), 'day'))
         },
         set: function set (val) {
           var this$1 = this;
@@ -9648,7 +9686,7 @@
           hour = this.model.getHours(),
           offset = this.am ? 12 : -12;
 
-        this.model = new Date(this.model.setHours(hour + offset));
+        this.model = new Date(new Date(this.model).setHours(hour + offset));
       },
 
       __parseTypeValue: function __parseTypeValue (type, value) {
@@ -9690,7 +9728,11 @@
       return {
         view: this.__calcView(this.defaultView),
         dragging: false,
-        centerClockPos: 0
+        centerClockPos: 0,
+        fakeValue: {
+          year: null,
+          month: null
+        }
       }
     },
     watch: {
@@ -9700,7 +9742,17 @@
         }
       },
       view: function view () {
-        this.__scrollView();
+        this.__scrollView(true);
+      },
+      model: function model () {
+        if (this.fakeValue.month !== this.month) {
+          this.fakeValue.month = this.month;
+          this.__scrollView();
+        }
+        if (this.fakeValue.year !== this.year) {
+          this.fakeValue.year = this.year;
+          this.__scrollView();
+        }
       }
     },
     computed: {
@@ -9712,11 +9764,6 @@
         this.minimal && cls.push('q-datetime-minimal');
         this.color && cls.push(("text-" + (this.color)));
         return cls
-      },
-      contentClasses: function contentClasses () {
-        if (!this.minimal) {
-          return 'col-md-8'
-        }
       },
       dateArrow: function dateArrow () {
         var val = [ this.$q.icon.datetime.arrowLeft, this.$q.icon.datetime.arrowRight ];
@@ -9742,34 +9789,67 @@
           : days
       },
 
+      fakeModel: function fakeModel () {
+        return new Date(this.fakeYear, this.fakeMonth - 1, 1)
+      },
+      fakeYear: function fakeYear () {
+        return this.fakeValue.year || this.year
+      },
+      fakeMonth: function fakeMonth () {
+        return this.fakeValue.month || this.month
+      },
+      daysInMonth: function daysInMonth$$1 () {
+        return (new Date(this.fakeYear, this.fakeMonth, 0)).getDate()
+      },
+
       monthString: function monthString () {
         return ("" + (this.$q.i18n.date.monthsShort[this.month - 1]))
       },
       monthStamp: function monthStamp () {
-        return ((this.$q.i18n.date.months[this.month - 1]) + " " + (this.year))
+        return ((this.$q.i18n.date.months[this.fakeMonth - 1]) + " " + (this.fakeYear))
       },
       weekDayString: function weekDayString () {
         return this.headerLabel || this.$q.i18n.date.days[this.model.getDay()]
       },
 
       fillerDays: function fillerDays () {
-        var days = (new Date(this.model.getFullYear(), this.model.getMonth(), 1).getDay() - this.computedFirstDayOfWeek);
+        var days = (this.fakeModel.getDay() - this.computedFirstDayOfWeek);
         if (days < 0) {
           days += 7;
         }
         return days
       },
       beforeMinDays: function beforeMinDays () {
-        if (this.pmin === null || !isSameDate(this.pmin, this.model, 'month')) {
+        if (this.pmin === null) {
           return false
         }
-        return this.pmin.getDate() - 1
+        var
+          pminYear = this.pmin.getFullYear(),
+          pminMonth = this.pmin.getMonth() + 1;
+
+        if (pminYear === this.fakeYear && pminMonth === this.fakeMonth) {
+          return this.pmin.getDate() - 1
+        }
+        if (pminYear > this.fakeYear || (pminYear === this.fakeYear && pminMonth > this.fakeMonth)) {
+          return this.daysInMonth
+        }
+        return false
       },
       afterMaxDays: function afterMaxDays () {
-        if (this.pmax === null || !isSameDate(this.pmax, this.model, 'month')) {
+        if (this.pmax === null) {
           return false
         }
-        return this.daysInMonth - this.maxDay
+        var
+          pmaxYear = this.pmax.getFullYear(),
+          pmaxMonth = this.pmax.getMonth() + 1;
+
+        if (pmaxYear === this.fakeYear && pmaxMonth === this.fakeMonth) {
+          return this.daysInMonth - this.maxDay
+        }
+        if (pmaxYear < this.fakeYear || (pmaxYear === this.fakeYear && pmaxMonth < this.fakeMonth)) {
+          return this.daysInMonth
+        }
+        return false
       },
       maxDay: function maxDay () {
         return this.pmax !== null ? this.pmax.getDate() : this.daysInMonth
@@ -9805,14 +9885,14 @@
         if (!forMinute && this.computedFormat24h && !(this.hour > 0 && this.hour < 13)) {
           transforms.push('scale(.7, .7)');
         }
-        return cssTransform(transforms.join(' '))
+        return { transform: transforms.join(' ') }
       },
       isValid: function isValid$1 () {
         return isValid(this.value)
       },
       today: function today () {
         var today = new Date();
-        return isSameDate(today, this.model, 'month')
+        return isSameDate(today, this.fakeModel, 'month')
           ? today.getDate()
           : -1
       }
@@ -9822,9 +9902,9 @@
       setYear: function setYear (value, skipView) {
         if (this.editable) {
           if (!skipView) {
-            this.view = 'day';
+            this.view = 'month';
           }
-          this.model = new Date(this.model.setFullYear(this.__parseTypeValue('year', value)));
+          this.model = new Date(new Date(this.model).setFullYear(this.__parseTypeValue('year', value)));
         }
       },
       setMonth: function setMonth (value, skipView) {
@@ -9832,14 +9912,64 @@
           if (!skipView) {
             this.view = 'day';
           }
-          this.model = adjustDate(this.model, {month: value});
+          this.model = adjustDate(this.model, { month: value });
         }
       },
-      setDay: function setDay (value, skipView) {
+      moveFakeMonth: function moveFakeMonth (direction) {
+        var
+          month = this.fakeMonth + (direction > 0 ? 1 : -1),
+          year = this.fakeYear;
+        if (month < 1) {
+          month = 12;
+          year -= 1;
+        }
+        else if (month > 12) {
+          month = 1;
+          year += 1;
+        }
+        if (this.pmin !== null && direction > 0) {
+          var
+            pminYear = this.pmin.getFullYear(),
+            pminMonth = this.pmin.getMonth() + 1;
+          if (year < pminYear) {
+            year = pminYear;
+            month = pminMonth;
+          }
+          else if (year === pminYear && month < pminMonth) {
+            month = pminMonth;
+          }
+        }
+        if (this.pmax !== null && direction < 0) {
+          var
+            pmaxYear = this.pmax.getFullYear(),
+            pmaxMonth = this.pmax.getMonth() + 1;
+          if (year > pmaxYear) {
+            year = pmaxYear;
+            month = pmaxMonth;
+          }
+          else if (year === pmaxYear && month > pmaxMonth) {
+            month = pmaxMonth;
+          }
+        }
+        this.fakeValue.year = year;
+        this.fakeValue.month = month;
+      },
+      setDay: function setDay (value, skipView, year, month) {
         if (this.editable) {
-          this.model = new Date(this.model.setDate(this.__parseTypeValue('date', value)));
+          if (year && month) {
+            var fake = adjustDate(this.model, { month: month });
+            fake.setFullYear(this.__parseTypeValue('year', year));
+            fake.setDate(this.__parseTypeValue('date', value));
+            this.model = fake;
+          }
+          else {
+            this.model = new Date(new Date(this.model).setDate(this.__parseTypeValue('date', value)));
+          }
           if (!skipView && this.type === 'date') {
             this.$emit('canClose');
+            if (this.minimal) {
+              this.setView(this.defaultView);
+            }
           }
           else if (!skipView) {
             this.view = 'hour';
@@ -9858,14 +9988,14 @@
           value += 12;
         }
 
-        this.model = new Date(this.model.setHours(value));
+        this.model = new Date(new Date(this.model).setHours(value));
       },
       setMinute: function setMinute (value) {
         if (!this.editable) {
           return
         }
 
-        this.model = new Date(this.model.setMinutes(this.__parseTypeValue('minute', value)));
+        this.model = new Date(new Date(this.model).setMinutes(this.__parseTypeValue('minute', value)));
       },
 
       setView: function setView (view) {
@@ -9879,34 +10009,38 @@
       __calcView: function __calcView (view) {
         switch (this.type) {
           case 'time':
-            return view
-              ? (['hour', 'minute'].includes(view) ? view : 'hour')
-              : 'hour'
+            return ['hour', 'minute'].includes(view) ? view : 'hour'
           case 'date':
-            return view
-              ? (['year', 'month', 'day'].includes(view) ? view : 'day')
-              : 'day'
+            return ['year', 'month', 'day'].includes(view) ? view : 'day'
           default:
-            return view
-              ? (['year', 'month', 'day', 'hour', 'minute'].includes(view) ? view : 'day')
-              : 'day'
+            return ['year', 'month', 'day', 'hour', 'minute'].includes(view) ? view : 'day'
         }
       },
       __pad: function __pad (unit, filler) {
         return (unit < 10 ? filler || '0' : '') + unit
       },
-      __scrollView: function __scrollView () {
+      __scrollView: function __scrollView (delayed) {
+        var this$1 = this;
+
         if (this.view !== 'year' && this.view !== 'month') {
           return
         }
 
+        if (delayed) {
+          setTimeout(function () { this$1.__scrollView(); }, 200); // wait to settle and recenter
+        }
+
         var
           el = this.$refs.selector,
-          rows = this.view === 'year' ? this.year - this.yearInterval.min + 1 : this.month - this.monthMin;
+          itemInactive = el.querySelector('.q-btn:not(.active)'),
+          itemActive = el.querySelector('.q-btn.active'),
+          viewHeight = el ? el.offsetHeight : 0;
 
         this.$nextTick(function () {
-          if (el) {
-            el.scrollTop = rows * height(el.children[0].children[0]) - height(el) / 2.5;
+          var rowsAbove = this$1.view === 'year' ? this$1.year - this$1.yearInterval.min : this$1.month - this$1.monthMin - 1;
+
+          if (viewHeight && itemActive) {
+            el.scrollTop = rowsAbove * (itemInactive ? itemInactive.offsetHeight : 0) + (itemActive.offsetHeight - viewHeight) / 2;
           }
         });
       },
@@ -9940,6 +10074,9 @@
         }
         if (this.view === 'minute') {
           this.$emit('canClose');
+          if (this.minimal) {
+            this.setView(this.defaultView);
+          }
         }
         else {
           this.view = 'minute';
@@ -9988,15 +10125,16 @@
       __getTopSection: function __getTopSection (h) {
         var this$1 = this;
 
-        var child = [];
+        var child = [
+          this.typeHasDate
+            ? h('div', { staticClass: 'q-datetime-weekdaystring' }, [this.weekDayString])
+            : void 0,
+          h('div', { staticClass: 'col' })
+        ];
 
         if (this.typeHasDate) {
           var content = [
-            h('div', { staticClass: 'q-datetime-weekdaystring col-12' }, [
-              this.weekDayString
-            ]),
-
-            h('div', { staticClass: 'q-datetime-datestring row flex-center' }, [
+            h('div', { staticClass: 'q-datetime-datestring row justify-center items-end' }, [
               h('span', {
                 staticClass: 'q-datetime-link small col-auto col-md-12',
                 'class': {active: this.view === 'month'},
@@ -10004,13 +10142,16 @@
                 on: {
                   keydown: function (e) {
                     var key = getEventKey(e);
-                    if (key === 40 || key === 37) { // down, left
+                    if (key === 38 || key === 39) { // up, right
                       stopAndPrevent(e);
                       this$1.setMonth(this$1.month - 1, true);
                     }
-                    else if (key === 38 || key === 39) { // up, right
+                    else if (key === 40 || key === 37) { // down, left
                       stopAndPrevent(e);
                       this$1.setMonth(this$1.month + 1, true);
+                    }
+                    else if (key === 13 || key === 20) { // enter, space
+                      this$1.view = 'month';
                     }
                   }
                 }
@@ -10038,6 +10179,9 @@
                       stopAndPrevent(e);
                       this$1.setDay(this$1.day + (key === 39 ? 1 : 7), true);
                     }
+                    else if (key === 13 || key === 20) { // enter, space
+                      this$1.view = 'day';
+                    }
                   }
                 }
               }, [
@@ -10056,13 +10200,16 @@
                 on: {
                   keydown: function (e) {
                     var key = getEventKey(e);
-                    if (key === 40 || key === 37) { // down, left
+                    if (key === 38 || key === 39) { // up, right
                       stopAndPrevent(e);
                       this$1.setYear(this$1.year - 1, true);
                     }
-                    else if (key === 38 || key === 39) { // up, right
+                    else if (key === 40 || key === 37) { // down, left
                       stopAndPrevent(e);
                       this$1.setYear(this$1.year + 1, true);
+                    }
+                    else if (key === 13 || key === 20) { // enter, space
+                      this$1.view = 'year';
                     }
                   }
                 }
@@ -10081,113 +10228,130 @@
         }
 
         if (this.typeHasTime) {
-          var content$1 = [
+          var ampm = (!this.computedFormat24h && h('span', {
+            staticClass: 'q-datetime-ampm column',
+            attrs: { tabindex: 0 },
+            on: this.__amPmEvents
+          }, [
             h('span', {
-              staticClass: 'q-datetime-link col-md q-pr-sm',
-              style: { textAlign: 'right' },
-              'class': {active: this.view === 'hour'},
-              attrs: { tabindex: 0 },
-              on: {
-                keydown: function (e) {
-                  var key = getEventKey(e);
-                  if (key === 40 || key === 37) { // down, left
-                    stopAndPrevent(e);
-                    this$1.setHour(this$1.hour - 1, true);
-                  }
-                  else if (key === 38 || key === 39) { // up, right
-                    stopAndPrevent(e);
-                    this$1.setHour(this$1.hour + 1, true);
-                  }
-                }
-              }
+              staticClass: 'q-datetime-link',
+              'class': { active: this.am }
             }, [
               h('span', {
                 attrs: { tabindex: -1 },
-                on: this.disable ? {} : {
-                  click: function () { this$1.view = 'hour'; }
+                on: { click: this.toggleAmPm }
+              }, [ 'AM' ])
+            ]),
+
+            h('span', {
+              staticClass: 'q-datetime-link',
+              'class': { active: !this.am }
+            }, [
+              h('span', {
+                attrs: { tabindex: -1 },
+                on: { click: this.toggleAmPm }
+              }, [ 'PM' ])
+            ])
+          ]));
+          var content$1 = [
+            h('span', {
+              staticClass: 'col',
+              style: { textAlign: 'right' }
+            }, [
+              h('span', {
+                staticClass: 'q-datetime-link',
+                style: { textAlign: 'right' },
+                'class': {active: this.view === 'hour'},
+                attrs: { tabindex: 0 },
+                on: {
+                  keydown: function (e) {
+                    var key = getEventKey(e);
+                    if (key === 40 || key === 37) { // down, left
+                      stopAndPrevent(e);
+                      this$1.setHour(this$1.hour - 1, true);
+                    }
+                    else if (key === 38 || key === 39) { // up, right
+                      stopAndPrevent(e);
+                      this$1.setHour(this$1.hour + 1, true);
+                    }
+                    else if (key === 13 || key === 20) { // enter, space
+                      this$1.view = 'hour';
+                    }
+                  }
                 }
-              }, [ this.computedFormat24h ? this.__pad(this.hour) : this.hour ])
+              }, [
+                h('span', {
+                  attrs: { tabindex: -1 },
+                  on: this.disable ? {} : {
+                    click: function () { this$1.view = 'hour'; }
+                  }
+                }, [ this.computedFormat24h ? this.__pad(this.hour) : this.hour ])
+              ])
             ]),
 
             h('span', { style: 'opacity:0.6;' }, [ ':' ]),
 
             h('span', {
-              staticClass: 'q-datetime-link col-md q-pl-sm',
-              style: { textAlign: 'left' },
-              'class': {active: this.view === 'minute'},
-              attrs: { tabindex: 0 },
-              on: {
-                keydown: function (e) {
-                  var key = getEventKey(e);
-                  if (key === 40 || key === 37) { // down, left
-                    stopAndPrevent(e);
-                    this$1.setMinute(this$1.minute - 1, true);
-                  }
-                  else if (key === 38 || key === 39) { // up, right
-                    stopAndPrevent(e);
-                    this$1.setMinute(this$1.minute + 1, true);
-                  }
-                }
-              }
+              staticClass: 'col row no-wrap items-center',
+              style: { textAlign: 'left' }
             }, [
               h('span', {
-                attrs: { tabindex: -1 },
-                on: this.disable ? {} : {
-                  click: function () { this$1.view = 'minute'; }
+                staticClass: 'q-datetime-link',
+                style: { textAlign: 'left' },
+                'class': {active: this.view === 'minute'},
+                attrs: { tabindex: 0 },
+                on: {
+                  keydown: function (e) {
+                    var key = getEventKey(e);
+                    if (key === 40 || key === 37) { // down, left
+                      stopAndPrevent(e);
+                      this$1.setMinute(this$1.minute - 1, true);
+                    }
+                    else if (key === 38 || key === 39) { // up, right
+                      stopAndPrevent(e);
+                      this$1.setMinute(this$1.minute + 1, true);
+                    }
+                    else if (key === 13 || key === 20) { // enter, space
+                      this$1.view = 'minute';
+                    }
+                  }
                 }
-              }, [ this.__pad(this.minute) ])
+              }, [
+                h('span', {
+                  attrs: { tabindex: -1 },
+                  on: this.disable ? {} : {
+                    click: function () { this$1.view = 'minute'; }
+                  }
+                }, [ this.__pad(this.minute) ])
+              ]),
+              ampm
             ])
           ];
 
           child.push(h('div', {
-            staticClass: 'q-datetime-time row flex-center'
+            staticClass: 'q-datetime-time row scroll flex-center'
           }, [
             h('div', {
-              staticClass: 'q-datetime-clockstring col-auto col-md-12 row no-wrap flex-center'
-            }, content$1),
-
-            (!this.computedFormat24h && h('div', {
-              staticClass: 'q-datetime-ampm column col-auto col-md-12 justify-around',
-              attrs: { tabindex: 0 },
-              on: this.__amPmEvents
-            }, [
-              h('div', {
-                staticClass: 'q-datetime-link',
-                'class': { active: this.am }
-              }, [
-                h('span', {
-                  attrs: { tabindex: -1 },
-                  on: { click: this.toggleAmPm }
-                }, [ 'AM' ])
-              ]),
-
-              h('div', {
-                staticClass: 'q-datetime-link',
-                'class': { active: !this.am }
-              }, [
-                h('span', {
-                  attrs: { tabindex: -1 },
-                  on: { click: this.toggleAmPm }
-                }, [ 'PM' ])
-              ])
-            ]))
+              staticClass: 'q-datetime-clockstring col row justify-center items-start'
+            }, content$1)
           ]));
         }
 
+        child.push(h('div', { staticClass: 'col' }));
+
         return h('div', {
-          staticClass: 'q-datetime-header column col-xs-12 col-md-4 justify-center'
+          staticClass: 'q-datetime-header column no-wrap items-center'
         }, child)
       },
 
       __getYearView: function __getYearView (h) {
         var this$1 = this;
 
-        var content = [];
+        var content = [h('div', { staticClass: 'col-grow' })]; // vertical align when there are limits
 
         var loop = function ( i ) {
           content.push(h(QBtn, {
-            key: ("yi" + i),
-            staticClass: 'q-datetime-btn full-width',
+            staticClass: 'q-datetime-btn no-border-radius',
             'class': {active: i === this$1.year},
             attrs: { tabindex: -1 },
             props: {
@@ -10203,21 +10367,21 @@
         };
 
         for (var i = this.yearInterval.min; i <= this.yearInterval.max; i++) loop( i );
+        content.push(h('div', { staticClass: 'col-grow' })); // vertical align when there are limits
 
         return h('div', {
-          staticClass: "q-datetime-view-year full-width full-height"
+          staticClass: "q-datetime-view-year fit column no-wrap"
         }, content)
       },
 
       __getMonthView: function __getMonthView (h) {
         var this$1 = this;
 
-        var content = [];
+        var content = [h('div', { staticClass: 'col-grow' })]; // vertical align when there are limits
 
         var loop = function ( i ) {
           content.push(h(QBtn, {
-            key: ("mi" + i),
-            staticClass: 'q-datetime-btn full-width',
+            staticClass: 'q-datetime-btn no-border-radius',
             'class': {active: i + 1 === this$1.month},
             attrs: { tabindex: -1 },
             props: {
@@ -10226,27 +10390,29 @@
             },
             on: {
               click: function () {
-                this$1.setMonth(i + 1, true);
+                this$1.setMonth(i + 1);
               }
             }
           }, [ this$1.$q.i18n.date.months[i] ]));
         };
 
         for (var i = this.monthInterval.min; i <= this.monthInterval.max; i++) loop( i );
+        content.push(h('div', { staticClass: 'col-grow' })); // vertical align when there are limits
 
         return h('div', {
-          staticClass: "q-datetime-view-month full-width full-height"
+          staticClass: "q-datetime-view-month fit column no-wrap"
         }, content)
       },
 
       __getDayView: function __getDayView (h) {
         var this$1 = this;
 
-        var days = [];
+        var
+          days = [],
+          day = this.fakeMonth === this.month && this.fakeYear === this.year ? this.day : -1;
 
         for (var i = 1; i <= this.fillerDays; i++) {
           days.push(h('div', {
-            key: ("fd" + i),
             staticClass: 'q-datetime-fillerday'
           }));
         }
@@ -10254,9 +10420,13 @@
         if (this.min) {
           for (var i$1 = 1; i$1 <= this.beforeMinDays; i$1++) {
             days.push(h('div', {
-              key: ("fb" + i$1),
-              staticClass: 'row items-center content-center justify-center disabled'
-            }, [ i$1 ]));
+              staticClass: 'row items-center content-center justify-center disabled',
+              'class': {
+                'q-datetime-day-active': this$1.isValid && i$1 === day
+              }
+            }, [
+              h('span', [i$1])
+            ]));
           }
         }
 
@@ -10265,15 +10435,14 @@
         var max = ref.max;
         var loop = function ( i ) {
           days.push(h('div', {
-            key: ("md" + i),
             staticClass: 'row items-center content-center justify-center cursor-pointer',
-            'class': [this$1.color && i === this$1.day ? ("text-" + (this$1.color)) : null, {
-              'q-datetime-day-active': this$1.isValid && i === this$1.day,
+            'class': [this$1.color && i === day ? ("text-" + (this$1.color)) : null, {
+              'q-datetime-day-active': this$1.isValid && i === day,
               'q-datetime-day-today': i === this$1.today,
               'disabled': !this$1.editable
             }],
             on: {
-              click: function () { this$1.setDay(i); }
+              click: function () { this$1.setDay(i, false, this$1.fakeYear, this$1.fakeMonth); }
             }
           }, [
             h('span', [ i ])
@@ -10285,9 +10454,13 @@
         if (this.max) {
           for (var i$3 = 1; i$3 <= this.afterMaxDays; i$3++) {
             days.push(h('div', {
-              key: ("fa" + i$3),
-              staticClass: 'row items-center content-center justify-center disabled'
-            }, [ (i$3 + this$1.maxDay) ]));
+              staticClass: 'row items-center content-center justify-center disabled',
+              'class': {
+                'q-datetime-day-active': this$1.isValid && i$3 + this$1.maxDay === day
+              }
+            }, [
+              h('span', [(i$3 + this$1.maxDay)])
+            ]));
           }
         }
 
@@ -10305,7 +10478,7 @@
                 disable: this.beforeMinDays > 0 || this.disable || this.readonly
               },
               on: {
-                click: function () { this$1.setMonth(this$1.month - 1); }
+                click: function () { this$1.moveFakeMonth(-1); }
               }
             }),
 
@@ -10325,14 +10498,14 @@
                 disable: this.afterMaxDays > 0 || this.disable || this.readonly
               },
               on: {
-                click: function () { this$1.setMonth(this$1.month + 1); }
+                click: function () { this$1.moveFakeMonth(1); }
               }
             })
           ]),
 
           h('div', {
-            staticClass: 'q-datetime-weekdays row items-center justify-start'
-          }, this.headerDayNames.map(function (day) { return h('div', { key: ("dh" + day) }, [ day ]); })),
+            staticClass: 'q-datetime-weekdays row no-wrap items-center justify-start'
+          }, this.headerDayNames.map(function (day) { return h('div', [ day ]); })),
 
           h('div', {
             staticClass: 'q-datetime-days row wrap items-center justify-start content-center'
@@ -10358,7 +10531,6 @@
           }
           var loop = function ( i ) {
             content.push(h('div', {
-              key: ("hi" + i),
               staticClass: ("q-datetime-clock-position" + cls),
               'class': [("q-datetime-clock-pos-" + i), i === this$1.hour ? 'active' : ''],
               on: {
@@ -10374,7 +10546,6 @@
           for (var i$1 = 0; i$1 < 12; i$1++) {
             var five = i$1 * 5;
             content.push(h('div', {
-              key: ("mi" + i$1),
               staticClass: 'q-datetime-clock-position',
               'class': [("q-datetime-clock-pos-" + i$1), five === this$1.minute ? 'active' : '']
             }, [
@@ -10439,11 +10610,7 @@
       };
     },
     mounted: function mounted () {
-      var this$1 = this;
-
-      this.$nextTick(function () {
-        this$1.__scrollView();
-      });
+      this.__scrollView(true);
     },
 
     render: function render (h) {
@@ -10456,14 +10623,15 @@
         (!this.minimal && this.__getTopSection(h)) || void 0,
 
         h('div', {
-          staticClass: 'q-datetime-content col-xs-12 column',
-          'class': this.contentClasses
+          staticClass: 'q-datetime-content scroll'
         }, [
           h('div', {
             ref: 'selector',
-            staticClass: 'q-datetime-selector auto row flex-center'
+            staticClass: 'q-datetime-selector row items-center'
           }, [
-            this.__getViewSection(h)
+            h('div', { 'class': 'col' }),
+            this.__getViewSection(h),
+            h('div', { 'class': 'col' })
           ])
         ].concat(this.$slots.default))
       ])
@@ -10568,14 +10736,7 @@
         }
         {
           var target = this.$refs.target;
-          if (target) {
-            if (this.defaultView) {
-              target.setView(this.defaultView);
-            }
-            else {
-              target.setView();
-            }
-          }
+          target && target.setView(this.defaultView, true);
         }
         this.model = clone$1(this.computedValue);
         this.focused = true;
@@ -10632,11 +10793,10 @@
           }
         });
       },
-      __resetView: function __resetView () {
-        // go back to initial entry point for that type of control
-        // if it has defaultView it's going to be reapplied anyway on focus
-        if (!this.defaultView && this.$refs.target) {
-          this.$refs.target.setView();
+      __scrollView: function __scrollView () {
+        {
+          var target = this.$refs.target;
+          target && target.__scrollView();
         }
       },
 
@@ -10672,7 +10832,6 @@
               canClose: function () {
                 if (this$1.isPopover) {
                   this$1.hide();
-                  this$1.__resetView();
                 }
               }
             }
@@ -10693,7 +10852,6 @@
                     click: function () {
                       this$1.__onHide(false, true);
                       this$1.hide();
-                      this$1.__resetView();
                     }
                   }
                 }),
@@ -10710,7 +10868,6 @@
                       click: function () {
                         this$1.__onHide(true, true);
                         this$1.hide();
-                        this$1.__resetView();
                       }
                     }
                   })
@@ -10767,13 +10924,17 @@
             ref: 'popup',
             props: {
               cover: true,
+              keepOnScreen: true,
               disable: this.disable,
               anchorClick: false,
               maxHeight: '100vh'
             },
             slot: 'after',
             on: {
-              show: this.__onFocus,
+              show: function (ev) {
+                this$1.__onFocus(ev);
+                this$1.__scrollView();
+              },
               hide: function () { return this$1.__onHide(true, true); }
             }
           }, this.__getPicker(h))
@@ -10787,6 +10948,7 @@
               transition: this.transition
             },
             on: {
+              show: this.__scrollView,
               dismiss: function () { return this$1.__onHide(false, true); }
             }
           }, this.__getPicker(h, true)),
@@ -10870,6 +11032,7 @@
       return h('object', {
         style: this.style,
         attrs: {
+          tabindex: -1, // fix for Firefox
           type: 'text/html',
           data: this.url,
           'aria-hidden': true
@@ -11314,11 +11477,16 @@
           }
         })) || void 0,
 
-        (this.isLoading && h(QSpinner, {
-          slot: 'after',
-          staticClass: 'q-if-control',
-          props: { size: '24px' }
-        })) || void 0
+        (this.isLoading && (this.$slots.loading
+          ? h('div', {
+            staticClass: 'q-if-control',
+            slot: 'after'
+          }, this.$slots.loading)
+          : h(QSpinner, {
+            slot: 'after',
+            staticClass: 'q-if-control',
+            props: { size: '24px' }
+          }))) || void 0
       ]).concat(this.$slots.after).concat(this.$slots.default
         ? h('div', { staticClass: 'absolute-full no-pointer-events', slot: 'after' }, this.$slots.default)
         : void 0
@@ -11629,9 +11797,8 @@
             this$1.$emit('input', val);
           },
           show: function () {
-            this$1.$emit('show');
-
             if (!this$1.$q.platform.is.desktop) {
+              this$1.$emit('show');
               return
             }
 
@@ -11644,6 +11811,7 @@
 
               if (node.length) {
                 node[0].focus();
+                this$1.$emit('show');
                 return
               }
             }
@@ -11652,6 +11820,7 @@
             if (node.length) {
               node[node.length - 1].focus();
             }
+            this$1.$emit('show');
           },
           hide: function () {
             this$1.$emit('hide');
@@ -11946,9 +12115,14 @@
 
         this$1.anchorEl = this$1.$el.parentNode;
         this$1.anchorEl.removeChild(this$1.$el);
-        if (this$1.anchorEl.classList.contains('q-btn-inner')) {
+        if (
+          this$1.anchorEl.classList.contains('q-btn-inner') ||
+          this$1.anchorEl.classList.contains('q-if-inner') ||
+          this$1.anchorEl.classList.contains('no-pointer-events')
+        ) {
           this$1.anchorEl = this$1.anchorEl.parentNode;
         }
+
         if (this$1.$q.platform.is.mobile) {
           this$1.anchorEl.addEventListener('click', this$1.show);
         }
@@ -11959,9 +12133,7 @@
           this$1.anchorEl.addEventListener('blur', this$1.__delayHide);
         }
 
-        if (this$1.value) {
-          this$1.show();
-        }
+        this$1.value && this$1.show();
       });
     },
     beforeDestroy: function beforeDestroy () {
@@ -11970,6 +12142,7 @@
       if (!this.anchorEl) {
         return
       }
+
       if (this.$q.platform.is.mobile) {
         this.anchorEl.removeEventListener('click', this.show);
       }
@@ -13226,12 +13399,12 @@
         if ((label = this.$slots.helper || this.helper)) {
           return h('div', { staticClass: 'q-field-helper col' }, label)
         }
-        return h('div', { staticClass: 'col' })
+        return h('div', { staticClass: 'col text-transparent' }, ['|'])
       },
       __hasBottom: function __hasBottom () {
-        return (this.hasError && (this.$slots['error-label'] || this.errorLabel)) ||
-          (this.hasWarning && (this.$slots['warning-label'] || this.warningLabel)) ||
-          (this.$slots.helper || this.helper) ||
+        return this.$slots['error-label'] || this.errorLabel ||
+          this.$slots['warning-label'] || this.warningLabel ||
+          this.$slots.helper || this.helper ||
           this.count
       }
     },
@@ -14119,7 +14292,7 @@
       'layout.scrollbarWidth': function layout_scrollbarWidth () {
         this.applyPosition(this.showing ? 0 : void 0);
       },
-      offset: function offset$$1 (val) {
+      offset: function offset (val) {
         this.__update('offset', val);
       },
       onLayout: function onLayout (val) {
@@ -14155,7 +14328,7 @@
       rightSide: function rightSide () {
         return this.side === 'right'
       },
-      offset: function offset$$1 () {
+      offset: function offset () {
         return this.showing && !this.mobileOpened && !this.overlay
           ? this.size
           : 0
@@ -14215,27 +14388,27 @@
         }
       },
       aboveStyle: function aboveStyle () {
-        var css$$1 = {};
+        var css = {};
 
         if (this.layout.header.space && !this.headerSlot) {
           if (this.fixed) {
-            css$$1.top = (this.layout.header.offset) + "px";
+            css.top = (this.layout.header.offset) + "px";
           }
           else if (this.layout.header.space) {
-            css$$1.top = (this.layout.header.size) + "px";
+            css.top = (this.layout.header.size) + "px";
           }
         }
 
         if (this.layout.footer.space && !this.footerSlot) {
           if (this.fixed) {
-            css$$1.bottom = (this.layout.footer.offset) + "px";
+            css.bottom = (this.layout.footer.offset) + "px";
           }
           else if (this.layout.footer.space) {
-            css$$1.bottom = (this.layout.footer.size) + "px";
+            css.bottom = (this.layout.footer.size) + "px";
           }
         }
 
-        return css$$1
+        return css
       },
       computedStyle: function computedStyle () {
         return [
@@ -14285,11 +14458,13 @@
           if (this.layout.container && this.rightSide && (this.mobileView || Math.abs(position) === this.size)) {
             position += this.stateDirection * this.layout.scrollbarWidth;
           }
-          css(this.$refs.content, cssTransform(("translateX(" + position + "px)")));
+          this.$refs.content.style.transform = "translateX(" + position + "px)";
         }
       },
       applyBackdrop: function applyBackdrop (x) {
-        this.$refs.backdrop && css(this.$refs.backdrop, { backgroundColor: ("rgba(0,0,0," + (x * 0.4) + ")") });
+        if (this.$refs.backdrop) {
+          this.$refs.backdrop.style.backgroundColor = "rgba(0,0,0," + (x * 0.4) + ")";
+        }
       },
       __setScrollable: function __setScrollable (v) {
         if (!this.layout.container) {
@@ -14302,13 +14477,13 @@
         }
 
         var
-          width$$1 = this.size,
-          position = between(evt.distance.x, 0, width$$1);
+          width = this.size,
+          position = between(evt.distance.x, 0, width);
 
         if (evt.isFinal) {
           var
             el = this.$refs.content,
-            opened = position >= Math.min(75, width$$1);
+            opened = position >= Math.min(75, width);
 
           el.classList.remove('no-transition');
 
@@ -14318,7 +14493,7 @@
           else {
             this.layout.__animate();
             this.applyBackdrop(0);
-            this.applyPosition(this.stateDirection * width$$1);
+            this.applyPosition(this.stateDirection * width);
             el.classList.remove('q-layout-drawer-delimiter');
           }
 
@@ -14327,11 +14502,11 @@
 
         this.applyPosition(
           (this.$q.i18n.rtl ? !this.rightSide : this.rightSide)
-            ? Math.max(width$$1 - position, 0)
-            : Math.min(0, position - width$$1)
+            ? Math.max(width - position, 0)
+            : Math.min(0, position - width)
         );
         this.applyBackdrop(
-          between(position / width$$1, 0, 1)
+          between(position / width, 0, 1)
         );
 
         if (evt.isFirst) {
@@ -14346,14 +14521,14 @@
         }
 
         var
-          width$$1 = this.size,
+          width = this.size,
           dir = evt.direction === this.side,
           position = (this.$q.i18n.rtl ? !dir : dir)
-            ? between(evt.distance.x, 0, width$$1)
+            ? between(evt.distance.x, 0, width)
             : 0;
 
         if (evt.isFinal) {
-          var opened = Math.abs(position) < Math.min(75, width$$1);
+          var opened = Math.abs(position) < Math.min(75, width);
           this.$refs.content.classList.remove('no-transition');
 
           if (opened) {
@@ -14369,7 +14544,7 @@
         }
 
         this.applyPosition(this.stateDirection * position);
-        this.applyBackdrop(between(1 - position / width$$1, 0, 1));
+        this.applyBackdrop(between(1 - position / width, 0, 1));
 
         if (evt.isFirst) {
           this.$refs.content.classList.add('no-transition');
@@ -14396,7 +14571,6 @@
           }
         }
         else {
-          console.log('set scrollable');
           this.__setScrollable(true);
         }
 
@@ -15012,32 +15186,32 @@
           transforms.push(("translateX(" + (-dir * this.right) + "px)"));
         }
 
-        var css$$1 = transforms.length
-          ? cssTransform(transforms.join(' '))
+        var css = transforms.length
+          ? { transform: transforms.join(' ') }
           : {};
 
         if (this.offset) {
-          css$$1.margin = (this.offset[1]) + "px " + (this.offset[0]) + "px";
+          css.margin = (this.offset[1]) + "px " + (this.offset[0]) + "px";
         }
 
         if (attach.vertical) {
           if (this.left) {
-            css$$1[this.$q.i18n.rtl ? 'right' : 'left'] = (this.left) + "px";
+            css[this.$q.i18n.rtl ? 'right' : 'left'] = (this.left) + "px";
           }
           if (this.right) {
-            css$$1[this.$q.i18n.rtl ? 'left' : 'right'] = (this.right) + "px";
+            css[this.$q.i18n.rtl ? 'left' : 'right'] = (this.right) + "px";
           }
         }
         else if (attach.horizontal) {
           if (this.top) {
-            css$$1.top = (this.top) + "px";
+            css.top = (this.top) + "px";
           }
           if (this.bottom) {
-            css$$1.bottom = (this.bottom) + "px";
+            css.bottom = (this.bottom) + "px";
           }
         }
 
-        return css$$1
+        return css
       },
       classes: function classes () {
         return [ ("fixed-" + (this.position)), ("q-page-sticky-" + (this.expand ? 'expand' : 'shrink')) ]
@@ -15564,7 +15738,7 @@
         }
       },
       __setPos: function __setPos (offset$$1) {
-        css(this.media, cssTransform(("translate3D(-50%," + offset$$1 + "px, 0)")));
+        this.media.style.transform = "translate3D(-50%," + offset$$1 + "px, 0)";
       }
     },
     render: function render (h) {
@@ -15624,6 +15798,10 @@
     props: {
       value: {},
       persistent: Boolean,
+      keepOnScreen: {
+        type: Boolean,
+        default: true
+      },
       title: String,
       buttons: Boolean,
       labelSet: String,
@@ -15635,7 +15813,8 @@
       validate: {
         type: Function,
         default: function () { return true; }
-      }
+      },
+      disable: Boolean
     },
     data: function data () {
       return {
@@ -15660,8 +15839,11 @@
         this.$nextTick(this.__close);
       },
       set: function set () {
-        if (this.__hasChanged() && this.validate(this.value)) {
-          this.$emit('save', this.value);
+        if (this.__hasChanged()) {
+          if (!this.validate(this.value)) {
+            return
+          }
+          this.$emit('save', this.value, this.initialValue);
         }
         this.__close();
       },
@@ -15712,22 +15894,29 @@
         ref: 'popover',
         props: {
           cover: true,
-          persistent: this.persistent
+          persistent: this.persistent,
+          keepOnScreen: this.keepOnScreen,
+          disable: this.disable
         },
         on: {
           show: function () {
-            var input = this$1.$el.querySelector('.q-input-target, input');
+            var input = this$1.$el.querySelector('.q-input-target:not(.q-input-shadow)') || this$1.$el.querySelector('input') || this$1.$el.querySelector('textarea');
             input && input.focus();
             this$1.$emit('show');
             this$1.initialValue = clone(this$1.value);
             this$1.validated = false;
+          },
+          'escape-key': function () {
+            this$1.validated = true;
+            this$1.$emit('cancel', this$1.value, this$1.initialValue);
+            this$1.$emit('input', this$1.initialValue);
           },
           hide: function () {
             if (this$1.validated) { return }
 
             if (this$1.__hasChanged()) {
               if (this$1.validate(this$1.value)) {
-                this$1.$emit('save', this$1.value);
+                this$1.$emit('save', this$1.value, this$1.initialValue);
               }
               else {
                 this$1.$emit('cancel', this$1.value, this$1.initialValue);
@@ -15741,7 +15930,7 @@
         nativeOn: {
           keydown: function (e) {
             if (getEventKey(e) === 13) {
-              this$1.$refs.popover.hide();
+              this$1.buttons ? this$1.set() : this$1.$refs.popover.hide();
             }
           }
         }
@@ -15883,10 +16072,11 @@
             return this.pullMessage || this.$q.i18n.pullToRefresh.pull
         }
       },
-      style: function style$$1 () {
-        var css$$1 = cssTransform(("translateY(" + (this.pullPosition) + "px)"));
-        css$$1.marginBottom = height$1 + "px";
-        return css$$1
+      style: function style () {
+        return {
+          transform: ("translateY(" + (this.pullPosition) + "px)"),
+          marginBottom: (height$1 + "px")
+        }
       },
       messageClass: function messageClass () {
         return ("text-" + (this.color))
@@ -16304,7 +16494,7 @@
             edge ? 'handle-at-minimum' : null,
             { dragging: this.dragging }
           ],
-          attrs: { tabindex: this.editable ? 0 : -1 },
+          attrs: { tabindex: this.$q.platform.is.desktop ? (this.editable ? 0 : -1) : void 0 },
           on: {
             keydown: function (ev) { return this$1.__onKeyDown(ev, lower); },
             keyup: function (ev) { return this$1.__onKeyUp(ev, lower); }
@@ -16877,7 +17067,8 @@
       },
       chipsColor: String,
       chipsBgColor: String,
-      displayValue: String
+      displayValue: String,
+      popupMaxHeight: String
     },
     data: function data () {
       return {
@@ -17003,6 +17194,11 @@
       },
       __keyboardCustomKeyHandle: function __keyboardCustomKeyHandle (key, e) {
         switch (key) {
+          case 27: // ESCAPE
+            if (this.$refs.popover.showing) {
+              this.hide();
+            }
+            break
           case 13: // ENTER key
           case 32: // SPACE key
             if (!this.$refs.popover.showing) {
@@ -17046,6 +17242,7 @@
         this.__onFocus();
         if (this.filter && this.$refs.filter) {
           this.$refs.filter.focus();
+          this.reposition();
         }
       },
       __onBlur: function __onBlur (e) {
@@ -17183,9 +17380,10 @@
             },
             nativeOn: {
               click: function (e) { e.stopPropagation(); }
-            },
-            domProps: { innerHTML: opt.label }
-          })
+            }
+          }, [
+            h('div', { domProps: { innerHTML: opt.label } })
+          ])
         }));
         child.push(el);
       }
@@ -17204,8 +17402,10 @@
         'class': this.dark ? 'bg-dark' : null,
         props: {
           cover: true,
+          keepOnScreen: true,
           disable: !this.editable,
-          anchorClick: false
+          anchorClick: false,
+          maxHeight: this.popupMaxHeight
         },
         slot: 'after',
         on: {
@@ -20449,7 +20649,8 @@
         var xPos = this.$q.i18n.rtl
           ? left + width$$1
           : left;
-        css(this.$refs.posbar, cssTransform(("translateX(" + xPos + "px) scaleX(" + width$$1 + ")")));
+
+        this.$refs.posbar.style.transform = "translateX(" + xPos + "px) scaleX(" + width$$1 + ")";
       },
       __updatePosbarTransition: function __updatePosbarTransition () {
         if (
@@ -22022,6 +22223,8 @@
         }
       },
 
+      duration: Number,
+
       noNodesLabel: String,
       noResultsLabel: String
     },
@@ -22484,7 +22687,9 @@
           ]),
 
           isParent
-            ? h(QSlideTransition, [
+            ? h(QSlideTransition, {
+              props: { duration: this.duration }
+            }, [
               h('div', {
                 directives: [{ name: 'show', value: meta.expanded }],
                 staticClass: 'q-tree-node-collapsible',
@@ -22650,7 +22855,7 @@
         return this.totalSize ? Math.min(99.99, this.uploadedSize / this.totalSize * 100) : 0
       },
       addDisabled: function addDisabled () {
-        return !this.multiple && this.queueLength >= 1
+        return this.disable || (!this.multiple && this.queueLength >= 1)
       },
       filesStyle: function filesStyle () {
         if (this.maxHeight) {
@@ -22722,12 +22927,6 @@
         }
 
         files = this.multiple ? files : [ files[0] ];
-        if (this.extensions) {
-          files = this.__filter(files);
-          if (files.length === 0) {
-            return
-          }
-        }
 
         this.__add(null, files);
       },
@@ -22749,6 +22948,13 @@
         }
 
         files = Array.prototype.slice.call(files || e.target.files);
+        if (this.extensions) {
+          files = this.__filter(files);
+          if (files.length === 0) {
+            return
+          }
+        }
+
         this.$refs.file.value = '';
 
         var filesReady = []; // List of image load promises
@@ -23003,11 +23209,16 @@
 
       if (this.uploading) {
         child.push(
-          h(QSpinner, {
-            slot: 'after',
-            staticClass: 'q-if-end self-center',
-            props: { size: '24px' }
-          }),
+          this.$slots.loading
+            ? h('div', {
+              slot: 'after',
+              staticClass: 'q-if-end self-center q-if-control'
+            }, this.$slots.loading)
+            : h(QSpinner, {
+              slot: 'after',
+              staticClass: 'q-if-end self-center',
+              props: { size: '24px' }
+            }),
           h(QIcon, {
             slot: 'after',
             staticClass: 'q-if-end self-center q-if-control',
@@ -24011,7 +24222,14 @@
     ].join('');
 
     if (ssr) {
-      ssr.res.setHeader('Set-Cookie', cookie);
+      if (ssr.req.qCookies) {
+        ssr.req.qCookies.push(cookie);
+      }
+      else {
+        ssr.req.qCookies = [ cookie ];
+      }
+
+      ssr.res.setHeader('Set-Cookie', ssr.req.qCookies);
 
       // make temporary update so future get()
       // within same SSR timeframe would return the set value
@@ -24995,16 +25213,12 @@
     install: function install (ref) {
       var $q = ref.$q;
 
-      if (onSSR) {
-        $q.localStorage = getEmptyStorage();
-        return
-      }
+      var storage = isSSR || !hasWebStorage
+        ? getEmptyStorage()
+        : getStorage('local');
 
-      if (hasWebStorage()) {
-        var storage = getStorage('local');
-        $q.localStorage = storage;
-        Object.assign(this, storage);
-      }
+      $q.localStorage = storage;
+      Object.assign(this, storage);
     }
   };
 
@@ -25012,16 +25226,12 @@
     install: function install (ref) {
       var $q = ref.$q;
 
-      if (onSSR) {
-        $q.sessionStorage = getEmptyStorage();
-        return
-      }
+      var storage = isSSR || !hasWebStorage
+        ? getEmptyStorage()
+        : getStorage('session');
 
-      if (hasWebStorage()) {
-        var storage = getStorage('session');
-        $q.sessionStorage = storage;
-        Object.assign(this, storage);
-      }
+      $q.sessionStorage = storage;
+      Object.assign(this, storage);
     }
   };
 

@@ -1,5 +1,5 @@
 /*
- * Quasar Framework v0.17.12
+ * Quasar Framework v0.17.16
  * (c) 2016-present Razvan Stoenescu
  * Released under the MIT License.
  */
@@ -238,9 +238,6 @@ input[type='search']::-webkit-search-decoration {
 }
 .q-alert-detail {
   font-size: 12px;
-}
-body.desktop .q-select-highlight {
-  background: rgba(189,189,189,0.5) !important;
 }
 .q-breadcrumbs .q-icon,
 .q-breadcrumbs .q-breadcrumbs-separator {
@@ -1679,9 +1676,6 @@ body.desktop .q-carousel-thumbnails img:hover {
 .q-if-control:hover {
   opacity: 0.7;
 }
-.q-if-control.q-icon {
-  cursor: pointer;
-}
 .q-if-baseline {
   line-height: 24px;
   width: 0;
@@ -2274,6 +2268,12 @@ body.with-loading {
   text-align: center;
   text-shadow: 0 0 7px #000;
 }
+.modal-backdrop {
+  background: rgba(0,0,0,0.4);
+}
+.modal.maximized .modal-backdrop {
+  display: none;
+}
 .modal-content {
   position: relative;
   background: #fff;
@@ -2289,10 +2289,6 @@ body.with-loading {
 }
 .modal {
   z-index: 5000;
-}
-.modal.minimized,
-.modal.with-backdrop {
-  background: rgba(0,0,0,0.4);
 }
 .modal.minimized .modal-content {
   max-width: 80vw;
@@ -2313,9 +2309,6 @@ body.with-loading {
   opacity: 0;
 }
 @media (min-width: 768px) {
-  .modal:not(.maximized) {
-    background: rgba(0,0,0,0.4);
-  }
   .modal:not(.maximized).q-modal-enter .modal-content {
     -webkit-transform: scale(1.2);
             transform: scale(1.2);
@@ -2794,13 +2787,6 @@ body div .q-popover {
 .q-toolbar .q-search {
   background: rgba(255,255,255,0.25);
 }
-body.desktop .q-select-highlight {
-  background: rgba(189,189,189,0.5) !important;
-}
-.q-slide-transition {
-  -webkit-transition: height 0.3s cubic-bezier(0.25, 0.8, 0.5, 1) !important;
-  transition: height 0.3s cubic-bezier(0.25, 0.8, 0.5, 1) !important;
-}
 .q-slider-track,
 .q-slider-mark {
   opacity: 0.4;
@@ -2905,9 +2891,9 @@ body.desktop .q-select-highlight {
   transition: all 0.2s ease-in;
   background: currentColor;
 }
-.q-slider:not(.disabled) .q-slider-handle:focus .q-slider-ring,
-.q-slider:not(.disabled):focus .q-slider-ring,
-.q-slider:not(.disabled):hover .q-slider-ring {
+.q-slider:not(.disabled):not(.readonly) .q-slider-handle.dragging .q-slider-ring,
+.q-slider:not(.disabled):not(.readonly) .q-slider-handle:focus .q-slider-ring,
+body.desktop .q-slider:not(.disabled):not(.readonly):hover .q-slider-ring {
   opacity: 0.4;
   -webkit-transform: scale(1);
           transform: scale(1);
@@ -7880,7 +7866,7 @@ img.avatar {
   overflow: hidden !important;
 }
 .q-no-input-spinner {
-  -moz-appearance: textfield;
+  -moz-appearance: textfield !important;
 }
 .q-no-input-spinner::-webkit-outer-spin-button,
 .q-no-input-spinner::-webkit-inner-spin-button {
@@ -7891,6 +7877,9 @@ a.q-link {
   outline: 0;
   color: inherit;
   text-decoration: none;
+}
+.q-select-highlight {
+  background: rgba(189,189,189,0.5) !important;
 }
 .highlight-and-fade {
   -webkit-animation: q-highlight 2s /* rtl:ignore */;

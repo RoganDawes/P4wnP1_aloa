@@ -1,5 +1,5 @@
 /*!
- * Quasar Framework v0.17.12
+ * Quasar Framework v0.17.16
  * (c) 2016-present Razvan Stoenescu
  * Released under the MIT License.
  */
@@ -427,7 +427,7 @@
     });
   }
 
-  var version = "0.17.12";
+  var version = "0.17.16";
 
   var History = {
     __history: [],
@@ -1964,8 +1964,8 @@
             this$1.__shake();
           }
           else {
+            this$1.$emit('escape-key');
             this$1.hide().then(function () {
-              this$1.$emit('escape-key');
               this$1.$emit('dismiss');
             });
           }
@@ -2034,9 +2034,7 @@
       }
     },
     mounted: function mounted () {
-      if (this.value) {
-        this.show();
-      }
+      this.value && this.show();
     },
     beforeDestroy: function beforeDestroy () {
       clearTimeout(this.shakeTimeout);
@@ -2068,14 +2066,15 @@
         h('div', {
           staticClass: 'modal fullscreen row',
           'class': this.modalClasses,
-          on: {
-            click: this.__dismiss
-          },
           directives: [{
             name: 'show',
             value: this.showing
           }]
         }, [
+          h('div', {
+            staticClass: 'modal-backdrop absolute-full',
+            on: { click: this.__dismiss }
+          }),
           h('div', {
             ref: 'content',
             staticClass: 'modal-content',
@@ -2711,12 +2710,12 @@
     if (horiz) {
       if (reverse) { x = -1; }
       if (pos === 'bottom') { y = -1; }
-      return cssTransform(("translate3d(" + (x * (p - 100)) + "%," + (active ? 0 : y * -200) + "%,0)"))
+      return { transform: ("translate3d(" + (x * (p - 100)) + "%," + (active ? 0 : y * -200) + "%,0)") }
     }
 
     if (reverse) { y = -1; }
     if (pos === 'right') { x = -1; }
-    return cssTransform(("translate3d(" + (active ? 0 : dir * x * -200) + "%," + (y * (p - 100)) + "%,0)"))
+    return { transform: ("translate3d(" + (active ? 0 : dir * x * -200) + "%," + (y * (p - 100)) + "%,0)") }
   }
 
   function inc (p, amount) {
@@ -2815,7 +2814,7 @@
           this.animate ? '' : 'no-transition'
         ]
       },
-      style: function style$$1 () {
+      style: function style () {
         var active = this.onScreen;
 
         var o = translate({
@@ -2933,7 +2932,7 @@
       animNode = document.createElement('span'),
       size = el.clientWidth > el.clientHeight ? el.clientWidth : el.clientHeight,
       unit = (center ? size : size * 2) + "px",
-      offset$$1 = el.getBoundingClientRect();
+      offset = el.getBoundingClientRect();
 
     container.appendChild(animNode);
     container.className = 'q-ripple-container';
@@ -2950,17 +2949,17 @@
     }
     else {
       var pos = position(evt);
-      x = pos.left - offset$$1.left - size;
-      y = pos.top - offset$$1.top - size;
+      x = pos.left - offset.left - size;
+      y = pos.top - offset.top - size;
     }
 
     animNode.classList.add('q-ripple-animation-enter');
     animNode.classList.add('q-ripple-animation-visible');
-    css(animNode, cssTransform(("translate(" + x + "px, " + y + "px) scale3d(0, 0, 0)")));
+    animNode.style.transform = "translate(" + x + "px, " + y + "px) scale3d(0, 0, 0)";
 
     setTimeout(function () {
       animNode.classList.remove('q-ripple-animation-enter');
-      css(animNode, cssTransform(("translate(" + x + "px, " + y + "px) scale3d(1, 1, 1)")));
+      animNode.style.transform = "translate(" + x + "px, " + y + "px) scale3d(1, 1, 1)";
       setTimeout(function () {
         animNode.classList.remove('q-ripple-animation-visible');
         setTimeout(function () { container.remove(); }, 300);
@@ -3806,65 +3805,46 @@
     }
   }
 
-  function getPositions (anchor, target) {
-    var
-      a = Object.assign({}, anchor),
-      t = Object.assign({}, target);
+  function repositionIfNeeded (anchor, target, selfOrigin, anchorOrigin, targetPosition, cover) {
+    var margin = getScrollbarWidth();
+    var innerHeight = window.innerHeight;
+    var innerWidth = window.innerWidth;
+    // don't go bellow scrollbars
+    innerHeight -= margin;
+    innerWidth -= margin;
 
-    var positions = {
-      x: ['left', 'right'].filter(function (p) { return p !== t.horizontal; }),
-      y: ['top', 'bottom'].filter(function (p) { return p !== t.vertical; })
-    };
-
-    var overlapAuto = {
-      x: [a.horizontal, t.horizontal].indexOf('middle') !== -1,
-      y: [a.vertical, t.vertical].indexOf('center') !== -1
-    };
-
-    positions.x.splice(overlapAuto.x ? 0 : 1, 0, 'middle');
-    positions.y.splice(overlapAuto.y ? 0 : 1, 0, 'center');
-
-    if (!overlapAuto.y) {
-      a.vertical = a.vertical === 'top' ? 'bottom' : 'top';
-    }
-
-    if (!overlapAuto.x) {
-      a.horizontal = a.horizontal === 'left' ? 'right' : 'left';
-    }
-
-    return {
-      positions: positions,
-      anchorPos: a
-    }
-  }
-
-  function repositionIfNeeded (anchor, target, selfOrigin, anchorOrigin, targetPosition) {
-    var ref = getPositions(anchorOrigin, selfOrigin);
-    var positions = ref.positions;
-    var anchorPos = ref.anchorPos;
-
-    if (targetPosition.top < 0 || targetPosition.top + target.bottom > window.innerHeight) {
-      var newTop = anchor[anchorPos.vertical] - target[positions.y[0]];
-      if (newTop + target.bottom <= window.innerHeight) {
-        targetPosition.top = newTop;
+    if (targetPosition.top < 0 || targetPosition.top + target.bottom > innerHeight) {
+      if (selfOrigin.vertical === 'center') {
+        targetPosition.top = anchor[selfOrigin.vertical] > innerHeight / 2 ? innerHeight - target.bottom : 0;
+        targetPosition.maxHeight = Math.min(target.bottom, innerHeight);
+      }
+      else if (anchor[selfOrigin.vertical] > innerHeight / 2) {
+        var anchorY = Math.min(innerHeight, anchorOrigin.vertical === 'center' ? anchor.center : (anchorOrigin.vertical === selfOrigin.vertical ? anchor.bottom : anchor.top));
+        targetPosition.maxHeight = Math.min(target.bottom, anchorY);
+        targetPosition.top = Math.max(0, anchorY - targetPosition.maxHeight);
       }
       else {
-        newTop = anchor[anchorPos.vertical] - target[positions.y[1]];
-        if (newTop + target.bottom <= window.innerHeight) {
-          targetPosition.top = newTop;
-        }
+        targetPosition.top = anchorOrigin.vertical === 'center' ? anchor.center : (anchorOrigin.vertical === selfOrigin.vertical ? anchor.top : anchor.bottom);
+        targetPosition.maxHeight = Math.min(target.bottom, innerHeight - targetPosition.top);
       }
     }
-    if (targetPosition.left < 0 || targetPosition.left + target.right > window.innerWidth) {
-      var newLeft = anchor[anchorPos.horizontal] - target[positions.x[0]];
-      if (newLeft + target.right <= window.innerWidth) {
-        targetPosition.left = newLeft;
+
+    if (targetPosition.left < 0 || targetPosition.left + target.right > innerWidth) {
+      targetPosition.maxWidth = Math.min(target.right, innerWidth);
+      if (selfOrigin.horizontal === 'middle') {
+        targetPosition.left = anchor[selfOrigin.horizontal] > innerWidth / 2 ? innerWidth - target.right : 0;
+      }
+      else if (cover) {
+        targetPosition.left = targetPosition.left < 0 ? 0 : innerWidth - target.right;
+      }
+      else if (anchor[selfOrigin.horizontal] > innerWidth / 2) {
+        var anchorY$1 = Math.min(innerWidth, anchorOrigin.horizontal === 'middle' ? anchor.center : (anchorOrigin.horizontal === selfOrigin.horizontal ? anchor.right : anchor.left));
+        targetPosition.maxWidth = Math.min(target.right, anchorY$1);
+        targetPosition.left = Math.max(0, anchorY$1 - targetPosition.maxWidth);
       }
       else {
-        newLeft = anchor[anchorPos.horizontal] - target[positions.x[1]];
-        if (newLeft + target.right <= window.innerWidth) {
-          targetPosition.left = newLeft;
-        }
+        targetPosition.left = anchorOrigin.horizontal === 'middle' ? anchor.center : (anchorOrigin.horizontal === selfOrigin.horizontal ? anchor.left : anchor.right);
+        targetPosition.maxWidth = Math.min(target.right, innerWidth - targetPosition.left);
       }
     }
 
@@ -3882,9 +3862,12 @@
     var anchorClick = ref.anchorClick;
     var touchPosition = ref.touchPosition;
     var offset = ref.offset;
+    var touchOffset = ref.touchOffset;
+    var cover = ref.cover;
 
     var anchor;
     el.style.maxHeight = maxHeight || '65vh';
+    el.style.maxWidth = '100vw';
 
     if (event$$1 && (!anchorClick || touchPosition)) {
       var ref$1 = position(event$$1);
@@ -3893,7 +3876,17 @@
       anchor = {top: top, left: left, width: 1, height: 1, right: left + 1, center: top, middle: left, bottom: top + 1};
     }
     else {
-      anchor = getAnchorPosition(anchorEl, offset);
+      if (touchOffset) {
+        var ref$2 = anchorEl.getBoundingClientRect();
+        var anchorTop = ref$2.top;
+        var anchorLeft = ref$2.left;
+        var top$1 = anchorTop + touchOffset.top,
+          left$1 = anchorLeft + touchOffset.left;
+        anchor = {top: top$1, left: left$1, width: 1, height: 1, right: left$1 + 1, center: top$1, middle: left$1, bottom: top$1 + 1};
+      }
+      else {
+        anchor = getAnchorPosition(anchorEl, offset);
+      }
     }
 
     var target = getTargetPosition(el);
@@ -3902,10 +3895,16 @@
       left: anchor[anchorOrigin.horizontal] - target[selfOrigin.horizontal]
     };
 
-    targetPosition = repositionIfNeeded(anchor, target, selfOrigin, anchorOrigin, targetPosition);
+    targetPosition = repositionIfNeeded(anchor, target, selfOrigin, anchorOrigin, targetPosition, cover);
 
     el.style.top = Math.max(0, targetPosition.top) + 'px';
     el.style.left = Math.max(0, targetPosition.left) + 'px';
+    if (targetPosition.maxHeight) {
+      el.style.maxHeight = (targetPosition.maxHeight) + "px";
+    }
+    if (targetPosition.maxWidth) {
+      el.style.maxWidth = (targetPosition.maxWidth) + "px";
+    }
 
     if (animate) {
       var directions = targetPosition.top < anchor.top ? ['up', 'down'] : ['down', 'up'];
@@ -3997,6 +3996,7 @@
       fit: Boolean,
       cover: Boolean,
       persistent: Boolean,
+      keepOnScreen: Boolean,
       maxHeight: String,
       touchPosition: Boolean,
       anchorClick: {
@@ -4054,18 +4054,23 @@
       this.$nextTick(function () {
         this$1.anchorEl = this$1.$el.parentNode;
         this$1.anchorEl.removeChild(this$1.$el);
-        if (this$1.anchorEl.classList.contains('q-btn-inner') || this$1.anchorEl.classList.contains('q-if-inner')) {
+
+        if (
+          this$1.anchorEl.classList.contains('q-btn-inner') ||
+          this$1.anchorEl.classList.contains('q-if-inner') ||
+          this$1.anchorEl.classList.contains('no-pointer-events')
+        ) {
           this$1.anchorEl = this$1.anchorEl.parentNode;
         }
+
         if (this$1.anchorClick) {
           this$1.anchorEl.classList.add('cursor-pointer');
           this$1.anchorEl.addEventListener('click', this$1.toggle);
           this$1.anchorEl.addEventListener('keyup', this$1.__toggleKey);
         }
       });
-      if (this.value) {
-        this.show();
-      }
+
+      this.value && this.show();
     },
     beforeDestroy: function beforeDestroy () {
       this.showing && this.__cleanup();
@@ -4082,7 +4087,10 @@
           this.__refocusTarget = (this.anchorClick && this.anchorEl) || document.activeElement;
         }
         document.body.appendChild(this.$el);
-        EscapeKey.register(function () { !this$1.persistent && this$1.hide(); });
+        EscapeKey.register(function () {
+          this$1.$emit('escape-key');
+          this$1.hide();
+        });
         this.scrollTarget = getScrollTarget(this.anchorEl);
         this.scrollTarget.addEventListener('scroll', this.__updatePosition, listenOpts.passive);
         if (this.scrollTarget !== window) {
@@ -4096,7 +4104,7 @@
           this.$refs.content.focus();
         }
         this.timer = setTimeout(function () {
-          document.body.addEventListener('click', this$1.__bodyHide, true);
+          document.body.addEventListener('mousedown', this$1.__bodyHide, true);
           document.body.addEventListener('touchstart', this$1.__bodyHide, true);
           this$1.showPromise && this$1.showPromiseResolve();
         }, 0);
@@ -4129,7 +4137,7 @@
       __cleanup: function __cleanup () {
         clearTimeout(this.timer);
 
-        document.body.removeEventListener('click', this.__bodyHide, true);
+        document.body.removeEventListener('mousedown', this.__bodyHide, true);
         document.body.removeEventListener('touchstart', this.__bodyHide, true);
         this.scrollTarget.removeEventListener('scroll', this.__updatePosition, listenOpts.passive);
         if (this.scrollTarget !== window) {
@@ -4144,8 +4152,13 @@
         var ref = this.anchorEl.getBoundingClientRect();
         var top = ref.top;
         var bottom = ref.bottom;
+        var left = ref.left;
+        var right = ref.right;
 
-        if (bottom < 0 || top > window.innerHeight) {
+        if (
+          !this.keepOnScreen &&
+          (bottom < 0 || top > window.innerHeight || right < 0 || left > window.innerWidth)
+        ) {
           return this.hide()
         }
 
@@ -4154,6 +4167,18 @@
           this.$el.style.minWidth = style.getPropertyValue('width');
           if (this.cover) {
             this.$el.style.minHeight = style.getPropertyValue('height');
+          }
+        }
+
+        if (animate) {
+          if (this.touchPosition) {
+            var ref$1 = position(event$$1);
+            var eventTop = ref$1.top;
+            var eventLeft = ref$1.left;
+            this.touchOffset = { left: eventLeft - left, top: eventTop - top };
+          }
+          else {
+            delete this.touchOffset;
           }
         }
 
@@ -4167,7 +4192,9 @@
           selfOrigin: this.selfOrigin,
           maxHeight: this.maxHeight,
           anchorClick: this.anchorClick,
-          touchPosition: this.touchPosition
+          touchPosition: this.touchPosition,
+          touchOffset: this.touchOffset,
+          cover: this.cover
         });
       }
     }
@@ -4992,6 +5019,7 @@
   var QCard = {
     name: 'QCard',
     props: {
+      dark: Boolean,
       square: Boolean,
       flat: Boolean,
       inline: Boolean,
@@ -5003,12 +5031,12 @@
         var cls = [{
           'no-border-radius': this.square,
           'no-shadow': this.flat,
-          'inline-block': this.inline
+          'inline-block': this.inline,
+          'q-card-dark': this.dark
         }];
 
         if (this.color) {
           cls.push(("bg-" + (this.color)));
-          cls.push("q-card-dark");
           cls.push(("text-" + (this.textColor || 'white')));
         }
         else if (this.textColor) {
@@ -5597,7 +5625,7 @@
           : ico
       },
       trackPosition: function trackPosition () {
-        return cssTransform(("translateX(" + (this.rtlDir * this.position) + "%)"))
+        return { transform: ("translateX(" + (this.rtlDir * this.position) + "%)") }
       },
       infiniteLeft: function infiniteLeft () {
         return this.infinite && this.slidesNumber > 1 && this.positionSlide < 0
@@ -7055,7 +7083,7 @@
       __onMouseDown: function __onMouseDown (e) {
         var this$1 = this;
 
-        this.$nextTick(function () { return this$1.$emit('focus', e); });
+        !this.disable && this.$nextTick(function () { return this$1.$emit('focus', e); });
       },
       __additionalHidden: function __additionalHidden (item, hasError, hasWarning, length) {
         if (item.condition !== void 0) {
@@ -7445,11 +7473,18 @@
         ])),
 
         this.isLoading
-          ? h(QSpinner, {
-            slot: 'after',
-            staticClass: 'q-if-control',
-            props: { size: '24px' }
-          })
+          ? (
+            this.$slots.loading
+              ? h('div', {
+                staticClass: 'q-if-control',
+                slot: 'after'
+              }, this.$slots.loading)
+              : h(QSpinner, {
+                slot: 'after',
+                staticClass: 'q-if-control',
+                props: { size: '24px' }
+              })
+          )
           : ((this.editable && h(QIcon, {
             slot: 'after',
             staticClass: 'q-if-control',
@@ -7567,7 +7602,11 @@
   var QSlideTransition = {
     name: 'QSlideTransition',
     props: {
-      appear: Boolean
+      appear: Boolean,
+      duration: {
+        type: Number,
+        default: 300
+      }
     },
     methods: {
       __begin: function __begin (el, height) {
@@ -7575,13 +7614,13 @@
         if (height !== void 0) {
           el.style.height = height + "px";
         }
-        el.classList.add('q-slide-transition');
+        el.style.transition = "height " + (this.duration) + "ms cubic-bezier(.25, .8, .50, 1)";
         this.animating = true;
       },
       __end: function __end (el, event) {
         el.style.overflowY = null;
         el.style.height = null;
-        el.classList.remove('q-slide-transition');
+        el.style.transition = null;
         this.__cleanup();
         event !== this.lastEvent && this.$emit(event);
         this.animating = false;
@@ -7674,6 +7713,7 @@
       iconToggle: Boolean,
       collapseIcon: String,
       opened: Boolean,
+      duration: Number,
 
       headerStyle: [Array, String, Object],
       headerClass: [Array, String, Object]
@@ -7771,7 +7811,9 @@
             ])
             : h(QItemWrapper, this.__getItemProps(true), this.__getToggleSide(h, true)),
 
-          h(QSlideTransition, [
+          h(QSlideTransition, {
+            props: { duration: this.duration }
+          }, [
             h('div', {
               directives: [{ name: 'show', value: this.showing }]
             }, [
@@ -8133,7 +8175,7 @@
               dragging: this.dragging,
               'handle-at-minimum': !this.fillHandleAlways && this.model === this.min
             },
-            attrs: { tabindex: this.editable ? 0 : -1 },
+            attrs: { tabindex: this.$q.platform.is.desktop ? (this.editable ? 0 : -1) : void 0 },
             on: {
               keydown: this.__onKeyDown,
               keyup: this.__onKeyUp
@@ -8918,6 +8960,7 @@
             ref: 'popup',
             props: {
               cover: true,
+              keepOnScreen: true,
               disable: this.disable,
               anchorClick: false,
               maxHeight: '100vh'
@@ -9065,7 +9108,8 @@
       return h(QPopover, {
         ref: 'popup',
         props: {
-          anchorClick: false
+          anchorClick: false,
+          touchPosition: true
         },
         on: {
           show: this.__desktopOnShow,
@@ -9773,15 +9817,9 @@
       },
       model: {
         get: function get () {
-          var date$$1 = isValid(this.computedValue)
+          return isValid(this.computedValue)
             ? new Date(this.computedValue)
-            : (this.computedDefaultValue ? new Date(this.computedDefaultValue) : startOfDate(new Date(), 'day'));
-
-          return getDateBetween(
-            date$$1,
-            this.pmin,
-            this.pmax
-          )
+            : (this.computedDefaultValue ? new Date(this.computedDefaultValue) : startOfDate(new Date(), 'day'))
         },
         set: function set (val) {
           var this$1 = this;
@@ -9865,7 +9903,7 @@
           hour = this.model.getHours(),
           offset = this.am ? 12 : -12;
 
-        this.model = new Date(this.model.setHours(hour + offset));
+        this.model = new Date(new Date(this.model).setHours(hour + offset));
       },
 
       __parseTypeValue: function __parseTypeValue (type, value) {
@@ -10409,12 +10447,7 @@
           }
         });
       },
-      __resetView: function __resetView () {
-        // go back to initial entry point for that type of control
-        // if it has defaultView it's going to be reapplied anyway on focus
-        if (!this.defaultView && this.$refs.target) {
-          this.$refs.target.setView();
-        }
+      __scrollView: function __scrollView () {
       },
 
       __getPicker: function __getPicker (h, modal) {
@@ -10449,7 +10482,6 @@
               canClose: function () {
                 if (this$1.isPopover) {
                   this$1.hide();
-                  this$1.__resetView();
                 }
               }
             }
@@ -10470,7 +10502,6 @@
                     click: function () {
                       this$1.__onHide(false, true);
                       this$1.hide();
-                      this$1.__resetView();
                     }
                   }
                 }),
@@ -10487,7 +10518,6 @@
                       click: function () {
                         this$1.__onHide(true, true);
                         this$1.hide();
-                        this$1.__resetView();
                       }
                     }
                   })
@@ -10544,13 +10574,17 @@
             ref: 'popup',
             props: {
               cover: true,
+              keepOnScreen: true,
               disable: this.disable,
               anchorClick: false,
               maxHeight: '100vh'
             },
             slot: 'after',
             on: {
-              show: this.__onFocus,
+              show: function (ev) {
+                this$1.__onFocus(ev);
+                this$1.__scrollView();
+              },
               hide: function () { return this$1.__onHide(true, true); }
             }
           }, this.__getPicker(h))
@@ -10564,6 +10598,7 @@
               transition: this.transition
             },
             on: {
+              show: this.__scrollView,
               dismiss: function () { return this$1.__onHide(false, true); }
             }
           }, this.__getPicker(h, true)),
@@ -10647,6 +10682,7 @@
       return h('object', {
         style: this.style,
         attrs: {
+          tabindex: -1, // fix for Firefox
           type: 'text/html',
           data: this.url,
           'aria-hidden': true
@@ -11091,11 +11127,16 @@
           }
         })) || void 0,
 
-        (this.isLoading && h(QSpinner, {
-          slot: 'after',
-          staticClass: 'q-if-control',
-          props: { size: '24px' }
-        })) || void 0
+        (this.isLoading && (this.$slots.loading
+          ? h('div', {
+            staticClass: 'q-if-control',
+            slot: 'after'
+          }, this.$slots.loading)
+          : h(QSpinner, {
+            slot: 'after',
+            staticClass: 'q-if-control',
+            props: { size: '24px' }
+          }))) || void 0
       ]).concat(this.$slots.after).concat(this.$slots.default
         ? h('div', { staticClass: 'absolute-full no-pointer-events', slot: 'after' }, this.$slots.default)
         : void 0
@@ -11409,9 +11450,8 @@
             this$1.$emit('input', val);
           },
           show: function () {
-            this$1.$emit('show');
-
             if (!this$1.$q.platform.is.desktop) {
+              this$1.$emit('show');
               return
             }
 
@@ -11424,6 +11464,7 @@
 
               if (node.length) {
                 node[0].focus();
+                this$1.$emit('show');
                 return
               }
             }
@@ -11432,6 +11473,7 @@
             if (node.length) {
               node[node.length - 1].focus();
             }
+            this$1.$emit('show');
           },
           hide: function () {
             this$1.$emit('hide');
@@ -11726,9 +11768,14 @@
 
         this$1.anchorEl = this$1.$el.parentNode;
         this$1.anchorEl.removeChild(this$1.$el);
-        if (this$1.anchorEl.classList.contains('q-btn-inner')) {
+        if (
+          this$1.anchorEl.classList.contains('q-btn-inner') ||
+          this$1.anchorEl.classList.contains('q-if-inner') ||
+          this$1.anchorEl.classList.contains('no-pointer-events')
+        ) {
           this$1.anchorEl = this$1.anchorEl.parentNode;
         }
+
         if (this$1.$q.platform.is.mobile) {
           this$1.anchorEl.addEventListener('click', this$1.show);
         }
@@ -11739,9 +11786,7 @@
           this$1.anchorEl.addEventListener('blur', this$1.__delayHide);
         }
 
-        if (this$1.value) {
-          this$1.show();
-        }
+        this$1.value && this$1.show();
       });
     },
     beforeDestroy: function beforeDestroy () {
@@ -11750,6 +11795,7 @@
       if (!this.anchorEl) {
         return
       }
+
       if (this.$q.platform.is.mobile) {
         this.anchorEl.removeEventListener('click', this.show);
       }
@@ -13006,12 +13052,12 @@
         if ((label = this.$slots.helper || this.helper)) {
           return h('div', { staticClass: 'q-field-helper col' }, label)
         }
-        return h('div', { staticClass: 'col' })
+        return h('div', { staticClass: 'col text-transparent' }, ['|'])
       },
       __hasBottom: function __hasBottom () {
-        return (this.hasError && (this.$slots['error-label'] || this.errorLabel)) ||
-          (this.hasWarning && (this.$slots['warning-label'] || this.warningLabel)) ||
-          (this.$slots.helper || this.helper) ||
+        return this.$slots['error-label'] || this.errorLabel ||
+          this.$slots['warning-label'] || this.warningLabel ||
+          this.$slots.helper || this.helper ||
           this.count
       }
     },
@@ -13899,7 +13945,7 @@
       'layout.scrollbarWidth': function layout_scrollbarWidth () {
         this.applyPosition(this.showing ? 0 : void 0);
       },
-      offset: function offset$$1 (val) {
+      offset: function offset (val) {
         this.__update('offset', val);
       },
       onLayout: function onLayout (val) {
@@ -13935,7 +13981,7 @@
       rightSide: function rightSide () {
         return this.side === 'right'
       },
-      offset: function offset$$1 () {
+      offset: function offset () {
         return this.showing && !this.mobileOpened && !this.overlay
           ? this.size
           : 0
@@ -13995,27 +14041,27 @@
         }
       },
       aboveStyle: function aboveStyle () {
-        var css$$1 = {};
+        var css = {};
 
         if (this.layout.header.space && !this.headerSlot) {
           if (this.fixed) {
-            css$$1.top = (this.layout.header.offset) + "px";
+            css.top = (this.layout.header.offset) + "px";
           }
           else if (this.layout.header.space) {
-            css$$1.top = (this.layout.header.size) + "px";
+            css.top = (this.layout.header.size) + "px";
           }
         }
 
         if (this.layout.footer.space && !this.footerSlot) {
           if (this.fixed) {
-            css$$1.bottom = (this.layout.footer.offset) + "px";
+            css.bottom = (this.layout.footer.offset) + "px";
           }
           else if (this.layout.footer.space) {
-            css$$1.bottom = (this.layout.footer.size) + "px";
+            css.bottom = (this.layout.footer.size) + "px";
           }
         }
 
-        return css$$1
+        return css
       },
       computedStyle: function computedStyle () {
         return [
@@ -14065,11 +14111,13 @@
           if (this.layout.container && this.rightSide && (this.mobileView || Math.abs(position) === this.size)) {
             position += this.stateDirection * this.layout.scrollbarWidth;
           }
-          css(this.$refs.content, cssTransform(("translateX(" + position + "px)")));
+          this.$refs.content.style.transform = "translateX(" + position + "px)";
         }
       },
       applyBackdrop: function applyBackdrop (x) {
-        this.$refs.backdrop && css(this.$refs.backdrop, { backgroundColor: ("rgba(0,0,0," + (x * 0.4) + ")") });
+        if (this.$refs.backdrop) {
+          this.$refs.backdrop.style.backgroundColor = "rgba(0,0,0," + (x * 0.4) + ")";
+        }
       },
       __setScrollable: function __setScrollable (v) {
         if (!this.layout.container) {
@@ -14082,13 +14130,13 @@
         }
 
         var
-          width$$1 = this.size,
-          position = between(evt.distance.x, 0, width$$1);
+          width = this.size,
+          position = between(evt.distance.x, 0, width);
 
         if (evt.isFinal) {
           var
             el = this.$refs.content,
-            opened = position >= Math.min(75, width$$1);
+            opened = position >= Math.min(75, width);
 
           el.classList.remove('no-transition');
 
@@ -14098,7 +14146,7 @@
           else {
             this.layout.__animate();
             this.applyBackdrop(0);
-            this.applyPosition(this.stateDirection * width$$1);
+            this.applyPosition(this.stateDirection * width);
             el.classList.remove('q-layout-drawer-delimiter');
           }
 
@@ -14107,11 +14155,11 @@
 
         this.applyPosition(
           (this.$q.i18n.rtl ? !this.rightSide : this.rightSide)
-            ? Math.max(width$$1 - position, 0)
-            : Math.min(0, position - width$$1)
+            ? Math.max(width - position, 0)
+            : Math.min(0, position - width)
         );
         this.applyBackdrop(
-          between(position / width$$1, 0, 1)
+          between(position / width, 0, 1)
         );
 
         if (evt.isFirst) {
@@ -14126,14 +14174,14 @@
         }
 
         var
-          width$$1 = this.size,
+          width = this.size,
           dir = evt.direction === this.side,
           position = (this.$q.i18n.rtl ? !dir : dir)
-            ? between(evt.distance.x, 0, width$$1)
+            ? between(evt.distance.x, 0, width)
             : 0;
 
         if (evt.isFinal) {
-          var opened = Math.abs(position) < Math.min(75, width$$1);
+          var opened = Math.abs(position) < Math.min(75, width);
           this.$refs.content.classList.remove('no-transition');
 
           if (opened) {
@@ -14149,7 +14197,7 @@
         }
 
         this.applyPosition(this.stateDirection * position);
-        this.applyBackdrop(between(1 - position / width$$1, 0, 1));
+        this.applyBackdrop(between(1 - position / width, 0, 1));
 
         if (evt.isFirst) {
           this.$refs.content.classList.add('no-transition');
@@ -14176,7 +14224,6 @@
           }
         }
         else {
-          console.log('set scrollable');
           this.__setScrollable(true);
         }
 
@@ -14792,32 +14839,32 @@
           transforms.push(("translateX(" + (-dir * this.right) + "px)"));
         }
 
-        var css$$1 = transforms.length
-          ? cssTransform(transforms.join(' '))
+        var css = transforms.length
+          ? { transform: transforms.join(' ') }
           : {};
 
         if (this.offset) {
-          css$$1.margin = (this.offset[1]) + "px " + (this.offset[0]) + "px";
+          css.margin = (this.offset[1]) + "px " + (this.offset[0]) + "px";
         }
 
         if (attach.vertical) {
           if (this.left) {
-            css$$1[this.$q.i18n.rtl ? 'right' : 'left'] = (this.left) + "px";
+            css[this.$q.i18n.rtl ? 'right' : 'left'] = (this.left) + "px";
           }
           if (this.right) {
-            css$$1[this.$q.i18n.rtl ? 'left' : 'right'] = (this.right) + "px";
+            css[this.$q.i18n.rtl ? 'left' : 'right'] = (this.right) + "px";
           }
         }
         else if (attach.horizontal) {
           if (this.top) {
-            css$$1.top = (this.top) + "px";
+            css.top = (this.top) + "px";
           }
           if (this.bottom) {
-            css$$1.bottom = (this.bottom) + "px";
+            css.bottom = (this.bottom) + "px";
           }
         }
 
-        return css$$1
+        return css
       },
       classes: function classes () {
         return [ ("fixed-" + (this.position)), ("q-page-sticky-" + (this.expand ? 'expand' : 'shrink')) ]
@@ -15344,7 +15391,7 @@
         }
       },
       __setPos: function __setPos (offset$$1) {
-        css(this.media, cssTransform(("translate3D(-50%," + offset$$1 + "px, 0)")));
+        this.media.style.transform = "translate3D(-50%," + offset$$1 + "px, 0)";
       }
     },
     render: function render (h) {
@@ -15404,6 +15451,10 @@
     props: {
       value: {},
       persistent: Boolean,
+      keepOnScreen: {
+        type: Boolean,
+        default: true
+      },
       title: String,
       buttons: Boolean,
       labelSet: String,
@@ -15415,7 +15466,8 @@
       validate: {
         type: Function,
         default: function () { return true; }
-      }
+      },
+      disable: Boolean
     },
     data: function data () {
       return {
@@ -15440,8 +15492,11 @@
         this.$nextTick(this.__close);
       },
       set: function set () {
-        if (this.__hasChanged() && this.validate(this.value)) {
-          this.$emit('save', this.value);
+        if (this.__hasChanged()) {
+          if (!this.validate(this.value)) {
+            return
+          }
+          this.$emit('save', this.value, this.initialValue);
         }
         this.__close();
       },
@@ -15492,22 +15547,29 @@
         ref: 'popover',
         props: {
           cover: true,
-          persistent: this.persistent
+          persistent: this.persistent,
+          keepOnScreen: this.keepOnScreen,
+          disable: this.disable
         },
         on: {
           show: function () {
-            var input = this$1.$el.querySelector('.q-input-target, input');
+            var input = this$1.$el.querySelector('.q-input-target:not(.q-input-shadow)') || this$1.$el.querySelector('input') || this$1.$el.querySelector('textarea');
             input && input.focus();
             this$1.$emit('show');
             this$1.initialValue = clone(this$1.value);
             this$1.validated = false;
+          },
+          'escape-key': function () {
+            this$1.validated = true;
+            this$1.$emit('cancel', this$1.value, this$1.initialValue);
+            this$1.$emit('input', this$1.initialValue);
           },
           hide: function () {
             if (this$1.validated) { return }
 
             if (this$1.__hasChanged()) {
               if (this$1.validate(this$1.value)) {
-                this$1.$emit('save', this$1.value);
+                this$1.$emit('save', this$1.value, this$1.initialValue);
               }
               else {
                 this$1.$emit('cancel', this$1.value, this$1.initialValue);
@@ -15521,7 +15583,7 @@
         nativeOn: {
           keydown: function (e) {
             if (getEventKey(e) === 13) {
-              this$1.$refs.popover.hide();
+              this$1.buttons ? this$1.set() : this$1.$refs.popover.hide();
             }
           }
         }
@@ -15663,10 +15725,11 @@
             return this.pullMessage || this.$q.i18n.pullToRefresh.pull
         }
       },
-      style: function style$$1 () {
-        var css$$1 = cssTransform(("translateY(" + (this.pullPosition) + "px)"));
-        css$$1.marginBottom = height$1 + "px";
-        return css$$1
+      style: function style () {
+        return {
+          transform: ("translateY(" + (this.pullPosition) + "px)"),
+          marginBottom: (height$1 + "px")
+        }
       },
       messageClass: function messageClass () {
         return ("text-" + (this.color))
@@ -16084,7 +16147,7 @@
             edge ? 'handle-at-minimum' : null,
             { dragging: this.dragging }
           ],
-          attrs: { tabindex: this.editable ? 0 : -1 },
+          attrs: { tabindex: this.$q.platform.is.desktop ? (this.editable ? 0 : -1) : void 0 },
           on: {
             keydown: function (ev) { return this$1.__onKeyDown(ev, lower); },
             keyup: function (ev) { return this$1.__onKeyUp(ev, lower); }
@@ -16657,7 +16720,8 @@
       },
       chipsColor: String,
       chipsBgColor: String,
-      displayValue: String
+      displayValue: String,
+      popupMaxHeight: String
     },
     data: function data () {
       return {
@@ -16783,6 +16847,11 @@
       },
       __keyboardCustomKeyHandle: function __keyboardCustomKeyHandle (key, e) {
         switch (key) {
+          case 27: // ESCAPE
+            if (this.$refs.popover.showing) {
+              this.hide();
+            }
+            break
           case 13: // ENTER key
           case 32: // SPACE key
             if (!this.$refs.popover.showing) {
@@ -16826,6 +16895,7 @@
         this.__onFocus();
         if (this.filter && this.$refs.filter) {
           this.$refs.filter.focus();
+          this.reposition();
         }
       },
       __onBlur: function __onBlur (e) {
@@ -16963,9 +17033,10 @@
             },
             nativeOn: {
               click: function (e) { e.stopPropagation(); }
-            },
-            domProps: { innerHTML: opt.label }
-          })
+            }
+          }, [
+            h('div', { domProps: { innerHTML: opt.label } })
+          ])
         }));
         child.push(el);
       }
@@ -16984,8 +17055,10 @@
         'class': this.dark ? 'bg-dark' : null,
         props: {
           cover: true,
+          keepOnScreen: true,
           disable: !this.editable,
-          anchorClick: false
+          anchorClick: false,
+          maxHeight: this.popupMaxHeight
         },
         slot: 'after',
         on: {
@@ -20024,7 +20097,8 @@
         var xPos = this.$q.i18n.rtl
           ? left + width$$1
           : left;
-        css(this.$refs.posbar, cssTransform(("translateX(" + xPos + "px) scaleX(" + width$$1 + ")")));
+
+        this.$refs.posbar.style.transform = "translateX(" + xPos + "px) scaleX(" + width$$1 + ")";
       },
       __updatePosbarTransition: function __updatePosbarTransition () {
         if (
@@ -21585,6 +21659,8 @@
         }
       },
 
+      duration: Number,
+
       noNodesLabel: String,
       noResultsLabel: String
     },
@@ -22045,7 +22121,9 @@
           ]),
 
           isParent
-            ? h(QSlideTransition, [
+            ? h(QSlideTransition, {
+              props: { duration: this.duration }
+            }, [
               h('div', {
                 directives: [{ name: 'show', value: meta.expanded }],
                 staticClass: 'q-tree-node-collapsible',
@@ -22211,7 +22289,7 @@
         return this.totalSize ? Math.min(99.99, this.uploadedSize / this.totalSize * 100) : 0
       },
       addDisabled: function addDisabled () {
-        return !this.multiple && this.queueLength >= 1
+        return this.disable || (!this.multiple && this.queueLength >= 1)
       },
       filesStyle: function filesStyle () {
         if (this.maxHeight) {
@@ -22283,12 +22361,6 @@
         }
 
         files = this.multiple ? files : [ files[0] ];
-        if (this.extensions) {
-          files = this.__filter(files);
-          if (files.length === 0) {
-            return
-          }
-        }
 
         this.__add(null, files);
       },
@@ -22310,6 +22382,13 @@
         }
 
         files = Array.prototype.slice.call(files || e.target.files);
+        if (this.extensions) {
+          files = this.__filter(files);
+          if (files.length === 0) {
+            return
+          }
+        }
+
         this.$refs.file.value = '';
 
         var filesReady = []; // List of image load promises
@@ -22564,11 +22643,16 @@
 
       if (this.uploading) {
         child.push(
-          h(QSpinner, {
-            slot: 'after',
-            staticClass: 'q-if-end self-center',
-            props: { size: '24px' }
-          }),
+          this.$slots.loading
+            ? h('div', {
+              slot: 'after',
+              staticClass: 'q-if-end self-center q-if-control'
+            }, this.$slots.loading)
+            : h(QSpinner, {
+              slot: 'after',
+              staticClass: 'q-if-end self-center',
+              props: { size: '24px' }
+            }),
           h(QIcon, {
             slot: 'after',
             staticClass: 'q-if-end self-center q-if-control',
@@ -23572,7 +23656,14 @@
     ].join('');
 
     if (ssr) {
-      ssr.res.setHeader('Set-Cookie', cookie);
+      if (ssr.req.qCookies) {
+        ssr.req.qCookies.push(cookie);
+      }
+      else {
+        ssr.req.qCookies = [ cookie ];
+      }
+
+      ssr.res.setHeader('Set-Cookie', ssr.req.qCookies);
 
       // make temporary update so future get()
       // within same SSR timeframe would return the set value
@@ -24556,16 +24647,12 @@
     install: function install (ref) {
       var $q = ref.$q;
 
-      if (onSSR) {
-        $q.localStorage = getEmptyStorage();
-        return
-      }
+      var storage = isSSR || !hasWebStorage
+        ? getEmptyStorage()
+        : getStorage('local');
 
-      if (hasWebStorage()) {
-        var storage = getStorage('local');
-        $q.localStorage = storage;
-        Object.assign(this, storage);
-      }
+      $q.localStorage = storage;
+      Object.assign(this, storage);
     }
   };
 
@@ -24573,16 +24660,12 @@
     install: function install (ref) {
       var $q = ref.$q;
 
-      if (onSSR) {
-        $q.sessionStorage = getEmptyStorage();
-        return
-      }
+      var storage = isSSR || !hasWebStorage
+        ? getEmptyStorage()
+        : getStorage('session');
 
-      if (hasWebStorage()) {
-        var storage = getStorage('session');
-        $q.sessionStorage = storage;
-        Object.assign(this, storage);
-      }
+      $q.sessionStorage = storage;
+      Object.assign(this, storage);
     }
   };
 
