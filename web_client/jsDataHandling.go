@@ -14,6 +14,32 @@ import (
 var eNoLogEvent = errors.New("No log event")
 var eNoHidEvent = errors.New("No HID event")
 
+type jsWifiRequestSettingsStorage struct {
+	*js.Object
+	TemplateName string `js:"TemplateName"`
+	Settings     *jsWiFiSettings `js:"Settings"`
+}
+
+func (rs *jsWifiRequestSettingsStorage) toGo() *pb.WifiRequestSettingsStorage {
+	return &pb.WifiRequestSettingsStorage{
+		Settings: rs.Settings.toGo(),
+		TemplateName: rs.TemplateName,
+	}
+}
+
+func (rs *jsWifiRequestSettingsStorage) fromGo(src *pb.WifiRequestSettingsStorage) {
+	rs.TemplateName = src.TemplateName
+	rs.Settings = NewWifiSettings()
+	rs.Settings.fromGo(src.Settings)
+}
+
+func NewWifiRequestSettingsStorage() *jsWifiRequestSettingsStorage {
+	res := &jsWifiRequestSettingsStorage{Object:O()}
+	res.TemplateName = ""
+	res.Settings = NewWifiSettings()
+	return res
+}
+
 /* USB Gadget types corresponding to gRPC messages */
 
 type jsGadgetSettings struct {

@@ -4,8 +4,9 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	"time"
+	"github.com/mame82/hvue"
 	"github.com/mame82/mvuex"
+	"time"
 )
 
 var globalState *GlobalState
@@ -20,9 +21,14 @@ const (
 	VUEX_ACTION_UPDATE_WIFI_STATE                    = "updateCurrentWifiSettingsFromDeployed"
 	VUEX_ACTION_DEPLOY_WIFI_SETTINGS                 = "deployWifiSettings"
 
+	VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST = "updateStoredWifiSettingsList"
+	VUEX_ACTION_STORE_WIFI_SETTINGS              = "storeWifiSettings"
+	VUEX_ACTION_LOAD_WIFI_SETTINGS               = "storeWifiSettings"
+
 	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO   = "setCurrentGadgetSettings"
 	VUEX_MUTATION_SET_WIFI_STATE                   = "setCurrentWifiSettings"
 	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO = "setCurrentHIDScriptSource"
+	VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST    = "setStoredWifiSettingsList"
 
 	initHIDScript = `layout('us');			// US keyboard layout
 typingSpeed(100,150)	// Wait 100ms between key strokes + an additional random value between 0ms and 150ms (natural)
@@ -64,7 +70,9 @@ type GlobalState struct {
 	FailedConnectionAttempts         int                     `js:"failedConnectionAttempts"`
 	InterfaceSettings                *jsEthernetSettingsList `js:"InterfaceSettings"`
 	//WiFiSettings                     *jsWiFiSettings         `js:"wifiSettings"`
-	WiFiState                        *jsWiFiState            `js:"wifiState"`
+	WiFiState *jsWiFiState `js:"wifiState"`
+
+	StoredWifiSettingsList []string `js:"StoredWifiSettingsList"`
 }
 
 func createGlobalStateStruct() GlobalState {
@@ -78,6 +86,8 @@ func createGlobalStateStruct() GlobalState {
 	state.IsConnected = false
 	state.IsModalEnabled = false
 	state.FailedConnectionAttempts = 0
+
+	state.StoredWifiSettingsList = []string{}
 	//Retrieve Interface settings
 	// ToDo: Replace panics by default values
 	ifSettings, err := RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second * 5)
@@ -132,12 +142,42 @@ func actionUpdateWifiState(store *mvuex.Store, context *mvuex.ActionContext, sta
 	return
 }
 
+func actionUpdateStoredWifiSettingsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch wsList")
+		//fetch deployed gadget settings
+		wsList, err := RpcClient.GetStoredWifiSettingsList(time.Second * 10)
+		if err != nil {
+			println("Couldn't retrieve WifiSettingsList")
+			return
+		}
+
+		//commit to current
+		println(wsList)
+		context.Commit(VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST, wsList)
+		//context.Commit(VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST, []string{"test1", "test2"})
+	}()
+
+	return
+}
+
+func actionStoreWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, req *jsWifiRequestSettingsStorage) {
+	go func() {
+		println("Vuex dispatch store WiFi settings: ", req.TemplateName)
+		// convert to Go type
+		err := RpcClient.StoreWifiSettings(time.Second*30, req.toGo())
+		if err != nil {
+			QuasarNotifyError("Error storing WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("New WiFi settings stored", "", QUASAR_NOTIFICATION_POSITION_TOP)
+	}()
+}
+
 func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settings *jsWiFiSettings) {
 	go func() {
 
 		state.CurrentlyDeployingWifiSettings = true
 		defer func() { state.CurrentlyDeployingWifiSettings = false }()
-
 
 		println("Vuex dispatch deploy WiFi settings")
 		// convert to Go type
@@ -147,7 +187,7 @@ func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, 
 		if err != nil {
 			QuasarNotifyError("Error deploying WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 		}
-		QuasarNotifySuccess("New WiFi settings deployed","", QUASAR_NOTIFICATION_POSITION_TOP)
+		QuasarNotifySuccess("New WiFi settings deployed", "", QUASAR_NOTIFICATION_POSITION_TOP)
 		state.WiFiState.fromGo(wstate)
 	}()
 }
@@ -239,6 +279,10 @@ func initMVuex() *mvuex.Store {
 			state.WiFiState = wifiState
 			return
 		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST, func(store *mvuex.Store, state *GlobalState, wsList []interface{}) {
+			println("New ws list", wsList)
+			hvue.Set(state, "StoredWifiSettingsList", wsList)
+		}),
 		/*
 		mvuex.Mutation("startLogListening", func (store *mvuex.Store, state *GlobalState) {
 			state.EventReceiver.StartListening()
@@ -255,6 +299,8 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS, actionDeployEthernetInterfaceSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_WIFI_STATE, actionUpdateWifiState),
 		mvuex.Action(VUEX_ACTION_DEPLOY_WIFI_SETTINGS, actionDeployWifiSettings),
+		mvuex.Action(VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST, actionUpdateStoredWifiSettingsList),
+		mvuex.Action(VUEX_ACTION_STORE_WIFI_SETTINGS, actionStoreWifiSettings),
 
 		mvuex.Getter("hidjobs", func(state *GlobalState) interface{} {
 			return state.HidJobList.Jobs
@@ -285,6 +331,21 @@ func initMVuex() *mvuex.Store {
 				return job.HasSucceeded
 			})
 			return filtered
+		}),
+
+		mvuex.Getter("storedWifiSettingsSelect", func(state *GlobalState) interface{} {
+			selectWS := js.Global.Get("Array").New()
+			for _,curS := range state.StoredWifiSettingsList  {
+				option := struct {
+					*js.Object
+					Label string `js:"label"`
+					Value string `js:"value"`
+				}{Object: O()}
+				option.Label = curS
+				option.Value = curS
+				selectWS.Call("push", option)
+			}
+			return selectWS
 		}),
 
 

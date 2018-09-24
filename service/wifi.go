@@ -845,7 +845,7 @@ func (wsvc WiFiService) UpdateStateFromIw() (err error) {
 
 	 */
 
-	 output := string(res)
+	output := string(res)
 
 	//split into BSS sections
 	reSsid := regexp.MustCompile("(?m)ssid (.*)\n")

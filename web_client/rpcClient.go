@@ -40,11 +40,29 @@ func (rpc *Rpc) DeployedEthernetInterfaceSettings(timeout time.Duration, setting
 }
 
 
+func (rpc *Rpc) GetStoredWifiSettingsList(timeout time.Duration) (ws []string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	ma, err := rpc.Client.ListStoredWifiSettings(ctx, &pb.Empty{})
+	if err != nil { return ws, err }
+	return ma.MsgArray, err
+}
+
 func (rpc *Rpc) DeployWifiSettings(timeout time.Duration, settings *pb.WiFiSettings) (state *pb.WiFiState, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	state, err = rpc.Client.DeployWiFiSettings(ctx, settings)
+	return
+}
+
+func (rpc *Rpc) StoreWifiSettings(timeout time.Duration, req *pb.WifiRequestSettingsStorage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_, err = rpc.Client.StoreWifiSettings(ctx, req)
+
 	return
 }
 

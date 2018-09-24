@@ -102,7 +102,7 @@ func main() {
 		Store(store), //include Vuex store in global scope, using own hvue fork, see here: https://github.com/HuckRidgeSW/hvue/pull/6
 		Router(router),
 	)
-	// ToDo: remove next line, debug code
+	// ToDo: remove next lines, debug code
 	js.Global.Set("vm",vm)
-
+	js.Global.Set("rpc", RpcClient)
 }

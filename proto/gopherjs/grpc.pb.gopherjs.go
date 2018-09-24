@@ -8,10 +8,12 @@
 		grpc.proto
 
 	It has these top-level messages:
+		WifiRequestSettingsStorage
 		WiFiSettings
 		WiFiState
 		WiFiBSSCfg
 		StringMessage
+		StringMessageArray
 		EventRequest
 		EventValue
 		Event
@@ -146,6 +148,88 @@ var EthernetInterfaceSettings_Mode_value = map[string]int{
 
 func (x EthernetInterfaceSettings_Mode) String() string {
 	return EthernetInterfaceSettings_Mode_name[int(x)]
+}
+
+type WifiRequestSettingsStorage struct {
+	TemplateName string
+	Settings     *WiFiSettings
+}
+
+// GetTemplateName gets the TemplateName of the WifiRequestSettingsStorage.
+func (m *WifiRequestSettingsStorage) GetTemplateName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.TemplateName
+}
+
+// GetSettings gets the Settings of the WifiRequestSettingsStorage.
+func (m *WifiRequestSettingsStorage) GetSettings() (x *WiFiSettings) {
+	if m == nil {
+		return x
+	}
+	return m.Settings
+}
+
+// MarshalToWriter marshals WifiRequestSettingsStorage to the provided writer.
+func (m *WifiRequestSettingsStorage) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.TemplateName) > 0 {
+		writer.WriteString(1, m.TemplateName)
+	}
+
+	if m.Settings != nil {
+		writer.WriteMessage(2, func() {
+			m.Settings.MarshalToWriter(writer)
+		})
+	}
+
+	return
+}
+
+// Marshal marshals WifiRequestSettingsStorage to a slice of bytes.
+func (m *WifiRequestSettingsStorage) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a WifiRequestSettingsStorage from the provided reader.
+func (m *WifiRequestSettingsStorage) UnmarshalFromReader(reader jspb.Reader) *WifiRequestSettingsStorage {
+	for reader.Next() {
+		if m == nil {
+			m = &WifiRequestSettingsStorage{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.TemplateName = reader.ReadString()
+		case 2:
+			reader.ReadMessage(func() {
+				m.Settings = m.Settings.UnmarshalFromReader(reader)
+			})
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a WifiRequestSettingsStorage from a slice of bytes.
+func (m *WifiRequestSettingsStorage) Unmarshal(rawBytes []byte) (*WifiRequestSettingsStorage, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
 
 type WiFiSettings struct {
@@ -598,6 +682,69 @@ func (m *StringMessage) UnmarshalFromReader(reader jspb.Reader) *StringMessage {
 
 // Unmarshal unmarshals a StringMessage from a slice of bytes.
 func (m *StringMessage) Unmarshal(rawBytes []byte) (*StringMessage, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type StringMessageArray struct {
+	MsgArray []string
+}
+
+// GetMsgArray gets the MsgArray of the StringMessageArray.
+func (m *StringMessageArray) GetMsgArray() (x []string) {
+	if m == nil {
+		return x
+	}
+	return m.MsgArray
+}
+
+// MarshalToWriter marshals StringMessageArray to the provided writer.
+func (m *StringMessageArray) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	for _, val := range m.MsgArray {
+		writer.WriteString(1, val)
+	}
+
+	return
+}
+
+// Marshal marshals StringMessageArray to a slice of bytes.
+func (m *StringMessageArray) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a StringMessageArray from the provided reader.
+func (m *StringMessageArray) UnmarshalFromReader(reader jspb.Reader) *StringMessageArray {
+	for reader.Next() {
+		if m == nil {
+			m = &StringMessageArray{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.MsgArray = append(m.MsgArray, reader.ReadString())
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a StringMessageArray from a slice of bytes.
+func (m *StringMessageArray) Unmarshal(rawBytes []byte) (*StringMessageArray, error) {
 	reader := jspb.NewReader(rawBytes)
 
 	m = m.UnmarshalFromReader(reader)
@@ -3115,6 +3262,12 @@ type P4WNP1Client interface {
 	DeployWiFiSettings(ctx context.Context, in *WiFiSettings, opts ...grpcweb.CallOption) (*WiFiState, error)
 	GetWiFiState(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFiState, error)
 	ListenWiFiStateChanges(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFiState, error)
+	// ToDo: Template requests (store, load, listStored)
+	StoreWifiSettings(ctx context.Context, in *WifiRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error)
+	GetStoredWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*WiFiSettings, error)
+	DeployStoredWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*WiFiState, error)
+	StoreDeployedWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
+	ListStoredWifiSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 }
 
 type p4WNP1Client struct {
@@ -3383,4 +3536,49 @@ func (c *p4WNP1Client) ListenWiFiStateChanges(ctx context.Context, in *Empty, op
 	}
 
 	return new(WiFiState).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) StoreWifiSettings(ctx context.Context, in *WifiRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "StoreWifiSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetStoredWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*WiFiSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "GetStoredWifiSettingsList", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(WiFiSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployStoredWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*WiFiState, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployStoredWifiSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(WiFiState).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) StoreDeployedWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "StoreDeployedWifiSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) ListStoredWifiSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
+	resp, err := c.client.RPCCall(ctx, "ListStoredWifiSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(StringMessageArray).Unmarshal(resp)
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/dgraph-io/badger"
 	_ "github.com/dgraph-io/badger"
+	"strings"
 )
 
 /*
@@ -14,8 +15,10 @@ var (
 	ErrCreate = errors.New("Error creating store")
 	ErrOpen = errors.New("Error opening store")
 	ErrGet = errors.New("Error retrieving value from store")
+	ErrKeys = errors.New("Error retrieving keys from store")
 	ErrDelete = errors.New("Error deleting value from store")
 	ErrPut = errors.New("Error putting value into store")
+	ErrExists = errors.New("Error key exists already")
 )
 
 
@@ -42,6 +45,11 @@ func (s *Store) Close() {
 }
 
 func (s *Store) Put(key string, value interface{}, allowOverwrite bool) (err error) {
+	// ToDo: Remove race condition (existence check and value set have to be merged into a single transaction)
+	if !allowOverwrite && s.Exists(key) {
+		return ErrExists
+	}
+
 	// serialize value
 	sv,err := s.serializer.Encode(value)
 	if err != nil { return }
@@ -52,6 +60,19 @@ func (s *Store) Put(key string, value interface{}, allowOverwrite bool) (err err
 	})
 	if err != nil { return ErrPut }
 	return
+}
+
+func (s *Store) Exists(key string) (exists bool) {
+	bkey := []byte(key)
+	err := s.Db.View(func(txn *badger.Txn) error {
+		_, err := txn.Get(bkey)
+		if err != nil {
+			return ErrGet
+		}
+		return nil
+	})
+	if err != nil { return false }
+	return true
 }
 
 func (s *Store) Get(key string, target interface{}) (err error) {
@@ -72,10 +93,41 @@ func (s *Store) Get(key string, target interface{}) (err error) {
 	return
 }
 
+func (s *Store) Keys() (keys []string, err error) {
+	err = s.Db.View(func(txn *badger.Txn) error {
+		iter := txn.NewIterator(badger.DefaultIteratorOptions)
+		defer iter.Close()
+		for iter.Rewind(); iter.Valid(); iter.Next() {
+			keys = append(keys, string(iter.Item().Key()))
+		}
+		return nil
+	})
+	if err != nil { return keys, ErrKeys }
+	return
+}
+
+func (s *Store) KeysPrefix(prefix string, trimPrefix bool) (keys []string, err error) {
+	bprefix := []byte(prefix)
+	err = s.Db.View(func(txn *badger.Txn) error {
+		iter := txn.NewIterator(badger.DefaultIteratorOptions)
+		defer iter.Close()
+		for iter.Seek(bprefix); iter.ValidForPrefix(bprefix); iter.Next() {
+			if trimPrefix {
+				s := strings.TrimPrefix(string(iter.Item().Key()), prefix)
+				keys = append(keys,s)
+			} else {
+				keys = append(keys, string(iter.Item().Key()))
+			}
+		}
+		return nil
+	})
+	if err != nil { return keys, ErrKeys }
+	return
+}
+
 func (s *Store) Delete(key string) (err error) {
 	err = s.Db.Update(func(txn *badger.Txn) error {
-		// Your code here…
-		return nil
+		return txn.Delete([]byte(key))
 	})
 	if err != nil { return ErrDelete }
 	return

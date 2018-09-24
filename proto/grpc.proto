@@ -43,8 +43,17 @@ service P4WNP1 {
     rpc GetWiFiState (Empty) returns (WiFiState) {}
     rpc ListenWiFiStateChanges (Empty) returns (WiFiState) {}
     // ToDo: Template requests (store, load, listStored)
+    rpc StoreWifiSettings(WifiRequestSettingsStorage) returns (Empty) {}
+    rpc GetStoredWifiSettings(StringMessage) returns (WiFiSettings) {}
+    rpc DeployStoredWifiSettings(StringMessage) returns (WiFiState) {}
+    rpc StoreDeployedWifiSettings(StringMessage) returns (Empty) {}
+    rpc ListStoredWifiSettings(Empty) returns (StringMessageArray) {}
 }
 
+message WifiRequestSettingsStorage {
+    string TemplateName = 1;
+    WiFiSettings settings = 2;
+}
 
 /* WiFi2 (distinguish state and settings) */
 enum WiFiWorkingMode {
@@ -95,11 +104,13 @@ message WiFiBSSCfg {
     string PSK = 2;
 }
 
-
-
 /* Alive check  */
 message StringMessage {
     string msg = 1;
+}
+
+message StringMessageArray {
+    repeated string msgArray = 1;
 }
 
 /* Events */

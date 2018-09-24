@@ -3,32 +3,69 @@
 package service
 
 import (
-	"log"
 	pb "github.com/mame82/P4wnP1_go/proto"
-	"context"
-	"net"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-//	"google.golang.org/grpc/reflection"
+	"log"
+	"net"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 
 	"net/http"
-	"strings"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/mame82/P4wnP1_go/common"
-	"os"
 	"io/ioutil"
+	"os"
 )
 
 var (
 	rpcErrNoHid = errors.New("HIDScript engine disabled, as current USB configuration has mouse and keyboard disable")
 )
 
+const (
+	cSTORE_PREFIX_WIFI_SETTINGS = "ws_"
+)
+
 type server struct {}
+
+func (s *server) StoreDeployedWifiSettings(ctx context.Context, m *pb.StringMessage) (e *pb.Empty, err error) {
+	return s.StoreWifiSettings(ctx, &pb.WifiRequestSettingsStorage{
+		Settings: ServiceState.WifiSvc.State.CurrentSettings,
+		TemplateName: m.Msg,
+	})
+}
+
+func (s *server) DeployStoredWifiSettings(ctx context.Context, m *pb.StringMessage) (st *pb.WiFiState, err error) {
+	ws,err := s.GetStoredWifiSettings(ctx,m)
+	if err != nil { return st,err }
+	return s.DeployWiFiSettings(ctx, ws)
+}
+
+func (s *server) StoreWifiSettings(ctx context.Context, r *pb.WifiRequestSettingsStorage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	err = ServiceState.Store.Put(cSTORE_PREFIX_WIFI_SETTINGS + r.TemplateName, r.Settings, true)
+	return
+}
+
+func (s *server) GetStoredWifiSettings(ctx context.Context, m *pb.StringMessage) (ws *pb.WiFiSettings, err error) {
+	ws = &pb.WiFiSettings{}
+	err = ServiceState.Store.Get(cSTORE_PREFIX_WIFI_SETTINGS + m.Msg, ws)
+	return
+}
+
+func (s *server) ListStoredWifiSettings(ctx context.Context, e *pb.Empty) (sa *pb.StringMessageArray, err error) {
+	res,err := ServiceState.Store.KeysPrefix(cSTORE_PREFIX_WIFI_SETTINGS, true)
+	if err != nil { return sa,err }
+	sa = &pb.StringMessageArray{
+		MsgArray: res,
+	}
+	return
+}
 
 func (s *server) DeployWiFiSettings(ctx context.Context, wset *pb.WiFiSettings) (wstate *pb.WiFiState, err error) {
 	return ServiceState.WifiSvc.DeploySettings(wset)

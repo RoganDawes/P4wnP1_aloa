@@ -3,15 +3,27 @@
 package main
 
 import (
-	"github.com/mame82/hvue"
 	"github.com/gopherjs/gopherjs/js"
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
+	"github.com/mame82/hvue"
 )
 
 func InitComponentsWiFi() {
 	hvue.NewComponent(
 		"wifi",
 		hvue.Template(templateWiFi),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := struct {
+				*js.Object
+				ShowStoreModal bool   `js:"showStoreModal"`
+				ShowLoadModal bool   `js:"showLoadModal"`
+				TemplateName   string `js:"templateName"`
+			}{Object: O()}
+			data.ShowStoreModal = false
+			data.ShowLoadModal = false
+			data.TemplateName = ""
+			return &data
+		}),
 		hvue.Computed("settings", func(vm *hvue.VM) interface{} {
 			return vm.Get("$store").Get("state").Get("wifiState").Get("CurrentSettings")
 		}),
@@ -38,11 +50,15 @@ func InitComponentsWiFi() {
 			switch mode {
 			case int(pb.WiFiStateMode_STA_CONNECTED):
 				res := "Connected to network"
-				if len(ssid) > 0 { res += ": '" + ssid + "' on channel " + channel}
+				if len(ssid) > 0 {
+					res += ": '" + ssid + "' on channel " + channel
+				}
 				return res
 			case int(pb.WiFiStateMode_AP_UP):
 				res := "Access Point running on channel " + channel
-				if len(ssid) > 0 { res += ": '" + ssid + "'"}
+				if len(ssid) > 0 {
+					res += ": '" + ssid + "'"
+				}
 				return res
 			default:
 				return "Not connected"
@@ -67,12 +83,12 @@ func InitComponentsWiFi() {
 
 		hvue.Computed("wifiAuthModes", func(vm *hvue.VM) interface{} {
 			modes := js.Global.Get("Array").New()
-			for val,_ := range pb.WiFiAuthMode_name {
+			for val, _ := range pb.WiFiAuthMode_name {
 				mode := struct {
 					*js.Object
 					Label string `js:"label"`
-					Value int  `js:"value"`
-				}{Object:O()}
+					Value int    `js:"value"`
+				}{Object: O()}
 				mode.Value = val
 				switch pb.WiFiAuthMode(val) {
 				case pb.WiFiAuthMode_WPA2_PSK:
@@ -88,12 +104,12 @@ func InitComponentsWiFi() {
 		}),
 		hvue.Computed("wifiModes", func(vm *hvue.VM) interface{} {
 			modes := js.Global.Get("Array").New()
-			for val,_ := range pb.WiFiWorkingMode_name {
+			for val, _ := range pb.WiFiWorkingMode_name {
 				mode := struct {
 					*js.Object
 					Label string `js:"label"`
-					Value int  `js:"value"`
-				}{Object:O()}
+					Value int    `js:"value"`
+				}{Object: O()}
 				mode.Value = val
 				switch pb.WiFiWorkingMode(val) {
 				case pb.WiFiWorkingMode_AP:
@@ -109,9 +125,9 @@ func InitComponentsWiFi() {
 			}
 			return modes
 		}),
-		hvue.Computed("mode_ap", func(vm *hvue.VM) interface{} {return pb.WiFiWorkingMode_AP}),
-		hvue.Computed("mode_sta", func(vm *hvue.VM) interface{} {return pb.WiFiWorkingMode_STA}),
-		hvue.Computed("mode_failover", func(vm *hvue.VM) interface{} {return pb.WiFiWorkingMode_STA_FAILOVER_AP}),
+		hvue.Computed("mode_ap", func(vm *hvue.VM) interface{} { return pb.WiFiWorkingMode_AP }),
+		hvue.Computed("mode_sta", func(vm *hvue.VM) interface{} { return pb.WiFiWorkingMode_STA }),
+		hvue.Computed("mode_failover", func(vm *hvue.VM) interface{} { return pb.WiFiWorkingMode_STA_FAILOVER_AP }),
 		hvue.Method("reset",
 			func(vm *hvue.VM) {
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_UPDATE_WIFI_STATE)
@@ -120,17 +136,93 @@ func InitComponentsWiFi() {
 			func(vm *hvue.VM, wifiSettings *jsWiFiSettings) {
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_WIFI_SETTINGS, wifiSettings)
 			}),
+		hvue.Method("updateStoredSettingsList",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST)
+			}),
+		hvue.Method("store",
+			func(vm *hvue.VM) {
+				sReq := NewWifiRequestSettingsStorage()
+				sReq.TemplateName = vm.Get("templateName").String()
+				sReq.Settings = &jsWiFiSettings{
+					Object: vm.Get("$store").Get("state").Get("wifiState").Get("CurrentSettings"),
+				}
+				println("Storing :", sReq)
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_STORE_WIFI_SETTINGS, sReq)
+				vm.Set("showStoreModal", false)
+			}),
 		hvue.Computed("deploying",
 			func(vm *hvue.VM) interface{} {
 				return vm.Get("$store").Get("state").Get("deployingWifiSettings")
 			}),
+		hvue.Mounted(func(vm *hvue.VM) {
+			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST)
+		}),
 
 	)
 }
 
 const templateWiFi = `
 <q-page padding>
+
+
 <div class="row gutter-sm">
+	<q-modal v-model="showLoadModal">
+		<q-modal-layout>
+			<q-toolbar slot="header">
+				<q-toolbar-title>
+					Load WiFi settings
+				</q-toolbar-title>
+			</q-toolbar>
+
+			<q-list>
+				<q-item link tag="label" v-for="tname in this.$store.state.StoredWifiSettingsList" :key="tname">
+					<q-item-side>
+						<q-radio v-model="templateName" :val="tname"/>
+					</q-item-side>
+					<q-item-main>
+						<q-item-tile label>{{ tname }}</q-item-tile>
+					</q-item-main>
+				</q-item>
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile>
+							<q-btn color="secondary" v-close-overlay label="close" />
+							<q-btn color="primary" label="load" />
+							<q-btn color="primary" label="deploy" />
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</q-list>
+		</q-modal-layout>
+	</q-modal>
+	<q-modal v-model="showStoreModal">
+		<q-modal-layout>
+			<q-toolbar slot="header">
+				<q-toolbar-title>
+					Store current WiFi Settings
+				</q-toolbar-title>
+			</q-toolbar>
+			<q-list>
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile label>Template name</q-item-tile>
+						<q-item-tile>
+							<q-input v-model="templateName" inverted></q-input>
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile>
+							<q-btn color="secondary" v-close-overlay label="close" />
+							<q-btn color="primary" @click="store" label="store" />
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</q-list>
+		</q-modal-layout>
+	</q-modal>
 	<div class="col-lg-4">
 	<q-card class="full-height">
 		<q-card-title>
@@ -147,6 +239,8 @@ const templateWiFi = `
 		<q-card-actions>
 			<q-btn :loading="deploying" color="primary" @click="deploy(settings)" label="deploy"></q-btn>
 			<q-btn color="secondary" @click="reset" label="reset"></q-btn>
+			<q-btn color="primary" @click="updateStoredSettingsList(); showStoreModal=true" label="store"></q-btn>
+			<q-btn color="primary" @click="updateStoredSettingsList(); showLoadModal=true" label="load"></q-btn>
 		</q-card-actions>
 
 		<q-list link>
