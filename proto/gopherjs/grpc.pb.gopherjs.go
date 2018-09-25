@@ -8,6 +8,20 @@
 		grpc.proto
 
 	It has these top-level messages:
+		TriggerActionSettings
+		TriggerAction
+		TriggerServiceStarted
+		TriggerGPIO
+		TriggerUSBGadgetConnected
+		TriggerUSBGadgetDisconnected
+		TriggerWifiAPStarted
+		TriggerWifiConnectedAsSta
+		TriggerSSHLogin
+		TriggerDHCPLeaseGranted
+		ActionStartBashScript
+		ActionStartHIDScript
+		ActionDeploySettingsTemplate
+		ActionLog
 		WifiRequestSettingsStorage
 		WiFiSettings
 		WiFiState
@@ -124,6 +138,35 @@ func (x WiFiAuthMode) String() string {
 	return WiFiAuthMode_name[int(x)]
 }
 
+type ActionDeploySettingsTemplate_TemplateType int
+
+const (
+	ActionDeploySettingsTemplate_FULL_SETTINGS ActionDeploySettingsTemplate_TemplateType = 0
+	ActionDeploySettingsTemplate_NETWORK       ActionDeploySettingsTemplate_TemplateType = 1
+	ActionDeploySettingsTemplate_WIFI          ActionDeploySettingsTemplate_TemplateType = 2
+	ActionDeploySettingsTemplate_USB           ActionDeploySettingsTemplate_TemplateType = 3
+	ActionDeploySettingsTemplate_BLUETOOTH     ActionDeploySettingsTemplate_TemplateType = 4
+)
+
+var ActionDeploySettingsTemplate_TemplateType_name = map[int]string{
+	0: "FULL_SETTINGS",
+	1: "NETWORK",
+	2: "WIFI",
+	3: "USB",
+	4: "BLUETOOTH",
+}
+var ActionDeploySettingsTemplate_TemplateType_value = map[string]int{
+	"FULL_SETTINGS": 0,
+	"NETWORK":       1,
+	"WIFI":          2,
+	"USB":           3,
+	"BLUETOOTH":     4,
+}
+
+func (x ActionDeploySettingsTemplate_TemplateType) String() string {
+	return ActionDeploySettingsTemplate_TemplateType_name[int(x)]
+}
+
 type EthernetInterfaceSettings_Mode int
 
 const (
@@ -148,6 +191,1163 @@ var EthernetInterfaceSettings_Mode_value = map[string]int{
 
 func (x EthernetInterfaceSettings_Mode) String() string {
 	return EthernetInterfaceSettings_Mode_name[int(x)]
+}
+
+// Triggers, Actions and resulting TriggerActions
+type TriggerActionSettings struct {
+	RegisteredTriggerActions []*TriggerAction
+}
+
+// GetRegisteredTriggerActions gets the RegisteredTriggerActions of the TriggerActionSettings.
+func (m *TriggerActionSettings) GetRegisteredTriggerActions() (x []*TriggerAction) {
+	if m == nil {
+		return x
+	}
+	return m.RegisteredTriggerActions
+}
+
+// MarshalToWriter marshals TriggerActionSettings to the provided writer.
+func (m *TriggerActionSettings) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	for _, msg := range m.RegisteredTriggerActions {
+		writer.WriteMessage(1, func() {
+			msg.MarshalToWriter(writer)
+		})
+	}
+
+	return
+}
+
+// Marshal marshals TriggerActionSettings to a slice of bytes.
+func (m *TriggerActionSettings) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerActionSettings from the provided reader.
+func (m *TriggerActionSettings) UnmarshalFromReader(reader jspb.Reader) *TriggerActionSettings {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerActionSettings{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			reader.ReadMessage(func() {
+				m.RegisteredTriggerActions = append(m.RegisteredTriggerActions, new(TriggerAction).UnmarshalFromReader(reader))
+			})
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerActionSettings from a slice of bytes.
+func (m *TriggerActionSettings) Unmarshal(rawBytes []byte) (*TriggerActionSettings, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TriggerAction struct {
+	Id uint32
+	// Types that are valid to be assigned to Trigger:
+	//	*TriggerAction_ServiceStarted
+	//	*TriggerAction_UsbGadgetConnected
+	//	*TriggerAction_UsbGadgetDisconnected
+	//	*TriggerAction_WifiAPStarted
+	//	*TriggerAction_WifiConnectedAsSta
+	//	*TriggerAction_SshLogin
+	//	*TriggerAction_DhcpLeaseGranted
+	Trigger isTriggerAction_Trigger
+	// Types that are valid to be assigned to Action:
+	//	*TriggerAction_BashScript
+	//	*TriggerAction_HidScript
+	//	*TriggerAction_DeploySettingsTemplate
+	//	*TriggerAction_Log
+	Action isTriggerAction_Action
+}
+
+// isTriggerAction_Trigger is used to distinguish types assignable to Trigger
+type isTriggerAction_Trigger interface{ isTriggerAction_Trigger() }
+
+// isTriggerAction_Action is used to distinguish types assignable to Action
+type isTriggerAction_Action interface{ isTriggerAction_Action() }
+
+// TriggerAction_ServiceStarted is assignable to Trigger
+type TriggerAction_ServiceStarted struct {
+	ServiceStarted *TriggerServiceStarted
+}
+
+// TriggerAction_UsbGadgetConnected is assignable to Trigger
+type TriggerAction_UsbGadgetConnected struct {
+	UsbGadgetConnected *TriggerUSBGadgetConnected
+}
+
+// TriggerAction_UsbGadgetDisconnected is assignable to Trigger
+type TriggerAction_UsbGadgetDisconnected struct {
+	UsbGadgetDisconnected *TriggerUSBGadgetDisconnected
+}
+
+// TriggerAction_WifiAPStarted is assignable to Trigger
+type TriggerAction_WifiAPStarted struct {
+	WifiAPStarted *TriggerWifiAPStarted
+}
+
+// TriggerAction_WifiConnectedAsSta is assignable to Trigger
+type TriggerAction_WifiConnectedAsSta struct {
+	WifiConnectedAsSta *TriggerWifiConnectedAsSta
+}
+
+// TriggerAction_SshLogin is assignable to Trigger
+type TriggerAction_SshLogin struct {
+	SshLogin *TriggerSSHLogin
+}
+
+// TriggerAction_DhcpLeaseGranted is assignable to Trigger
+type TriggerAction_DhcpLeaseGranted struct {
+	DhcpLeaseGranted *TriggerDHCPLeaseGranted
+}
+
+// TriggerAction_BashScript is assignable to Action
+type TriggerAction_BashScript struct {
+	BashScript *ActionStartBashScript
+}
+
+// TriggerAction_HidScript is assignable to Action
+type TriggerAction_HidScript struct {
+	HidScript *ActionStartHIDScript
+}
+
+// TriggerAction_DeploySettingsTemplate is assignable to Action
+type TriggerAction_DeploySettingsTemplate struct {
+	DeploySettingsTemplate *ActionDeploySettingsTemplate
+}
+
+// TriggerAction_Log is assignable to Action
+type TriggerAction_Log struct {
+	Log *ActionLog
+}
+
+func (*TriggerAction_ServiceStarted) isTriggerAction_Trigger()        {}
+func (*TriggerAction_UsbGadgetConnected) isTriggerAction_Trigger()    {}
+func (*TriggerAction_UsbGadgetDisconnected) isTriggerAction_Trigger() {}
+func (*TriggerAction_WifiAPStarted) isTriggerAction_Trigger()         {}
+func (*TriggerAction_WifiConnectedAsSta) isTriggerAction_Trigger()    {}
+func (*TriggerAction_SshLogin) isTriggerAction_Trigger()              {}
+func (*TriggerAction_DhcpLeaseGranted) isTriggerAction_Trigger()      {}
+func (*TriggerAction_BashScript) isTriggerAction_Action()             {}
+func (*TriggerAction_HidScript) isTriggerAction_Action()              {}
+func (*TriggerAction_DeploySettingsTemplate) isTriggerAction_Action() {}
+func (*TriggerAction_Log) isTriggerAction_Action()                    {}
+
+// GetTrigger gets the Trigger of the TriggerAction.
+func (m *TriggerAction) GetTrigger() (x isTriggerAction_Trigger) {
+	if m == nil {
+		return x
+	}
+	return m.Trigger
+}
+
+// GetAction gets the Action of the TriggerAction.
+func (m *TriggerAction) GetAction() (x isTriggerAction_Action) {
+	if m == nil {
+		return x
+	}
+	return m.Action
+}
+
+// GetId gets the Id of the TriggerAction.
+func (m *TriggerAction) GetId() (x uint32) {
+	if m == nil {
+		return x
+	}
+	return m.Id
+}
+
+// GetServiceStarted gets the ServiceStarted of the TriggerAction.
+func (m *TriggerAction) GetServiceStarted() (x *TriggerServiceStarted) {
+	if v, ok := m.GetTrigger().(*TriggerAction_ServiceStarted); ok {
+		return v.ServiceStarted
+	}
+	return x
+}
+
+// GetUsbGadgetConnected gets the UsbGadgetConnected of the TriggerAction.
+func (m *TriggerAction) GetUsbGadgetConnected() (x *TriggerUSBGadgetConnected) {
+	if v, ok := m.GetTrigger().(*TriggerAction_UsbGadgetConnected); ok {
+		return v.UsbGadgetConnected
+	}
+	return x
+}
+
+// GetUsbGadgetDisconnected gets the UsbGadgetDisconnected of the TriggerAction.
+func (m *TriggerAction) GetUsbGadgetDisconnected() (x *TriggerUSBGadgetDisconnected) {
+	if v, ok := m.GetTrigger().(*TriggerAction_UsbGadgetDisconnected); ok {
+		return v.UsbGadgetDisconnected
+	}
+	return x
+}
+
+// GetWifiAPStarted gets the WifiAPStarted of the TriggerAction.
+func (m *TriggerAction) GetWifiAPStarted() (x *TriggerWifiAPStarted) {
+	if v, ok := m.GetTrigger().(*TriggerAction_WifiAPStarted); ok {
+		return v.WifiAPStarted
+	}
+	return x
+}
+
+// GetWifiConnectedAsSta gets the WifiConnectedAsSta of the TriggerAction.
+func (m *TriggerAction) GetWifiConnectedAsSta() (x *TriggerWifiConnectedAsSta) {
+	if v, ok := m.GetTrigger().(*TriggerAction_WifiConnectedAsSta); ok {
+		return v.WifiConnectedAsSta
+	}
+	return x
+}
+
+// GetSshLogin gets the SshLogin of the TriggerAction.
+func (m *TriggerAction) GetSshLogin() (x *TriggerSSHLogin) {
+	if v, ok := m.GetTrigger().(*TriggerAction_SshLogin); ok {
+		return v.SshLogin
+	}
+	return x
+}
+
+// GetDhcpLeaseGranted gets the DhcpLeaseGranted of the TriggerAction.
+func (m *TriggerAction) GetDhcpLeaseGranted() (x *TriggerDHCPLeaseGranted) {
+	if v, ok := m.GetTrigger().(*TriggerAction_DhcpLeaseGranted); ok {
+		return v.DhcpLeaseGranted
+	}
+	return x
+}
+
+// GetBashScript gets the BashScript of the TriggerAction.
+func (m *TriggerAction) GetBashScript() (x *ActionStartBashScript) {
+	if v, ok := m.GetAction().(*TriggerAction_BashScript); ok {
+		return v.BashScript
+	}
+	return x
+}
+
+// GetHidScript gets the HidScript of the TriggerAction.
+func (m *TriggerAction) GetHidScript() (x *ActionStartHIDScript) {
+	if v, ok := m.GetAction().(*TriggerAction_HidScript); ok {
+		return v.HidScript
+	}
+	return x
+}
+
+// GetDeploySettingsTemplate gets the DeploySettingsTemplate of the TriggerAction.
+func (m *TriggerAction) GetDeploySettingsTemplate() (x *ActionDeploySettingsTemplate) {
+	if v, ok := m.GetAction().(*TriggerAction_DeploySettingsTemplate); ok {
+		return v.DeploySettingsTemplate
+	}
+	return x
+}
+
+// GetLog gets the Log of the TriggerAction.
+func (m *TriggerAction) GetLog() (x *ActionLog) {
+	if v, ok := m.GetAction().(*TriggerAction_Log); ok {
+		return v.Log
+	}
+	return x
+}
+
+// MarshalToWriter marshals TriggerAction to the provided writer.
+func (m *TriggerAction) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	switch t := m.Trigger.(type) {
+	case *TriggerAction_ServiceStarted:
+		if t.ServiceStarted != nil {
+			writer.WriteMessage(2, func() {
+				t.ServiceStarted.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_UsbGadgetConnected:
+		if t.UsbGadgetConnected != nil {
+			writer.WriteMessage(3, func() {
+				t.UsbGadgetConnected.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_UsbGadgetDisconnected:
+		if t.UsbGadgetDisconnected != nil {
+			writer.WriteMessage(4, func() {
+				t.UsbGadgetDisconnected.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_WifiAPStarted:
+		if t.WifiAPStarted != nil {
+			writer.WriteMessage(5, func() {
+				t.WifiAPStarted.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_WifiConnectedAsSta:
+		if t.WifiConnectedAsSta != nil {
+			writer.WriteMessage(6, func() {
+				t.WifiConnectedAsSta.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_SshLogin:
+		if t.SshLogin != nil {
+			writer.WriteMessage(7, func() {
+				t.SshLogin.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_DhcpLeaseGranted:
+		if t.DhcpLeaseGranted != nil {
+			writer.WriteMessage(8, func() {
+				t.DhcpLeaseGranted.MarshalToWriter(writer)
+			})
+		}
+	}
+
+	switch t := m.Action.(type) {
+	case *TriggerAction_BashScript:
+		if t.BashScript != nil {
+			writer.WriteMessage(9, func() {
+				t.BashScript.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_HidScript:
+		if t.HidScript != nil {
+			writer.WriteMessage(10, func() {
+				t.HidScript.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_DeploySettingsTemplate:
+		if t.DeploySettingsTemplate != nil {
+			writer.WriteMessage(11, func() {
+				t.DeploySettingsTemplate.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_Log:
+		if t.Log != nil {
+			writer.WriteMessage(12, func() {
+				t.Log.MarshalToWriter(writer)
+			})
+		}
+	}
+
+	if m.Id != 0 {
+		writer.WriteUint32(1, m.Id)
+	}
+
+	return
+}
+
+// Marshal marshals TriggerAction to a slice of bytes.
+func (m *TriggerAction) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerAction from the provided reader.
+func (m *TriggerAction) UnmarshalFromReader(reader jspb.Reader) *TriggerAction {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerAction{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Id = reader.ReadUint32()
+		case 2:
+			reader.ReadMessage(func() {
+				m.Trigger = &TriggerAction_ServiceStarted{
+					ServiceStarted: new(TriggerServiceStarted).UnmarshalFromReader(reader),
+				}
+			})
+		case 3:
+			reader.ReadMessage(func() {
+				m.Trigger = &TriggerAction_UsbGadgetConnected{
+					UsbGadgetConnected: new(TriggerUSBGadgetConnected).UnmarshalFromReader(reader),
+				}
+			})
+		case 4:
+			reader.ReadMessage(func() {
+				m.Trigger = &TriggerAction_UsbGadgetDisconnected{
+					UsbGadgetDisconnected: new(TriggerUSBGadgetDisconnected).UnmarshalFromReader(reader),
+				}
+			})
+		case 5:
+			reader.ReadMessage(func() {
+				m.Trigger = &TriggerAction_WifiAPStarted{
+					WifiAPStarted: new(TriggerWifiAPStarted).UnmarshalFromReader(reader),
+				}
+			})
+		case 6:
+			reader.ReadMessage(func() {
+				m.Trigger = &TriggerAction_WifiConnectedAsSta{
+					WifiConnectedAsSta: new(TriggerWifiConnectedAsSta).UnmarshalFromReader(reader),
+				}
+			})
+		case 7:
+			reader.ReadMessage(func() {
+				m.Trigger = &TriggerAction_SshLogin{
+					SshLogin: new(TriggerSSHLogin).UnmarshalFromReader(reader),
+				}
+			})
+		case 8:
+			reader.ReadMessage(func() {
+				m.Trigger = &TriggerAction_DhcpLeaseGranted{
+					DhcpLeaseGranted: new(TriggerDHCPLeaseGranted).UnmarshalFromReader(reader),
+				}
+			})
+		case 9:
+			reader.ReadMessage(func() {
+				m.Action = &TriggerAction_BashScript{
+					BashScript: new(ActionStartBashScript).UnmarshalFromReader(reader),
+				}
+			})
+		case 10:
+			reader.ReadMessage(func() {
+				m.Action = &TriggerAction_HidScript{
+					HidScript: new(ActionStartHIDScript).UnmarshalFromReader(reader),
+				}
+			})
+		case 11:
+			reader.ReadMessage(func() {
+				m.Action = &TriggerAction_DeploySettingsTemplate{
+					DeploySettingsTemplate: new(ActionDeploySettingsTemplate).UnmarshalFromReader(reader),
+				}
+			})
+		case 12:
+			reader.ReadMessage(func() {
+				m.Action = &TriggerAction_Log{
+					Log: new(ActionLog).UnmarshalFromReader(reader),
+				}
+			})
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerAction from a slice of bytes.
+func (m *TriggerAction) Unmarshal(rawBytes []byte) (*TriggerAction, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TriggerServiceStarted struct {
+}
+
+// MarshalToWriter marshals TriggerServiceStarted to the provided writer.
+func (m *TriggerServiceStarted) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	return
+}
+
+// Marshal marshals TriggerServiceStarted to a slice of bytes.
+func (m *TriggerServiceStarted) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerServiceStarted from the provided reader.
+func (m *TriggerServiceStarted) UnmarshalFromReader(reader jspb.Reader) *TriggerServiceStarted {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerServiceStarted{}
+		}
+
+		switch reader.GetFieldNumber() {
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerServiceStarted from a slice of bytes.
+func (m *TriggerServiceStarted) Unmarshal(rawBytes []byte) (*TriggerServiceStarted, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TriggerGPIO struct {
+}
+
+// MarshalToWriter marshals TriggerGPIO to the provided writer.
+func (m *TriggerGPIO) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	return
+}
+
+// Marshal marshals TriggerGPIO to a slice of bytes.
+func (m *TriggerGPIO) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerGPIO from the provided reader.
+func (m *TriggerGPIO) UnmarshalFromReader(reader jspb.Reader) *TriggerGPIO {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerGPIO{}
+		}
+
+		switch reader.GetFieldNumber() {
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerGPIO from a slice of bytes.
+func (m *TriggerGPIO) Unmarshal(rawBytes []byte) (*TriggerGPIO, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TriggerUSBGadgetConnected struct {
+}
+
+// MarshalToWriter marshals TriggerUSBGadgetConnected to the provided writer.
+func (m *TriggerUSBGadgetConnected) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	return
+}
+
+// Marshal marshals TriggerUSBGadgetConnected to a slice of bytes.
+func (m *TriggerUSBGadgetConnected) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerUSBGadgetConnected from the provided reader.
+func (m *TriggerUSBGadgetConnected) UnmarshalFromReader(reader jspb.Reader) *TriggerUSBGadgetConnected {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerUSBGadgetConnected{}
+		}
+
+		switch reader.GetFieldNumber() {
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerUSBGadgetConnected from a slice of bytes.
+func (m *TriggerUSBGadgetConnected) Unmarshal(rawBytes []byte) (*TriggerUSBGadgetConnected, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TriggerUSBGadgetDisconnected struct {
+}
+
+// MarshalToWriter marshals TriggerUSBGadgetDisconnected to the provided writer.
+func (m *TriggerUSBGadgetDisconnected) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	return
+}
+
+// Marshal marshals TriggerUSBGadgetDisconnected to a slice of bytes.
+func (m *TriggerUSBGadgetDisconnected) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerUSBGadgetDisconnected from the provided reader.
+func (m *TriggerUSBGadgetDisconnected) UnmarshalFromReader(reader jspb.Reader) *TriggerUSBGadgetDisconnected {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerUSBGadgetDisconnected{}
+		}
+
+		switch reader.GetFieldNumber() {
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerUSBGadgetDisconnected from a slice of bytes.
+func (m *TriggerUSBGadgetDisconnected) Unmarshal(rawBytes []byte) (*TriggerUSBGadgetDisconnected, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TriggerWifiAPStarted struct {
+}
+
+// MarshalToWriter marshals TriggerWifiAPStarted to the provided writer.
+func (m *TriggerWifiAPStarted) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	return
+}
+
+// Marshal marshals TriggerWifiAPStarted to a slice of bytes.
+func (m *TriggerWifiAPStarted) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerWifiAPStarted from the provided reader.
+func (m *TriggerWifiAPStarted) UnmarshalFromReader(reader jspb.Reader) *TriggerWifiAPStarted {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerWifiAPStarted{}
+		}
+
+		switch reader.GetFieldNumber() {
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerWifiAPStarted from a slice of bytes.
+func (m *TriggerWifiAPStarted) Unmarshal(rawBytes []byte) (*TriggerWifiAPStarted, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TriggerWifiConnectedAsSta struct {
+}
+
+// MarshalToWriter marshals TriggerWifiConnectedAsSta to the provided writer.
+func (m *TriggerWifiConnectedAsSta) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	return
+}
+
+// Marshal marshals TriggerWifiConnectedAsSta to a slice of bytes.
+func (m *TriggerWifiConnectedAsSta) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerWifiConnectedAsSta from the provided reader.
+func (m *TriggerWifiConnectedAsSta) UnmarshalFromReader(reader jspb.Reader) *TriggerWifiConnectedAsSta {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerWifiConnectedAsSta{}
+		}
+
+		switch reader.GetFieldNumber() {
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerWifiConnectedAsSta from a slice of bytes.
+func (m *TriggerWifiConnectedAsSta) Unmarshal(rawBytes []byte) (*TriggerWifiConnectedAsSta, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TriggerSSHLogin struct {
+	ResLoginUser string
+}
+
+// GetResLoginUser gets the ResLoginUser of the TriggerSSHLogin.
+func (m *TriggerSSHLogin) GetResLoginUser() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.ResLoginUser
+}
+
+// MarshalToWriter marshals TriggerSSHLogin to the provided writer.
+func (m *TriggerSSHLogin) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.ResLoginUser) > 0 {
+		writer.WriteString(1, m.ResLoginUser)
+	}
+
+	return
+}
+
+// Marshal marshals TriggerSSHLogin to a slice of bytes.
+func (m *TriggerSSHLogin) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerSSHLogin from the provided reader.
+func (m *TriggerSSHLogin) UnmarshalFromReader(reader jspb.Reader) *TriggerSSHLogin {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerSSHLogin{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.ResLoginUser = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerSSHLogin from a slice of bytes.
+func (m *TriggerSSHLogin) Unmarshal(rawBytes []byte) (*TriggerSSHLogin, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TriggerDHCPLeaseGranted struct {
+	ResInterface string
+	ResClientIP  string
+	ResClientMac string
+}
+
+// GetResInterface gets the ResInterface of the TriggerDHCPLeaseGranted.
+func (m *TriggerDHCPLeaseGranted) GetResInterface() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.ResInterface
+}
+
+// GetResClientIP gets the ResClientIP of the TriggerDHCPLeaseGranted.
+func (m *TriggerDHCPLeaseGranted) GetResClientIP() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.ResClientIP
+}
+
+// GetResClientMac gets the ResClientMac of the TriggerDHCPLeaseGranted.
+func (m *TriggerDHCPLeaseGranted) GetResClientMac() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.ResClientMac
+}
+
+// MarshalToWriter marshals TriggerDHCPLeaseGranted to the provided writer.
+func (m *TriggerDHCPLeaseGranted) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.ResInterface) > 0 {
+		writer.WriteString(1, m.ResInterface)
+	}
+
+	if len(m.ResClientIP) > 0 {
+		writer.WriteString(2, m.ResClientIP)
+	}
+
+	if len(m.ResClientMac) > 0 {
+		writer.WriteString(3, m.ResClientMac)
+	}
+
+	return
+}
+
+// Marshal marshals TriggerDHCPLeaseGranted to a slice of bytes.
+func (m *TriggerDHCPLeaseGranted) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerDHCPLeaseGranted from the provided reader.
+func (m *TriggerDHCPLeaseGranted) UnmarshalFromReader(reader jspb.Reader) *TriggerDHCPLeaseGranted {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerDHCPLeaseGranted{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.ResInterface = reader.ReadString()
+		case 2:
+			m.ResClientIP = reader.ReadString()
+		case 3:
+			m.ResClientMac = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerDHCPLeaseGranted from a slice of bytes.
+func (m *TriggerDHCPLeaseGranted) Unmarshal(rawBytes []byte) (*TriggerDHCPLeaseGranted, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type ActionStartBashScript struct {
+	ScriptPath string
+}
+
+// GetScriptPath gets the ScriptPath of the ActionStartBashScript.
+func (m *ActionStartBashScript) GetScriptPath() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.ScriptPath
+}
+
+// MarshalToWriter marshals ActionStartBashScript to the provided writer.
+func (m *ActionStartBashScript) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.ScriptPath) > 0 {
+		writer.WriteString(1, m.ScriptPath)
+	}
+
+	return
+}
+
+// Marshal marshals ActionStartBashScript to a slice of bytes.
+func (m *ActionStartBashScript) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a ActionStartBashScript from the provided reader.
+func (m *ActionStartBashScript) UnmarshalFromReader(reader jspb.Reader) *ActionStartBashScript {
+	for reader.Next() {
+		if m == nil {
+			m = &ActionStartBashScript{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.ScriptPath = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a ActionStartBashScript from a slice of bytes.
+func (m *ActionStartBashScript) Unmarshal(rawBytes []byte) (*ActionStartBashScript, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type ActionStartHIDScript struct {
+	ScriptName string
+}
+
+// GetScriptName gets the ScriptName of the ActionStartHIDScript.
+func (m *ActionStartHIDScript) GetScriptName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.ScriptName
+}
+
+// MarshalToWriter marshals ActionStartHIDScript to the provided writer.
+func (m *ActionStartHIDScript) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.ScriptName) > 0 {
+		writer.WriteString(1, m.ScriptName)
+	}
+
+	return
+}
+
+// Marshal marshals ActionStartHIDScript to a slice of bytes.
+func (m *ActionStartHIDScript) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a ActionStartHIDScript from the provided reader.
+func (m *ActionStartHIDScript) UnmarshalFromReader(reader jspb.Reader) *ActionStartHIDScript {
+	for reader.Next() {
+		if m == nil {
+			m = &ActionStartHIDScript{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.ScriptName = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a ActionStartHIDScript from a slice of bytes.
+func (m *ActionStartHIDScript) Unmarshal(rawBytes []byte) (*ActionStartHIDScript, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type ActionDeploySettingsTemplate struct {
+	TemplateName string
+	Type         ActionDeploySettingsTemplate_TemplateType
+}
+
+// GetTemplateName gets the TemplateName of the ActionDeploySettingsTemplate.
+func (m *ActionDeploySettingsTemplate) GetTemplateName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.TemplateName
+}
+
+// GetType gets the Type of the ActionDeploySettingsTemplate.
+func (m *ActionDeploySettingsTemplate) GetType() (x ActionDeploySettingsTemplate_TemplateType) {
+	if m == nil {
+		return x
+	}
+	return m.Type
+}
+
+// MarshalToWriter marshals ActionDeploySettingsTemplate to the provided writer.
+func (m *ActionDeploySettingsTemplate) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.TemplateName) > 0 {
+		writer.WriteString(1, m.TemplateName)
+	}
+
+	if int(m.Type) != 0 {
+		writer.WriteEnum(2, int(m.Type))
+	}
+
+	return
+}
+
+// Marshal marshals ActionDeploySettingsTemplate to a slice of bytes.
+func (m *ActionDeploySettingsTemplate) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a ActionDeploySettingsTemplate from the provided reader.
+func (m *ActionDeploySettingsTemplate) UnmarshalFromReader(reader jspb.Reader) *ActionDeploySettingsTemplate {
+	for reader.Next() {
+		if m == nil {
+			m = &ActionDeploySettingsTemplate{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.TemplateName = reader.ReadString()
+		case 2:
+			m.Type = ActionDeploySettingsTemplate_TemplateType(reader.ReadEnum())
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a ActionDeploySettingsTemplate from a slice of bytes.
+func (m *ActionDeploySettingsTemplate) Unmarshal(rawBytes []byte) (*ActionDeploySettingsTemplate, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type ActionLog struct {
+}
+
+// MarshalToWriter marshals ActionLog to the provided writer.
+func (m *ActionLog) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	return
+}
+
+// Marshal marshals ActionLog to a slice of bytes.
+func (m *ActionLog) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a ActionLog from the provided reader.
+func (m *ActionLog) UnmarshalFromReader(reader jspb.Reader) *ActionLog {
+	for reader.Next() {
+		if m == nil {
+			m = &ActionLog{}
+		}
+
+		switch reader.GetFieldNumber() {
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a ActionLog from a slice of bytes.
+func (m *ActionLog) Unmarshal(rawBytes []byte) (*ActionLog, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
 
 type WifiRequestSettingsStorage struct {
@@ -3548,7 +4748,7 @@ func (c *p4WNP1Client) StoreWifiSettings(ctx context.Context, in *WifiRequestSet
 }
 
 func (c *p4WNP1Client) GetStoredWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*WiFiSettings, error) {
-	resp, err := c.client.RPCCall(ctx, "GetStoredWifiSettingsList", in.Marshal(), opts...)
+	resp, err := c.client.RPCCall(ctx, "GetStoredWifiSettings", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}

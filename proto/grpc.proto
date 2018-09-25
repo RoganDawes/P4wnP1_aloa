@@ -50,6 +50,69 @@ service P4WNP1 {
     rpc ListStoredWifiSettings(Empty) returns (StringMessageArray) {}
 }
 
+/* Triggers, Actions and resulting TriggerActions */
+message TriggerActionSettings {
+    repeated TriggerAction registeredTriggerActions = 1;
+}
+
+message TriggerAction {
+    uint32 id = 1; // assigned by service, used as identifier to allow deletion of trigger actions
+    oneof Trigger {
+        TriggerServiceStarted serviceStarted = 2;
+        TriggerUSBGadgetConnected usbGadgetConnected = 3;
+        TriggerUSBGadgetDisconnected usbGadgetDisconnected = 4;
+        TriggerWifiAPStarted wifiAPStarted = 5;
+        TriggerWifiConnectedAsSta wifiConnectedAsSta = 6;
+        TriggerSSHLogin sshLogin = 7;
+        TriggerDHCPLeaseGranted dhcpLeaseGranted = 8;
+    }
+
+    oneof Action {
+        ActionStartBashScript bashScript = 9;
+        ActionStartHIDScript hidScript = 10;
+        ActionDeploySettingsTemplate deploySettingsTemplate = 11;
+        ActionLog log = 12;
+    }
+}
+
+message TriggerServiceStarted {} //no fields
+message TriggerGPIO{} // input and output params have to be defined
+message TriggerUSBGadgetConnected{}
+message TriggerUSBGadgetDisconnected{}
+message TriggerWifiAPStarted{} // fired when an Access Point is running
+message TriggerWifiConnectedAsSta{} // fired when successfully connected to an existing AP
+message TriggerSSHLogin{  // fired when a user logs in
+    string resLoginUser = 1;
+}
+message TriggerDHCPLeaseGranted {  // fired when a client receives a lease
+    string resInterface = 1;
+    string resClientIP = 2;
+    string resClientMac = 3;
+}
+
+message ActionStartBashScript {
+    string scriptPath = 1;
+}
+message ActionStartHIDScript {
+    string scriptName = 1; //could be combined into oneof with script path, to allow starting scripts from arbitrary filepath (avoids storing scripts in DB or fixed folder)
+}
+message ActionDeploySettingsTemplate {
+    string templateName = 1;
+    enum TemplateType {
+        FULL_SETTINGS = 0;
+        NETWORK = 1;
+        WIFI = 2;
+        USB = 3;
+        BLUETOOTH = 4;
+    }
+    TemplateType type = 2;
+}
+message ActionLog {}
+
+
+
+
+
 message WifiRequestSettingsStorage {
     string TemplateName = 1;
     WiFiSettings settings = 2;
