@@ -78,7 +78,9 @@ func (em *EventManager) RegisterReceiver(filterEventType int64) *EventReceiver {
 }
 
 func (em *EventManager) UnregisterReceiver(receiver *EventReceiver) {
-	if !receiver.isRegistered { return }
+	if !receiver.isRegistered {
+		return
+	}
 	em.receiverDelListMutex.Lock()
 	em.receiverDeleteList[receiver] = true
 	receiver.isRegistered = false
@@ -95,8 +97,9 @@ loop:
 			em.receiverDelListMutex.Lock()
 			for delReceiver := range em.receiverDeleteList {
 				delete(em.registeredReceivers, delReceiver)
+				delReceiver.Cancel() // cancel context BEFORE closing the eventQueue channel
 				close(delReceiver.EventQueue)
-				delReceiver.Cancel()
+
 			}
 			//Replace the delete list with a new one and let the GC take care of the old
 			em.receiverDeleteList = make(map[*EventReceiver]bool)
@@ -110,7 +113,6 @@ loop:
 			//Replace the register list with a new one and let the GC take care of the old
 			em.receiverRegisterList = make(map[*EventReceiver]bool)
 			em.receiverRegListMutex.Unlock()
-
 
 			// distribute to registered receiver
 			// Note: no mutex on em.registeredReceivers needed, only accessed in this method
@@ -142,7 +144,7 @@ loop:
 }
 
 type EventReceiver struct {
-	isRegistered bool
+	isRegistered    bool
 	Ctx             context.Context
 	Cancel          context.CancelFunc
 	EventQueue      chan *pb.Event
@@ -160,6 +162,17 @@ func ConstructEventLog(source string, level int, message string) *pb.Event {
 			{Val: &pb.EventValue_Tint64{Tint64: int64(level)}},
 			{Val: &pb.EventValue_Tstring{Tstring: message}},
 			{Val: &pb.EventValue_Tstring{Tstring: string(tJson)}},
+		},
+	}
+}
+
+// We add the Triggers to the oneof Values in proto later on (as they could carry arguments)
+func ConstructEventTrigger(triggerType common_web.EvtTriggerType) *pb.Event {
+
+	return &pb.Event{
+		Type: common_web.EVT_TRIGGER,
+		Values: []*pb.EventValue{
+			&pb.EventValue{Val: &pb.EventValue_Tint64{Tint64: int64(triggerType)}},
 		},
 	}
 }
