@@ -80,7 +80,9 @@ func (wSvc *WiFiService) StartHostapd(timeout time.Duration) (err error) {
 		wSvc.mutexHostapd.Lock()
 	}
 
-	wSvc.CmdHostapd = exec.Command("/usr/sbin/hostapd", "-d", wSvc.PathHostapdConf)
+	wSvc.CmdHostapd = exec.Command("/usr/sbin/hostapd", wSvc.PathHostapdConf)
+	// the logger is the signal generator for OutMonitorHostapd, so we reset the signal before applying the logger
+	wSvc.OutMonitorHostapd.resultReceived.Reset()
 	wSvc.CmdHostapd.Stdout = wSvc.LoggerHostapd.LogWriter
 	wSvc.CmdHostapd.Stderr = wSvc.LoggerHostapd.LogWriter
 	err = wSvc.CmdHostapd.Start()
@@ -131,6 +133,7 @@ func (wSvc *WiFiService) StopHostapd() (err error) {
 		return nil
 	}
 
+	/*
 	wSvc.CmdHostapd.Process.Signal(syscall.SIGTERM)
 	time.Sleep(time.Millisecond * 500)
 	if wSvc.CmdHostapd.ProcessState == nil || !wSvc.CmdHostapd.ProcessState.Exited() {
@@ -148,8 +151,9 @@ func (wSvc *WiFiService) StopHostapd() (err error) {
 		}
 
 	}
-
-
+	*/
+	err = ProcSoftKill(wSvc.CmdHostapd, time.Second)
+	if err != nil { return errors.New(eCantStop) }
 
 
 	wSvc.CmdHostapd = nil
@@ -211,6 +215,8 @@ func (wSvc *WiFiService) StartWpaSupplicant(timeout time.Duration) (err error) {
 	//we monitor output of wpa_supplicant till we are connected, fail due to wrong PSK or timeout is reached
 	//Note: PID file creation doesn't work when not started as daemon, so we do it manually, later on
 	wSvc.CmdWpaSupplicant = exec.Command("/sbin/wpa_supplicant", "-c", wSvc.PathWpaSupplicantConf, "-i", wSvc.IfaceName)
+	// the logger is the signal generator for OutMonitorWpaSupplicant, so we reset the signal before apllying the logger
+	wSvc.OutMonitorWpaSupplicant.resultReceived.Reset()
 	wSvc.CmdWpaSupplicant.Stdout = wSvc.LoggerWpaSupplicant.LogWriter
 
 	err = wSvc.CmdWpaSupplicant.Start()
@@ -383,7 +389,7 @@ func (wSvc *WiFiService) DeploySettings(newWifiSettings *pb.WiFiSettings) (wstat
 			err = errors.New("Unknown working mode")
 		}
 	}
-	fmt.Println("HOSTAPD ERR CHECK\n==============\n-->", err)
+	//fmt.Println("HOSTAPD ERR CHECK\n==============\n-->", err)
 	if err == nil {
 		log.Printf("... WiFi settings deployed successfully\n")
 	} else {
@@ -926,4 +932,33 @@ func wifiSetReg(reg string) (err error) {
 
 	log.Printf("Notified kernel to use ISO/IEC 3166-1 alpha2 regulatory domain '%s'\n", reg)
 	return nil
+}
+
+func ProcSoftKill(cmd *exec.Cmd, timeToKill time.Duration) (err error) {
+	if cmd.Process == nil {
+		// process already dead
+		return nil
+	}
+
+	//send SIGTERM for softkill
+	cmd.Process.Signal(syscall.SIGTERM)
+
+	//we wait for process to exit or issue SIGKILL after timeout
+	hasExitted := make(chan interface{},0)
+	go func() {
+		cmd.Process.Wait() // even if waite ends with error, the process should have died
+		//fmt.Println("WAIT RES ENDED")
+		close(hasExitted)
+	}()
+
+	select {
+	case <- hasExitted:
+		//fmt.Println("HAS EXITED")
+		return nil
+	case <-time.After(timeToKill):
+		//timeout exceeded, send SIGKILL
+		//fmt.Println("TIMEOUT, SENDING SIGKILL")
+		cmd.Process.Kill()
+		return nil
+	}
 }

@@ -6,12 +6,7 @@ package service
 var ServiceState *GlobalServiceState
 
 
-type SubSysState struct {
-	Led *LedState
-}
-
 type GlobalServiceState struct {
-//	EvMgr                 *EventManager
 	BtSvc                 *BtService
 }
 
