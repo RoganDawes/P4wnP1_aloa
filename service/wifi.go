@@ -47,6 +47,8 @@ func wifiCheckExternalBinaries() error {
 }
 
 type WiFiService struct {
+	RootSvc *Service
+
 	State *pb.WiFiState
 	//Settings *pb.WiFi2Settings
 
@@ -381,7 +383,10 @@ func (wSvc *WiFiService) DeploySettings(newWifiSettings *pb.WiFiSettings) (wstat
 	}
 
 	// At this point, we reestablish the interface settings
-	ReInitNetworkInterface(wSvc.IfaceName)
+	//ReInitNetworkInterface(wSvc.IfaceName)
+	if nim,err := wSvc.RootSvc.SubSysNetwork.GetManagedInterface(wSvc.IfaceName); err == nil {
+		nim.ReDeploy()
+	}
 
 	if err == nil {
 		log.Printf("... WiFi settings deployed successfully\n")
@@ -399,7 +404,7 @@ func (wSvc *WiFiService) DeploySettings(newWifiSettings *pb.WiFiSettings) (wstat
 	return wSvc.State, nil
 }
 
-func NewWifiService() (res *WiFiService) {
+func NewWifiService(rootSvc *Service) (res *WiFiService) {
 	ifName := wifi_if_name
 	err := wifiCheckExternalBinaries()
 	if err != nil {
@@ -412,7 +417,7 @@ func NewWifiService() (res *WiFiService) {
 	}
 
 	res = &WiFiService{
-
+		RootSvc: rootSvc,
 		mutexSettings:         &sync.Mutex{},
 		CmdWpaSupplicant:      nil,
 		mutexWpaSupplicant:    &sync.Mutex{},

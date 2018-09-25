@@ -3,8 +3,6 @@
 package service
 
 import (
-	"errors"
-	pb "github.com/mame82/P4wnP1_go/proto"
 	"github.com/mame82/P4wnP1_go/service/datastore"
 )
 
@@ -22,11 +20,11 @@ type SubSysState struct {
 type GlobalServiceState struct {
 	Store                 *datastore.Store
 	EvMgr                 *EventManager
-	UsbGM                 *UsbGadgetManager
+//	UsbGM                 *UsbGadgetManager
 //	Led                   *LedState
 	HidDevPath            map[string]string //stores device path for HID devices
-	StoredNetworkSettings map[string]*pb.EthernetInterfaceSettings
-	WifiSvc               *WiFiService
+//	StoredNetworkSettings map[string]*pb.EthernetInterfaceSettings
+//	WifiSvc               *WiFiService
 	BtSvc                 *BtService
 }
 
@@ -36,12 +34,9 @@ func InitGlobalServiceState() (err error) {
 
 	state.Store,err = datastore.Open(cSTORE_PATH)
 	if err != nil { return }
-	state.StoredNetworkSettings = make(map[string]*pb.EthernetInterfaceSettings)
 
 	/*
-	state.StoredNetworkSettings[USB_ETHERNET_BRIDGE_NAME] = GetDefaultNetworkSettingsUSB()
-	state.StoredNetworkSettings["wlan0"] = GetDefaultNetworkSettingsWiFi()
-	*/
+	state.StoredNetworkSettings = make(map[string]*pb.EthernetInterfaceSettings)
 	//pre initialize Default settings for "wlan0" and USB_ETHERNET_BRIDGE_NAME ("usbeth")
 	state.StoredNetworkSettings[USB_ETHERNET_BRIDGE_NAME] = &pb.EthernetInterfaceSettings{
 		Name:       USB_ETHERNET_BRIDGE_NAME,
@@ -64,12 +59,13 @@ func InitGlobalServiceState() (err error) {
 		IpAddress4: "172.26.0.1",
 		Netmask4:   "255.255.255.0",
 	}
+	*/
 
-	state.WifiSvc = NewWifiService()
+//	state.WifiSvc = NewWifiService()
 
 	state.HidDevPath = make(map[string]string) //should be initialized BEFORE UsbGadgetManager uses it
 	state.EvMgr = NewEventManager(20)
-	state.UsbGM, err = NewUSBGadgetManager()
+//	state.UsbGM, err = NewUSBGadgetManager()
 	if err != nil {
 		return
 	}
@@ -85,6 +81,7 @@ func InitGlobalServiceState() (err error) {
 	return nil
 }
 
+/*
 func (state *GlobalServiceState) GetInterfaceSettingsByInterfaceName(ifname string) (*pb.EthernetInterfaceSettings, error) {
 	for _, s := range state.StoredNetworkSettings {
 		if s.Name == ifname {
@@ -93,6 +90,7 @@ func (state *GlobalServiceState) GetInterfaceSettingsByInterfaceName(ifname stri
 	}
 	return nil, errors.New("No settings for interface " + ifname + " found")
 }
+*/
 
 func (state *GlobalServiceState) StartService() {
 	state.EvMgr.Start()

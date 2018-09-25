@@ -54,7 +54,7 @@ func (s *server) Stop() error {
 
 func (s *server) StoreDeployedWifiSettings(ctx context.Context, m *pb.StringMessage) (e *pb.Empty, err error) {
 	return s.StoreWifiSettings(ctx, &pb.WifiRequestSettingsStorage{
-		Settings: ServiceState.WifiSvc.State.CurrentSettings,
+		Settings: s.rootSvc.SubSysWifi.State.CurrentSettings,
 		TemplateName: m.Msg,
 	})
 }
@@ -87,14 +87,14 @@ func (s *server) ListStoredWifiSettings(ctx context.Context, e *pb.Empty) (sa *p
 }
 
 func (s *server) DeployWiFiSettings(ctx context.Context, wset *pb.WiFiSettings) (wstate *pb.WiFiState, err error) {
-	return ServiceState.WifiSvc.DeploySettings(wset)
+	return s.rootSvc.SubSysWifi.DeploySettings(wset)
 }
 
 func (s *server) GetWiFiState(ctx context.Context, empty *pb.Empty) (wstate *pb.WiFiState, err error) {
 	// Update state before transmitting back
-	ServiceState.WifiSvc.UpdateStateFromIw()
+	s.rootSvc.SubSysWifi.UpdateStateFromIw()
 
-	st := ServiceState.WifiSvc.State
+	st := s.rootSvc.SubSysWifi.State
 	return st, nil
 }
 
@@ -103,18 +103,30 @@ func (s *server) ListenWiFiStateChanges(ctx context.Context, empty *pb.Empty) (w
 }
 
 func (s *server) GetDeployedEthernetInterfaceSettings(ctx context.Context, req *pb.StringMessage) (resp *pb.EthernetInterfaceSettings, err error) {
+
+
+	if mi,err := s.rootSvc.SubSysNetwork.GetManagedInterface(req.Msg); err == nil {
+		return mi.GetState().CurrentSettings, nil
+	} else {
+		return nil, errors.New(fmt.Sprintf("No stored (or used) settings for ethernet interface '%s'", req.Msg))
+	}
+	/*
 	if settings,exist := ServiceState.StoredNetworkSettings[req.Msg]; exist && settings.SettingsInUse {
 		return settings, nil
 	} else {
 		return nil, errors.New(fmt.Sprintf("No stored (or used) settings for ethernet interface '%s'", req.Msg))
 	}
+	*/
 }
 
 func (s *server) GetAllDeployedEthernetInterfaceSettings(ctx context.Context, empty *pb.Empty) (resp *pb.DeployedEthernetInterfaceSettings, err error) {
-	deployed := make([]*pb.EthernetInterfaceSettings, len(ServiceState.StoredNetworkSettings))
-	var i = 0
-	for _,settings := range ServiceState.StoredNetworkSettings { deployed[i] = settings; i++ }
-
+	miList := s.rootSvc.SubSysNetwork.GetManagedInterfaceNames()
+	deployed := make([]*pb.EthernetInterfaceSettings,len(miList))
+	for idx,name := range miList {
+		mi,err := s.rootSvc.SubSysNetwork.GetManagedInterface(name)
+		if err != nil { return nil,err }
+		deployed[idx] = mi.GetState().CurrentSettings
+	}
 	resp = &pb.DeployedEthernetInterfaceSettings{
 		List: deployed,
 	}
@@ -193,7 +205,7 @@ func (s *server) FSCreateTempDirOrFile(ctx context.Context, req *pb.TempDirOrFil
 }
 
 func (s *server) HIDGetRunningJobState(ctx context.Context, req *pb.HIDScriptJob) (res *pb.HIDRunningJobStateResult, err error) {
-	targetJob,err := ServiceState.UsbGM.HidCtl.GetBackgroundJobByID(int(req.Id))
+	targetJob,err := s.rootSvc.SubSysUSB.HidCtl.GetBackgroundJobByID(int(req.Id))
 	if err != nil { return nil, err }
 
 	vmID,_ := targetJob.GetVMId() // ignore error, as VM ID would be -1 in error case
@@ -211,9 +223,9 @@ func (s *server) HIDGetRunningJobState(ctx context.Context, req *pb.HIDScriptJob
 }
 
 func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) (jobs *pb.HIDScriptJobList, err error) {
-	if ServiceState.UsbGM.HidCtl == nil { return nil, rpcErrNoHid}
+	if s.rootSvc.SubSysUSB.HidCtl == nil { return nil, rpcErrNoHid}
 
-	retJobs,err := ServiceState.UsbGM.HidCtl.GetAllBackgroundJobs()
+	retJobs,err := s.rootSvc.SubSysUSB.HidCtl.GetAllBackgroundJobs()
 	if err != nil { return nil, err }
 	jobs = &pb.HIDScriptJobList{}
 	for _, aJob := range retJobs {
@@ -224,10 +236,10 @@ func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) 
 
 func (s *server) HIDCancelAllScriptJobs(ctx context.Context, rEmpty *pb.Empty) (empty *pb.Empty, err error) {
 	empty = &pb.Empty{}
-	if ServiceState.UsbGM.HidCtl == nil { return empty, rpcErrNoHid}
+	if s.rootSvc.SubSysUSB.HidCtl == nil { return empty, rpcErrNoHid}
 
 	// Try to find script
-	ServiceState.UsbGM.HidCtl.CancelAllBackgroundJobs()
+	s.rootSvc.SubSysUSB.HidCtl.CancelAllBackgroundJobs()
 	return
 }
 
@@ -235,10 +247,10 @@ func (s *server) HIDCancelAllScriptJobs(ctx context.Context, rEmpty *pb.Empty) (
 
 func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) (empty *pb.Empty, err error) {
 	empty = &pb.Empty{}
-	if ServiceState.UsbGM.HidCtl == nil { return empty, rpcErrNoHid}
+	if s.rootSvc.SubSysUSB.HidCtl == nil { return empty, rpcErrNoHid}
 
 	// Try to find script
-	job,err := ServiceState.UsbGM.HidCtl.GetBackgroundJobByID(int(sJob.Id))
+	job,err := s.rootSvc.SubSysUSB.HidCtl.GetBackgroundJobByID(int(sJob.Id))
 	if err != nil { return empty, err }
 
 	job.Cancel()
@@ -246,7 +258,7 @@ func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) 
 }
 
 func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptRequest) (scriptRes *pb.HIDScriptResult, err error) {
-	if ServiceState.UsbGM.HidCtl == nil { return nil, rpcErrNoHid}
+	if s.rootSvc.SubSysUSB.HidCtl == nil { return nil, rpcErrNoHid}
 
 
 
@@ -259,7 +271,7 @@ func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptReques
 		if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
 
 
-		scriptVal,err := ServiceState.UsbGM.HidCtl.RunScript(jobCtx, string(scriptFile))
+		scriptVal,err := s.rootSvc.SubSysUSB.HidCtl.RunScript(jobCtx, string(scriptFile))
 		if err != nil { return nil,err }
 		val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
 		jsonVal,err := json.Marshal(val)
@@ -276,7 +288,7 @@ func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptReques
 }
 
 func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptRequest) (rJob *pb.HIDScriptJob, err error) {
-	if ServiceState.UsbGM.HidCtl == nil { return nil, rpcErrNoHid}
+	if s.rootSvc.SubSysUSB.HidCtl == nil { return nil, rpcErrNoHid}
 
 	if scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath); err != nil {
 		return nil, errors.New(fmt.Sprintf("Couldn't load HIDScript '%s': %v\n", scriptReq.ScriptPath, err))
@@ -285,7 +297,7 @@ func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptReq
 		jobCtx := context.Background()
 		// ToDo: we don't retrieve the cancelFunc which should be called to free resources. Solution: use withCancel context and call cancel by go routine on timeout
 		if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
-		job,err := ServiceState.UsbGM.HidCtl.StartScriptAsBackgroundJob(jobCtx, string(scriptFile))
+		job,err := s.rootSvc.SubSysUSB.HidCtl.StartScriptAsBackgroundJob(jobCtx, string(scriptFile))
 		if err != nil { return nil,err }
 
 		rJob = &pb.HIDScriptJob{
@@ -297,15 +309,15 @@ func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptReq
 }
 
 func (s *server) HIDGetScriptJobResult(ctx context.Context, sJob *pb.HIDScriptJob) (scriptRes *pb.HIDScriptResult, err error) {
-	if ServiceState.UsbGM.HidCtl == nil { return nil, rpcErrNoHid}
+	if s.rootSvc.SubSysUSB.HidCtl == nil { return nil, rpcErrNoHid}
 
 	// Try to find script
-	job,err := ServiceState.UsbGM.HidCtl.GetBackgroundJobByID(int(sJob.Id))
+	job,err := s.rootSvc.SubSysUSB.HidCtl.GetBackgroundJobByID(int(sJob.Id))
 	if err != nil { return scriptRes, err }
 
 
 	//ToDo: check impact/behavior, because ctx is provided by gRPC server
-	scriptVal,err := ServiceState.UsbGM.HidCtl.WaitBackgroundJobResult(ctx, job)
+	scriptVal,err := s.rootSvc.SubSysUSB.HidCtl.WaitBackgroundJobResult(ctx, job)
 	if err != nil { return nil,err }
 	val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
 	jsonVal,err := json.Marshal(val)
@@ -326,7 +338,11 @@ func (s *server) DeployEthernetInterfaceSettings(ctx context.Context, es *pb.Eth
 	log.Printf("Trying to deploy ethernet interface settings %v", es)
 
 	empty = &pb.Empty{}
-	err = ConfigureInterface(es)
+	iname := es.Name
+	nim,err := s.rootSvc.SubSysNetwork.GetManagedInterface(iname)
+	if err != nil { return empty,err }
+
+	err = nim.DeploySettings(es)
 	if err != nil {
 		log.Printf("Error deploying ethernet interface settings %v", err)
 	}
@@ -358,11 +374,11 @@ func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetS
 	//ToDo: Former gadgets are destroyed without testing if there're changes, this should be aborted if GadgetSettingsState == GetDeployedGadgetSettings()
 	DestroyGadget(USB_GADGET_NAME)
 
-	errg := ServiceState.UsbGM.DeployGadgetSettings(ServiceState.UsbGM.UndeployedGadgetSettings)
+	errg := s.rootSvc.SubSysUSB.DeployGadgetSettings(s.rootSvc.SubSysUSB.UndeployedGadgetSettings)
 	err = nil
 	if errg != nil {
 		err = errors.New(fmt.Sprintf("Deploying new gadget settings failed, reverted to old ones: %v", errg))
-		ServiceState.UsbGM.DeployGadgetSettings(gs_backup) //We don't catch the error, as the old settings should have been working
+		s.rootSvc.SubSysUSB.DeployGadgetSettings(gs_backup) //We don't catch the error, as the old settings should have been working
 	}
 
 	gs, _ = ParseGadgetState(USB_GADGET_NAME) //Return settings from deployed gadget
@@ -370,17 +386,17 @@ func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetS
 }
 
 func (s *server) GetGadgetSettings(context.Context, *pb.Empty) (*pb.GadgetSettings, error) {
-	return ServiceState.UsbGM.UndeployedGadgetSettings, nil
+	return s.rootSvc.SubSysUSB.UndeployedGadgetSettings, nil
 }
 
 func (s *server) SetGadgetSettings(ctx context.Context, gs *pb.GadgetSettings) (res *pb.GadgetSettings, err error) {
 	if err = ValidateGadgetSetting(*gs); err != nil {
 		//We return the validation error and the current (unchanged) GadgetSettingsState
-		res = ServiceState.UsbGM.UndeployedGadgetSettings
+		res = s.rootSvc.SubSysUSB.UndeployedGadgetSettings
 		return
 	}
-	ServiceState.UsbGM.UndeployedGadgetSettings = gs
-	res = ServiceState.UsbGM.UndeployedGadgetSettings
+	s.rootSvc.SubSysUSB.UndeployedGadgetSettings = gs
+	res = s.rootSvc.SubSysUSB.UndeployedGadgetSettings
 	return
 }
 

@@ -13,107 +13,99 @@ import (
 	"errors"
 )
 
+var (
+	ErrUnmanagedInterface = errors.New("Not a managed network interface")
+)
+
+func NewNetworkManager() (nm *NetworkManager, err error){
+	nm = &NetworkManager{
+		ManagedInterfaces: make(map[string]*NetworkInterfaceManager),
+	}
+
+	// Add managed interfaces
+
+	// USB
+	err = nm.AddManagedInterface(GetDefaultNetworkSettingsUSB())
+	if err != nil { return }
+	// WiFi
+	err = nm.AddManagedInterface(GetDefaultNetworkSettingsWiFi())
+	if err != nil { return }
+	// Bluetooth
+	err = nm.AddManagedInterface(GetDefaultNetworkSettingsBluetooth())
+	if err != nil { return }
+
+	return nm, nil
+}
 
 
-func ReInitNetworkInterface(ifName string) (err error) {
+type NetworkManager struct {
+	ManagedInterfaces map[string]*NetworkInterfaceManager
+}
+
+func (nm *NetworkManager) AddManagedInterface(startupConfig *pb.EthernetInterfaceSettings) (err error) {
+	nim,err := NewNetworkInterfaceManager(startupConfig.Name, startupConfig)
+	if err != nil { return err }
+	nm.ManagedInterfaces[startupConfig.Name] = nim
+	return
+}
+
+func (nm *NetworkManager) GetManagedInterfaceNames() (ifnames []string) {
+	ifnames = make([]string, len(nm.ManagedInterfaces))
+	i:=0
+	for name,_ := range nm.ManagedInterfaces {
+		ifnames[i] = name
+		i += 1
+	}
+	return
+}
+
+func (nm *NetworkManager) GetManagedInterface(name string) (nim *NetworkInterfaceManager, err error) {
+	if nim, exists := nm.ManagedInterfaces[name]; exists {
+		return nim, nil
+	} else {
+		return nil, ErrUnmanagedInterface
+	}
+}
+
+
+
+type NetworkInterfaceState struct {
+	InterfacePresent bool
+	CurrentSettings *pb.EthernetInterfaceSettings
+}
+
+// ToDo: interface watcher (up/down --> auto redeploy)
+type NetworkInterfaceManager struct {
+	InterfaceName string
+	state *NetworkInterfaceState
+}
+
+func (nim *NetworkInterfaceManager) GetState() (res *NetworkInterfaceState) {
+	return nim.state
+}
+
+func (nim *NetworkInterfaceManager) ReDeploy() (err error) {
+	/*
 	if settings, existing := ServiceState.StoredNetworkSettings[ifName]; existing {
 		log.Printf("Redeploying stored Network settings for interface '%s' ...\n", ifName)
 		return ConfigureInterface(settings)
 	} else {
 		return errors.New(fmt.Sprintf("No stored interface settings found for '%s'\n", ifName))
 	}
+	*/
+	return nim.DeploySettings(nim.state.CurrentSettings)
 }
 
-func ParseIPv4Mask(maskstr string) (net.IPMask, error) {
-	mask := net.ParseIP(maskstr)
-	if mask == nil { return nil, errors.New("Couldn't parse netmask") }
-
-	net.ParseCIDR(maskstr)
-	return net.IPv4Mask(mask[12], mask[13], mask[14], mask[15]), nil
-}
-
-func IpNetFromIPv4AndNetmask(ipv4 string, netmask string) (*net.IPNet, error) {
-	mask, err := ParseIPv4Mask(netmask)
-	if err != nil { return nil, err }
-
-	ip := net.ParseIP(ipv4)
-	if mask == nil { return nil, errors.New("Couldn't parse IP") }
-
-	netw := ip.Mask(mask)
-
-	return &net.IPNet{IP: netw, Mask: mask}, nil
-}
-
-
-
-func CreateBridge(name string) (err error) {
-	return netlink.CreateBridge(name, false)
-}
-
-func setInterfaceMac(name string, mac string) error {
-	return netlink.SetMacAddress(name, mac)
-}
-
-func DeleteBridge(name string) error {
-	return netlink.DeleteBridge(name)
-}
-
-//Uses sysfs (not IOCTL)
-func SetBridgeSTP(name string, stp_on bool) (err error) {
-	value := "0"
-	if (stp_on) { value = "1" }
-	return ioutil.WriteFile(fmt.Sprintf("/sys/class/net/%s/bridge/stp_state", name), []byte(value), os.ModePerm)
-}
-
-func SetBridgeForwardDelay(name string, fd uint) (err error) {
-	return ioutil.WriteFile(fmt.Sprintf("/sys/class/net/%s/bridge/forward_delay", name), []byte(fmt.Sprintf("%d", fd)), os.ModePerm)
-}
-
-
-
-func CheckInterfaceExistence(name string) (res bool, err error) {
-	_, err = net.InterfaceByName(name)
-	if err != nil {
-		return false, err
-	}
-	return true, err
-}
-
-func NetworkLinkUp(name string) (err error) {
-	iface, err := net.InterfaceByName(name)
-	if err != nil {
-		return err
-	}
-
-	err = netlink.NetworkLinkUp(iface)
-	return
-}
-
-func AddInterfaceToBridgeIfExistent(bridgeName string, ifName string) (err error) {
-	br, err := net.InterfaceByName(bridgeName)
-	if err != nil {
-		return err
-	}
-	iface, err := net.InterfaceByName(ifName)
-	if err != nil {
-		return err
-	}
-
-	err = netlink.AddToBridge(iface, br)
-	if err != nil {
-		return err
-	}
-	log.Printf("Interface %s added to bridge %s", ifName, bridgeName)
-
-	//enable interface
-	NetworkLinkUp(ifName)
-	return nil
-}
-
-func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
+func (nim *NetworkInterfaceManager) DeploySettings(settings *pb.EthernetInterfaceSettings) (err error) {
 	//Get Interface
 	iface, err := net.InterfaceByName(settings.Name)
-	if err != nil {	return err }
+	if err != nil {
+		nim.state.InterfacePresent = false
+		//return err
+		return nil //Not having the interface present isn't an error
+	} else {
+		nim.state.InterfacePresent = true
+	}
 
 	//stop DHCP server / client if still running
 	running, _, err := IsDHCPServerRunning(settings.Name)
@@ -223,7 +215,138 @@ func ConfigureInterface(settings *pb.EthernetInterfaceSettings) (err error) {
 
 	//Store latest settings
 	settings.SettingsInUse = true
-	ServiceState.StoredNetworkSettings[settings.Name] = settings
 
+	//ServiceState.StoredNetworkSettings[settings.Name] = settings
+	nim.state.CurrentSettings = settings
+
+	return nil
+}
+
+func NewNetworkInterfaceManager(ifaceName string, startupSettings *pb.EthernetInterfaceSettings) (nim *NetworkInterfaceManager, err error) {
+	nim = &NetworkInterfaceManager{
+		InterfaceName: ifaceName,
+		state: &NetworkInterfaceState{},
+	}
+	nim.state.CurrentSettings = startupSettings
+	nim.ReDeploy()
+
+	// Deploy startup configuration, to have an initial, defined state
+
+	/*
+	// Startup settings (always DHCP client, Interface up)
+	nim.state.CurrentSettings = &pb.EthernetInterfaceSettings{
+		Name: ifaceName,
+		Mode: pb.EthernetInterfaceSettings_DHCP_CLIENT,
+		Enabled: true,
+		SettingsInUse: true,
+		DhcpServerSettings: &pb.DHCPServerSettings{
+			CallbackScript: "",
+			DoNotBindInterface: false,
+			LeaseFile: nameLeaseFileDHCPSrv(ifaceName),
+			ListenInterface: ifaceName,
+			ListenPort: 0,
+			NotAuthoritative: false,
+			Options: map[uint32]string{
+				3: "",
+				6: "",
+			},
+			Ranges: []*pb.DHCPServerRange{},
+			StaticHosts: []*pb.DHCPServerStaticHost{},
+		},
+	}
+	*/
+
+	return
+}
+
+
+/* HELPER */
+func nameLeaseFileDHCPSrv(nameIface string) (lf string) {
+	return "/tmp/dnsmasq_" + nameIface + ".leases"
+}
+
+func ParseIPv4Mask(maskstr string) (net.IPMask, error) {
+	mask := net.ParseIP(maskstr)
+	if mask == nil { return nil, errors.New("Couldn't parse netmask") }
+
+	net.ParseCIDR(maskstr)
+	return net.IPv4Mask(mask[12], mask[13], mask[14], mask[15]), nil
+}
+
+func IpNetFromIPv4AndNetmask(ipv4 string, netmask string) (*net.IPNet, error) {
+	mask, err := ParseIPv4Mask(netmask)
+	if err != nil { return nil, err }
+
+	ip := net.ParseIP(ipv4)
+	if mask == nil { return nil, errors.New("Couldn't parse IP") }
+
+	netw := ip.Mask(mask)
+
+	return &net.IPNet{IP: netw, Mask: mask}, nil
+}
+
+
+
+func CreateBridge(name string) (err error) {
+	return netlink.CreateBridge(name, false)
+}
+
+func setInterfaceMac(name string, mac string) error {
+	return netlink.SetMacAddress(name, mac)
+}
+
+func DeleteBridge(name string) error {
+	return netlink.DeleteBridge(name)
+}
+
+//Uses sysfs (not IOCTL)
+func SetBridgeSTP(name string, stp_on bool) (err error) {
+	value := "0"
+	if (stp_on) { value = "1" }
+	return ioutil.WriteFile(fmt.Sprintf("/sys/class/net/%s/bridge/stp_state", name), []byte(value), os.ModePerm)
+}
+
+func SetBridgeForwardDelay(name string, fd uint) (err error) {
+	return ioutil.WriteFile(fmt.Sprintf("/sys/class/net/%s/bridge/forward_delay", name), []byte(fmt.Sprintf("%d", fd)), os.ModePerm)
+}
+
+
+
+func CheckInterfaceExistence(name string) (res bool, err error) {
+	_, err = net.InterfaceByName(name)
+	if err != nil {
+		return false, err
+	}
+	return true, err
+}
+
+func NetworkLinkUp(name string) (err error) {
+	iface, err := net.InterfaceByName(name)
+	if err != nil {
+		return err
+	}
+
+	err = netlink.NetworkLinkUp(iface)
+	return
+}
+
+func AddInterfaceToBridgeIfExistent(bridgeName string, ifName string) (err error) {
+	br, err := net.InterfaceByName(bridgeName)
+	if err != nil {
+		return err
+	}
+	iface, err := net.InterfaceByName(ifName)
+	if err != nil {
+		return err
+	}
+
+	err = netlink.AddToBridge(iface, br)
+	if err != nil {
+		return err
+	}
+	log.Printf("Interface %s added to bridge %s", ifName, bridgeName)
+
+	//enable interface
+	NetworkLinkUp(ifName)
 	return nil
 }

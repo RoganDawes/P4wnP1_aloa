@@ -8,6 +8,7 @@ import (
 type Service struct {
 	SubSysState          interface{}
 	SubSysLogging        interface{}
+	SubSysNetwork *NetworkManager
 	SubSysDataStore      *datastore.Store
 	SubSysEvent          *EventManager
 	SubSysUSB            *UsbGadgetManager
@@ -21,6 +22,12 @@ type Service struct {
 func NewService() (svc *Service, err error) {
 	svc = &Service{}
 	svc.SubSysLed = NewLedService()
+	svc.SubSysNetwork, err = NewNetworkManager()
+	if err != nil { return nil,err}
+	svc.SubSysUSB,err = NewUSBGadgetManager(svc)
+	if err != nil { return nil,err}
+	svc.SubSysWifi = NewWifiService(svc)
+
 	svc.SubSysRPC = NewRpcServerService(svc)
 	return
 }

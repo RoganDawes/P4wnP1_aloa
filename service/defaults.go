@@ -13,8 +13,20 @@ const (
 	USB_ETHERNET_BRIDGE_NAME  = "usbeth"
 	BT_ETHERNET_BRIDGE_MAC   = "44:22:26:12:14:16"
 	BT_ETHERNET_BRIDGE_NAME  = "bteth"
-
+	WIFI_ETHERNET_IFACE_NAME = "wlan0"
 )
+
+func GetDefaultNetworkSettingsBluetooth() (*pb.EthernetInterfaceSettings) {
+	ifSettings := &pb.EthernetInterfaceSettings{
+		Name:       BT_ETHERNET_BRIDGE_NAME,
+		Enabled:    true,
+		Mode:       pb.EthernetInterfaceSettings_MANUAL,
+		IpAddress4: "172.26.0.1",
+		Netmask4:   "255.255.255.0",
+		DhcpServerSettings: GetDefaultDHCPConfigBluetooth(),
+	}
+	return ifSettings
+}
 
 func GetDefaultNetworkSettingsUSB() (*pb.EthernetInterfaceSettings) {
 	//configure 172.24.0.1/255.255.255.252 for usbeth
@@ -32,7 +44,7 @@ func GetDefaultNetworkSettingsUSB() (*pb.EthernetInterfaceSettings) {
 func GetDefaultNetworkSettingsWiFi() (*pb.EthernetInterfaceSettings) {
 	ifSettings := &pb.EthernetInterfaceSettings {
 		Enabled:            true,
-		Name:               "wlan0",
+		Name:               WIFI_ETHERNET_IFACE_NAME,
 		Mode:               pb.EthernetInterfaceSettings_DHCP_SERVER,
 		IpAddress4:         "172.24.0.1",
 		Netmask4:           "255.255.255.0",
@@ -46,7 +58,7 @@ func GetDefaultDHCPConfigUSB() (settings *pb.DHCPServerSettings) {
 		//CallbackScript:     "/bin/evilscript",
 		DoNotBindInterface: false, //only bind to given interface
 		ListenInterface:    USB_ETHERNET_BRIDGE_NAME,
-		LeaseFile:          "/tmp/dnsmasq_" + USB_ETHERNET_BRIDGE_NAME + ".leases",
+		LeaseFile:          nameLeaseFileDHCPSrv(USB_ETHERNET_BRIDGE_NAME),
 		ListenPort:         0,     //No DNS, DHCP only
 		NotAuthoritative:   false, //be authoritative
 		Ranges: []*pb.DHCPServerRange{
@@ -63,12 +75,31 @@ func GetDefaultDHCPConfigUSB() (settings *pb.DHCPServerSettings) {
 	return
 }
 
+func GetDefaultDHCPConfigBluetooth() (settings *pb.DHCPServerSettings) {
+	settings = &pb.DHCPServerSettings{
+		//CallbackScript:     "/bin/evilscript",
+		DoNotBindInterface: false, //only bind to given interface
+		ListenInterface:    BT_ETHERNET_BRIDGE_NAME,
+		LeaseFile:          nameLeaseFileDHCPSrv(BT_ETHERNET_BRIDGE_NAME),
+		ListenPort:         0,     //No DNS, DHCP only
+		NotAuthoritative:   false, //be authoritative
+		Ranges: []*pb.DHCPServerRange{
+			&pb.DHCPServerRange{RangeLower: "172.26.0.2", RangeUpper: "172.26.0.20", LeaseTime: "5m"},
+		},
+		Options: map[uint32]string{
+			3:   "", //Disable option: Router
+			6:   "", //Disable option: DNS
+		},
+	}
+	return
+}
+
 func GetDefaultDHCPConfigWiFi() (settings *pb.DHCPServerSettings) {
 	settings = &pb.DHCPServerSettings{
 		//CallbackScript:     "/bin/evilscript",
 		DoNotBindInterface: false, //only bind to given interface
-		ListenInterface:    "wlan0",
-		LeaseFile:          "/tmp/dnsmasq_wlan0.leases",
+		ListenInterface:    WIFI_ETHERNET_IFACE_NAME,
+		LeaseFile:          nameLeaseFileDHCPSrv(WIFI_ETHERNET_IFACE_NAME),
 		ListenPort:         0,     //No DNS, DHCP only
 		NotAuthoritative:   false, //be authoritative
 		Ranges: []*pb.DHCPServerRange{

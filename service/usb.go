@@ -77,6 +77,8 @@ const (
 var rp_usbHidDevName                      = regexp.MustCompile("(?m)DEVNAME=(.*)\n")
 
 type UsbGadgetManager struct {
+	RootSvc *Service
+
 	// ToDo: variable, indicating if HIDScript is usable
 	HidCtl *hid.HIDController // Points to an HID controller instance only if keyboard and/or mouse are enabled, nil otherwise
 	UndeployedGadgetSettings *pb.GadgetSettings
@@ -87,8 +89,10 @@ func (gm *UsbGadgetManager) HandleEvent(event hid.Event) {
 	ServiceState.EvMgr.Emit(ConstructEventHID(event))
 }
 
-func NewUSBGadgetManager() (newUGM *UsbGadgetManager, err error) {
-	newUGM = &UsbGadgetManager{}
+func NewUSBGadgetManager(rooSvc *Service) (newUGM *UsbGadgetManager, err error) {
+	newUGM = &UsbGadgetManager{
+		RootSvc: rooSvc,
+	}
 	defGS := GetDefaultGadgetSettings()
 	newUGM.UndeployedGadgetSettings = &defGS //preload state with default settings
 	err = CheckLibComposite()
@@ -664,7 +668,11 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 			log.Printf("... creating network bridge for USB ethernet devices")
 			addUSBEthernetBridge()
 			log.Printf("... checking for stored network interface settings for USB ethernet")
-			ReInitNetworkInterface(USB_ETHERNET_BRIDGE_NAME)
+			//ReInitNetworkInterface(USB_ETHERNET_BRIDGE_NAME)
+			if nim,err := gm.RootSvc.SubSysNetwork.GetManagedInterface(USB_ETHERNET_BRIDGE_NAME); err == nil {
+				nim.ReDeploy()
+			}
+
 		} else {
 			return err
 		}
