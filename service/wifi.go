@@ -24,7 +24,7 @@ import (
 const (
 	wifi_if_name                   string = "wlan0"
 	WPA_SUPPLICANT_CONNECT_TIMEOUT        = time.Second * 20
-	HOSTAPD_WAIT_AP_UP_TIMEOUT        = time.Second * 20
+	HOSTAPD_WAIT_AP_UP_TIMEOUT        = time.Second * 8
 )
 
 func wifiCheckExternalBinaries() error {
@@ -80,7 +80,7 @@ func (wSvc *WiFiService) StartHostapd(timeout time.Duration) (err error) {
 		wSvc.mutexHostapd.Lock()
 	}
 
-	wSvc.CmdHostapd = exec.Command("/usr/sbin/hostapd", wSvc.PathHostapdConf)
+	wSvc.CmdHostapd = exec.Command("/usr/sbin/hostapd", "-d", wSvc.PathHostapdConf)
 	wSvc.CmdHostapd.Stdout = wSvc.LoggerHostapd.LogWriter
 	wSvc.CmdHostapd.Stderr = wSvc.LoggerHostapd.LogWriter
 	err = wSvc.CmdHostapd.Start()
@@ -93,7 +93,6 @@ func (wSvc *WiFiService) StartHostapd(timeout time.Duration) (err error) {
 	apUp, errcon := wSvc.OutMonitorHostapd.WaitConnectResultOnce(timeout)
 	if errcon != nil {
 		log.Printf("... hostapd reached timeout of '%v' without beeing able to bring up an Access Point\n", timeout)
-		log.Println("... killing hostapd")
 		// avoid dead lock
 		wSvc.mutexHostapd.Unlock()
 		wSvc.StopHostapd()
@@ -108,11 +107,11 @@ func (wSvc *WiFiService) StartHostapd(timeout time.Duration) (err error) {
 	} else {
 		log.Println("... hostapd failed to bring up an Access Point, stopping ...")
 		//wifiStopWpaSupplicant(nameIface)
-		log.Println("... killing hostapd")
 		// avoid dead lock
 		wSvc.mutexHostapd.Unlock()
 		wSvc.StopHostapd()
 		wSvc.mutexHostapd.Lock()
+		log.Println("... hostapd terminated")
 		return errors.New("Hostapd failed to bring up Access Point")
 	}
 
@@ -123,6 +122,7 @@ func (wSvc *WiFiService) StopHostapd() (err error) {
 	eSuccess := fmt.Sprintf("... hostapd for interface '%s' stopped", wSvc.IfaceName)
 	eCantStop := fmt.Sprintf("... couldn't terminate hostapd for interface '%s'", wSvc.IfaceName)
 
+	log.Println("... killing hostapd")
 	wSvc.mutexHostapd.Lock()
 	defer wSvc.mutexHostapd.Unlock()
 
@@ -132,12 +132,12 @@ func (wSvc *WiFiService) StopHostapd() (err error) {
 	}
 
 	wSvc.CmdHostapd.Process.Signal(syscall.SIGTERM)
-	wSvc.CmdHostapd.Wait()
-	if !wSvc.CmdHostapd.ProcessState.Exited() {
-		log.Printf("... hostapd didn't react on SIGTERM for interface '%s', trying SIGKILL\n", wSvc.IfaceName)
+	time.Sleep(time.Millisecond * 500)
+	if wSvc.CmdHostapd.ProcessState == nil || !wSvc.CmdHostapd.ProcessState.Exited() {
 		wSvc.CmdHostapd.Process.Kill()
+		wSvc.CmdHostapd.Wait()
 
-		time.Sleep(500 * time.Millisecond)
+		//wSvc.CmdHostapd.Process.Kill()
 		if wSvc.CmdHostapd.ProcessState.Exited() {
 			wSvc.CmdHostapd = nil
 			log.Println(eSuccess)
@@ -146,7 +146,11 @@ func (wSvc *WiFiService) StopHostapd() (err error) {
 			log.Println(eCantStop)
 			return errors.New(eCantStop)
 		}
+
 	}
+
+
+
 
 	wSvc.CmdHostapd = nil
 	log.Println(eSuccess)
@@ -310,14 +314,12 @@ func (wSvc *WiFiService) runAPMode(newWifiSettings *pb.WiFiSettings) (err error)
 	err = wSvc.StartHostapd(HOSTAPD_WAIT_AP_UP_TIMEOUT)
 	if err != nil {
 		fmt.Println("Wait 2 seconds and retry to to start hostapd once...")
-		time.Sleep(2 * time.Second) // ToDo: replace by output monitor, waiting till hostapd is up
+		time.Sleep(2 * time.Second)
 		err = wSvc.StartHostapd(HOSTAPD_WAIT_AP_UP_TIMEOUT)
 		if err != nil {
 			return err
 		}
 	}
-
-
 
 	return nil
 }
@@ -381,6 +383,13 @@ func (wSvc *WiFiService) DeploySettings(newWifiSettings *pb.WiFiSettings) (wstat
 			err = errors.New("Unknown working mode")
 		}
 	}
+	fmt.Println("HOSTAPD ERR CHECK\n==============\n-->", err)
+	if err == nil {
+		log.Printf("... WiFi settings deployed successfully\n")
+	} else {
+		log.Printf("... deploying WiFi settings failed: %s\n", err.Error())
+		return wSvc.State, err
+	}
 
 	// At this point, we reestablish the interface settings
 	//ReInitNetworkInterface(wSvc.IfaceName)
@@ -388,11 +397,7 @@ func (wSvc *WiFiService) DeploySettings(newWifiSettings *pb.WiFiSettings) (wstat
 		nim.ReDeploy()
 	}
 
-	if err == nil {
-		log.Printf("... WiFi settings deployed successfully\n")
-	} else {
-		log.Printf("... deploying WiFi settings failed: %s\n", err.Error())
-	}
+
 
 	// update settings (wSvc is updated by runAPMode/runStaMode)
 	wSvc.State.CurrentSettings = newWifiSettings
@@ -474,7 +479,7 @@ func (m *hostapdOutMonitor) Write(p []byte) (n int, err error) {
 	line := string(p)
 
 	switch {
-	case strings.Contains(line, "->DISABLED"):
+	case strings.Contains(line, "AP-DISABLED"):
 		log.Printf("Starting Access Point failed\n")
 		m.Lock()
 		defer m.Unlock()
@@ -507,6 +512,7 @@ func NewHostapdOutMonitor() *hostapdOutMonitor {
 	return &hostapdOutMonitor{
 		resultReceived: util.NewSignal(false, false),
 		Mutex:          &sync.Mutex{},
+		result: false,
 	}
 }
 

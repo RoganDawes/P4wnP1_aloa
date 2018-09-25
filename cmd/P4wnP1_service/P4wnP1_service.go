@@ -70,8 +70,8 @@ func main() {
 	go func() {
 		for {
 			//println("Sending log event")
-			state.EvMgr.Emit(service.ConstructEventLog("test source", i%5, "message " +strconv.Itoa(i) + ": " + textfill))
-			time.Sleep(time.Millisecond *2000)
+			svc.SubSysEvent.Emit(service.ConstructEventLog("test source", i%5, "message " +strconv.Itoa(i) + ": " + textfill))
+			time.Sleep(time.Millisecond *3000)
 			i++
 		}
 	}()

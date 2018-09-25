@@ -67,18 +67,18 @@ func (s *server) DeployStoredWifiSettings(ctx context.Context, m *pb.StringMessa
 
 func (s *server) StoreWifiSettings(ctx context.Context, r *pb.WifiRequestSettingsStorage) (e *pb.Empty, err error) {
 	e = &pb.Empty{}
-	err = ServiceState.Store.Put(cSTORE_PREFIX_WIFI_SETTINGS + r.TemplateName, r.Settings, true)
+	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_WIFI_SETTINGS + r.TemplateName, r.Settings, true)
 	return
 }
 
 func (s *server) GetStoredWifiSettings(ctx context.Context, m *pb.StringMessage) (ws *pb.WiFiSettings, err error) {
 	ws = &pb.WiFiSettings{}
-	err = ServiceState.Store.Get(cSTORE_PREFIX_WIFI_SETTINGS + m.Msg, ws)
+	err = s.rootSvc.SubSysDataStore.Get(cSTORE_PREFIX_WIFI_SETTINGS + m.Msg, ws)
 	return
 }
 
 func (s *server) ListStoredWifiSettings(ctx context.Context, e *pb.Empty) (sa *pb.StringMessageArray, err error) {
-	res,err := ServiceState.Store.KeysPrefix(cSTORE_PREFIX_WIFI_SETTINGS, true)
+	res,err := s.rootSvc.SubSysDataStore.KeysPrefix(cSTORE_PREFIX_WIFI_SETTINGS, true)
 	if err != nil { return sa,err }
 	sa = &pb.StringMessageArray{
 		MsgArray: res,
@@ -139,7 +139,7 @@ func (s *server) EchoRequest(ctx context.Context, req *pb.StringMessage) (resp *
 
 func (s *server) EventListen(eReq *pb.EventRequest, eStream pb.P4WNP1_EventListenServer) (err error) {
 	//ToDo: check dependency from state (EvMgr initialized)
-	rcv := ServiceState.EvMgr.RegisterReceiver(eReq.ListenType)
+	rcv := s.rootSvc.SubSysEvent.RegisterReceiver(eReq.ListenType)
 
 	for {
 		select {
@@ -223,6 +223,8 @@ func (s *server) HIDGetRunningJobState(ctx context.Context, req *pb.HIDScriptJob
 }
 
 func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) (jobs *pb.HIDScriptJobList, err error) {
+	if !s.rootSvc.SubSysUSB.Usable { return nil, ErrUsbNotUsable }
+
 	if s.rootSvc.SubSysUSB.HidCtl == nil { return nil, rpcErrNoHid}
 
 	retJobs,err := s.rootSvc.SubSysUSB.HidCtl.GetAllBackgroundJobs()
@@ -374,7 +376,7 @@ func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetS
 	//ToDo: Former gadgets are destroyed without testing if there're changes, this should be aborted if GadgetSettingsState == GetDeployedGadgetSettings()
 	DestroyGadget(USB_GADGET_NAME)
 
-	errg := s.rootSvc.SubSysUSB.DeployGadgetSettings(s.rootSvc.SubSysUSB.UndeployedGadgetSettings)
+	errg := s.rootSvc.SubSysUSB.DeployGadgetSettings(s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings)
 	err = nil
 	if errg != nil {
 		err = errors.New(fmt.Sprintf("Deploying new gadget settings failed, reverted to old ones: %v", errg))
@@ -386,17 +388,17 @@ func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetS
 }
 
 func (s *server) GetGadgetSettings(context.Context, *pb.Empty) (*pb.GadgetSettings, error) {
-	return s.rootSvc.SubSysUSB.UndeployedGadgetSettings, nil
+	return s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings, nil
 }
 
 func (s *server) SetGadgetSettings(ctx context.Context, gs *pb.GadgetSettings) (res *pb.GadgetSettings, err error) {
 	if err = ValidateGadgetSetting(*gs); err != nil {
 		//We return the validation error and the current (unchanged) GadgetSettingsState
-		res = s.rootSvc.SubSysUSB.UndeployedGadgetSettings
+		res = s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings
 		return
 	}
-	s.rootSvc.SubSysUSB.UndeployedGadgetSettings = gs
-	res = s.rootSvc.SubSysUSB.UndeployedGadgetSettings
+	s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings = gs
+	res = s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings
 	return
 }
 

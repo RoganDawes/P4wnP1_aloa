@@ -74,31 +74,60 @@ const (
 
 )
 
-var rp_usbHidDevName                      = regexp.MustCompile("(?m)DEVNAME=(.*)\n")
+var (
+	ErrUsbNotUsable = errors.New("USB subsystem not available")
+	rp_usbHidDevName                      = regexp.MustCompile("(?m)DEVNAME=(.*)\n")
+)
+
+type UsbManagerState struct {
+	UndeployedGadgetSettings *pb.GadgetSettings
+	DevicePath map[string]string
+
+}
 
 type UsbGadgetManager struct {
 	RootSvc *Service
+	Usable bool
 
+	State *UsbManagerState
 	// ToDo: variable, indicating if HIDScript is usable
 	HidCtl *hid.HIDController // Points to an HID controller instance only if keyboard and/or mouse are enabled, nil otherwise
-	UndeployedGadgetSettings *pb.GadgetSettings
 }
 
 func (gm *UsbGadgetManager) HandleEvent(event hid.Event) {
 	fmt.Printf("GADGET MANAGER HID EVENT: %+v\n", event)
-	ServiceState.EvMgr.Emit(ConstructEventHID(event))
+	gm.RootSvc.SubSysEvent.Emit(ConstructEventHID(event))
 }
 
 func NewUSBGadgetManager(rooSvc *Service) (newUGM *UsbGadgetManager, err error) {
 	newUGM = &UsbGadgetManager{
 		RootSvc: rooSvc,
+		Usable: true,
+		State: &UsbManagerState{
+			DevicePath: map[string]string{},
+		},
 	}
+
+	if err = CheckLibComposite(); err != nil {
+		//return nil, errors.New(fmt.Sprintf("Couldn't load libcomposite: %v", err))
+		newUGM.Usable = false
+		return newUGM,nil
+	}
+
+
+
+	newUGM.State.DevicePath[USB_FUNCTION_HID_KEYBOARD_name] = ""
+	newUGM.State.DevicePath[USB_FUNCTION_HID_MOUSE_name] = ""
+	newUGM.State.DevicePath[USB_FUNCTION_HID_RAW_name] = ""
+
+
 	defGS := GetDefaultGadgetSettings()
-	newUGM.UndeployedGadgetSettings = &defGS //preload state with default settings
-	err = CheckLibComposite()
-	if err != nil { return nil, errors.New(fmt.Sprintf("Couldn't load libcomposite: %v", err)) }
-	err = newUGM.DeployGadgetSettings(newUGM.UndeployedGadgetSettings)
-	if err != nil { return nil, err }
+	newUGM.State.UndeployedGadgetSettings = &defGS //preload state with default settings
+	err = newUGM.DeployGadgetSettings(newUGM.State.UndeployedGadgetSettings)
+	if err != nil {
+		newUGM.Usable = false
+		return newUGM,nil
+	}
 	return
 }
 
@@ -427,6 +456,10 @@ func MountUMSFile(filename string) error {
 }
 
 func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) error {
+	if !gm.Usable {
+		return ErrUsbNotUsable
+	}
+
 	var usesUSBEthernet bool
 
 	//gadget_root := "./test"
@@ -615,9 +648,9 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 	}
 
 	//clear device path for HID devices
-	ServiceState.HidDevPath[USB_FUNCTION_HID_KEYBOARD_name] = ""
-	ServiceState.HidDevPath[USB_FUNCTION_HID_MOUSE_name] = ""
-	ServiceState.HidDevPath[USB_FUNCTION_HID_RAW_name] = ""
+	gm.State.DevicePath[USB_FUNCTION_HID_KEYBOARD_name] = ""
+	gm.State.DevicePath[USB_FUNCTION_HID_MOUSE_name] = ""
+	gm.State.DevicePath[USB_FUNCTION_HID_RAW_name] = ""
 
 	//get UDC driver name and bind to gadget
 	if settings.Enabled {
@@ -631,14 +664,14 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 		}
 
 		//update device path'
-		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_KEYBOARD_name); errF == nil  { ServiceState.HidDevPath[USB_FUNCTION_HID_KEYBOARD_name] = devPath }
-		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_MOUSE_name); errF == nil  { ServiceState.HidDevPath[USB_FUNCTION_HID_MOUSE_name] = devPath }
-		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_RAW_name); errF == nil  { ServiceState.HidDevPath[USB_FUNCTION_HID_RAW_name] = devPath }
+		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_KEYBOARD_name); errF == nil  { gm.State.DevicePath[USB_FUNCTION_HID_KEYBOARD_name] = devPath }
+		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_MOUSE_name); errF == nil  { gm.State.DevicePath[USB_FUNCTION_HID_MOUSE_name] = devPath }
+		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_RAW_name); errF == nil  { gm.State.DevicePath[USB_FUNCTION_HID_RAW_name] = devPath }
 
 		//if Keyboard or Mouse are deployed, grab a HIDController Instance else set it to nil (the old HIDController object won't be destroyed)
 		if settings.Use_HID_KEYBOARD || settings.Use_HID_MOUSE {
-			devPathKeyboard := ServiceState.HidDevPath[USB_FUNCTION_HID_KEYBOARD_name]
-			devPathMouse := ServiceState.HidDevPath[USB_FUNCTION_HID_MOUSE_name]
+			devPathKeyboard := gm.State.DevicePath[USB_FUNCTION_HID_KEYBOARD_name]
+			devPathMouse := gm.State.DevicePath[USB_FUNCTION_HID_MOUSE_name]
 
 			var errH error
 			gm.HidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, USB_KEYBOARD_LANGUAGE_MAP_PATH, devPathMouse)
