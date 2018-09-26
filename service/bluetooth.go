@@ -76,6 +76,7 @@ func (bt *BtService) StartNAP() (err error) {
 	// Disable simple secure pairing to make PIN requests work
 	bt.Controller.SetPowered(false)
 	bt.Controller.SetSSP(true) //NAP doesn't work well without SSP
+	bt.Controller.SetHighSpeed(true) // Enable high speed mode
 	bt.Controller.SetPowered(true)
 
 	// Configure adapter

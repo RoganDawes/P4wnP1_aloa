@@ -34,6 +34,8 @@ func NewNetworkManager() (nm *NetworkManager, err error){
 	err = nm.AddManagedInterface(GetDefaultNetworkSettingsBluetooth())
 	if err != nil { return }
 
+	//ToDo: Deploy all settings once, to assure consistency of server state and real adapter configuration
+
 	return nm, nil
 }
 

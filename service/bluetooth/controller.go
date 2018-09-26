@@ -34,6 +34,17 @@ func (c *Controller) SetSSP(val bool) (err error) {
 	return
 }
 
+func (c *Controller) SetHighSpeed(val bool) (err error) {
+	mgmt,err := btmgmt.NewBtMgmt()
+	if err != nil { return ErrChgSetting }
+
+	s,err := mgmt.SetHighSpeed(c.Index, val)
+	if err != nil || s.HighSpeed != val {
+		return ErrChgSetting
+	}
+	return
+}
+
 
 func (c *Controller) StartDiscovery() error {
 	return c.adapter.StartDiscovery()
