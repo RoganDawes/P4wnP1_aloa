@@ -57,6 +57,7 @@ message TriggerActionSettings {
 
 message TriggerAction {
     uint32 id = 1; // assigned by service, used as identifier to allow deletion of trigger actions
+    bool oneShot = 13;
     oneof Trigger {
         TriggerServiceStarted serviceStarted = 2;
         TriggerUSBGadgetConnected usbGadgetConnected = 3;

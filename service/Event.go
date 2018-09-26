@@ -177,6 +177,28 @@ func ConstructEventTrigger(triggerType common_web.EvtTriggerType) *pb.Event {
 	}
 }
 
+func ConstructEventTriggerDHCPLease(iface, mac, ip string) *pb.Event {
+	return &pb.Event{
+		Type: common_web.EVT_TRIGGER,
+		Values: []*pb.EventValue{
+			{Val: &pb.EventValue_Tint64{Tint64: int64(common_web.EVT_TRIGGER_TYPE_DHCP_LEASE_GRANTED)}},
+			{Val: &pb.EventValue_Tstring{Tstring: iface}},
+			{Val: &pb.EventValue_Tstring{Tstring: mac}},
+			{Val: &pb.EventValue_Tstring{Tstring: ip}},
+		},
+	}
+}
+
+func ConstructEventTriggerSSHLogin(username string) *pb.Event {
+	return &pb.Event{
+		Type: common_web.EVT_TRIGGER,
+		Values: []*pb.EventValue{
+			{Val: &pb.EventValue_Tint64{Tint64: int64(common_web.EVT_TRIGGER_TYPE_SSH_LOGIN)}},
+			{Val: &pb.EventValue_Tstring{Tstring: username}},
+		},
+	}
+}
+
 func ConstructEventHID(hidEvent hid.Event) *pb.Event {
 	//subType, vmID, jobID int, error bool, resString, errString, message string
 	vmID := -1

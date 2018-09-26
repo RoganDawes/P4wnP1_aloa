@@ -262,7 +262,8 @@ func (m *TriggerActionSettings) Unmarshal(rawBytes []byte) (*TriggerActionSettin
 }
 
 type TriggerAction struct {
-	Id uint32
+	Id      uint32
+	OneShot bool
 	// Types that are valid to be assigned to Trigger:
 	//	*TriggerAction_ServiceStarted
 	//	*TriggerAction_UsbGadgetConnected
@@ -375,6 +376,14 @@ func (m *TriggerAction) GetId() (x uint32) {
 		return x
 	}
 	return m.Id
+}
+
+// GetOneShot gets the OneShot of the TriggerAction.
+func (m *TriggerAction) GetOneShot() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.OneShot
 }
 
 // GetServiceStarted gets the ServiceStarted of the TriggerAction.
@@ -547,6 +556,10 @@ func (m *TriggerAction) MarshalToWriter(writer jspb.Writer) {
 		writer.WriteUint32(1, m.Id)
 	}
 
+	if m.OneShot {
+		writer.WriteBool(13, m.OneShot)
+	}
+
 	return
 }
 
@@ -567,6 +580,8 @@ func (m *TriggerAction) UnmarshalFromReader(reader jspb.Reader) *TriggerAction {
 		switch reader.GetFieldNumber() {
 		case 1:
 			m.Id = reader.ReadUint32()
+		case 13:
+			m.OneShot = reader.ReadBool()
 		case 2:
 			reader.ReadMessage(func() {
 				m.Trigger = &TriggerAction_ServiceStarted{
