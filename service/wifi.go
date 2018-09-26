@@ -3,6 +3,7 @@
 package service
 
 import (
+	"github.com/mame82/P4wnP1_go/common_web"
 	"github.com/mame82/P4wnP1_go/netlink"
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"sync"
@@ -372,14 +373,25 @@ func (wSvc *WiFiService) DeploySettings(newWifiSettings *pb.WiFiSettings) (wstat
 		switch newWifiSettings.WorkingMode {
 		case pb.WiFiWorkingMode_AP:
 			err = wSvc.runAPMode(newWifiSettings)
+			// emit Trigger event if AP is Up
+			if err == nil {
+				wSvc.RootSvc.SubSysEvent.Emit(ConstructEventTrigger(common_web.EVT_TRIGGER_TYPE_WIFI_AP_STARTED))
+			}
 		case pb.WiFiWorkingMode_STA, pb.WiFiWorkingMode_STA_FAILOVER_AP:
 			errSta := wSvc.runStaMode(newWifiSettings)
+			if errSta == nil {
+				wSvc.RootSvc.SubSysEvent.Emit(ConstructEventTrigger(common_web.EVT_TRIGGER_TYPE_WIFI_CONNECTED_AS_STA))
+			}
+
 			if errSta != nil {
 				//in failover mode, we try to enable AP first
 				if newWifiSettings.WorkingMode == pb.WiFiWorkingMode_STA_FAILOVER_AP {
 					log.Println(errSta)
 					log.Printf("Trying to fail over to Access Point Mode...")
 					err = wSvc.runAPMode(newWifiSettings)
+					if err == nil {
+						wSvc.RootSvc.SubSysEvent.Emit(ConstructEventTrigger(common_web.EVT_TRIGGER_TYPE_WIFI_AP_STARTED))
+					}
 				} else {
 					err = errSta
 				}

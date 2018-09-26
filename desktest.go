@@ -29,15 +29,7 @@ echo "Interface: $SSH_LOGIN_USER"
 
  */
 
-func main() {
-	pseudoService := &service.Service{
-		SubSysEvent: service.NewEventManager(10),
-	}
-	tam := service.NewTriggerActionManager(pseudoService)
-
-	pseudoService.SubSysEvent.Start()
-	tam.Start()
-
+func RegisterTestActions(tam *service.TriggerActionManager) {
 	// create test trigger
 	serviceUpRunScript := &pb.TriggerAction{
 		Trigger: &pb.TriggerAction_ServiceStarted{
@@ -82,6 +74,47 @@ func main() {
 	tam.AddTriggerAction(serviceUpLog)
 	tam.AddTriggerAction(dhcpLeaseScript)
 	tam.AddTriggerAction(sshLoginScript)
+}
+
+func EmitTestEvents(evmgr *service.EventManager) {
+	// generate events
+	go func() {
+		for {
+			evmgr.Emit(service.ConstructEventTriggerDHCPLease("wlan0", "aa:bb:cc:dd:ee:ff", "172.24.0.6"))
+			time.Sleep(1800*time.Millisecond)
+		}
+	}()
+
+	go func() {
+		time.Sleep(time.Second)
+		for  {
+			evmgr.Emit(service.ConstructEventTriggerSSHLogin("testuser"))
+			time.Sleep(5*time.Second)
+		}
+
+	}()
+
+	go func() {
+		time.Sleep(2*time.Second)
+		for  {
+			evmgr.Emit(service.ConstructEventTrigger(common_web.EVT_TRIGGER_TYPE_SERVICE_STARTED))
+			time.Sleep(5*time.Second)
+		}
+
+	}()
+
+}
+
+func main() {
+	pseudoService := &service.Service{
+		SubSysEvent: service.NewEventManager(10),
+	}
+	tam := service.NewTriggerActionManager(pseudoService)
+
+	pseudoService.SubSysEvent.Start()
+	tam.Start()
+
+	RegisterTestActions(tam)
 
 	/*
 	// Pause TriggerActionManager after 5 seconds for 5 seconds
@@ -93,30 +126,7 @@ func main() {
 	}()
 	*/
 
-	go func() {
-		for {
-			pseudoService.SubSysEvent.Emit(service.ConstructEventTriggerDHCPLease("wlan0", "aa:bb:cc:dd:ee:ff", "172.24.0.6"))
-			time.Sleep(1800*time.Millisecond)
-		}
-	}()
-
-	go func() {
-		time.Sleep(time.Second)
-		for  {
-			pseudoService.SubSysEvent.Emit(service.ConstructEventTriggerSSHLogin("testuser"))
-			time.Sleep(5*time.Second)
-		}
-
-	}()
-
-	go func() {
-		time.Sleep(2*time.Second)
-		for  {
-			pseudoService.SubSysEvent.Emit(service.ConstructEventTrigger(common_web.EVT_TRIGGER_TYPE_SERVICE_STARTED))
-			time.Sleep(5*time.Second)
-		}
-
-	}()
+	EmitTestEvents(pseudoService.SubSysEvent)
 
 	//use a channel to wait for SIGTERM or SIGINT
 	fmt.Println("P4wnP1 service initialized, stop with SIGTERM or SIGINT")

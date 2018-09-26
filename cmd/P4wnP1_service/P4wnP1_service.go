@@ -3,7 +3,6 @@
 package main
 
 import (
-	"github.com/mame82/P4wnP1_go/common"
 	"log"
 	"strconv"
 	"time"
@@ -56,13 +55,14 @@ func main() {
 	svc.Start()
 
 
+	/*
 	//service.StartEventManager(20)
 	//	log.SetOutput(state.EvMgr)
 	go func() {
 		err := common.RunBashScript("/usr/local/P4wnP1/scripts/servicestart.sh")
 		if err != nil { log.Printf("Error executing service startup script: %v\n", err) }
 	}()
-
+	*/
 
 	//Send some log messages for testing
 	textfill := "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea"

@@ -19,8 +19,7 @@ type TriggerActionManager struct {
 }
 
 func (tam *TriggerActionManager) processing_loop() {
-	// (un)register event listener(s)
-	tam.evtRcv = tam.rootSvc.SubSysEvent.RegisterReceiver(common_web.EVT_ANY) // ToDo: change to trigger event type, once defined
+
 	fmt.Println("TAM processing loop started")
 	Outer:
 		for {
@@ -260,6 +259,7 @@ func (tam *TriggerActionManager) AddTriggerAction(ta *pb.TriggerAction) (err err
 }
 
 func (tam *TriggerActionManager) Start() {
+	tam.evtRcv = tam.rootSvc.SubSysEvent.RegisterReceiver(common_web.EVT_TRIGGER) // ToDo: change to trigger event type, once defined
 	go tam.processing_loop()
 }
 
