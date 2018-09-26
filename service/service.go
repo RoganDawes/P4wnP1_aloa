@@ -101,8 +101,8 @@ func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 
 type Service struct {
 	SubSysDataStore      *datastore.Store // very first service
-	SubSysState          interface{}
-	SubSysLogging        interface{}
+//	SubSysState          interface{}
+//	SubSysLogging        interface{}
 	SubSysNetwork *NetworkManager
 
 	SubSysEvent          *EventManager
@@ -126,12 +126,12 @@ func NewService() (svc *Service, err error) {
 	svc.SubSysNetwork, err = NewNetworkManager()
 	if err != nil { return nil,err}
 	svc.SubSysUSB,err = NewUSBGadgetManager(svc) //Depends on NetworkSubSys, EvenSubSys
-	if err == ErrUsbNotUsable { err = nil } //ToDo: delete this
-
+//	if err == ErrUsbNotUsable { err = nil } //ToDo: delete this
 	if err != nil { return nil,err}
+
 	svc.SubSysWifi = NewWifiService(svc) //Depends on NetworkSubSys
 
-
+	svc.SubSysBluetooth = NewBtService(svc) //Depends on NetworkSubSys
 
 	svc.SubSysRPC = NewRpcServerService(svc)  //Depends on all other
 
@@ -147,6 +147,10 @@ func (s *Service) Start() {
 
 	// Register TriggerActions
 	RegisterDefaultTriggerActions(s.SubSysTriggerActions)
+
+	// ToDo: Manual start of BT NAP, has to be replaced by settings based approach (same as other subsystems)
+	s.SubSysBluetooth.StartNAP()
+
 	// fire service started Event
 	s.SubSysEvent.Emit(ConstructEventTrigger(common_web.EVT_TRIGGER_TYPE_SERVICE_STARTED))
 }
@@ -154,6 +158,8 @@ func (s *Service) Start() {
 func (s *Service) Stop() {
 	s.SubSysTriggerActions.Stop()
 	s.SubSysLed.Stop()
+
+	s.SubSysBluetooth.StopNAP()
 
 	s.SubSysEvent.Stop()
 }

@@ -24,7 +24,7 @@ func (a *DefaultAgent) Release() *dbus.Error {
 }
 
 func (a *DefaultAgent) RequestPinCode(device dbus.ObjectPath) (pincode string, err *dbus.Error) {
-	fmt.Println("DefaultAgent request pincode called, returning string '12345'")
+	fmt.Printf("DefaultAgent request pincode called, returning string '%s'\n", a.pincode)
 	// Called when SSP is off and currentCap != CAP_NO_INPUT_NO_OUTPUT, we could use a pre-generated PIN
 	// and the remote device has to enter the same one
 	return a.pincode, nil
@@ -61,8 +61,8 @@ func (a *DefaultAgent) RequestConfirmation(device dbus.ObjectPath, passkey uint3
 
 func (a *DefaultAgent) RequestAuthorization(device dbus.ObjectPath) *dbus.Error {
 	fmt.Println("DefaultAgent request authorization called")
-	fmt.Println("... rejecting")
-	return toolz.ErrRejected
+	fmt.Println("... accepting")
+	return nil
 }
 
 func (a *DefaultAgent) AuthorizeService(device dbus.ObjectPath, uuid string) *dbus.Error {

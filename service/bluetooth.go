@@ -13,28 +13,30 @@ import (
 )
 
 const (
-	BT_MINIMUM_BLUEZ_VERSION_MAJOR        = 5
-	BT_MINIMUM_BLUEZ_VERSION_MINOR        = 43
+	BT_MINIMUM_BLUEZ_VERSION_MAJOR = 5
+	BT_MINIMUM_BLUEZ_VERSION_MINOR = 43
 )
 
 type BtService struct {
+	RootSvc *Service
+
 	ServiceAvailable bool
 	Controller       *bluetooth.Controller
 	BrName           string
 	bridgeIfDeployed bool
 
-	Agent   *bluetooth.DefaultAgent
+	Agent *bluetooth.DefaultAgent
 }
 
-
-func NewBtService() (res *BtService) {
+func NewBtService(rootService *Service) (res *BtService) {
 	res = &BtService{
-		Agent:      bluetooth.NewDefaultAgent("4321"),
-		BrName:     BT_ETHERNET_BRIDGE_NAME,
+		RootSvc: rootService,
+		Agent:   bluetooth.NewDefaultAgent("4321"),
+		BrName:  BT_ETHERNET_BRIDGE_NAME,
 	}
 
 	// ToDo Check if bluetooth service is loaded
-	if c,err := bluetooth.FindFirstAvailableController(); err == nil {
+	if c, err := bluetooth.FindFirstAvailableController(); err == nil {
 		res.ServiceAvailable = true
 		res.Controller = c
 	} else {
@@ -52,7 +54,8 @@ func NewBtService() (res *BtService) {
 
 // ToDo: Move all controller specific tasks to controller
 func (bt *BtService) StartNAP() (err error) {
-	if !bt.ServiceAvailable { return bluetooth.ErrBtSvcNotAvailable
+	if !bt.ServiceAvailable {
+		return bluetooth.ErrBtSvcNotAvailable
 	}
 	log.Println("Bluetooth: starting NAP...")
 	// assure bnep module is loaded
@@ -72,33 +75,51 @@ func (bt *BtService) StartNAP() (err error) {
 
 	// Disable simple secure pairing to make PIN requests work
 	bt.Controller.SetPowered(false)
-	bt.Controller.SetSSP(false)
+	bt.Controller.SetSSP(true) //NAP doesn't work well without SSP
 	bt.Controller.SetPowered(true)
 
 	// Configure adapter
 	fmt.Println("Reconfigure adapter to be discoverable and pairable")
 	err = bt.Controller.SetAlias("P4wnP1")
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 	err = bt.Controller.SetDiscoverableTimeout(0)
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 	err = bt.Controller.SetPairableTimeout(0)
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 	err = bt.Controller.SetDiscoverable(true)
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 	err = bt.Controller.SetPairable(true)
 
 	// Enable PAN networking for bridge
-	nw,err := toolz.NetworkServer(bt.Controller.DBusPath)
-	if err != nil { return }
+	nw, err := toolz.NetworkServer(bt.Controller.DBusPath)
+	if err != nil {
+		return
+	}
 	//defer nw.Close()
 	err = nw.Register(toolz.UUID_NETWORK_SERVER_NAP, BT_ETHERNET_BRIDGE_NAME)
-	if err != nil { return }
+	if err != nil {
+		return
+	}
+
+	if mi, err := bt.RootSvc.SubSysNetwork.GetManagedInterface(BT_ETHERNET_BRIDGE_NAME); err == nil {
+		mi.ReDeploy()
+	}
 
 	return
 }
 
 func (bt *BtService) StopNAP() (err error) {
-	if !bt.ServiceAvailable { return bluetooth.ErrBtSvcNotAvailable	}
+	if !bt.ServiceAvailable {
+		return bluetooth.ErrBtSvcNotAvailable
+	}
 	log.Println("Bluetooth: stopping NAP...")
 
 	//Stop bt-agent
@@ -108,7 +129,7 @@ func (bt *BtService) StopNAP() (err error) {
 	bt.DisableBridge()
 
 	// Unregister pan service
-	nw,err := toolz.NetworkServer(bt.Controller.DBusPath)
+	nw, err := toolz.NetworkServer(bt.Controller.DBusPath)
 	//if err != nil { return }
 	defer nw.Close()
 	err = nw.Unregister("pan")
@@ -135,7 +156,12 @@ func (bt *BtService) EnableBridge() (err error) {
 		return err
 	}
 	//	SetBridgeSTP(BT_ETHERNET_BRIDGE_NAME, true) //enable spanning tree
-	SetBridgeForwardDelay(BT_ETHERNET_BRIDGE_NAME, 0)
+	err = SetBridgeForwardDelay(BT_ETHERNET_BRIDGE_NAME, 0)
+	if err != nil {
+		return err
+	}
+
+	err = SetBridgeSTP(BT_ETHERNET_BRIDGE_NAME, false)
 	if err != nil {
 		return err
 	}

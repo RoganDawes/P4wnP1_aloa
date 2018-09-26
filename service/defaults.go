@@ -20,7 +20,7 @@ func GetDefaultNetworkSettingsBluetooth() (*pb.EthernetInterfaceSettings) {
 	ifSettings := &pb.EthernetInterfaceSettings{
 		Name:       BT_ETHERNET_BRIDGE_NAME,
 		Enabled:    true,
-		Mode:       pb.EthernetInterfaceSettings_MANUAL,
+		Mode:       pb.EthernetInterfaceSettings_DHCP_SERVER,
 		IpAddress4: "172.26.0.1",
 		Netmask4:   "255.255.255.0",
 		DhcpServerSettings: GetDefaultDHCPConfigBluetooth(),

@@ -18,18 +18,8 @@ import (
 
 func main() {
 
-	err := service.InitGlobalServiceState()
-	if err != nil { panic(err) }
-
-	state := service.ServiceState
-	state.StartService()
-
-
 	//ToDo: Check for root privs
 
-
-	//service.NewLed(false) //Set LED to manual trigger
-	//service.InitDefaultLEDSettings()
 
 	/*
 	log.Printf("Keyboard devFile: %s\n", service.HidDevPath[service.USB_FUNCTION_HID_KEYBOARD_name])
@@ -38,13 +28,6 @@ func main() {
 	*/
 
 	// ToDo: The webroot has to be changed to /usr/local/P4wnP1/www
-	//service.StartRpcServerAndWeb("0.0.0.0", "50051", "8000", "/usr/local/P4wnP1/www") //start gRPC service
-
-	/*
-	//Indicate servers up with LED blink count 1
-	state.Led.SetLed(&pb.LEDSettings{1})
-	*/
-
 
 
 
@@ -55,15 +38,7 @@ func main() {
 	svc.Start()
 
 
-	/*
-	//service.StartEventManager(20)
-	//	log.SetOutput(state.EvMgr)
-	go func() {
-		err := common.RunBashScript("/usr/local/P4wnP1/scripts/servicestart.sh")
-		if err != nil { log.Printf("Error executing service startup script: %v\n", err) }
-	}()
-	*/
-
+	// ToDo: Remove this (testing only)
 	//Send some log messages for testing
 	textfill := "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea"
 	i := 0
@@ -83,6 +58,6 @@ func main() {
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	s := <-sig
 	log.Printf("Signal (%v) received, ending P4wnP1_service ...\n", s)
-	state.StopService()
+	svc.Stop()
 	return
 }
