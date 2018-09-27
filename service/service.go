@@ -98,11 +98,10 @@ func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 	tam.AddTriggerAction(logSSHLogin)
 }
 
-
 type Service struct {
-	SubSysDataStore      *datastore.Store // very first service
-//	SubSysState          interface{}
-//	SubSysLogging        interface{}
+	SubSysDataStore *datastore.Store // very first service
+	//	SubSysState          interface{}
+	//	SubSysLogging        interface{}
 	SubSysNetwork *NetworkManager
 
 	SubSysEvent          *EventManager
@@ -112,35 +111,46 @@ type Service struct {
 	SubSysBluetooth      *BtService
 	SubSysRPC            *server
 	SubSysTriggerActions *TriggerActionManager
+
+	SubSysDwc2ConnectWatcher *Dwc2ConnectWatcher
 }
 
 func NewService() (svc *Service, err error) {
 	svc = &Service{}
 
-	svc.SubSysDataStore,err = datastore.Open(pPATH_DATA_STORE)
-	if err != nil { return nil,err}
+	svc.SubSysDataStore, err = datastore.Open(pPATH_DATA_STORE)
+	if err != nil {
+		return nil, err
+	}
 
 	svc.SubSysEvent = NewEventManager(20)
 
 	svc.SubSysLed = NewLedService()
 	svc.SubSysNetwork, err = NewNetworkManager()
-	if err != nil { return nil,err}
-	svc.SubSysUSB,err = NewUSBGadgetManager(svc) //Depends on NetworkSubSys, EvenSubSys
-//	if err == ErrUsbNotUsable { err = nil } //ToDo: delete this
-	if err != nil { return nil,err}
+	if err != nil {
+		return nil, err
+	}
+	svc.SubSysUSB, err = NewUSBGadgetManager(svc) //Depends on NetworkSubSys, EvenSubSys
+	//	if err == ErrUsbNotUsable { err = nil } //ToDo: delete this
+	if err != nil {
+		return nil, err
+	}
 
 	svc.SubSysWifi = NewWifiService(svc) //Depends on NetworkSubSys
 
 	svc.SubSysBluetooth = NewBtService(svc) //Depends on NetworkSubSys
 
-	svc.SubSysRPC = NewRpcServerService(svc)  //Depends on all other
+	svc.SubSysRPC = NewRpcServerService(svc) //Depends on all other
 
 	svc.SubSysTriggerActions = NewTriggerActionManager(svc) //Depends on EventManager, UsbGadgetManager (to trigger HID scripts)
+
+	svc.SubSysDwc2ConnectWatcher = NewDwc2ConnectWatcher(svc) // Depends on EventManager, should be started before USB gadget settings are deployed (to avoid missing initial state change)
 	return
 }
 
 func (s *Service) Start() {
 	s.SubSysEvent.Start()
+	s.SubSysDwc2ConnectWatcher.Start()
 	s.SubSysLed.Start()
 	s.SubSysRPC.StartRpcServerAndWeb("0.0.0.0", "50051", "8000", "/usr/local/P4wnP1/www") //start gRPC service
 	s.SubSysTriggerActions.Start()
@@ -160,6 +170,6 @@ func (s *Service) Stop() {
 	s.SubSysLed.Stop()
 
 	s.SubSysBluetooth.StopNAP()
-
+	s.SubSysDwc2ConnectWatcher.Stop()
 	s.SubSysEvent.Stop()
 }

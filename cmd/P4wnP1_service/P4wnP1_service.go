@@ -3,12 +3,9 @@
 package main
 
 import (
-	"log"
-	"strconv"
-	"time"
-
 	"fmt"
 	"github.com/mame82/P4wnP1_go/service"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -37,7 +34,7 @@ func main() {
 	}
 	svc.Start()
 
-
+/*
 	// ToDo: Remove this (testing only)
 	//Send some log messages for testing
 	textfill := "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea"
@@ -50,7 +47,7 @@ func main() {
 			i++
 		}
 	}()
-
+*/
 
 	//use a channel to wait for SIGTERM or SIGINT
 	fmt.Println("P4wnP1 service initialized, stop with SIGTERM or SIGINT")
