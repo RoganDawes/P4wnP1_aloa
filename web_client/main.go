@@ -63,6 +63,7 @@ func main() {
 		VueRouterRoute("/logger","", "<logger :max-entries='7'></logger>"),
 		VueRouterRoute("/network","", "<network></network>"),
 		VueRouterRoute("/wifi","", "<wifi></wifi>"),
+		VueRouterRoute("/triggeractions","", "<triggeraction></triggeraction>"),
 	)
 
 
@@ -77,6 +78,7 @@ func main() {
 	InitCompState()
 	InitComponentsNetwork()
 	InitComponentsWiFi()
+	InitComponentsTriggerActions()
 	vm := hvue.NewVM(
 		hvue.El("#app"),
 		//add "testString" to data
