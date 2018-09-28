@@ -23,8 +23,8 @@ To cope with that behavior, we only fire an event if the new state differs from 
 
 const (
 	mcast_group = 24
-	host_connected = uint32(0x00001000)
-	host_disconnected = uint32(0x00000000)
+	host_connected = byte(0x01)
+	host_disconnected = byte(0x00)
 )
 
 type Dwc2ConnectWatcher struct {
@@ -64,19 +64,15 @@ func (d * Dwc2ConnectWatcher) update(newStateConnected bool) {
 func (d * Dwc2ConnectWatcher) evt_loop() {
 	for d.isRunning {
 		indata := d.nl.Read()
-		if len(indata) != 4 {
+		if len(indata) != 1 {
 			continue // ignore, we want tor receive an uint32
 		}
-		val := dwc2.Hbo().Uint32(indata)
+		val := indata[0]
 		switch val {
 		case host_connected:
-			if d.udateNeeded(true) {
 				d.update(true)
-			}
 		case host_disconnected:
-			if d.udateNeeded(false) {
 				d.update(false)
-			}
 		default:
 			fmt.Println("Unknown value from DWC2: ", val)
 		}
