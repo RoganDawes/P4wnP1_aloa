@@ -24,10 +24,10 @@ func ExportDefaultTriggerActions() {
 	svcUpRunScript.Trigger = trigger.Object
 	svcUpRunScript.Action = action.Object
 
-	js.Global.Set("testtriggeraction", svcUpRunScript)
+	js.Global.Set("testta", svcUpRunScript)
 
 	// Try to cast back (shouldn't work because of the interfaces
-	copyobj := &jsTriggerAction{Object:js.Global.Get("testtriggeraction")}
+	copyobj := &jsTriggerAction{Object:js.Global.Get("testta")}
 	js.Global.Set("copyobj", copyobj)
 	println("copyobj", copyobj)
 	println("copyobjtrigger", copyobj.Trigger) //<--- this wouldn't work
@@ -330,55 +330,303 @@ type jsActionLog struct {
 
 
 
+type triggerType int
+type actionType int
+const (
+ 	TriggerServiceStarted = triggerType(0)
+	TriggerUsbGadgetConnected = triggerType(1)
+	TriggerUsbGadgetDisconnected = triggerType(2)
+	TriggerWifiAPStarted = triggerType(3)
+	TriggerWifiConnectedAsSta = triggerType(4)
+	TriggerSshLogin = triggerType(5)
+	TriggerDhcpLeaseGranted = triggerType(6)
+
+	ActionLog = actionType(0)
+	ActionHidScript = actionType(1)
+	ActionDeploySettingsTemplate = actionType(2)
+	ActionBashScript = actionType(3)
+)
+var triggerNames = map[triggerType]string{
+	TriggerServiceStarted: "Service started",
+	TriggerUsbGadgetConnected: "USB Gadget connected to host",
+	TriggerUsbGadgetDisconnected: "USB Gadget disconnected from host",
+	TriggerWifiAPStarted: "WiFi Access Point is up",
+	TriggerWifiConnectedAsSta: "Connected to existing WiFi",
+	TriggerSshLogin: "User login via SSH",
+	TriggerDhcpLeaseGranted: "Client received DHCP lease",
+}
+var actionNames = map[actionType]string{
+	ActionLog: "Log to internal console",
+	ActionHidScript: "Start a HIDScript",
+	ActionDeploySettingsTemplate: "Load and deploy the given settings",
+	ActionBashScript: "Run the given bash script",
+}
+var availableTriggers = []triggerType{
+	TriggerServiceStarted,
+	TriggerUsbGadgetConnected,
+	TriggerUsbGadgetDisconnected,
+	TriggerWifiAPStarted,
+	TriggerWifiConnectedAsSta,
+	TriggerDhcpLeaseGranted,
+}
+var availableActions = []actionType {
+	ActionLog,
+	ActionBashScript,
+}
+func generateSelectOptionsTrigger() *js.Object {
+	tts := js.Global.Get("Array").New()
+	type option struct {
+		*js.Object
+		Label string `js:"label"`
+		Value triggerType `js:"value"`
+	}
+	for _,triggerVal := range availableTriggers {
+		triggerLabel := triggerNames[triggerVal]
+		o := option{Object:O()}
+		o.Value = triggerVal
+		o.Label = triggerLabel
+		tts.Call("push", o)
+	}
+	return tts
+}
+
+func generateSelectOptionsAction() *js.Object {
+	tts := js.Global.Get("Array").New()
+	type option struct {
+		*js.Object
+		Label string `js:"label"`
+		Value actionType `js:"value"`
+	}
+	for _, actionVal := range availableActions {
+		actionLabel := actionNames[actionVal]
+		o := option{Object:O()}
+		o.Value = actionVal
+		o.Label = actionLabel
+		tts.Call("push", o)
+	}
+	return tts
+}
+
+type jsVMTriggerAction struct {
+	*js.Object
+
+	Id      uint32 `js:"Id"`
+	OneShot bool `js:"OneShot"`
+	IsActive bool `js:"IsActive"`
+	Immutable bool `js:"Immutable"`
+
+
+	TriggerType triggerType `js:"TriggerType"`
+	ActionType actionType `js:"ActionType"`
+
+	TriggerData *js.Object `js:"TriggerData"`
+	ActionData *js.Object `js:"ActionData"`
+}
+
+func NewTriggerAction() *jsVMTriggerAction {
+	ta := &jsVMTriggerAction{Object:O()}
+	ta.Id = 0
+	ta.IsActive = true
+	ta.Immutable = false
+	ta.OneShot = false
+	ta.ActionData = O()
+	ta.TriggerData = O()
+	ta.TriggerType = availableTriggers[0]
+	ta.ActionType = availableActions[0]
+	return ta
+}
+
 func InitComponentsTriggerActions() {
 	// ToDo: delete test
 	ExportDefaultTriggerActions()
 
 	hvue.NewComponent(
-		"triggeraction",
-		hvue.Template(templateTriggerAction),
+		"triggeraction-manager",
+		hvue.Template(templateTriggerActionManager),
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			data := struct {
 				*js.Object
-				ShowStoreModal bool   `js:"showStoreModal"`
-				ShowLoadModal bool   `js:"showLoadModal"`
-				TemplateName   string `js:"templateName"`
+				TriggerAction *jsVMTriggerAction `js:"TriggerAction"`
 			}{Object: O()}
-			data.ShowStoreModal = false
-			data.ShowLoadModal = false
-			data.TemplateName = ""
+			data.TriggerAction = NewTriggerAction()
 			return &data
 		}),
-		hvue.Computed("ta", func(vm *hvue.VM) interface{} {
-			return js.Global.Get("testtriggeraction")
+		hvue.Mounted(func(vm *hvue.VM) {
+			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_TRIGGER_ACTIONS)
 		}),
+	)
+
+	hvue.NewComponent(
+		"triggeraction",
+		hvue.Template(templateTriggerAction),
+		hvue.Props("ta"),
+	)
+	hvue.NewComponent(
+		"trigger",
+		hvue.Props("ta"),
+		hvue.Template(templateTrigger),
 		hvue.Computed("triggertypes", func(vm *hvue.VM) interface{} {
-			tts := js.Global.Get("Array").New()
-			type entry struct {
-				*js.Object
-				Label string `js:"label"`
-				Value *js.Object `js:"value"`
+			return generateSelectOptionsTrigger()
+		}),
+	)
+	hvue.NewComponent(
+		"action",
+		hvue.Props("ta"),
+		hvue.Template(templateAction),
+		hvue.Computed("actiontypes", func(vm *hvue.VM) interface{} {
+			return generateSelectOptionsAction()
+		}),
+		hvue.ComputedWithGetSet(
+			"actionType",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("ta").Get("ActionType")
+			},
+			func(vm *hvue.VM, newValue *js.Object) {
+				// set ActionData accordingly
+				var data *js.Object
+				switch aType := actionType(newValue.Int()); aType {
+				case ActionLog:
+					d := &jsActionLog{Object:O()}
+					data = d.Object
+				case ActionHidScript:
+					d := &jsActionStartHIDScript{Object:O()}
+					d.ScriptName = "somescript"
+					data = d.Object
+				case ActionDeploySettingsTemplate:
+					d := &jsActionDeploySettingsTemplate{Object:O()}
+					d.TemplateName = "somescript"
+					d.Type = "Template type"
+					data = d.Object
+				case ActionBashScript:
+					d := &jsActionStartBashScript{Object:O()}
+					d.ScriptPath = "/path/to/some/script"
+					data = d.Object
+				default:
+					println("Unknown action type")
+					data = O()
+				}
+				vm.Get("ta").Set("ActionData", data)
+
+				// set type itself (after data)
+				vm.Get("ta").Set("ActionType", newValue)
+			}),
+		hvue.Computed("isActionLog", func(vm *hvue.VM) interface{} {
+			if at := actionType(vm.Get("actionType").Int()); at == ActionLog {
+				return true
+			} else {
+				return false
 			}
-
-			//trigger service started
-			entrySvcSt := entry{Object:O()}
-			entrySvcSt.Label = "Service started"
-			trigger := &jsTriggerAction_ServiceStarted{Object:O()}
-			trigger.ServiceStarted = &jsTriggerServiceStarted{Object:O()}
-			entrySvcSt.Value = trigger.Object
-			tts.Call("push", entrySvcSt)
-
-			return tts
+		}),
+		hvue.Computed("isActionHidScript", func(vm *hvue.VM) interface{} {
+			if at := actionType(vm.Get("actionType").Int()); at == ActionHidScript {
+				return true
+			} else {
+				return false
+			}
+		}),
+		hvue.Computed("isActionDeploySettingsTemplate", func(vm *hvue.VM) interface{} {
+			if at := actionType(vm.Get("actionType").Int()); at == ActionDeploySettingsTemplate {
+				return true
+			} else {
+				return false
+			}
+		}),
+		hvue.Computed("isActionBashScript", func(vm *hvue.VM) interface{} {
+			if at := actionType(vm.Get("actionType").Int()); at == ActionBashScript {
+				return true
+			} else {
+				return false
+			}
 		}),
 	)
 }
 
+//
 const templateTriggerAction = `
+<q-card class="fit">
+<!-- {{ ta }} -->
+	<q-card-title>Triggered Action (ID {{ ta.Id }})</q-card-title>
+	<q-list>
+			<q-item tag="label" link>
+				<q-item-side>
+					<q-toggle v-model="ta.IsActive"></q-toggle>
+				</q-item-side>
+				<q-item-main>
+					<q-item-tile label>Enabled</q-item-tile>
+					<q-item-tile sublabel>If not enabled, the triggered action is ignored</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+			<q-item tag="label" link :disabled="!ta.IsActive">
+				<q-item-side>
+					<q-toggle v-model="ta.OneShot" :disable="!ta.IsActive"></q-toggle>
+				</q-item-side>
+				<q-item-main>
+					<q-item-tile label>One shot</q-item-tile>
+					<q-item-tile sublabel>The trigger fires every time the respective event occurs. If "one shot" is enabled it fores only once.</q-item-tile>
+				</q-item-main>
+			</q-item>
+	</q-list>
+
+						<div class="row items-stretch">
+							<div class="col-12 col-md-6"">
+								<trigger :ta="ta"></trigger>
+							</div>
+	
+							<div class="col-12 col-md-6">
+								<action :ta="ta"></action>
+							</div>
+						</div>
+
+
+</q-card>
+`
+const templateTrigger = `
+		<q-list class="fit" no-border link :disabled="!ta.IsActive">
+			<q-item tag="label">
+				<q-item-main>
+					<q-item-tile label>Trigger</q-item-tile>
+					<q-item-tile sublabel>Chose the event which has to occur to start the selected action</q-item-tile>
+					<q-item-tile>
+						<q-select v-model="ta.TriggerType" :options="triggertypes" inverted :disable="!ta.IsActive"></q-select>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+		</q-list>
+`
+
+const templateAction = `
+		<q-list class="fit" no-border link :disabled="!ta.IsActive">
+			<q-item tag="label">
+				<q-item-main>
+					<q-item-tile label>Action</q-item-tile>
+					<q-item-tile sublabel>Chose the action which should be started when the trigger fired</q-item-tile>
+					<q-item-tile>
+						<q-select v-model="actionType" :options="actiontypes" color="secondary" inverted :disable="!ta.IsActive"></q-select>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+			<q-item tag="label" v-if="isActionBashScript">
+				<q-item-main>
+					<q-item-tile label>Script path</q-item-tile>
+					<q-item-tile sublabel>Path to the BashScript which should be issued</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="ta.ActionData.ScriptPath" :options="actiontypes" color="secondary" inverted :disable="!ta.IsActive"></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+		</q-list>
+`
+
+
+
+const templateTriggerActionManager = `
 <q-page padding>
 <div class="row gutter-sm">
-Hello TA
-{{ ta }} <br />
-{{ triggertypes }}
+	<div class="col-12 col-xl-6" v-for="ta in $store.getters.triggerActions"> 
+		<triggeraction :key="ta.Id" :ta="ta"></triggeraction>
+	</div>
 </div>
 </q-page>	
 

@@ -15,6 +15,7 @@ const (
 	maxLogEntries = 500
 
 	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS              = "updateRunningHidJobs"
+	VUEX_ACTION_UPDATE_TRIGGER_ACTIONS              = "updateTriggerActions"
 	VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS       = "deployCurrentGadgetSettings"
 	VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED = "updateCurrentGadgetSettingsFromDeployed"
 	VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS   = "deployEthernetInterfaceSettings"
@@ -65,6 +66,7 @@ type GlobalState struct {
 	CurrentlyDeployingWifiSettings   bool                    `js:"deployingWifiSettings"`
 	EventReceiver                    *jsEventReceiver        `js:"eventReceiver"`
 	HidJobList                       *jsHidJobStateList      `js:"hidJobList"`
+	TriggerActionList *jsTriggerActionList `js:"triggerActionList"`
 	IsModalEnabled                   bool                    `js:"isModalEnabled"`
 	IsConnected                      bool                    `js:"isConnected"`
 	FailedConnectionAttempts         int                     `js:"failedConnectionAttempts"`
@@ -82,6 +84,7 @@ func createGlobalStateStruct() GlobalState {
 	state.CurrentGadgetSettings = NewUSBGadgetSettings()
 	state.CurrentlyDeployingWifiSettings = false
 	state.HidJobList = NewHIDJobStateList()
+	state.TriggerActionList = NewTriggerActionList()
 	state.EventReceiver = NewEventReceiver(maxLogEntries, state.HidJobList)
 	state.IsConnected = false
 	state.IsModalEnabled = false
@@ -210,6 +213,35 @@ func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext
 	return
 }
 
+func actionUpdateTriggerActions(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		// ToDo: replace by with RPC, dummy function
+
+		//Test Actions
+		// Generate an array of TriggerActions, which is provided from the Vuex store once the components ViewModel structures are finalized
+		taList := []*jsVMTriggerAction{
+			NewTriggerAction(),
+			NewTriggerAction(),
+			NewTriggerAction(),
+			NewTriggerAction(),
+			NewTriggerAction(),
+			NewTriggerAction(),
+			NewTriggerAction(),
+			NewTriggerAction(),
+			NewTriggerAction(),
+			NewTriggerAction(),
+		}
+		taList[1].Immutable = true
+		taList[2].IsActive = false
+		for idx,ta := range taList {
+			ta.Id = uint32(idx)
+			state.TriggerActionList.UpdateEntry(ta)
+		}
+	}()
+
+	return
+}
+
 func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 
@@ -301,7 +333,11 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_DEPLOY_WIFI_SETTINGS, actionDeployWifiSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST, actionUpdateStoredWifiSettingsList),
 		mvuex.Action(VUEX_ACTION_STORE_WIFI_SETTINGS, actionStoreWifiSettings),
+		mvuex.Action(VUEX_ACTION_UPDATE_TRIGGER_ACTIONS, actionUpdateTriggerActions),
 
+		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
+			return state.TriggerActionList.TriggerActions
+		}),
 		mvuex.Getter("hidjobs", func(state *GlobalState) interface{} {
 			return state.HidJobList.Jobs
 		}),

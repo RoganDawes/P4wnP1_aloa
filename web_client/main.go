@@ -63,7 +63,7 @@ func main() {
 		VueRouterRoute("/logger","", "<logger :max-entries='7'></logger>"),
 		VueRouterRoute("/network","", "<network></network>"),
 		VueRouterRoute("/wifi","", "<wifi></wifi>"),
-		VueRouterRoute("/triggeractions","", "<triggeraction></triggeraction>"),
+		VueRouterRoute("/triggeractions","", "<triggeraction-manager></triggeraction-manager>"),
 	)
 
 
