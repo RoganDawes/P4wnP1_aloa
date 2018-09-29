@@ -955,15 +955,15 @@ func NewTriggerActionList() *jsTriggerActionList {
 	return tal
 }
 
-func (tal *jsTriggerActionList) UpdateEntry(ta *jsVMTriggerAction) {
+func (tal *jsTriggerActionList) UpdateEntry(ta *jsTriggerAction) {
 	key := strconv.Itoa(int(ta.Id))
 
 	//Check if job exists, update existing one if already present
-	var updateTa *jsVMTriggerAction
+	var updateTa *jsTriggerAction
 	if res := tal.TriggerActions.Get(key); res == js.Undefined {
-		updateTa = &jsVMTriggerAction{Object: O()}
+		updateTa = &jsTriggerAction{Object: O()}
 	} else {
-		updateTa = &jsVMTriggerAction{Object: res}
+		updateTa = &jsTriggerAction{Object: res}
 	}
 
 	//Create job object

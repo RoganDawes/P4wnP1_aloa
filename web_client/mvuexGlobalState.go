@@ -219,7 +219,7 @@ func actionUpdateTriggerActions(store *mvuex.Store, context *mvuex.ActionContext
 
 		//Test Actions
 		// Generate an array of TriggerActions, which is provided from the Vuex store once the components ViewModel structures are finalized
-		taList := []*jsVMTriggerAction{
+		taList := []*jsTriggerAction{
 			NewTriggerAction(),
 			NewTriggerAction(),
 			NewTriggerAction(),

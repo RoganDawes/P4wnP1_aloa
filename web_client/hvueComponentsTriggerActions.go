@@ -5,11 +5,13 @@ package main
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/mame82/hvue"
+	"strconv"
 )
 
 func ExportDefaultTriggerActions() {
 	// create test trigger
 
+	/*
 	// Trigger to run startup script
 	triggerData := &jsTriggerServiceStarted{Object:O()}
 	trigger := &jsTriggerAction_ServiceStarted{Object:O()}
@@ -45,7 +47,7 @@ func ExportDefaultTriggerActions() {
 		println("is HIDScript action")
 	}
 
-
+	*/
 	/*
 	serviceUpRunScript := &pb.TriggerAction{
 		Trigger: &pb.TriggerAction_ServiceStarted{
@@ -132,6 +134,7 @@ func ExportDefaultTriggerActions() {
 
 }
 
+/*
 type jsIsTriggerAction_Trigger interface {
 	isTriggerAction_Trigger()
 }
@@ -282,97 +285,12 @@ func (*jsTriggerAction_HidScript) isTriggerAction_Action()              {}
 func (*jsTriggerAction_DeploySettingsTemplate) isTriggerAction_Action() {}
 func (*jsTriggerAction_Log) isTriggerAction_Action()                    {}
 
-type jsTriggerServiceStarted struct {
-	*js.Object
-}
-
-type jsTriggerUSBGadgetConnected struct {
-	*js.Object
-}
-
-type jsTriggerUSBGadgetDisconnected struct {
-	*js.Object
-}
-
-type jsTriggerWifiAPStarted struct {
-	*js.Object
-}
-type jsTriggerWifiConnectedAsSta struct {
-	*js.Object
-}
-type jsTriggerSSHLogin struct {
-	*js.Object
-	ResLoginUser string `js:"ResLoginUser"`
-}
-type jsTriggerDHCPLeaseGranted struct {
-	*js.Object
-	ResInterface string `js:"ResInterface"`
-	ResClientIP  string `js:"ResClientIP"`
-	ResClientMac string `js:"ResClientMac"`
-}
-
-type jsActionStartBashScript struct {
-	*js.Object
-	ScriptPath string `js:"ScriptPath"`
-}
-type jsActionStartHIDScript struct {
-	*js.Object
-	ScriptName string `js:"ScriptName"`
-}
-type jsActionDeploySettingsTemplate struct {
-	*js.Object
-	TemplateName string `js:"TemplateName"`
-	Type         string `js:"Type"`
-}
-type jsActionLog struct {
-	*js.Object
-}
+*/
 
 
 
-type triggerType int
-type actionType int
-const (
- 	TriggerServiceStarted = triggerType(0)
-	TriggerUsbGadgetConnected = triggerType(1)
-	TriggerUsbGadgetDisconnected = triggerType(2)
-	TriggerWifiAPStarted = triggerType(3)
-	TriggerWifiConnectedAsSta = triggerType(4)
-	TriggerSshLogin = triggerType(5)
-	TriggerDhcpLeaseGranted = triggerType(6)
 
-	ActionLog = actionType(0)
-	ActionHidScript = actionType(1)
-	ActionDeploySettingsTemplate = actionType(2)
-	ActionBashScript = actionType(3)
-)
-var triggerNames = map[triggerType]string{
-	TriggerServiceStarted: "Service started",
-	TriggerUsbGadgetConnected: "USB Gadget connected to host",
-	TriggerUsbGadgetDisconnected: "USB Gadget disconnected from host",
-	TriggerWifiAPStarted: "WiFi Access Point is up",
-	TriggerWifiConnectedAsSta: "Connected to existing WiFi",
-	TriggerSshLogin: "User login via SSH",
-	TriggerDhcpLeaseGranted: "Client received DHCP lease",
-}
-var actionNames = map[actionType]string{
-	ActionLog: "Log to internal console",
-	ActionHidScript: "Start a HIDScript",
-	ActionDeploySettingsTemplate: "Load and deploy the given settings",
-	ActionBashScript: "Run the given bash script",
-}
-var availableTriggers = []triggerType{
-	TriggerServiceStarted,
-	TriggerUsbGadgetConnected,
-	TriggerUsbGadgetDisconnected,
-	TriggerWifiAPStarted,
-	TriggerWifiConnectedAsSta,
-	TriggerDhcpLeaseGranted,
-}
-var availableActions = []actionType {
-	ActionLog,
-	ActionBashScript,
-}
+
 func generateSelectOptionsTrigger() *js.Object {
 	tts := js.Global.Get("Array").New()
 	type option struct {
@@ -407,34 +325,60 @@ func generateSelectOptionsAction() *js.Object {
 	return tts
 }
 
-type jsVMTriggerAction struct {
-	*js.Object
+func generateSelectOptionsGPIOOutValue() *js.Object {
+	tts := js.Global.Get("Array").New()
+	type option struct {
+		*js.Object
+		Label string `js:"label"`
+		Value GPIOOutValue `js:"value"`
+	}
 
-	Id      uint32 `js:"Id"`
-	OneShot bool `js:"OneShot"`
-	IsActive bool `js:"IsActive"`
-	Immutable bool `js:"Immutable"`
-
-
-	TriggerType triggerType `js:"TriggerType"`
-	ActionType actionType `js:"ActionType"`
-
-	TriggerData *js.Object `js:"TriggerData"`
-	ActionData *js.Object `js:"ActionData"`
+	for _, value := range availableGPIOOutValues {
+		label := gpioOutValueNames[value]
+		o := option{Object:O()}
+		o.Value = value
+		o.Label = label
+		tts.Call("push", o)
+	}
+	return tts
 }
 
-func NewTriggerAction() *jsVMTriggerAction {
-	ta := &jsVMTriggerAction{Object:O()}
-	ta.Id = 0
-	ta.IsActive = true
-	ta.Immutable = false
-	ta.OneShot = false
-	ta.ActionData = O()
-	ta.TriggerData = O()
-	ta.TriggerType = availableTriggers[0]
-	ta.ActionType = availableActions[0]
-	return ta
+func generateSelectOptionsGPIOInPullUpDown() *js.Object {
+	tts := js.Global.Get("Array").New()
+	type option struct {
+		*js.Object
+		Label string `js:"label"`
+		Value GPIOInPullUpDown `js:"value"`
+	}
+
+	for _, value := range availableGPIOInPullUpDowns {
+		label := gpioInPullUpDownNames[value]
+		o := option{Object:O()}
+		o.Value = value
+		o.Label = label
+		tts.Call("push", o)
+	}
+	return tts
 }
+
+func generateSelectOptionsGPIOInEdges() *js.Object {
+	tts := js.Global.Get("Array").New()
+	type option struct {
+		*js.Object
+		Label string `js:"label"`
+		Value GPIOInEdge `js:"value"`
+	}
+
+	for _, value := range availableGPIOInEdges {
+		label := gpioInEdgeNames[value]
+		o := option{Object:O()}
+		o.Value = value
+		o.Label = label
+		tts.Call("push", o)
+	}
+	return tts
+}
+
 
 func InitComponentsTriggerActions() {
 	// ToDo: delete test
@@ -446,7 +390,7 @@ func InitComponentsTriggerActions() {
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			data := struct {
 				*js.Object
-				TriggerAction *jsVMTriggerAction `js:"TriggerAction"`
+				TriggerAction *jsTriggerAction `js:"TriggerAction"`
 			}{Object: O()}
 			data.TriggerAction = NewTriggerAction()
 			return &data
@@ -468,6 +412,82 @@ func InitComponentsTriggerActions() {
 		hvue.Computed("triggertypes", func(vm *hvue.VM) interface{} {
 			return generateSelectOptionsTrigger()
 		}),
+		hvue.Computed("pullupdown", func(vm *hvue.VM) interface{} {
+			return generateSelectOptionsGPIOInPullUpDown()
+		}),
+		hvue.Computed("edge", func(vm *hvue.VM) interface{} {
+			return generateSelectOptionsGPIOInEdges()
+		}),
+		hvue.ComputedWithGetSet(
+			"triggerType",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("ta").Get("TriggerType")
+			},
+			func(vm *hvue.VM, newValue *js.Object) {
+				tType := triggerType(newValue.Int())
+				ta := &jsTriggerAction{Object: vm.Get("ta")}
+				ta.ChangeTriggerType(tType)
+			}),
+		hvue.Method(
+			"TriggerGroupReceiveSequenceAddValue",
+			func(vm *hvue.VM, newVal *js.Object) {
+				println("Force add", newVal)
+				ta := &jsTriggerAction{Object: vm.Get("ta")}
+				if !ta.IsTriggerGroupReceiveSequence() { return }
+
+				// cast data Object to jsTriggerGroupReceiveSequence
+				tgrs := &jsTriggerGroupReceiveSequence{Object:ta.TriggerData}
+				strVal := newVal.String()
+				if intVal,errconv := strconv.Atoi(strVal); errconv == nil {
+					//append to Values
+					tgrs.ValueSequence = append(tgrs.ValueSequence, intVal)
+				}
+			}),
+		hvue.ComputedWithGetSet(
+			"TriggerGroupReceiveSequenceValues",
+			func(vm *hvue.VM) interface{} {
+				ta := &jsTriggerAction{Object: vm.Get("ta")}
+				if !ta.IsTriggerGroupReceiveSequence() { return []string{} }
+
+				// cast data Object to jsTriggerGroupReceiveSequence
+				tgrs := &jsTriggerGroupReceiveSequence{Object:ta.TriggerData}
+
+				res := make([]string, len(tgrs.ValueSequence))
+				for idx,intVal := range tgrs.ValueSequence {
+					res[idx] = strconv.Itoa(intVal)
+				}
+				return res
+			},
+			func(vm *hvue.VM, newValue *js.Object) {
+				ta := &jsTriggerAction{Object: vm.Get("ta")}
+				if !ta.IsTriggerGroupReceiveSequence() { return }
+
+				// cast data Object to jsTriggerGroupReceiveSequence
+				tgrs := &jsTriggerGroupReceiveSequence{Object:ta.TriggerData}
+
+				// clear old array
+				tgrs.ValueSequence = []int{}
+
+				// iterate over newValue, which is assumed to be an Array of strings
+				for idx := 0; idx < newValue.Length(); idx++ {
+					//fetch value
+					strVal := newValue.Index(idx).String()
+					// try to cast to int
+					if intVal,errconv := strconv.Atoi(strVal); errconv == nil {
+						//append to Values
+						tgrs.ValueSequence = append(tgrs.ValueSequence, intVal)
+					}
+				}
+			}),
+		hvue.Computed("isTriggerGPIOIn", func(vm *hvue.VM) interface{} {
+			return (&jsTriggerAction{Object: vm.Get("ta")}).IsTriggerGPIOIn()
+		}),
+		hvue.Computed("isTriggerGroupReceive", func(vm *hvue.VM) interface{} {
+			return (&jsTriggerAction{Object: vm.Get("ta")}).IsTriggerGroupReceive()
+		}),
+		hvue.Computed("isTriggerGroupReceiveSequence", func(vm *hvue.VM) interface{} {
+			return (&jsTriggerAction{Object: vm.Get("ta")}).IsTriggerGroupReceiveSequence()
+		}),
 	)
 	hvue.NewComponent(
 		"action",
@@ -476,67 +496,36 @@ func InitComponentsTriggerActions() {
 		hvue.Computed("actiontypes", func(vm *hvue.VM) interface{} {
 			return generateSelectOptionsAction()
 		}),
+		hvue.Computed("gpiooutvalues", func(vm *hvue.VM) interface{} {
+			return generateSelectOptionsGPIOOutValue()
+		}),
 		hvue.ComputedWithGetSet(
 			"actionType",
 			func(vm *hvue.VM) interface{} {
 				return vm.Get("ta").Get("ActionType")
 			},
 			func(vm *hvue.VM, newValue *js.Object) {
-				// set ActionData accordingly
-				var data *js.Object
-				switch aType := actionType(newValue.Int()); aType {
-				case ActionLog:
-					d := &jsActionLog{Object:O()}
-					data = d.Object
-				case ActionHidScript:
-					d := &jsActionStartHIDScript{Object:O()}
-					d.ScriptName = "somescript"
-					data = d.Object
-				case ActionDeploySettingsTemplate:
-					d := &jsActionDeploySettingsTemplate{Object:O()}
-					d.TemplateName = "somescript"
-					d.Type = "Template type"
-					data = d.Object
-				case ActionBashScript:
-					d := &jsActionStartBashScript{Object:O()}
-					d.ScriptPath = "/path/to/some/script"
-					data = d.Object
-				default:
-					println("Unknown action type")
-					data = O()
-				}
-				vm.Get("ta").Set("ActionData", data)
-
-				// set type itself (after data)
-				vm.Get("ta").Set("ActionType", newValue)
+				aType := actionType(newValue.Int())
+				ta := &jsTriggerAction{Object: vm.Get("ta")}
+				ta.ChangeActionType(aType)
 			}),
 		hvue.Computed("isActionLog", func(vm *hvue.VM) interface{} {
-			if at := actionType(vm.Get("actionType").Int()); at == ActionLog {
-				return true
-			} else {
-				return false
-			}
+			return (&jsTriggerAction{Object: vm.Get("ta")}).IsActionLog()
 		}),
 		hvue.Computed("isActionHidScript", func(vm *hvue.VM) interface{} {
-			if at := actionType(vm.Get("actionType").Int()); at == ActionHidScript {
-				return true
-			} else {
-				return false
-			}
+			return (&jsTriggerAction{Object: vm.Get("ta")}).IsActionHidScript()
 		}),
 		hvue.Computed("isActionDeploySettingsTemplate", func(vm *hvue.VM) interface{} {
-			if at := actionType(vm.Get("actionType").Int()); at == ActionDeploySettingsTemplate {
-				return true
-			} else {
-				return false
-			}
+			return (&jsTriggerAction{Object: vm.Get("ta")}).IsActionDeploySettingsTemplate()
 		}),
 		hvue.Computed("isActionBashScript", func(vm *hvue.VM) interface{} {
-			if at := actionType(vm.Get("actionType").Int()); at == ActionBashScript {
-				return true
-			} else {
-				return false
-			}
+			return (&jsTriggerAction{Object: vm.Get("ta")}).IsActionBashScript()
+		}),
+		hvue.Computed("isActionGPIOOut", func(vm *hvue.VM) interface{} {
+			return (&jsTriggerAction{Object: vm.Get("ta")}).IsActionGPIOOut()
+		}),
+		hvue.Computed("isActionGroupSend", func(vm *hvue.VM) interface{} {
+			return (&jsTriggerAction{Object: vm.Get("ta")}).IsActionGroupSend()
 		}),
 	)
 }
@@ -545,7 +534,7 @@ func InitComponentsTriggerActions() {
 const templateTriggerAction = `
 <q-card class="fit">
 <!-- {{ ta }} -->
-	<q-card-title>Triggered Action (ID {{ ta.Id }})</q-card-title>
+	<q-card-title>TriggereAction (ID {{ ta.Id }})</q-card-title>
 	<q-list>
 			<q-item tag="label" link>
 				<q-item-side>
@@ -588,10 +577,77 @@ const templateTrigger = `
 					<q-item-tile label>Trigger</q-item-tile>
 					<q-item-tile sublabel>Chose the event which has to occur to start the selected action</q-item-tile>
 					<q-item-tile>
-						<q-select v-model="ta.TriggerType" :options="triggertypes" inverted :disable="!ta.IsActive"></q-select>
+						<q-select v-model="triggerType" :options="triggertypes" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
+
+			<q-item tag="label" v-if="isTriggerGroupReceive || isTriggerGroupReceiveSequence">
+				<q-item-main>
+					<q-item-tile label>Group name</q-item-tile>
+					<q-item-tile sublabel>Only values send for this group name are regarded</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="ta.TriggerData.GroupName" inverted :disable="!ta.IsActive"></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+			<q-item tag="label" v-if="isTriggerGroupReceive">
+				<q-item-main>
+					<q-item-tile label>Value</q-item-tile>
+					<q-item-tile sublabel>The numeric value which has to be received to activate the trigger</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="ta.TriggerData.Value" type="number" decimals="0" inverted :disable="!ta.IsActive"></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+			<q-item tag="label" v-if="isTriggerGroupReceiveSequence">
+				<q-item-main>
+					<q-item-tile label>Values</q-item-tile>
+					<q-item-tile sublabel>The numeric value which has to be received to activate the trigger</q-item-tile>
+					<q-item-tile>
+						<q-chips-input v-model="TriggerGroupReceiveSequenceValues" @duplicate="TriggerGroupReceiveSequenceAddValue($event)" decimals="0" inverted :disable="!ta.IsActive"></q-chips-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+			<q-item tag="label" link :disabled="!ta.IsActive" v-if="isTriggerGroupReceiveSequence">
+				<q-item-side>
+					<q-toggle v-model="ta.TriggerData.IgnoreOutOfOrder" :disable="!ta.IsActive"></q-toggle>
+				</q-item-side>
+				<q-item-main>
+					<q-item-tile label>Ignore out-of-order values</q-item-tile>
+					<q-item-tile sublabel>If enabled, the trigger fires even if other values arrive in between the ones of the sequence. If disabled, no other values are allowed in between the sequence</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+
+			<q-item tag="label" v-if="isTriggerGPIOIn">
+				<q-item-main>
+					<q-item-tile label>GPIO Number</q-item-tile>
+					<q-item-tile sublabel>The number of the GPIO to monitor</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="ta.TriggerData.GpioNum" type="number" decimals="0" inverted :disable="!ta.IsActive"></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+			<q-item tag="label" v-if="isTriggerGPIOIn">
+				<q-item-main>
+					<q-item-tile label>Pull resistor</q-item-tile>
+					<q-item-tile sublabel>Chose if internal Pull-up/down resistor should be used</q-item-tile>
+					<q-item-tile>
+						<q-select v-model="ta.TriggerData.PullUpDown" :options="pullupdown" inverted :disable="!ta.IsActive"></q-select>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+			<q-item tag="label" v-if="isTriggerGPIOIn">
+				<q-item-main>
+					<q-item-tile label>Edge</q-item-tile>
+					<q-item-tile sublabel>What edge (level change) has to occur to fire the trigger</q-item-tile>
+					<q-item-tile>
+						<q-select v-model="ta.TriggerData.Edge" :options="edge" inverted :disable="!ta.IsActive"></q-select>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
 		</q-list>
 `
 
@@ -612,10 +668,61 @@ const templateAction = `
 					<q-item-tile label>Script path</q-item-tile>
 					<q-item-tile sublabel>Path to the BashScript which should be issued</q-item-tile>
 					<q-item-tile>
-						<q-input v-model="ta.ActionData.ScriptPath" :options="actiontypes" color="secondary" inverted :disable="!ta.IsActive"></q-input>
+						<q-input v-model="ta.ActionData.ScriptName" color="secondary" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
+
+			<q-item tag="label" v-if="isActionHidScript">
+				<q-item-main>
+					<q-item-tile label>Script name</q-item-tile>
+					<q-item-tile sublabel>Name of a stored HIDScript</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="ta.ActionData.ScriptName" color="secondary" inverted :disable="!ta.IsActive"></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+			<q-item tag="label" v-if="isActionGPIOOut">
+				<q-item-main>
+					<q-item-tile label>GPIO Number</q-item-tile>
+					<q-item-tile sublabel>The number of the GPIO to output on</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="ta.ActionData.GpioNum" type="number" decimals="0" color="secondary" inverted :disable="!ta.IsActive"></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+			<q-item tag="label" v-if="isActionGPIOOut">
+				<q-item-main>
+					<q-item-tile label>Output</q-item-tile>
+					<q-item-tile sublabel>Output low/high on the given GPIO or toggle the output</q-item-tile>
+					<q-item-tile>
+						<q-select v-model="ta.ActionData.Value" :options="gpiooutvalues" color="secondary" inverted :disable="!ta.IsActive"></q-select>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+
+			<q-item tag="label" v-if="isActionGroupSend">
+				<q-item-main>
+					<q-item-tile label>Group name</q-item-tile>
+					<q-item-tile sublabel>The name of the group to send to (has to match respective listeners)</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="ta.ActionData.GroupName" color="secondary" inverted :disable="!ta.IsActive"></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+			<q-item tag="label" v-if="isActionGroupSend">
+				<q-item-main>
+					<q-item-tile label>Value</q-item-tile>
+					<q-item-tile sublabel>The numeric value which is sent to the group channel</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="ta.ActionData.Value" color="secondary" type="number" decimals="0" inverted :disable="!ta.IsActive"></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+
 		</q-list>
 `
 
