@@ -4,6 +4,7 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
+	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 	"github.com/mame82/hvue"
 	"github.com/mame82/mvuex"
 	"time"
@@ -15,7 +16,8 @@ const (
 	maxLogEntries = 500
 
 	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS              = "updateRunningHidJobs"
-	VUEX_ACTION_UPDATE_TRIGGER_ACTIONS              = "updateTriggerActions"
+	VUEX_ACTION_UPDATE_TRIGGER_ACTIONS               = "updateTriggerActions"
+	VUEX_ACTION_ADD_NEW_TRIGGER_ACTION               = "addTriggerAction"
 	VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS       = "deployCurrentGadgetSettings"
 	VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED = "updateCurrentGadgetSettingsFromDeployed"
 	VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS   = "deployEthernetInterfaceSettings"
@@ -215,28 +217,32 @@ func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext
 
 func actionUpdateTriggerActions(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
-		// ToDo: replace by with RPC, dummy function
+		tastate,err := RpcClient.GetTriggerActionsState(time.Second * 10)
+		if err != nil {
+			QuasarNotifyError("Error fetching deployed TriggerActions", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
+			return
+		}
 
-		//Test Actions
-		// Generate an array of TriggerActions, which is provided from the Vuex store once the components ViewModel structures are finalized
-		taList := []*jsTriggerAction{
-			NewTriggerAction(),
-			NewTriggerAction(),
-			NewTriggerAction(),
-			NewTriggerAction(),
-			NewTriggerAction(),
-			NewTriggerAction(),
-			NewTriggerAction(),
-			NewTriggerAction(),
-			NewTriggerAction(),
-			NewTriggerAction(),
+		// ToDo: Clear list berfore adding back elements
+
+		for _,ta := range tastate.TriggerActions {
+
+			jsTA := NewTriggerAction()
+			jsTA.fromGo(ta)
+			state.TriggerActionList.UpdateEntry(jsTA)
 		}
-		taList[1].Immutable = true
-		taList[2].IsActive = false
-		for idx,ta := range taList {
-			ta.Id = uint32(idx)
-			state.TriggerActionList.UpdateEntry(ta)
-		}
+	}()
+
+	return
+}
+
+func actionAddNewTriggerAction(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		newTA := NewTriggerAction()
+		newTA.IsActive = false // don't activate by default
+		RpcClient.DeployTriggerActionsSetAdd(time.Second*10, &pb.TriggerActionSet{TriggerActions:[]*pb.TriggerAction{newTA.toGo()}})
+
+		actionUpdateTriggerActions(store, context, state)
 	}()
 
 	return
@@ -334,6 +340,7 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST, actionUpdateStoredWifiSettingsList),
 		mvuex.Action(VUEX_ACTION_STORE_WIFI_SETTINGS, actionStoreWifiSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_TRIGGER_ACTIONS, actionUpdateTriggerActions),
+		mvuex.Action(VUEX_ACTION_ADD_NEW_TRIGGER_ACTION, actionAddNewTriggerAction),
 
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
 			return state.TriggerActionList.TriggerActions

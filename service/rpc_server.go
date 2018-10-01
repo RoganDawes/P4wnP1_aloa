@@ -28,7 +28,8 @@ var (
 )
 
 const (
-	cSTORE_PREFIX_WIFI_SETTINGS = "ws_"
+	cSTORE_PREFIX_WIFI_SETTINGS      = "ws_"
+	cSTORE_PREFIX_TRIGGER_ACTION_SET = "tas_"
 )
 
 type server struct {
@@ -36,6 +37,46 @@ type server struct {
 
 	listenAddrGrpc string
 	listenAddrWeb string
+}
+
+func (s *server) StoreTriggerActionSets(ctx context.Context, sr *pb.TriggerActionSetRequestStorage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_TRIGGER_ACTION_SET+ sr.TemplateName, sr.Set, true)
+	return
+}
+
+func (s *server) ListStoredTriggerActionSets(ctx context.Context, e *pb.Empty) (tas *pb.StringMessageArray, err error) {
+	res, err := s.rootSvc.SubSysDataStore.KeysPrefix(cSTORE_PREFIX_TRIGGER_ACTION_SET, true)
+	if err != nil {
+		return tas, err
+	}
+	tas = &pb.StringMessageArray{
+		MsgArray: res,
+	}
+	return
+}
+
+func (s *server) GetTriggerActionsState(context.Context, *pb.Empty) (*pb.TriggerActionSet, error) {
+	return s.rootSvc.SubSysTriggerActions.GetCurrentTriggerActionSet(), nil
+}
+
+func (s *server) DeployTriggerActionSetReplace(ctx context.Context, tas *pb.TriggerActionSet) (resTas *pb.TriggerActionSet, err error) {
+	// Clear old set, but keep immutables
+	s.rootSvc.SubSysTriggerActions.ClearTriggerActions(true)
+	// Add the new set
+	_,err = s.DeployTriggerActionSetAdd(ctx, tas)
+	if err != nil { return s.rootSvc.SubSysTriggerActions.GetCurrentTriggerActionSet(),err }
+	return s.GetTriggerActionsState(ctx, &pb.Empty{})
+}
+
+func (s *server) DeployTriggerActionSetAdd(ctx context.Context, tas *pb.TriggerActionSet) (resTas *pb.TriggerActionSet, err error) {
+	addedTA := make([]*pb.TriggerAction, len(tas.TriggerActions))
+	for idx,ta := range tas.TriggerActions {
+		addedTA[idx],err = s.rootSvc.SubSysTriggerActions.AddTriggerAction(ta)
+		if err != nil { return s.rootSvc.SubSysTriggerActions.GetCurrentTriggerActionSet(),err }
+	}
+
+	return &pb.TriggerActionSet{TriggerActions:addedTA},nil
 }
 
 func NewRpcServerService(root *Service) *server {

@@ -70,7 +70,7 @@ const (
 	USB_FUNCTION_HID_RAW_report_desc   = "\x06\x00\xff\t\x01\xa1\x01\t\x01\x15\x00&\xff\x00u\x08\x95@\x81\x02\t\x02\x15\x00&\xff\x00u\x08\x95@\x91\x02\xc0"
 	USB_FUNCTION_HID_RAW_name          = "hid.raw"
 
-	USB_KEYBOARD_LANGUAGE_MAP_PATH = "/usr/local/P4wnP1/keymaps"
+
 
 )
 
@@ -674,12 +674,12 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 			devPathMouse := gm.State.DevicePath[USB_FUNCTION_HID_MOUSE_name]
 
 			var errH error
-			gm.HidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, USB_KEYBOARD_LANGUAGE_MAP_PATH, devPathMouse)
+			gm.HidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, PATH_KEYBOARD_LANGUAGE_MAPS, devPathMouse)
 			gm.HidCtl.SetEventHandler(gm)
 			if errH != nil {
-				log.Printf("ERROR: Couldn't bring up an instance of HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s'\nReason: %v\n", devPathKeyboard, devPathMouse, USB_KEYBOARD_LANGUAGE_MAP_PATH, errH)
+				log.Printf("ERROR: Couldn't bring up an instance of HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s'\nReason: %v\n", devPathKeyboard, devPathMouse, PATH_KEYBOARD_LANGUAGE_MAPS, errH)
 			} else {
-				log.Printf("HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s' initialized\n", devPathKeyboard, devPathMouse, USB_KEYBOARD_LANGUAGE_MAP_PATH)
+				log.Printf("HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s' initialized\n", devPathKeyboard, devPathMouse, PATH_KEYBOARD_LANGUAGE_MAPS)
 			}
 		} else {
 			if gm.HidCtl != nil { gm.HidCtl.Abort() }

@@ -48,12 +48,25 @@ service P4WNP1 {
     rpc DeployStoredWifiSettings(StringMessage) returns (WiFiState) {}
     rpc StoreDeployedWifiSettings(StringMessage) returns (Empty) {}
     rpc ListStoredWifiSettings(Empty) returns (StringMessageArray) {}
+
+    // TriggerActions
+    rpc ListStoredTriggerActionSets(Empty) returns (StringMessageArray) {}
+    rpc StoreTriggerActionSets(TriggerActionSetRequestStorage) returns (Empty) {}
+    rpc GetTriggerActionsState(Empty) returns (TriggerActionSet) {}
+    rpc DeployTriggerActionSetReplace(TriggerActionSet) returns (TriggerActionSet) {} // Adds a set of additional TriggerActions, returns a set of all Triggeractions registered afterwards
+    rpc DeployTriggerActionSetAdd(TriggerActionSet) returns (TriggerActionSet) {} // Replaces registered TriggerActions with given set, returns a set ONLY OF ADDED TriggerActions (with assigned IDs)
 }
 
 /* Triggers, Actions and resulting TriggerActions */
-message TriggerActionSettings {
-    repeated TriggerAction registeredTriggerActions = 1;
+message TriggerActionSet {
+    repeated TriggerAction TriggerActions = 1;
 }
+
+message TriggerActionSetRequestStorage {
+    string TemplateName = 1;
+    TriggerActionSet set = 2;
+}
+
 
 message TriggerAction {
     uint32 id = 1; // assigned by service, used as identifier to allow deletion of trigger actions

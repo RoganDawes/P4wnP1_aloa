@@ -27,24 +27,24 @@ const (
 	ActionGroupSend = actionType(5)
 )
 var triggerNames = map[triggerType]string{
-	TriggerServiceStarted: "Service started",
-	TriggerUsbGadgetConnected: "USB Gadget connected to host",
-	TriggerUsbGadgetDisconnected: "USB Gadget disconnected from host",
+	TriggerServiceStarted: "service has been started",
+	TriggerUsbGadgetConnected: "USB gadget has connected to host",
+	TriggerUsbGadgetDisconnected: "USB Gadget has disconnected from host",
 	TriggerWifiAPStarted: "WiFi Access Point is up",
-	TriggerWifiConnectedAsSta: "Connected to existing WiFi",
-	TriggerSshLogin: "User login via SSH",
-	TriggerDhcpLeaseGranted: "Client received DHCP lease",
-	TriggerGPIOIn: "GPIO Pin input",
-	TriggerGroupReceive: "Group channel received value",
-	TriggerGroupReceiveSequence: "Group channel received sequence",
+	TriggerWifiConnectedAsSta: "joined an existing WiFi",
+	TriggerSshLogin: "a user logged in via SSH",
+	TriggerDhcpLeaseGranted: "a DHCP lease has been issued",
+	TriggerGPIOIn: "received input on GPIO",
+	TriggerGroupReceive: "received a value on a group channel",
+	TriggerGroupReceiveSequence: "received a sequence of values on a group channel",
 }
 var actionNames = map[actionType]string{
-	ActionLog: "Log to internal console",
-	ActionHidScript: "Start a HIDScript",
-	ActionDeploySettingsTemplate: "Load and deploy the given settings",
-	ActionBashScript: "Run the given bash script",
-	ActionGPIOOut: "GPIO Pin output",
-	ActionGroupSend: "Send value to group channel",
+	ActionLog: "write log entry",
+	ActionHidScript: "start a HIDScript",
+	ActionDeploySettingsTemplate: "load and deploy settings from a template",
+	ActionBashScript: "run a bash script",
+	ActionGPIOOut: "set output on GPIO",
+	ActionGroupSend: "send a value to a group channel",
 }
 var availableTriggers = []triggerType{
 	TriggerServiceStarted,

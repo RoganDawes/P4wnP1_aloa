@@ -132,6 +132,12 @@ func generateSelectOptionsTemplateTypes() *js.Object {
 	return tts
 }
 
+type TriggerActionCompData struct {
+	*js.Object
+	EditMode bool `js:"EditMode"`
+}
+
+
 
 func InitComponentsTriggerActions() {
 	hvue.NewComponent(
@@ -145,15 +151,50 @@ func InitComponentsTriggerActions() {
 			data.TriggerAction = NewTriggerAction()
 			return &data
 		}),
+		hvue.Method("addTA",
+			func(vm *hvue.VM) {
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_ADD_NEW_TRIGGER_ACTION)
+			}),
 		hvue.Mounted(func(vm *hvue.VM) {
 			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_TRIGGER_ACTIONS)
 		}),
 	)
 
+
 	hvue.NewComponent(
 		"triggeraction",
 		hvue.Template(templateTriggerAction),
-		hvue.Props("ta"),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := &TriggerActionCompData{Object: O()}
+			data.EditMode = false
+
+			return data
+		}),
+		hvue.PropObj("ta"),
+		hvue.PropObj(
+			"overview",
+			hvue.Types(hvue.PBoolean),
+			),
+		hvue.Computed("strTrigger", func(vm *hvue.VM) interface{} {
+			ta := &jsTriggerAction{Object: vm.Get("ta")}
+			strTrigger := triggerNames[ta.TriggerType]
+			return strTrigger
+		}),
+		hvue.Computed("strAction", func(vm *hvue.VM) interface{} {
+			ta := &jsTriggerAction{Object: vm.Get("ta")}
+			strTrigger := actionNames[ta.ActionType]
+			return strTrigger
+		}),
+		hvue.Mounted(func(vm *hvue.VM) {
+			data := TriggerActionCompData{Object: vm.Data}
+			data.EditMode = vm.Get("overview").Bool()
+		}),
+		hvue.Method(
+			"toggleEditMode",
+			func(vm *hvue.VM) {
+				data := TriggerActionCompData{Object: vm.Data}
+				data.EditMode = !data.EditMode
+			}),
 	)
 	hvue.NewComponent(
 		"trigger",
@@ -291,9 +332,28 @@ func InitComponentsTriggerActions() {
 
 //
 const templateTriggerAction = `
-<q-card class="fit">
+<q-card tag="label" link v-if="EditMode">
+	<q-card-title>
+		TriggerAction ({{ ta.IsActive ? "active" : "inactive" }})
+		<span slot="subtitle">
+			<q-icon name="input"></q-icon> 
+			{{ strTrigger }}
+			<q-icon name="launch"></q-icon>
+			{{ strAction }}{{ta.OneShot ? " (only once)" : "" }}
+		</span>
+		<q-btn slot="right" icon="more_vert" @click="toggleEditMode" flat></q-btn>
+	</q-card-title>
+	
+	
+</q-card>
+
+<q-card v-else class="fit">
 <!-- {{ ta }} -->
-	<q-card-title>TriggerAction (ID {{ ta.Id }})</q-card-title>
+	<q-card-title>
+		TriggerAction
+		<span slot="subtitle">ID {{ ta.Id }}</span>
+		<q-btn slot="right" icon="more_vert" @click="toggleEditMode" flat></q-btn>
+	</q-card-title>
 	<q-list>
 			<q-item tag="label" link>
 				<q-item-side>
@@ -512,11 +572,18 @@ const templateAction = `
 
 const templateTriggerActionManager = `
 <q-page padding>
+	<q-card>
+		<q-card-actions>
+    		<q-btn label="add" @click="addTA" icon="event" />
+  		</q-card-actions>
+
 <div class="row gutter-sm">
-	<div class="col-12 col-xl-6" v-for="ta in $store.getters.triggerActions"> 
-		<triggeraction :key="ta.Id" :ta="ta"></triggeraction>
-	</div>
+		<div class="col-12 col-xl-6" v-for="ta in $store.getters.triggerActions"> 
+			<triggeraction :key="ta.Id" :ta="ta" overview></triggeraction>
+		</div>
 </div>
+
+	</q-card>
 </q-page>	
 
 `

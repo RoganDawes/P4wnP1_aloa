@@ -1,3 +1,5 @@
+// +build linux,arm
+
 package service
 
 import (
@@ -6,28 +8,28 @@ import (
 	"github.com/mame82/P4wnP1_go/service/datastore"
 )
 
-const (
-	// ToDo: change to non-temporary folder to persist over reboot
-	pPATH_DATA_STORE = "/tmp/store"
-)
 
 func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 	// create test trigger
 
 	// Trigger to run startup script
 	serviceUpRunScript := &pb.TriggerAction{
+		IsActive: true,
+		Immutable: true,
+		OneShot: false,
 		Trigger: &pb.TriggerAction_ServiceStarted{
 			ServiceStarted: &pb.TriggerServiceStarted{},
 		},
 		Action: &pb.TriggerAction_BashScript{
 			BashScript: &pb.ActionStartBashScript{
-				ScriptPath: "/usr/local/P4wnP1/scripts/servicestart.sh", // ToDo: use real script path once ready
+				ScriptName: "servicestart.sh", // ToDo: Remove path component
 			},
 		},
 	}
 	tam.AddTriggerAction(serviceUpRunScript)
 
 	logServiceStart := &pb.TriggerAction{
+		IsActive: true,
 		Trigger: &pb.TriggerAction_ServiceStarted{
 			ServiceStarted: &pb.TriggerServiceStarted{},
 		},
@@ -38,6 +40,7 @@ func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 	tam.AddTriggerAction(logServiceStart)
 
 	logDHCPLease := &pb.TriggerAction{
+		IsActive: true,
 		Trigger: &pb.TriggerAction_DhcpLeaseGranted{
 			DhcpLeaseGranted: &pb.TriggerDHCPLeaseGranted{},
 		},
@@ -48,6 +51,7 @@ func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 	tam.AddTriggerAction(logDHCPLease)
 
 	logUSBGadgetConnected := &pb.TriggerAction{
+		IsActive: true,
 		Trigger: &pb.TriggerAction_UsbGadgetConnected{
 			UsbGadgetConnected: &pb.TriggerUSBGadgetConnected{},
 		},
@@ -58,6 +62,7 @@ func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 	tam.AddTriggerAction(logUSBGadgetConnected)
 
 	logUSBGadgetDisconnected := &pb.TriggerAction{
+		IsActive: true,
 		Trigger: &pb.TriggerAction_UsbGadgetDisconnected{
 			UsbGadgetDisconnected: &pb.TriggerUSBGadgetDisconnected{},
 		},
@@ -68,6 +73,7 @@ func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 	tam.AddTriggerAction(logUSBGadgetDisconnected)
 
 	logWifiAp := &pb.TriggerAction{
+		IsActive: true,
 		Trigger: &pb.TriggerAction_WifiAPStarted{
 			WifiAPStarted: &pb.TriggerWifiAPStarted{},
 		},
@@ -78,6 +84,7 @@ func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 	tam.AddTriggerAction(logWifiAp)
 
 	logWifiSta := &pb.TriggerAction{
+		IsActive: true,
 		Trigger: &pb.TriggerAction_WifiConnectedAsSta{
 			WifiConnectedAsSta: &pb.TriggerWifiConnectedAsSta{},
 		},
@@ -88,6 +95,7 @@ func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 	tam.AddTriggerAction(logWifiSta)
 
 	logSSHLogin := &pb.TriggerAction{
+		IsActive: true,
 		Trigger: &pb.TriggerAction_SshLogin{
 			SshLogin: &pb.TriggerSSHLogin{},
 		},
@@ -118,7 +126,7 @@ type Service struct {
 func NewService() (svc *Service, err error) {
 	svc = &Service{}
 
-	svc.SubSysDataStore, err = datastore.Open(pPATH_DATA_STORE)
+	svc.SubSysDataStore, err = datastore.Open(PATH_DATA_STORE)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +160,7 @@ func (s *Service) Start() {
 	s.SubSysEvent.Start()
 	s.SubSysDwc2ConnectWatcher.Start()
 	s.SubSysLed.Start()
-	s.SubSysRPC.StartRpcServerAndWeb("0.0.0.0", "50051", "8000", "/usr/local/P4wnP1/www") //start gRPC service
+	s.SubSysRPC.StartRpcServerAndWeb("0.0.0.0", "50051", "8000", PATH_WEBROOT) //start gRPC service
 	s.SubSysTriggerActions.Start()
 
 	// Register TriggerActions

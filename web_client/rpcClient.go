@@ -3,14 +3,14 @@
 package main
 
 import (
-	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 	"context"
-	"sync"
 	"github.com/johanbrandhorst/protobuf/grpcweb"
+	"github.com/mame82/P4wnP1_go/common_web"
+	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
+	"io"
+	"sync"
 	"time"
 	"errors"
-	"github.com/mame82/P4wnP1_go/common_web"
-	"io"
 )
 
 type Rpc struct {
@@ -140,6 +140,46 @@ func (rpc *Rpc) RpcGetRunningHidJobStates(timeout time.Duration) (states []*pb.H
 
 	return states, nil
 }
+
+func (rpc *Rpc) ListStoredTriggerActionSets(timeout time.Duration) (tasNames []string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	msgArray,err := rpc.Client.ListStoredTriggerActionSets(ctx, &pb.Empty{})
+	if err != nil { return tasNames, err}
+	return msgArray.MsgArray, nil
+}
+
+func (rpc *Rpc) StoreTriggerActionSet(timeout time.Duration, set *pb.TriggerActionSet) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_,err = rpc.Client.StoreTriggerActionSets(ctx, &pb.TriggerActionSetRequestStorage{Set:set})
+	return err
+}
+
+func (rpc *Rpc) GetTriggerActionsState(timeout time.Duration) (res *pb.TriggerActionSet, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	return rpc.Client.GetTriggerActionsState(ctx, &pb.Empty{})
+}
+
+func (rpc *Rpc) DeployTriggerActionsSetReplace(timeout time.Duration, set *pb.TriggerActionSet) (res *pb.TriggerActionSet, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	return rpc.Client.DeployTriggerActionSetReplace(ctx, set)
+}
+
+func (rpc *Rpc) DeployTriggerActionsSetAdd(timeout time.Duration, set *pb.TriggerActionSet) (res *pb.TriggerActionSet, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	return rpc.Client.DeployTriggerActionSetAdd(ctx, set)
+}
+
+
 
 func (rpc *Rpc) RpcGetDeployedGadgetSettings(timeout time.Duration) (*pb.GadgetSettings, error) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"github.com/mame82/P4wnP1_go/common"
 	"github.com/mame82/P4wnP1_go/common_web"
@@ -44,8 +45,9 @@ func (tam *TriggerActionManager) fireActionNoArgs(ta *pb.TriggerAction) (err err
 	switch actionType := ta.Action.(type) {
 	case *pb.TriggerAction_BashScript:
 		bs := actionType.BashScript
-		go common.RunBashScriptEnv(bs.ScriptPath)
-		fmt.Printf("Fire bash script '%s'\n", bs.ScriptPath)
+		scriptPath := PATH_BASH_SCRIPTS + "/" + bs.ScriptName
+		go common.RunBashScriptEnv(scriptPath)
+		fmt.Printf("Fire bash script '%s'\n", scriptPath)
 	case *pb.TriggerAction_HidScript:
 		// ToDo: Implement
 		hs := actionType.HidScript
@@ -70,10 +72,11 @@ func (tam *TriggerActionManager) fireActionSSHLogin(loginUser string, ta *pb.Tri
 	switch actionType := ta.Action.(type) {
 	case *pb.TriggerAction_BashScript:
 		bs := actionType.BashScript
+		scriptPath := PATH_BASH_SCRIPTS + "/" + bs.ScriptName
 		envUser := fmt.Sprintf("SSH_LOGIN_USER=%s", loginUser)
-		go common.RunBashScriptEnv(bs.ScriptPath, envUser)
+		go common.RunBashScriptEnv(scriptPath, envUser)
 		//go common.RunBashScript(bs.ScriptPath)
-		fmt.Printf("Started bash script '%s' (%s)\n", bs.ScriptPath, envUser)
+		fmt.Printf("Started bash script '%s' (%s)\n", scriptPath, envUser)
 	case *pb.TriggerAction_HidScript:
 		// ToDo: Implement
 		hs := actionType.HidScript
@@ -101,12 +104,13 @@ func (tam *TriggerActionManager) fireActionDhcpLeaseGranted(iface string, mac st
 	switch actionType := ta.Action.(type) {
 	case *pb.TriggerAction_BashScript:
 		bs := actionType.BashScript
+		scriptPath := PATH_BASH_SCRIPTS + "/" + bs.ScriptName
 		envIface := fmt.Sprintf("DHCP_LEASE_IFACE=%s", iface)
 		envMac := fmt.Sprintf("DHCP_LEASE_MAC=%s", mac)
 		envIp := fmt.Sprintf("DHCP_LEASE_IP=%s", ip)
-		go common.RunBashScriptEnv(bs.ScriptPath, envIface, envMac, envIp)
+		go common.RunBashScriptEnv(scriptPath, envIface, envMac, envIp)
 		//go common.RunBashScript(bs.ScriptPath)
-		fmt.Printf("Started bash script '%s' (%s, %s, %s)\n", bs.ScriptPath, envIface, envMac, envIp)
+		fmt.Printf("Started bash script '%s' (%s, %s, %s)\n", scriptPath, envIface, envMac, envIp)
 	case *pb.TriggerAction_HidScript:
 		// ToDo: Implement
 		hs := actionType.HidScript
@@ -188,52 +192,42 @@ func (tam *TriggerActionManager) dispatchTriggerEvent(evt *pb.Event) {
 	tam.registeredTriggerActionMutex.Lock()
 	defer tam.registeredTriggerActionMutex.Unlock()
 	markedForRemoval := []int{}
-	for idx,ta := range tam.registeredTriggerAction {
+	for _,ta := range tam.registeredTriggerAction {
 		// ToDo: handle errors of fireAction* methods
+		// ToDo: fire action methods have to return an additional int, indicating if the action has really fired (filter function in action could prevent this, which would cause wrong behavior for OneShot riggerActions)
+
+		// skip disabled triggeractions
+		if !ta.IsActive { continue }
 		if taTriggerTypeMatchesEvtTriggerType(ta, evt) {
+			hasFired := true
 			switch ttEvt := common_web.EvtTriggerType(evt.Values[0].GetTint64()); ttEvt {
 			case common_web.EVT_TRIGGER_TYPE_SERVICE_STARTED:
 				tam.fireActionServiceStarted(ta)
-				if ta.OneShot {
-					markedForRemoval = append(markedForRemoval,idx)
-				}
 			case common_web.EVT_TRIGGER_TYPE_SSH_LOGIN:
 				loginUser := evt.Values[1].GetTstring()
 				tam.fireActionSSHLogin(loginUser, ta)
-				if ta.OneShot {
-					markedForRemoval = append(markedForRemoval,idx)
-				}
 			case common_web.EVT_TRIGGER_TYPE_WIFI_CONNECTED_AS_STA:
 				tam.fireActionWifiConnectedAsSta(ta)
-				if ta.OneShot {
-					markedForRemoval = append(markedForRemoval,idx)
-				}
 			case common_web.EVT_TRIGGER_TYPE_WIFI_AP_STARTED:
 				tam.fireActionWifiApStarted(ta)
-				if ta.OneShot {
-					markedForRemoval = append(markedForRemoval,idx)
-				}
 			case common_web.EVT_TRIGGER_TYPE_DHCP_LEASE_GRANTED:
 				// extract iface, mac and ip from event
 				iface := evt.Values[1].GetTstring()
 				mac := evt.Values[2].GetTstring()
 				ip := evt.Values[3].GetTstring()
 				tam.fireActionDhcpLeaseGranted(iface, mac, ip, ta)
-				if ta.OneShot {
-					markedForRemoval = append(markedForRemoval,idx)
-				}
 			case common_web.EVT_TRIGGER_TYPE_USB_GADGET_CONNECTED:
 				tam.fireActionUsbGadgetConnected(ta)
-				if ta.OneShot {
-					markedForRemoval = append(markedForRemoval,idx)
-				}
 			case common_web.EVT_TRIGGER_TYPE_USB_GADGET_DISCONNECTED:
 				tam.fireActionUsbGadgetDisconnected(ta)
-				if ta.OneShot {
-					markedForRemoval = append(markedForRemoval,idx)
-				}
 			default:
+				hasFired = false
 				fmt.Println("unhandled trigger: ", ttEvt)
+			}
+
+			if hasFired && ta.OneShot {
+				//markedForRemoval = append(markedForRemoval,idx)
+				ta.IsActive = false // don't delete, but deactivate
 			}
 		}
 	}
@@ -247,15 +241,80 @@ func (tam *TriggerActionManager) dispatchTriggerEvent(evt *pb.Event) {
 	return
 }
 
-
-func (tam *TriggerActionManager) AddTriggerAction(ta *pb.TriggerAction) (err error) {
+// returns the TriggerAction with assigned ID
+func (tam *TriggerActionManager) AddTriggerAction(ta *pb.TriggerAction) (taAdded *pb.TriggerAction, err error) {
 	tam.registeredTriggerActionMutex.Lock()
 	defer tam.registeredTriggerActionMutex.Unlock()
 	ta.Id = tam.nextID
 	tam.nextID++
 	tam.registeredTriggerAction = append(tam.registeredTriggerAction, ta)
 
+	return taAdded,nil
+}
+
+var (
+	ErrTaNotFound = errors.New("Couldn't find given TriggerAction")
+	ErrTaImmutable = errors.New("Not allowed to change immutable TriggerAction")
+)
+
+func (tam *TriggerActionManager) GetTriggerActionByID(Id uint32) (ta *pb.TriggerAction ,err error) {
+	for _,ta = range tam.registeredTriggerAction {
+		if ta.Id == Id {
+			return ta, nil
+		}
+	}
+	return nil, ErrTaNotFound
+}
+
+func (tam *TriggerActionManager) UpdateTriggerAction(srcTa *pb.TriggerAction, addIfMissing bool) (err error) {
+	tam.registeredTriggerActionMutex.Lock()
+	defer tam.registeredTriggerActionMutex.Unlock()
+
+	if targetTA,err := tam.GetTriggerActionByID(srcTa.Id); err != nil {
+		if addIfMissing {
+			_,err = tam.AddTriggerAction(srcTa)
+			return err
+		} else {
+			return ErrTaNotFound
+		}
+	} else {
+		if targetTA.Immutable { return ErrTaImmutable }
+
+		targetTA.OneShot = srcTa.OneShot
+		targetTA.IsActive = srcTa.IsActive
+		targetTA.Immutable = srcTa.Immutable
+		targetTA.Action = srcTa.Action
+		targetTA.Trigger = srcTa.Trigger
+		return nil
+	}
+}
+
+func (tam *TriggerActionManager) ClearTriggerActions(keepImmutable bool) (err error) {
+	tam.registeredTriggerActionMutex.Lock()
+	defer tam.registeredTriggerActionMutex.Unlock()
+
+	if !keepImmutable {
+		tam.registeredTriggerAction = []*pb.TriggerAction{}
+		return
+	}
+
+	newTas := []*pb.TriggerAction{}
+	for _,ta := range tam.registeredTriggerAction {
+		if ta.Immutable {
+			newTas = append(newTas, ta)
+		}
+	}
+	tam.registeredTriggerAction = newTas
 	return nil
+}
+
+func (tam *TriggerActionManager) GetCurrentTriggerActionSet() (ta *pb.TriggerActionSet) {
+	tam.registeredTriggerActionMutex.Lock()
+	resTAs := make([]*pb.TriggerAction, len(tam.registeredTriggerAction))
+	copy(resTAs, tam.registeredTriggerAction)
+	tam.registeredTriggerActionMutex.Unlock()
+
+	return &pb.TriggerActionSet{ TriggerActions: resTAs }
 }
 
 func (tam *TriggerActionManager) Start() {
