@@ -161,40 +161,125 @@ func InitComponentsTriggerActions() {
 	)
 
 
+
 	hvue.NewComponent(
-		"triggeraction",
+		"TriggerAction",
 		hvue.Template(templateTriggerAction),
+		hvue.PropObj("ta"),
+	)
+
+	hvue.NewComponent(
+		"TriggerActionOverview",
+		hvue.Template(templateTriggerActionOverview),
+		hvue.PropObj("ta"),
+		hvue.Computed("computedColor", func(vm *hvue.VM) interface{} {
+			ta := &jsTriggerAction{Object: vm.Get("ta")}
+			switch {
+			case ta.Immutable:
+				return "dark"
+			/*
+			case !ta.IsActive:
+				return "light"
+			*/
+			default:
+				return ""
+			}
+
+		}),
+		hvue.Computed("strTrigger", func(vm *hvue.VM) interface{} {
+			ta := &jsTriggerAction{Object: vm.Get("ta")}
+			strTrigger := triggerNames[ta.TriggerType]
+
+			switch {
+			case ta.IsTriggerGroupReceive():
+				t := jsTriggerGroupReceive{Object: ta.TriggerData}
+				strTrigger += " ("
+				strTrigger += t.GroupName
+				strTrigger += ": " + strconv.Itoa(int(t.Value))
+				strTrigger += ")"
+			case ta.IsTriggerGroupReceiveSequence():
+				t := jsTriggerGroupReceiveSequence{Object: ta.TriggerData}
+				strTrigger += " ("
+				strTrigger += t.GroupName
+				strTrigger += ": ["
+				for idx,val  := range t.ValueSequence {
+					if idx != 0 {
+						strTrigger += ", "
+					}
+					strTrigger += strconv.Itoa(int(val))
+				}
+				strTrigger += "]"
+				if !t.IgnoreOutOfOrder {
+					strTrigger += ", out-of-order allowed"
+				}
+				strTrigger += ")"
+			case ta.IsTriggerGPIOIn():
+				t := jsTriggerGPIOIn{Object: ta.TriggerData}
+				strTrigger += " ("
+				strTrigger += gpioNumNames[t.GpioNum]
+				strTrigger += ": " + gpioInEdgeNames[t.Edge]
+				strTrigger += ", resistor: " + gpioInPullUpDownNames[t.PullUpDown]
+				strTrigger += ")"
+			}
+
+			return strTrigger
+		}),
+		hvue.Computed("strAction", func(vm *hvue.VM) interface{} {
+			ta := &jsTriggerAction{Object: vm.Get("ta")}
+			strAction := actionNames[ta.ActionType]
+			switch {
+			case ta.IsActionGroupSend():
+				tgs := jsActionGroupSend{Object: ta.ActionData}
+				strAction += " ("
+				strAction += tgs.GroupName
+				strAction += ": " + strconv.Itoa(int(tgs.Value))
+				strAction += ")"
+			case ta.IsActionGPIOOut():
+				a := jsActionGPIOOut{Object: ta.ActionData}
+				strAction += " ("
+				strAction += gpioNumNames[a.GpioNum]
+				strAction += ": " + gpioOutValueNames[a.Value]
+				strAction += ")"
+			case ta.IsActionBashScript():
+				a := jsActionStartBashScript{Object: ta.ActionData}
+				strAction += " ('"
+				strAction += a.ScriptName
+				strAction += "')"
+			case ta.IsActionDeploySettingsTemplate():
+				a := jsActionDeploySettingsTemplate{Object: ta.ActionData}
+				strAction += " ("
+				strAction += templateTypeNames[a.Type]
+				strAction += ": '" + a.TemplateName
+				strAction += "')"
+			case ta.IsActionHidScript():
+				a := jsActionStartHIDScript{Object: ta.ActionData}
+				strAction += " ('"
+				strAction += a.ScriptName
+				strAction += "')"
+			}
+			return strAction
+		}),
+		hvue.Mounted(func(vm *hvue.VM) {
+			data := TriggerActionCompData{Object: vm.Data}
+			data.EditMode = vm.Get("overview").Bool()
+		}),
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			data := &TriggerActionCompData{Object: O()}
 			data.EditMode = false
 
 			return data
 		}),
-		hvue.PropObj("ta"),
-		hvue.PropObj(
-			"overview",
-			hvue.Types(hvue.PBoolean),
-			),
-		hvue.Computed("strTrigger", func(vm *hvue.VM) interface{} {
-			ta := &jsTriggerAction{Object: vm.Get("ta")}
-			strTrigger := triggerNames[ta.TriggerType]
-			return strTrigger
-		}),
-		hvue.Computed("strAction", func(vm *hvue.VM) interface{} {
-			ta := &jsTriggerAction{Object: vm.Get("ta")}
-			strTrigger := actionNames[ta.ActionType]
-			return strTrigger
-		}),
-		hvue.Mounted(func(vm *hvue.VM) {
-			data := TriggerActionCompData{Object: vm.Data}
-			data.EditMode = vm.Get("overview").Bool()
-		}),
 		hvue.Method(
-			"toggleEditMode",
+			"enableEditMode",
 			func(vm *hvue.VM) {
 				data := TriggerActionCompData{Object: vm.Data}
-				data.EditMode = !data.EditMode
+				data.EditMode = true
 			}),
+	)
+	hvue.NewComponent(
+		"TriggerActionEdit",
+		hvue.Template(templateTriggerActionEdit),
+		hvue.PropObj("ta"),
 	)
 	hvue.NewComponent(
 		"trigger",
@@ -330,29 +415,52 @@ func InitComponentsTriggerActions() {
 	)
 }
 
-//
 const templateTriggerAction = `
-<q-card tag="label" link v-if="EditMode">
+<div>
+<!-- {{ ta }} -->
+	<TriggerActionOverview :ta="ta"></TriggerActionOverview>
+</div>
+`
+const templateTriggerActionOverview = `
+<div>
+<q-modal v-model="EditMode">
+	<TriggerActionEdit :ta="ta">
+		<span slot="actions">
+			<q-btn color="secondary" v-close-overlay label="close" />
+			<q-btn color="primary" v-close-overlay label="close" />
+		</span>
+	</TriggerActionEdit>
+	
+</q-modal>
+
+<q-card tag="label" :color="computedColor" :text-color="ta.IsActive ? '': 'light'" :disabled="ta.Immutable" :dark="ta.Immutable">
 	<q-card-title>
-		TriggerAction ({{ ta.IsActive ? "active" : "inactive" }})
+		{{ ta.Immutable ? "immutable, " : "" }}
+		{{ ta.IsActive ? "enabled" : "disabled" }}
+		TriggerAction
+	
 		<span slot="subtitle">
 			<q-icon name="input"></q-icon> 
 			{{ strTrigger }}
-			<q-icon name="launch"></q-icon>
-			{{ strAction }}{{ta.OneShot ? " (only once)" : "" }}
+			<br><q-icon name="launch"></q-icon>
+			{{ strAction }}{{ta.OneShot ? " only once" : "" }}	
 		</span>
-		<q-btn slot="right" icon="more_vert" @click="toggleEditMode" flat></q-btn>
-	</q-card-title>
-	
-	
-</q-card>
 
-<q-card v-else class="fit">
-<!-- {{ ta }} -->
+		<div slot="right" v-if="!ta.Immutable">
+			<q-btn color="primary" icon="edit" @click="enableEditMode" flat></q-btn>
+			<q-btn color="negative" icon="delete" flat></q-btn>
+		</div>
+	</q-card-title>
+</q-card>
+</div>
+`
+
+const templateTriggerActionEdit = `
+<q-card class="fit">
 	<q-card-title>
 		TriggerAction
 		<span slot="subtitle">ID {{ ta.Id }}</span>
-		<q-btn slot="right" icon="more_vert" @click="toggleEditMode" flat></q-btn>
+		<q-btn slot="right" icon="more_vert" flat></q-btn>
 	</q-card-title>
 	<q-list>
 			<q-item tag="label" link>
@@ -376,17 +484,19 @@ const templateTriggerAction = `
 			</q-item>
 	</q-list>
 
-						<div class="row items-stretch">
-							<div class="col-12 col-md-6"">
-								<trigger :ta="ta"></trigger>
-							</div>
+	<div class="row items-stretch">
+		<div class="col-12 col-md-6"">
+			<trigger :ta="ta"></trigger>
+		</div>
 	
-							<div class="col-12 col-md-6">
-								<action :ta="ta"></action>
-							</div>
-						</div>
+		<div class="col-12 col-md-6">
+			<action :ta="ta"></action>
+		</div>
+	</div>
 
-
+	<q-card-actions>
+		<slot name="actions"></slot>
+	</q-card-actions>
 </q-card>
 `
 const templateTrigger = `
@@ -434,7 +544,7 @@ const templateTrigger = `
 				</q-item-side>
 				<q-item-main>
 					<q-item-tile label>Ignore out-of-order values</q-item-tile>
-					<q-item-tile sublabel>If enabled, the trigger fires even if other values arrive in between the ones of the sequence. If disabled, no other values are allowed in between the sequence</q-item-tile>
+					<q-item-tile sublabel>If enabled the sequence may be interrupted by other values. If disabled they have to arrive in exact order.</q-item-tile>
 				</q-item-main>
 			</q-item>
 
@@ -483,11 +593,12 @@ const templateAction = `
 			</q-item>
 
 			<q-item tag="label" v-if="isActionBashScript">
+				<modalLoadBashScript ref="bashScriptSelect"></modalLoadBashScript>
 				<q-item-main>
 					<q-item-tile label>Script path</q-item-tile>
 					<q-item-tile sublabel>Path to the BashScript which should be issued</q-item-tile>
 					<q-item-tile>
-						<q-input v-model="ta.ActionData.ScriptName" color="secondary" inverted :disable="!ta.IsActive"></q-input>
+						<q-input v-model="ta.ActionData.ScriptName" color="secondary" inverted readonly :after="[{icon: 'more_horiz', handler(){$refs.bashScriptSelect.setVisible(true)}}]" :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
@@ -572,18 +683,19 @@ const templateAction = `
 
 const templateTriggerActionManager = `
 <q-page padding>
-	<q-card>
-		<q-card-actions>
-    		<q-btn label="add" @click="addTA" icon="event" />
-  		</q-card-actions>
-
-<div class="row gutter-sm">
-		<div class="col-12 col-xl-6" v-for="ta in $store.getters.triggerActions"> 
-			<triggeraction :key="ta.Id" :ta="ta" overview></triggeraction>
+	<div class="row gutter-sm">
+		<div class="col-12">
+			<q-card>
+				<q-card-actions>
+    				<q-btn label="add" @click="addTA" icon="event" />
+  				</q-card-actions>
+			</q-card>
 		</div>
-</div>
 
-	</q-card>
+		<div class="col-12 col-lg-6" v-for="ta in $store.getters.triggerActions"> 
+			<TriggerAction :key="ta.Id" :ta="ta" overview></TriggerAction>
+		</div>
+	</div>
 </q-page>	
 
 `

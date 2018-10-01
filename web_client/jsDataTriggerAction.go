@@ -27,21 +27,21 @@ const (
 	ActionGroupSend = actionType(5)
 )
 var triggerNames = map[triggerType]string{
-	TriggerServiceStarted: "service has been started",
-	TriggerUsbGadgetConnected: "USB gadget has connected to host",
-	TriggerUsbGadgetDisconnected: "USB Gadget has disconnected from host",
+	TriggerServiceStarted: "service started",
+	TriggerUsbGadgetConnected: "USB gadget connected to host",
+	TriggerUsbGadgetDisconnected: "USB Gadget disconnected from host",
 	TriggerWifiAPStarted: "WiFi Access Point is up",
-	TriggerWifiConnectedAsSta: "joined an existing WiFi",
-	TriggerSshLogin: "a user logged in via SSH",
-	TriggerDhcpLeaseGranted: "a DHCP lease has been issued",
-	TriggerGPIOIn: "received input on GPIO",
-	TriggerGroupReceive: "received a value on a group channel",
-	TriggerGroupReceiveSequence: "received a sequence of values on a group channel",
+	TriggerWifiConnectedAsSta: "joined existing WiFi",
+	TriggerSshLogin: "SSH user login",
+	TriggerDhcpLeaseGranted: "DHCP lease issued",
+	TriggerGPIOIn: "input on GPIO",
+	TriggerGroupReceive: "a value on a group channel",
+	TriggerGroupReceiveSequence: "value sequence on a group channel",
 }
 var actionNames = map[actionType]string{
 	ActionLog: "write log entry",
 	ActionHidScript: "start a HIDScript",
-	ActionDeploySettingsTemplate: "load and deploy settings from a template",
+	ActionDeploySettingsTemplate: "load and deploy settings template",
 	ActionBashScript: "run a bash script",
 	ActionGPIOOut: "set output on GPIO",
 	ActionGroupSend: "send a value to a group channel",
@@ -295,16 +295,16 @@ func (ta *jsTriggerAction) ChangeActionType(newAt actionType) {
 		data = d.Object
 	case ActionHidScript:
 		d := &jsActionStartHIDScript{Object:O()}
-		d.ScriptName = "somescript"
+		d.ScriptName = "some-hid-script.js"
 		data = d.Object
 	case ActionDeploySettingsTemplate:
 		d := &jsActionDeploySettingsTemplate{Object:O()}
-		d.TemplateName = "somescript"
+		d.TemplateName = "some-template"
 		d.Type = availableTemplateTypes[0]
 		data = d.Object
 	case ActionBashScript:
 		d := &jsActionStartBashScript{Object:O()}
-		d.ScriptName = "/path/to/some/script"
+		d.ScriptName = "some-bash-script.sh"
 		data = d.Object
 	case ActionGPIOOut:
 		d := &jsActionGPIOOut{Object:O()}
@@ -313,7 +313,7 @@ func (ta *jsTriggerAction) ChangeActionType(newAt actionType) {
 		data = d.Object
 	case ActionGroupSend:
 		d := &jsActionGroupSend{Object:O()}
-		d.GroupName = "Channel1"
+		d.GroupName = "Group1"
 		d.Value = 1
 		data = d.Object
 	default:
@@ -380,12 +380,12 @@ func (ta *jsTriggerAction) ChangeTriggerType(newTt triggerType) {
 		data = d.Object
 	case TriggerGroupReceive:
 		d := &jsTriggerGroupReceive{Object:O()}
-		d.GroupName = "Channel1"
+		d.GroupName = "Group1"
 		d.Value = 0
 		data = d.Object
 	case TriggerGroupReceiveSequence:
 		d := &jsTriggerGroupReceiveSequence{Object:O()}
-		d.GroupName = "Channel1"
+		d.GroupName = "Group1"
 		d.IgnoreOutOfOrder = false
 		d.ValueSequence = []int32{1,1}
 		data = d.Object
