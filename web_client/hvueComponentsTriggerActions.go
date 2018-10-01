@@ -8,289 +8,6 @@ import (
 	"strconv"
 )
 
-func ExportDefaultTriggerActions() {
-	// create test trigger
-
-	/*
-	// Trigger to run startup script
-	triggerData := &jsTriggerServiceStarted{Object:O()}
-	trigger := &jsTriggerAction_ServiceStarted{Object:O()}
-	trigger.ServiceStarted = triggerData
-	actionData := &jsActionStartBashScript{Object:O()}
-	actionData.ScriptPath = "/usr/local/P4wnP1/scripts/servicestart.sh"
-	action := &jsTriggerAction_BashScript{Object:O()}
-	action.BashScript = actionData
-	svcUpRunScript := &jsTriggerAction{Object:O()}
-	svcUpRunScript.OneShot = false
-	svcUpRunScript.Id = 0
-	svcUpRunScript.Trigger = trigger.Object
-	svcUpRunScript.Action = action.Object
-
-	js.Global.Set("testta", svcUpRunScript)
-
-	// Try to cast back (shouldn't work because of the interfaces
-	copyobj := &jsTriggerAction{Object:js.Global.Get("testta")}
-	js.Global.Set("copyobj", copyobj)
-	println("copyobj", copyobj)
-	println("copyobjtrigger", copyobj.Trigger) //<--- this wouldn't work
-
-	if isJsTriggerAction_ServiceStarted(copyobj.Trigger) {
-		println("is service started trigger")
-	}
-	if isJsTriggerAction_UsbGadgetConnected(copyobj.Trigger) {
-		println("is USB gadget connected trigger")
-	}
-	if isJsTriggerAction_BashScript(copyobj.Action) {
-		println("is BashScript action")
-	}
-	if isJsTriggerAction_HidScript(copyobj.Trigger) {
-		println("is HIDScript action")
-	}
-
-	*/
-	/*
-	serviceUpRunScript := &pb.TriggerAction{
-		Trigger: &pb.TriggerAction_ServiceStarted{
-			ServiceStarted: &pb.TriggerServiceStarted{},
-		},
-		Action: &pb.TriggerAction_BashScript{
-			BashScript: &pb.ActionStartBashScript{
-				ScriptPath: "/usr/local/P4wnP1/scripts/servicestart.sh", // ToDo: use real script path once ready
-			},
-		},
-	}
-	a[0] = serviceUpRunScript
-
-	logServiceStart := &pb.TriggerAction{
-		Trigger: &pb.TriggerAction_ServiceStarted{
-			ServiceStarted: &pb.TriggerServiceStarted{},
-		},
-		Action: &pb.TriggerAction_Log{
-			Log: &pb.ActionLog{},
-		},
-	}
-	a[1]= logServiceStart
-
-	logDHCPLease := &pb.TriggerAction{
-		Trigger: &pb.TriggerAction_DhcpLeaseGranted{
-			DhcpLeaseGranted: &pb.TriggerDHCPLeaseGranted{},
-		},
-		Action: &pb.TriggerAction_Log{
-			Log: &pb.ActionLog{},
-		},
-	}
-	a[2] = logDHCPLease
-
-	logUSBGadgetConnected := &pb.TriggerAction{
-		Trigger: &pb.TriggerAction_UsbGadgetConnected{
-			UsbGadgetConnected: &pb.TriggerUSBGadgetConnected{},
-		},
-		Action: &pb.TriggerAction_Log{
-			Log: &pb.ActionLog{},
-		},
-	}
-	a[3] = logUSBGadgetConnected
-
-	logUSBGadgetDisconnected := &pb.TriggerAction{
-		Trigger: &pb.TriggerAction_UsbGadgetDisconnected{
-			UsbGadgetDisconnected: &pb.TriggerUSBGadgetDisconnected{},
-		},
-		Action: &pb.TriggerAction_Log{
-			Log: &pb.ActionLog{},
-		},
-	}
-	a[4] = logUSBGadgetDisconnected
-
-	logWifiAp := &pb.TriggerAction{
-		Trigger: &pb.TriggerAction_WifiAPStarted{
-			WifiAPStarted: &pb.TriggerWifiAPStarted{},
-		},
-		Action: &pb.TriggerAction_Log{
-			Log: &pb.ActionLog{},
-		},
-	}
-	a[5] = logWifiAp
-
-	logWifiSta := &pb.TriggerAction{
-		Trigger: &pb.TriggerAction_WifiConnectedAsSta{
-			WifiConnectedAsSta: &pb.TriggerWifiConnectedAsSta{},
-		},
-		Action: &pb.TriggerAction_Log{
-			Log: &pb.ActionLog{},
-		},
-	}
-	a[6] = logWifiSta
-
-	logSSHLogin := &pb.TriggerAction{
-		Trigger: &pb.TriggerAction_SshLogin{
-			SshLogin: &pb.TriggerSSHLogin{},
-		},
-		Action: &pb.TriggerAction_Log{
-			Log: &pb.ActionLog{},
-		},
-	}
-	a[7] = logSSHLogin
-	*/
-
-}
-
-/*
-type jsIsTriggerAction_Trigger interface {
-	isTriggerAction_Trigger()
-}
-type jsIsTriggerAction_Action interface{ isTriggerAction_Action() }
-
-type jsTriggerAction struct {
-	*js.Object
-
-	Id      uint32 `js:"Id"`
-	OneShot bool `js:"OnShot"`
-
-	Trigger *js.Object `js:"Trigger"`
-	Action *js.Object `js:"Action"`
-}
-
-// TriggerAction_ServiceStarted is assignable to Trigger
-type jsTriggerAction_ServiceStarted struct {
-	*js.Object
-	ServiceStarted *jsTriggerServiceStarted `js:"ServiceStarted"`
-}
-
-func isJsTriggerAction_ServiceStarted(src *js.Object) bool {
-	test := jsTriggerAction_ServiceStarted{Object:src}
-	if test.ServiceStarted.Object == js.Undefined { return false }
-	return true
-}
-
-// TriggerAction_UsbGadgetConnected is assignable to Trigger
-type jsTriggerAction_UsbGadgetConnected struct {
-	*js.Object
-	UsbGadgetConnected *jsTriggerUSBGadgetConnected `js:"UsbGadgetConnected"`
-}
-
-func isJsTriggerAction_UsbGadgetConnected(src *js.Object) bool {
-	test := jsTriggerAction_UsbGadgetConnected{Object:src}
-	if test.UsbGadgetConnected.Object == js.Undefined { return false }
-	return true
-}
-
-// TriggerAction_UsbGadgetDisconnected is assignable to Trigger
-type jsTriggerAction_UsbGadgetDisconnected struct {
-	*js.Object
-	UsbGadgetDisconnected *jsTriggerUSBGadgetDisconnected `js:"UsbGadgetDisconnected"`
-}
-func isJsTriggerAction_UsbGadgetDisconnected(src *js.Object) bool {
-	test := jsTriggerAction_UsbGadgetDisconnected{Object:src}
-	if test.UsbGadgetDisconnected.Object == js.Undefined { return false }
-	return true
-}
-
-// TriggerAction_WifiAPStarted is assignable to Trigger
-type jsTriggerAction_WifiAPStarted struct {
-	*js.Object
-	WifiAPStarted *jsTriggerWifiAPStarted `js:"WifiAPStarted"`
-}
-func iJsTriggerAction_WifiAPStarted(src *js.Object) bool {
-	test := jsTriggerAction_WifiAPStarted{Object:src}
-	if test.WifiAPStarted.Object == js.Undefined { return false }
-	return true
-}
-
-// TriggerAction_WifiConnectedAsSta is assignable to Trigger
-type jsTriggerAction_WifiConnectedAsSta struct {
-	*js.Object
-	WifiConnectedAsSta *jsTriggerWifiConnectedAsSta `js:"WifiConnectedAsSta"`
-}
-func isJsTriggerAction_WifiConnectedAsSta(src *js.Object) bool {
-	test := jsTriggerAction_WifiConnectedAsSta{Object:src}
-	if test.WifiConnectedAsSta.Object == js.Undefined { return false }
-	return true
-}
-
-// TriggerAction_SshLogin is assignable to Trigger
-type jsTriggerAction_SshLogin struct {
-	*js.Object
-	SshLogin *jsTriggerSSHLogin `js:"SshLogin"`
-}
-func isJsTriggerAction_SshLogin(src *js.Object) bool {
-	test := jsTriggerAction_SshLogin{Object:src}
-	if test.SshLogin.Object == js.Undefined { return false }
-	return true
-}
-
-// TriggerAction_DhcpLeaseGranted is assignable to Trigger
-type jsTriggerAction_DhcpLeaseGranted struct {
-	*js.Object
-	DhcpLeaseGranted *jsTriggerDHCPLeaseGranted `js:"DhcpLeaseGranted"`
-}
-func isJsTriggerAction_DhcpLeaseGranted(src *js.Object) bool {
-	test := jsTriggerAction_DhcpLeaseGranted{Object:src}
-	if test.DhcpLeaseGranted.Object == js.Undefined { return false }
-	return true
-}
-
-// TriggerAction_BashScript is assignable to Action
-type jsTriggerAction_BashScript struct {
-	*js.Object
-	BashScript *jsActionStartBashScript `js:"BashScript"`
-}
-func isJsTriggerAction_BashScript(src *js.Object) bool {
-	test := jsTriggerAction_BashScript{Object:src}
-	if test.BashScript.Object == js.Undefined { return false }
-	return true
-}
-
-// TriggerAction_HidScript is assignable to Action
-type jsTriggerAction_HidScript struct {
-	*js.Object
-	HidScript *jsActionStartHIDScript `js:"HidScript"`
-}
-func isJsTriggerAction_HidScript(src *js.Object) bool {
-	test := jsTriggerAction_HidScript{Object:src}
-	if test.HidScript.Object == js.Undefined { return false }
-	return true
-}
-
-// TriggerAction_DeploySettingsTemplate is assignable to Action
-type jsTriggerAction_DeploySettingsTemplate struct {
-	*js.Object
-	DeploySettingsTemplate *jsActionDeploySettingsTemplate `js:"DeploySettingsTemplate"`
-}
-func isJsTriggerAction_DeploySettingsTemplate(src *js.Object) bool {
-	test := jsTriggerAction_DeploySettingsTemplate{Object:src}
-	if test.DeploySettingsTemplate.Object == js.Undefined { return false }
-	return true
-}
-
-// TriggerAction_Log is assignable to Action
-type jsTriggerAction_Log struct {
-	*js.Object
-	Log *jsActionLog `js:"Log"`
-}
-func isJsTriggerAction_Log(src *js.Object) bool {
-	test := jsTriggerAction_Log{Object:src}
-	if test.Log.Object == js.Undefined { return false }
-	return true
-}
-
-func (*jsTriggerAction_ServiceStarted) isTriggerAction_Trigger()        {}
-func (*jsTriggerAction_UsbGadgetConnected) isTriggerAction_Trigger()    {}
-func (*jsTriggerAction_UsbGadgetDisconnected) isTriggerAction_Trigger() {}
-func (*jsTriggerAction_WifiAPStarted) isTriggerAction_Trigger()         {}
-func (*jsTriggerAction_WifiConnectedAsSta) isTriggerAction_Trigger()    {}
-func (*jsTriggerAction_SshLogin) isTriggerAction_Trigger()              {}
-func (*jsTriggerAction_DhcpLeaseGranted) isTriggerAction_Trigger()      {}
-func (*jsTriggerAction_BashScript) isTriggerAction_Action()             {}
-func (*jsTriggerAction_HidScript) isTriggerAction_Action()              {}
-func (*jsTriggerAction_DeploySettingsTemplate) isTriggerAction_Action() {}
-func (*jsTriggerAction_Log) isTriggerAction_Action()                    {}
-
-*/
-
-
-
-
-
 func generateSelectOptionsTrigger() *js.Object {
 	tts := js.Global.Get("Array").New()
 	type option struct {
@@ -343,6 +60,24 @@ func generateSelectOptionsGPIOOutValue() *js.Object {
 	return tts
 }
 
+func generateSelectOptionsGPIONum() *js.Object {
+	tts := js.Global.Get("Array").New()
+	type option struct {
+		*js.Object
+		Label string `js:"label"`
+		Value GPIONum `js:"value"`
+	}
+
+	for _, value := range availableGPIONums {
+		label := gpioNumNames[value]
+		o := option{Object:O()}
+		o.Value = value
+		o.Label = label
+		tts.Call("push", o)
+	}
+	return tts
+}
+
 func generateSelectOptionsGPIOInPullUpDown() *js.Object {
 	tts := js.Global.Get("Array").New()
 	type option struct {
@@ -379,11 +114,26 @@ func generateSelectOptionsGPIOInEdges() *js.Object {
 	return tts
 }
 
+func generateSelectOptionsTemplateTypes() *js.Object {
+	tts := js.Global.Get("Array").New()
+	type option struct {
+		*js.Object
+		Label string `js:"label"`
+		Value TemplateType `js:"value"`
+	}
+
+	for _, value := range availableTemplateTypes {
+		label := templateTypeNames[value]
+		o := option{Object:O()}
+		o.Value = value
+		o.Label = label
+		tts.Call("push", o)
+	}
+	return tts
+}
+
 
 func InitComponentsTriggerActions() {
-	// ToDo: delete test
-	ExportDefaultTriggerActions()
-
 	hvue.NewComponent(
 		"triggeraction-manager",
 		hvue.Template(templateTriggerActionManager),
@@ -418,6 +168,9 @@ func InitComponentsTriggerActions() {
 		hvue.Computed("edge", func(vm *hvue.VM) interface{} {
 			return generateSelectOptionsGPIOInEdges()
 		}),
+		hvue.Computed("gpionum", func(vm *hvue.VM) interface{} {
+			return generateSelectOptionsGPIONum()
+		}),
 		hvue.ComputedWithGetSet(
 			"triggerType",
 			func(vm *hvue.VM) interface{} {
@@ -440,7 +193,7 @@ func InitComponentsTriggerActions() {
 				strVal := newVal.String()
 				if intVal,errconv := strconv.Atoi(strVal); errconv == nil {
 					//append to Values
-					tgrs.ValueSequence = append(tgrs.ValueSequence, intVal)
+					tgrs.ValueSequence = append(tgrs.ValueSequence, int32(intVal))
 				}
 			}),
 		hvue.ComputedWithGetSet(
@@ -454,7 +207,7 @@ func InitComponentsTriggerActions() {
 
 				res := make([]string, len(tgrs.ValueSequence))
 				for idx,intVal := range tgrs.ValueSequence {
-					res[idx] = strconv.Itoa(intVal)
+					res[idx] = strconv.Itoa(int(intVal))
 				}
 				return res
 			},
@@ -466,7 +219,7 @@ func InitComponentsTriggerActions() {
 				tgrs := &jsTriggerGroupReceiveSequence{Object:ta.TriggerData}
 
 				// clear old array
-				tgrs.ValueSequence = []int{}
+				tgrs.ValueSequence = []int32{}
 
 				// iterate over newValue, which is assumed to be an Array of strings
 				for idx := 0; idx < newValue.Length(); idx++ {
@@ -475,7 +228,7 @@ func InitComponentsTriggerActions() {
 					// try to cast to int
 					if intVal,errconv := strconv.Atoi(strVal); errconv == nil {
 						//append to Values
-						tgrs.ValueSequence = append(tgrs.ValueSequence, intVal)
+						tgrs.ValueSequence = append(tgrs.ValueSequence, int32(intVal))
 					}
 				}
 			}),
@@ -498,6 +251,12 @@ func InitComponentsTriggerActions() {
 		}),
 		hvue.Computed("gpiooutvalues", func(vm *hvue.VM) interface{} {
 			return generateSelectOptionsGPIOOutValue()
+		}),
+		hvue.Computed("gpionum", func(vm *hvue.VM) interface{} {
+			return generateSelectOptionsGPIONum()
+		}),
+		hvue.Computed("templatetypes", func(vm *hvue.VM) interface{} {
+			return generateSelectOptionsTemplateTypes()
 		}),
 		hvue.ComputedWithGetSet(
 			"actionType",
@@ -534,7 +293,7 @@ func InitComponentsTriggerActions() {
 const templateTriggerAction = `
 <q-card class="fit">
 <!-- {{ ta }} -->
-	<q-card-title>TriggereAction (ID {{ ta.Id }})</q-card-title>
+	<q-card-title>TriggerAction (ID {{ ta.Id }})</q-card-title>
 	<q-list>
 			<q-item tag="label" link>
 				<q-item-side>
@@ -552,7 +311,7 @@ const templateTriggerAction = `
 				</q-item-side>
 				<q-item-main>
 					<q-item-tile label>One shot</q-item-tile>
-					<q-item-tile sublabel>The trigger fires every time the respective event occurs. If "one shot" is enabled it fores only once.</q-item-tile>
+					<q-item-tile sublabel>The trigger fires every time the respective event occurs. If "one shot" is enabled it fires only once.</q-item-tile>
 				</q-item-main>
 			</q-item>
 	</q-list>
@@ -603,7 +362,7 @@ const templateTrigger = `
 			<q-item tag="label" v-if="isTriggerGroupReceiveSequence">
 				<q-item-main>
 					<q-item-tile label>Values</q-item-tile>
-					<q-item-tile sublabel>The numeric value which has to be received to activate the trigger</q-item-tile>
+					<q-item-tile sublabel>The numeric value sequence which has to be received to activate the trigger</q-item-tile>
 					<q-item-tile>
 						<q-chips-input v-model="TriggerGroupReceiveSequenceValues" @duplicate="TriggerGroupReceiveSequenceAddValue($event)" decimals="0" inverted :disable="!ta.IsActive"></q-chips-input>
 					</q-item-tile>
@@ -625,7 +384,7 @@ const templateTrigger = `
 					<q-item-tile label>GPIO Number</q-item-tile>
 					<q-item-tile sublabel>The number of the GPIO to monitor</q-item-tile>
 					<q-item-tile>
-						<q-input v-model="ta.TriggerData.GpioNum" type="number" decimals="0" inverted :disable="!ta.IsActive"></q-input>
+						<q-select v-model="ta.TriggerData.GpioNum" :options="gpionum" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
@@ -688,7 +447,7 @@ const templateAction = `
 					<q-item-tile label>GPIO Number</q-item-tile>
 					<q-item-tile sublabel>The number of the GPIO to output on</q-item-tile>
 					<q-item-tile>
-						<q-input v-model="ta.ActionData.GpioNum" type="number" decimals="0" color="secondary" inverted :disable="!ta.IsActive"></q-input>
+						<q-select v-model="ta.ActionData.GpioNum" :options="gpionum" color="secondary" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
@@ -718,6 +477,29 @@ const templateAction = `
 					<q-item-tile sublabel>The numeric value which is sent to the group channel</q-item-tile>
 					<q-item-tile>
 						<q-input v-model="ta.ActionData.Value" color="secondary" type="number" decimals="0" inverted :disable="!ta.IsActive"></q-input>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+
+
+
+			<q-item tag="label" v-if="isActionDeploySettingsTemplate">
+				<q-item-main>
+					<q-item-tile label>Type</q-item-tile>
+					<q-item-tile sublabel>Name of the stored settings template to load</q-item-tile>
+					<q-item-tile>
+						<q-select v-model="ta.ActionData.Type" :options="templatetypes" color="secondary" inverted :disable="!ta.IsActive"></q-select>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+			<q-item tag="label" v-if="isActionDeploySettingsTemplate">
+				<q-item-main>
+					<q-item-tile label>Template name</q-item-tile>
+					<q-item-tile sublabel>Name of the stored settings template to load</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="ta.ActionData.TemplateName" color="secondary" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>

@@ -11,17 +11,21 @@
 		TriggerActionSettings
 		TriggerAction
 		TriggerServiceStarted
-		TriggerGPIO
 		TriggerUSBGadgetConnected
 		TriggerUSBGadgetDisconnected
 		TriggerWifiAPStarted
 		TriggerWifiConnectedAsSta
 		TriggerSSHLogin
 		TriggerDHCPLeaseGranted
+		TriggerGroupReceive
+		TriggerGroupReceiveSequence
+		TriggerGPIOIn
 		ActionStartBashScript
 		ActionStartHIDScript
 		ActionDeploySettingsTemplate
 		ActionLog
+		ActionGPIOOut
+		ActionGroupSend
 		WifiRequestSettingsStorage
 		WiFiSettings
 		WiFiState
@@ -67,6 +71,149 @@ import (
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the jspb package it is being compiled against.
 const _ = jspb.JspbPackageIsVersion2
+
+type GPIOInPullUpDown int
+
+const (
+	GPIOInPullUpDown_UP   GPIOInPullUpDown = 0
+	GPIOInPullUpDown_DOWN GPIOInPullUpDown = 1
+	GPIOInPullUpDown_OFF  GPIOInPullUpDown = 2
+)
+
+var GPIOInPullUpDown_name = map[int]string{
+	0: "UP",
+	1: "DOWN",
+	2: "OFF",
+}
+var GPIOInPullUpDown_value = map[string]int{
+	"UP":   0,
+	"DOWN": 1,
+	"OFF":  2,
+}
+
+func (x GPIOInPullUpDown) String() string {
+	return GPIOInPullUpDown_name[int(x)]
+}
+
+type GPIOInEdge int
+
+const (
+	GPIOInEdge_RISING  GPIOInEdge = 0
+	GPIOInEdge_FALLING GPIOInEdge = 1
+	GPIOInEdge_BOTH    GPIOInEdge = 2
+)
+
+var GPIOInEdge_name = map[int]string{
+	0: "RISING",
+	1: "FALLING",
+	2: "BOTH",
+}
+var GPIOInEdge_value = map[string]int{
+	"RISING":  0,
+	"FALLING": 1,
+	"BOTH":    2,
+}
+
+func (x GPIOInEdge) String() string {
+	return GPIOInEdge_name[int(x)]
+}
+
+type GPIONum int
+
+const (
+	GPIONum_NUM_1  GPIONum = 0
+	GPIONum_NUM_2  GPIONum = 1
+	GPIONum_NUM_3  GPIONum = 2
+	GPIONum_NUM_4  GPIONum = 3
+	GPIONum_NUM_5  GPIONum = 4
+	GPIONum_NUM_6  GPIONum = 5
+	GPIONum_NUM_7  GPIONum = 6
+	GPIONum_NUM_8  GPIONum = 7
+	GPIONum_NUM_9  GPIONum = 8
+	GPIONum_NUM_10 GPIONum = 9
+	GPIONum_NUM_11 GPIONum = 10
+	GPIONum_NUM_12 GPIONum = 11
+	GPIONum_NUM_13 GPIONum = 12
+	GPIONum_NUM_14 GPIONum = 13
+	GPIONum_NUM_15 GPIONum = 14
+	GPIONum_NUM_16 GPIONum = 15
+	GPIONum_NUM_17 GPIONum = 16
+	GPIONum_NUM_18 GPIONum = 17
+	GPIONum_NUM_19 GPIONum = 18
+	GPIONum_NUM_20 GPIONum = 19
+)
+
+var GPIONum_name = map[int]string{
+	0:  "NUM_1",
+	1:  "NUM_2",
+	2:  "NUM_3",
+	3:  "NUM_4",
+	4:  "NUM_5",
+	5:  "NUM_6",
+	6:  "NUM_7",
+	7:  "NUM_8",
+	8:  "NUM_9",
+	9:  "NUM_10",
+	10: "NUM_11",
+	11: "NUM_12",
+	12: "NUM_13",
+	13: "NUM_14",
+	14: "NUM_15",
+	15: "NUM_16",
+	16: "NUM_17",
+	17: "NUM_18",
+	18: "NUM_19",
+	19: "NUM_20",
+}
+var GPIONum_value = map[string]int{
+	"NUM_1":  0,
+	"NUM_2":  1,
+	"NUM_3":  2,
+	"NUM_4":  3,
+	"NUM_5":  4,
+	"NUM_6":  5,
+	"NUM_7":  6,
+	"NUM_8":  7,
+	"NUM_9":  8,
+	"NUM_10": 9,
+	"NUM_11": 10,
+	"NUM_12": 11,
+	"NUM_13": 12,
+	"NUM_14": 13,
+	"NUM_15": 14,
+	"NUM_16": 15,
+	"NUM_17": 16,
+	"NUM_18": 17,
+	"NUM_19": 18,
+	"NUM_20": 19,
+}
+
+func (x GPIONum) String() string {
+	return GPIONum_name[int(x)]
+}
+
+type GPIOOutValue int
+
+const (
+	GPIOOutValue_LOW    GPIOOutValue = 0
+	GPIOOutValue_HIGH   GPIOOutValue = 1
+	GPIOOutValue_TOGGLE GPIOOutValue = 2
+)
+
+var GPIOOutValue_name = map[int]string{
+	0: "LOW",
+	1: "HIGH",
+	2: "TOGGLE",
+}
+var GPIOOutValue_value = map[string]int{
+	"LOW":    0,
+	"HIGH":   1,
+	"TOGGLE": 2,
+}
+
+func (x GPIOOutValue) String() string {
+	return GPIOOutValue_name[int(x)]
+}
 
 // WiFi2 (distinguish state and settings)
 type WiFiWorkingMode int
@@ -141,11 +288,12 @@ func (x WiFiAuthMode) String() string {
 type ActionDeploySettingsTemplate_TemplateType int
 
 const (
-	ActionDeploySettingsTemplate_FULL_SETTINGS ActionDeploySettingsTemplate_TemplateType = 0
-	ActionDeploySettingsTemplate_NETWORK       ActionDeploySettingsTemplate_TemplateType = 1
-	ActionDeploySettingsTemplate_WIFI          ActionDeploySettingsTemplate_TemplateType = 2
-	ActionDeploySettingsTemplate_USB           ActionDeploySettingsTemplate_TemplateType = 3
-	ActionDeploySettingsTemplate_BLUETOOTH     ActionDeploySettingsTemplate_TemplateType = 4
+	ActionDeploySettingsTemplate_FULL_SETTINGS   ActionDeploySettingsTemplate_TemplateType = 0
+	ActionDeploySettingsTemplate_NETWORK         ActionDeploySettingsTemplate_TemplateType = 1
+	ActionDeploySettingsTemplate_WIFI            ActionDeploySettingsTemplate_TemplateType = 2
+	ActionDeploySettingsTemplate_USB             ActionDeploySettingsTemplate_TemplateType = 3
+	ActionDeploySettingsTemplate_BLUETOOTH       ActionDeploySettingsTemplate_TemplateType = 4
+	ActionDeploySettingsTemplate_TRIGGER_ACTIONS ActionDeploySettingsTemplate_TemplateType = 5
 )
 
 var ActionDeploySettingsTemplate_TemplateType_name = map[int]string{
@@ -154,13 +302,15 @@ var ActionDeploySettingsTemplate_TemplateType_name = map[int]string{
 	2: "WIFI",
 	3: "USB",
 	4: "BLUETOOTH",
+	5: "TRIGGER_ACTIONS",
 }
 var ActionDeploySettingsTemplate_TemplateType_value = map[string]int{
-	"FULL_SETTINGS": 0,
-	"NETWORK":       1,
-	"WIFI":          2,
-	"USB":           3,
-	"BLUETOOTH":     4,
+	"FULL_SETTINGS":   0,
+	"NETWORK":         1,
+	"WIFI":            2,
+	"USB":             3,
+	"BLUETOOTH":       4,
+	"TRIGGER_ACTIONS": 5,
 }
 
 func (x ActionDeploySettingsTemplate_TemplateType) String() string {
@@ -262,8 +412,10 @@ func (m *TriggerActionSettings) Unmarshal(rawBytes []byte) (*TriggerActionSettin
 }
 
 type TriggerAction struct {
-	Id      uint32
-	OneShot bool
+	Id        uint32
+	OneShot   bool
+	IsActive  bool
+	Immutable bool
 	// Types that are valid to be assigned to Trigger:
 	//	*TriggerAction_ServiceStarted
 	//	*TriggerAction_UsbGadgetConnected
@@ -272,12 +424,17 @@ type TriggerAction struct {
 	//	*TriggerAction_WifiConnectedAsSta
 	//	*TriggerAction_SshLogin
 	//	*TriggerAction_DhcpLeaseGranted
+	//	*TriggerAction_GroupReceive
+	//	*TriggerAction_GroupReceiveSequence
+	//	*TriggerAction_GpioIn
 	Trigger isTriggerAction_Trigger
 	// Types that are valid to be assigned to Action:
 	//	*TriggerAction_BashScript
 	//	*TriggerAction_HidScript
 	//	*TriggerAction_DeploySettingsTemplate
 	//	*TriggerAction_Log
+	//	*TriggerAction_GpioOut
+	//	*TriggerAction_GroupSend
 	Action isTriggerAction_Action
 }
 
@@ -322,6 +479,21 @@ type TriggerAction_DhcpLeaseGranted struct {
 	DhcpLeaseGranted *TriggerDHCPLeaseGranted
 }
 
+// TriggerAction_GroupReceive is assignable to Trigger
+type TriggerAction_GroupReceive struct {
+	GroupReceive *TriggerGroupReceive
+}
+
+// TriggerAction_GroupReceiveSequence is assignable to Trigger
+type TriggerAction_GroupReceiveSequence struct {
+	GroupReceiveSequence *TriggerGroupReceiveSequence
+}
+
+// TriggerAction_GpioIn is assignable to Trigger
+type TriggerAction_GpioIn struct {
+	GpioIn *TriggerGPIOIn
+}
+
 // TriggerAction_BashScript is assignable to Action
 type TriggerAction_BashScript struct {
 	BashScript *ActionStartBashScript
@@ -342,6 +514,16 @@ type TriggerAction_Log struct {
 	Log *ActionLog
 }
 
+// TriggerAction_GpioOut is assignable to Action
+type TriggerAction_GpioOut struct {
+	GpioOut *ActionGPIOOut
+}
+
+// TriggerAction_GroupSend is assignable to Action
+type TriggerAction_GroupSend struct {
+	GroupSend *ActionGroupSend
+}
+
 func (*TriggerAction_ServiceStarted) isTriggerAction_Trigger()        {}
 func (*TriggerAction_UsbGadgetConnected) isTriggerAction_Trigger()    {}
 func (*TriggerAction_UsbGadgetDisconnected) isTriggerAction_Trigger() {}
@@ -349,10 +531,15 @@ func (*TriggerAction_WifiAPStarted) isTriggerAction_Trigger()         {}
 func (*TriggerAction_WifiConnectedAsSta) isTriggerAction_Trigger()    {}
 func (*TriggerAction_SshLogin) isTriggerAction_Trigger()              {}
 func (*TriggerAction_DhcpLeaseGranted) isTriggerAction_Trigger()      {}
+func (*TriggerAction_GroupReceive) isTriggerAction_Trigger()          {}
+func (*TriggerAction_GroupReceiveSequence) isTriggerAction_Trigger()  {}
+func (*TriggerAction_GpioIn) isTriggerAction_Trigger()                {}
 func (*TriggerAction_BashScript) isTriggerAction_Action()             {}
 func (*TriggerAction_HidScript) isTriggerAction_Action()              {}
 func (*TriggerAction_DeploySettingsTemplate) isTriggerAction_Action() {}
 func (*TriggerAction_Log) isTriggerAction_Action()                    {}
+func (*TriggerAction_GpioOut) isTriggerAction_Action()                {}
+func (*TriggerAction_GroupSend) isTriggerAction_Action()              {}
 
 // GetTrigger gets the Trigger of the TriggerAction.
 func (m *TriggerAction) GetTrigger() (x isTriggerAction_Trigger) {
@@ -384,6 +571,22 @@ func (m *TriggerAction) GetOneShot() (x bool) {
 		return x
 	}
 	return m.OneShot
+}
+
+// GetIsActive gets the IsActive of the TriggerAction.
+func (m *TriggerAction) GetIsActive() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.IsActive
+}
+
+// GetImmutable gets the Immutable of the TriggerAction.
+func (m *TriggerAction) GetImmutable() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Immutable
 }
 
 // GetServiceStarted gets the ServiceStarted of the TriggerAction.
@@ -442,6 +645,30 @@ func (m *TriggerAction) GetDhcpLeaseGranted() (x *TriggerDHCPLeaseGranted) {
 	return x
 }
 
+// GetGroupReceive gets the GroupReceive of the TriggerAction.
+func (m *TriggerAction) GetGroupReceive() (x *TriggerGroupReceive) {
+	if v, ok := m.GetTrigger().(*TriggerAction_GroupReceive); ok {
+		return v.GroupReceive
+	}
+	return x
+}
+
+// GetGroupReceiveSequence gets the GroupReceiveSequence of the TriggerAction.
+func (m *TriggerAction) GetGroupReceiveSequence() (x *TriggerGroupReceiveSequence) {
+	if v, ok := m.GetTrigger().(*TriggerAction_GroupReceiveSequence); ok {
+		return v.GroupReceiveSequence
+	}
+	return x
+}
+
+// GetGpioIn gets the GpioIn of the TriggerAction.
+func (m *TriggerAction) GetGpioIn() (x *TriggerGPIOIn) {
+	if v, ok := m.GetTrigger().(*TriggerAction_GpioIn); ok {
+		return v.GpioIn
+	}
+	return x
+}
+
 // GetBashScript gets the BashScript of the TriggerAction.
 func (m *TriggerAction) GetBashScript() (x *ActionStartBashScript) {
 	if v, ok := m.GetAction().(*TriggerAction_BashScript); ok {
@@ -474,6 +701,22 @@ func (m *TriggerAction) GetLog() (x *ActionLog) {
 	return x
 }
 
+// GetGpioOut gets the GpioOut of the TriggerAction.
+func (m *TriggerAction) GetGpioOut() (x *ActionGPIOOut) {
+	if v, ok := m.GetAction().(*TriggerAction_GpioOut); ok {
+		return v.GpioOut
+	}
+	return x
+}
+
+// GetGroupSend gets the GroupSend of the TriggerAction.
+func (m *TriggerAction) GetGroupSend() (x *ActionGroupSend) {
+	if v, ok := m.GetAction().(*TriggerAction_GroupSend); ok {
+		return v.GroupSend
+	}
+	return x
+}
+
 // MarshalToWriter marshals TriggerAction to the provided writer.
 func (m *TriggerAction) MarshalToWriter(writer jspb.Writer) {
 	if m == nil {
@@ -483,44 +726,62 @@ func (m *TriggerAction) MarshalToWriter(writer jspb.Writer) {
 	switch t := m.Trigger.(type) {
 	case *TriggerAction_ServiceStarted:
 		if t.ServiceStarted != nil {
-			writer.WriteMessage(2, func() {
+			writer.WriteMessage(5, func() {
 				t.ServiceStarted.MarshalToWriter(writer)
 			})
 		}
 	case *TriggerAction_UsbGadgetConnected:
 		if t.UsbGadgetConnected != nil {
-			writer.WriteMessage(3, func() {
+			writer.WriteMessage(6, func() {
 				t.UsbGadgetConnected.MarshalToWriter(writer)
 			})
 		}
 	case *TriggerAction_UsbGadgetDisconnected:
 		if t.UsbGadgetDisconnected != nil {
-			writer.WriteMessage(4, func() {
+			writer.WriteMessage(7, func() {
 				t.UsbGadgetDisconnected.MarshalToWriter(writer)
 			})
 		}
 	case *TriggerAction_WifiAPStarted:
 		if t.WifiAPStarted != nil {
-			writer.WriteMessage(5, func() {
+			writer.WriteMessage(8, func() {
 				t.WifiAPStarted.MarshalToWriter(writer)
 			})
 		}
 	case *TriggerAction_WifiConnectedAsSta:
 		if t.WifiConnectedAsSta != nil {
-			writer.WriteMessage(6, func() {
+			writer.WriteMessage(9, func() {
 				t.WifiConnectedAsSta.MarshalToWriter(writer)
 			})
 		}
 	case *TriggerAction_SshLogin:
 		if t.SshLogin != nil {
-			writer.WriteMessage(7, func() {
+			writer.WriteMessage(10, func() {
 				t.SshLogin.MarshalToWriter(writer)
 			})
 		}
 	case *TriggerAction_DhcpLeaseGranted:
 		if t.DhcpLeaseGranted != nil {
-			writer.WriteMessage(8, func() {
+			writer.WriteMessage(11, func() {
 				t.DhcpLeaseGranted.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_GroupReceive:
+		if t.GroupReceive != nil {
+			writer.WriteMessage(12, func() {
+				t.GroupReceive.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_GroupReceiveSequence:
+		if t.GroupReceiveSequence != nil {
+			writer.WriteMessage(13, func() {
+				t.GroupReceiveSequence.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_GpioIn:
+		if t.GpioIn != nil {
+			writer.WriteMessage(14, func() {
+				t.GpioIn.MarshalToWriter(writer)
 			})
 		}
 	}
@@ -528,26 +789,38 @@ func (m *TriggerAction) MarshalToWriter(writer jspb.Writer) {
 	switch t := m.Action.(type) {
 	case *TriggerAction_BashScript:
 		if t.BashScript != nil {
-			writer.WriteMessage(9, func() {
+			writer.WriteMessage(15, func() {
 				t.BashScript.MarshalToWriter(writer)
 			})
 		}
 	case *TriggerAction_HidScript:
 		if t.HidScript != nil {
-			writer.WriteMessage(10, func() {
+			writer.WriteMessage(16, func() {
 				t.HidScript.MarshalToWriter(writer)
 			})
 		}
 	case *TriggerAction_DeploySettingsTemplate:
 		if t.DeploySettingsTemplate != nil {
-			writer.WriteMessage(11, func() {
+			writer.WriteMessage(17, func() {
 				t.DeploySettingsTemplate.MarshalToWriter(writer)
 			})
 		}
 	case *TriggerAction_Log:
 		if t.Log != nil {
-			writer.WriteMessage(12, func() {
+			writer.WriteMessage(18, func() {
 				t.Log.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_GpioOut:
+		if t.GpioOut != nil {
+			writer.WriteMessage(19, func() {
+				t.GpioOut.MarshalToWriter(writer)
+			})
+		}
+	case *TriggerAction_GroupSend:
+		if t.GroupSend != nil {
+			writer.WriteMessage(20, func() {
+				t.GroupSend.MarshalToWriter(writer)
 			})
 		}
 	}
@@ -557,7 +830,15 @@ func (m *TriggerAction) MarshalToWriter(writer jspb.Writer) {
 	}
 
 	if m.OneShot {
-		writer.WriteBool(13, m.OneShot)
+		writer.WriteBool(2, m.OneShot)
+	}
+
+	if m.IsActive {
+		writer.WriteBool(3, m.IsActive)
+	}
+
+	if m.Immutable {
+		writer.WriteBool(4, m.Immutable)
 	}
 
 	return
@@ -580,72 +861,106 @@ func (m *TriggerAction) UnmarshalFromReader(reader jspb.Reader) *TriggerAction {
 		switch reader.GetFieldNumber() {
 		case 1:
 			m.Id = reader.ReadUint32()
-		case 13:
-			m.OneShot = reader.ReadBool()
 		case 2:
+			m.OneShot = reader.ReadBool()
+		case 3:
+			m.IsActive = reader.ReadBool()
+		case 4:
+			m.Immutable = reader.ReadBool()
+		case 5:
 			reader.ReadMessage(func() {
 				m.Trigger = &TriggerAction_ServiceStarted{
 					ServiceStarted: new(TriggerServiceStarted).UnmarshalFromReader(reader),
 				}
 			})
-		case 3:
+		case 6:
 			reader.ReadMessage(func() {
 				m.Trigger = &TriggerAction_UsbGadgetConnected{
 					UsbGadgetConnected: new(TriggerUSBGadgetConnected).UnmarshalFromReader(reader),
 				}
 			})
-		case 4:
+		case 7:
 			reader.ReadMessage(func() {
 				m.Trigger = &TriggerAction_UsbGadgetDisconnected{
 					UsbGadgetDisconnected: new(TriggerUSBGadgetDisconnected).UnmarshalFromReader(reader),
 				}
 			})
-		case 5:
+		case 8:
 			reader.ReadMessage(func() {
 				m.Trigger = &TriggerAction_WifiAPStarted{
 					WifiAPStarted: new(TriggerWifiAPStarted).UnmarshalFromReader(reader),
 				}
 			})
-		case 6:
+		case 9:
 			reader.ReadMessage(func() {
 				m.Trigger = &TriggerAction_WifiConnectedAsSta{
 					WifiConnectedAsSta: new(TriggerWifiConnectedAsSta).UnmarshalFromReader(reader),
 				}
 			})
-		case 7:
+		case 10:
 			reader.ReadMessage(func() {
 				m.Trigger = &TriggerAction_SshLogin{
 					SshLogin: new(TriggerSSHLogin).UnmarshalFromReader(reader),
 				}
 			})
-		case 8:
+		case 11:
 			reader.ReadMessage(func() {
 				m.Trigger = &TriggerAction_DhcpLeaseGranted{
 					DhcpLeaseGranted: new(TriggerDHCPLeaseGranted).UnmarshalFromReader(reader),
 				}
 			})
-		case 9:
+		case 12:
+			reader.ReadMessage(func() {
+				m.Trigger = &TriggerAction_GroupReceive{
+					GroupReceive: new(TriggerGroupReceive).UnmarshalFromReader(reader),
+				}
+			})
+		case 13:
+			reader.ReadMessage(func() {
+				m.Trigger = &TriggerAction_GroupReceiveSequence{
+					GroupReceiveSequence: new(TriggerGroupReceiveSequence).UnmarshalFromReader(reader),
+				}
+			})
+		case 14:
+			reader.ReadMessage(func() {
+				m.Trigger = &TriggerAction_GpioIn{
+					GpioIn: new(TriggerGPIOIn).UnmarshalFromReader(reader),
+				}
+			})
+		case 15:
 			reader.ReadMessage(func() {
 				m.Action = &TriggerAction_BashScript{
 					BashScript: new(ActionStartBashScript).UnmarshalFromReader(reader),
 				}
 			})
-		case 10:
+		case 16:
 			reader.ReadMessage(func() {
 				m.Action = &TriggerAction_HidScript{
 					HidScript: new(ActionStartHIDScript).UnmarshalFromReader(reader),
 				}
 			})
-		case 11:
+		case 17:
 			reader.ReadMessage(func() {
 				m.Action = &TriggerAction_DeploySettingsTemplate{
 					DeploySettingsTemplate: new(ActionDeploySettingsTemplate).UnmarshalFromReader(reader),
 				}
 			})
-		case 12:
+		case 18:
 			reader.ReadMessage(func() {
 				m.Action = &TriggerAction_Log{
 					Log: new(ActionLog).UnmarshalFromReader(reader),
+				}
+			})
+		case 19:
+			reader.ReadMessage(func() {
+				m.Action = &TriggerAction_GpioOut{
+					GpioOut: new(ActionGPIOOut).UnmarshalFromReader(reader),
+				}
+			})
+		case 20:
+			reader.ReadMessage(func() {
+				m.Action = &TriggerAction_GroupSend{
+					GroupSend: new(ActionGroupSend).UnmarshalFromReader(reader),
 				}
 			})
 		default:
@@ -706,54 +1021,6 @@ func (m *TriggerServiceStarted) UnmarshalFromReader(reader jspb.Reader) *Trigger
 
 // Unmarshal unmarshals a TriggerServiceStarted from a slice of bytes.
 func (m *TriggerServiceStarted) Unmarshal(rawBytes []byte) (*TriggerServiceStarted, error) {
-	reader := jspb.NewReader(rawBytes)
-
-	m = m.UnmarshalFromReader(reader)
-
-	if err := reader.Err(); err != nil {
-		return nil, err
-	}
-
-	return m, nil
-}
-
-type TriggerGPIO struct {
-}
-
-// MarshalToWriter marshals TriggerGPIO to the provided writer.
-func (m *TriggerGPIO) MarshalToWriter(writer jspb.Writer) {
-	if m == nil {
-		return
-	}
-
-	return
-}
-
-// Marshal marshals TriggerGPIO to a slice of bytes.
-func (m *TriggerGPIO) Marshal() []byte {
-	writer := jspb.NewWriter()
-	m.MarshalToWriter(writer)
-	return writer.GetResult()
-}
-
-// UnmarshalFromReader unmarshals a TriggerGPIO from the provided reader.
-func (m *TriggerGPIO) UnmarshalFromReader(reader jspb.Reader) *TriggerGPIO {
-	for reader.Next() {
-		if m == nil {
-			m = &TriggerGPIO{}
-		}
-
-		switch reader.GetFieldNumber() {
-		default:
-			reader.SkipField()
-		}
-	}
-
-	return m
-}
-
-// Unmarshal unmarshals a TriggerGPIO from a slice of bytes.
-func (m *TriggerGPIO) Unmarshal(rawBytes []byte) (*TriggerGPIO, error) {
 	reader := jspb.NewReader(rawBytes)
 
 	m = m.UnmarshalFromReader(reader)
@@ -958,15 +1225,15 @@ func (m *TriggerWifiConnectedAsSta) Unmarshal(rawBytes []byte) (*TriggerWifiConn
 }
 
 type TriggerSSHLogin struct {
-	ResLoginUser string
+	LoginUser string
 }
 
-// GetResLoginUser gets the ResLoginUser of the TriggerSSHLogin.
-func (m *TriggerSSHLogin) GetResLoginUser() (x string) {
+// GetLoginUser gets the LoginUser of the TriggerSSHLogin.
+func (m *TriggerSSHLogin) GetLoginUser() (x string) {
 	if m == nil {
 		return x
 	}
-	return m.ResLoginUser
+	return m.LoginUser
 }
 
 // MarshalToWriter marshals TriggerSSHLogin to the provided writer.
@@ -975,8 +1242,8 @@ func (m *TriggerSSHLogin) MarshalToWriter(writer jspb.Writer) {
 		return
 	}
 
-	if len(m.ResLoginUser) > 0 {
-		writer.WriteString(1, m.ResLoginUser)
+	if len(m.LoginUser) > 0 {
+		writer.WriteString(1, m.LoginUser)
 	}
 
 	return
@@ -998,7 +1265,7 @@ func (m *TriggerSSHLogin) UnmarshalFromReader(reader jspb.Reader) *TriggerSSHLog
 
 		switch reader.GetFieldNumber() {
 		case 1:
-			m.ResLoginUser = reader.ReadString()
+			m.LoginUser = reader.ReadString()
 		default:
 			reader.SkipField()
 		}
@@ -1021,51 +1288,12 @@ func (m *TriggerSSHLogin) Unmarshal(rawBytes []byte) (*TriggerSSHLogin, error) {
 }
 
 type TriggerDHCPLeaseGranted struct {
-	ResInterface string
-	ResClientIP  string
-	ResClientMac string
-}
-
-// GetResInterface gets the ResInterface of the TriggerDHCPLeaseGranted.
-func (m *TriggerDHCPLeaseGranted) GetResInterface() (x string) {
-	if m == nil {
-		return x
-	}
-	return m.ResInterface
-}
-
-// GetResClientIP gets the ResClientIP of the TriggerDHCPLeaseGranted.
-func (m *TriggerDHCPLeaseGranted) GetResClientIP() (x string) {
-	if m == nil {
-		return x
-	}
-	return m.ResClientIP
-}
-
-// GetResClientMac gets the ResClientMac of the TriggerDHCPLeaseGranted.
-func (m *TriggerDHCPLeaseGranted) GetResClientMac() (x string) {
-	if m == nil {
-		return x
-	}
-	return m.ResClientMac
 }
 
 // MarshalToWriter marshals TriggerDHCPLeaseGranted to the provided writer.
 func (m *TriggerDHCPLeaseGranted) MarshalToWriter(writer jspb.Writer) {
 	if m == nil {
 		return
-	}
-
-	if len(m.ResInterface) > 0 {
-		writer.WriteString(1, m.ResInterface)
-	}
-
-	if len(m.ResClientIP) > 0 {
-		writer.WriteString(2, m.ResClientIP)
-	}
-
-	if len(m.ResClientMac) > 0 {
-		writer.WriteString(3, m.ResClientMac)
 	}
 
 	return
@@ -1086,12 +1314,6 @@ func (m *TriggerDHCPLeaseGranted) UnmarshalFromReader(reader jspb.Reader) *Trigg
 		}
 
 		switch reader.GetFieldNumber() {
-		case 1:
-			m.ResInterface = reader.ReadString()
-		case 2:
-			m.ResClientIP = reader.ReadString()
-		case 3:
-			m.ResClientMac = reader.ReadString()
 		default:
 			reader.SkipField()
 		}
@@ -1113,16 +1335,280 @@ func (m *TriggerDHCPLeaseGranted) Unmarshal(rawBytes []byte) (*TriggerDHCPLeaseG
 	return m, nil
 }
 
-type ActionStartBashScript struct {
-	ScriptPath string
+type TriggerGroupReceive struct {
+	GroupName string
+	Value     int32
 }
 
-// GetScriptPath gets the ScriptPath of the ActionStartBashScript.
-func (m *ActionStartBashScript) GetScriptPath() (x string) {
+// GetGroupName gets the GroupName of the TriggerGroupReceive.
+func (m *TriggerGroupReceive) GetGroupName() (x string) {
 	if m == nil {
 		return x
 	}
-	return m.ScriptPath
+	return m.GroupName
+}
+
+// GetValue gets the Value of the TriggerGroupReceive.
+func (m *TriggerGroupReceive) GetValue() (x int32) {
+	if m == nil {
+		return x
+	}
+	return m.Value
+}
+
+// MarshalToWriter marshals TriggerGroupReceive to the provided writer.
+func (m *TriggerGroupReceive) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.GroupName) > 0 {
+		writer.WriteString(1, m.GroupName)
+	}
+
+	if m.Value != 0 {
+		writer.WriteInt32(2, m.Value)
+	}
+
+	return
+}
+
+// Marshal marshals TriggerGroupReceive to a slice of bytes.
+func (m *TriggerGroupReceive) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerGroupReceive from the provided reader.
+func (m *TriggerGroupReceive) UnmarshalFromReader(reader jspb.Reader) *TriggerGroupReceive {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerGroupReceive{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.GroupName = reader.ReadString()
+		case 2:
+			m.Value = reader.ReadInt32()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerGroupReceive from a slice of bytes.
+func (m *TriggerGroupReceive) Unmarshal(rawBytes []byte) (*TriggerGroupReceive, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TriggerGroupReceiveSequence struct {
+	GroupName        string
+	IgnoreOutOfOrder bool
+	Values           []int32
+}
+
+// GetGroupName gets the GroupName of the TriggerGroupReceiveSequence.
+func (m *TriggerGroupReceiveSequence) GetGroupName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.GroupName
+}
+
+// GetIgnoreOutOfOrder gets the IgnoreOutOfOrder of the TriggerGroupReceiveSequence.
+func (m *TriggerGroupReceiveSequence) GetIgnoreOutOfOrder() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.IgnoreOutOfOrder
+}
+
+// GetValues gets the Values of the TriggerGroupReceiveSequence.
+func (m *TriggerGroupReceiveSequence) GetValues() (x []int32) {
+	if m == nil {
+		return x
+	}
+	return m.Values
+}
+
+// MarshalToWriter marshals TriggerGroupReceiveSequence to the provided writer.
+func (m *TriggerGroupReceiveSequence) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.GroupName) > 0 {
+		writer.WriteString(1, m.GroupName)
+	}
+
+	if m.IgnoreOutOfOrder {
+		writer.WriteBool(2, m.IgnoreOutOfOrder)
+	}
+
+	if len(m.Values) > 0 {
+		writer.WriteInt32Slice(3, m.Values)
+	}
+
+	return
+}
+
+// Marshal marshals TriggerGroupReceiveSequence to a slice of bytes.
+func (m *TriggerGroupReceiveSequence) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerGroupReceiveSequence from the provided reader.
+func (m *TriggerGroupReceiveSequence) UnmarshalFromReader(reader jspb.Reader) *TriggerGroupReceiveSequence {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerGroupReceiveSequence{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.GroupName = reader.ReadString()
+		case 2:
+			m.IgnoreOutOfOrder = reader.ReadBool()
+		case 3:
+			m.Values = reader.ReadInt32Slice()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerGroupReceiveSequence from a slice of bytes.
+func (m *TriggerGroupReceiveSequence) Unmarshal(rawBytes []byte) (*TriggerGroupReceiveSequence, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type TriggerGPIOIn struct {
+	GpioNum    GPIONum
+	PullUpDown GPIOInPullUpDown
+	GpioInEdge GPIOInEdge
+}
+
+// GetGpioNum gets the GpioNum of the TriggerGPIOIn.
+func (m *TriggerGPIOIn) GetGpioNum() (x GPIONum) {
+	if m == nil {
+		return x
+	}
+	return m.GpioNum
+}
+
+// GetPullUpDown gets the PullUpDown of the TriggerGPIOIn.
+func (m *TriggerGPIOIn) GetPullUpDown() (x GPIOInPullUpDown) {
+	if m == nil {
+		return x
+	}
+	return m.PullUpDown
+}
+
+// GetGpioInEdge gets the GpioInEdge of the TriggerGPIOIn.
+func (m *TriggerGPIOIn) GetGpioInEdge() (x GPIOInEdge) {
+	if m == nil {
+		return x
+	}
+	return m.GpioInEdge
+}
+
+// MarshalToWriter marshals TriggerGPIOIn to the provided writer.
+func (m *TriggerGPIOIn) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if int(m.GpioNum) != 0 {
+		writer.WriteEnum(1, int(m.GpioNum))
+	}
+
+	if int(m.PullUpDown) != 0 {
+		writer.WriteEnum(2, int(m.PullUpDown))
+	}
+
+	if int(m.GpioInEdge) != 0 {
+		writer.WriteEnum(3, int(m.GpioInEdge))
+	}
+
+	return
+}
+
+// Marshal marshals TriggerGPIOIn to a slice of bytes.
+func (m *TriggerGPIOIn) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a TriggerGPIOIn from the provided reader.
+func (m *TriggerGPIOIn) UnmarshalFromReader(reader jspb.Reader) *TriggerGPIOIn {
+	for reader.Next() {
+		if m == nil {
+			m = &TriggerGPIOIn{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.GpioNum = GPIONum(reader.ReadEnum())
+		case 2:
+			m.PullUpDown = GPIOInPullUpDown(reader.ReadEnum())
+		case 3:
+			m.GpioInEdge = GPIOInEdge(reader.ReadEnum())
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a TriggerGPIOIn from a slice of bytes.
+func (m *TriggerGPIOIn) Unmarshal(rawBytes []byte) (*TriggerGPIOIn, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type ActionStartBashScript struct {
+	ScriptName string
+}
+
+// GetScriptName gets the ScriptName of the ActionStartBashScript.
+func (m *ActionStartBashScript) GetScriptName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.ScriptName
 }
 
 // MarshalToWriter marshals ActionStartBashScript to the provided writer.
@@ -1131,8 +1617,8 @@ func (m *ActionStartBashScript) MarshalToWriter(writer jspb.Writer) {
 		return
 	}
 
-	if len(m.ScriptPath) > 0 {
-		writer.WriteString(1, m.ScriptPath)
+	if len(m.ScriptName) > 0 {
+		writer.WriteString(1, m.ScriptName)
 	}
 
 	return
@@ -1154,7 +1640,7 @@ func (m *ActionStartBashScript) UnmarshalFromReader(reader jspb.Reader) *ActionS
 
 		switch reader.GetFieldNumber() {
 		case 1:
-			m.ScriptPath = reader.ReadString()
+			m.ScriptName = reader.ReadString()
 		default:
 			reader.SkipField()
 		}
@@ -1354,6 +1840,162 @@ func (m *ActionLog) UnmarshalFromReader(reader jspb.Reader) *ActionLog {
 
 // Unmarshal unmarshals a ActionLog from a slice of bytes.
 func (m *ActionLog) Unmarshal(rawBytes []byte) (*ActionLog, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type ActionGPIOOut struct {
+	GpioNum GPIONum
+	Value   GPIOOutValue
+}
+
+// GetGpioNum gets the GpioNum of the ActionGPIOOut.
+func (m *ActionGPIOOut) GetGpioNum() (x GPIONum) {
+	if m == nil {
+		return x
+	}
+	return m.GpioNum
+}
+
+// GetValue gets the Value of the ActionGPIOOut.
+func (m *ActionGPIOOut) GetValue() (x GPIOOutValue) {
+	if m == nil {
+		return x
+	}
+	return m.Value
+}
+
+// MarshalToWriter marshals ActionGPIOOut to the provided writer.
+func (m *ActionGPIOOut) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if int(m.GpioNum) != 0 {
+		writer.WriteEnum(1, int(m.GpioNum))
+	}
+
+	if int(m.Value) != 0 {
+		writer.WriteEnum(2, int(m.Value))
+	}
+
+	return
+}
+
+// Marshal marshals ActionGPIOOut to a slice of bytes.
+func (m *ActionGPIOOut) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a ActionGPIOOut from the provided reader.
+func (m *ActionGPIOOut) UnmarshalFromReader(reader jspb.Reader) *ActionGPIOOut {
+	for reader.Next() {
+		if m == nil {
+			m = &ActionGPIOOut{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.GpioNum = GPIONum(reader.ReadEnum())
+		case 2:
+			m.Value = GPIOOutValue(reader.ReadEnum())
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a ActionGPIOOut from a slice of bytes.
+func (m *ActionGPIOOut) Unmarshal(rawBytes []byte) (*ActionGPIOOut, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type ActionGroupSend struct {
+	GroupName string
+	Value     int32
+}
+
+// GetGroupName gets the GroupName of the ActionGroupSend.
+func (m *ActionGroupSend) GetGroupName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.GroupName
+}
+
+// GetValue gets the Value of the ActionGroupSend.
+func (m *ActionGroupSend) GetValue() (x int32) {
+	if m == nil {
+		return x
+	}
+	return m.Value
+}
+
+// MarshalToWriter marshals ActionGroupSend to the provided writer.
+func (m *ActionGroupSend) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.GroupName) > 0 {
+		writer.WriteString(1, m.GroupName)
+	}
+
+	if m.Value != 0 {
+		writer.WriteInt32(2, m.Value)
+	}
+
+	return
+}
+
+// Marshal marshals ActionGroupSend to a slice of bytes.
+func (m *ActionGroupSend) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a ActionGroupSend from the provided reader.
+func (m *ActionGroupSend) UnmarshalFromReader(reader jspb.Reader) *ActionGroupSend {
+	for reader.Next() {
+		if m == nil {
+			m = &ActionGroupSend{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.GroupName = reader.ReadString()
+		case 2:
+			m.Value = reader.ReadInt32()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a ActionGroupSend from a slice of bytes.
+func (m *ActionGroupSend) Unmarshal(rawBytes []byte) (*ActionGroupSend, error) {
 	reader := jspb.NewReader(rawBytes)
 
 	m = m.UnmarshalFromReader(reader)

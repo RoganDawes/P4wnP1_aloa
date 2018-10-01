@@ -1,6 +1,9 @@
 package main
 
-import "github.com/gopherjs/gopherjs/js"
+import (
+	"github.com/gopherjs/gopherjs/js"
+	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
+)
 
 type triggerType int
 type actionType int
@@ -80,6 +83,210 @@ type jsTriggerAction struct {
 	ActionData *js.Object `js:"ActionData"`
 }
 
+func (dst *jsTriggerAction) fromGo(src *pb.TriggerAction) {
+	dst.IsActive = src.IsActive
+	dst.Immutable = src.Immutable
+	dst.OneShot = src.OneShot
+	dst.Id = src.Id
+
+	// convert action
+	switch srcAction := src.Action.(type) {
+	case *pb.TriggerAction_Log:
+		dst.ChangeActionType(ActionLog)
+	case *pb.TriggerAction_HidScript:
+		dst.ChangeActionType(ActionHidScript)
+		dstAction := &jsActionStartHIDScript{Object: dst.ActionData}
+		dstAction.ScriptName = srcAction.HidScript.ScriptName
+	case *pb.TriggerAction_DeploySettingsTemplate:
+		dst.ChangeActionType(ActionDeploySettingsTemplate)
+		dstAction := &jsActionDeploySettingsTemplate{Object: dst.ActionData}
+		dstAction.TemplateName = srcAction.DeploySettingsTemplate.TemplateName
+		dstAction.Type = TemplateType(srcAction.DeploySettingsTemplate.Type)
+	case *pb.TriggerAction_BashScript:
+		dst.ChangeActionType(ActionBashScript)
+		dstAction := &jsActionStartBashScript{Object: dst.ActionData}
+		dstAction.ScriptName = srcAction.BashScript.ScriptName
+	case *pb.TriggerAction_GpioOut:
+		dst.ChangeActionType(ActionGPIOOut)
+		dstAction := &jsActionGPIOOut{Object: dst.ActionData}
+		dstAction.Value = GPIOOutValue(srcAction.GpioOut.Value)
+		dstAction.GpioNum = GPIONum(srcAction.GpioOut.GpioNum)
+	case *pb.TriggerAction_GroupSend:
+		dst.ChangeActionType(ActionGroupSend)
+		dstAction := &jsActionGroupSend{Object: dst.ActionData}
+		dstAction.Value = srcAction.GroupSend.Value
+		dstAction.GroupName = srcAction.GroupSend.GroupName
+	default:
+		// do nothing
+		// Note: no default case, we don't change any values of jsTriggerAction if there isn't a type match
+	}
+
+	// convert trigger
+	switch srcTrigger := src.Trigger.(type) {
+	case *pb.TriggerAction_SshLogin:
+		dst.ChangeTriggerType(TriggerSshLogin)
+		dstTrigger := &jsTriggerSSHLogin{Object: dst.ActionData}
+		dstTrigger.LoginUser = srcTrigger.SshLogin.LoginUser
+	case *pb.TriggerAction_DhcpLeaseGranted:
+		dst.ChangeTriggerType(TriggerDhcpLeaseGranted)
+	case *pb.TriggerAction_WifiAPStarted:
+		dst.ChangeTriggerType(TriggerWifiAPStarted)
+	case *pb.TriggerAction_WifiConnectedAsSta:
+		dst.ChangeTriggerType(TriggerWifiConnectedAsSta)
+	case *pb.TriggerAction_UsbGadgetConnected:
+		dst.ChangeTriggerType(TriggerUsbGadgetConnected)
+	case *pb.TriggerAction_UsbGadgetDisconnected:
+		dst.ChangeTriggerType(TriggerUsbGadgetDisconnected)
+	case *pb.TriggerAction_ServiceStarted:
+		dst.ChangeTriggerType(TriggerServiceStarted)
+	case *pb.TriggerAction_GpioIn:
+		dst.ChangeTriggerType(TriggerGPIOIn)
+		dstTrigger := &jsTriggerGPIOIn{Object: dst.ActionData}
+		dstTrigger.GpioNum = GPIONum(srcTrigger.GpioIn.GpioNum)
+		dstTrigger.Edge = GPIOInEdge(srcTrigger.GpioIn.GpioInEdge)
+		dstTrigger.PullUpDown = GPIOInPullUpDown(srcTrigger.GpioIn.PullUpDown)
+	case *pb.TriggerAction_GroupReceive:
+		dst.ChangeTriggerType(TriggerGroupReceive)
+		dstTrigger := &jsTriggerGroupReceive{Object: dst.ActionData}
+		dstTrigger.GroupName = srcTrigger.GroupReceive.GroupName
+		dstTrigger.Value = srcTrigger.GroupReceive.Value
+	case *pb.TriggerAction_GroupReceiveSequence:
+		dst.ChangeTriggerType(TriggerGroupReceiveSequence)
+		dstTrigger := &jsTriggerGroupReceiveSequence{Object: dst.ActionData}
+		dstTrigger.GroupName = srcTrigger.GroupReceiveSequence.GroupName
+		dstTrigger.ValueSequence = srcTrigger.GroupReceiveSequence.Values
+	default:
+		// change nothing
+	}
+}
+
+
+func (ta *jsTriggerAction) toGo() (res *pb.TriggerAction) {
+	res = &pb.TriggerAction{
+		OneShot: ta.OneShot,
+		Immutable: ta.Immutable,
+		IsActive: ta.IsActive,
+		Id: ta.Id,
+	}
+
+	// Convert action
+	switch ta.ActionType {
+	case ActionLog:
+		res.Action = &pb.TriggerAction_Log{
+			Log: &pb.ActionLog{},
+		}
+	case ActionHidScript:
+		actionData := &jsActionStartHIDScript{Object: ta.ActionData}
+		res.Action = &pb.TriggerAction_HidScript{
+			HidScript: &pb.ActionStartHIDScript{
+				ScriptName: actionData.ScriptName,
+			},
+		}
+	case ActionDeploySettingsTemplate:
+		actionData := &jsActionDeploySettingsTemplate{Object: ta.ActionData}
+		res.Action = &pb.TriggerAction_DeploySettingsTemplate{
+			DeploySettingsTemplate: &pb.ActionDeploySettingsTemplate{
+				Type: pb.ActionDeploySettingsTemplate_TemplateType(actionData.Type),
+				TemplateName: actionData.TemplateName,
+			},
+		}
+	case ActionBashScript:
+		actionData := &jsActionStartBashScript{Object: ta.ActionData}
+		res.Action = &pb.TriggerAction_BashScript {
+			BashScript: &pb.ActionStartBashScript{
+				ScriptName: actionData.ScriptName,
+			},
+		}
+	case ActionGPIOOut:
+		actionData := &jsActionGPIOOut{Object: ta.ActionData}
+		res.Action = &pb.TriggerAction_GpioOut{
+			GpioOut: &pb.ActionGPIOOut{
+				GpioNum: pb.GPIONum(actionData.GpioNum),
+				Value: pb.GPIOOutValue(actionData.Value),
+			},
+		}
+	case ActionGroupSend:
+		actionData := &jsActionGroupSend{Object: ta.ActionData}
+		res.Action = &pb.TriggerAction_GroupSend{
+			GroupSend: &pb.ActionGroupSend{
+				GroupName: actionData.GroupName,
+				Value: actionData.Value,
+			},
+		}
+	default:
+		println("Unknown action type")
+		res.Action = nil
+	}
+
+	// convert trigger
+	switch ta.TriggerType {
+	case TriggerSshLogin:
+		triggerData := &jsTriggerSSHLogin{Object: ta.TriggerData}
+		res.Trigger = &pb.TriggerAction_SshLogin{
+			SshLogin: &pb.TriggerSSHLogin{
+				LoginUser: triggerData.LoginUser,
+			},
+		}
+	case TriggerDhcpLeaseGranted:
+		//triggerData := &jsTriggerDHCPLeaseGranted{Object: ta.TriggerData}
+		res.Trigger = &pb.TriggerAction_DhcpLeaseGranted{
+			DhcpLeaseGranted: &pb.TriggerDHCPLeaseGranted{},
+		}
+	case TriggerWifiAPStarted:
+		res.Trigger = &pb.TriggerAction_WifiAPStarted{
+			WifiAPStarted: &pb.TriggerWifiAPStarted{},
+		}
+	case TriggerWifiConnectedAsSta:
+		res.Trigger = &pb.TriggerAction_WifiConnectedAsSta{
+			WifiConnectedAsSta: &pb.TriggerWifiConnectedAsSta{},
+		}
+	case TriggerUsbGadgetConnected:
+		res.Trigger = &pb.TriggerAction_UsbGadgetConnected{
+			UsbGadgetConnected: &pb.TriggerUSBGadgetConnected{},
+		}
+	case TriggerUsbGadgetDisconnected:
+		res.Trigger = &pb.TriggerAction_UsbGadgetDisconnected{
+			UsbGadgetDisconnected: &pb.TriggerUSBGadgetDisconnected{},
+		}
+	case TriggerServiceStarted:
+		res.Trigger = &pb.TriggerAction_ServiceStarted{
+			ServiceStarted: &pb.TriggerServiceStarted{},
+		}
+	case TriggerGPIOIn:
+		triggerData := &jsTriggerGPIOIn{Object: ta.TriggerData}
+		res.Trigger = &pb.TriggerAction_GpioIn{
+			GpioIn: &pb.TriggerGPIOIn{
+				GpioNum: pb.GPIONum(triggerData.GpioNum),
+				PullUpDown: pb.GPIOInPullUpDown(triggerData.PullUpDown),
+				GpioInEdge: pb.GPIOInEdge(triggerData.Edge),
+			},
+		}
+	case TriggerGroupReceive:
+		triggerData := &jsTriggerGroupReceive{Object: ta.TriggerData}
+		res.Trigger = &pb.TriggerAction_GroupReceive{
+			GroupReceive: &pb.TriggerGroupReceive {
+				GroupName: triggerData.GroupName,
+				Value: triggerData.Value,
+			},
+		}
+	case TriggerGroupReceiveSequence:
+		triggerData := &jsTriggerGroupReceiveSequence{Object: ta.TriggerData}
+		res.Trigger = &pb.TriggerAction_GroupReceiveSequence{
+			GroupReceiveSequence: &pb.TriggerGroupReceiveSequence {
+				GroupName: triggerData.GroupName,
+				Values: triggerData.ValueSequence,
+			},
+		}
+	default:
+		println("Unknown trigger type")
+		res.Trigger = nil
+	}
+
+
+	return res
+}
+
+
 func (ta *jsTriggerAction) ChangeActionType(newAt actionType) {
 	var data *js.Object
 	switch newAt {
@@ -93,7 +300,7 @@ func (ta *jsTriggerAction) ChangeActionType(newAt actionType) {
 	case ActionDeploySettingsTemplate:
 		d := &jsActionDeploySettingsTemplate{Object:O()}
 		d.TemplateName = "somescript"
-		d.Type = "Template type"
+		d.Type = availableTemplateTypes[0]
 		data = d.Object
 	case ActionBashScript:
 		d := &jsActionStartBashScript{Object:O()}
@@ -145,7 +352,7 @@ func (ta *jsTriggerAction) ChangeTriggerType(newTt triggerType) {
 	switch newTt {
 	case TriggerSshLogin:
 		d := &jsTriggerSSHLogin{Object:O()}
-		d.ResLoginUser = "root"
+		d.LoginUser = "root"
 		data = d.Object
 	case TriggerDhcpLeaseGranted:
 		d := &jsTriggerDHCPLeaseGranted{Object:O()}
@@ -180,7 +387,7 @@ func (ta *jsTriggerAction) ChangeTriggerType(newTt triggerType) {
 		d := &jsTriggerGroupReceiveSequence{Object:O()}
 		d.GroupName = "Channel1"
 		d.IgnoreOutOfOrder = false
-		d.ValueSequence = []int{1,1}
+		d.ValueSequence = []int32{1,1}
 		data = d.Object
 	default:
 		println("Unknown trigger type")
@@ -256,7 +463,7 @@ type jsTriggerWifiConnectedAsSta struct {
 }
 type jsTriggerSSHLogin struct {
 	*js.Object
-	ResLoginUser string `js:"ResLoginUser"`
+	LoginUser string `js:"LoginUser"`
 }
 type jsTriggerDHCPLeaseGranted struct {
 	*js.Object
@@ -264,17 +471,17 @@ type jsTriggerDHCPLeaseGranted struct {
 type jsTriggerGroupReceive struct {
 	*js.Object
 	GroupName string `js:"GroupName"`
-	Value int `js:"Value"`
+	Value int32 `js:"Value"`
 }
 type jsTriggerGroupReceiveSequence struct {
 	*js.Object
 	GroupName string `js:"GroupName"`
 	IgnoreOutOfOrder bool `js:"IgnoreOutOfOrder"`
-	ValueSequence []int `js:"ValueSequence"`
+	ValueSequence []int32 `js:"ValueSequence"`
 }
 type jsTriggerGPIOIn struct {
 	*js.Object
-	GpioNum int `js:"GpioNum"`
+	GpioNum GPIONum `js:"GpioNum"`
 	PullUpDown GPIOInPullUpDown `js:"PullUpDown"` //PullUp resistor, pull down otherwise
 	Edge GPIOInEdge `js:"Edge"` // 0 == GPIO.RISING, 1 == GPIO.FALLING, every value > 1 == GPIO.BOTH
 }
@@ -311,11 +518,11 @@ type jsActionStartHIDScript struct {
 type jsActionDeploySettingsTemplate struct {
 	*js.Object
 	TemplateName string `js:"TemplateName"`
-	Type         string `js:"Type"`
+	Type         TemplateType `js:"Type"`
 }
 type jsActionGPIOOut struct {
 	*js.Object
-	GpioNum int `js:"GpioNum"`
+	GpioNum GPIONum `js:"GpioNum"`
 	Value GPIOOutValue `js:"Value"` //PullUp resistor, pull down otherwise
 }
 type GPIOOutValue int
@@ -333,8 +540,80 @@ var availableGPIOOutValues = []GPIOOutValue{GPIOOutValueLow, GPIOOutValueHigh, G
 type jsActionGroupSend struct {
 	*js.Object
 	GroupName string `js:"GroupName"`
-	Value int `js:"Value"`
+	Value int32 `js:"Value"`
 }
 type jsActionLog struct {
 	*js.Object
+}
+
+type GPIONum int
+const GPIO_NUM_1 = GPIONum(pb.GPIONum_NUM_1)
+const GPIO_NUM_2 = GPIONum(pb.GPIONum_NUM_2)
+const GPIO_NUM_3 = GPIONum(pb.GPIONum_NUM_3)
+const GPIO_NUM_4 = GPIONum(pb.GPIONum_NUM_4)
+const GPIO_NUM_5 = GPIONum(pb.GPIONum_NUM_5)
+const GPIO_NUM_6 = GPIONum(pb.GPIONum_NUM_6)
+const GPIO_NUM_7 = GPIONum(pb.GPIONum_NUM_7)
+const GPIO_NUM_8 = GPIONum(pb.GPIONum_NUM_8)
+const GPIO_NUM_9 = GPIONum(pb.GPIONum_NUM_9)
+const GPIO_NUM_10 = GPIONum(pb.GPIONum_NUM_10)
+const GPIO_NUM_11 = GPIONum(pb.GPIONum_NUM_11)
+const GPIO_NUM_12 = GPIONum(pb.GPIONum_NUM_12)
+const GPIO_NUM_13 = GPIONum(pb.GPIONum_NUM_13)
+const GPIO_NUM_14 = GPIONum(pb.GPIONum_NUM_14)
+const GPIO_NUM_15 = GPIONum(pb.GPIONum_NUM_15)
+const GPIO_NUM_16 = GPIONum(pb.GPIONum_NUM_16)
+const GPIO_NUM_17 = GPIONum(pb.GPIONum_NUM_17)
+const GPIO_NUM_18 = GPIONum(pb.GPIONum_NUM_18)
+const GPIO_NUM_19 = GPIONum(pb.GPIONum_NUM_19)
+const GPIO_NUM_20 = GPIONum(pb.GPIONum_NUM_20)
+var gpioNumNames = map[GPIONum]string{
+	GPIO_NUM_1: "GPIO 1",
+	GPIO_NUM_2: "GPIO 2",
+	GPIO_NUM_3: "GPIO 3",
+	GPIO_NUM_4: "GPIO 4",
+	GPIO_NUM_5: "GPIO 5",
+	GPIO_NUM_6: "GPIO 6",
+	GPIO_NUM_7: "GPIO 7",
+	GPIO_NUM_8: "GPIO 8",
+	GPIO_NUM_9: "GPIO 9",
+	GPIO_NUM_10: "GPIO 10",
+	GPIO_NUM_11: "GPIO 11",
+	GPIO_NUM_12: "GPIO 12",
+	GPIO_NUM_13: "GPIO 13",
+	GPIO_NUM_14: "GPIO 14",
+	GPIO_NUM_15: "GPIO 15",
+	GPIO_NUM_16: "GPIO 16",
+	GPIO_NUM_17: "GPIO 17",
+	GPIO_NUM_18: "GPIO 18",
+	GPIO_NUM_19: "GPIO 19",
+	GPIO_NUM_20: "GPIO 20",
+}
+var availableGPIONums = []GPIONum{
+	GPIO_NUM_1, GPIO_NUM_2, GPIO_NUM_3, GPIO_NUM_4, GPIO_NUM_5, GPIO_NUM_6, GPIO_NUM_7, GPIO_NUM_8, GPIO_NUM_9, GPIO_NUM_10,
+	GPIO_NUM_11, GPIO_NUM_12, GPIO_NUM_13, GPIO_NUM_14, GPIO_NUM_15, GPIO_NUM_16, GPIO_NUM_17, GPIO_NUM_18, GPIO_NUM_19, GPIO_NUM_20,
+}
+
+type TemplateType int
+const TemplateTypeFullSettings = TemplateType(pb.ActionDeploySettingsTemplate_FULL_SETTINGS)
+const TemplateTypeNetwork = TemplateType(pb.ActionDeploySettingsTemplate_NETWORK)
+const TemplateTypeWifi = TemplateType(pb.ActionDeploySettingsTemplate_WIFI)
+const TemplateTypeUSB = TemplateType(pb.ActionDeploySettingsTemplate_USB)
+const TemplateTypeBluetooth = TemplateType(pb.ActionDeploySettingsTemplate_BLUETOOTH)
+const TemplateTypeTriggerActions = TemplateType(pb.ActionDeploySettingsTemplate_TRIGGER_ACTIONS)
+var templateTypeNames = map[TemplateType]string{
+	TemplateTypeFullSettings: "Overall settings",
+	TemplateTypeNetwork: "Network interface settings",
+	TemplateTypeWifi: "WiFi settings",
+	TemplateTypeUSB: "USB settings",
+	TemplateTypeBluetooth: "Bluetooth settings",
+	TemplateTypeTriggerActions: "Stored TriggerAction set",
+}
+var availableTemplateTypes = []TemplateType{
+	TemplateTypeFullSettings,
+	TemplateTypeNetwork,
+	TemplateTypeWifi,
+	TemplateTypeUSB,
+	TemplateTypeBluetooth,
+	TemplateTypeTriggerActions,
 }

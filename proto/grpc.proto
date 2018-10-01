@@ -57,42 +57,92 @@ message TriggerActionSettings {
 
 message TriggerAction {
     uint32 id = 1; // assigned by service, used as identifier to allow deletion of trigger actions
-    bool oneShot = 13;
+    bool oneShot = 2;
+    bool isActive = 3;
+    bool immutable = 4;
     oneof Trigger {
-        TriggerServiceStarted serviceStarted = 2;
-        TriggerUSBGadgetConnected usbGadgetConnected = 3;
-        TriggerUSBGadgetDisconnected usbGadgetDisconnected = 4;
-        TriggerWifiAPStarted wifiAPStarted = 5;
-        TriggerWifiConnectedAsSta wifiConnectedAsSta = 6;
-        TriggerSSHLogin sshLogin = 7;
-        TriggerDHCPLeaseGranted dhcpLeaseGranted = 8;
+        TriggerServiceStarted serviceStarted = 5;
+        TriggerUSBGadgetConnected usbGadgetConnected = 6;
+        TriggerUSBGadgetDisconnected usbGadgetDisconnected = 7;
+        TriggerWifiAPStarted wifiAPStarted = 8;
+        TriggerWifiConnectedAsSta wifiConnectedAsSta = 9;
+        TriggerSSHLogin sshLogin = 10;
+        TriggerDHCPLeaseGranted dhcpLeaseGranted = 11;
+        TriggerGroupReceive groupReceive = 12;
+        TriggerGroupReceiveSequence groupReceiveSequence = 13;
+        TriggerGPIOIn gpioIn = 14;
     }
 
     oneof Action {
-        ActionStartBashScript bashScript = 9;
-        ActionStartHIDScript hidScript = 10;
-        ActionDeploySettingsTemplate deploySettingsTemplate = 11;
-        ActionLog log = 12;
+        ActionStartBashScript bashScript = 15;
+        ActionStartHIDScript hidScript = 16;
+        ActionDeploySettingsTemplate deploySettingsTemplate = 17;
+        ActionLog log = 18;
+        ActionGPIOOut gpioOut = 19;
+        ActionGroupSend groupSend = 20;
     }
 }
 
 message TriggerServiceStarted {} //no fields
-message TriggerGPIO{} // input and output params have to be defined
 message TriggerUSBGadgetConnected{}
 message TriggerUSBGadgetDisconnected{}
 message TriggerWifiAPStarted{} // fired when an Access Point is running
 message TriggerWifiConnectedAsSta{} // fired when successfully connected to an existing AP
 message TriggerSSHLogin{  // fired when a user logs in
-    string resLoginUser = 1;
+    string loginUser = 1;
 }
-message TriggerDHCPLeaseGranted {  // fired when a client receives a lease
-    string resInterface = 1;
-    string resClientIP = 2;
-    string resClientMac = 3;
+message TriggerDHCPLeaseGranted {} // fired when a client receives a lease
+message TriggerGroupReceive{  // fired when the correct value is received on the group channel
+    string groupName = 1;
+    int32 value = 2;
+}
+message TriggerGroupReceiveSequence{  // fired when the correct value is received on the group channel
+    string groupName = 1;
+    bool IgnoreOutOfOrder = 2;
+    repeated int32 values = 3;
+}
+enum GPIOInPullUpDown {
+    UP = 0;
+    DOWN = 1;
+    OFF = 2;
+}
+enum GPIOInEdge {
+    RISING = 0;
+    FALLING = 1;
+    BOTH = 2;
+}
+enum GPIONum {
+    NUM_1 = 0;
+    NUM_2 = 1;
+    NUM_3 = 2;
+    NUM_4 = 3;
+    NUM_5 = 4;
+    NUM_6 = 5;
+    NUM_7 = 6;
+    NUM_8 = 7;
+    NUM_9 = 8;
+    NUM_10 = 9;
+    NUM_11 = 10;
+    NUM_12 = 11;
+    NUM_13 = 12;
+    NUM_14 = 13;
+    NUM_15 = 14;
+    NUM_16 = 15;
+    NUM_17 = 16;
+    NUM_18 = 17;
+    NUM_19 = 18;
+    NUM_20 = 19;
+}
+message TriggerGPIOIn {
+    GPIONum gpioNum = 1;
+    GPIOInPullUpDown pullUpDown = 2;
+    GPIOInEdge gpioInEdge = 3;
 }
 
+
+
 message ActionStartBashScript {
-    string scriptPath = 1;
+    string scriptName = 1;
 }
 message ActionStartHIDScript {
     string scriptName = 1; //could be combined into oneof with script path, to allow starting scripts from arbitrary filepath (avoids storing scripts in DB or fixed folder)
@@ -105,10 +155,25 @@ message ActionDeploySettingsTemplate {
         WIFI = 2;
         USB = 3;
         BLUETOOTH = 4;
+        TRIGGER_ACTIONS = 5;
     }
     TemplateType type = 2;
 }
 message ActionLog {}
+enum GPIOOutValue {
+    LOW = 0;
+    HIGH = 1;
+    TOGGLE = 2;
+}
+
+message ActionGPIOOut {
+    GPIONum gpioNum = 1;
+    GPIOOutValue value = 2;
+}
+message ActionGroupSend {
+    string groupName = 1;
+    int32 value = 2;
+}
 
 
 
