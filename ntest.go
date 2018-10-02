@@ -1,9 +1,11 @@
+// +build linux
+
 package main
 
 import (
 	"errors"
 	"fmt"
-	"github.com/mame82/P4wnP1_go/service"
+	"github.com/mame82/P4wnP1_go/service/peripheral"
 	"io/ioutil"
 	"os"
 	"os/signal"
@@ -201,43 +203,49 @@ func ReadState() (regval *HprtData, err error) {
 	return regval, nil
 }
 
-func main() {
 
-	btsvc := service.NewBtService()
-	err := btsvc.StartNAP()
-	if err != nil {
-		panic(err)
+
+func main() {
+	wo := peripheral.WaveshareOled{}
+	wo.Start()
+	/*
+	dwc := dwc2.NewDwc2Nl(24)
+	err := dwc.OpenNlKernelSock()
+
+	if err == nil {
+		dwc.SocketReaderLoop2()
+	} else {
+		fmt.Println("Err: ", err)
 	}
+	dwc.Close()
+	*/
+
+
+	/*
+	i := 0
+	for {
+		res, err := ReadState()
+		if err == nil {
+			fmt.Printf("%d %+v\n ", i, res)
+		} else {
+			fmt.Println(err)
+		}
+		time.Sleep(time.Millisecond * 200)
+		i++
+	}
+	*/
+
+	/*
+	w := service.NewDwc2ConnectWatcher()
+	w.Start()
+	*/
 
 	fmt.Println("Stop with SIGTERM or SIGINT")
 	sig := make(chan os.Signal)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	si := <-sig
 	fmt.Printf("Signal (%v) received, ending P4wnP1_service ...\n", si)
+	wo.Stop()
+	//w.Stop()
 
-
-	btsvc.StopNAP()
-
-
-	/*
-		wsvc := service.NewWifiService()
-		res, err := wsvc.UpdateStateFromIw()
-		if err == nil {
-			fmt.Printf("Wifi state: %+v\n", res)
-		} else {
-			fmt.Println("Error retrieving WiFi state")
-		}
-	*/
-
-	/*
-	for {
-		res, err := ReadState()
-		if err == nil {
-			fmt.Printf("%+v\n ", res)
-		} else {
-			fmt.Println(err)
-		}
-		time.Sleep(time.Second)
-	}
-*/
 }
