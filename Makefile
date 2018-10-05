@@ -55,6 +55,38 @@ compile:
 	$(HOME)/go/bin/gopherjs get github.com/mame82/P4wnP1_go/web_client/...
 	$(HOME)/go/bin/gopherjs build -m -o build/webapp.js web_client/*.go
 
+installkali:
+	apt-get -y install git screen hostapd autossh bluez bluez-tools bridge-utils policykit-1 genisoimage iodine haveged
+	apt-get -y install tcpdump
+	apt-get -y install python-pip python-dev
+
+	# before installing dnsmasq, the nameserver from /etc/resolv.conf should be saved
+	# to restore after install (gets overwritten by dnsmasq package)
+	cp /etc/resolv.conf /tmp/backup_resolv.conf
+	apt-get -y install dnsmasq
+	/bin/bash -c 'cat /tmp/backup_resolv.conf > /etc/resolv.conf'
+
+	# python dependencies for HIDbackdoor
+	sudo pip install pydispatcher
+
+	cp build/P4wnP1_service /usr/local/bin/
+	cp build/P4wnP1_cli /usr/local/bin/
+	cp dist/P4wnP1.service /etc/systemd/system/P4wnP1.service
+	# copy over keymaps, scripts and www data
+	mkdir -p /usr/local/P4wnP1
+	cp -R dist/keymaps /usr/local/P4wnP1/
+	cp -R dist/scripts /usr/local/P4wnP1/
+	cp -R dist/HIDScripts /usr/local/P4wnP1/
+	cp -R dist/www /usr/local/P4wnP1/
+	cp build/webapp.js /usr/local/P4wnP1/www
+	cp build/webapp.js.map /usr/local/P4wnP1/www
+
+	# careful testing
+	#sudo update-rc.d dhcpcd disable
+	#sudo update-rc.d dnsmasq disable
+	systemctl disable networking.service # disable network service, relevant parts are wrapped by P4wnP1 (boottime below 20 seconds)
+
+
 install:
 	cp build/P4wnP1_service /usr/local/bin/
 	cp build/P4wnP1_cli /usr/local/bin/
