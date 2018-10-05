@@ -86,6 +86,8 @@ installkali:
 	#sudo update-rc.d dnsmasq disable
 	systemctl disable networking.service # disable network service, relevant parts are wrapped by P4wnP1 (boottime below 20 seconds)
 
+    # enable service
+    systemctl enable P4wnP1.service
 
 install:
 	cp build/P4wnP1_service /usr/local/bin/
