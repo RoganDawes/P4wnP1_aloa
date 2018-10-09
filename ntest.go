@@ -5,7 +5,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/mame82/P4wnP1_go/service/peripheral"
+	"github.com/mame82/P4wnP1_go/genl_p4wnp1"
+	"golang.org/x/sys/unix"
 	"io/ioutil"
 	"os"
 	"os/signal"
@@ -205,9 +206,70 @@ func ReadState() (regval *HprtData, err error) {
 
 
 
+
+func init_nl() (sock_fd int, err error) {
+	sock_fd,err = unix.Socket(unix.AF_NETLINK, unix.SOCK_RAW, unix.NETLINK_GENERIC) // Socket to netlink generic family
+	if err != nil { return }
+
+	err = unix.Bind(sock_fd, &unix.SockaddrNetlink {
+		Family: unix.AF_NETLINK,
+		Groups: 0,
+		Pid: uint32(os.Getpid()),
+	})
+	if err != nil { return }
+
+	//err = syscall.SetsockoptInt(d.sock_fd, unix.SOL_NETLINK, unix.NETLINK_ADD_MEMBERSHIP, d.nl_group)
+
+	return
+
+}
+
+func deinit_nl() {
+
+}
+
+
+
+
 func main() {
-	wo := peripheral.WaveshareOled{}
-	wo.Start()
+
+/*
+	genl,err := mgennetlink.NewGeNl()
+	if err != nil { panic(err) }
+	genl.Open()
+	defer genl.Close()
+
+	fam_name := "p4wnp1"
+	dwc2_group_name := "p4wnp1_dwc2_mc"
+
+	fam,err := genl.GetFamily(fam_name)
+	if err != nil { panic(err) }
+	fmt.Printf("FAMILY\n=====\n%+v\n", fam)
+
+	dwc2grpId,err := fam.GetGroupByName(dwc2_group_name)
+	if err != nil { panic(err) }
+
+	fmt.Println("Join Group: ", dwc2_group_name)
+	genl.AddGroupMembership(dwc2grpId)
+
+
+	for {
+		fmt.Println("Recieve....")
+		msgs,errm := genl.Receive()
+		if errm == nil {
+			fmt.Printf("Messages:\n%+v\n", msgs)
+		} else {
+			fmt.Println("Receive error: ", errm)
+		}
+	}
+*/
+
+	c,err := genl_p4wnp1.NewClient()
+	if err != nil { panic(err) }
+	c.Open()
+
+	//wo := peripheral.WaveshareOled{}
+	//wo.Start()
 	/*
 	dwc := dwc2.NewDwc2Nl(24)
 	err := dwc.OpenNlKernelSock()
@@ -245,7 +307,8 @@ func main() {
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	si := <-sig
 	fmt.Printf("Signal (%v) received, ending P4wnP1_service ...\n", si)
-	wo.Stop()
+	//wo.Stop()
 	//w.Stop()
 
+	c.Close()
 }
