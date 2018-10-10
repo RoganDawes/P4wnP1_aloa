@@ -56,15 +56,15 @@ compile:
 	$(HOME)/go/bin/gopherjs build -m -o build/webapp.js web_client/*.go
 
 installkali:
-	apt-get -y install git screen hostapd autossh bluez bluez-tools bridge-utils policykit-1 genisoimage iodine haveged
-	apt-get -y install tcpdump
-	apt-get -y install python-pip python-dev
+	#apt-get -y install git screen hostapd autossh bluez bluez-tools bridge-utils policykit-1 genisoimage iodine haveged
+	#apt-get -y install tcpdump
+	#apt-get -y install python-pip python-dev
 
 	# before installing dnsmasq, the nameserver from /etc/resolv.conf should be saved
 	# to restore after install (gets overwritten by dnsmasq package)
-	cp /etc/resolv.conf /tmp/backup_resolv.conf
-	apt-get -y install dnsmasq
-	/bin/bash -c 'cat /tmp/backup_resolv.conf > /etc/resolv.conf'
+	#cp /etc/resolv.conf /tmp/backup_resolv.conf
+	#apt-get -y install dnsmasq
+	#/bin/bash -c 'cat /tmp/backup_resolv.conf > /etc/resolv.conf'
 
 	# python dependencies for HIDbackdoor
 	sudo pip install pydispatcher
