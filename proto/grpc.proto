@@ -51,7 +51,7 @@ service P4WNP1 {
 
     // TriggerActions
     rpc ListStoredTriggerActionSets(Empty) returns (StringMessageArray) {}
-    rpc StoreTriggerActionSets(TriggerActionSetRequestStorage) returns (Empty) {}
+    rpc StoreTriggerActionSets(TriggerActionSet) returns (Empty) {}
     rpc GetTriggerActionsState(Empty) returns (TriggerActionSet) {}
     rpc DeployTriggerActionSetReplace(TriggerActionSet) returns (TriggerActionSet) {} // Adds a set of additional TriggerActions, returns a set of all Triggeractions registered afterwards
     rpc DeployTriggerActionSetAdd(TriggerActionSet) returns (TriggerActionSet) {} // Replaces registered TriggerActions with given set, returns a set ONLY OF ADDED TriggerActions (with assigned IDs)
@@ -60,12 +60,9 @@ service P4WNP1 {
 /* Triggers, Actions and resulting TriggerActions */
 message TriggerActionSet {
     repeated TriggerAction TriggerActions = 1;
+    string Name = 2;
 }
 
-message TriggerActionSetRequestStorage {
-    string TemplateName = 1;
-    TriggerActionSet set = 2;
-}
 
 
 message TriggerAction {

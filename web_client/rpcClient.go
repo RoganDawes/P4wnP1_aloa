@@ -154,7 +154,7 @@ func (rpc *Rpc) StoreTriggerActionSet(timeout time.Duration, set *pb.TriggerActi
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	_,err = rpc.Client.StoreTriggerActionSets(ctx, &pb.TriggerActionSetRequestStorage{Set:set})
+	_,err = rpc.Client.StoreTriggerActionSets(ctx, set)
 	return err
 }
 

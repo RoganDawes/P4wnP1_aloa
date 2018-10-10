@@ -146,14 +146,25 @@ func InitComponentsTriggerActions() {
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			data := struct {
 				*js.Object
-				TriggerAction *jsTriggerAction `js:"TriggerAction"`
+				ShowLoadModal bool   `js:"showLoadModal"`
+				TemplateName   string `js:"templateName"`
 			}{Object: O()}
-			data.TriggerAction = NewTriggerAction()
+			data.ShowLoadModal = false
+			data.TemplateName = ""
 			return &data
 		}),
 		hvue.Method("addTA",
 			func(vm *hvue.VM) {
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_ADD_NEW_TRIGGER_ACTION)
+			}),
+		hvue.Method("storeTAS",
+			func(vm *hvue.VM) {
+				tas := vm.Get("$store").Get("state").Get("triggerActionList")
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_STORE_TRIGGER_ACTION_SET, tas)
+			}),
+		hvue.Method("updateStoredTriggerActionSetsList",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST)
 			}),
 		hvue.Mounted(func(vm *hvue.VM) {
 			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_TRIGGER_ACTIONS)
@@ -683,11 +694,45 @@ const templateAction = `
 
 const templateTriggerActionManager = `
 <q-page padding>
+
+	<q-modal v-model="showLoadModal">
+		<q-modal-layout>
+			<q-toolbar slot="header">
+				<q-toolbar-title>
+					Load TriggerAction Set
+				</q-toolbar-title>
+			</q-toolbar>
+
+			<q-list>
+				<q-item link tag="label" v-for="tname in this.$store.state.StoredTriggerActionSetsList" :key="tname">
+					<q-item-side>
+						<q-radio v-model="templateName" :val="tname"/>
+					</q-item-side>
+					<q-item-main>
+						<q-item-tile label>{{ tname }}</q-item-tile>
+					</q-item-main>
+				</q-item>
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile>
+							<q-btn color="secondary" v-close-overlay label="close" />
+							<q-btn color="primary" label="load" />
+							<q-btn color="primary" label="deploy" />
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</q-list>
+		</q-modal-layout>
+	</q-modal>
+
+
 	<div class="row gutter-sm">
 		<div class="col-12">
 			<q-card>
 				<q-card-actions>
     				<q-btn label="add" @click="addTA" icon="event" />
+    				<q-btn label="store" @click="storeTAS" icon="event" />
+    				<q-btn label="load" @click="updateStoredTriggerActionSetsList(); showLoadModal=true" icon="event" />
   				</q-card-actions>
 			</q-card>
 		</div>

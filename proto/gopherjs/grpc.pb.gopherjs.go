@@ -9,7 +9,6 @@
 
 	It has these top-level messages:
 		TriggerActionSet
-		TriggerActionSetRequestStorage
 		TriggerAction
 		TriggerServiceStarted
 		TriggerUSBGadgetConnected
@@ -347,6 +346,7 @@ func (x EthernetInterfaceSettings_Mode) String() string {
 // Triggers, Actions and resulting TriggerActions
 type TriggerActionSet struct {
 	TriggerActions []*TriggerAction
+	Name           string
 }
 
 // GetTriggerActions gets the TriggerActions of the TriggerActionSet.
@@ -355,6 +355,14 @@ func (m *TriggerActionSet) GetTriggerActions() (x []*TriggerAction) {
 		return x
 	}
 	return m.TriggerActions
+}
+
+// GetName gets the Name of the TriggerActionSet.
+func (m *TriggerActionSet) GetName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Name
 }
 
 // MarshalToWriter marshals TriggerActionSet to the provided writer.
@@ -367,6 +375,10 @@ func (m *TriggerActionSet) MarshalToWriter(writer jspb.Writer) {
 		writer.WriteMessage(1, func() {
 			msg.MarshalToWriter(writer)
 		})
+	}
+
+	if len(m.Name) > 0 {
+		writer.WriteString(2, m.Name)
 	}
 
 	return
@@ -391,6 +403,8 @@ func (m *TriggerActionSet) UnmarshalFromReader(reader jspb.Reader) *TriggerActio
 			reader.ReadMessage(func() {
 				m.TriggerActions = append(m.TriggerActions, new(TriggerAction).UnmarshalFromReader(reader))
 			})
+		case 2:
+			m.Name = reader.ReadString()
 		default:
 			reader.SkipField()
 		}
@@ -401,88 +415,6 @@ func (m *TriggerActionSet) UnmarshalFromReader(reader jspb.Reader) *TriggerActio
 
 // Unmarshal unmarshals a TriggerActionSet from a slice of bytes.
 func (m *TriggerActionSet) Unmarshal(rawBytes []byte) (*TriggerActionSet, error) {
-	reader := jspb.NewReader(rawBytes)
-
-	m = m.UnmarshalFromReader(reader)
-
-	if err := reader.Err(); err != nil {
-		return nil, err
-	}
-
-	return m, nil
-}
-
-type TriggerActionSetRequestStorage struct {
-	TemplateName string
-	Set          *TriggerActionSet
-}
-
-// GetTemplateName gets the TemplateName of the TriggerActionSetRequestStorage.
-func (m *TriggerActionSetRequestStorage) GetTemplateName() (x string) {
-	if m == nil {
-		return x
-	}
-	return m.TemplateName
-}
-
-// GetSet gets the Set of the TriggerActionSetRequestStorage.
-func (m *TriggerActionSetRequestStorage) GetSet() (x *TriggerActionSet) {
-	if m == nil {
-		return x
-	}
-	return m.Set
-}
-
-// MarshalToWriter marshals TriggerActionSetRequestStorage to the provided writer.
-func (m *TriggerActionSetRequestStorage) MarshalToWriter(writer jspb.Writer) {
-	if m == nil {
-		return
-	}
-
-	if len(m.TemplateName) > 0 {
-		writer.WriteString(1, m.TemplateName)
-	}
-
-	if m.Set != nil {
-		writer.WriteMessage(2, func() {
-			m.Set.MarshalToWriter(writer)
-		})
-	}
-
-	return
-}
-
-// Marshal marshals TriggerActionSetRequestStorage to a slice of bytes.
-func (m *TriggerActionSetRequestStorage) Marshal() []byte {
-	writer := jspb.NewWriter()
-	m.MarshalToWriter(writer)
-	return writer.GetResult()
-}
-
-// UnmarshalFromReader unmarshals a TriggerActionSetRequestStorage from the provided reader.
-func (m *TriggerActionSetRequestStorage) UnmarshalFromReader(reader jspb.Reader) *TriggerActionSetRequestStorage {
-	for reader.Next() {
-		if m == nil {
-			m = &TriggerActionSetRequestStorage{}
-		}
-
-		switch reader.GetFieldNumber() {
-		case 1:
-			m.TemplateName = reader.ReadString()
-		case 2:
-			reader.ReadMessage(func() {
-				m.Set = m.Set.UnmarshalFromReader(reader)
-			})
-		default:
-			reader.SkipField()
-		}
-	}
-
-	return m
-}
-
-// Unmarshal unmarshals a TriggerActionSetRequestStorage from a slice of bytes.
-func (m *TriggerActionSetRequestStorage) Unmarshal(rawBytes []byte) (*TriggerActionSetRequestStorage, error) {
 	reader := jspb.NewReader(rawBytes)
 
 	m = m.UnmarshalFromReader(reader)
@@ -5210,7 +5142,7 @@ type P4WNP1Client interface {
 	ListStoredWifiSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// TriggerActions
 	ListStoredTriggerActionSets(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
-	StoreTriggerActionSets(ctx context.Context, in *TriggerActionSetRequestStorage, opts ...grpcweb.CallOption) (*Empty, error)
+	StoreTriggerActionSets(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*Empty, error)
 	GetTriggerActionsState(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	DeployTriggerActionSetReplace(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	DeployTriggerActionSetAdd(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
@@ -5538,7 +5470,7 @@ func (c *p4WNP1Client) ListStoredTriggerActionSets(ctx context.Context, in *Empt
 	return new(StringMessageArray).Unmarshal(resp)
 }
 
-func (c *p4WNP1Client) StoreTriggerActionSets(ctx context.Context, in *TriggerActionSetRequestStorage, opts ...grpcweb.CallOption) (*Empty, error) {
+func (c *p4WNP1Client) StoreTriggerActionSets(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*Empty, error) {
 	resp, err := c.client.RPCCall(ctx, "StoreTriggerActionSets", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err

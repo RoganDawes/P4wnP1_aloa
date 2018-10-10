@@ -1,8 +1,12 @@
+// +build js
+
 package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
+	"github.com/mame82/hvue"
+	"strconv"
 )
 
 type triggerType int
@@ -616,4 +620,66 @@ var availableTemplateTypes = []TemplateType{
 	TemplateTypeUSB,
 	TemplateTypeBluetooth,
 	TemplateTypeTriggerActions,
+}
+
+
+
+/* TriggerActions */
+type jsTriggerActionSet struct {
+	*js.Object
+	Name string `js:"Name"`
+	TriggerActions *js.Object `js:"TriggerActions"`
+}
+
+func NewTriggerActionList() *jsTriggerActionSet {
+	tal := &jsTriggerActionSet{Object: O()}
+	tal.TriggerActions = O()
+	tal.Name = "default_ta_set"
+	return tal
+}
+
+func (tal *jsTriggerActionSet) UpdateEntry(ta *jsTriggerAction) {
+	key := strconv.Itoa(int(ta.Id))
+
+	//Check if job exists, update existing one if already present
+	var updateTa *jsTriggerAction
+	if res := tal.TriggerActions.Get(key); res == js.Undefined {
+		updateTa = &jsTriggerAction{Object: O()}
+	} else {
+		updateTa = &jsTriggerAction{Object: res}
+	}
+
+	//Create job object
+	updateTa.Id = ta.Id
+	updateTa.IsActive = ta.IsActive
+	updateTa.Immutable = ta.Immutable
+	updateTa.OneShot = ta.OneShot
+	updateTa.ActionType = ta.ActionType
+	updateTa.TriggerType = ta.TriggerType
+	updateTa.TriggerData = ta.TriggerData
+	updateTa.ActionData = ta.ActionData
+
+	hvue.Set(tal.TriggerActions, key, updateTa)
+}
+
+func (tal *jsTriggerActionSet) DeleteEntry(id uint32) {
+	tal.TriggerActions.Delete(strconv.Itoa(int(id))) //JS version
+	//delete(jl.Jobs, strconv.Itoa(int(id)))
+}
+
+func (src jsTriggerActionSet) toGo() (target *pb.TriggerActionSet) {
+	js_ta_array := js.Global.Get("Object").Call("values", src.TriggerActions)
+	count := js_ta_array.Length()
+	// println("tal len:", count)
+	// iterate over array
+	target = &pb.TriggerActionSet{
+		Name: src.Name,
+	}
+	target.TriggerActions = make([]*pb.TriggerAction, count)
+	for i:=0;i<count;i++ {
+		jsTa := &jsTriggerAction{Object: js_ta_array.Index(i)}
+		target.TriggerActions[i] = jsTa.toGo()
+	}
+	//println("Go TAS: ", target )
+	return
 }

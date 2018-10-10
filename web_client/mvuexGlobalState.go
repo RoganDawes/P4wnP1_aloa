@@ -16,13 +16,17 @@ const (
 	maxLogEntries = 500
 
 	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS              = "updateRunningHidJobs"
-	VUEX_ACTION_UPDATE_TRIGGER_ACTIONS               = "updateTriggerActions"
-	VUEX_ACTION_ADD_NEW_TRIGGER_ACTION               = "addTriggerAction"
 	VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS       = "deployCurrentGadgetSettings"
 	VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED = "updateCurrentGadgetSettingsFromDeployed"
 	VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS   = "deployEthernetInterfaceSettings"
 	VUEX_ACTION_UPDATE_WIFI_STATE                    = "updateCurrentWifiSettingsFromDeployed"
 	VUEX_ACTION_DEPLOY_WIFI_SETTINGS                 = "deployWifiSettings"
+
+
+	VUEX_ACTION_UPDATE_TRIGGER_ACTIONS               = "updateTriggerActions"
+	VUEX_ACTION_ADD_NEW_TRIGGER_ACTION               = "addTriggerAction"
+	VUEX_ACTION_STORE_TRIGGER_ACTION_SET			= "storeTriggerActionSet"
+	VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST = "updateStoredTriggerActionSetsList"
 
 	VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST = "updateStoredWifiSettingsList"
 	VUEX_ACTION_STORE_WIFI_SETTINGS              = "storeWifiSettings"
@@ -32,6 +36,8 @@ const (
 	VUEX_MUTATION_SET_WIFI_STATE                   = "setCurrentWifiSettings"
 	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO = "setCurrentHIDScriptSource"
 	VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST    = "setStoredWifiSettingsList"
+
+	VUEX_MUTATION_SET_STORED_TRIGGER_ACTIONS_SETS_LIST = "setStoredTriggerActionSetsList"
 
 	initHIDScript = `layout('us');			// US keyboard layout
 typingSpeed(100,150)	// Wait 100ms between key strokes + an additional random value between 0ms and 150ms (natural)
@@ -68,7 +74,7 @@ type GlobalState struct {
 	CurrentlyDeployingWifiSettings   bool                    `js:"deployingWifiSettings"`
 	EventReceiver                    *jsEventReceiver        `js:"eventReceiver"`
 	HidJobList                       *jsHidJobStateList      `js:"hidJobList"`
-	TriggerActionList *jsTriggerActionList `js:"triggerActionList"`
+	TriggerActionList *jsTriggerActionSet                    `js:"triggerActionList"`
 	IsModalEnabled                   bool                    `js:"isModalEnabled"`
 	IsConnected                      bool                    `js:"isConnected"`
 	FailedConnectionAttempts         int                     `js:"failedConnectionAttempts"`
@@ -77,6 +83,7 @@ type GlobalState struct {
 	WiFiState *jsWiFiState `js:"wifiState"`
 
 	StoredWifiSettingsList []string `js:"StoredWifiSettingsList"`
+	StoredTriggerActionSetsList []string `js:"StoredTriggerActionSetsList"`
 }
 
 func createGlobalStateStruct() GlobalState {
@@ -93,6 +100,7 @@ func createGlobalStateStruct() GlobalState {
 	state.FailedConnectionAttempts = 0
 
 	state.StoredWifiSettingsList = []string{}
+	state.StoredTriggerActionSetsList = []string{}
 	//Retrieve Interface settings
 	// ToDo: Replace panics by default values
 	ifSettings, err := RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second * 5)
@@ -215,6 +223,26 @@ func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext
 	return
 }
 
+func actionUpdateStoredTriggerActionSetsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch wsList")
+		//fetch deployed gadget settings
+		tasList, err := RpcClient.ListStoredTriggerActionSets(time.Second * 10)
+		if err != nil {
+			println("Couldn't retrieve WifiSettingsList")
+			return
+		}
+
+		//commit to current
+
+		context.Commit(VUEX_MUTATION_SET_STORED_TRIGGER_ACTIONS_SETS_LIST, tasList)
+		//context.Commit(VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST, []string{"test1", "test2"})
+	}()
+
+	return
+}
+
+
 func actionUpdateTriggerActions(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		tastate,err := RpcClient.GetTriggerActionsState(time.Second * 10)
@@ -247,6 +275,24 @@ func actionAddNewTriggerAction(store *mvuex.Store, context *mvuex.ActionContext,
 
 	return
 }
+
+func actionStoreTriggerActionSet(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, req *jsTriggerActionSet) {
+	go func() {
+		println("Vuex dispatch store TriggerAction list: ", req.Name)
+		req.toGo()
+		// convert to Go type
+
+		err := RpcClient.StoreTriggerActionSet(time.Second*30, req.toGo())
+		if err != nil {
+			QuasarNotifyError("Error storing TriggerActionSet", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+			return
+		}
+		QuasarNotifySuccess("TriggerActionSet stored", "", QUASAR_NOTIFICATION_POSITION_TOP)
+
+	}()
+}
+
+
 
 func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
@@ -321,6 +367,9 @@ func initMVuex() *mvuex.Store {
 			println("New ws list", wsList)
 			hvue.Set(state, "StoredWifiSettingsList", wsList)
 		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_STORED_TRIGGER_ACTIONS_SETS_LIST, func(store *mvuex.Store, state *GlobalState, tasList []interface{}) {
+			hvue.Set(state, "StoredTriggerActionSetsList", tasList)
+		}),
 		/*
 		mvuex.Mutation("startLogListening", func (store *mvuex.Store, state *GlobalState) {
 			state.EventReceiver.StartListening()
@@ -339,8 +388,11 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_DEPLOY_WIFI_SETTINGS, actionDeployWifiSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST, actionUpdateStoredWifiSettingsList),
 		mvuex.Action(VUEX_ACTION_STORE_WIFI_SETTINGS, actionStoreWifiSettings),
+
 		mvuex.Action(VUEX_ACTION_UPDATE_TRIGGER_ACTIONS, actionUpdateTriggerActions),
 		mvuex.Action(VUEX_ACTION_ADD_NEW_TRIGGER_ACTION, actionAddNewTriggerAction),
+		mvuex.Action(VUEX_ACTION_STORE_TRIGGER_ACTION_SET, actionStoreTriggerActionSet),
+		mvuex.Action(VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST, actionUpdateStoredTriggerActionSetsList),
 
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
 			return state.TriggerActionList.TriggerActions

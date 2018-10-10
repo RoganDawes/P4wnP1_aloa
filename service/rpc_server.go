@@ -39,9 +39,9 @@ type server struct {
 	listenAddrWeb string
 }
 
-func (s *server) StoreTriggerActionSets(ctx context.Context, sr *pb.TriggerActionSetRequestStorage) (e *pb.Empty, err error) {
+func (s *server) StoreTriggerActionSets(ctx context.Context, set *pb.TriggerActionSet) (e *pb.Empty, err error) {
 	e = &pb.Empty{}
-	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_TRIGGER_ACTION_SET+ sr.TemplateName, sr.Set, true)
+	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_TRIGGER_ACTION_SET+ set.Name, set, true)
 	return
 }
 
