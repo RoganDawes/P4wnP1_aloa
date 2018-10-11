@@ -5142,7 +5142,7 @@ type P4WNP1Client interface {
 	ListStoredWifiSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// TriggerActions
 	ListStoredTriggerActionSets(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
-	StoreTriggerActionSets(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*Empty, error)
+	StoreTriggerActionSet(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*Empty, error)
 	GetTriggerActionsState(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	DeployTriggerActionSetReplace(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	DeployTriggerActionSetAdd(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
@@ -5470,8 +5470,8 @@ func (c *p4WNP1Client) ListStoredTriggerActionSets(ctx context.Context, in *Empt
 	return new(StringMessageArray).Unmarshal(resp)
 }
 
-func (c *p4WNP1Client) StoreTriggerActionSets(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*Empty, error) {
-	resp, err := c.client.RPCCall(ctx, "StoreTriggerActionSets", in.Marshal(), opts...)
+func (c *p4WNP1Client) StoreTriggerActionSet(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "StoreTriggerActionSet", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -881,6 +881,8 @@ func (data *jsEventReceiver) handleHidEvent(hEv *jsHidEvent) {
 	case common_web.HidEventType_JOB_FAILED:
 		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, false, hEv.Message, hEv.Error, hEv.EvLogTime, "")
 
+		QuasarNotifyError("HIDScript job " + strconv.Itoa(int(hEv.JobId)) + " failed", hEv.Error, QUASAR_NOTIFICATION_POSITION_TOP)
+	/*
 		notification := &QuasarNotification{Object: O()}
 		notification.Message = "HIDScript job " + strconv.Itoa(int(hEv.JobId)) + " failed"
 		notification.Detail = hEv.Error
@@ -888,9 +890,13 @@ func (data *jsEventReceiver) handleHidEvent(hEv *jsHidEvent) {
 		notification.Type = QUASAR_NOTIFICATION_TYPE_NEGATIVE
 		notification.Timeout = 5000
 		QuasarNotify(notification)
+	*/
 	case common_web.HidEventType_JOB_SUCCEEDED:
 		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, true, hEv.Message, hEv.Result, hEv.EvLogTime, "")
 
+		QuasarNotifySuccess("HIDScript job " + strconv.Itoa(int(hEv.JobId)) + " succeeded", hEv.Result, QUASAR_NOTIFICATION_POSITION_TOP)
+
+	/*
 		notification := &QuasarNotification{Object: O()}
 		notification.Message = "HIDScript job " + strconv.Itoa(int(hEv.JobId)) + " succeeded"
 		notification.Detail = hEv.Result
@@ -898,7 +904,7 @@ func (data *jsEventReceiver) handleHidEvent(hEv *jsHidEvent) {
 		notification.Type = QUASAR_NOTIFICATION_TYPE_POSITIVE
 		notification.Timeout = 5000
 		QuasarNotify(notification)
-
+	*/
 	case common_web.HidEventType_JOB_CANCELLED:
 		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, true, false, hEv.Message, hEv.Message, hEv.EvLogTime, "")
 	default:
