@@ -67,6 +67,7 @@ func main() {
 	)
 
 
+	InitComponentsDialog()
 	InitCompHIDJobs()
 	InitCompHIDEvents()
 	InitCompModal()

@@ -146,10 +146,12 @@ func InitComponentsTriggerActions() {
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			data := struct {
 				*js.Object
-				ShowLoadModal bool   `js:"showLoadModal"`
+				ShowReplaceTASModal bool   `js:"showReplaceTASModal"`
+				ShowAddTASModal bool   `js:"showAddTASModal"`
 				TemplateName   string `js:"templateName"`
 			}{Object: O()}
-			data.ShowLoadModal = false
+			data.ShowReplaceTASModal = false
+			data.ShowAddTASModal = false
 			data.TemplateName = ""
 			return &data
 		}),
@@ -161,6 +163,14 @@ func InitComponentsTriggerActions() {
 			func(vm *hvue.VM) {
 				tas := vm.Get("$store").Get("state").Get("triggerActionList")
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_STORE_TRIGGER_ACTION_SET, tas)
+			}),
+		hvue.Method("replaceCurrentTAS",
+			func(vm *hvue.VM, newTASName *js.Object) {
+				vm.Get("$q").Call("notify", "Replacing TAS with '" + newTASName.String() +"'")
+			}),
+		hvue.Method("addToCurrentTAS",
+			func(vm *hvue.VM, newTASName *js.Object) {
+				vm.Get("$q").Call("notify", "Add '" + newTASName.String() +"' to current TAS")
 			}),
 		hvue.Method("updateStoredTriggerActionSetsList",
 			func(vm *hvue.VM) {
@@ -695,44 +705,19 @@ const templateAction = `
 const templateTriggerActionManager = `
 <q-page padding>
 
-	<q-modal v-model="showLoadModal">
-		<q-modal-layout>
-			<q-toolbar slot="header">
-				<q-toolbar-title>
-					Load TriggerAction Set
-				</q-toolbar-title>
-			</q-toolbar>
 
-			<q-list>
-				<q-item link tag="label" v-for="tname in this.$store.state.StoredTriggerActionSetsList" :key="tname">
-					<q-item-side>
-						<q-radio v-model="templateName" :val="tname"/>
-					</q-item-side>
-					<q-item-main>
-						<q-item-tile label>{{ tname }}</q-item-tile>
-					</q-item-main>
-				</q-item>
-				<q-item tag="label">
-					<q-item-main>
-						<q-item-tile>
-							<q-btn color="secondary" v-close-overlay label="close" />
-							<q-btn color="primary" label="load" />
-							<q-btn color="primary" label="deploy" />
-						</q-item-tile>
-					</q-item-main>
-				</q-item>
-			</q-list>
-		</q-modal-layout>
-	</q-modal>
 
+	<select-string-from-array :values="this.$store.state.StoredTriggerActionSetsList" v-model="showReplaceTASModal" title="Replace current Trigger Actions with stored set" @load="replaceCurrentTAS($event)"></select-string-from-array>
+	<select-string-from-array :values="this.$store.state.StoredTriggerActionSetsList" v-model="showAddTASModal" title="Add stored set to current Trigger Actions" @load="addToCurrentTAS($event)"></select-string-from-array>
 
 	<div class="row gutter-sm">
 		<div class="col-12">
 			<q-card>
 				<q-card-actions>
-    				<q-btn label="add" @click="addTA" icon="event" />
-    				<q-btn label="store" @click="storeTAS" icon="event" />
-    				<q-btn label="load" @click="updateStoredTriggerActionSetsList(); showLoadModal=true" icon="event" />
+    				<q-btn label="add single TriggerAction" @click="addTA" icon="note_add" />
+    				<q-btn label="store current set" @click="storeTAS" icon="save" />
+    				<q-btn label="replace with stored set" @click="updateStoredTriggerActionSetsList(); showReplaceTASModal=true" icon="settings_backup_restore" />
+    				<q-btn label="insert stored set" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" />
   				</q-card-actions>
 			</q-card>
 		</div>

@@ -225,7 +225,7 @@ func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext
 
 func actionUpdateStoredTriggerActionSetsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
-		println("Trying to fetch wsList")
+		println("Trying to fetch TriggerActionSetList")
 		//fetch deployed gadget settings
 		tasList, err := RpcClient.ListStoredTriggerActionSets(time.Second * 10)
 		if err != nil {
