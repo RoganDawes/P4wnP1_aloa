@@ -24,12 +24,14 @@ const (
 
 
 	VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER = "updateCurrentTriggerActionsFromServer"
-	VUEX_ACTION_ADD_NEW_TRIGGER_ACTION                     = "addTriggerAction"
-	VUEX_ACTION_REMOVE_TRIGGER_ACTIONS                     = "removeTriggerActions"
-	VUEX_ACTION_STORE_TRIGGER_ACTION_SET                   = "storeTriggerActionSet"
-	VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST     = "updateStoredTriggerActionSetsList"
-	VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_REPLACE     = "deployStoredTriggerActionSetReplace"
+	VUEX_ACTION_ADD_NEW_TRIGGER_ACTION                   = "addTriggerAction"
+	VUEX_ACTION_REMOVE_TRIGGER_ACTIONS                   = "removeTriggerActions"
+	VUEX_ACTION_STORE_TRIGGER_ACTION_SET                 = "storeTriggerActionSet"
+	VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST   = "updateStoredTriggerActionSetsList"
+	VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_REPLACE = "deployStoredTriggerActionSetReplace"
 	VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_ADD     = "deployStoredTriggerActionSetAdd"
+	VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_REPLACE        = "deployCurrentTriggerActionSetReplace"
+	VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_ADD            = "deployCurrentTriggerActionSetAdd"
 
 	VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST = "updateStoredWifiSettingsList"
 	VUEX_ACTION_STORE_WIFI_SETTINGS              = "storeWifiSettings"
@@ -309,6 +311,37 @@ func actionStoreTriggerActionSet(store *mvuex.Store, context *mvuex.ActionContex
 	}()
 }
 
+func actionDeployTriggerActionSetReplace(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, tasToDeploy *jsTriggerActionSet) {
+	go func() {
+		tas := tasToDeploy.toGo()
+
+		_,err := RpcClient.DeployTriggerActionsSetReplace(defaultTimeout, tas)
+		if err != nil {
+			QuasarNotifyError("Error replacing TriggerActionSet with given one", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+			return
+		}
+		QuasarNotifySuccess("Replaced TriggerActionSet with given one", "", QUASAR_NOTIFICATION_POSITION_TOP)
+
+		actionUpdateCurrentTriggerActionsFromServer(store,context,state)
+	}()
+}
+
+func actionDeployTriggerActionSetAdd(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, tasToDeploy *jsTriggerActionSet) {
+	go func() {
+		tas := tasToDeploy.toGo()
+		_,err := RpcClient.DeployTriggerActionsSetAdd(defaultTimeout, tas)
+		if err != nil {
+			QuasarNotifyError("Error adding given TriggerActionSet to server", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+			return
+		}
+		QuasarNotifySuccess("Added TriggerActionSet to server", "", QUASAR_NOTIFICATION_POSITION_TOP)
+
+		actionUpdateCurrentTriggerActionsFromServer(store,context,state)
+	}()
+}
+
+
+
 func actionDeployStoredTriggerActionSetReplace(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jsName *js.Object) {
 	go func() {
 		name := jsName.String()
@@ -346,8 +379,6 @@ func actionDeployStoredTriggerActionSetAdd(store *mvuex.Store, context *mvuex.Ac
 		actionUpdateCurrentTriggerActionsFromServer(store,context,state)
 	}()
 }
-
-
 
 func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
@@ -451,6 +482,8 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST, actionUpdateStoredTriggerActionSetsList),
 		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_REPLACE, actionDeployStoredTriggerActionSetReplace),
 		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_ADD, actionDeployStoredTriggerActionSetAdd),
+		mvuex.Action(VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_REPLACE, actionDeployTriggerActionSetReplace),
+		mvuex.Action(VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_ADD, actionDeployTriggerActionSetAdd),
 
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
 			return state.TriggerActionList.TriggerActions

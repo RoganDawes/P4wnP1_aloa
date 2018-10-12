@@ -316,11 +316,17 @@ func InitComponentsTriggerActions() {
 			"updateTA",
 			func(vm *hvue.VM) {
 				println("update ta: ", vm.Get("ta"))
+				//Replace the whole TriggerActionSet of server with the current one from vuex store
+				// ToDo: This has to be changed to update a single action (inconssistnecy with multiple clients, all TA IDs change, overhead of transferring a whole set) -> has to be implemented like deleteTA logic
+				currentTas := vm.Get("$store").Get("state").Get("triggerActionList") //Current TriggerActionSet of ViewModel
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_REPLACE, currentTas)
 			}),
 		hvue.Method(
 			"cancelUpdateTA",
 			func(vm *hvue.VM) {
 				println("cancel update ta: ", vm.Get("ta"))
+				//Reload the whole TriggerActionSet from server and overwrite the current one of vuex store
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER)
 			}),
 		hvue.Method(
 			"deleteTA",
@@ -486,7 +492,7 @@ const templateTriggerActionOverview = `
 	<TriggerActionEdit :ta="ta">
 		<span slot="actions">
 			<q-btn color="primary" @click="updateTA(); EditMode=false" label="update" />
-			<q-btn color="secondary" @click="cancelUpdateTA(); EditMode=false" label="close" />
+			<q-btn color="secondary" @click="cancelUpdateTA(); EditMode=false" label="cancel" />
 		</span>
 	</TriggerActionEdit>
 	
@@ -496,7 +502,7 @@ const templateTriggerActionOverview = `
 	<q-card-title>
 		{{ ta.Immutable ? "immutable, " : "" }}
 		{{ ta.IsActive ? "enabled" : "disabled" }}
-		TriggerAction
+		TriggerAction (ID {{ ta.Id }})
 	
 		<span slot="subtitle">
 			<q-icon name="input"></q-icon> 
@@ -519,7 +525,7 @@ const templateTriggerActionEdit = `
 	<q-card-title>
 		TriggerAction
 		<span slot="subtitle">ID {{ ta.Id }}</span>
-		<q-btn slot="right" icon="more_vert" flat></q-btn>
+		<!-- <q-btn slot="right" icon="more_vert" flat></q-btn> -->
 	</q-card-title>
 	<q-list>
 			<q-item tag="label" link>
@@ -749,12 +755,28 @@ const templateTriggerActionManager = `
 	<div class="row gutter-sm">
 		<div class="col-12">
 			<q-card>
+				<q-card-title>
+					TriggerAction Manager
+				</q-card-title>
+
+<!--
 				<q-card-actions>
     				<q-btn label="add TriggerAction" @click="addTA" icon="note_add" />
     				<q-btn label="store template" @click="showStoreTASModal=true" icon="save" />
     				<q-btn label="load template" @click="updateStoredTriggerActionSetsList(); showReplaceTASModal=true" icon="settings_backup_restore" />
     				<q-btn label="insert template" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" />
   				</q-card-actions>
+-->
+				<q-card-main>
+					<div class="row gutter-sm">
+	    				<div class="col-12 col-sm"><q-btn class="fit" color="primary" label="add one" @click="addTA" icon="note_add" /></div>
+    					<div class="col-12 col-sm"><q-btn class="fit" color="secondary" label="store" @click="showStoreTASModal=true" icon="save" /></div>
+    					<div class="col-12 col-sm"><q-btn class="fit" color="warning" label="load & replace" @click="updateStoredTriggerActionSetsList(); showReplaceTASModal=true" icon="settings_backup_restore" /></div>
+    					<div class="col-12 col-sm"><q-btn class="fit" color="warning" label="load & add" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" /></div>
+					</div>
+  				</q-card-main>
+
+
 			</q-card>
 		</div>
 

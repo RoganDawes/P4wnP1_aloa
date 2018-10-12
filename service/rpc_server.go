@@ -88,10 +88,14 @@ func (s *server) DeployTriggerActionSetReplace(ctx context.Context, tas *pb.Trig
 }
 
 func (s *server) DeployTriggerActionSetAdd(ctx context.Context, tas *pb.TriggerActionSet) (resTas *pb.TriggerActionSet, err error) {
-	addedTA := make([]*pb.TriggerAction, len(tas.TriggerActions))
-	for idx,ta := range tas.TriggerActions {
-		addedTA[idx],err = s.rootSvc.SubSysTriggerActions.AddTriggerAction(ta)
-		if err != nil { return s.rootSvc.SubSysTriggerActions.GetCurrentTriggerActionSet(),err }
+	addedTA := make([]*pb.TriggerAction, 0)
+	for _,ta := range tas.TriggerActions {
+		// we don't allow adding immutable settings via RPC call
+		if !ta.Immutable {
+			added,err := s.rootSvc.SubSysTriggerActions.AddTriggerAction(ta)
+			if err != nil { return s.rootSvc.SubSysTriggerActions.GetCurrentTriggerActionSet(),err }
+			addedTA = append(addedTA, added)
+		}
 	}
 
 	resTas = &pb.TriggerActionSet{TriggerActions:addedTA, Name: "Added TriggerActions"}
