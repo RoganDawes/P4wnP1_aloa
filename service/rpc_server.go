@@ -39,6 +39,24 @@ type server struct {
 	listenAddrWeb string
 }
 
+func (s *server) DeployStoredTriggerActionSetReplace(ctx context.Context, msg *pb.StringMessage) (tas *pb.TriggerActionSet, err error) {
+	// load set from store
+	tas = &pb.TriggerActionSet{}
+	err = s.rootSvc.SubSysDataStore.Get(cSTORE_PREFIX_TRIGGER_ACTION_SET + msg.Msg, tas)
+	if err != nil { return }
+
+	return s.DeployTriggerActionSetReplace(ctx,tas)
+}
+
+func (s *server) DeployStoredTriggerActionSetAdd(ctx context.Context, msg *pb.StringMessage) (tas *pb.TriggerActionSet, err error) {
+	// load set from store
+	tas = &pb.TriggerActionSet{}
+	err = s.rootSvc.SubSysDataStore.Get(cSTORE_PREFIX_TRIGGER_ACTION_SET + msg.Msg, tas)
+	if err != nil { return }
+
+	return s.DeployTriggerActionSetAdd(ctx,tas)
+}
+
 func (s *server) StoreTriggerActionSet(ctx context.Context, set *pb.TriggerActionSet) (e *pb.Empty, err error) {
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_TRIGGER_ACTION_SET+ set.Name, set, true)
@@ -56,7 +74,7 @@ func (s *server) ListStoredTriggerActionSets(ctx context.Context, e *pb.Empty) (
 	return
 }
 
-func (s *server) GetTriggerActionsState(context.Context, *pb.Empty) (*pb.TriggerActionSet, error) {
+func (s *server) GetDeployedTriggerActionSet(context.Context, *pb.Empty) (*pb.TriggerActionSet, error) {
 	return s.rootSvc.SubSysTriggerActions.GetCurrentTriggerActionSet(), nil
 }
 
@@ -66,7 +84,7 @@ func (s *server) DeployTriggerActionSetReplace(ctx context.Context, tas *pb.Trig
 	// Add the new set
 	_,err = s.DeployTriggerActionSetAdd(ctx, tas)
 	if err != nil { return s.rootSvc.SubSysTriggerActions.GetCurrentTriggerActionSet(),err }
-	return s.GetTriggerActionsState(ctx, &pb.Empty{})
+	return s.GetDeployedTriggerActionSet(ctx, &pb.Empty{})
 }
 
 func (s *server) DeployTriggerActionSetAdd(ctx context.Context, tas *pb.TriggerActionSet) (resTas *pb.TriggerActionSet, err error) {
@@ -76,8 +94,23 @@ func (s *server) DeployTriggerActionSetAdd(ctx context.Context, tas *pb.TriggerA
 		if err != nil { return s.rootSvc.SubSysTriggerActions.GetCurrentTriggerActionSet(),err }
 	}
 
-	return &pb.TriggerActionSet{TriggerActions:addedTA},nil
+	resTas = &pb.TriggerActionSet{TriggerActions:addedTA, Name: "Added TriggerActions"}
+	return
 }
+
+func (s *server) DeployTriggerActionSetRemove(ctx context.Context, removeTas *pb.TriggerActionSet) (removedTas *pb.TriggerActionSet, err error) {
+	removedOnes := make([]*pb.TriggerAction,0)
+	for _,removeTa := range removeTas.TriggerActions {
+		removed,err := s.rootSvc.SubSysTriggerActions.RemoveTriggerAction(removeTa)
+		if err != nil { return s.rootSvc.SubSysTriggerActions.GetCurrentTriggerActionSet(),err }
+		removedOnes = append(removedOnes, removed)
+	}
+
+	removedTas = &pb.TriggerActionSet{TriggerActions:removedOnes, Name:"removed TriggerActions"}
+	return
+}
+
+
 
 func NewRpcServerService(root *Service) *server {
 	return &server{

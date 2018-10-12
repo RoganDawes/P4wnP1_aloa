@@ -50,11 +50,15 @@ service P4WNP1 {
     rpc ListStoredWifiSettings(Empty) returns (StringMessageArray) {}
 
     // TriggerActions
+    rpc GetDeployedTriggerActionSet(Empty) returns (TriggerActionSet) {}
+    rpc DeployTriggerActionSetReplace(TriggerActionSet) returns (TriggerActionSet) {} // Replaces registered TriggerActions with given set, returns a set ONLY OF ADDED TriggerActions (with assigned IDs)
+    rpc DeployTriggerActionSetAdd(TriggerActionSet) returns (TriggerActionSet) {} //  Adds a set of additional TriggerActions, returns a set of all Triggeractions registered afterwards
+    rpc DeployTriggerActionSetRemove(TriggerActionSet) returns (TriggerActionSet) {} // Removes registered TriggerActions from given set, returns a set ONLY OF REMOVED TriggerActions (with assigned IDs)
+
     rpc ListStoredTriggerActionSets(Empty) returns (StringMessageArray) {}
     rpc StoreTriggerActionSet(TriggerActionSet) returns (Empty) {}
-    rpc GetTriggerActionsState(Empty) returns (TriggerActionSet) {}
-    rpc DeployTriggerActionSetReplace(TriggerActionSet) returns (TriggerActionSet) {} // Adds a set of additional TriggerActions, returns a set of all Triggeractions registered afterwards
-    rpc DeployTriggerActionSetAdd(TriggerActionSet) returns (TriggerActionSet) {} // Replaces registered TriggerActions with given set, returns a set ONLY OF ADDED TriggerActions (with assigned IDs)
+    rpc DeployStoredTriggerActionSetReplace(StringMessage) returns (TriggerActionSet) {} // Adds a set of additional TriggerActions, returns a set of all Triggeractions registered afterwards
+    rpc DeployStoredTriggerActionSetAdd(StringMessage) returns (TriggerActionSet) {} // Replaces registered TriggerActions with given set, returns a set ONLY OF ADDED TriggerActions (with assigned IDs)
 }
 
 /* Triggers, Actions and resulting TriggerActions */

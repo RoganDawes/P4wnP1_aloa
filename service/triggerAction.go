@@ -14,7 +14,8 @@ type TriggerActionManager struct {
 	evtRcv *EventReceiver
 
 	registeredTriggerActionMutex *sync.Mutex
-	registeredTriggerAction      []*pb.TriggerAction
+	//registeredTriggerAction      []*pb.TriggerAction
+	registeredTriggerActions      pb.TriggerActionSet
 
 	nextID                       uint32
 }
@@ -192,7 +193,7 @@ func (tam *TriggerActionManager) dispatchTriggerEvent(evt *pb.Event) {
 	tam.registeredTriggerActionMutex.Lock()
 	defer tam.registeredTriggerActionMutex.Unlock()
 	markedForRemoval := []int{}
-	for _,ta := range tam.registeredTriggerAction {
+	for _,ta := range tam.registeredTriggerActions.TriggerActions {
 		// ToDo: handle errors of fireAction* methods
 		// ToDo: fire action methods have to return an additional int, indicating if the action has really fired (filter function in action could prevent this, which would cause wrong behavior for OneShot riggerActions)
 
@@ -235,8 +236,8 @@ func (tam *TriggerActionManager) dispatchTriggerEvent(evt *pb.Event) {
 	//fmt.Println("Indexes of TriggerActions to remove, because thy are OneShots and have fired", markedForRemoval)
 	for _,delIdx := range markedForRemoval {
 		// doesn't preserve order
-		tam.registeredTriggerAction[delIdx] = tam.registeredTriggerAction[len(tam.registeredTriggerAction)-1]
-		tam.registeredTriggerAction = tam.registeredTriggerAction[:len(tam.registeredTriggerAction)-1]
+		tam.registeredTriggerActions.TriggerActions[delIdx] = tam.registeredTriggerActions.TriggerActions[len(tam.registeredTriggerActions.TriggerActions)-1]
+		tam.registeredTriggerActions.TriggerActions = tam.registeredTriggerActions.TriggerActions[:len(tam.registeredTriggerActions.TriggerActions)-1]
 	}
 	return
 }
@@ -247,9 +248,28 @@ func (tam *TriggerActionManager) AddTriggerAction(ta *pb.TriggerAction) (taAdded
 	defer tam.registeredTriggerActionMutex.Unlock()
 	ta.Id = tam.nextID
 	tam.nextID++
-	tam.registeredTriggerAction = append(tam.registeredTriggerAction, ta)
+	tam.registeredTriggerActions.TriggerActions = append(tam.registeredTriggerActions.TriggerActions, ta)
+	taAdded = ta
 
 	return taAdded,nil
+}
+
+// removes the given TriggerAction
+// ToDo: for now only the ID is compared, to assure we don't remove a TriggerAction which has been changed meanwhile, we should deep-compare the whole object
+func (tam *TriggerActionManager) RemoveTriggerAction(removeTa *pb.TriggerAction) (taRemoved *pb.TriggerAction, err error) {
+	tam.registeredTriggerActionMutex.Lock()
+	defer tam.registeredTriggerActionMutex.Unlock()
+
+
+	for idx,ta := range tam.registeredTriggerActions.TriggerActions {
+		if ta.Id == removeTa.Id {
+			// remove element (not a problem for running `for`-loop, as it is interrupted here)
+			tam.registeredTriggerActions.TriggerActions = append(tam.registeredTriggerActions.TriggerActions[:idx], tam.registeredTriggerActions.TriggerActions[idx+1:]...)
+			return ta, nil
+		}
+	}
+	return nil, ErrTaNotFound
+
 }
 
 var (
@@ -258,7 +278,7 @@ var (
 )
 
 func (tam *TriggerActionManager) GetTriggerActionByID(Id uint32) (ta *pb.TriggerAction ,err error) {
-	for _,ta = range tam.registeredTriggerAction {
+	for _,ta = range tam.registeredTriggerActions.TriggerActions {
 		if ta.Id == Id {
 			return ta, nil
 		}
@@ -294,27 +314,30 @@ func (tam *TriggerActionManager) ClearTriggerActions(keepImmutable bool) (err er
 	defer tam.registeredTriggerActionMutex.Unlock()
 
 	if !keepImmutable {
-		tam.registeredTriggerAction = []*pb.TriggerAction{}
+		tam.registeredTriggerActions.TriggerActions = []*pb.TriggerAction{}
 		return
 	}
 
 	newTas := []*pb.TriggerAction{}
-	for _,ta := range tam.registeredTriggerAction {
+	for _,ta := range tam.registeredTriggerActions.TriggerActions {
 		if ta.Immutable {
 			newTas = append(newTas, ta)
 		}
 	}
-	tam.registeredTriggerAction = newTas
+	tam.registeredTriggerActions.TriggerActions = newTas
 	return nil
 }
 
 func (tam *TriggerActionManager) GetCurrentTriggerActionSet() (ta *pb.TriggerActionSet) {
+	/*
 	tam.registeredTriggerActionMutex.Lock()
-	resTAs := make([]*pb.TriggerAction, len(tam.registeredTriggerAction))
-	copy(resTAs, tam.registeredTriggerAction)
+	resTAs := make([]*pb.TriggerAction, len(tam.registeredTriggerActions.TriggerActions))
+	copy(resTAs, tam.registeredTriggerActions.TriggerActions)
 	tam.registeredTriggerActionMutex.Unlock()
 
 	return &pb.TriggerActionSet{ TriggerActions: resTAs }
+	*/
+	return &tam.registeredTriggerActions
 }
 
 func (tam *TriggerActionManager) Start() {
@@ -328,7 +351,10 @@ func (tam *TriggerActionManager) Stop() {
 
 func NewTriggerActionManager(rootService *Service) (tam *TriggerActionManager) {
 	tam = &TriggerActionManager{
-		registeredTriggerAction:      []*pb.TriggerAction{},
+		registeredTriggerActions:      pb.TriggerActionSet{
+			Name: "DeployedTriggerActions",
+			TriggerActions: []*pb.TriggerAction{},
+		},
 		registeredTriggerActionMutex: &sync.Mutex{},
 		rootSvc: rootService,
 	}

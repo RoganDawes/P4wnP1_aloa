@@ -631,7 +631,7 @@ type jsTriggerActionSet struct {
 	TriggerActions *js.Object `js:"TriggerActions"`
 }
 
-func NewTriggerActionList() *jsTriggerActionSet {
+func NewTriggerActionSet() *jsTriggerActionSet {
 	tal := &jsTriggerActionSet{Object: O()}
 	tal.TriggerActions = O()
 	tal.Name = "default_ta_set"
@@ -664,6 +664,11 @@ func (tal *jsTriggerActionSet) UpdateEntry(ta *jsTriggerAction) {
 
 func (tal *jsTriggerActionSet) DeleteEntry(id uint32) {
 	tal.TriggerActions.Delete(strconv.Itoa(int(id))) //JS version
+	//delete(jl.Jobs, strconv.Itoa(int(id)))
+}
+
+func (tas *jsTriggerActionSet) Flush() {
+	tas.TriggerActions = O()
 	//delete(jl.Jobs, strconv.Itoa(int(id)))
 }
 

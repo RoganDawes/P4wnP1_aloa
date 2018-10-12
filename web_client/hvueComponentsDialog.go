@@ -53,6 +53,50 @@ func InitComponentsDialog() {
 			hvue.Types(hvue.PString),
 			),
 	)
+
+	hvue.NewComponent(
+		"modal-string-input",
+		hvue.Template(templateInputStringModal),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := struct {
+				*js.Object
+				Text string `js:"text"`
+			}{Object:O()}
+			data.Text = ""
+
+			return &data
+		}),
+		hvue.ComputedWithGetSet(
+			"visible",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("value")
+			},
+			func(vm *hvue.VM, newValue *js.Object) {
+				vm.Call("$emit", "input", newValue)
+			},
+			),
+		hvue.Method(
+			"onSavePressed",
+			func(vm *hvue.VM) {
+				if vm.Get("text") == js.Undefined || vm.Get("text").String() == "" {
+					QuasarNotifyError("Can't store to empty template name", "", QUASAR_NOTIFICATION_POSITION_TOP)
+					return
+				}
+				vm.Call("$emit", "save", vm.Get("text"))
+				println(vm.Get("text"))
+
+			},
+		),
+		hvue.PropObj(
+			"title",
+			hvue.Types(hvue.PString),
+			),
+		hvue.PropObj(
+			"value",
+			hvue.Required,
+			hvue.Types(hvue.PBoolean),
+		),
+	)
 }
 
 const templateSelectStringModal = `
@@ -84,4 +128,36 @@ const templateSelectStringModal = `
 			</q-list>
 		</q-modal-layout>
 	</q-modal>
+`
+
+const templateInputStringModal = `
+<div>
+	<q-modal v-model="visible">
+		<q-modal-layout>
+			<q-toolbar slot="header">
+				<q-toolbar-title>
+					{{ title }}
+				</q-toolbar-title>
+			</q-toolbar>
+			<q-list>
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile label>Name</q-item-tile>
+						<q-item-tile>
+							<q-input v-model="text" inverted></q-input>
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile>
+							<q-btn color="primary" v-show="text != undefined && text.length > 0" @click="onSavePressed(); visible=false" label="store" />
+							<q-btn color="secondary" v-close-overlay label="close" />
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</q-list>
+		</q-modal-layout>
+	</q-modal>
+</div>
 `

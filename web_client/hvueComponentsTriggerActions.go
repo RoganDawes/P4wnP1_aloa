@@ -148,10 +148,12 @@ func InitComponentsTriggerActions() {
 				*js.Object
 				ShowReplaceTASModal bool   `js:"showReplaceTASModal"`
 				ShowAddTASModal bool   `js:"showAddTASModal"`
+				ShowStoreTASModal bool   `js:"showStoreTASModal"`
 				TemplateName   string `js:"templateName"`
 			}{Object: O()}
 			data.ShowReplaceTASModal = false
 			data.ShowAddTASModal = false
+			data.ShowStoreTASModal = false
 			data.TemplateName = ""
 			return &data
 		}),
@@ -160,24 +162,38 @@ func InitComponentsTriggerActions() {
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_ADD_NEW_TRIGGER_ACTION)
 			}),
 		hvue.Method("storeTAS",
-			func(vm *hvue.VM) {
-				tas := vm.Get("$store").Get("state").Get("triggerActionList")
-				vm.Get("$store").Call("dispatch", VUEX_ACTION_STORE_TRIGGER_ACTION_SET, tas)
+			func(vm *hvue.VM, name *js.Object) {
+				tas_obj := vm.Get("$store").Get("state").Get("triggerActionList")
+				current_tas := jsTriggerActionSet{Object:tas_obj}.toGo()
+				store_tas := NewTriggerActionSet()
+				store_tas.Name = name.String()
+				for _,ta := range current_tas.TriggerActions {
+
+					if ta.IsActive && !ta.Immutable {
+						jsTa := &jsTriggerAction{Object:O()}
+						jsTa.fromGo(ta)
+						store_tas.UpdateEntry(jsTa)
+					}
+				}
+
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_STORE_TRIGGER_ACTION_SET, store_tas)
 			}),
 		hvue.Method("replaceCurrentTAS",
-			func(vm *hvue.VM, newTASName *js.Object) {
-				vm.Get("$q").Call("notify", "Replacing TAS with '" + newTASName.String() +"'")
+			func(vm *hvue.VM, storedTASName *js.Object) {
+				//vm.Get("$q").Call("notify", "Replacing TAS with '" + storedTASName.String() +"'")
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_REPLACE, storedTASName)
 			}),
 		hvue.Method("addToCurrentTAS",
-			func(vm *hvue.VM, newTASName *js.Object) {
-				vm.Get("$q").Call("notify", "Add '" + newTASName.String() +"' to current TAS")
+			func(vm *hvue.VM, storedTASName *js.Object) {
+				//vm.Get("$q").Call("notify", "Add '" + storedTASName.String() +"' to current TAS")
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_ADD, storedTASName)
 			}),
 		hvue.Method("updateStoredTriggerActionSetsList",
 			func(vm *hvue.VM) {
 				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST)
 			}),
 		hvue.Mounted(func(vm *hvue.VM) {
-			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_TRIGGER_ACTIONS)
+			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER)
 		}),
 	)
 
@@ -296,12 +312,34 @@ func InitComponentsTriggerActions() {
 				data := TriggerActionCompData{Object: vm.Data}
 				data.EditMode = true
 			}),
+		hvue.Method(
+			"updateTA",
+			func(vm *hvue.VM) {
+				println("update ta: ", vm.Get("ta"))
+			}),
+		hvue.Method(
+			"cancelUpdateTA",
+			func(vm *hvue.VM) {
+				println("cancel update ta: ", vm.Get("ta"))
+			}),
+		hvue.Method(
+			"deleteTA",
+			func(vm *hvue.VM) {
+				ta_obj := vm.Get("ta")
+				println("delete ta: ", ta_obj)
+
+				delTas := NewTriggerActionSet()
+				delTas.UpdateEntry(&jsTriggerAction{Object: ta_obj})
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_REMOVE_TRIGGER_ACTIONS, delTas)
+			}),
 	)
+
 	hvue.NewComponent(
 		"TriggerActionEdit",
 		hvue.Template(templateTriggerActionEdit),
 		hvue.PropObj("ta"),
 	)
+
 	hvue.NewComponent(
 		"trigger",
 		hvue.Props("ta"),
@@ -444,11 +482,11 @@ const templateTriggerAction = `
 `
 const templateTriggerActionOverview = `
 <div>
-<q-modal v-model="EditMode">
+<q-modal v-model="EditMode" no-route-dismiss no-esc-dismiss no-backdrop-dismiss>
 	<TriggerActionEdit :ta="ta">
 		<span slot="actions">
-			<q-btn color="secondary" v-close-overlay label="close" />
-			<q-btn color="primary" v-close-overlay label="close" />
+			<q-btn color="primary" @click="updateTA(); EditMode=false" label="update" />
+			<q-btn color="secondary" @click="cancelUpdateTA(); EditMode=false" label="close" />
 		</span>
 	</TriggerActionEdit>
 	
@@ -469,7 +507,7 @@ const templateTriggerActionOverview = `
 
 		<div slot="right" v-if="!ta.Immutable">
 			<q-btn color="primary" icon="edit" @click="enableEditMode" flat></q-btn>
-			<q-btn color="negative" icon="delete" flat></q-btn>
+			<q-btn color="negative" icon="delete" @click="deleteTA" flat></q-btn>
 		</div>
 	</q-card-title>
 </q-card>
@@ -704,9 +742,7 @@ const templateAction = `
 
 const templateTriggerActionManager = `
 <q-page padding>
-
-
-
+	<modal-string-input v-model="showStoreTASModal" title="Store selected TriggerActions" @save="storeTAS($event)"></modal-string-input>
 	<select-string-from-array :values="this.$store.state.StoredTriggerActionSetsList" v-model="showReplaceTASModal" title="Replace current Trigger Actions with stored set" @load="replaceCurrentTAS($event)"></select-string-from-array>
 	<select-string-from-array :values="this.$store.state.StoredTriggerActionSetsList" v-model="showAddTASModal" title="Add stored set to current Trigger Actions" @load="addToCurrentTAS($event)"></select-string-from-array>
 
@@ -714,10 +750,10 @@ const templateTriggerActionManager = `
 		<div class="col-12">
 			<q-card>
 				<q-card-actions>
-    				<q-btn label="add single TriggerAction" @click="addTA" icon="note_add" />
-    				<q-btn label="store current set" @click="storeTAS" icon="save" />
-    				<q-btn label="replace with stored set" @click="updateStoredTriggerActionSetsList(); showReplaceTASModal=true" icon="settings_backup_restore" />
-    				<q-btn label="insert stored set" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" />
+    				<q-btn label="add TriggerAction" @click="addTA" icon="note_add" />
+    				<q-btn label="store template" @click="showStoreTASModal=true" icon="save" />
+    				<q-btn label="load template" @click="updateStoredTriggerActionSetsList(); showReplaceTASModal=true" icon="settings_backup_restore" />
+    				<q-btn label="insert template" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" />
   				</q-card-actions>
 			</q-card>
 		</div>

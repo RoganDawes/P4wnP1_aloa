@@ -158,11 +158,11 @@ func (rpc *Rpc) StoreTriggerActionSet(timeout time.Duration, set *pb.TriggerActi
 	return err
 }
 
-func (rpc *Rpc) GetTriggerActionsState(timeout time.Duration) (res *pb.TriggerActionSet, err error) {
+func (rpc *Rpc) GetDeployedTriggerActionSet(timeout time.Duration) (res *pb.TriggerActionSet, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	return rpc.Client.GetTriggerActionsState(ctx, &pb.Empty{})
+	return rpc.Client.GetDeployedTriggerActionSet(ctx, &pb.Empty{})
 }
 
 func (rpc *Rpc) DeployTriggerActionsSetReplace(timeout time.Duration, set *pb.TriggerActionSet) (res *pb.TriggerActionSet, err error) {
@@ -172,11 +172,32 @@ func (rpc *Rpc) DeployTriggerActionsSetReplace(timeout time.Duration, set *pb.Tr
 	return rpc.Client.DeployTriggerActionSetReplace(ctx, set)
 }
 
+func (rpc *Rpc) DeployTriggerActionsSetRemove(timeout time.Duration, set *pb.TriggerActionSet) (res *pb.TriggerActionSet, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	return rpc.Client.DeployTriggerActionSetRemove(ctx, set)
+}
+
 func (rpc *Rpc) DeployTriggerActionsSetAdd(timeout time.Duration, set *pb.TriggerActionSet) (res *pb.TriggerActionSet, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	return rpc.Client.DeployTriggerActionSetAdd(ctx, set)
+}
+
+func (rpc *Rpc) DeployStoredTriggerActionsSetReplace(timeout time.Duration, name *pb.StringMessage) (res *pb.TriggerActionSet, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	return rpc.Client.DeployStoredTriggerActionSetReplace(ctx, name)
+}
+
+func (rpc *Rpc) DeployStoredTriggerActionsSetAdd(timeout time.Duration, name *pb.StringMessage) (res *pb.TriggerActionSet, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	return rpc.Client.DeployStoredTriggerActionSetAdd(ctx, name)
 }
 
 
