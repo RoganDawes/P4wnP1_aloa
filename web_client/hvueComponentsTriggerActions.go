@@ -599,7 +599,7 @@ const templateTrigger = `
 					<q-item-tile label>Values</q-item-tile>
 					<q-item-tile sublabel>The numeric value sequence which has to be received to activate the trigger</q-item-tile>
 					<q-item-tile>
-						<q-chips-input v-model="TriggerGroupReceiveSequenceValues" @duplicate="TriggerGroupReceiveSequenceAddValue($event)" decimals="0" inverted :disable="!ta.IsActive"></q-chips-input>
+						<q-chips-input v-model="TriggerGroupReceiveSequenceValues" @duplicate="TriggerGroupReceiveSequenceAddValue($event)" type="number" decimals="0" inverted :disable="!ta.IsActive"></q-chips-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
@@ -712,7 +712,7 @@ const templateAction = `
 					<q-item-tile label>Value</q-item-tile>
 					<q-item-tile sublabel>The numeric value which is sent to the group channel</q-item-tile>
 					<q-item-tile>
-						<q-input v-model="ta.ActionData.Value" color="secondary" type="number" decimals="0" inverted :disable="!ta.IsActive"></q-input>
+						<q-input v-model="ta.ActionData.Value" color="secondary"  type="number" decimals="0" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"context"
@@ -181,7 +182,7 @@ func ConstructEventTriggerDHCPLease(iface, mac, ip string) *pb.Event {
 	return &pb.Event{
 		Type: common_web.EVT_TRIGGER,
 		Values: []*pb.EventValue{
-			{Val: &pb.EventValue_Tint64{Tint64: int64(common_web.EVT_TRIGGER_TYPE_DHCP_LEASE_GRANTED)}},
+			{Val: &pb.EventValue_Tint64{Tint64: int64(common_web.TRIGGER_EVT_TYPE_DHCP_LEASE_GRANTED)}},
 			{Val: &pb.EventValue_Tstring{Tstring: iface}},
 			{Val: &pb.EventValue_Tstring{Tstring: mac}},
 			{Val: &pb.EventValue_Tstring{Tstring: ip}},
@@ -193,10 +194,43 @@ func ConstructEventTriggerSSHLogin(username string) *pb.Event {
 	return &pb.Event{
 		Type: common_web.EVT_TRIGGER,
 		Values: []*pb.EventValue{
-			{Val: &pb.EventValue_Tint64{Tint64: int64(common_web.EVT_TRIGGER_TYPE_SSH_LOGIN)}},
+			{Val: &pb.EventValue_Tint64{Tint64: int64(common_web.TRIGGER_EVT_TYPE_SSH_LOGIN)}},
 			{Val: &pb.EventValue_Tstring{Tstring: username}},
 		},
 	}
+}
+
+func ConstructEventTriggerGroupReceive(groupName string, value int32) *pb.Event {
+	return &pb.Event{
+		Type: common_web.EVT_TRIGGER,
+		Values: []*pb.EventValue{
+			{Val: &pb.EventValue_Tint64{Tint64: int64(common_web.TRIGGER_EVT_TYPE_GROUP_RECEIVE)}},
+			{Val: &pb.EventValue_Tstring{Tstring: groupName}},
+			{Val: &pb.EventValue_Tint64{Tint64: int64(value)}},
+		},
+	}
+}
+
+func DeconstructEventTriggerGroupReceive(evt *pb.Event) (groupName string, value int32, err error) {
+	e := errors.New("Malformed GroupReceiveEvent")
+	if evt.Type != common_web.EVT_TRIGGER {
+		err = e
+		return
+	}
+	if evTypeInt64,match := evt.Values[0].Val.(*pb.EventValue_Tint64); !match {
+		err = e
+		return
+	} else {
+		evType := common_web.EvtTriggerType(evTypeInt64.Tint64)
+		if evType != common_web.TRIGGER_EVT_TYPE_GROUP_RECEIVE {
+			err = e
+			return
+		}
+	}
+
+	groupName = evt.Values[1].GetTstring()
+	value = int32(evt.Values[2].GetTint64())
+	return
 }
 
 func ConstructEventHID(hidEvent hid.Event) *pb.Event {

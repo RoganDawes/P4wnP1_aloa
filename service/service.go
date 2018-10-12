@@ -170,7 +170,7 @@ func (s *Service) Start() {
 	s.SubSysBluetooth.StartNAP()
 
 	// fire service started Event
-	s.SubSysEvent.Emit(ConstructEventTrigger(common_web.EVT_TRIGGER_TYPE_SERVICE_STARTED))
+	s.SubSysEvent.Emit(ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_SERVICE_STARTED))
 }
 
 func (s *Service) Stop() {

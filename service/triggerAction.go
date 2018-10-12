@@ -1,3 +1,5 @@
+// +build linux
+
 package service
 
 import (
@@ -6,8 +8,110 @@ import (
 	"github.com/mame82/P4wnP1_go/common"
 	"github.com/mame82/P4wnP1_go/common_web"
 	pb "github.com/mame82/P4wnP1_go/proto"
+	"github.com/mame82/P4wnP1_go/service/util"
 	"sync"
 )
+
+var (
+	ErrTaNotFound = errors.New("Couldn't find given TriggerAction")
+	ErrTaImmutable = errors.New("Not allowed to change immutable TriggerAction")
+)
+
+
+type triggerType int
+const (
+	triggerTypeServiceStarted triggerType = iota
+	triggerTypeUsbGadgetConnected
+	triggerTypeUsbGadgetDisconnected
+	triggerTypeWifiAPStarted
+	triggerTypeWifiConnectedAsSta
+	triggerTypeSshLogin
+	triggerTypeDhcpLeaseGranted
+	triggerTypeGroupReceive
+	triggerTypeGroupReceiveSequence
+	triggerTypeGpioIn
+)
+var triggerTypeString = map[triggerType]string {
+	triggerTypeServiceStarted: "TRIGGER_SERVICE_STARTED",
+	triggerTypeUsbGadgetConnected: "TRIGGER_USB_GADGET_CONNECTED",
+	triggerTypeUsbGadgetDisconnected: "TRIGGER_USB_GADGET_DISCONNECTED",
+	triggerTypeWifiAPStarted: "TRIGGER_WIFI_AP_STARTED",
+	triggerTypeWifiConnectedAsSta: "TRIGGER_WIFI_CONNECTED_AS_STA",
+	triggerTypeSshLogin: "TRIGGER_SSH_LOGIN",
+	triggerTypeDhcpLeaseGranted: "TRIGGER_DHCP_LEASE_GRANTED",
+	triggerTypeGroupReceive: "TRIGGER_GROUP_RECEIVE",
+	triggerTypeGroupReceiveSequence: "TRIGGER_GROUP_RECEIVE_SEQUENCE",
+	triggerTypeGpioIn: "TRIGGER_GPIO_IN",
+}
+
+type actionType int
+const (
+	actionTypeBashScript actionType = iota
+	actionTypeHidScript
+	actionTypeDeploySettingsTemplate
+	actionTypeLog
+	actionTypeGpioOut
+	actionTypeGroupSend
+)
+var actionTypeString = map[actionType]string {
+	actionTypeBashScript: "ACTION_BASH_SCRIPT",
+	actionTypeHidScript: "ACTION_HID_SCRIPT",
+	actionTypeDeploySettingsTemplate: "ACTION_DEPLOY_SETTINGS_TEMPLATE",
+	actionTypeLog: "ACTION_LOG",
+	actionTypeGpioOut: "ACTION_GPIO_OUT",
+	actionTypeGroupSend: "ACTION_GROUP_SEND",
+
+}
+
+
+func retrieveTriggerActionTypes(ta *pb.TriggerAction) (ttype triggerType, atype actionType) {
+	// Trigger
+	switch x := ta.Trigger.(type) {
+	case *pb.TriggerAction_ServiceStarted:
+		ttype = triggerTypeServiceStarted
+	case *pb.TriggerAction_UsbGadgetConnected:
+		ttype = triggerTypeUsbGadgetConnected
+	case *pb.TriggerAction_UsbGadgetDisconnected:
+		ttype = triggerTypeUsbGadgetDisconnected
+	case *pb.TriggerAction_WifiAPStarted:
+		ttype = triggerTypeWifiAPStarted
+	case *pb.TriggerAction_WifiConnectedAsSta:
+		ttype = triggerTypeWifiConnectedAsSta
+	case *pb.TriggerAction_SshLogin:
+		ttype = triggerTypeSshLogin
+	case *pb.TriggerAction_DhcpLeaseGranted:
+		ttype = triggerTypeDhcpLeaseGranted
+	case *pb.TriggerAction_GroupReceive:
+		ttype = triggerTypeGroupReceive
+	case *pb.TriggerAction_GroupReceiveSequence:
+		ttype = triggerTypeGroupReceiveSequence
+	case *pb.TriggerAction_GpioIn:
+		ttype = triggerTypeGpioIn
+	case nil:
+	default:
+		panic(fmt.Sprintf("unexpected trigger type %T", x))
+	}
+	// Action
+	switch x := ta.Action.(type) {
+	case *pb.TriggerAction_BashScript:
+		atype = actionTypeBashScript
+	case *pb.TriggerAction_HidScript:
+		atype = actionTypeHidScript
+	case *pb.TriggerAction_DeploySettingsTemplate:
+		atype = actionTypeDeploySettingsTemplate
+	case *pb.TriggerAction_Log:
+		atype = actionTypeLog
+	case *pb.TriggerAction_GpioOut:
+		atype = actionTypeGpioOut
+	case *pb.TriggerAction_GroupSend:
+		atype = actionTypeGroupSend
+	case nil:
+	default:
+		panic(fmt.Sprintf("unexpected action type %T", x))
+	}
+
+	return
+}
 
 type TriggerActionManager struct {
 	rootSvc *Service
@@ -16,6 +120,9 @@ type TriggerActionManager struct {
 	registeredTriggerActionMutex *sync.Mutex
 	//registeredTriggerAction      []*pb.TriggerAction
 	registeredTriggerActions      pb.TriggerActionSet
+
+	groupReceiveSequenceCheckers map[*pb.TriggerAction]*util.ValueSequenceChecker
+	groupReceiveSequenceCheckersMutex *sync.Mutex
 
 	nextID                       uint32
 }
@@ -32,7 +139,7 @@ func (tam *TriggerActionManager) processing_loop() {
 					break Outer // abort loop on "nil" event, as this indicates the EventQueue channel has been closed
 				}
 				//fmt.Println("TriggerActionManager received unfiltered event", evt)
-				tam.dispatchTriggerEvent(evt)
+				tam.processTriggerEvent(evt)
 				// check if relevant and dispatch to triggers
 			case <- tam.evtRcv.Ctx.Done():
 				// evvent Receiver cancelled or unregistered
@@ -42,6 +149,307 @@ func (tam *TriggerActionManager) processing_loop() {
 	fmt.Println("TAM processing loop finished")
 }
 
+// iterates over registered trigger actions
+// if event matches a trigger, pass execution to respective on{Event} method, along with the arguments
+// from the respective events
+//
+// Tasks of on{event} method:
+// 	- decide if the given trigger fires, based on the event arguments
+//  - disable the TriggerAction, in case the trigger has fired
+//  - call the execute{Action} method, according to the Action defined in the trigger Action, in case the trigger fires
+//
+// Note: a event doesn't necessarily map to a trigger (f.e. a TRIGGER_EVT_TYPE_GROUP_RECEIVE carries a single value to a
+// group, but a triggerTypeGroupReceive doesn't trigger if it is the wrong value)
+//
+func (tam *TriggerActionManager) processTriggerEvent(evt *pb.Event) {
+	//fmt.Printf("Remaining triggerActions: %+v\n", tam.registeredTriggerAction)
+	//fmt.Printf("Received event: %+v\n", evt)
+	tam.registeredTriggerActionMutex.Lock()
+	defer tam.registeredTriggerActionMutex.Unlock()
+
+	for _,ta := range tam.registeredTriggerActions.TriggerActions {
+		// skip disabled triggeractions
+		if !ta.IsActive { continue }
+		ttype,atype := retrieveTriggerActionTypes(ta)
+		if taTriggerTypeMatchesEvtTriggerType(ttype, evt) {
+			switch ttEvt := common_web.EvtTriggerType(evt.Values[0].GetTint64()); ttEvt {
+			case common_web.TRIGGER_EVT_TYPE_SERVICE_STARTED:
+				tam.onServiceStarted(evt, ta, ttype, atype)
+			case common_web.TRIGGER_EVT_TYPE_SSH_LOGIN:
+				tam.onSSHLogin(evt, ta, ttype, atype)
+			case common_web.TRIGGER_EVT_TYPE_WIFI_CONNECTED_AS_STA:
+				tam.onWifiConnectedAsSta(evt, ta, ttype, atype)
+			case common_web.TRIGGER_EVT_TYPE_WIFI_AP_STARTED:
+				tam.onWifiApStarted(evt, ta, ttype, atype)
+			case common_web.TRIGGER_EVT_TYPE_DHCP_LEASE_GRANTED:
+				// extract iface, mac and ip from event
+				tam.onDhcpLeaseGranted(evt, ta, ttype, atype)
+			case common_web.TRIGGER_EVT_TYPE_USB_GADGET_CONNECTED:
+				tam.onUsbGadgetConnected(evt, ta, ttype, atype)
+			case common_web.TRIGGER_EVT_TYPE_USB_GADGET_DISCONNECTED:
+				tam.onUsbGadgetDisconnected(evt, ta, ttype, atype)
+			case common_web.TRIGGER_EVT_TYPE_GPIO_IN:
+				tam.onGpioIn(evt, ta, ttype, atype)
+			case common_web.TRIGGER_EVT_TYPE_GROUP_RECEIVE:
+				tam.onGroupReceive(evt, ta, ttype, atype)
+			default:
+				fmt.Println("unhandled trigger: ", ttEvt)
+			}
+
+		}
+	}
+
+	return
+}
+
+func (tam *TriggerActionManager) onServiceStarted(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
+	// always triggers
+	tam.executeAction(evt, ta, tt, at)
+	return nil
+}
+
+
+func (tam *TriggerActionManager) onSSHLogin(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
+	//ToDo: allow filtering by login user
+	// always triggers
+	tam.executeAction(evt, ta, tt, at)
+	return nil
+}
+
+func (tam *TriggerActionManager) onWifiConnectedAsSta(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
+	//ToDo: filter by AP name
+	// always triggers
+	tam.executeAction(evt, ta, tt, at)
+	return nil
+}
+
+func (tam *TriggerActionManager) onWifiApStarted(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
+	//ToDo: filter by AP name
+	// always triggers
+	tam.executeAction(evt, ta, tt, at)
+	return nil
+}
+
+func (tam *TriggerActionManager) onDhcpLeaseGranted(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
+	//ToDo: filter by source interface, mac, IP
+	// always triggers
+	tam.executeAction(evt, ta, tt, at)
+	return nil
+}
+
+func (tam *TriggerActionManager) onUsbGadgetConnected(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
+	// always triggers
+	tam.executeAction(evt, ta, tt, at)
+	return nil
+}
+
+func (tam *TriggerActionManager) onUsbGadgetDisconnected(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
+	// always triggers
+	tam.executeAction(evt, ta, tt, at)
+	return nil
+}
+
+func (tam *TriggerActionManager) onGpioIn(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
+	// only triggers if PIN matches
+	tam.executeAction(evt, ta, tt, at)
+	return nil
+}
+
+func (tam *TriggerActionManager) onGroupReceive(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
+	evGroupName,evValue,err := DeconstructEventTriggerGroupReceive(evt)
+	if err != nil { return err }
+
+	switch tt {
+	case triggerTypeGroupReceive:
+		triggerVal := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.Value
+		triggerGroupName := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.GroupName
+		if evGroupName != triggerGroupName {
+			return nil // don't handle on group mismatch, but return without error
+		}
+		if evValue != triggerVal {
+			return nil // don't handle on value mismatch, but return without error
+		}
+		tam.executeAction(evt, ta, tt, at) // fire action
+		return nil
+	case triggerTypeGroupReceiveSequence:
+		//triggerValues := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.Values
+		triggerGroupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.GroupName
+		if evGroupName != triggerGroupName {
+			// retrieve the sequence checker
+			if sc,exists := tam.groupReceiveSequenceCheckers[ta]; exists {
+				if sc.Check(evValue) {
+					tam.executeAction(evt, ta, tt, at) // fire action
+				}
+			}
+
+			return nil // don't handle on group mismatch, but return without error
+		}
+
+
+	default:
+		return errors.New("Wrong trigger for onGroupReceive event")
+	}
+	// only triggers if
+	//  - group of event macthes group of trigger
+	//  - value of event matches value of trigger
+
+
+
+	return nil
+}
+
+
+
+func (tam *TriggerActionManager) executeAction(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
+	if ta.OneShot { ta.IsActive = false }
+
+	switch actionType := ta.Action.(type) {
+	case *pb.TriggerAction_BashScript:
+		go tam.executeActionBashScript(evt, ta, tt, at, actionType.BashScript)
+	case *pb.TriggerAction_HidScript:
+		go tam.executeActionStartHidScript(evt, ta, tt, at, actionType.HidScript)
+	case *pb.TriggerAction_Log:
+		go tam.executeActionLog(evt, ta, tt, at, actionType.Log)
+	case *pb.TriggerAction_DeploySettingsTemplate:
+		go tam.executeActionDeploySettingsTemplate(evt, ta, tt, at, actionType.DeploySettingsTemplate)
+	case *pb.TriggerAction_GroupSend:
+		tam.executeActionGroupSend(evt, ta, tt, at, actionType.GroupSend)
+	case *pb.TriggerAction_GpioOut:
+		tam.executeActionGPIOOut(evt, ta, tt, at, actionType.GpioOut)
+	}
+
+	return nil
+}
+
+
+func (tam *TriggerActionManager) executeActionGroupSend(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionGroupSend) {
+	triggerName := triggerTypeString[tt]
+	actionName := actionTypeString[at]
+
+	groupName := action.GroupName
+	value := action.Value
+	fmt.Printf("Trigger '%s' fired -> executing action '%s' ('%s': %d)\n", triggerName, actionName, groupName, value)
+
+	tam.rootSvc.SubSysEvent.Emit(ConstructEventTriggerGroupReceive(groupName, value))
+}
+
+func (tam *TriggerActionManager) executeActionGPIOOut(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionGPIOOut) {
+	triggerName := triggerTypeString[tt]
+	actionName := actionTypeString[at]
+
+	gpioNumName := pb.GPIONum_name[int32(action.GpioNum)]
+	fmt.Printf("Trigger '%s' fired -> executing action '%s' ('%s')\n", triggerName, actionName, gpioNumName)
+
+	// ToDo: Implement
+}
+
+
+func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionStartHIDScript) {
+	triggerName := triggerTypeString[tt]
+	actionName := actionTypeString[at]
+
+	fmt.Printf("Trigger '%s' fired -> executing action '%s' ('%s')\n", triggerName, actionName, action.ScriptName)
+
+	// ToDo: Implement
+}
+
+func (tam *TriggerActionManager) executeActionDeploySettingsTemplate(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionDeploySettingsTemplate) {
+	triggerName := triggerTypeString[tt]
+	actionName := actionTypeString[at]
+
+	templateTypeName := pb.ActionDeploySettingsTemplate_TemplateType_name[int32(action.Type)]
+	fmt.Printf("Trigger '%s' fired -> executing action '%s' (%s: '%s')\n", triggerName, actionName, templateTypeName, action.TemplateName)
+
+	// ToDo: Implement
+}
+
+func (tam *TriggerActionManager) executeActionBashScript(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionStartBashScript) {
+	triggerName := triggerTypeString[tt]
+	actionName := actionTypeString[at]
+
+	scriptPath := PATH_BASH_SCRIPTS + "/" + action.ScriptName
+	env := []string{
+		fmt.Sprintf("TRIGGER=%s", triggerName),
+	}
+
+	switch tt {
+	case triggerTypeGpioIn:
+		gpioPin := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioNum
+		gpioPinName := pb.GPIONum_name[int32(gpioPin)]
+		env = append(env, fmt.Sprintf("GPIO_PIN=%s", gpioPinName))
+	case triggerTypeGroupReceiveSequence:
+		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.GroupName
+		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.Values
+		// create bash array of values
+		bashArray := "("
+		for _,v := range values { bashArray += fmt.Sprintf("%d ", v)}
+		bashArray += ")"
+		env = append(env,
+			fmt.Sprintf("GROUP='%s'", groupName),
+			fmt.Sprintf("VALUES=%s", bashArray),
+		)
+	case triggerTypeGroupReceive:
+		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.GroupName
+		value := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.Value
+		env = append(env,
+			fmt.Sprintf("GROUP='%s'", groupName),
+			fmt.Sprintf("VALUE=%s", value),
+		)
+	case triggerTypeDhcpLeaseGranted:
+		iface := evt.Values[1].GetTstring()
+		mac := evt.Values[2].GetTstring()
+		ip := evt.Values[3].GetTstring()
+		env = append(env,
+			fmt.Sprintf("DHCP_LEASE_IFACE=%s", iface),
+			fmt.Sprintf("DHCP_LEASE_MAC=%s", mac),
+			fmt.Sprintf("DHCP_LEASE_IP=%s", ip),
+		)
+	case triggerTypeSshLogin:
+		loginUser := evt.Values[1].GetTstring()
+		env = append(env,
+			fmt.Sprintf("SSH_LOGIN_USER=%s", loginUser),
+		)
+	}
+
+	fmt.Printf("Trigger '%s' fired -> executing action '%s' ('%s')\n", triggerName, actionName, scriptPath)
+	common.RunBashScriptEnv(scriptPath, env...)
+}
+
+func (tam *TriggerActionManager) executeActionLog(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionLog) {
+	triggerName := triggerTypeString[tt]
+	actionName := actionTypeString[at]
+
+	logMessage := fmt.Sprintf("Trigger fired: %s", triggerName)
+
+
+	switch tt {
+	case triggerTypeGpioIn:
+		gpioPin := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioNum
+		gpioPinName := pb.GPIONum_name[int32(gpioPin)]
+		logMessage += fmt.Sprintf(" (GPIO_PIN=%s)", gpioPinName)
+	case triggerTypeGroupReceiveSequence:
+		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.GroupName
+		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.Values
+		logMessage += fmt.Sprintf(" (GROUP='%s', VALUES=%v)", groupName, values)
+	case triggerTypeGroupReceive:
+		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.GroupName
+		value := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.Value
+		logMessage += fmt.Sprintf(" (GROUP='%s', VALUE=%d)", groupName, value)
+	case triggerTypeDhcpLeaseGranted:
+		iface := evt.Values[1].GetTstring()
+		mac := evt.Values[2].GetTstring()
+		ip := evt.Values[3].GetTstring()
+		logMessage += fmt.Sprintf(" (DHCP_LEASE_IFACE=%s, DHCP_LEASE_MAC=%s, DHCP_LEASE_IP=%s)", iface, mac, ip)
+	case triggerTypeSshLogin:
+		loginUser := evt.Values[1].GetTstring()
+		logMessage += fmt.Sprintf(" (SSH_LOGIN_USER=%s)", loginUser)
+	}
+
+	fmt.Printf("Trigger '%s' fired -> executing action '%s'\n", triggerName, actionName)
+	tam.rootSvc.SubSysEvent.Emit(ConstructEventLog("TriggerAction", 0, logMessage))
+}
+
+/*
 func (tam *TriggerActionManager) fireActionNoArgs(ta *pb.TriggerAction) (err error ) {
 	switch actionType := ta.Action.(type) {
 	case *pb.TriggerAction_BashScript:
@@ -60,187 +468,66 @@ func (tam *TriggerActionManager) fireActionNoArgs(ta *pb.TriggerAction) (err err
 		fmt.Printf("Placeholder: Deploy settings template of type [%s] with name '%s'\n", strType, st.TemplateName)
 	case *pb.TriggerAction_Log:
 		fmt.Printf("Logging trigger '%+v'\n", ta.Trigger)
+	case *pb.TriggerAction_GroupSend:
+		tam.executeActionGroupSend(ta, actionType.GroupSend)
+	case *pb.TriggerAction_GpioOut:
+		tam.executeActionGPIOOut(ta, actionType.GpioOut)
+
 	}
 	return nil
 }
+*/
 
 
-func (tam *TriggerActionManager) fireActionServiceStarted(ta *pb.TriggerAction) error {
-	return tam.fireActionNoArgs(ta)
-}
-
-func (tam *TriggerActionManager) fireActionSSHLogin(loginUser string, ta *pb.TriggerAction) error {
-	switch actionType := ta.Action.(type) {
-	case *pb.TriggerAction_BashScript:
-		bs := actionType.BashScript
-		scriptPath := PATH_BASH_SCRIPTS + "/" + bs.ScriptName
-		envUser := fmt.Sprintf("SSH_LOGIN_USER=%s", loginUser)
-		go common.RunBashScriptEnv(scriptPath, envUser)
-		//go common.RunBashScript(bs.ScriptPath)
-		fmt.Printf("Started bash script '%s' (%s)\n", scriptPath, envUser)
-	case *pb.TriggerAction_HidScript:
-		// ToDo: Implement
-		hs := actionType.HidScript
-		fmt.Printf("Placeholder: Starting HID script '%s'\n", hs.ScriptName)
-	case *pb.TriggerAction_DeploySettingsTemplate:
-		// ToDo: Implement
-		st := actionType.DeploySettingsTemplate
-		strType := pb.ActionDeploySettingsTemplate_TemplateType_name[int32(st.Type)]
-		fmt.Printf("Placeholder: Deploy settings template of type [%s] with name '%s'\n", strType, st.TemplateName)
-	case *pb.TriggerAction_Log:
-		fmt.Printf("Logging action: SSHLogin user: '%s'\n", loginUser)
-	}
-	return nil
-}
-
-func (tam *TriggerActionManager) fireActionWifiConnectedAsSta(ta *pb.TriggerAction) error {
-	return tam.fireActionNoArgs(ta)
-}
-
-func (tam *TriggerActionManager) fireActionWifiApStarted(ta *pb.TriggerAction) error {
-	return tam.fireActionNoArgs(ta)
-}
-
-func (tam *TriggerActionManager) fireActionDhcpLeaseGranted(iface string, mac string, ip string, ta *pb.TriggerAction) error {
-	switch actionType := ta.Action.(type) {
-	case *pb.TriggerAction_BashScript:
-		bs := actionType.BashScript
-		scriptPath := PATH_BASH_SCRIPTS + "/" + bs.ScriptName
-		envIface := fmt.Sprintf("DHCP_LEASE_IFACE=%s", iface)
-		envMac := fmt.Sprintf("DHCP_LEASE_MAC=%s", mac)
-		envIp := fmt.Sprintf("DHCP_LEASE_IP=%s", ip)
-		go common.RunBashScriptEnv(scriptPath, envIface, envMac, envIp)
-		//go common.RunBashScript(bs.ScriptPath)
-		fmt.Printf("Started bash script '%s' (%s, %s, %s)\n", scriptPath, envIface, envMac, envIp)
-	case *pb.TriggerAction_HidScript:
-		// ToDo: Implement
-		hs := actionType.HidScript
-		fmt.Printf("Placeholder: Starting HID script '%s'\n", hs.ScriptName)
-	case *pb.TriggerAction_DeploySettingsTemplate:
-		// ToDo: Implement
-		st := actionType.DeploySettingsTemplate
-		strType := pb.ActionDeploySettingsTemplate_TemplateType_name[int32(st.Type)]
-		fmt.Printf("Placeholder: Deploy settings template of type [%s] with name '%s'\n", strType, st.TemplateName)
-	case *pb.TriggerAction_Log:
-		fmt.Printf("Logging action: DHCPLeaseGranted interface: '%s' mac:'%s' IP: '%s'\n", iface, mac, ip)
-	}
-	return nil
-}
-
-func (tam *TriggerActionManager) fireActionUsbGadgetConnected(ta *pb.TriggerAction) error {
-	return tam.fireActionNoArgs(ta)
-}
-
-func (tam *TriggerActionManager) fireActionUsbGadgetDisconnected(ta *pb.TriggerAction) error {
-	return tam.fireActionNoArgs(ta)
-}
 
 // checks if the triggerType of the given event (if trigger event at all), matches the TriggerType of the TriggerAction
-func taTriggerTypeMatchesEvtTriggerType(ta *pb.TriggerAction, evt *pb.Event) bool {
+func taTriggerTypeMatchesEvtTriggerType(ttype triggerType, evt *pb.Event) bool {
 	if evt.Type != common_web.EVT_TRIGGER { return false }
 	triggerTypeEvt := common_web.EvtTriggerType(evt.Values[0].GetTint64())
 	switch triggerTypeEvt {
-	case common_web.EVT_TRIGGER_TYPE_SERVICE_STARTED:
-		if _,match := ta.Trigger.(*pb.TriggerAction_ServiceStarted); match {
+	case common_web.TRIGGER_EVT_TYPE_SERVICE_STARTED:
+		if ttype == triggerTypeServiceStarted {
 			return true
-		} else {
-			return false
 		}
-	case common_web.EVT_TRIGGER_TYPE_DHCP_LEASE_GRANTED:
-		if _,match := ta.Trigger.(*pb.TriggerAction_DhcpLeaseGranted); match {
+	case common_web.TRIGGER_EVT_TYPE_DHCP_LEASE_GRANTED:
+		if ttype == triggerTypeDhcpLeaseGranted {
 			return true
-		} else {
-			return false
 		}
-	case common_web.EVT_TRIGGER_TYPE_WIFI_AP_STARTED:
-		if _,match := ta.Trigger.(*pb.TriggerAction_WifiAPStarted); match {
+	case common_web.TRIGGER_EVT_TYPE_WIFI_AP_STARTED:
+		if ttype == triggerTypeWifiAPStarted {
 			return true
-		} else {
-			return false
 		}
-	case common_web.EVT_TRIGGER_TYPE_WIFI_CONNECTED_AS_STA:
-		if _,match := ta.Trigger.(*pb.TriggerAction_WifiConnectedAsSta); match {
+	case common_web.TRIGGER_EVT_TYPE_WIFI_CONNECTED_AS_STA:
+		if ttype == triggerTypeWifiConnectedAsSta {
 			return true
-		} else {
-			return false
 		}
-	case common_web.EVT_TRIGGER_TYPE_USB_GADGET_CONNECTED:
-		if _,match := ta.Trigger.(*pb.TriggerAction_UsbGadgetConnected); match {
+	case common_web.TRIGGER_EVT_TYPE_USB_GADGET_CONNECTED:
+		if ttype == triggerTypeUsbGadgetConnected {
 			return true
-		} else {
-			return false
 		}
-	case common_web.EVT_TRIGGER_TYPE_USB_GADGET_DISCONNECTED:
-		if _,match := ta.Trigger.(*pb.TriggerAction_UsbGadgetDisconnected); match {
+	case common_web.TRIGGER_EVT_TYPE_USB_GADGET_DISCONNECTED:
+		if ttype == triggerTypeUsbGadgetDisconnected {
 			return true
-		} else {
-			return false
 		}
-	case common_web.EVT_TRIGGER_TYPE_SSH_LOGIN:
-		if _,match := ta.Trigger.(*pb.TriggerAction_SshLogin); match {
+	case common_web.TRIGGER_EVT_TYPE_SSH_LOGIN:
+		if ttype == triggerTypeSshLogin {
 			return true
-		} else {
-			return false
+		}
+	case common_web.TRIGGER_EVT_TYPE_GROUP_RECEIVE:
+		if ttype == triggerTypeGroupReceive || ttype == triggerTypeGroupReceiveSequence {
+			return true
+		}
+	case common_web.TRIGGER_EVT_TYPE_GPIO_IN:
+		if ttype == triggerTypeGpioIn {
+			return true
 		}
 	default:
 		return false
 	}
+
+	return false
 }
 
-func (tam *TriggerActionManager) dispatchTriggerEvent(evt *pb.Event) {
-	//fmt.Printf("Remaining triggerActions: %+v\n", tam.registeredTriggerAction)
-	//fmt.Printf("Received event: %+v\n", evt)
-	tam.registeredTriggerActionMutex.Lock()
-	defer tam.registeredTriggerActionMutex.Unlock()
-	markedForRemoval := []int{}
-	for _,ta := range tam.registeredTriggerActions.TriggerActions {
-		// ToDo: handle errors of fireAction* methods
-		// ToDo: fire action methods have to return an additional int, indicating if the action has really fired (filter function in action could prevent this, which would cause wrong behavior for OneShot riggerActions)
-
-		// skip disabled triggeractions
-		if !ta.IsActive { continue }
-		if taTriggerTypeMatchesEvtTriggerType(ta, evt) {
-			hasFired := true
-			switch ttEvt := common_web.EvtTriggerType(evt.Values[0].GetTint64()); ttEvt {
-			case common_web.EVT_TRIGGER_TYPE_SERVICE_STARTED:
-				tam.fireActionServiceStarted(ta)
-			case common_web.EVT_TRIGGER_TYPE_SSH_LOGIN:
-				loginUser := evt.Values[1].GetTstring()
-				tam.fireActionSSHLogin(loginUser, ta)
-			case common_web.EVT_TRIGGER_TYPE_WIFI_CONNECTED_AS_STA:
-				tam.fireActionWifiConnectedAsSta(ta)
-			case common_web.EVT_TRIGGER_TYPE_WIFI_AP_STARTED:
-				tam.fireActionWifiApStarted(ta)
-			case common_web.EVT_TRIGGER_TYPE_DHCP_LEASE_GRANTED:
-				// extract iface, mac and ip from event
-				iface := evt.Values[1].GetTstring()
-				mac := evt.Values[2].GetTstring()
-				ip := evt.Values[3].GetTstring()
-				tam.fireActionDhcpLeaseGranted(iface, mac, ip, ta)
-			case common_web.EVT_TRIGGER_TYPE_USB_GADGET_CONNECTED:
-				tam.fireActionUsbGadgetConnected(ta)
-			case common_web.EVT_TRIGGER_TYPE_USB_GADGET_DISCONNECTED:
-				tam.fireActionUsbGadgetDisconnected(ta)
-			default:
-				hasFired = false
-				fmt.Println("unhandled trigger: ", ttEvt)
-			}
-
-			if hasFired && ta.OneShot {
-				//markedForRemoval = append(markedForRemoval,idx)
-				ta.IsActive = false // don't delete, but deactivate
-			}
-		}
-	}
-
-	//fmt.Println("Indexes of TriggerActions to remove, because thy are OneShots and have fired", markedForRemoval)
-	for _,delIdx := range markedForRemoval {
-		// doesn't preserve order
-		tam.registeredTriggerActions.TriggerActions[delIdx] = tam.registeredTriggerActions.TriggerActions[len(tam.registeredTriggerActions.TriggerActions)-1]
-		tam.registeredTriggerActions.TriggerActions = tam.registeredTriggerActions.TriggerActions[:len(tam.registeredTriggerActions.TriggerActions)-1]
-	}
-	return
-}
 
 // returns the TriggerAction with assigned ID
 func (tam *TriggerActionManager) AddTriggerAction(ta *pb.TriggerAction) (taAdded *pb.TriggerAction, err error) {
@@ -250,6 +537,14 @@ func (tam *TriggerActionManager) AddTriggerAction(ta *pb.TriggerAction) (taAdded
 	tam.nextID++
 	tam.registeredTriggerActions.TriggerActions = append(tam.registeredTriggerActions.TriggerActions, ta)
 	taAdded = ta
+
+	//if new ta trigger is GroupReceiveSequence, add a SequenceChecker
+	if triggerGrpRcv,match := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence); match {
+		tam.groupReceiveSequenceCheckersMutex.Lock()
+		fmt.Printf("##### New val checker %+v\n", triggerGrpRcv.GroupReceiveSequence.Values)
+		tam.groupReceiveSequenceCheckers[ta] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveSequence.Values, triggerGrpRcv.GroupReceiveSequence.IgnoreOutOfOrder)
+		tam.groupReceiveSequenceCheckersMutex.Unlock()
+	}
 
 	return taAdded,nil
 }
@@ -265,17 +560,20 @@ func (tam *TriggerActionManager) RemoveTriggerAction(removeTa *pb.TriggerAction)
 		if ta.Id == removeTa.Id {
 			// remove element (not a problem for running `for`-loop, as it is interrupted here)
 			tam.registeredTriggerActions.TriggerActions = append(tam.registeredTriggerActions.TriggerActions[:idx], tam.registeredTriggerActions.TriggerActions[idx+1:]...)
+
+			//if target ta trigger had a sequenceChecker assigned, remove it
+			if _,match := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence); match {
+				tam.groupReceiveSequenceCheckersMutex.Lock()
+				delete(tam.groupReceiveSequenceCheckers, ta)
+				tam.groupReceiveSequenceCheckersMutex.Unlock()
+			}
+
 			return ta, nil
 		}
 	}
 	return nil, ErrTaNotFound
 
 }
-
-var (
-	ErrTaNotFound = errors.New("Couldn't find given TriggerAction")
-	ErrTaImmutable = errors.New("Not allowed to change immutable TriggerAction")
-)
 
 func (tam *TriggerActionManager) GetTriggerActionByID(Id uint32) (ta *pb.TriggerAction ,err error) {
 	for _,ta = range tam.registeredTriggerActions.TriggerActions {
@@ -300,13 +598,30 @@ func (tam *TriggerActionManager) UpdateTriggerAction(srcTa *pb.TriggerAction, ad
 	} else {
 		if targetTA.Immutable { return ErrTaImmutable }
 
+		//if target ta trigger had a sequenceChecker assigned, remove it
+		if _,match := targetTA.Trigger.(*pb.TriggerAction_GroupReceiveSequence); match {
+			tam.groupReceiveSequenceCheckersMutex.Lock()
+			delete(tam.groupReceiveSequenceCheckers, targetTA)
+			tam.groupReceiveSequenceCheckersMutex.Unlock()
+		}
+
 		targetTA.OneShot = srcTa.OneShot
 		targetTA.IsActive = srcTa.IsActive
 		targetTA.Immutable = srcTa.Immutable
 		targetTA.Action = srcTa.Action
 		targetTA.Trigger = srcTa.Trigger
+
+		//if new ta trigger is GroupReceiveSequence, add a SequenceChecker
+		if triggerGrpRcv,match := targetTA.Trigger.(*pb.TriggerAction_GroupReceiveSequence); match {
+			tam.groupReceiveSequenceCheckersMutex.Lock()
+			tam.groupReceiveSequenceCheckers[targetTA] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveSequence.Values, triggerGrpRcv.GroupReceiveSequence.IgnoreOutOfOrder)
+			tam.groupReceiveSequenceCheckersMutex.Unlock()
+		}
 		return nil
 	}
+
+
+
 }
 
 func (tam *TriggerActionManager) ClearTriggerActions(keepImmutable bool) (err error) {
@@ -325,6 +640,11 @@ func (tam *TriggerActionManager) ClearTriggerActions(keepImmutable bool) (err er
 		}
 	}
 	tam.registeredTriggerActions.TriggerActions = newTas
+
+	tam.groupReceiveSequenceCheckersMutex.Lock()
+	defer tam.groupReceiveSequenceCheckersMutex.Unlock()
+	tam.groupReceiveSequenceCheckers = make(map[*pb.TriggerAction]*util.ValueSequenceChecker)
+
 	return nil
 }
 
@@ -341,7 +661,7 @@ func (tam *TriggerActionManager) GetCurrentTriggerActionSet() (ta *pb.TriggerAct
 }
 
 func (tam *TriggerActionManager) Start() {
-	tam.evtRcv = tam.rootSvc.SubSysEvent.RegisterReceiver(common_web.EVT_TRIGGER) // ToDo: change to trigger event type, once defined
+	tam.evtRcv = tam.rootSvc.SubSysEvent.RegisterReceiver(common_web.EVT_TRIGGER)
 	go tam.processing_loop()
 }
 
@@ -357,6 +677,10 @@ func NewTriggerActionManager(rootService *Service) (tam *TriggerActionManager) {
 		},
 		registeredTriggerActionMutex: &sync.Mutex{},
 		rootSvc: rootService,
+
+
+		groupReceiveSequenceCheckers: make(map[*pb.TriggerAction]*util.ValueSequenceChecker),
+		groupReceiveSequenceCheckersMutex: &sync.Mutex{},
 	}
 
 	return tam

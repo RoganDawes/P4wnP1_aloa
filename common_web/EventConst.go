@@ -10,13 +10,15 @@ const (
 type EvtTriggerType int64
 
 const (
-	EVT_TRIGGER_TYPE_SERVICE_STARTED         = EvtTriggerType(0)
-	EVT_TRIGGER_TYPE_USB_GADGET_CONNECTED    = EvtTriggerType(1)
-	EVT_TRIGGER_TYPE_USB_GADGET_DISCONNECTED = EvtTriggerType(2)
-	EVT_TRIGGER_TYPE_WIFI_AP_STARTED         = EvtTriggerType(3)
-	EVT_TRIGGER_TYPE_WIFI_CONNECTED_AS_STA   = EvtTriggerType(4)
-	EVT_TRIGGER_TYPE_SSH_LOGIN               = EvtTriggerType(5)
-	EVT_TRIGGER_TYPE_DHCP_LEASE_GRANTED      = EvtTriggerType(6)
+	TRIGGER_EVT_TYPE_SERVICE_STARTED         = EvtTriggerType(0)
+	TRIGGER_EVT_TYPE_USB_GADGET_CONNECTED    = EvtTriggerType(1)
+	TRIGGER_EVT_TYPE_USB_GADGET_DISCONNECTED = EvtTriggerType(2)
+	TRIGGER_EVT_TYPE_WIFI_AP_STARTED         = EvtTriggerType(3)
+	TRIGGER_EVT_TYPE_WIFI_CONNECTED_AS_STA   = EvtTriggerType(4)
+	TRIGGER_EVT_TYPE_SSH_LOGIN               = EvtTriggerType(5)
+	TRIGGER_EVT_TYPE_DHCP_LEASE_GRANTED      = EvtTriggerType(6)
+	TRIGGER_EVT_TYPE_GPIO_IN                 = EvtTriggerType(7)
+	TRIGGER_EVT_TYPE_GROUP_RECEIVE           = EvtTriggerType(8) //used for group receive and group receive sequence
 )
 
 const (

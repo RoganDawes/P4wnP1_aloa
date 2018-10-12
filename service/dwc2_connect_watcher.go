@@ -56,12 +56,12 @@ func (d * Dwc2ConnectWatcher) update(newStateConnected bool) {
 	// --> here a event could be triggered (in case the event manager is registered)
 	if d.connected {
 		fmt.Println("Connected to USB host")
-		d.rootSvc.SubSysEvent.Emit(ConstructEventTrigger(common_web.EVT_TRIGGER_TYPE_USB_GADGET_CONNECTED))
+		d.rootSvc.SubSysEvent.Emit(ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_USB_GADGET_CONNECTED))
 		d.rootSvc.SubSysEvent.Emit(ConstructEventLog("USB watcher", 1, "Connected to USB host"))
 
 	} else {
 		fmt.Println("Disconnected from USB host")
-		d.rootSvc.SubSysEvent.Emit(ConstructEventTrigger(common_web.EVT_TRIGGER_TYPE_USB_GADGET_DISCONNECTED))
+		d.rootSvc.SubSysEvent.Emit(ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_USB_GADGET_DISCONNECTED))
 		d.rootSvc.SubSysEvent.Emit(ConstructEventLog("USB watcher", 1, "Disconnected from USB host"))
 	}
 }
