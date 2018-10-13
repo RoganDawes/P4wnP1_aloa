@@ -129,7 +129,7 @@ func (dst *jsTriggerAction) fromGo(src *pb.TriggerAction) {
 	switch srcTrigger := src.Trigger.(type) {
 	case *pb.TriggerAction_SshLogin:
 		dst.ChangeTriggerType(TriggerSshLogin)
-		dstTrigger := &jsTriggerSSHLogin{Object: dst.ActionData}
+		dstTrigger := &jsTriggerSSHLogin{Object: dst.TriggerData}
 		dstTrigger.LoginUser = srcTrigger.SshLogin.LoginUser
 	case *pb.TriggerAction_DhcpLeaseGranted:
 		dst.ChangeTriggerType(TriggerDhcpLeaseGranted)
@@ -145,18 +145,18 @@ func (dst *jsTriggerAction) fromGo(src *pb.TriggerAction) {
 		dst.ChangeTriggerType(TriggerServiceStarted)
 	case *pb.TriggerAction_GpioIn:
 		dst.ChangeTriggerType(TriggerGPIOIn)
-		dstTrigger := &jsTriggerGPIOIn{Object: dst.ActionData}
+		dstTrigger := &jsTriggerGPIOIn{Object: dst.TriggerData}
 		dstTrigger.GpioNum = GPIONum(srcTrigger.GpioIn.GpioNum)
 		dstTrigger.Edge = GPIOInEdge(srcTrigger.GpioIn.GpioInEdge)
 		dstTrigger.PullUpDown = GPIOInPullUpDown(srcTrigger.GpioIn.PullUpDown)
 	case *pb.TriggerAction_GroupReceive:
 		dst.ChangeTriggerType(TriggerGroupReceive)
-		dstTrigger := &jsTriggerGroupReceive{Object: dst.ActionData}
+		dstTrigger := &jsTriggerGroupReceive{Object: dst.TriggerData}
 		dstTrigger.GroupName = srcTrigger.GroupReceive.GroupName
 		dstTrigger.Value = srcTrigger.GroupReceive.Value
 	case *pb.TriggerAction_GroupReceiveSequence:
 		dst.ChangeTriggerType(TriggerGroupReceiveSequence)
-		dstTrigger := &jsTriggerGroupReceiveSequence{Object: dst.ActionData}
+		dstTrigger := &jsTriggerGroupReceiveSequence{Object: dst.TriggerData}
 		dstTrigger.GroupName = srcTrigger.GroupReceiveSequence.GroupName
 		dstTrigger.ValueSequence = srcTrigger.GroupReceiveSequence.Values
 	default:

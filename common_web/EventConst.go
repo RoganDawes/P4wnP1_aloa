@@ -3,8 +3,8 @@ package common_web
 const (
 	EVT_ANY     = int64(0)
 	EVT_LOG     = int64(1)
-	EVT_HID     = int64(2)
-	EVT_TRIGGER = int64(2)
+	EVT_HID     = int64(3)
+	EVT_TRIGGER = int64(4)
 )
 
 type EvtTriggerType int64
