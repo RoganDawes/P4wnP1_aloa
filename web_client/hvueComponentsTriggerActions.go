@@ -437,6 +437,24 @@ func InitComponentsTriggerActions() {
 		"action",
 		hvue.Props("ta"),
 		hvue.Template(templateAction),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := struct {
+				*js.Object
+				ShowSelectHIDScriptModal bool   `js:"ShowSelectHIDScriptModal"`
+				ShowSelectBashScriptModal bool   `js:"ShowSelectBashScriptModal"`
+			}{Object: O()}
+			data.ShowSelectHIDScriptModal = false
+			data.ShowSelectBashScriptModal = false
+			return &data
+		}),
+		hvue.Method("updateStoredHIDScriptsList",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST)
+			}),
+		hvue.Method("updateStoredBashScriptsList",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST)
+			}),
 		hvue.Computed("actiontypes", func(vm *hvue.VM) interface{} {
 			return generateSelectOptionsAction()
 		}),
@@ -658,24 +676,28 @@ const templateAction = `
 			</q-item>
 
 			<q-item tag="label" v-if="isActionBashScript">
-				<modalLoadBashScript ref="bashScriptSelect"></modalLoadBashScript>
+<select-string-from-array :values="this.$store.state.StoredBashScriptsList" v-model="ShowSelectBashScriptModal" title="Select BASH script" @load="ta.ActionData.ScriptName=$event"></select-string-from-array>
 				<q-item-main>
 					<q-item-tile label>Script path</q-item-tile>
 					<q-item-tile sublabel>Path to the BashScript which should be issued</q-item-tile>
 					<q-item-tile>
-						<q-input v-model="ta.ActionData.ScriptName" color="secondary" inverted readonly :after="[{icon: 'more_horiz', handler(){$refs.bashScriptSelect.setVisible(true)}}]" :disable="!ta.IsActive"></q-input>
+<q-input @click="updateStoredBashScriptsList();ShowSelectBashScriptModal=true" v-model="ta.ActionData.ScriptName" color="secondary" inverted readonly :after="[{icon: 'more_horiz', handler(){}}]" :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
 
 			<q-item tag="label" v-if="isActionHidScript">
+<select-string-from-array :values="this.$store.state.StoredHIDScriptsList" v-model="ShowSelectHIDScriptModal" title="Select HIDScript" @load="ta.ActionData.ScriptName=$event"></select-string-from-array>
+
 				<q-item-main>
 					<q-item-tile label>Script name</q-item-tile>
 					<q-item-tile sublabel>Name of a stored HIDScript</q-item-tile>
 					<q-item-tile>
-						<q-input v-model="ta.ActionData.ScriptName" color="secondary" inverted :disable="!ta.IsActive"></q-input>
+<q-input @click="updateStoredHIDScriptsList();ShowSelectHIDScriptModal=true" v-model="ta.ActionData.ScriptName" color="secondary" inverted readonly :after="[{icon: 'more_horiz', handler(){}}]" :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
 				</q-item-main>
+				
+				
 			</q-item>
 
 			<q-item tag="label" v-if="isActionGPIOOut">

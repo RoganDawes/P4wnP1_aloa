@@ -13,9 +13,8 @@ type CompHIDScriptCodeEditorData struct {
 	CodeMirrorOptions *CodeMirrorOptionsType `js:"codemirrorOptions"`
 }
 
-func (data *CompHIDScriptCodeEditorData) SendAndRun(vm *hvue.VM) {
-	sourceCode := vm.Get("scriptContent").String()
-
+func SendAndRun(vm *hvue.VM) {
+	sourceCode := vm.Get("$store").Get("state").Get("currentHIDScriptSource").String()
 	md5 := StringToMD5(sourceCode) //Calculate MD5 hexstring of current script content
 
 	go func() {
@@ -80,7 +79,7 @@ func InitComponentsHIDScript() {
 		"hid-script-code-editor",
 		hvue.Template(compHIDScriptCodeEditorTemplate),
 		hvue.DataFunc(newCompHIDScriptCodeEditorData),
-		hvue.MethodsOf(&CompHIDScriptCodeEditorData{}),
+		hvue.Method("SendAndRun",	SendAndRun),
 		hvue.ComputedWithGetSet(
 			"scriptContent",
 			func(vm *hvue.VM) interface{} {
@@ -94,6 +93,21 @@ func InitComponentsHIDScript() {
 	hvue.NewComponent(
 		"hid-script",
 		hvue.Template(compHIDScriptTemplate),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := struct {
+				*js.Object
+				ShowLoadHIDScriptModal bool   `js:"ShowLoadHIDScriptModal"`
+				ShowStoreHIDScriptModal bool   `js:"ShowStoreHIDScriptModal"`
+			}{Object: O()}
+			data.ShowLoadHIDScriptModal = false
+			data.ShowStoreHIDScriptModal = false
+			return &data
+		}),
+		hvue.Method("updateStoredHIDScriptsList",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST)
+			}),
+		hvue.Method("SendAndRun",	SendAndRun),
 	)
 }
 
@@ -101,7 +115,32 @@ const (
 
 	compHIDScriptTemplate = `
 <q-page padding>
+	<modal-string-input v-model="ShowStoreHIDScriptModal" title="Store HIDScript" @save=""></modal-string-input>
+	<select-string-from-array :values="this.$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptModal" title="Load HIDScript to editor" @load=""></select-string-from-array>
+
+
 	<div class="row gutter-sm">
+
+		<div class="col-12">
+			<q-card>
+  				<q-card-title>
+    				HIDScript editor
+  				</q-card-title>
+
+				<q-card-main>
+					<div class="row gutter-sm">
+	    				<div class="col-12 col-sm"><q-btn class="fit" color="primary" label="run" @click="SendAndRun()" icon="play_circle_filled" /></div>
+    					<div class="col-12 col-sm"><q-btn class="fit" color="secondary" label="store" icon="save" @click="ShowStoreHIDScriptModal=true" /></div>
+    					<div class="col-12 col-sm"><q-btn class="fit" color="warning" label="load & replace" icon="settings_backup_restore" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptModal=true"/></div>
+    					<div class="col-12 col-sm"><q-btn class="fit" color="warning" label="load & prepend" icon="add_to_photos" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptModal=true"/></div>
+    					<!-- <div class="col-12 col-sm"><q-btn class="fit" color="warning" label="load & add" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" /></div> -->
+					</div>
+  				</q-card-main>
+
+			</q-card>
+		</div>
+
+
 		<div class="col-12 col-md-7 col-lg-8 col-xl-9">
 			<hid-script-code-editor></hid-script-code-editor>
 		</div>
@@ -116,18 +155,11 @@ const (
 `
 	compHIDScriptCodeEditorTemplate = `
 	<q-card class="full-height">
+<!--
   		<q-card-title>
     		HIDScript editor
   		</q-card-title>
-
-		<q-card-separator />
-
-		<q-card-actions>
-    		<q-btn color="primary" @click="SendAndRun()">run</q-btn>
-		</q-card-actions>
-
-		<q-card-separator />
-
+-->
 		<q-card-main>
 			<codemirror v-model="scriptContent" :options="codemirrorOptions"></codemirror>
 	  	</q-card-main>

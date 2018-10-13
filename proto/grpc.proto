@@ -59,6 +59,10 @@ service P4WNP1 {
     rpc StoreTriggerActionSet(TriggerActionSet) returns (Empty) {}
     rpc DeployStoredTriggerActionSetReplace(StringMessage) returns (TriggerActionSet) {} // Adds a set of additional TriggerActions, returns a set of all Triggeractions registered afterwards
     rpc DeployStoredTriggerActionSetAdd(StringMessage) returns (TriggerActionSet) {} // Replaces registered TriggerActions with given set, returns a set ONLY OF ADDED TriggerActions (with assigned IDs)
+
+
+    rpc ListStoredHIDScripts(Empty) returns (StringMessageArray) {}
+    rpc ListStoredBashScripts(Empty) returns (StringMessageArray) {}
 }
 
 /* Triggers, Actions and resulting TriggerActions */

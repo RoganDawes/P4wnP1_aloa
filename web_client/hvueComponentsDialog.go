@@ -120,7 +120,7 @@ const templateSelectStringModal = `
 				<q-item tag="label">
 					<q-item-main>
 						<q-item-tile>
-							<q-btn color="primary" v-show="CurrentSelection != undefined" label="load" @click="onLoadPressed(); visible=false"/>							
+							<q-btn color="primary" v-show="CurrentSelection != undefined" label="ok" @click="onLoadPressed(); visible=false"/>							
 							<q-btn color="secondary" v-close-overlay label="close" />
 						</q-item-tile>
 					</q-item-main>

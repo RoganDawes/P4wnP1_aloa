@@ -299,16 +299,16 @@ func (ta *jsTriggerAction) ChangeActionType(newAt actionType) {
 		data = d.Object
 	case ActionHidScript:
 		d := &jsActionStartHIDScript{Object:O()}
-		d.ScriptName = "some-hid-script.js"
+		d.ScriptName = ""
 		data = d.Object
 	case ActionDeploySettingsTemplate:
 		d := &jsActionDeploySettingsTemplate{Object:O()}
-		d.TemplateName = "some-template"
+		d.TemplateName = ""
 		d.Type = availableTemplateTypes[0]
 		data = d.Object
 	case ActionBashScript:
 		d := &jsActionStartBashScript{Object:O()}
-		d.ScriptName = "some-bash-script.sh"
+		d.ScriptName = ""
 		data = d.Object
 	case ActionGPIOOut:
 		d := &jsActionGPIOOut{Object:O()}

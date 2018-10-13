@@ -226,7 +226,7 @@ func (tam *TriggerActionManager) onWifiConnectedAsSta(evt *pb.Event, ta *pb.Trig
 }
 
 func (tam *TriggerActionManager) onWifiApStarted(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
-	//ToDo: filter by AP name
+	//ToDo: provide AP name with event and hand it over to the action
 	// always triggers
 	tam.executeAction(evt, ta, tt, at)
 	return nil
@@ -252,7 +252,7 @@ func (tam *TriggerActionManager) onUsbGadgetDisconnected(evt *pb.Event, ta *pb.T
 }
 
 func (tam *TriggerActionManager) onGpioIn(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
-	// only triggers if PIN matches
+	//ToDo: only trigger if PIN matches, important: Enum values have to be parsed for matching (0 != PIN0)
 	tam.executeAction(evt, ta, tt, at)
 	return nil
 }
@@ -326,15 +326,14 @@ func (tam *TriggerActionManager) executeAction(evt *pb.Event, ta *pb.TriggerActi
 }
 
 
-func (tam *TriggerActionManager) executeActionGroupSend(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionGroupSend) {
+func (tam *TriggerActionManager) executeActionDeploySettingsTemplate(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionDeploySettingsTemplate) {
 	triggerName := triggerTypeString[tt]
 	actionName := actionTypeString[at]
 
-	groupName := action.GroupName
-	value := action.Value
-	fmt.Printf("Trigger '%s' fired -> executing action '%s' ('%s': %d)\n", triggerName, actionName, groupName, value)
+	templateTypeName := pb.ActionDeploySettingsTemplate_TemplateType_name[int32(action.Type)]
+	fmt.Printf("Trigger '%s' fired -> executing action '%s' (%s: '%s')\n", triggerName, actionName, templateTypeName, action.TemplateName)
 
-	tam.rootSvc.SubSysEvent.Emit(ConstructEventTriggerGroupReceive(groupName, value))
+	// ToDo: Implement
 }
 
 func (tam *TriggerActionManager) executeActionGPIOOut(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionGPIOOut) {
@@ -347,6 +346,16 @@ func (tam *TriggerActionManager) executeActionGPIOOut(evt *pb.Event, ta *pb.Trig
 	// ToDo: Implement
 }
 
+func (tam *TriggerActionManager) executeActionGroupSend(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionGroupSend) {
+	triggerName := triggerTypeString[tt]
+	actionName := actionTypeString[at]
+
+	groupName := action.GroupName
+	value := action.Value
+	fmt.Printf("Trigger '%s' fired -> executing action '%s' ('%s': %d)\n", triggerName, actionName, groupName, value)
+
+	tam.rootSvc.SubSysEvent.Emit(ConstructEventTriggerGroupReceive(groupName, value))
+}
 
 func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionStartHIDScript) {
 	triggerName := triggerTypeString[tt]
@@ -413,16 +422,6 @@ func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *
 	}
 
 	return
-}
-
-func (tam *TriggerActionManager) executeActionDeploySettingsTemplate(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionDeploySettingsTemplate) {
-	triggerName := triggerTypeString[tt]
-	actionName := actionTypeString[at]
-
-	templateTypeName := pb.ActionDeploySettingsTemplate_TemplateType_name[int32(action.Type)]
-	fmt.Printf("Trigger '%s' fired -> executing action '%s' (%s: '%s')\n", triggerName, actionName, templateTypeName, action.TemplateName)
-
-	// ToDo: Implement
 }
 
 func (tam *TriggerActionManager) executeActionBashScript(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionStartBashScript) {
@@ -510,37 +509,6 @@ func (tam *TriggerActionManager) executeActionLog(evt *pb.Event, ta *pb.TriggerA
 	fmt.Printf("Trigger '%s' fired -> executing action '%s'\n", triggerName, actionName)
 	tam.rootSvc.SubSysEvent.Emit(ConstructEventLog("TriggerAction", 0, logMessage))
 }
-
-/*
-func (tam *TriggerActionManager) fireActionNoArgs(ta *pb.TriggerAction) (err error ) {
-	switch actionType := ta.Action.(type) {
-	case *pb.TriggerAction_BashScript:
-		bs := actionType.BashScript
-		scriptPath := PATH_BASH_SCRIPTS + "/" + bs.ScriptName
-		go common.RunBashScriptEnv(scriptPath)
-		fmt.Printf("Fire bash script '%s'\n", scriptPath)
-	case *pb.TriggerAction_HidScript:
-		// ToDo: Implement
-		hs := actionType.HidScript
-		fmt.Printf("Placeholder: Starting HID script '%s'\n", hs.ScriptName)
-	case *pb.TriggerAction_DeploySettingsTemplate:
-		// ToDo: Implement
-		st := actionType.DeploySettingsTemplate
-		strType := pb.ActionDeploySettingsTemplate_TemplateType_name[int32(st.Type)]
-		fmt.Printf("Placeholder: Deploy settings template of type [%s] with name '%s'\n", strType, st.TemplateName)
-	case *pb.TriggerAction_Log:
-		fmt.Printf("Logging trigger '%+v'\n", ta.Trigger)
-	case *pb.TriggerAction_GroupSend:
-		tam.executeActionGroupSend(ta, actionType.GroupSend)
-	case *pb.TriggerAction_GpioOut:
-		tam.executeActionGPIOOut(ta, actionType.GpioOut)
-
-	}
-	return nil
-}
-*/
-
-
 
 // checks if the triggerType of the given event (if trigger event at all), matches the TriggerType of the TriggerAction
 func taTriggerTypeMatchesEvtTriggerType(ttype triggerType, evt *pb.Event) bool {

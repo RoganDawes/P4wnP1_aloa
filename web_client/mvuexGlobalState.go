@@ -42,6 +42,13 @@ const (
 	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO = "setCurrentHIDScriptSource"
 	VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST    = "setStoredWifiSettingsList"
 
+
+	VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST = "updateStoredBashScriptsList"
+	VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST = "updateStoredHIDScriptsList"
+
+	VUEX_MUTATION_SET_STORED_BASH_SCRIPTS_LIST    = "setStoredBashScriptsList"
+	VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST    = "setStoredHIDScriptsList"
+
 	VUEX_MUTATION_SET_STORED_TRIGGER_ACTIONS_SETS_LIST = "setStoredTriggerActionSetsList"
 
 	initHIDScript = `layout('us');			// US keyboard layout
@@ -93,6 +100,8 @@ type GlobalState struct {
 
 	StoredWifiSettingsList []string `js:"StoredWifiSettingsList"`
 	StoredTriggerActionSetsList []string `js:"StoredTriggerActionSetsList"`
+	StoredBashScriptsList []string `js:"StoredBashScriptsList"`
+	StoredHIDScriptsList []string `js:"StoredHIDScriptsList"`
 }
 
 func createGlobalStateStruct() GlobalState {
@@ -110,6 +119,8 @@ func createGlobalStateStruct() GlobalState {
 
 	state.StoredWifiSettingsList = []string{}
 	state.StoredTriggerActionSetsList = []string{}
+	state.StoredBashScriptsList = []string{}
+	state.StoredHIDScriptsList = []string{}
 	//Retrieve Interface settings
 	// ToDo: Replace panics by default values
 	ifSettings, err := RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second * 5)
@@ -128,6 +139,44 @@ func createGlobalStateStruct() GlobalState {
 	state.WiFiState = NewWiFiState()
 	return state
 }
+
+func actionUpdateStoredBashScriptsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch stored BasScripts list")
+		//fetch deployed gadget settings
+		wsList, err := RpcClient.GetStoredBashScriptsList(defaultTimeout)
+		if err != nil {
+			println("Couldn't retrieve stored BasScripts list")
+			return
+		}
+
+		//commit to current
+		println(wsList)
+		context.Commit(VUEX_MUTATION_SET_STORED_BASH_SCRIPTS_LIST, wsList)
+	}()
+
+	return
+}
+
+func actionUpdateStoredHIDScriptsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch stored HIDScripts list")
+		//fetch deployed gadget settings
+		wsList, err := RpcClient.GetStoredHIDScriptsList(defaultTimeout)
+		if err != nil {
+			println("Couldn't retrieve  stored HIDScripts list")
+			return
+		}
+
+		//commit to current
+		println(wsList)
+		context.Commit(VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST, wsList)
+	}()
+
+	return
+}
+
+
 
 func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
@@ -453,6 +502,12 @@ func initMVuex() *mvuex.Store {
 			println("New ws list", wsList)
 			hvue.Set(state, "StoredWifiSettingsList", wsList)
 		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_STORED_BASH_SCRIPTS_LIST, func(store *mvuex.Store, state *GlobalState, bsList []interface{}) {
+			hvue.Set(state, "StoredBashScriptsList", bsList)
+		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST, func(store *mvuex.Store, state *GlobalState, hidsList []interface{}) {
+			hvue.Set(state, "StoredHIDScriptsList", hidsList)
+		}),
 		mvuex.Mutation(VUEX_MUTATION_SET_STORED_TRIGGER_ACTIONS_SETS_LIST, func(store *mvuex.Store, state *GlobalState, tasList []interface{}) {
 			hvue.Set(state, "StoredTriggerActionSetsList", tasList)
 		}),
@@ -484,6 +539,10 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_ADD, actionDeployStoredTriggerActionSetAdd),
 		mvuex.Action(VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_REPLACE, actionDeployTriggerActionSetReplace),
 		mvuex.Action(VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_ADD, actionDeployTriggerActionSetAdd),
+
+		mvuex.Action(VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST, actionUpdateStoredBashScriptsList),
+		mvuex.Action(VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST, actionUpdateStoredHIDScriptsList),
+
 
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
 			return state.TriggerActionList.TriggerActions

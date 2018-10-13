@@ -30,6 +30,25 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) GetStoredBashScriptsList(timeout time.Duration) (ws []string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	ma, err := rpc.Client.ListStoredBashScripts(ctx, &pb.Empty{})
+	if err != nil { return ws, err }
+	return ma.MsgArray, err
+}
+
+func (rpc *Rpc) GetStoredHIDScriptsList(timeout time.Duration) (ws []string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	ma, err := rpc.Client.ListStoredHIDScripts(ctx, &pb.Empty{})
+	if err != nil { return ws, err }
+	return ma.MsgArray, err
+}
+
+
 func (rpc *Rpc) DeployedEthernetInterfaceSettings(timeout time.Duration, settings *pb.EthernetInterfaceSettings) (err error) {
 	// ToDo: The RPC call has to return an error in case deployment fails
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)

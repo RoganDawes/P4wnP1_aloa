@@ -111,6 +111,7 @@ install:
 	# reinit service daemon
 	systemctl daemon-reload
 	# enable service
+    systemctl enable haveged
 	systemctl enable P4wnP1.service
 	# start service
 	service P4wnP1 start

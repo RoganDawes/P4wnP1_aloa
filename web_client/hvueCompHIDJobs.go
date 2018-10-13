@@ -128,10 +128,6 @@ ScriptSource   string `js:"textSource"`
 	//{ "evtype": 0, "vmId": 2, "jobId": 3, "hasError": false, "result": "null", "error": "", "message": "Script started", "time": "2018-07-30 04:56:42.297533 +0000 UTC m=+7625.097825001" }
 	compHIDJobOverviewTemplate = `
 	<q-card class="full-height">
-  		<q-card-title>
-    		HIDScript jobs
-  		</q-card-title>
-
 		<q-list>
 			<q-list-header>Running</q-list-header>
 			<hid-job-overview-item v-for="job in $store.getters.hidjobsRunning" :job="job" :key="job.id"></hid-job-overview-item>

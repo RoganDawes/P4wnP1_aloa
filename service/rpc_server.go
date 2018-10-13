@@ -46,6 +46,20 @@ type server struct {
 	listenAddrWeb string
 }
 
+func (s *server) ListStoredHIDScripts(context.Context, *pb.Empty) (*pb.StringMessageArray, error) {
+	scripts,err := ListFilesOfFolder(PATH_HID_SCRIPTS, ".js", ".javascript")
+	if err != nil { return nil,err }
+
+	return &pb.StringMessageArray{MsgArray:scripts}, nil
+}
+
+func (s *server) ListStoredBashScripts(context.Context, *pb.Empty) (*pb.StringMessageArray, error) {
+	scripts,err := ListFilesOfFolder(PATH_BASH_SCRIPTS, ".sh", ".bash")
+	if err != nil { return nil,err }
+
+	return &pb.StringMessageArray{MsgArray:scripts}, nil
+}
+
 func (s *server) DeployStoredTriggerActionSetReplace(ctx context.Context, msg *pb.StringMessage) (tas *pb.TriggerActionSet, err error) {
 	// load set from store
 	tas = &pb.TriggerActionSet{}
