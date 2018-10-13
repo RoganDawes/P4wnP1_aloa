@@ -591,7 +591,7 @@ func (srv *server) StartRpcServerAndWeb(host string, gRPCPort string, webPort st
 			//fmt.Printf("gRPC-web req:\n %v\n", req)
 			grpc_web_srv.ServeHTTP(resp, req) // if content type indicates grpc or REQUEST METHOD IS OPTIONS (pre-flight) serve gRPC-web
 		} else {
-			fmt.Printf("legacy web req:\n %v\n", req)
+			fmt.Printf("legacy web req: %v\n", req.RequestURI)
 			http.FileServer(http.Dir((absWebRoot))).ServeHTTP(resp, req)
 		}
 	}

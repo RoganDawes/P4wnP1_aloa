@@ -163,7 +163,7 @@ func (tam *TriggerActionManager) processing_loop() {
 //
 func (tam *TriggerActionManager) processTriggerEvent(evt *pb.Event) {
 	//fmt.Printf("Remaining triggerActions: %+v\n", tam.registeredTriggerAction)
-	//fmt.Printf("Received event: %+v\n", evt)
+	//fmt.Printf("TriggerActionManager Received event: %+v\n", evt)
 	tam.registeredTriggerActionMutex.Lock()
 	defer tam.registeredTriggerActionMutex.Unlock()
 
@@ -272,18 +272,20 @@ func (tam *TriggerActionManager) onGroupReceive(evt *pb.Event, ta *pb.TriggerAct
 		tam.executeAction(evt, ta, tt, at) // fire action
 		return nil
 	case triggerTypeGroupReceiveSequence:
-		//triggerValues := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.Values
+	//	fmt.Println("### Processing GroupReceive event for trigger type GroupReceiveSequence")
 		triggerGroupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.GroupName
 		if evGroupName != triggerGroupName {
-			// retrieve the sequence checker
-			if sc,exists := tam.groupReceiveSequenceCheckers[ta]; exists {
-				if sc.Check(evValue) {
-					tam.executeAction(evt, ta, tt, at) // fire action
-				}
-			}
-
-			return nil // don't handle on group mismatch, but return without error
+			return nil
 		}
+		// retrieve the sequence checker
+		if sc,exists := tam.groupReceiveSequenceCheckers[ta]; exists {
+			if sc.Check(evValue) {
+				tam.executeAction(evt, ta, tt, at) // fire action
+			}
+		//	fmt.Printf("GrpRcvSeq '%s' received '%d': %s\n", triggerGroupName, evValue, sc)
+		}
+
+		return nil // don't handle on group mismatch, but return without error
 
 
 	default:
@@ -541,7 +543,7 @@ func (tam *TriggerActionManager) AddTriggerAction(ta *pb.TriggerAction) (taAdded
 	//if new ta trigger is GroupReceiveSequence, add a SequenceChecker
 	if triggerGrpRcv,match := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence); match {
 		tam.groupReceiveSequenceCheckersMutex.Lock()
-		fmt.Printf("##### New val checker %+v\n", triggerGrpRcv.GroupReceiveSequence.Values)
+		//fmt.Printf("##### New val checker %+v\n", triggerGrpRcv.GroupReceiveSequence.Values)
 		tam.groupReceiveSequenceCheckers[ta] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveSequence.Values, triggerGrpRcv.GroupReceiveSequence.IgnoreOutOfOrder)
 		tam.groupReceiveSequenceCheckersMutex.Unlock()
 	}

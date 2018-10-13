@@ -1,9 +1,25 @@
 package util
 
+import "fmt"
+
 type ValueSequenceChecker struct {
 	values          []int32
 	allowOutOfOrder bool
 	currentPos      int
+}
+
+func (sc *ValueSequenceChecker) String() string {
+	res := "("
+	for i,v := range sc.values {
+		if i == sc.currentPos { res += "[" }
+
+		res += fmt.Sprintf("%d", v)
+
+		if i == sc.currentPos { res += "]" }
+		if i != len(sc.values)-1 { res += " "}
+	}
+	res += ")"
+	return res
 }
 
 func (sc *ValueSequenceChecker) Check(val int32) bool {
