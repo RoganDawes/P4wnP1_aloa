@@ -3,12 +3,14 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/mame82/P4wnP1_go/common"
 	"github.com/mame82/P4wnP1_go/common_web"
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"github.com/mame82/P4wnP1_go/service/util"
+	"io/ioutil"
 	"sync"
 )
 
@@ -352,7 +354,65 @@ func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *
 
 	fmt.Printf("Trigger '%s' fired -> executing action '%s' ('%s')\n", triggerName, actionName, action.ScriptName)
 
-	// ToDo: Implement
+	scriptPath := PATH_HID_SCRIPTS + "/" + action.ScriptName
+	preScript := fmt.Sprintf("TRIGGER='%s';\n", triggerName)
+
+	switch tt {
+	case triggerTypeGpioIn:
+		gpioPin := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioNum
+		gpioPinName := pb.GPIONum_name[int32(gpioPin)]
+		preScript += fmt.Sprintf("GPIO_PIN=%s;\n", gpioPinName)
+	case triggerTypeGroupReceiveSequence:
+		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.GroupName
+		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.Values
+		// create bash array of values
+		jsArray := "["
+		for idx,v := range values {
+			if idx >= len(values) - 1 {
+				jsArray += fmt.Sprintf("%d", v)
+			} else {
+				jsArray += fmt.Sprintf("%d, ", v)
+			}
+		}
+		jsArray += "]"
+		preScript += fmt.Sprintf("GROUP='%s';\n", groupName)
+		preScript += fmt.Sprintf("var VALUES=%s;\n", jsArray)
+	case triggerTypeGroupReceive:
+		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.GroupName
+		value := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.Value
+		preScript += fmt.Sprintf("GROUP='%s';\n", groupName)
+		preScript += fmt.Sprintf("VALUE=%d;\n", value)
+	case triggerTypeDhcpLeaseGranted:
+		iface := evt.Values[1].GetTstring()
+		mac := evt.Values[2].GetTstring()
+		ip := evt.Values[3].GetTstring()
+		preScript += fmt.Sprintf("DHCP_LEASE_IFACE=%s;\n", iface)
+		preScript += fmt.Sprintf("DHCP_LEASE_MAC=%s;\n", mac)
+		preScript += fmt.Sprintf("DHCP_LEASE_IP=%s;\n", ip)
+	case triggerTypeSshLogin:
+		loginUser := evt.Values[1].GetTstring()
+		preScript += fmt.Sprintf("SSH_LOGIN_USER=%s;\n", loginUser)
+
+	}
+
+	err := tam.rootSvc.SubSysUSB.HidScriptUsable()
+	if err != nil { return }
+
+	scriptFile, err := ioutil.ReadFile(scriptPath)
+	if err != nil {
+		fmt.Printf("Couldn't load HIDScript '%s': %v\n", scriptPath, err)
+		return
+	}
+
+	newScriptFile := preScript + string(scriptFile)
+
+	_,err = tam.rootSvc.SubSysUSB.HidScriptStartBackground(context.Background(), newScriptFile)
+	if err != nil {
+		fmt.Printf("Couldn't start HIDScript as background job'%s': %v\n", action.ScriptName, err)
+		return
+	}
+
+	return
 }
 
 func (tam *TriggerActionManager) executeActionDeploySettingsTemplate(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionDeploySettingsTemplate) {
@@ -395,7 +455,7 @@ func (tam *TriggerActionManager) executeActionBashScript(evt *pb.Event, ta *pb.T
 		value := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.Value
 		env = append(env,
 			fmt.Sprintf("GROUP='%s'", groupName),
-			fmt.Sprintf("VALUE=%s", value),
+			fmt.Sprintf("VALUE=%d", value),
 		)
 	case triggerTypeDhcpLeaseGranted:
 		iface := evt.Values[1].GetTstring()

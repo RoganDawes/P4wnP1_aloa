@@ -32,6 +32,13 @@ const (
 	cSTORE_PREFIX_TRIGGER_ACTION_SET = "tas_"
 )
 
+
+func NewRpcServerService(root *Service) *server {
+	return &server{
+		rootSvc:root,
+	}
+}
+
 type server struct {
 	rootSvc *Service
 
@@ -116,12 +123,6 @@ func (s *server) DeployTriggerActionSetRemove(ctx context.Context, removeTas *pb
 
 
 
-func NewRpcServerService(root *Service) *server {
-	return &server{
-		rootSvc:root,
-	}
-}
-
 func (s *server) Start() error {
 	return nil
 }
@@ -181,8 +182,6 @@ func (s *server) ListenWiFiStateChanges(ctx context.Context, empty *pb.Empty) (w
 }
 
 func (s *server) GetDeployedEthernetInterfaceSettings(ctx context.Context, req *pb.StringMessage) (resp *pb.EthernetInterfaceSettings, err error) {
-
-
 	if mi,err := s.rootSvc.SubSysNetwork.GetManagedInterface(req.Msg); err == nil {
 		return mi.GetState().CurrentSettings, nil
 	} else {
@@ -283,7 +282,7 @@ func (s *server) FSCreateTempDirOrFile(ctx context.Context, req *pb.TempDirOrFil
 }
 
 func (s *server) HIDGetRunningJobState(ctx context.Context, req *pb.HIDScriptJob) (res *pb.HIDRunningJobStateResult, err error) {
-	targetJob,err := s.rootSvc.SubSysUSB.HidCtl.GetBackgroundJobByID(int(req.Id))
+	targetJob,err := s.rootSvc.SubSysUSB.HidScriptGetBackgroundJobByID(int(req.Id))
 	if err != nil { return nil, err }
 
 	vmID,_ := targetJob.GetVMId() // ignore error, as VM ID would be -1 in error case
@@ -301,11 +300,7 @@ func (s *server) HIDGetRunningJobState(ctx context.Context, req *pb.HIDScriptJob
 }
 
 func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) (jobs *pb.HIDScriptJobList, err error) {
-	if !s.rootSvc.SubSysUSB.Usable { return nil, ErrUsbNotUsable }
-
-	if s.rootSvc.SubSysUSB.HidCtl == nil { return nil, rpcErrNoHid}
-
-	retJobs,err := s.rootSvc.SubSysUSB.HidCtl.GetAllBackgroundJobs()
+	retJobs,err := s.rootSvc.SubSysUSB.HidScriptGetAllRunningBackgroundJobs()
 	if err != nil { return nil, err }
 	jobs = &pb.HIDScriptJobList{}
 	for _, aJob := range retJobs {
@@ -315,91 +310,75 @@ func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) 
 }
 
 func (s *server) HIDCancelAllScriptJobs(ctx context.Context, rEmpty *pb.Empty) (empty *pb.Empty, err error) {
-	empty = &pb.Empty{}
-	if s.rootSvc.SubSysUSB.HidCtl == nil { return empty, rpcErrNoHid}
-
-	// Try to find script
-	s.rootSvc.SubSysUSB.HidCtl.CancelAllBackgroundJobs()
+	err = s.rootSvc.SubSysUSB.HidScriptCancelAllRunningBackgroundJobs()
 	return
 }
 
-
-
 func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) (empty *pb.Empty, err error) {
-	empty = &pb.Empty{}
-	if s.rootSvc.SubSysUSB.HidCtl == nil { return empty, rpcErrNoHid}
-
-	// Try to find script
-	job,err := s.rootSvc.SubSysUSB.HidCtl.GetBackgroundJobByID(int(sJob.Id))
-	if err != nil { return empty, err }
+	job,err := s.rootSvc.SubSysUSB.HidScriptGetBackgroundJobByID(int(sJob.Id))
+	if err != nil { return nil, err }
 
 	job.Cancel()
 	return
 }
 
 func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptRequest) (scriptRes *pb.HIDScriptResult, err error) {
-	if s.rootSvc.SubSysUSB.HidCtl == nil { return nil, rpcErrNoHid}
+	err = s.rootSvc.SubSysUSB.HidScriptUsable()
+	if err != nil { return }
 
-
-
-	if scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath); err != nil {
+	scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath)
+	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Couldn't load HIDScript '%s': %v\n", scriptReq.ScriptPath, err))
-	} else {
-		//jobCtx := context.Background()
-		jobCtx := ctx //we want to interrupt the script if the gRPC client cancels
-		// ToDo: we don't retrieve the cancelFunc which should be called to free resources. Solution: use withCancel context and call cancel by go routine on timeout
-		if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
+	}
 
+	// ToDo: we don't retrieve the cancelFunc which should be called to free resources. Solution: use withCancel context and call cancel by go routine on timeout
+	if scriptReq.TimeoutSeconds > 0 { ctx,_ = context.WithTimeout(ctx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
 
-		scriptVal,err := s.rootSvc.SubSysUSB.HidCtl.RunScript(jobCtx, string(scriptFile))
-		if err != nil { return nil,err }
-		val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
-		jsonVal,err := json.Marshal(val)
-		if err != nil {
-			return nil, errors.New(fmt.Sprintf("Script seems to have succeeded but result couldn't be converted to JSON: %v\n", err))
-		}
+	val,err := s.rootSvc.SubSysUSB.HidScriptRun(ctx, string(scriptFile))
+	if err != nil { return nil,err }
+
+	if jsonVal,err := json.Marshal(val); err == nil {
 		scriptRes = &pb.HIDScriptResult{
 			IsFinished: true,
 			Job: &pb.HIDScriptJob{Id:0},
 			ResultJson: string(jsonVal),
 		}
 		return scriptRes,nil
+	} else {
+		return nil, errors.New(fmt.Sprintf("Script seems to have succeeded but result couldn't be converted to JSON: %v\n", err))
 	}
+
 }
 
 func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptRequest) (rJob *pb.HIDScriptJob, err error) {
-	if s.rootSvc.SubSysUSB.HidCtl == nil { return nil, rpcErrNoHid}
+	err = s.rootSvc.SubSysUSB.HidScriptUsable()
+	if err != nil { return }
 
-	if scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath); err != nil {
+	scriptFile, err := ioutil.ReadFile(scriptReq.ScriptPath)
+	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Couldn't load HIDScript '%s': %v\n", scriptReq.ScriptPath, err))
-	} else {
-		//Note: Don't use the gRPC context, it would cancel after this call and thus interrupt the job immediately
-		jobCtx := context.Background()
-		// ToDo: we don't retrieve the cancelFunc which should be called to free resources. Solution: use withCancel context and call cancel by go routine on timeout
-		if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
-		job,err := s.rootSvc.SubSysUSB.HidCtl.StartScriptAsBackgroundJob(jobCtx, string(scriptFile))
-		if err != nil { return nil,err }
-
-		rJob = &pb.HIDScriptJob{
-			Id: uint32(job.Id),
-		}
-		return rJob,nil
 	}
-	return
+
+	//Note: Don't use the gRPC context, it would cancel after this call and thus interrupt the job immediately
+	jobCtx := context.Background()
+	// ToDo: we don't retrieve the cancelFunc which should be called to free resources. Solution: use withCancel context and call cancel by go routine on timeout
+	if scriptReq.TimeoutSeconds > 0 { jobCtx,_ = context.WithTimeout(jobCtx, time.Second * time.Duration(scriptReq.TimeoutSeconds))}
+	job,err := s.rootSvc.SubSysUSB.HidScriptStartBackground(jobCtx, string(scriptFile))
+	if err != nil { return nil,err }
+
+	rJob = &pb.HIDScriptJob{
+		Id: uint32(job.Id),
+	}
+	return rJob,nil
 }
 
 func (s *server) HIDGetScriptJobResult(ctx context.Context, sJob *pb.HIDScriptJob) (scriptRes *pb.HIDScriptResult, err error) {
-	if s.rootSvc.SubSysUSB.HidCtl == nil { return nil, rpcErrNoHid}
-
 	// Try to find script
-	job,err := s.rootSvc.SubSysUSB.HidCtl.GetBackgroundJobByID(int(sJob.Id))
-	if err != nil { return scriptRes, err }
+	job,err := s.rootSvc.SubSysUSB.HidScriptGetBackgroundJobByID(int(sJob.Id))
+	if err != nil { return nil, err }
 
-
-	//ToDo: check impact/behavior, because ctx is provided by gRPC server
-	scriptVal,err := s.rootSvc.SubSysUSB.HidCtl.WaitBackgroundJobResult(ctx, job)
+	val,err := s.rootSvc.SubSysUSB.HidScriptWaitBackgroundJobResult(ctx, job)
 	if err != nil { return nil,err }
-	val,_ := scriptVal.Export() //Convert to Go representation, error is always nil
 	jsonVal,err := json.Marshal(val)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Script seems to have succeeded but result couldn't be converted to JSON: %v\n", err))
@@ -410,7 +389,6 @@ func (s *server) HIDGetScriptJobResult(ctx context.Context, sJob *pb.HIDScriptJo
 		ResultJson: string(jsonVal),
 	}
 	return scriptRes,nil
-	return
 }
 
 

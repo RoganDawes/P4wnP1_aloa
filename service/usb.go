@@ -8,13 +8,13 @@ import (
 	"os/exec"
 	"strings"
 
-	pb "github.com/mame82/P4wnP1_go/proto"
-	"time"
+	"context"
 	"fmt"
+	"github.com/mame82/P4wnP1_go/hid"
+	pb "github.com/mame82/P4wnP1_go/proto"
 	"net"
 	"regexp"
-	"github.com/mame82/P4wnP1_go/hid"
-	"context"
+	"time"
 )
 
 const (
@@ -76,6 +76,7 @@ const (
 
 var (
 	ErrUsbNotUsable = errors.New("USB subsystem not available")
+	ErrHidNotUsable = errors.New("HIDScript not available (mouse and keyboard disabled)")
 	rp_usbHidDevName                      = regexp.MustCompile("(?m)DEVNAME=(.*)\n")
 )
 
@@ -91,13 +92,72 @@ type UsbGadgetManager struct {
 
 	State *UsbManagerState
 	// ToDo: variable, indicating if HIDScript is usable
-	HidCtl *hid.HIDController // Points to an HID controller instance only if keyboard and/or mouse are enabled, nil otherwise
+	hidCtl *hid.HIDController // Points to an HID controller instance only if keyboard and/or mouse are enabled, nil otherwise
 }
 
 func (gm *UsbGadgetManager) HandleEvent(event hid.Event) {
 	fmt.Printf("GADGET MANAGER HID EVENT: %+v\n", event)
 	gm.RootSvc.SubSysEvent.Emit(ConstructEventHID(event))
 }
+
+func (gm *UsbGadgetManager) HidScriptUsable() error {
+	if gm.hidCtl == nil {
+		return ErrHidNotUsable
+	}
+	return nil
+}
+
+func (gm *UsbGadgetManager) HidScriptRun(ctx context.Context, scriptContent string) (result interface{}, err error) {
+	err = gm.HidScriptUsable()
+	if err != nil {	return }
+
+	scriptVal,err := gm.hidCtl.RunScript(ctx, scriptContent)
+	if err != nil { return nil, err}
+
+	return scriptVal.Export()
+}
+
+func (gm *UsbGadgetManager) HidScriptStartBackground(ctx context.Context, scriptContent string) (job *hid.AsyncOttoJob, err error) {
+	err = gm.HidScriptUsable()
+	if err != nil {	return }
+
+	return gm.hidCtl.StartScriptAsBackgroundJob(ctx, scriptContent)
+}
+
+//WaitBackgroundJobResult(ctx context.Context, job *AsyncOttoJob) (val otto.Value, err error) {
+func (gm *UsbGadgetManager) HidScriptWaitBackgroundJobResult(ctx context.Context, job *hid.AsyncOttoJob) (result interface{}, err error) {
+	err = gm.HidScriptUsable()
+	if err != nil {	return }
+
+	scriptVal,err := gm.hidCtl.WaitBackgroundJobResult(ctx, job)
+	if err != nil { return nil, err}
+
+	return scriptVal.Export()
+}
+
+func (gm *UsbGadgetManager) HidScriptGetBackgroundJobByID(id int) (job *hid.AsyncOttoJob, err error) {
+	err = gm.HidScriptUsable()
+	if err != nil {	return }
+
+	return gm.hidCtl.GetBackgroundJobByID(id)
+}
+
+func (gm *UsbGadgetManager) HidScriptGetAllRunningBackgroundJobs() (jobs []*hid.AsyncOttoJob, err error) {
+	err = gm.HidScriptUsable()
+	if err != nil {	return }
+
+	return gm.hidCtl.GetAllBackgroundJobs()
+}
+
+func (gm *UsbGadgetManager) HidScriptCancelAllRunningBackgroundJobs() (err error) {
+	err = gm.HidScriptUsable()
+	if err != nil {	return }
+
+	gm.hidCtl.CancelAllBackgroundJobs()
+	return
+}
+
+
 
 func NewUSBGadgetManager(rooSvc *Service) (newUGM *UsbGadgetManager, err error) {
 	newUGM = &UsbGadgetManager{
@@ -674,16 +734,16 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 			devPathMouse := gm.State.DevicePath[USB_FUNCTION_HID_MOUSE_name]
 
 			var errH error
-			gm.HidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, PATH_KEYBOARD_LANGUAGE_MAPS, devPathMouse)
-			gm.HidCtl.SetEventHandler(gm)
+			gm.hidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, PATH_KEYBOARD_LANGUAGE_MAPS, devPathMouse)
+			gm.hidCtl.SetEventHandler(gm)
 			if errH != nil {
 				log.Printf("ERROR: Couldn't bring up an instance of HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s'\nReason: %v\n", devPathKeyboard, devPathMouse, PATH_KEYBOARD_LANGUAGE_MAPS, errH)
 			} else {
 				log.Printf("HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s' initialized\n", devPathKeyboard, devPathMouse, PATH_KEYBOARD_LANGUAGE_MAPS)
 			}
 		} else {
-			if gm.HidCtl != nil { gm.HidCtl.Abort() }
-			gm.HidCtl = nil
+			if gm.hidCtl != nil { gm.hidCtl.Abort() }
+			gm.hidCtl = nil
 			log.Printf("HIDController for keyboard / mouse disabled\n")
 		}
 	}
@@ -765,8 +825,8 @@ func (gm *UsbGadgetManager) DestroyAllGadgets() error {
 		}
 	}
 
-	if gm.HidCtl != nil { gm.HidCtl.Abort() }
-	gm.HidCtl = nil
+	if gm.hidCtl != nil { gm.hidCtl.Abort() }
+	gm.hidCtl = nil
 	log.Printf("HIDController for keyboard / mouse disabled\n")
 
 	return nil
