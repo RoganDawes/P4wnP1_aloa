@@ -33,12 +33,12 @@ func InitComponentsNetwork() {
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			data := &struct {
 				*js.Object
-				CurrentInterface *jsEthernetInterfaceSettings `js:"current"`
+				CurrentInterface int `js:"currentIdx"`
 				ShowStoreModal bool   `js:"showStoreModal"`
 				ShowLoadModal bool   `js:"showLoadModal"`
 				ShowDeployStoredModal bool   `js:"showDeployStoredModal"`
 			}{Object: O()}
-			data.CurrentInterface = &jsEthernetInterfaceSettings{Object: O()}
+			data.CurrentInterface = 0
 			data.ShowStoreModal = false
 			data.ShowLoadModal = false
 			data.ShowDeployStoredModal = false
@@ -56,16 +56,21 @@ func InitComponentsNetwork() {
 				option := struct {
 					*js.Object
 					Label string                       `js:"label"`
-					Value *jsEthernetInterfaceSettings `js:"value"`
+					Value int `js:"value"`
 				}{Object: O()}
 				currentIf := &jsEthernetInterfaceSettings{
 					Object: interfaces.Index(i),
 				}
 				option.Label = currentIf.Name
-				option.Value = currentIf
+				option.Value = i
 				selectIf.Call("push", option)
 			}
 			return selectIf
+		}),
+		hvue.Computed("current", func(vm *hvue.VM) interface{} {
+			interfaces := vm.Get("$store").Get("state").Get("InterfaceSettings").Get("interfaces")
+			idx := vm.Get("currentIdx").Int()
+			return interfaces.Index(idx)
 		}),
 		hvue.Computed("currentWithDhcp", func(vm *hvue.VM) interface{} {
 			if mode := vm.Get("current").Get("mode").Int(); mode == pb.EthernetInterfaceSettings_Mode_value["DHCP_SERVER"] {
@@ -294,7 +299,7 @@ const templateNetwork = `
 						<q-item-tile label>Interface</q-item-tile>
 						<q-item-tile sublabel>Select which interface to configure</q-item-tile>
 						<q-item-tile>
-							<q-select v-model="current" :options="selectOptionsInterface" color="secondary" inverted></q-select>
+							<q-select v-model="currentIdx" :options="selectOptionsInterface" color="secondary" inverted></q-select>
 						</q-item-tile>
 					</q-item-main>
 				</q-item>
