@@ -581,6 +581,34 @@ func NewWifiSettings() *jsWiFiSettings {
 }
 
 /* Network Settings */
+type jsEthernetRequestSettingsStorage struct {
+	*js.Object
+	TemplateName string `js:"TemplateName"`
+	Settings     *jsEthernetInterfaceSettings `js:"Settings"`
+}
+
+func (rs *jsEthernetRequestSettingsStorage) toGo() *pb.EthernetRequestSettingsStorage {
+	return &pb.EthernetRequestSettingsStorage{
+		Settings: rs.Settings.toGo(),
+		TemplateName: rs.TemplateName,
+	}
+}
+
+func (rs *jsEthernetRequestSettingsStorage) fromGo(src *pb.EthernetRequestSettingsStorage) {
+	rs.TemplateName = src.TemplateName
+	rs.Settings = &jsEthernetInterfaceSettings{Object:O()}
+	rs.Settings.fromGo(src.Settings)
+}
+
+func NewEthernetRequestSettingsStorage() *jsEthernetRequestSettingsStorage {
+	res := &jsEthernetRequestSettingsStorage{Object:O()}
+	res.TemplateName = ""
+	res.Settings = &jsEthernetInterfaceSettings{Object:O()}
+	return res
+}
+
+
+
 type jsEthernetSettingsList struct {
 	*js.Object
 	Interfaces *js.Object `js:"interfaces"` //every object property represents an EthernetSettings struct, the key is the interface name
@@ -594,6 +622,28 @@ func (isl *jsEthernetSettingsList) fromGo(src *pb.DeployedEthernetInterfaceSetti
 		jsIfSets.fromGo(ifSets)
 		isl.Interfaces.Call("push", jsIfSets)
 	}
+}
+
+func (isl *jsEthernetSettingsList) updateSingleInterface(updatedSettings *jsEthernetInterfaceSettings) {
+	//Options array (converted from map)
+	for i:=0; i<isl.Interfaces.Length(); i++ {
+		 settings := &jsEthernetInterfaceSettings{Object:isl.Interfaces.Index(i)}
+		 if settings.Name == updatedSettings.Name {
+		 	// this are the settings to update (== replace)
+		 	isl.Interfaces.SetIndex(i, updatedSettings)
+		 	return // we are done
+		 }
+	}
+
+	// if here, the settings haven't been found, so we add them
+	isl.Interfaces.Call("push", updatedSettings)
+
+}
+
+func NewEthernetSettingsList() (res *jsEthernetSettingsList) {
+	res = &jsEthernetSettingsList{Object:O()}
+	res.Interfaces = js.Global.Get("Array").New()
+	return
 }
 
 type jsEthernetInterfaceSettings struct {
@@ -694,7 +744,7 @@ func (src *jsDHCPServerSettings) toGo() (target *pb.DHCPServerSettings) {
 	target.DoNotBindInterface = src.DoNotBindInterface
 	target.CallbackScript = src.CallbackScript
 
-	println("jsRanges", src.Ranges)
+	//println("jsRanges", src.Ranges)
 
 	//Check if ranges are present
 	if src.Ranges != js.Undefined {

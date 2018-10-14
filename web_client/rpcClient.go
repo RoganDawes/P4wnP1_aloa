@@ -76,6 +76,15 @@ func (rpc *Rpc) DownloadFileToBytes(timeout time.Duration, filename string, fold
 }
 
 
+func (rpc *Rpc) GetStoredEthernetInterfaceSettingsList(timeout time.Duration) (eis []string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	ma, err := rpc.Client.ListStoredEthernetInterfaceSettings(ctx, &pb.Empty{})
+	if err != nil { return eis, err }
+	return ma.MsgArray, err
+}
+
 func (rpc *Rpc) GetStoredBashScriptsList(timeout time.Duration) (ws []string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -140,6 +149,15 @@ func (rpc *Rpc) GetStoredWifiSettings(timeout time.Duration, req *pb.StringMessa
 	return
 }
 
+func (rpc *Rpc) DeployStoredWifiSettings(timeout time.Duration, req *pb.StringMessage) (state *pb.WiFiState, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	state, err = rpc.Client.DeployStoredWifiSettings(ctx, req)
+
+	return
+}
+
 
 func (rpc *Rpc) GetWifiState(timeout time.Duration) (state *jsWiFiState, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
@@ -190,6 +208,34 @@ func (rpc *Rpc) GetAllDeployedEthernetInterfaceSettings(timeout time.Duration) (
 	}
 	*/
 }
+
+func (rpc *Rpc) StoreEthernetInterfaceSettings(timeout time.Duration, req *pb.EthernetRequestSettingsStorage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_, err = rpc.Client.StoreEthernetInterfaceSettings(ctx, req)
+
+	return
+}
+
+func (rpc *Rpc) GetStoredEthernetInterfaceSettings(timeout time.Duration, req *pb.StringMessage) (settings *pb.EthernetInterfaceSettings, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	settings, err = rpc.Client.GetStoredEthernetInterfaceSettings(ctx, req)
+
+	return
+}
+
+func (rpc *Rpc) DeployStoredEthernetInterfaceSettings(timeout time.Duration, req *pb.StringMessage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_,err = rpc.Client.DeployStoredEthernetInterfaceSettings(ctx, req)
+
+	return
+}
+
 
 func (rpc *Rpc) GetRunningHidJobStates(timeout time.Duration) (states []*pb.HIDRunningJobStateResult, err error) {
 	println("GetRunningHidJobStates called")

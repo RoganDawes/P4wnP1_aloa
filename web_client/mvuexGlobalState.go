@@ -7,6 +7,7 @@ import (
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 	"github.com/mame82/hvue"
 	"github.com/mame82/mvuex"
+	"github.com/pkg/errors"
 	"path/filepath"
 	"strings"
 	"time"
@@ -17,50 +18,66 @@ var globalState *GlobalState
 const (
 	maxLogEntries = 500
 
-	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS              = "updateRunningHidJobs"
+	//HIDScripts and jobs
+	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS                           = "updateRunningHidJobs"
+	VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST                    = "updateStoredHIDScriptsList"
+	VUEX_ACTION_UPDATE_CURRENT_HID_SCRIPT_SOURCE_FROM_REMOTE_FILE = "updateCurrentHidScriptSourceFromRemoteFile"
+	VUEX_ACTION_STORE_CURRENT_HID_SCRIPT_SOURCE_TO_REMOTE_FILE    = "storeCurrentHidScriptSourceToRemoteFile"
+
+	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO = "setCurrentHIDScriptSource"
+	VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST      = "setStoredHIDScriptsList"
+
+	//USBGadget
 	VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS       = "deployCurrentGadgetSettings"
 	VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED = "updateCurrentGadgetSettingsFromDeployed"
-	VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS   = "deployEthernetInterfaceSettings"
-	VUEX_ACTION_UPDATE_WIFI_STATE                    = "updateCurrentWifiSettingsFromDeployed"
-	VUEX_ACTION_DEPLOY_WIFI_SETTINGS                 = "deployWifiSettings"
 
+	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO = "setCurrentGadgetSettings"
 
-	VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER = "updateCurrentTriggerActionsFromServer"
-	VUEX_ACTION_ADD_NEW_TRIGGER_ACTION                   = "addTriggerAction"
-	VUEX_ACTION_REMOVE_TRIGGER_ACTIONS                   = "removeTriggerActions"
-	VUEX_ACTION_STORE_TRIGGER_ACTION_SET                 = "storeTriggerActionSet"
-	VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST   = "updateStoredTriggerActionSetsList"
-	VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_REPLACE = "deployStoredTriggerActionSetReplace"
-	VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_ADD     = "deployStoredTriggerActionSetAdd"
-	VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_REPLACE        = "deployCurrentTriggerActionSetReplace"
-	VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_ADD            = "deployCurrentTriggerActionSetAdd"
+	// Ethernet
+	VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS                = "updateAllEthernetInterfaceSettings"
+	VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS             = "deployEthernetInterfaceSettings"
+	VUEX_ACTION_STORE_ETHERNET_INTERFACE_SETTINGS              = "storeEthernetInterfaceSettings"
+	VUEX_ACTION_LOAD_ETHERNET_INTERFACE_SETTINGS               = "loadEthernetInterfaceSettings"
+	VUEX_ACTION_DEPLOY_STORED_ETHERNET_INTERFACE_SETTINGS      = "deployStoredEthernetInterfaceSettings"
+	VUEX_ACTION_UPDATE_STORED_ETHERNET_INTERFACE_SETTINGS_LIST = "updateStoredEthernetInterfaceSettingsList"
 
+	VUEX_MUTATION_SET_STORED_ETHERNET_INTERFACE_SETTINGS_LIST = "setStoredEthernetInterfaceSettingsList"
+	VUEX_MUTATION_SET_ALL_ETHERNET_INTERFACE_SETTINGS         = "setAllEthernetInterfaceSettings"
+	VUEX_MUTATION_SET_SINGLE_ETHERNET_INTERFACE_SETTINGS      = "setSingleEthernetInterfaceSettings"
+
+	//WiFi
+	VUEX_ACTION_UPDATE_WIFI_STATE                = "updateCurrentWifiSettingsFromDeployed"
+	VUEX_ACTION_DEPLOY_WIFI_SETTINGS             = "deployWifiSettings"
 	VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST = "updateStoredWifiSettingsList"
 	VUEX_ACTION_STORE_WIFI_SETTINGS              = "storeWifiSettings"
 	VUEX_ACTION_LOAD_WIFI_SETTINGS               = "loadWifiSettings"
+	VUEX_ACTION_DEPLOY_STORED_WIFI_SETTINGS      = "deployStoredWifiSettings"
 
-	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO   = "setCurrentGadgetSettings"
-	VUEX_MUTATION_SET_WIFI_STATE                   = "setCurrentWifiState"
-	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO = "setCurrentHIDScriptSource"
-	VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST    = "setStoredWifiSettingsList"
+	VUEX_MUTATION_SET_WIFI_STATE                = "setCurrentWifiState"
+	VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST = "setStoredWifiSettingsList"
+	VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS     = "setCurrentWifiSettings"
 
-
-	VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST = "updateStoredBashScriptsList"
-	VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST = "updateStoredHIDScriptsList"
-	VUEX_ACTION_UPDATE_CURRENT_HID_SCRIPT_SOURCE_FROM_REMOTE_FILE              = "updateCurrentHidScriptSourceFromRemoteFile"
-	VUEX_ACTION_STORE_CURRENT_HID_SCRIPT_SOURCE_TO_REMOTE_FILE               = "storeCurrentHidScriptSourceToRemoteFile"
-
-
-	VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS  = "setCurrentWifiSettings"
-	VUEX_MUTATION_SET_STORED_BASH_SCRIPTS_LIST    = "setStoredBashScriptsList"
-	VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST    = "setStoredHIDScriptsList"
+	//TriggerActions
+	VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER = "updateCurrentTriggerActionsFromServer"
+	VUEX_ACTION_ADD_NEW_TRIGGER_ACTION                     = "addTriggerAction"
+	VUEX_ACTION_REMOVE_TRIGGER_ACTIONS                     = "removeTriggerActions"
+	VUEX_ACTION_STORE_TRIGGER_ACTION_SET                   = "storeTriggerActionSet"
+	VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST     = "updateStoredTriggerActionSetsList"
+	VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_REPLACE   = "deployStoredTriggerActionSetReplace"
+	VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_ADD       = "deployStoredTriggerActionSetAdd"
+	VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_REPLACE          = "deployCurrentTriggerActionSetReplace"
+	VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_ADD              = "deployCurrentTriggerActionSetAdd"
 
 	VUEX_MUTATION_SET_STORED_TRIGGER_ACTIONS_SETS_LIST = "setStoredTriggerActionSetsList"
 
+	//Bash scripts (used by TriggerActions)
+	VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST = "updateStoredBashScriptsList"
+
+	VUEX_MUTATION_SET_STORED_BASH_SCRIPTS_LIST = "setStoredBashScriptsList"
 
 	defaultTimeoutShort = time.Second * 5
-	defaultTimeout = time.Second * 10
-	defaultTimeoutMid = time.Second * 30
+	defaultTimeout      = time.Second * 10
+	defaultTimeoutMid   = time.Second * 30
 )
 
 type GlobalState struct {
@@ -72,7 +89,7 @@ type GlobalState struct {
 	CurrentlyDeployingWifiSettings   bool                    `js:"deployingWifiSettings"`
 	EventReceiver                    *jsEventReceiver        `js:"eventReceiver"`
 	HidJobList                       *jsHidJobStateList      `js:"hidJobList"`
-	TriggerActionList *jsTriggerActionSet                    `js:"triggerActionList"`
+	TriggerActionList                *jsTriggerActionSet     `js:"triggerActionList"`
 	IsModalEnabled                   bool                    `js:"isModalEnabled"`
 	IsConnected                      bool                    `js:"isConnected"`
 	FailedConnectionAttempts         int                     `js:"failedConnectionAttempts"`
@@ -80,10 +97,11 @@ type GlobalState struct {
 	//WiFiSettings                     *jsWiFiSettings         `js:"wifiSettings"`
 	WiFiState *jsWiFiState `js:"wifiState"`
 
-	StoredWifiSettingsList []string `js:"StoredWifiSettingsList"`
-	StoredTriggerActionSetsList []string `js:"StoredTriggerActionSetsList"`
-	StoredBashScriptsList []string `js:"StoredBashScriptsList"`
-	StoredHIDScriptsList []string `js:"StoredHIDScriptsList"`
+	StoredWifiSettingsList              []string `js:"StoredWifiSettingsList"`
+	StoredEthernetInterfaceSettingsList []string `js:"StoredEthernetInterfaceSettingsList"`
+	StoredTriggerActionSetsList         []string `js:"StoredTriggerActionSetsList"`
+	StoredBashScriptsList               []string `js:"StoredBashScriptsList"`
+	StoredHIDScriptsList                []string `js:"StoredHIDScriptsList"`
 }
 
 func createGlobalStateStruct() GlobalState {
@@ -100,16 +118,12 @@ func createGlobalStateStruct() GlobalState {
 	state.FailedConnectionAttempts = 0
 
 	state.StoredWifiSettingsList = []string{}
+	state.StoredEthernetInterfaceSettingsList = []string{}
 	state.StoredTriggerActionSetsList = []string{}
 	state.StoredBashScriptsList = []string{}
 	state.StoredHIDScriptsList = []string{}
 	//Retrieve Interface settings
-	// ToDo: Replace panics by default values
-	ifSettings, err := RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second * 5)
-	if err != nil {
-		panic("Couldn't retrieve interface settings")
-	}
-	state.InterfaceSettings = ifSettings
+	state.InterfaceSettings = NewEthernetSettingsList()
 
 	/*
 	wifiSettings, err := RpcClient.GetWifiState(time.Second * 5)
@@ -122,13 +136,96 @@ func createGlobalStateStruct() GlobalState {
 	return state
 }
 
+func actionUpdateAllEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) interface{} {
+
+	return NewPromise(func() (res interface{}, err error) {
+
+		ifSettings, err := RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second * 5)
+		if err != nil {
+			err = errors.New("Couldn't retrieve interface settings")
+			println(err.Error())
+			return
+		}
+
+		//commit to current
+		context.Commit(VUEX_MUTATION_SET_ALL_ETHERNET_INTERFACE_SETTINGS, ifSettings)
+		//return nil,errors.New("gone wrong")
+		return
+	})
+
+}
+
+
+func actionStoreEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, req *jsEthernetRequestSettingsStorage) {
+	go func() {
+		println("Vuex dispatch store ethernet interface settings '", req.TemplateName, "' for interface: ", req.Settings.Name)
+		// convert to Go type
+		err := RpcClient.StoreEthernetInterfaceSettings(defaultTimeout, req.toGo())
+		if err != nil {
+			QuasarNotifyError("Error storing ethernet interface Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("New ethernet interface settings stored", "", QUASAR_NOTIFICATION_POSITION_TOP)
+	}()
+}
+
+func actionLoadEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch load ethernet interface settings: ", settingsName.String())
+		// retrieve GO type EthernetInterfaceSettings
+		settings, err := RpcClient.GetStoredEthernetInterfaceSettings(defaultTimeout, &pb.StringMessage{Msg: settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error fetching stored ethernet interface Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+
+		// convert to JS representation, in order to forward to mutation
+		jsSettings := &jsEthernetInterfaceSettings{Object: O()}
+		jsSettings.fromGo(settings)
+		context.Commit(VUEX_MUTATION_SET_SINGLE_ETHERNET_INTERFACE_SETTINGS, jsSettings)
+
+		QuasarNotifySuccess("New ethernet interface settings loaded", "Interface: "+jsSettings.Name, QUASAR_NOTIFICATION_POSITION_TOP)
+	}()
+}
+
+func actionDeployStoredEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch load ethernet interface settings: ", settingsName.String())
+		// convert to Go type
+		err := RpcClient.DeployStoredEthernetInterfaceSettings(defaultTimeoutMid, &pb.StringMessage{Msg: settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error deploying stored ethernet interface Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("New ethernet interface settings deployed", "", QUASAR_NOTIFICATION_POSITION_TOP)
+
+		//we update all modelview settings of vuex, to reflect the changes
+		actionUpdateAllEthernetInterfaceSettings(store,context,state)
+	}()
+}
+
+func actionUpdateStoredEthernetInterfaceSettingsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch EthernetInterfaceSettings list")
+		//fetch deployed gadget settings
+		eisList, err := RpcClient.GetStoredEthernetInterfaceSettingsList(defaultTimeout)
+		if err != nil {
+			println("Couldn't retrieve EthernetInterfaceSettings list")
+			return
+		}
+
+		println("Fetched list: ", eisList)
+
+		context.Commit(VUEX_MUTATION_SET_STORED_ETHERNET_INTERFACE_SETTINGS_LIST, eisList)
+	}()
+
+	return
+}
+
 func actionUpdateCurrentHidScriptSourceFromRemoteFile(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, req *jsLoadHidScriptSourceReq) {
 	go func() {
 		println("Trying to update current hid script source from remote file ", req.FileName)
 
-		content,err := RpcClient.DownloadFileToBytes(defaultTimeoutMid, req.FileName, pb.AccessibleFolder_HID_SCRIPTS)
+		content, err := RpcClient.DownloadFileToBytes(defaultTimeoutMid, req.FileName, pb.AccessibleFolder_HID_SCRIPTS)
 		if err != nil {
-			QuasarNotifyError("Couldn't load HIDScript source " + req.FileName, err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
+			QuasarNotifyError("Couldn't load HIDScript source "+req.FileName, err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			//println("err", err)
 			return
 		}
@@ -162,7 +259,7 @@ func actionStoreCurrentHidScriptSourceToRemoteFile(store *mvuex.Store, context *
 		content := []byte(state.CurrentHIDScriptSource)
 		err := RpcClient.UploadBytesToFile(defaultTimeoutMid, fname, pb.AccessibleFolder_HID_SCRIPTS, content, true)
 		if err != nil {
-			QuasarNotifyError("Couldn't store HIDScript source " + fname, err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
+			QuasarNotifyError("Couldn't store HIDScript source "+fname, err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			//println("err", err)
 			return
 		}
@@ -207,8 +304,6 @@ func actionUpdateStoredHIDScriptsList(store *mvuex.Store, context *mvuex.ActionC
 
 	return
 }
-
-
 
 func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
@@ -280,7 +375,7 @@ func actionLoadWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, st
 	go func() {
 		println("Vuex dispatch load WiFi settings: ", settingsName.String())
 		// convert to Go type
-		settings,err := RpcClient.GetStoredWifiSettings(defaultTimeout, &pb.StringMessage{Msg:settingsName.String()})
+		settings, err := RpcClient.GetStoredWifiSettings(defaultTimeout, &pb.StringMessage{Msg: settingsName.String()})
 		if err != nil {
 			QuasarNotifyError("Error fetching stored WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 		}
@@ -290,6 +385,19 @@ func actionLoadWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, st
 		context.Commit(VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS, jsSettings)
 
 		QuasarNotifySuccess("New WiFi settings loaded", "", QUASAR_NOTIFICATION_POSITION_TOP)
+	}()
+}
+
+func actionDeployStoredWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch load WiFi settings: ", settingsName.String())
+		// convert to Go type
+		wstate, err := RpcClient.DeployStoredWifiSettings(defaultTimeoutMid, &pb.StringMessage{Msg: settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error deploying stored WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("New WiFi settings deployed", "", QUASAR_NOTIFICATION_POSITION_TOP)
+		state.WiFiState.fromGo(wstate)
 	}()
 }
 
@@ -349,10 +457,9 @@ func actionUpdateStoredTriggerActionSetsList(store *mvuex.Store, context *mvuex.
 	return
 }
 
-
 func actionUpdateCurrentTriggerActionsFromServer(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
-		tastate,err := RpcClient.GetDeployedTriggerActionSet(defaultTimeout)
+		tastate, err := RpcClient.GetDeployedTriggerActionSet(defaultTimeout)
 		if err != nil {
 			QuasarNotifyError("Error fetching deployed TriggerActions", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			return
@@ -361,7 +468,7 @@ func actionUpdateCurrentTriggerActionsFromServer(store *mvuex.Store, context *mv
 		// ToDo: Clear list berfore adding back elements
 		state.TriggerActionList.Flush()
 
-		for _,ta := range tastate.TriggerActions {
+		for _, ta := range tastate.TriggerActions {
 
 			jsTA := NewTriggerAction()
 			jsTA.fromGo(ta)
@@ -376,7 +483,7 @@ func actionAddNewTriggerAction(store *mvuex.Store, context *mvuex.ActionContext,
 	go func() {
 		newTA := NewTriggerAction()
 		newTA.IsActive = false // don't activate by default
-		RpcClient.DeployTriggerActionsSetAdd(defaultTimeout, &pb.TriggerActionSet{TriggerActions:[]*pb.TriggerAction{newTA.toGo()}})
+		RpcClient.DeployTriggerActionsSetAdd(defaultTimeout, &pb.TriggerActionSet{TriggerActions: []*pb.TriggerAction{newTA.toGo()}})
 
 		actionUpdateCurrentTriggerActionsFromServer(store, context, state)
 	}()
@@ -386,7 +493,7 @@ func actionAddNewTriggerAction(store *mvuex.Store, context *mvuex.ActionContext,
 
 func actionRemoveTriggerActions(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jsTas *jsTriggerActionSet) {
 	go func() {
-		RpcClient.DeployTriggerActionsSetRemove(defaultTimeout,jsTas.toGo())
+		RpcClient.DeployTriggerActionsSetRemove(defaultTimeout, jsTas.toGo())
 
 		actionUpdateCurrentTriggerActionsFromServer(store, context, state)
 	}()
@@ -413,32 +520,30 @@ func actionDeployTriggerActionSetReplace(store *mvuex.Store, context *mvuex.Acti
 	go func() {
 		tas := tasToDeploy.toGo()
 
-		_,err := RpcClient.DeployTriggerActionsSetReplace(defaultTimeout, tas)
+		_, err := RpcClient.DeployTriggerActionsSetReplace(defaultTimeout, tas)
 		if err != nil {
 			QuasarNotifyError("Error replacing TriggerActionSet with given one", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 			return
 		}
 		QuasarNotifySuccess("Replaced TriggerActionSet with given one", "", QUASAR_NOTIFICATION_POSITION_TOP)
 
-		actionUpdateCurrentTriggerActionsFromServer(store,context,state)
+		actionUpdateCurrentTriggerActionsFromServer(store, context, state)
 	}()
 }
 
 func actionDeployTriggerActionSetAdd(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, tasToDeploy *jsTriggerActionSet) {
 	go func() {
 		tas := tasToDeploy.toGo()
-		_,err := RpcClient.DeployTriggerActionsSetAdd(defaultTimeout, tas)
+		_, err := RpcClient.DeployTriggerActionsSetAdd(defaultTimeout, tas)
 		if err != nil {
 			QuasarNotifyError("Error adding given TriggerActionSet to server", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 			return
 		}
 		QuasarNotifySuccess("Added TriggerActionSet to server", "", QUASAR_NOTIFICATION_POSITION_TOP)
 
-		actionUpdateCurrentTriggerActionsFromServer(store,context,state)
+		actionUpdateCurrentTriggerActionsFromServer(store, context, state)
 	}()
 }
-
-
 
 func actionDeployStoredTriggerActionSetReplace(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jsName *js.Object) {
 	go func() {
@@ -446,16 +551,16 @@ func actionDeployStoredTriggerActionSetReplace(store *mvuex.Store, context *mvue
 		println("Vuex dispatch deploy stored TriggerActionSet as replacement: ", name)
 
 		// convert to Go type
-		msg := &pb.StringMessage{Msg:name}
+		msg := &pb.StringMessage{Msg: name}
 
-		_,err := RpcClient.DeployStoredTriggerActionsSetReplace(defaultTimeout, msg)
+		_, err := RpcClient.DeployStoredTriggerActionsSetReplace(defaultTimeout, msg)
 		if err != nil {
 			QuasarNotifyError("Error replacing TriggerActionSet with stored set", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 			return
 		}
 		QuasarNotifySuccess("Replaced TriggerActionSet by stored set", name, QUASAR_NOTIFICATION_POSITION_TOP)
 
-		actionUpdateCurrentTriggerActionsFromServer(store,context,state)
+		actionUpdateCurrentTriggerActionsFromServer(store, context, state)
 	}()
 }
 
@@ -465,16 +570,16 @@ func actionDeployStoredTriggerActionSetAdd(store *mvuex.Store, context *mvuex.Ac
 		println("Vuex dispatch deploy stored TriggerActionSet as addition: ", name)
 
 		// convert to Go type
-		msg := &pb.StringMessage{Msg:name}
+		msg := &pb.StringMessage{Msg: name}
 
-		_,err := RpcClient.DeployStoredTriggerActionsSetAdd(defaultTimeout, msg)
+		_, err := RpcClient.DeployStoredTriggerActionsSetAdd(defaultTimeout, msg)
 		if err != nil {
 			QuasarNotifyError("Error adding TriggerActionSet from store", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 			return
 		}
 		QuasarNotifySuccess("Added TriggerActionSet from store", name, QUASAR_NOTIFICATION_POSITION_TOP)
 
-		actionUpdateCurrentTriggerActionsFromServer(store,context,state)
+		actionUpdateCurrentTriggerActionsFromServer(store, context, state)
 	}()
 }
 
@@ -564,6 +669,18 @@ func initMVuex() *mvuex.Store {
 		mvuex.Mutation(VUEX_MUTATION_SET_STORED_TRIGGER_ACTIONS_SETS_LIST, func(store *mvuex.Store, state *GlobalState, tasList []interface{}) {
 			hvue.Set(state, "StoredTriggerActionSetsList", tasList)
 		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_STORED_ETHERNET_INTERFACE_SETTINGS_LIST, func(store *mvuex.Store, state *GlobalState, eisList []interface{}) {
+			hvue.Set(state, "StoredEthernetInterfaceSettingsList", eisList)
+		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_ALL_ETHERNET_INTERFACE_SETTINGS, func(store *mvuex.Store, state *GlobalState, eifSettings *jsEthernetSettingsList) {
+			println("Updating all ethernet interface settings: ", eifSettings)
+			state.InterfaceSettings = eifSettings
+
+		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_SINGLE_ETHERNET_INTERFACE_SETTINGS, func(store *mvuex.Store, state *GlobalState, ifSettings *jsEthernetInterfaceSettings) {
+			println("Updating ethernet interface settings for ", ifSettings.Name)
+			state.InterfaceSettings.updateSingleInterface(ifSettings)
+		}),
 		/*
 		mvuex.Mutation("startLogListening", func (store *mvuex.Store, state *GlobalState) {
 			state.EventReceiver.StartListening()
@@ -577,11 +694,13 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED, actionUpdateGadgetSettingsFromDeployed),
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS, actionDeployCurrentGadgetSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS, actionUpdateRunningHidJobs),
+
 		mvuex.Action(VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS, actionDeployEthernetInterfaceSettings),
+		mvuex.Action(VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS, actionUpdateAllEthernetInterfaceSettings),
+
 		mvuex.Action(VUEX_ACTION_UPDATE_WIFI_STATE, actionUpdateWifiState),
 		mvuex.Action(VUEX_ACTION_DEPLOY_WIFI_SETTINGS, actionDeployWifiSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST, actionUpdateStoredWifiSettingsList),
-		mvuex.Action(VUEX_ACTION_STORE_WIFI_SETTINGS, actionStoreWifiSettings),
 
 		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER, actionUpdateCurrentTriggerActionsFromServer),
 		mvuex.Action(VUEX_ACTION_ADD_NEW_TRIGGER_ACTION, actionAddNewTriggerAction),
@@ -595,9 +714,17 @@ func initMVuex() *mvuex.Store {
 
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST, actionUpdateStoredBashScriptsList),
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST, actionUpdateStoredHIDScriptsList),
+		mvuex.Action(VUEX_ACTION_UPDATE_STORED_ETHERNET_INTERFACE_SETTINGS_LIST, actionUpdateStoredEthernetInterfaceSettingsList),
 		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_HID_SCRIPT_SOURCE_FROM_REMOTE_FILE, actionUpdateCurrentHidScriptSourceFromRemoteFile),
 		mvuex.Action(VUEX_ACTION_STORE_CURRENT_HID_SCRIPT_SOURCE_TO_REMOTE_FILE, actionStoreCurrentHidScriptSourceToRemoteFile),
+
+		mvuex.Action(VUEX_ACTION_STORE_WIFI_SETTINGS, actionStoreWifiSettings),
 		mvuex.Action(VUEX_ACTION_LOAD_WIFI_SETTINGS, actionLoadWifiSettings),
+		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_WIFI_SETTINGS, actionDeployStoredWifiSettings),
+
+		mvuex.Action(VUEX_ACTION_STORE_ETHERNET_INTERFACE_SETTINGS, actionStoreEthernetInterfaceSettings),
+		mvuex.Action(VUEX_ACTION_LOAD_ETHERNET_INTERFACE_SETTINGS, actionLoadEthernetInterfaceSettings),
+		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_ETHERNET_INTERFACE_SETTINGS, actionDeployStoredEthernetInterfaceSettings),
 
 
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
@@ -636,7 +763,7 @@ func initMVuex() *mvuex.Store {
 
 		mvuex.Getter("storedWifiSettingsSelect", func(state *GlobalState) interface{} {
 			selectWS := js.Global.Get("Array").New()
-			for _,curS := range state.StoredWifiSettingsList  {
+			for _, curS := range state.StoredWifiSettingsList {
 				option := struct {
 					*js.Object
 					Label string `js:"label"`
@@ -660,6 +787,11 @@ func initMVuex() *mvuex.Store {
 
 	// Update WiFi state
 	store.Dispatch(VUEX_ACTION_UPDATE_WIFI_STATE)
+
+	/*
+	// Update ethernet interface state (done by component)
+	store.Dispatch(VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS)
+	*/
 
 	// propagate Vuex store to global scope to allow injecting it to Vue by setting the "store" option
 	js.Global.Set("store", store)

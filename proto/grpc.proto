@@ -12,11 +12,6 @@ service P4WNP1 {
     rpc SetLEDSettings (LEDSettings) returns (Empty) {    }
     rpc MountUMSFile (GadgetSettingsUMS) returns (Empty) {    }
 
-    //Ethernet
-    rpc DeployEthernetInterfaceSettings (EthernetInterfaceSettings) returns (Empty) {    }
-    rpc GetAllDeployedEthernetInterfaceSettings (Empty) returns (DeployedEthernetInterfaceSettings) {    }
-    rpc GetDeployedEthernetInterfaceSettings (StringMessage) returns (EthernetInterfaceSettings) {    } //StringMessage has to contain the interface name
-
     //HIDScript / job management
     rpc HIDRunScript (HIDScriptRequest) returns (HIDScriptResult) {    }
     rpc HIDRunScriptJob (HIDScriptRequest) returns (HIDScriptJob) {    }
@@ -27,8 +22,8 @@ service P4WNP1 {
     rpc HIDGetRunningJobState (HIDScriptJob) returns (HIDRunningJobStateResult) {    }
 
     //FileSystem
-    rpc FSWriteFile (WriteFileRequest) returns (Empty) {    }
-    rpc FSReadFile (ReadFileRequest) returns (ReadFileResponse) {    }
+    rpc FSWriteFile (WriteFileRequest) returns (Empty) {}
+    rpc FSReadFile (ReadFileRequest) returns (ReadFileResponse) {}
     rpc FSGetFileInfo (FileInfoRequest) returns (FileInfoResponse) {    }
     rpc FSCreateTempDirOrFile (TempDirOrFileRequest) returns (TempDirOrFileResponse) {    }
 
@@ -41,13 +36,26 @@ service P4WNP1 {
     // WiFi
     rpc DeployWiFiSettings (WiFiSettings) returns (WiFiState) {}
     rpc GetWiFiState (Empty) returns (WiFiState) {}
-    rpc ListenWiFiStateChanges (Empty) returns (WiFiState) {}
-    // ToDo: Template requests (store, load, listStored)
+    rpc ListenWiFiStateChanges (Empty) returns (WiFiState) {} //ToDo: Check usage
+
     rpc StoreWifiSettings(WifiRequestSettingsStorage) returns (Empty) {}
     rpc GetStoredWifiSettings(StringMessage) returns (WiFiSettings) {}
     rpc DeployStoredWifiSettings(StringMessage) returns (WiFiState) {}
     rpc StoreDeployedWifiSettings(StringMessage) returns (Empty) {}
     rpc ListStoredWifiSettings(Empty) returns (StringMessageArray) {}
+
+    //Ethernet
+    rpc DeployEthernetInterfaceSettings (EthernetInterfaceSettings) returns (Empty) {    }
+    rpc GetAllDeployedEthernetInterfaceSettings (Empty) returns (DeployedEthernetInterfaceSettings) {    }
+    rpc GetDeployedEthernetInterfaceSettings (StringMessage) returns (EthernetInterfaceSettings) {    } //StringMessage has to contain the interface name
+
+    rpc StoreEthernetInterfaceSettings(EthernetRequestSettingsStorage) returns (Empty) {}
+    rpc GetStoredEthernetInterfaceSettings(StringMessage) returns (EthernetInterfaceSettings) {}
+    rpc DeployStoredEthernetInterfaceSettings(StringMessage) returns (Empty) {}
+    rpc ListStoredEthernetInterfaceSettings(Empty) returns (StringMessageArray) {}
+    //ToDo: Store&Load for EthernetInterfaceSettingsList (multiple interfaces)
+
+
 
     // TriggerActions
     rpc GetDeployedTriggerActionSet(Empty) returns (TriggerActionSet) {}
@@ -192,10 +200,6 @@ message ActionGroupSend {
     string groupName = 1;
     int32 value = 2;
 }
-
-
-
-
 
 message WifiRequestSettingsStorage {
     string TemplateName = 1;
@@ -392,6 +396,12 @@ message GadgetSettingsUMS {
 /* End USB Gadget */
 
 /* Ethernet Interface Settings */
+message EthernetRequestSettingsStorage {
+    string TemplateName = 1;
+    EthernetInterfaceSettings settings = 2;
+}
+
+
 message DeployedEthernetInterfaceSettings {
     repeated EthernetInterfaceSettings list = 1;
 }

@@ -51,6 +51,7 @@
 		GadgetSettings
 		GadgetSettingsEthernet
 		GadgetSettingsUMS
+		EthernetRequestSettingsStorage
 		DeployedEthernetInterfaceSettings
 		EthernetInterfaceSettings
 		DHCPServerSettings
@@ -4500,6 +4501,88 @@ func (m *GadgetSettingsUMS) Unmarshal(rawBytes []byte) (*GadgetSettingsUMS, erro
 }
 
 // Ethernet Interface Settings
+type EthernetRequestSettingsStorage struct {
+	TemplateName string
+	Settings     *EthernetInterfaceSettings
+}
+
+// GetTemplateName gets the TemplateName of the EthernetRequestSettingsStorage.
+func (m *EthernetRequestSettingsStorage) GetTemplateName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.TemplateName
+}
+
+// GetSettings gets the Settings of the EthernetRequestSettingsStorage.
+func (m *EthernetRequestSettingsStorage) GetSettings() (x *EthernetInterfaceSettings) {
+	if m == nil {
+		return x
+	}
+	return m.Settings
+}
+
+// MarshalToWriter marshals EthernetRequestSettingsStorage to the provided writer.
+func (m *EthernetRequestSettingsStorage) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.TemplateName) > 0 {
+		writer.WriteString(1, m.TemplateName)
+	}
+
+	if m.Settings != nil {
+		writer.WriteMessage(2, func() {
+			m.Settings.MarshalToWriter(writer)
+		})
+	}
+
+	return
+}
+
+// Marshal marshals EthernetRequestSettingsStorage to a slice of bytes.
+func (m *EthernetRequestSettingsStorage) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a EthernetRequestSettingsStorage from the provided reader.
+func (m *EthernetRequestSettingsStorage) UnmarshalFromReader(reader jspb.Reader) *EthernetRequestSettingsStorage {
+	for reader.Next() {
+		if m == nil {
+			m = &EthernetRequestSettingsStorage{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.TemplateName = reader.ReadString()
+		case 2:
+			reader.ReadMessage(func() {
+				m.Settings = m.Settings.UnmarshalFromReader(reader)
+			})
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a EthernetRequestSettingsStorage from a slice of bytes.
+func (m *EthernetRequestSettingsStorage) Unmarshal(rawBytes []byte) (*EthernetRequestSettingsStorage, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
 type DeployedEthernetInterfaceSettings struct {
 	List []*EthernetInterfaceSettings
 }
@@ -5177,10 +5260,6 @@ type P4WNP1Client interface {
 	GetLEDSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*LEDSettings, error)
 	SetLEDSettings(ctx context.Context, in *LEDSettings, opts ...grpcweb.CallOption) (*Empty, error)
 	MountUMSFile(ctx context.Context, in *GadgetSettingsUMS, opts ...grpcweb.CallOption) (*Empty, error)
-	// Ethernet
-	DeployEthernetInterfaceSettings(ctx context.Context, in *EthernetInterfaceSettings, opts ...grpcweb.CallOption) (*Empty, error)
-	GetAllDeployedEthernetInterfaceSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*DeployedEthernetInterfaceSettings, error)
-	GetDeployedEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*EthernetInterfaceSettings, error)
 	// HIDScript / job management
 	HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error)
 	HIDRunScriptJob(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptJob, error)
@@ -5202,12 +5281,19 @@ type P4WNP1Client interface {
 	DeployWiFiSettings(ctx context.Context, in *WiFiSettings, opts ...grpcweb.CallOption) (*WiFiState, error)
 	GetWiFiState(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFiState, error)
 	ListenWiFiStateChanges(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*WiFiState, error)
-	// ToDo: Template requests (store, load, listStored)
 	StoreWifiSettings(ctx context.Context, in *WifiRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error)
 	GetStoredWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*WiFiSettings, error)
 	DeployStoredWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*WiFiState, error)
 	StoreDeployedWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	ListStoredWifiSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
+	// Ethernet
+	DeployEthernetInterfaceSettings(ctx context.Context, in *EthernetInterfaceSettings, opts ...grpcweb.CallOption) (*Empty, error)
+	GetAllDeployedEthernetInterfaceSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*DeployedEthernetInterfaceSettings, error)
+	GetDeployedEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*EthernetInterfaceSettings, error)
+	StoreEthernetInterfaceSettings(ctx context.Context, in *EthernetRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error)
+	GetStoredEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*EthernetInterfaceSettings, error)
+	DeployStoredEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
+	ListStoredEthernetInterfaceSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// TriggerActions
 	GetDeployedTriggerActionSet(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	DeployTriggerActionSetReplace(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
@@ -5293,33 +5379,6 @@ func (c *p4WNP1Client) MountUMSFile(ctx context.Context, in *GadgetSettingsUMS, 
 	}
 
 	return new(Empty).Unmarshal(resp)
-}
-
-func (c *p4WNP1Client) DeployEthernetInterfaceSettings(ctx context.Context, in *EthernetInterfaceSettings, opts ...grpcweb.CallOption) (*Empty, error) {
-	resp, err := c.client.RPCCall(ctx, "DeployEthernetInterfaceSettings", in.Marshal(), opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return new(Empty).Unmarshal(resp)
-}
-
-func (c *p4WNP1Client) GetAllDeployedEthernetInterfaceSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*DeployedEthernetInterfaceSettings, error) {
-	resp, err := c.client.RPCCall(ctx, "GetAllDeployedEthernetInterfaceSettings", in.Marshal(), opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return new(DeployedEthernetInterfaceSettings).Unmarshal(resp)
-}
-
-func (c *p4WNP1Client) GetDeployedEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*EthernetInterfaceSettings, error) {
-	resp, err := c.client.RPCCall(ctx, "GetDeployedEthernetInterfaceSettings", in.Marshal(), opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return new(EthernetInterfaceSettings).Unmarshal(resp)
 }
 
 func (c *p4WNP1Client) HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error) {
@@ -5527,6 +5586,69 @@ func (c *p4WNP1Client) StoreDeployedWifiSettings(ctx context.Context, in *String
 
 func (c *p4WNP1Client) ListStoredWifiSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
 	resp, err := c.client.RPCCall(ctx, "ListStoredWifiSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(StringMessageArray).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployEthernetInterfaceSettings(ctx context.Context, in *EthernetInterfaceSettings, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployEthernetInterfaceSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetAllDeployedEthernetInterfaceSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*DeployedEthernetInterfaceSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "GetAllDeployedEthernetInterfaceSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(DeployedEthernetInterfaceSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetDeployedEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*EthernetInterfaceSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "GetDeployedEthernetInterfaceSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(EthernetInterfaceSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) StoreEthernetInterfaceSettings(ctx context.Context, in *EthernetRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "StoreEthernetInterfaceSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetStoredEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*EthernetInterfaceSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "GetStoredEthernetInterfaceSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(EthernetInterfaceSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployStoredEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployStoredEthernetInterfaceSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) ListStoredEthernetInterfaceSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
+	resp, err := c.client.RPCCall(ctx, "ListStoredEthernetInterfaceSettings", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}

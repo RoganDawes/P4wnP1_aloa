@@ -30,10 +30,24 @@ func InitComponentsNetwork() {
 	hvue.NewComponent(
 		"network",
 		hvue.Template(templateNetwork),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := &struct {
+				*js.Object
+				CurrentInterface *jsEthernetInterfaceSettings `js:"current"`
+				ShowStoreModal bool   `js:"showStoreModal"`
+				ShowLoadModal bool   `js:"showLoadModal"`
+				ShowDeployStoredModal bool   `js:"showDeployStoredModal"`
+			}{Object: O()}
+			data.CurrentInterface = &jsEthernetInterfaceSettings{Object: O()}
+			data.ShowStoreModal = false
+			data.ShowLoadModal = false
+			data.ShowDeployStoredModal = false
+			return data
+		}),
+
 		hvue.Computed("interfaces", func(vm *hvue.VM) interface{} {
 			return vm.Get("$store").Get("state").Get("InterfaceSettings").Get("interfaces")
 		}),
-
 		// converts interface array to array which could be used with Quasar q-select (every object item has label and value)
 		hvue.Computed("selectOptionsInterface", func(vm *hvue.VM) interface{} {
 			selectIf := js.Global.Get("Array").New()
@@ -64,20 +78,53 @@ func InitComponentsNetwork() {
 		hvue.Method("deploy", func(vm *hvue.VM, ifaceSettings *jsEthernetInterfaceSettings) {
 			vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS, ifaceSettings)
 		}),
+		hvue.Method("updateStoredSettingsList",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_ETHERNET_INTERFACE_SETTINGS_LIST)
+			}),
+		hvue.Method("store",
+			func(vm *hvue.VM, name *js.Object) {
+				sReq := NewEthernetRequestSettingsStorage()
+				sReq.TemplateName = name.String()
+				sReq.Settings = &jsEthernetInterfaceSettings{
+					Object: vm.Get("current"),
+				}
+				println("Storing :", sReq)
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_STORE_ETHERNET_INTERFACE_SETTINGS, sReq)
+				vm.Set("showStoreModal", false)
+			}),
+		hvue.Method("load",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_LOAD_ETHERNET_INTERFACE_SETTINGS, name)
+			}),
+		hvue.Method("deployStored",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_STORED_ETHERNET_INTERFACE_SETTINGS, name)
+			}),
 
-		hvue.DataFunc(func(vm *hvue.VM) interface{} {
-			data := &struct {
-				*js.Object
-				CurrentInterface *jsEthernetInterfaceSettings `js:"current"`
-			}{Object: O()}
-			data.CurrentInterface = &jsEthernetInterfaceSettings{Object: js.Undefined}
-			return data
-		}),
-		hvue.Created(func(vm *hvue.VM) {
-			// data field "current" is still undefined, set to first interface of computed property "interfaces" (if there is one)
-			if vm.Get("interfaces").Length() > 0 {
-				hvue.Set(vm, "current", vm.Get("interfaces").Index(0))
-			}
+		hvue.Mounted(func(vm *hvue.VM) {
+			// update network interface
+			promise := vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS)
+
+			promise.Call("then",
+				func() {
+					println("Mounting network interface settings, try to select first interface")
+					// current" could be an empty settings object, set to first interface of computed property "interfaces" (if there is one)
+					interfaces := vm.Get("$store").Get("state").Get("InterfaceSettings").Get("interfaces")
+					if interfaces.Length() > 0 {
+						hvue.Set(vm, "current", interfaces.Index(0))
+						println("... current is", vm.Get("current"))
+					} else {
+						println("... No interface found")
+					}
+				},
+				func() {
+					println("error in THEN ")
+				},
+			)
+
 		}),
 	)
 
@@ -220,7 +267,12 @@ func InitComponentsNetwork() {
 
 const templateNetwork = `
 <q-page padding>
+	<select-string-from-array :values="this.$store.state.StoredEthernetInterfaceSettingsList" v-model="showLoadModal" title="Load ethernet interface settings" @load="load($event)"></select-string-from-array>
+	<select-string-from-array :values="this.$store.state.StoredEthernetInterfaceSettingsList" v-model="showDeployStoredModal" title="Deploy stored ethernet interface settings" @load="deployStored($event)"></select-string-from-array>
+	<modal-string-input v-model="showStoreModal" title="Store current ethernet interface Settings" @save="store($event)"></modal-string-input>
+
 	<div class="row gutter-sm">
+
 		<div class="col-12 col-xl-3">
 		<q-card class="full-height">
 			<q-card-title>
@@ -229,6 +281,10 @@ const templateNetwork = `
 
 			<q-card-actions>
 				<q-btn color="primary" @click="deploy(current)" label="deploy"></q-btn>
+				<q-btn color="primary" @click="showStoreModal=true" label="store"></q-btn>
+				<q-btn color="primary" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored"></q-btn>
+				<q-btn color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored"></q-btn>
+
 			</q-card-actions>
 
 			<q-list link>

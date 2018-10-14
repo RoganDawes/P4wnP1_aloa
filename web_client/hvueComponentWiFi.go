@@ -17,10 +17,12 @@ func InitComponentsWiFi() {
 				*js.Object
 				ShowStoreModal bool   `js:"showStoreModal"`
 				ShowLoadModal bool   `js:"showLoadModal"`
+				ShowDeployStoredModal bool   `js:"showDeployStoredModal"`
 				TemplateName   string `js:"templateName"`
 			}{Object: O()}
 			data.ShowStoreModal = false
 			data.ShowLoadModal = false
+			data.ShowDeployStoredModal = false
 			data.TemplateName = ""
 			return &data
 		}),
@@ -156,6 +158,11 @@ func InitComponentsWiFi() {
 				println("Loading :", name.String())
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_LOAD_WIFI_SETTINGS, name)
 			}),
+		hvue.Method("deployStored",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_STORED_WIFI_SETTINGS, name)
+			}),
 		hvue.Computed("deploying",
 			func(vm *hvue.VM) interface{} {
 				return vm.Get("$store").Get("state").Get("deployingWifiSettings")
@@ -171,6 +178,7 @@ const templateWiFi = `
 <q-page padding>
 <div class="row gutter-sm">
 	<select-string-from-array :values="this.$store.state.StoredWifiSettingsList" v-model="showLoadModal" title="Load WiFi settings" @load="load($event)"></select-string-from-array>
+	<select-string-from-array :values="this.$store.state.StoredWifiSettingsList" v-model="showDeployStoredModal" title="Deploy stored WiFi settings" @load="deployStored($event)"></select-string-from-array>
 	<modal-string-input v-model="showStoreModal" title="Store current WiFi Settings" @save="store($event)"></modal-string-input>
 
 	<div class="col-lg-4">
@@ -189,8 +197,9 @@ const templateWiFi = `
 		<q-card-actions>
 			<q-btn :loading="deploying" color="primary" @click="deploy(settings)" label="deploy"></q-btn>
 			<q-btn color="secondary" @click="reset" label="reset"></q-btn>
-			<q-btn color="primary" @click="updateStoredSettingsList(); showStoreModal=true" label="store"></q-btn>
-			<q-btn color="primary" @click="updateStoredSettingsList(); showLoadModal=true" label="load"></q-btn>
+			<q-btn color="primary" @click="showStoreModal=true" label="store"></q-btn>
+			<q-btn color="primary" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored"></q-btn>
+			<q-btn color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored"></q-btn>
 		</q-card-actions>
 
 		<q-list link>

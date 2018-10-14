@@ -30,6 +30,7 @@ var (
 
 const (
 	cSTORE_PREFIX_WIFI_SETTINGS      = "ws_"
+	cSTORE_PREFIX_ETHERNET_INTERFACE_SETTINGS      = "eis_"
 	cSTORE_PREFIX_TRIGGER_ACTION_SET = "tas_"
 )
 
@@ -136,8 +137,6 @@ func (s *server) DeployTriggerActionSetRemove(ctx context.Context, removeTas *pb
 	return
 }
 
-
-
 func (s *server) Start() error {
 	return nil
 }
@@ -194,35 +193,6 @@ func (s *server) GetWiFiState(ctx context.Context, empty *pb.Empty) (wstate *pb.
 
 func (s *server) ListenWiFiStateChanges(ctx context.Context, empty *pb.Empty) (wstate *pb.WiFiState, err error) {
 	panic("implement me")
-}
-
-func (s *server) GetDeployedEthernetInterfaceSettings(ctx context.Context, req *pb.StringMessage) (resp *pb.EthernetInterfaceSettings, err error) {
-	if mi,err := s.rootSvc.SubSysNetwork.GetManagedInterface(req.Msg); err == nil {
-		return mi.GetState().CurrentSettings, nil
-	} else {
-		return nil, errors.New(fmt.Sprintf("No stored (or used) settings for ethernet interface '%s'", req.Msg))
-	}
-	/*
-	if settings,exist := ServiceState.StoredNetworkSettings[req.Msg]; exist && settings.SettingsInUse {
-		return settings, nil
-	} else {
-		return nil, errors.New(fmt.Sprintf("No stored (or used) settings for ethernet interface '%s'", req.Msg))
-	}
-	*/
-}
-
-func (s *server) GetAllDeployedEthernetInterfaceSettings(ctx context.Context, empty *pb.Empty) (resp *pb.DeployedEthernetInterfaceSettings, err error) {
-	miList := s.rootSvc.SubSysNetwork.GetManagedInterfaceNames()
-	deployed := make([]*pb.EthernetInterfaceSettings,len(miList))
-	for idx,name := range miList {
-		mi,err := s.rootSvc.SubSysNetwork.GetManagedInterface(name)
-		if err != nil { return nil,err }
-		deployed[idx] = mi.GetState().CurrentSettings
-	}
-	resp = &pb.DeployedEthernetInterfaceSettings{
-		List: deployed,
-	}
-	return resp, nil
 }
 
 func (s *server) EchoRequest(ctx context.Context, req *pb.StringMessage) (resp *pb.StringMessage, err error) {
@@ -437,6 +407,34 @@ func (s *server) HIDGetScriptJobResult(ctx context.Context, sJob *pb.HIDScriptJo
 	return scriptRes,nil
 }
 
+func (s *server) GetDeployedEthernetInterfaceSettings(ctx context.Context, req *pb.StringMessage) (resp *pb.EthernetInterfaceSettings, err error) {
+	if mi,err := s.rootSvc.SubSysNetwork.GetManagedInterface(req.Msg); err == nil {
+		return mi.GetState().CurrentSettings, nil
+	} else {
+		return nil, errors.New(fmt.Sprintf("No stored (or used) settings for ethernet interface '%s'", req.Msg))
+	}
+	/*
+	if settings,exist := ServiceState.StoredNetworkSettings[req.Msg]; exist && settings.SettingsInUse {
+		return settings, nil
+	} else {
+		return nil, errors.New(fmt.Sprintf("No stored (or used) settings for ethernet interface '%s'", req.Msg))
+	}
+	*/
+}
+
+func (s *server) GetAllDeployedEthernetInterfaceSettings(ctx context.Context, empty *pb.Empty) (resp *pb.DeployedEthernetInterfaceSettings, err error) {
+	miList := s.rootSvc.SubSysNetwork.GetManagedInterfaceNames()
+	deployed := make([]*pb.EthernetInterfaceSettings,len(miList))
+	for idx,name := range miList {
+		mi,err := s.rootSvc.SubSysNetwork.GetManagedInterface(name)
+		if err != nil { return nil,err }
+		deployed[idx] = mi.GetState().CurrentSettings
+	}
+	resp = &pb.DeployedEthernetInterfaceSettings{
+		List: deployed,
+	}
+	return resp, nil
+}
 
 func (s *server) DeployEthernetInterfaceSettings(ctx context.Context, es *pb.EthernetInterfaceSettings) (empty *pb.Empty, err error) {
 	log.Printf("Trying to deploy ethernet interface settings %v", es)
@@ -449,6 +447,35 @@ func (s *server) DeployEthernetInterfaceSettings(ctx context.Context, es *pb.Eth
 	err = nim.DeploySettings(es)
 	if err != nil {
 		log.Printf("Error deploying ethernet interface settings %v", err)
+	}
+	return
+}
+
+func (s *server) StoreEthernetInterfaceSettings(ctx context.Context, req *pb.EthernetRequestSettingsStorage) (empty *pb.Empty, err error) {
+	empty = &pb.Empty{}
+	ifName := req.Settings.Name
+	storageKey := cSTORE_PREFIX_ETHERNET_INTERFACE_SETTINGS + ifName + "_" + req.TemplateName
+	err = s.rootSvc.SubSysDataStore.Put(storageKey, req.Settings, true)
+	return
+}
+
+func (s *server) GetStoredEthernetInterfaceSettings(ctx context.Context, m *pb.StringMessage) (eis *pb.EthernetInterfaceSettings, err error) {
+	eis = &pb.EthernetInterfaceSettings{}
+	err = s.rootSvc.SubSysDataStore.Get(cSTORE_PREFIX_ETHERNET_INTERFACE_SETTINGS + m.Msg, eis)
+	return
+}
+
+func (s *server) DeployStoredEthernetInterfaceSettings(ctx context.Context, msg *pb.StringMessage) (empty *pb.Empty, err error) {
+	eis,err := s.GetStoredEthernetInterfaceSettings(ctx, msg)
+	if err != nil { return empty,err }
+	return s.DeployEthernetInterfaceSettings(ctx, eis)
+}
+
+func (s *server) ListStoredEthernetInterfaceSettings(ctx context.Context, empty *pb.Empty) (messages *pb.StringMessageArray, err error) {
+	res,err := s.rootSvc.SubSysDataStore.KeysPrefix(cSTORE_PREFIX_ETHERNET_INTERFACE_SETTINGS, true)
+	if err != nil { return messages,err }
+	messages = &pb.StringMessageArray{
+		MsgArray: res,
 	}
 	return
 }
