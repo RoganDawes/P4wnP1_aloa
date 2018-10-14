@@ -3,12 +3,12 @@
 package main
 
 import (
-	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
-	"github.com/gopherjs/gopherjs/js"
 	"errors"
+	"github.com/gopherjs/gopherjs/js"
 	"github.com/mame82/P4wnP1_go/common_web"
-	"strconv"
+	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 	"github.com/mame82/hvue"
+	"strconv"
 )
 
 var eNoLogEvent = errors.New("No log event")
@@ -630,7 +630,8 @@ func (isl *jsEthernetSettingsList) updateSingleInterface(updatedSettings *jsEthe
 		 settings := &jsEthernetInterfaceSettings{Object:isl.Interfaces.Index(i)}
 		 if settings.Name == updatedSettings.Name {
 		 	// this are the settings to update (== replace)
-		 	isl.Interfaces.SetIndex(i, updatedSettings)
+		 	//isl.Interfaces.SetIndex(i, updatedSettings.Object)
+		 	hvue.Set(isl.Interfaces,i, updatedSettings)
 		 	return // we are done
 		 }
 	}

@@ -70,7 +70,11 @@ func InitComponentsNetwork() {
 		hvue.Computed("current", func(vm *hvue.VM) interface{} {
 			interfaces := vm.Get("$store").Get("state").Get("InterfaceSettings").Get("interfaces")
 			idx := vm.Get("currentIdx").Int()
-			return interfaces.Index(idx)
+			currentIface := interfaces.Index(idx)
+			if currentIface == js.Undefined {
+				return &jsEthernetInterfaceSettings{Object:O()}
+			}
+			return currentIface
 		}),
 		hvue.Computed("currentWithDhcp", func(vm *hvue.VM) interface{} {
 			if mode := vm.Get("current").Get("mode").Int(); mode == pb.EthernetInterfaceSettings_Mode_value["DHCP_SERVER"] {
@@ -109,12 +113,14 @@ func InitComponentsNetwork() {
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_STORED_ETHERNET_INTERFACE_SETTINGS, name)
 			}),
 
+		// The following method doesn't make much sense anymore, but is kept as an example for working with promises
 		hvue.Mounted(func(vm *hvue.VM) {
 			// update network interface
 			promise := vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS)
 
 			promise.Call("then",
 				func() {
+					/*
 					println("Mounting network interface settings, try to select first interface")
 					// current" could be an empty settings object, set to first interface of computed property "interfaces" (if there is one)
 					interfaces := vm.Get("$store").Get("state").Get("InterfaceSettings").Get("interfaces")
@@ -124,6 +130,8 @@ func InitComponentsNetwork() {
 					} else {
 						println("... No interface found")
 					}
+					*/
+					hvue.Set(vm, "currentIdx", 0)
 				},
 				func() {
 					println("error in THEN ")
@@ -131,6 +139,7 @@ func InitComponentsNetwork() {
 			)
 
 		}),
+
 	)
 
 	hvue.NewComponent(
