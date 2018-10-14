@@ -131,6 +131,15 @@ func (rpc *Rpc) StoreWifiSettings(timeout time.Duration, req *pb.WifiRequestSett
 	return
 }
 
+func (rpc *Rpc) GetStoredWifiSettings(timeout time.Duration, req *pb.StringMessage) (settings *pb.WiFiSettings, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	settings, err = rpc.Client.GetStoredWifiSettings(ctx, req)
+
+	return
+}
+
 
 func (rpc *Rpc) GetWifiState(timeout time.Duration) (state *jsWiFiState, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)

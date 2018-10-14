@@ -141,15 +141,20 @@ func InitComponentsWiFi() {
 				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST)
 			}),
 		hvue.Method("store",
-			func(vm *hvue.VM) {
+			func(vm *hvue.VM, name *js.Object) {
 				sReq := NewWifiRequestSettingsStorage()
-				sReq.TemplateName = vm.Get("templateName").String()
+				sReq.TemplateName = name.String()
 				sReq.Settings = &jsWiFiSettings{
 					Object: vm.Get("$store").Get("state").Get("wifiState").Get("CurrentSettings"),
 				}
 				println("Storing :", sReq)
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_STORE_WIFI_SETTINGS, sReq)
 				vm.Set("showStoreModal", false)
+			}),
+		hvue.Method("load",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_LOAD_WIFI_SETTINGS, name)
 			}),
 		hvue.Computed("deploying",
 			func(vm *hvue.VM) interface{} {
@@ -164,65 +169,10 @@ func InitComponentsWiFi() {
 
 const templateWiFi = `
 <q-page padding>
-
-
 <div class="row gutter-sm">
-	<q-modal v-model="showLoadModal">
-		<q-modal-layout>
-			<q-toolbar slot="header">
-				<q-toolbar-title>
-					Load WiFi settings
-				</q-toolbar-title>
-			</q-toolbar>
+	<select-string-from-array :values="this.$store.state.StoredWifiSettingsList" v-model="showLoadModal" title="Load WiFi settings" @load="load($event)"></select-string-from-array>
+	<modal-string-input v-model="showStoreModal" title="Store current WiFi Settings" @save="store($event)"></modal-string-input>
 
-			<q-list>
-				<q-item link tag="label" v-for="tname in this.$store.state.StoredWifiSettingsList" :key="tname">
-					<q-item-side>
-						<q-radio v-model="templateName" :val="tname"/>
-					</q-item-side>
-					<q-item-main>
-						<q-item-tile label>{{ tname }}</q-item-tile>
-					</q-item-main>
-				</q-item>
-				<q-item tag="label">
-					<q-item-main>
-						<q-item-tile>
-							<q-btn color="secondary" v-close-overlay label="close" />
-							<q-btn color="primary" label="load" />
-							<q-btn color="primary" label="deploy" />
-						</q-item-tile>
-					</q-item-main>
-				</q-item>
-			</q-list>
-		</q-modal-layout>
-	</q-modal>
-	<q-modal v-model="showStoreModal">
-		<q-modal-layout>
-			<q-toolbar slot="header">
-				<q-toolbar-title>
-					Store current WiFi Settings
-				</q-toolbar-title>
-			</q-toolbar>
-			<q-list>
-				<q-item tag="label">
-					<q-item-main>
-						<q-item-tile label>Template name</q-item-tile>
-						<q-item-tile>
-							<q-input v-model="templateName" inverted></q-input>
-						</q-item-tile>
-					</q-item-main>
-				</q-item>
-				<q-item tag="label">
-					<q-item-main>
-						<q-item-tile>
-							<q-btn color="secondary" v-close-overlay label="close" />
-							<q-btn color="primary" @click="store" label="store" />
-						</q-item-tile>
-					</q-item-main>
-				</q-item>
-			</q-list>
-		</q-modal-layout>
-	</q-modal>
 	<div class="col-lg-4">
 	<q-card class="full-height">
 		<q-card-title>

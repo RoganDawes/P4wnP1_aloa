@@ -221,7 +221,7 @@ func InitComponentsNetwork() {
 const templateNetwork = `
 <q-page padding>
 	<div class="row gutter-sm">
-		<div class="col-xl-3">
+		<div class="col-12 col-xl-3">
 		<q-card class="full-height">
 			<q-card-title>
 		    	Network interface settings
@@ -248,7 +248,7 @@ const templateNetwork = `
 		</q-card>
 		</div>
 
-		<div class="col-xl-9">
+		<div class="col-12 col-xl-9">
 			<dhcp-config :interface="current" v-if="currentWithDhcp"></dhcp-config>
 		</div>
 	</div>

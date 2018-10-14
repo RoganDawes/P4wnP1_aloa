@@ -37,10 +37,10 @@ const (
 
 	VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST = "updateStoredWifiSettingsList"
 	VUEX_ACTION_STORE_WIFI_SETTINGS              = "storeWifiSettings"
-	VUEX_ACTION_LOAD_WIFI_SETTINGS               = "storeWifiSettings"
+	VUEX_ACTION_LOAD_WIFI_SETTINGS               = "loadWifiSettings"
 
 	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO   = "setCurrentGadgetSettings"
-	VUEX_MUTATION_SET_WIFI_STATE                   = "setCurrentWifiSettings"
+	VUEX_MUTATION_SET_WIFI_STATE                   = "setCurrentWifiState"
 	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO = "setCurrentHIDScriptSource"
 	VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST    = "setStoredWifiSettingsList"
 
@@ -51,6 +51,7 @@ const (
 	VUEX_ACTION_STORE_CURRENT_HID_SCRIPT_SOURCE_TO_REMOTE_FILE               = "storeCurrentHidScriptSourceToRemoteFile"
 
 
+	VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS  = "setCurrentWifiSettings"
 	VUEX_MUTATION_SET_STORED_BASH_SCRIPTS_LIST    = "setStoredBashScriptsList"
 	VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST    = "setStoredHIDScriptsList"
 
@@ -272,6 +273,23 @@ func actionStoreWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, s
 			QuasarNotifyError("Error storing WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 		}
 		QuasarNotifySuccess("New WiFi settings stored", "", QUASAR_NOTIFICATION_POSITION_TOP)
+	}()
+}
+
+func actionLoadWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch load WiFi settings: ", settingsName.String())
+		// convert to Go type
+		settings,err := RpcClient.GetStoredWifiSettings(defaultTimeout, &pb.StringMessage{Msg:settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error fetching stored WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+
+		jsSettings := NewWifiSettings()
+		jsSettings.fromGo(settings)
+		context.Commit(VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS, jsSettings)
+
+		QuasarNotifySuccess("New WiFi settings loaded", "", QUASAR_NOTIFICATION_POSITION_TOP)
 	}()
 }
 
@@ -529,6 +547,10 @@ func initMVuex() *mvuex.Store {
 			state.WiFiState = wifiState
 			return
 		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_WIFI_SETTINGS, func(store *mvuex.Store, state *GlobalState, wifiSettings *jsWiFiSettings) {
+			state.WiFiState.CurrentSettings = wifiSettings
+			return
+		}),
 		mvuex.Mutation(VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST, func(store *mvuex.Store, state *GlobalState, wsList []interface{}) {
 			println("New ws list", wsList)
 			hvue.Set(state, "StoredWifiSettingsList", wsList)
@@ -575,6 +597,7 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST, actionUpdateStoredHIDScriptsList),
 		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_HID_SCRIPT_SOURCE_FROM_REMOTE_FILE, actionUpdateCurrentHidScriptSourceFromRemoteFile),
 		mvuex.Action(VUEX_ACTION_STORE_CURRENT_HID_SCRIPT_SOURCE_TO_REMOTE_FILE, actionStoreCurrentHidScriptSourceToRemoteFile),
+		mvuex.Action(VUEX_ACTION_LOAD_WIFI_SETTINGS, actionLoadWifiSettings),
 
 
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
