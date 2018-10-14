@@ -144,8 +144,8 @@ const (
 	<ransom-note v-model="ShowRansom"></ransom-note>
 
 	<modal-string-input v-model="ShowStoreHIDScriptModal" title="Store HIDScript" @save="storeHIDScript($event)"></modal-string-input>
-	<select-string-from-array :values="this.$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptModal" title="Load HIDScript to editor" @load="loadHIDScript($event)"></select-string-from-array>
-	<select-string-from-array :values="this.$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptPrependModal" title="Load HIDScript to editor" @load="loadHIDScriptPrepend($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptModal" title="Load HIDScript to editor" @load="loadHIDScript($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptPrependModal" title="Load HIDScript to editor" @load="loadHIDScriptPrepend($event)"></select-string-from-array>
 
 
 	<div class="row gutter-sm">

@@ -676,7 +676,7 @@ const templateAction = `
 			</q-item>
 
 			<q-item tag="label" v-if="isActionBashScript">
-<select-string-from-array :values="this.$store.state.StoredBashScriptsList" v-model="ShowSelectBashScriptModal" title="Select BASH script" @load="ta.ActionData.ScriptName=$event"></select-string-from-array>
+<select-string-from-array :values="$store.state.StoredBashScriptsList" v-model="ShowSelectBashScriptModal" title="Select BASH script" @load="ta.ActionData.ScriptName=$event"></select-string-from-array>
 				<q-item-main>
 					<q-item-tile label>Script path</q-item-tile>
 					<q-item-tile sublabel>Path to the BashScript which should be issued</q-item-tile>
@@ -687,7 +687,7 @@ const templateAction = `
 			</q-item>
 
 			<q-item tag="label" v-if="isActionHidScript">
-<select-string-from-array :values="this.$store.state.StoredHIDScriptsList" v-model="ShowSelectHIDScriptModal" title="Select HIDScript" @load="ta.ActionData.ScriptName=$event"></select-string-from-array>
+<select-string-from-array :values="$store.state.StoredHIDScriptsList" v-model="ShowSelectHIDScriptModal" title="Select HIDScript" @load="ta.ActionData.ScriptName=$event"></select-string-from-array>
 
 				<q-item-main>
 					<q-item-tile label>Script name</q-item-tile>
@@ -771,8 +771,8 @@ const templateAction = `
 const templateTriggerActionManager = `
 <q-page padding>
 	<modal-string-input v-model="showStoreTASModal" title="Store selected TriggerActions" @save="storeTAS($event)"></modal-string-input>
-	<select-string-from-array :values="this.$store.state.StoredTriggerActionSetsList" v-model="showReplaceTASModal" title="Replace current Trigger Actions with stored set" @load="replaceCurrentTAS($event)"></select-string-from-array>
-	<select-string-from-array :values="this.$store.state.StoredTriggerActionSetsList" v-model="showAddTASModal" title="Add stored set to current Trigger Actions" @load="addToCurrentTAS($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredTriggerActionSetsList" v-model="showReplaceTASModal" title="Replace current Trigger Actions with stored set" @load="replaceCurrentTAS($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredTriggerActionSetsList" v-model="showAddTASModal" title="Add stored set to current Trigger Actions" @load="addToCurrentTAS($event)"></select-string-from-array>
 
 	<div class="row gutter-sm">
 		<div class="col-12">

@@ -50,7 +50,7 @@ const templateLoadBashScript = `
 			</q-toolbar>
 
 			<q-list>
-				<q-item link tag="label" v-for="tname in this.$store.state.StoredWifiSettingsList" :key="tname">
+				<q-item link tag="label" v-for="tname in $store.state.StoredWifiSettingsList" :key="tname">
 					<q-item-side>
 						<q-radio v-model="templateName" :val="tname"/>
 					</q-item-side>

@@ -281,8 +281,8 @@ func InitComponentsNetwork() {
 
 const templateNetwork = `
 <q-page padding>
-	<select-string-from-array :values="this.$store.state.StoredEthernetInterfaceSettingsList" v-model="showLoadModal" title="Load ethernet interface settings" @load="load($event)"></select-string-from-array>
-	<select-string-from-array :values="this.$store.state.StoredEthernetInterfaceSettingsList" v-model="showDeployStoredModal" title="Deploy stored ethernet interface settings" @load="deployStored($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredEthernetInterfaceSettingsList" v-model="showLoadModal" title="Load ethernet interface settings" @load="load($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredEthernetInterfaceSettingsList" v-model="showDeployStoredModal" title="Deploy stored ethernet interface settings" @load="deployStored($event)"></select-string-from-array>
 	<modal-string-input v-model="showStoreModal" title="Store current ethernet interface Settings" @save="store($event)"></modal-string-input>
 
 	<div class="row gutter-sm">

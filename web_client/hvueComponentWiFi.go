@@ -177,8 +177,8 @@ func InitComponentsWiFi() {
 const templateWiFi = `
 <q-page padding>
 <div class="row gutter-sm">
-	<select-string-from-array :values="this.$store.state.StoredWifiSettingsList" v-model="showLoadModal" title="Load WiFi settings" @load="load($event)"></select-string-from-array>
-	<select-string-from-array :values="this.$store.state.StoredWifiSettingsList" v-model="showDeployStoredModal" title="Deploy stored WiFi settings" @load="deployStored($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showLoadModal" title="Load WiFi settings" @load="load($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showDeployStoredModal" title="Deploy stored WiFi settings" @load="deployStored($event)"></select-string-from-array>
 	<modal-string-input v-model="showStoreModal" title="Store current WiFi Settings" @save="store($event)"></modal-string-input>
 
 	<div class="col-lg-4">
