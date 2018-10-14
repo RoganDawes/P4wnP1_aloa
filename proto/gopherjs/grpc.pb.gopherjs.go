@@ -285,6 +285,29 @@ func (x WiFiAuthMode) String() string {
 	return WiFiAuthMode_name[int(x)]
 }
 
+type AccessibleFolder int
+
+const (
+	AccessibleFolder_TMP          AccessibleFolder = 0
+	AccessibleFolder_BASH_SCRIPTS AccessibleFolder = 1
+	AccessibleFolder_HID_SCRIPTS  AccessibleFolder = 2
+)
+
+var AccessibleFolder_name = map[int]string{
+	0: "TMP",
+	1: "BASH_SCRIPTS",
+	2: "HID_SCRIPTS",
+}
+var AccessibleFolder_value = map[string]int{
+	"TMP":          0,
+	"BASH_SCRIPTS": 1,
+	"HID_SCRIPTS":  2,
+}
+
+func (x AccessibleFolder) String() string {
+	return AccessibleFolder_name[int(x)]
+}
+
 type ActionDeploySettingsTemplate_TemplateType int
 
 const (
@@ -3066,17 +3089,26 @@ func (m *TempDirOrFileResponse) Unmarshal(rawBytes []byte) (*TempDirOrFileRespon
 }
 
 type ReadFileRequest struct {
-	Path  string
-	Start int64
-	Data  []byte
+	Folder   AccessibleFolder
+	Filename string
+	Start    int64
+	Len      int64
 }
 
-// GetPath gets the Path of the ReadFileRequest.
-func (m *ReadFileRequest) GetPath() (x string) {
+// GetFolder gets the Folder of the ReadFileRequest.
+func (m *ReadFileRequest) GetFolder() (x AccessibleFolder) {
 	if m == nil {
 		return x
 	}
-	return m.Path
+	return m.Folder
+}
+
+// GetFilename gets the Filename of the ReadFileRequest.
+func (m *ReadFileRequest) GetFilename() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Filename
 }
 
 // GetStart gets the Start of the ReadFileRequest.
@@ -3087,12 +3119,12 @@ func (m *ReadFileRequest) GetStart() (x int64) {
 	return m.Start
 }
 
-// GetData gets the Data of the ReadFileRequest.
-func (m *ReadFileRequest) GetData() (x []byte) {
+// GetLen gets the Len of the ReadFileRequest.
+func (m *ReadFileRequest) GetLen() (x int64) {
 	if m == nil {
 		return x
 	}
-	return m.Data
+	return m.Len
 }
 
 // MarshalToWriter marshals ReadFileRequest to the provided writer.
@@ -3101,16 +3133,20 @@ func (m *ReadFileRequest) MarshalToWriter(writer jspb.Writer) {
 		return
 	}
 
-	if len(m.Path) > 0 {
-		writer.WriteString(1, m.Path)
+	if int(m.Folder) != 0 {
+		writer.WriteEnum(1, int(m.Folder))
+	}
+
+	if len(m.Filename) > 0 {
+		writer.WriteString(2, m.Filename)
 	}
 
 	if m.Start != 0 {
-		writer.WriteInt64(2, m.Start)
+		writer.WriteInt64(3, m.Start)
 	}
 
-	if len(m.Data) > 0 {
-		writer.WriteBytes(3, m.Data)
+	if m.Len != 0 {
+		writer.WriteInt64(4, m.Len)
 	}
 
 	return
@@ -3132,11 +3168,13 @@ func (m *ReadFileRequest) UnmarshalFromReader(reader jspb.Reader) *ReadFileReque
 
 		switch reader.GetFieldNumber() {
 		case 1:
-			m.Path = reader.ReadString()
+			m.Folder = AccessibleFolder(reader.ReadEnum())
 		case 2:
-			m.Start = reader.ReadInt64()
+			m.Filename = reader.ReadString()
 		case 3:
-			m.Data = reader.ReadBytes()
+			m.Start = reader.ReadInt64()
+		case 4:
+			m.Len = reader.ReadInt64()
 		default:
 			reader.SkipField()
 		}
@@ -3160,6 +3198,7 @@ func (m *ReadFileRequest) Unmarshal(rawBytes []byte) (*ReadFileRequest, error) {
 
 type ReadFileResponse struct {
 	ReadCount int64
+	Data      []byte
 }
 
 // GetReadCount gets the ReadCount of the ReadFileResponse.
@@ -3170,6 +3209,14 @@ func (m *ReadFileResponse) GetReadCount() (x int64) {
 	return m.ReadCount
 }
 
+// GetData gets the Data of the ReadFileResponse.
+func (m *ReadFileResponse) GetData() (x []byte) {
+	if m == nil {
+		return x
+	}
+	return m.Data
+}
+
 // MarshalToWriter marshals ReadFileResponse to the provided writer.
 func (m *ReadFileResponse) MarshalToWriter(writer jspb.Writer) {
 	if m == nil {
@@ -3178,6 +3225,10 @@ func (m *ReadFileResponse) MarshalToWriter(writer jspb.Writer) {
 
 	if m.ReadCount != 0 {
 		writer.WriteInt64(1, m.ReadCount)
+	}
+
+	if len(m.Data) > 0 {
+		writer.WriteBytes(2, m.Data)
 	}
 
 	return
@@ -3200,6 +3251,8 @@ func (m *ReadFileResponse) UnmarshalFromReader(reader jspb.Reader) *ReadFileResp
 		switch reader.GetFieldNumber() {
 		case 1:
 			m.ReadCount = reader.ReadInt64()
+		case 2:
+			m.Data = reader.ReadBytes()
 		default:
 			reader.SkipField()
 		}
@@ -3222,18 +3275,27 @@ func (m *ReadFileResponse) Unmarshal(rawBytes []byte) (*ReadFileResponse, error)
 }
 
 type WriteFileRequest struct {
-	Path         string
+	Folder       AccessibleFolder
+	Filename     string
 	Append       bool
 	MustNotExist bool
 	Data         []byte
 }
 
-// GetPath gets the Path of the WriteFileRequest.
-func (m *WriteFileRequest) GetPath() (x string) {
+// GetFolder gets the Folder of the WriteFileRequest.
+func (m *WriteFileRequest) GetFolder() (x AccessibleFolder) {
 	if m == nil {
 		return x
 	}
-	return m.Path
+	return m.Folder
+}
+
+// GetFilename gets the Filename of the WriteFileRequest.
+func (m *WriteFileRequest) GetFilename() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Filename
 }
 
 // GetAppend gets the Append of the WriteFileRequest.
@@ -3266,20 +3328,24 @@ func (m *WriteFileRequest) MarshalToWriter(writer jspb.Writer) {
 		return
 	}
 
-	if len(m.Path) > 0 {
-		writer.WriteString(1, m.Path)
+	if int(m.Folder) != 0 {
+		writer.WriteEnum(1, int(m.Folder))
+	}
+
+	if len(m.Filename) > 0 {
+		writer.WriteString(2, m.Filename)
 	}
 
 	if m.Append {
-		writer.WriteBool(2, m.Append)
+		writer.WriteBool(3, m.Append)
 	}
 
 	if m.MustNotExist {
-		writer.WriteBool(3, m.MustNotExist)
+		writer.WriteBool(4, m.MustNotExist)
 	}
 
 	if len(m.Data) > 0 {
-		writer.WriteBytes(4, m.Data)
+		writer.WriteBytes(5, m.Data)
 	}
 
 	return
@@ -3301,12 +3367,14 @@ func (m *WriteFileRequest) UnmarshalFromReader(reader jspb.Reader) *WriteFileReq
 
 		switch reader.GetFieldNumber() {
 		case 1:
-			m.Path = reader.ReadString()
+			m.Folder = AccessibleFolder(reader.ReadEnum())
 		case 2:
-			m.Append = reader.ReadBool()
+			m.Filename = reader.ReadString()
 		case 3:
-			m.MustNotExist = reader.ReadBool()
+			m.Append = reader.ReadBool()
 		case 4:
+			m.MustNotExist = reader.ReadBool()
+		case 5:
 			m.Data = reader.ReadBytes()
 		default:
 			reader.SkipField()

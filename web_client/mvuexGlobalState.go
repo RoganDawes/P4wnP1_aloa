@@ -7,6 +7,8 @@ import (
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 	"github.com/mame82/hvue"
 	"github.com/mame82/mvuex"
+	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -45,36 +47,15 @@ const (
 
 	VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST = "updateStoredBashScriptsList"
 	VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST = "updateStoredHIDScriptsList"
+	VUEX_ACTION_UPDATE_CURRENT_HID_SCRIPT_SOURCE_FROM_REMOTE_FILE              = "updateCurrentHidScriptSourceFromRemoteFile"
+	VUEX_ACTION_STORE_CURRENT_HID_SCRIPT_SOURCE_TO_REMOTE_FILE               = "storeCurrentHidScriptSourceToRemoteFile"
+
 
 	VUEX_MUTATION_SET_STORED_BASH_SCRIPTS_LIST    = "setStoredBashScriptsList"
 	VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST    = "setStoredHIDScriptsList"
 
 	VUEX_MUTATION_SET_STORED_TRIGGER_ACTIONS_SETS_LIST = "setStoredTriggerActionSetsList"
 
-	initHIDScript = `layout('us');			// US keyboard layout
-typingSpeed(100,150)	// Wait 100ms between key strokes + an additional random value between 0ms and 150ms (natural)
-
-waitLEDRepeat(NUM);		// Wait till NUM LED of target changes frequently multiple times (doesn't work on OSX)
-press("GUI r");
-delay(500);
-type("notepad\n")
-delay(1000);
-for (var i = 0; i < 3; i++) {
-  type("Hello from P4wnP1 run " + i + " !\n");
-  type("Moving mouse right ...");
-  moveStepped(500,0);
-  type("and left\n");
-  moveStepped(-500,0);
-}
-type("Let's type fast !!!!!!!!!!!!!!!\n")
-typingSpeed(0,0);
-for (var i = 3; i < 10; i++) {
-  type("Hello from P4wnP1 run " + i + " !\n");
-  type("Moving mouse right ...");
-  moveStepped(500,0);
-  type("and left\n");
-  moveStepped(-500,0);
-}`
 
 	defaultTimeoutShort = time.Second * 5
 	defaultTimeout = time.Second * 10
@@ -140,13 +121,63 @@ func createGlobalStateStruct() GlobalState {
 	return state
 }
 
+func actionUpdateCurrentHidScriptSourceFromRemoteFile(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, req *jsLoadHidScriptSourceReq) {
+	go func() {
+		println("Trying to update current hid script source from remote file ", req.FileName)
+
+		content,err := RpcClient.DownloadFileToBytes(defaultTimeoutMid, req.FileName, pb.AccessibleFolder_HID_SCRIPTS)
+		if err != nil {
+			QuasarNotifyError("Couldn't load HIDScript source " + req.FileName, err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
+			//println("err", err)
+			return
+		}
+
+		newSource := string(content)
+		switch req.Mode {
+		case HID_SCRIPT_SOURCE_LOAD_MODE_APPEND:
+			newSource = state.CurrentHIDScriptSource + newSource
+		case HID_SCRIPT_SOURCE_LOAD_MODE_PREPEND:
+			newSource = newSource + state.CurrentHIDScriptSource
+		case HID_SCRIPT_SOURCE_LOAD_MODE_REPLACE:
+		default:
+		}
+
+		context.Commit(VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO, newSource)
+	}()
+
+	return
+}
+
+func actionStoreCurrentHidScriptSourceToRemoteFile(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, filename *js.Object) {
+	go func() {
+		fname := filename.String()
+		ext := filepath.Ext(fname)
+		if lext := strings.ToLower(ext); lext != ".js" && lext != ".javascript" {
+			fname = fname + ".js"
+		}
+
+		println("Trying to store current hid script source to remote file ", fname)
+
+		content := []byte(state.CurrentHIDScriptSource)
+		err := RpcClient.UploadBytesToFile(defaultTimeoutMid, fname, pb.AccessibleFolder_HID_SCRIPTS, content, true)
+		if err != nil {
+			QuasarNotifyError("Couldn't store HIDScript source " + fname, err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
+			//println("err", err)
+			return
+		}
+
+	}()
+
+	return
+}
+
 func actionUpdateStoredBashScriptsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
-		println("Trying to fetch stored BasScripts list")
+		println("Trying to fetch stored BashScripts list")
 		//fetch deployed gadget settings
 		wsList, err := RpcClient.GetStoredBashScriptsList(defaultTimeout)
 		if err != nil {
-			println("Couldn't retrieve stored BasScripts list")
+			println("Couldn't retrieve stored BashScripts list")
 			return
 		}
 
@@ -181,7 +212,7 @@ func actionUpdateStoredHIDScriptsList(store *mvuex.Store, context *mvuex.ActionC
 func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		//fetch deployed gadget settings
-		dGS, err := RpcClient.RpcGetDeployedGadgetSettings(defaultTimeoutShort)
+		dGS, err := RpcClient.GetDeployedGadgetSettings(defaultTimeoutShort)
 		if err != nil {
 			println("Couldn't retrieve deployed gadget settings")
 			return
@@ -266,7 +297,7 @@ func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, 
 func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		//fetch deployed gadget settings
-		jobstates, err := RpcClient.RpcGetRunningHidJobStates(defaultTimeout)
+		jobstates, err := RpcClient.GetRunningHidJobStates(defaultTimeout)
 		if err != nil {
 			println("Couldn't retrieve stateof running HID jobs", err)
 			return
@@ -439,14 +470,14 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		curGS := state.CurrentGadgetSettings.toGS()
 
 		//try to set them via gRPC (the server holds an internal state, setting != deploying)
-		err := RpcClient.RpcSetRemoteGadgetSettings(curGS, defaultTimeoutShort)
+		err := RpcClient.SetRemoteGadgetSettings(curGS, defaultTimeoutShort)
 		if err != nil {
 			QuasarNotifyError("Error in pre-check of new USB gadget settings", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			return
 		}
 
 		//try to deploy the, now set, remote GadgetSettings via gRPC
-		_, err = RpcClient.RpcDeployRemoteGadgetSettings(defaultTimeout)
+		_, err = RpcClient.DeployRemoteGadgetSettings(defaultTimeout)
 		if err != nil {
 			QuasarNotifyError("Error while deploying new USB gadget settings", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			return
@@ -542,6 +573,8 @@ func initMVuex() *mvuex.Store {
 
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST, actionUpdateStoredBashScriptsList),
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST, actionUpdateStoredHIDScriptsList),
+		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_HID_SCRIPT_SOURCE_FROM_REMOTE_FILE, actionUpdateCurrentHidScriptSourceFromRemoteFile),
+		mvuex.Action(VUEX_ACTION_STORE_CURRENT_HID_SCRIPT_SOURCE_TO_REMOTE_FILE, actionStoreCurrentHidScriptSourceToRemoteFile),
 
 
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {

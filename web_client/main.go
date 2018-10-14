@@ -83,6 +83,7 @@ func main() {
 	InitCompsLoadModals()
 	vm := hvue.NewVM(
 		hvue.El("#app"),
+/*
 		//add "testString" to data
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			data := struct{
@@ -94,6 +95,7 @@ func main() {
 			data.TestString = "type('hello');"
 			return &data
 		}),
+*/
 		//add console to app as computed property, to allow debug output on vue events
 		hvue.Computed(
 			"console",
@@ -102,6 +104,9 @@ func main() {
 		}),
 		hvue.Computed("state", func(vm *hvue.VM) interface{} {
 			return vm.Get("$store").Get("state") //works only with Vuex store option added
+		}),
+		hvue.BeforeMount(func(vm *hvue.VM) {
+			vm.Get("$q").Get("addressbarColor").Call("set", "#027be3")
 		}),
 		Store(store), //include Vuex store in global scope, using own hvue fork, see here: https://github.com/HuckRidgeSW/hvue/pull/6
 		Router(router),

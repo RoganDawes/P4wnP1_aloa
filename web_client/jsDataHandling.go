@@ -14,6 +14,18 @@ import (
 var eNoLogEvent = errors.New("No log event")
 var eNoHidEvent = errors.New("No HID event")
 
+type jsLoadHidScriptSourceMode int
+const (
+	HID_SCRIPT_SOURCE_LOAD_MODE_PREPEND jsLoadHidScriptSourceMode = iota
+	HID_SCRIPT_SOURCE_LOAD_MODE_APPEND
+	HID_SCRIPT_SOURCE_LOAD_MODE_REPLACE
+)
+type jsLoadHidScriptSourceReq struct {
+	*js.Object
+	FileName string `js:"FileName"`
+	Mode jsLoadHidScriptSourceMode `js:"Mode"`
+}
+
 type jsWifiRequestSettingsStorage struct {
 	*js.Object
 	TemplateName string `js:"TemplateName"`

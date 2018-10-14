@@ -97,6 +97,25 @@ func InitComponentsDialog() {
 			hvue.Types(hvue.PBoolean),
 		),
 	)
+
+	hvue.NewComponent(
+		"ransom-note",
+		hvue.Template(templateRansomModal),
+		hvue.ComputedWithGetSet(
+			"visible",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("value")
+			},
+			func(vm *hvue.VM, newValue *js.Object) {
+				vm.Call("$emit", "input", newValue)
+			},
+			),
+		hvue.PropObj(
+			"value",
+			hvue.Required,
+			hvue.Types(hvue.PBoolean),
+		),
+	)
 }
 
 const templateSelectStringModal = `
@@ -158,6 +177,34 @@ const templateInputStringModal = `
 				</q-item>
 			</q-list>
 		</q-modal-layout>
+	</q-modal>
+</div>
+`
+const templateRansomModal = `
+<div>
+	<q-modal v-model="visible" content-css="background: red;" no-route-dismiss no-backdrop-dismiss>
+			<div style="color: white; font-size: 1.5em; font-family: monospace; padding: 10%">
+				
+You became victim of a VERY SILLY IDEA</br>
+███████████████████████████████████████████████████████████████████████████████</br>
+</br>
+The web page you've been viewing, provided a sophisticated experience</br>
+in terms of keyboard automation and scripting. There were LED based triggers,</br>
+there was scriptable mouse control, there were complex control structures</br>
+like if-else-branching and for-loops. Not to mention the capability of running</br>
+multiple asynchronous jobs.</br>
+</br>
+If you really need a converter for a limited, old-school language:</br>
+</br>
+1. Ask somebody else to write one.</br>
+2. Send me 10+ BTC and I'll write one'.</br>
+or</br>
+3. Write one yourself and don't send a PR'.</br>
+</br>
+If you want your DuckyScript encrypted, please enter it elsewhere!</br>
+				
+			</div>
+		</q-card>
 	</q-modal>
 </div>
 `

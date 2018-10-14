@@ -30,6 +30,52 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) UploadBytesToFile(timeout time.Duration, filename string, folder pb.AccessibleFolder, content []byte, allowOverwrite bool) (err error) {
+	ctx := context.Background()
+	if timeout > 0 {
+		newCtx, cancel := context.WithTimeout(ctx, timeout)
+		ctx = newCtx
+		defer cancel()
+	}
+
+	_, err = rpc.Client.FSWriteFile(ctx, &pb.WriteFileRequest{
+		Data: content,
+		Folder: folder,
+		Filename: filename,
+		Append: false,
+		MustNotExist: !allowOverwrite,
+	})
+	return err
+}
+
+// Warning, this method reads content completely to RAM
+func (rpc *Rpc) DownloadFileToBytes(timeout time.Duration, filename string, folder pb.AccessibleFolder) (content []byte, err error) {
+	ctx := context.Background()
+	if timeout > 0 {
+		newCtx, cancel := context.WithTimeout(ctx, timeout)
+		ctx = newCtx
+		defer cancel()
+	}
+
+	chunksize := int64(1 << 15)
+	readCount := chunksize
+
+	for readCount >= chunksize {
+		resp, err := rpc.Client.FSReadFile(ctx, &pb.ReadFileRequest{
+			Filename: filename,
+			Folder: folder,
+			Start: int64(len(content)),
+			Len:   chunksize,
+		})
+		if err != nil { return content,err }
+		content = append(content, resp.Data...)
+		readCount = resp.ReadCount
+	}
+
+	return
+}
+
+
 func (rpc *Rpc) GetStoredBashScriptsList(timeout time.Duration) (ws []string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -136,8 +182,8 @@ func (rpc *Rpc) GetAllDeployedEthernetInterfaceSettings(timeout time.Duration) (
 	*/
 }
 
-func (rpc *Rpc) RpcGetRunningHidJobStates(timeout time.Duration) (states []*pb.HIDRunningJobStateResult, err error) {
-	println("RpcGetRunningHidJobStates called")
+func (rpc *Rpc) GetRunningHidJobStates(timeout time.Duration) (states []*pb.HIDRunningJobStateResult, err error) {
+	println("GetRunningHidJobStates called")
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -221,9 +267,9 @@ func (rpc *Rpc) DeployStoredTriggerActionsSetAdd(timeout time.Duration, name *pb
 
 
 
-func (rpc *Rpc) RpcGetDeployedGadgetSettings(timeout time.Duration) (*pb.GadgetSettings, error) {
+func (rpc *Rpc) GetDeployedGadgetSettings(timeout time.Duration) (*pb.GadgetSettings, error) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
-	println("RpcGetDeployedGadgetSettings called")
+	println("GetDeployedGadgetSettings called")
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -232,9 +278,9 @@ func (rpc *Rpc) RpcGetDeployedGadgetSettings(timeout time.Duration) (*pb.GadgetS
 
 }
 
-func (rpc *Rpc) RpcSetRemoteGadgetSettings(targetGS *pb.GadgetSettings, timeout time.Duration) (err error) {
+func (rpc *Rpc) SetRemoteGadgetSettings(targetGS *pb.GadgetSettings, timeout time.Duration) (err error) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
-	println("RpcSetRemoteGadgetSettings called")
+	println("SetRemoteGadgetSettings called")
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -251,9 +297,9 @@ func (rpc *Rpc) RpcSetRemoteGadgetSettings(targetGS *pb.GadgetSettings, timeout 
 	return nil
 }
 
-func (rpc *Rpc) RpcDeployRemoteGadgetSettings(timeout time.Duration) (*pb.GadgetSettings, error) {
+func (rpc *Rpc) DeployRemoteGadgetSettings(timeout time.Duration) (*pb.GadgetSettings, error) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
-	println("RpcDeployRemoteGadgetSettings called")
+	println("DeployRemoteGadgetSettings called")
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -264,7 +310,7 @@ func (rpc *Rpc) RpcDeployRemoteGadgetSettings(timeout time.Duration) (*pb.Gadget
 
 func (rpc *Rpc) ConnectionTest(timeout time.Duration) (err error) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
-	println("RpcDeployRemoteGadgetSettings called")
+	println("DeployRemoteGadgetSettings called")
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

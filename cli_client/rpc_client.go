@@ -1,15 +1,14 @@
 package cli_client
 
 import (
-	"log"
 	"google.golang.org/grpc"
+	"log"
 
-	pb "github.com/mame82/P4wnP1_go/proto"
-	"time"
-	"golang.org/x/net/context"
-	"os"
 	"fmt"
+	pb "github.com/mame82/P4wnP1_go/proto"
+	"golang.org/x/net/context"
 	"io"
+	"time"
 )
 
 
@@ -65,6 +64,7 @@ func clientCreateTempDirOfFile(host string, port string, dir string, prefix stri
 	return
 }
 
+/*
 func ClientUploadFileFromSrcPath(host string, port string, srcPath string, destPath string, forceOverwrite bool) (err error) {
 	//open local file for reading
 	flag := os.O_RDONLY
@@ -74,6 +74,7 @@ func ClientUploadFileFromSrcPath(host string, port string, srcPath string, destP
 
 	return  ClientUploadFile(host,port,f,destPath,forceOverwrite)
 }
+*/
 
 func ClientRegisterEvent(host string, port string,  evtType int64) (err error) {
 	// open gRPC Client
@@ -95,7 +96,7 @@ func ClientRegisterEvent(host string, port string,  evtType int64) (err error) {
 	return nil
 }
 
-func ClientUploadFile(host string, port string, src io.Reader, destPath string, forceOverwrite bool) (err error) {
+func ClientUploadFile(host string, port string, src io.Reader, folder pb.AccessibleFolder, filename string, forceOverwrite bool) (err error) {
 
 	// open gRPC Client
 	address := host + ":" + port
@@ -108,14 +109,15 @@ func ClientUploadFile(host string, port string, src io.Reader, destPath string, 
 	_, err = client.FSWriteFile(
 		context.Background(),
 		&pb.WriteFileRequest{
-			Path: destPath,
+			Folder:folder,
+			Filename: filename,
 			Data: []byte{}, //empty chunk
 			Append: false,
 			MustNotExist: !forceOverwrite,
 		})
 	if err != nil {return}
 
-	fmt.Printf("Start appending to %s\n", destPath)
+	fmt.Printf("Start appending to %s in folder\n", filename, pb.AccessibleFolder_name[int32(folder)])
 
 	// start appending chunks read from source file to remote file (Remote file is closed and opened every time, but
 	// this avoids client to server streaming, which would be hard to implement for gRPC-web
@@ -132,7 +134,8 @@ func ClientUploadFile(host string, port string, src io.Reader, destPath string, 
 		client.FSWriteFile(
 			context.Background(),
 			&pb.WriteFileRequest{
-				Path: destPath,
+				Folder:folder,
+				Filename: filename,
 				Data: sendData,
 				Append: true,
 				MustNotExist: false,

@@ -3,6 +3,7 @@ package cli_client
 import (
 	"github.com/spf13/cobra"
 	"fmt"
+	"path/filepath"
 	"strings"
 	"io"
 	"bufio"
@@ -10,6 +11,7 @@ import (
 	"errors"
 	"log"
 	"strconv"
+	pb "github.com/mame82/P4wnP1_go/proto"
 )
 
 var (
@@ -161,6 +163,7 @@ func parseHIDRunScripCmd(cmd *cobra.Command, args []string) (serverScriptPath st
 
 	if transferNeeded {
 		// create random remote file
+
 		serverScriptPath, err = ClientCreateTempFile(StrRemoteHost,StrRemotePort,"","HIDscript")
 		if err != nil {
 			return "",err
@@ -168,8 +171,10 @@ func parseHIDRunScripCmd(cmd *cobra.Command, args []string) (serverScriptPath st
 			fmt.Printf("TempFile created: %s\n", serverScriptPath)
 		}
 
+		filename := filepath.Base(serverScriptPath)
+
 		//transfer from reader to remote file
-		err = ClientUploadFile(StrRemoteHost, StrRemotePort, srcReader, serverScriptPath, true)
+		err = ClientUploadFile(StrRemoteHost, StrRemotePort, srcReader, pb.AccessibleFolder_TMP, filename, true)
 		if err != nil { return "",errors.New(fmt.Sprintf("Error transfering HIDScript content to P4wnP1 Server: %v", err))}
 	}
 

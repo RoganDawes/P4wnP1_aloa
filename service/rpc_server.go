@@ -6,6 +6,7 @@ import (
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"io"
 	"log"
 	"net"
 	"encoding/json"
@@ -256,13 +257,44 @@ func (s *server) EventListen(eReq *pb.EventRequest, eStream pb.P4WNP1_EventListe
 }
 
 func (s *server) FSWriteFile(ctx context.Context, req *pb.WriteFileRequest) (empty *pb.Empty, err error) {
-	return &pb.Empty{}, common.WriteFile(req.Path, req.MustNotExist, req.Append, req.Data)
+	filePath := "/" + req.Filename
+	switch req.Folder {
+	case pb.AccessibleFolder_TMP:
+		filePath = "/tmp" + filePath
+	case pb.AccessibleFolder_BASH_SCRIPTS:
+		filePath = PATH_BASH_SCRIPTS + filePath
+	case pb.AccessibleFolder_HID_SCRIPTS:
+		filePath = PATH_HID_SCRIPTS + filePath
+	default:
+		err = errors.New("Unknown folder")
+		return
+	}
+
+	return &pb.Empty{}, common.WriteFile(filePath, req.MustNotExist, req.Append, req.Data)
 
 }
 
 func (s *server) FSReadFile(ctx context.Context, req *pb.ReadFileRequest) (resp *pb.ReadFileResponse, err error) {
-	n,err := common.ReadFile(req.Path, req.Start, req.Data)
-	resp = &pb.ReadFileResponse{ReadCount: int64(n)}
+	//ToDo: check filename for path traversal attempts (don't care for security, currently - hey, we allow executing bash scripts as root - so what)
+
+	filePath := "/" + req.Filename
+	switch req.Folder {
+	case pb.AccessibleFolder_TMP:
+		filePath = "/tmp" + filePath
+	case pb.AccessibleFolder_BASH_SCRIPTS:
+		filePath = PATH_BASH_SCRIPTS + filePath
+	case pb.AccessibleFolder_HID_SCRIPTS:
+		filePath = PATH_HID_SCRIPTS + filePath
+	default:
+		err = errors.New("Unknown folder")
+		return
+	}
+
+	chunk := make([]byte, req.Len)
+	n,err := common.ReadFile(filePath, req.Start, chunk)
+	if err == io.EOF { err = nil } //we ignore eof error, as eof is indicated by n = 0
+	if err != nil {	return nil,err	}
+	resp = &pb.ReadFileResponse{ReadCount: int64(n), Data: chunk[:n]}
 	return
 }
 

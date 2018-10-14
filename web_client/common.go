@@ -41,7 +41,8 @@ func UploadHIDScript(filename string, content string) (err error) {
 		&pb.WriteFileRequest{
 			Data: []byte(content),
 			Append: false,
-			Path: "/tmp/" + filename,
+			Filename:filename,
+			Folder: pb.AccessibleFolder_TMP,
 			MustNotExist: false,
 		},
 	)

@@ -221,7 +221,6 @@ enum WiFiAuthMode {
     OPEN = 1; //Open System Authentication (no authentication)
 }
 
-
 message WiFiSettings {
     /* Generic */
     string name = 1; //for template storage
@@ -289,21 +288,30 @@ message TempDirOrFileResponse {
     string resultPath = 1;
 }
 
+enum AccessibleFolder {
+    TMP = 0;
+    BASH_SCRIPTS = 1;
+    HID_SCRIPTS = 2;
+}
+
 message ReadFileRequest {
-    string path = 1;
-    int64 start = 2;
-    bytes data = 3;
+    AccessibleFolder folder = 1;
+    string filename = 2;
+    int64 start = 3;
+    int64 len = 4;
 }
 
 message ReadFileResponse {
     int64 readCount = 1;
+    bytes data = 2;
 }
 
 message WriteFileRequest {
-    string path = 1;
-    bool append = 2;
-    bool mustNotExist = 3;
-    bytes data = 4;
+    AccessibleFolder folder = 1;
+    string filename = 2;
+    bool append = 3;
+    bool mustNotExist = 4;
+    bytes data = 5;
 }
 
 message FileInfoRequest {

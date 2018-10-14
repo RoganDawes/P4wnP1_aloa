@@ -13,6 +13,7 @@ type CompHIDScriptCodeEditorData struct {
 	CodeMirrorOptions *CodeMirrorOptionsType `js:"codemirrorOptions"`
 }
 
+// ToDo: Change into action of vuex store
 func SendAndRun(vm *hvue.VM) {
 	sourceCode := vm.Get("$store").Get("state").Get("currentHIDScriptSource").String()
 	md5 := StringToMD5(sourceCode) //Calculate MD5 hexstring of current script content
@@ -97,15 +98,40 @@ func InitComponentsHIDScript() {
 			data := struct {
 				*js.Object
 				ShowLoadHIDScriptModal bool   `js:"ShowLoadHIDScriptModal"`
+				ShowLoadHIDScriptPrependModal bool   `js:"ShowLoadHIDScriptPrependModal"`
 				ShowStoreHIDScriptModal bool   `js:"ShowStoreHIDScriptModal"`
+				ShowRansom bool   `js:"ShowRansom"`
 			}{Object: O()}
 			data.ShowLoadHIDScriptModal = false
+			data.ShowLoadHIDScriptPrependModal = false
 			data.ShowStoreHIDScriptModal = false
+			data.ShowRansom = false
 			return &data
 		}),
 		hvue.Method("updateStoredHIDScriptsList",
 			func(vm *hvue.VM) {
 				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST)
+			}),
+		hvue.Method("loadHIDScript",
+			func(vm *hvue.VM, name string) {
+				vm.Get("$q").Call("notify", "load  " + name)
+				updateReq := &jsLoadHidScriptSourceReq{Object:O()}
+				updateReq.FileName = name
+				updateReq.Mode = HID_SCRIPT_SOURCE_LOAD_MODE_REPLACE
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_CURRENT_HID_SCRIPT_SOURCE_FROM_REMOTE_FILE, updateReq)
+			}),
+		hvue.Method("loadHIDScriptPrepend",
+			func(vm *hvue.VM, name string) {
+				vm.Get("$q").Call("notify", "load prepend " + name)
+				updateReq := &jsLoadHidScriptSourceReq{Object:O()}
+				updateReq.FileName = name
+				updateReq.Mode = HID_SCRIPT_SOURCE_LOAD_MODE_PREPEND
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_CURRENT_HID_SCRIPT_SOURCE_FROM_REMOTE_FILE, updateReq)
+			}),
+		hvue.Method("storeHIDScript",
+			func(vm *hvue.VM, name *js.Object) {
+				vm.Get("$q").Call("notify", "store " + name.String())
+				vm.Store.Call("dispatch", VUEX_ACTION_STORE_CURRENT_HID_SCRIPT_SOURCE_TO_REMOTE_FILE, name)
 			}),
 		hvue.Method("SendAndRun",	SendAndRun),
 	)
@@ -115,8 +141,11 @@ const (
 
 	compHIDScriptTemplate = `
 <q-page padding>
-	<modal-string-input v-model="ShowStoreHIDScriptModal" title="Store HIDScript" @save=""></modal-string-input>
-	<select-string-from-array :values="this.$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptModal" title="Load HIDScript to editor" @load=""></select-string-from-array>
+	<ransom-note v-model="ShowRansom"></ransom-note>
+
+	<modal-string-input v-model="ShowStoreHIDScriptModal" title="Store HIDScript" @save="storeHIDScript($event)"></modal-string-input>
+	<select-string-from-array :values="this.$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptModal" title="Load HIDScript to editor" @load="loadHIDScript($event)"></select-string-from-array>
+	<select-string-from-array :values="this.$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptPrependModal" title="Load HIDScript to editor" @load="loadHIDScriptPrepend($event)"></select-string-from-array>
 
 
 	<div class="row gutter-sm">
@@ -129,11 +158,11 @@ const (
 
 				<q-card-main>
 					<div class="row gutter-sm">
-	    				<div class="col-12 col-sm"><q-btn class="fit" color="primary" label="run" @click="SendAndRun()" icon="play_circle_filled" /></div>
-    					<div class="col-12 col-sm"><q-btn class="fit" color="secondary" label="store" icon="save" @click="ShowStoreHIDScriptModal=true" /></div>
-    					<div class="col-12 col-sm"><q-btn class="fit" color="warning" label="load & replace" icon="settings_backup_restore" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptModal=true"/></div>
-    					<div class="col-12 col-sm"><q-btn class="fit" color="warning" label="load & prepend" icon="add_to_photos" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptModal=true"/></div>
-    					<!-- <div class="col-12 col-sm"><q-btn class="fit" color="warning" label="load & add" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" /></div> -->
+	    				<div class="col-6 col-sm"><q-btn class="fit" color="primary" label="run" @click="SendAndRun()" icon="play_circle_filled" /></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="secondary" label="store" icon="save" @click="ShowStoreHIDScriptModal=true" /></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="load & replace" icon="settings_backup_restore" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptModal=true"/></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="load & prepend" icon="add_to_photos" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptPrependModal=true"/></div>
+    					<div class="col-12 col-sm md"><q-btn class="fit" color="negative" label="import DuckyScript" icon="accessible" @click="ShowRansom=true"/></div>
 					</div>
   				</q-card-main>
 
