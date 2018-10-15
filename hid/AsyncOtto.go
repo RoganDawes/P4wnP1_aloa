@@ -123,7 +123,7 @@ func (avm *AsyncOttoVM) SetWorking(working bool) {
 	return
 }
 
-func (avm *AsyncOttoVM) RunAsync(ctx context.Context, src interface{}) (job *AsyncOttoJob, err error) {
+func (avm *AsyncOttoVM) RunAsync(ctx context.Context, src interface{}, anonymousSelfInvoked bool) (job *AsyncOttoJob, err error) {
 	if avm.IsWorking() {
 		return job, errors.New(fmt.Sprintf("VM %d couldn't start new job, because it is still running one"))
 	}
@@ -179,10 +179,19 @@ func (avm *AsyncOttoVM) RunAsync(ctx context.Context, src interface{}) (job *Asy
 		fmt.Printf("START JOB %d SCRIPT ON VM %d\n", job.Id, avm.Id) //DEBUG
 
 		//short pre-run to set JobID and VMID (ignore errors)
-		avm.vm.Run(fmt.Sprintf("JID=%d;VMID=%d;", job.Id, avm.Id))
+		avm.vm.Run(fmt.Sprintf("JID=%d;VMID=%d;\n", job.Id, avm.Id))
 
-		job.ResultValue, job.ResultErr = avm.vm.Run(job.Source) //store result
-		job.SetFinished()                                       // signal job finished
+		// try to wrap source into a anonymous, self-invoked function, to avoid polluting global scope (only if source is string)
+		if src, isString := job.Source.(string); isString {
+			if anonymousSelfInvoked {
+				src = fmt.Sprintf("(function() {\n%s\n})();",src)
+				job.ResultValue, job.ResultErr = avm.vm.Run(src) //store result
+				job.SetFinished()                                       // signal job finished
+			}
+		} else {
+			job.ResultValue, job.ResultErr = avm.vm.Run(job.Source) //store result
+			job.SetFinished()                                       // signal job finished
+		}
 
 		//Emit event + print DEBUG
 		evRes := Event{ Vm: avm, Job: job }
@@ -211,8 +220,8 @@ func (avm *AsyncOttoVM) RunAsync(ctx context.Context, src interface{}) (job *Asy
 }
 
 
-func (avm *AsyncOttoVM) Run(ctx context.Context,src interface{}) (val otto.Value, res error) {
-	job,err := avm.RunAsync(ctx, src)
+func (avm *AsyncOttoVM) Run(ctx context.Context,src interface{}, anonymousSelfInvoked bool) (val otto.Value, res error) {
+	job,err := avm.RunAsync(ctx, src, anonymousSelfInvoked)
 	if err != nil { return val,err }
 	return job.WaitResult()
 }

@@ -156,7 +156,7 @@ func (ctl *HIDController) NextUnusedVM() (vm *AsyncOttoVM, err error) {
 	return nil, errors.New("No free JavaScript VM available in pool")
 }
 
-func (ctl *HIDController) RunScript(ctx context.Context, script string) (val otto.Value, err error) {
+func (ctl *HIDController) RunScript(ctx context.Context, script string, anonymousSelfInvoked bool) (val otto.Value, err error) {
 	/*
 	//fetch next free vm from pool
 	avm,err := ctl.NextUnusedVM()
@@ -167,7 +167,7 @@ func (ctl *HIDController) RunScript(ctx context.Context, script string) (val ott
 
 	// use backround job and wait, to force keeping track of job in joblist, in case the result is never fetched due to
 	// remote CLI abort after running endless script (wouldn't cancel the script)
-	job,err := ctl.StartScriptAsBackgroundJob(ctx, script)
+	job,err := ctl.StartScriptAsBackgroundJob(ctx, script, anonymousSelfInvoked)
 	if err != nil { return val,err }
 	val,err = ctl.WaitBackgroundJobResult(ctx, job)
 	return
@@ -212,7 +212,7 @@ func (ctl *HIDController) retrieveJobFromOtto(vm *otto.Otto) (job *AsyncOttoJob,
 	}
 }
 
-func (ctl *HIDController) StartScriptAsBackgroundJob(ctx context.Context,script string) (job *AsyncOttoJob, err error) {
+func (ctl *HIDController) StartScriptAsBackgroundJob(ctx context.Context,script string, anonymousSelfInvoked bool) (job *AsyncOttoJob, err error) {
 	//fetch next free vm from pool
 	avm,err := ctl.NextUnusedVM()
 	if err != nil {
@@ -225,7 +225,7 @@ func (ctl *HIDController) StartScriptAsBackgroundJob(ctx context.Context,script 
 	}
 
 	//try to run script async
-	job,err = avm.RunAsync(ctx,script)
+	job,err = avm.RunAsync(ctx,script,anonymousSelfInvoked)
 	if err != nil { return nil, err }
 
 	ctl.emitEvent(Event{

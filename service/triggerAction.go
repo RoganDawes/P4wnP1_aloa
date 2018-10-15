@@ -389,13 +389,13 @@ func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *
 	fmt.Printf("Trigger '%s' fired -> executing action '%s' ('%s')\n", triggerName, actionName, action.ScriptName)
 
 	scriptPath := PATH_HID_SCRIPTS + "/" + action.ScriptName
-	preScript := fmt.Sprintf("TRIGGER='%s';\n", triggerName)
+	preScript := fmt.Sprintf("var TRIGGER='%s';\n", triggerName)
 
 	switch tt {
 	case triggerTypeGpioIn:
 		gpioPin := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioNum
 		gpioPinName := pb.GPIONum_name[int32(gpioPin)]
-		preScript += fmt.Sprintf("GPIO_PIN=%s;\n", gpioPinName)
+		preScript += fmt.Sprintf("var GPIO_PIN=%s;\n", gpioPinName)
 	case triggerTypeGroupReceiveSequence:
 		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.GroupName
 		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.Values
@@ -409,23 +409,23 @@ func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *
 			}
 		}
 		jsArray += "]"
-		preScript += fmt.Sprintf("GROUP='%s';\n", groupName)
+		preScript += fmt.Sprintf("var GROUP='%s';\n", groupName)
 		preScript += fmt.Sprintf("var VALUES=%s;\n", jsArray)
 	case triggerTypeGroupReceive:
 		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.GroupName
 		value := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.Value
-		preScript += fmt.Sprintf("GROUP='%s';\n", groupName)
-		preScript += fmt.Sprintf("VALUE=%d;\n", value)
+		preScript += fmt.Sprintf("var GROUP='%s';\n", groupName)
+		preScript += fmt.Sprintf("var VALUE=%d;\n", value)
 	case triggerTypeDhcpLeaseGranted:
 		iface := evt.Values[1].GetTstring()
 		mac := evt.Values[2].GetTstring()
 		ip := evt.Values[3].GetTstring()
-		preScript += fmt.Sprintf("DHCP_LEASE_IFACE=%s;\n", iface)
-		preScript += fmt.Sprintf("DHCP_LEASE_MAC=%s;\n", mac)
-		preScript += fmt.Sprintf("DHCP_LEASE_IP=%s;\n", ip)
+		preScript += fmt.Sprintf("var DHCP_LEASE_IFACE=%s;\n", iface)
+		preScript += fmt.Sprintf("var DHCP_LEASE_MAC=%s;\n", mac)
+		preScript += fmt.Sprintf("var DHCP_LEASE_IP=%s;\n", ip)
 	case triggerTypeSshLogin:
 		loginUser := evt.Values[1].GetTstring()
-		preScript += fmt.Sprintf("SSH_LOGIN_USER=%s;\n", loginUser)
+		preScript += fmt.Sprintf("var SSH_LOGIN_USER=%s;\n", loginUser)
 
 	}
 

@@ -213,7 +213,7 @@ func TestCombinedScript(hidCtl *hid.HIDController) (err error) {
 		}
 	`
 
-	_,err = hidCtl.RunScript(context.Background(),testcript)
+	_,err = hidCtl.RunScript(context.Background(),testcript, true)
 	if err != nil {panic(err)}
 
 	return
@@ -253,7 +253,7 @@ func TestMouseCircle(hidCtl *hid.HIDController) {
 		}
 	`
 
-	_,err := hidCtl.RunScript(context.Background(),scriptMouse)
+	_,err := hidCtl.RunScript(context.Background(),scriptMouse, true)
 	if err != nil { panic(err)}
 }
 
@@ -273,7 +273,7 @@ func TestControllerReInit() {
 		script := "console.log('...started');delay(3000);console.log('...ended');"
 		ctx := context.Background()
 		for i:=0;i<4;i++ {
-			job,err := hidCtlTest.StartScriptAsBackgroundJob(ctx, script)
+			job,err := hidCtlTest.StartScriptAsBackgroundJob(ctx, script, true)
 			if err != nil {
 				fmt.Printf("Error starting new job: %v\n",err)
 			} else {
@@ -343,7 +343,7 @@ func main() {
 	script := "console.log('START ' + JID + ' on VM ' + VMID);waitLEDRepeat(ANY,5000);console.log(JID + ' returned from 5s blocking delay');"
 	startTime := time.Now()
 	for i:=1; i<4; i++ {
-		job,err := hidCtl.StartScriptAsBackgroundJob(ctxT,script)
+		job,err := hidCtl.StartScriptAsBackgroundJob(ctxT,script,true)
 		if err != nil {
 			fmt.Printf("Failed adding background job: %v\n", err)
 		} else {
@@ -377,7 +377,7 @@ func main() {
 	if scriptFile, err := ioutil.ReadFile(filepath); err != nil {
 		log.Printf("Couldn't load HIDScript testfile: %s\n", filepath)
 	} else {
-		_,err = hidCtl.RunScript(context.Background(),string(scriptFile))
+		_,err = hidCtl.RunScript(context.Background(),string(scriptFile), true)
 		if err != nil { panic(err)}
 	}
 

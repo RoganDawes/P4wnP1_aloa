@@ -113,7 +113,7 @@ func (gm *UsbGadgetManager) HidScriptRun(ctx context.Context, scriptContent stri
 	err = gm.HidScriptUsable()
 	if err != nil {	return }
 
-	scriptVal,err := gm.hidCtl.RunScript(ctx, scriptContent)
+	scriptVal,err := gm.hidCtl.RunScript(ctx, scriptContent, true)
 	if err != nil { return nil, err}
 
 	return scriptVal.Export()
@@ -123,7 +123,7 @@ func (gm *UsbGadgetManager) HidScriptStartBackground(ctx context.Context, script
 	err = gm.HidScriptUsable()
 	if err != nil {	return }
 
-	return gm.hidCtl.StartScriptAsBackgroundJob(ctx, scriptContent)
+	return gm.hidCtl.StartScriptAsBackgroundJob(ctx, scriptContent, true)
 }
 
 //WaitBackgroundJobResult(ctx context.Context, job *AsyncOttoJob) (val otto.Value, err error) {
