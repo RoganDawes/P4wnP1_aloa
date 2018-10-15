@@ -168,7 +168,9 @@ func InitComponentsWiFi() {
 				return vm.Get("$store").Get("state").Get("deployingWifiSettings")
 			}),
 		hvue.Mounted(func(vm *hvue.VM) {
+			println("wifi component mounted")
 			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST)
+			vm.Get("$store").Call("dispatch", VUEX_ACTION_UPDATE_WIFI_STATE)
 		}),
 
 	)
@@ -176,11 +178,11 @@ func InitComponentsWiFi() {
 
 const templateWiFi = `
 <q-page padding>
-<div class="row gutter-sm">
 	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showLoadModal" title="Load WiFi settings" @load="load($event)"></select-string-from-array>
 	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showDeployStoredModal" title="Deploy stored WiFi settings" @load="deployStored($event)"></select-string-from-array>
 	<modal-string-input v-model="showStoreModal" title="Store current WiFi Settings" @save="store($event)"></modal-string-input>
 
+<div class="row gutter-sm">
 	<div class="col-lg-4">
 	<q-card class="full-height">
 		<q-card-title>

@@ -116,6 +116,7 @@ func InitComponentsNetwork() {
 		// The following method doesn't make much sense anymore, but is kept as an example for working with promises
 		hvue.Mounted(func(vm *hvue.VM) {
 			// update network interface
+			println("ethernet settings component mounted")
 			promise := vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS)
 
 			promise.Call("then",
@@ -131,6 +132,7 @@ func InitComponentsNetwork() {
 						println("... No interface found")
 					}
 					*/
+					println("ethernet interface settings reloaded")
 					hvue.Set(vm, "currentIdx", 0)
 				},
 				func() {

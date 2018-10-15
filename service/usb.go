@@ -256,9 +256,7 @@ func addUSBEthernetBridge() {
 	//Create the bridge
 	CreateBridge(USB_ETHERNET_BRIDGE_NAME)
 	setInterfaceMac(USB_ETHERNET_BRIDGE_NAME, USB_ETHERNET_BRIDGE_MAC)
-	//Note: 	STP hopefully deals with issues when both, RNDIS and ECM, are enabled and both are detected
-	//			and both are detected and configured by the remote host (redundant link)
-	SetBridgeSTP(USB_ETHERNET_BRIDGE_NAME, true) //enable spanning tree
+	SetBridgeSTP(USB_ETHERNET_BRIDGE_NAME, false) //aboid loosing time by learning interface states, both usb0 and usb1 have to be set to forward
 	SetBridgeForwardDelay(USB_ETHERNET_BRIDGE_NAME, 0)
 
 	//add the interfaces

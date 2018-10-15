@@ -17,7 +17,6 @@ type PromiseFunc func() (result interface{}, err error)
 
 func NewPromise(pf PromiseFunc) (p *Promise) {
 	f := func(resolve *js.Object, reject *js.Object) {
-		println("Promise called ", resolve, reject)
 		p := &struct {
 			*js.Object
 			Resolve *js.Object `js:"resolve"`

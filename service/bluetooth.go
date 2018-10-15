@@ -156,7 +156,7 @@ func (bt *BtService) EnableBridge() (err error) {
 	if err != nil {
 		return err
 	}
-	//	SetBridgeSTP(BT_ETHERNET_BRIDGE_NAME, true) //enable spanning tree
+
 	err = SetBridgeForwardDelay(BT_ETHERNET_BRIDGE_NAME, 0)
 	if err != nil {
 		return err

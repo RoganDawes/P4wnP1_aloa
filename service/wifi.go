@@ -176,6 +176,7 @@ func (wSvc *WiFiService) StopWpaSupplicant() (err error) {
 		return nil
 	}
 
+	/*
 	log.Printf("... sending SIGTERM for wpa_supplicant on interface '%s' with PID\n", wSvc.IfaceName, wSvc.CmdWpaSupplicant.Process.Pid)
 	wSvc.CmdWpaSupplicant.Process.Signal(syscall.SIGTERM)
 	wSvc.CmdWpaSupplicant.Wait()
@@ -193,6 +194,10 @@ func (wSvc *WiFiService) StopWpaSupplicant() (err error) {
 			return errors.New(eCantStop)
 		}
 	}
+	*/
+	log.Printf("... stopping wpa_supplicant\n", wSvc.IfaceName, wSvc.CmdWpaSupplicant.Process.Pid)
+	err = ProcSoftKill(wSvc.CmdWpaSupplicant, time.Second*2)
+	if err != nil { return errors.New(eCantStop) }
 
 	wSvc.CmdWpaSupplicant = nil
 	log.Println(eSuccess)
@@ -369,28 +374,27 @@ func (wSvc *WiFiService) DeploySettings(newWifiSettings *pb.WiFiSettings) (wstat
 		log.Printf("Error setting WiFi regulatory domain '%s': %v\n", newWifiSettings.Regulatory	, err) //we don't abort on error here
 	}
 
+	var triggerEvent *pb.Event = nil
 	if !newWifiSettings.Disabled {
 		switch newWifiSettings.WorkingMode {
 		case pb.WiFiWorkingMode_AP:
 			err = wSvc.runAPMode(newWifiSettings)
 			// emit Trigger event if AP is Up
 			if err == nil {
-				wSvc.RootSvc.SubSysEvent.Emit(ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_WIFI_AP_STARTED))
+				triggerEvent = ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_WIFI_AP_STARTED)
 			}
 		case pb.WiFiWorkingMode_STA, pb.WiFiWorkingMode_STA_FAILOVER_AP:
 			errSta := wSvc.runStaMode(newWifiSettings)
 			if errSta == nil {
-				wSvc.RootSvc.SubSysEvent.Emit(ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_WIFI_CONNECTED_AS_STA))
-			}
-
-			if errSta != nil {
+				triggerEvent = ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_WIFI_CONNECTED_AS_STA)
+			} else {
 				//in failover mode, we try to enable AP first
 				if newWifiSettings.WorkingMode == pb.WiFiWorkingMode_STA_FAILOVER_AP {
 					log.Println(errSta)
 					log.Printf("Trying to fail over to Access Point Mode...")
 					err = wSvc.runAPMode(newWifiSettings)
 					if err == nil {
-						wSvc.RootSvc.SubSysEvent.Emit(ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_WIFI_AP_STARTED))
+						triggerEvent = ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_WIFI_AP_STARTED)
 					}
 				} else {
 					err = errSta
@@ -424,6 +428,16 @@ func (wSvc *WiFiService) DeploySettings(newWifiSettings *pb.WiFiSettings) (wstat
 	if serr := wSvc.UpdateStateFromIw(); serr != nil {
 		log.Println("Couldn't update internal WiFi state:", serr)
 	}
+
+	// Fire the event after everything is done, especially after redeployment of the network interface settings
+	// to allow an ActionTrigger which deploys another ethernet settings template (without changing the settings
+	// in parallel)
+	// ToDo: check if it makes sense to lock the methods responsible for deploying ethernet interface settings and WifI settings (both long-running)
+	if triggerEvent != nil {
+		wSvc.RootSvc.SubSysEvent.Emit(triggerEvent)
+	}
+
+
 	return wSvc.State, nil
 }
 

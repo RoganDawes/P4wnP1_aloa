@@ -293,11 +293,6 @@ func (tam *TriggerActionManager) onGroupReceive(evt *pb.Event, ta *pb.TriggerAct
 	default:
 		return errors.New("Wrong trigger for onGroupReceive event")
 	}
-	// only triggers if
-	//  - group of event macthes group of trigger
-	//  - value of event matches value of trigger
-
-
 
 	return nil
 }
@@ -333,7 +328,37 @@ func (tam *TriggerActionManager) executeActionDeploySettingsTemplate(evt *pb.Eve
 	templateTypeName := pb.ActionDeploySettingsTemplate_TemplateType_name[int32(action.Type)]
 	fmt.Printf("Trigger '%s' fired -> executing action '%s' (%s: '%s')\n", triggerName, actionName, templateTypeName, action.TemplateName)
 
-	// ToDo: Implement
+	switch action.Type {
+	case pb.ActionDeploySettingsTemplate_FULL_SETTINGS:
+		// ToDo: Implement
+	case pb.ActionDeploySettingsTemplate_NETWORK:
+		_,err := tam.rootSvc.SubSysRPC.DeployStoredEthernetInterfaceSettings(context.Background(), &pb.StringMessage{Msg: action.TemplateName})
+		if err == nil {
+			fmt.Println("... stored settings deployed")
+		} else {
+			fmt.Println("... deploying stored settings failed: ", err.Error())
+		}
+	case pb.ActionDeploySettingsTemplate_USB:
+		// ToDo: Implement
+	case pb.ActionDeploySettingsTemplate_WIFI:
+		_,err := tam.rootSvc.SubSysRPC.DeployStoredWifiSettings(context.Background(), &pb.StringMessage{Msg: action.TemplateName})
+		if err == nil {
+			fmt.Println("... stored settings deployed")
+		} else {
+			fmt.Println("... deploying stored settings failed: ", err.Error())
+		}
+	case pb.ActionDeploySettingsTemplate_BLUETOOTH:
+		// ToDo: Implement
+	case pb.ActionDeploySettingsTemplate_TRIGGER_ACTIONS:
+		_,err := tam.rootSvc.SubSysRPC.DeployStoredTriggerActionSetReplace(context.Background(), &pb.StringMessage{Msg: action.TemplateName})
+		if err == nil {
+			fmt.Println("... stored settings deployed")
+		} else {
+			fmt.Println("... deploying stored settings failed: ", err.Error())
+		}
+	}
+
+
 }
 
 func (tam *TriggerActionManager) executeActionGPIOOut(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionGPIOOut) {
