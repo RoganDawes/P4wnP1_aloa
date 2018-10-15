@@ -2,6 +2,7 @@ package hid
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"errors"
 	"io/ioutil"
@@ -41,6 +42,8 @@ type HIDKeyboard struct {
 	KeyDelayJitter       int
 	ctx context.Context
 	cancel context.CancelFunc
+
+	kbdOutFile *os.File
 }
 
 
@@ -68,10 +71,18 @@ func NewKeyboard(ctx context.Context, devicePath string, resourcePath string) (k
 	keyboard.LEDWatcher, err = NewLEDStateWatcher(ctx, devicePath)
 	if err != nil {return nil, err}
 
+	//Open dev file for writing
+	keyboard.kbdOutFile, err = os.OpenFile(devicePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
+	if err != nil {
+		return nil,err
+	}
+
+
 	return
 }
 
 func (kbd *HIDKeyboard) Close() {
+	kbd.kbdOutFile.Close()
 	kbd.LEDWatcher.Stop()
 }
 
@@ -389,11 +400,13 @@ func (kbd *HIDKeyboard) PressKeySequence(reports []KeyboardOutReport) (err error
 
 	//iterate over reports and send them
 	for _,rep := range reports {
-		err = rep.WriteTo(kbd.DevicePath)
+		//err = rep.WriteTo(kbd.DevicePath)
+		err = rep.WriteToFile(kbd.kbdOutFile)
 		if err != nil { return err }
 	}
 	//append an empty report to release all keys
-	err = KeyboardReportEmpty.WriteTo(kbd.DevicePath)
+	//err = KeyboardReportEmpty.WriteTo(kbd.DevicePath)
+	err = KeyboardReportEmpty.WriteToFile(kbd.kbdOutFile)
 	if err != nil { return err }
 
 	//Delay after keypress
@@ -594,6 +607,16 @@ func (rep KeyboardOutReport) WriteTo(filePath string) (err error) {
 	return ioutil.WriteFile(filePath, rep.Serialize(), os.ModePerm) //Serialize Report and write to specified file
 }
 
+// Accepts *os.File, in contrast to WriteTo() this allows keeping the file open
+func (rep KeyboardOutReport) WriteToFile(file *os.File) (err error) {
+	data := rep.Serialize()
+	n, err := file.Write(data)
+	if err == nil && n < len(data) {
+		err = io.ErrShortWrite
+	}
+	return err
+}
+
 
 
 func NewKeyboardOutReport(modifiers byte, keys ...byte) (res KeyboardOutReport) {
@@ -607,4 +630,19 @@ func NewKeyboardOutReport(modifiers byte, keys ...byte) (res KeyboardOutReport) 
 		}
 	}
 	return
+}
+
+func writeHidFile(filename string, data []byte, perm os.FileMode) error {
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
+	if err != nil {
+		return err
+	}
+	n, err := f.Write(data)
+	if err == nil && n < len(data) {
+		err = io.ErrShortWrite
+	}
+	if err1 := f.Close(); err == nil {
+		err = err1
+	}
+	return err
 }
