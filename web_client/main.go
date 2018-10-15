@@ -80,7 +80,6 @@ func main() {
 	InitComponentsNetwork()
 	InitComponentsWiFi()
 	InitComponentsTriggerActions()
-	InitCompsLoadModals()
 	vm := hvue.NewVM(
 		hvue.El("#app"),
 /*

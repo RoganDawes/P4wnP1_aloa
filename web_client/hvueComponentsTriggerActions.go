@@ -442,9 +442,11 @@ func InitComponentsTriggerActions() {
 				*js.Object
 				ShowSelectHIDScriptModal bool   `js:"ShowSelectHIDScriptModal"`
 				ShowSelectBashScriptModal bool   `js:"ShowSelectBashScriptModal"`
+				ShowSelectTemplateModal bool   `js:"ShowSelectTemplateModal"`
 			}{Object: O()}
 			data.ShowSelectHIDScriptModal = false
 			data.ShowSelectBashScriptModal = false
+			data.ShowSelectTemplateModal = false
 			return &data
 		}),
 		hvue.Method("updateStoredHIDScriptsList",
@@ -454,6 +456,64 @@ func InitComponentsTriggerActions() {
 		hvue.Method("updateStoredBashScriptsList",
 			func(vm *hvue.VM) {
 				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST)
+			}),
+		hvue.Computed(
+			"typedTemplateList",
+			func(vm *hvue.VM) interface{} {
+				// template type: ta.ActionData.Type
+				ta:=&jsTriggerAction{Object: vm.Get("ta")}
+				if !ta.IsActionDeploySettingsTemplate() {
+					return []string{}
+				}
+				aData := &jsActionDeploySettingsTemplate{Object: ta.ActionData}
+				switch aData.Type {
+				case TemplateTypeFullSettings:
+					//ToDo: Implement
+				case TemplateTypeBluetooth:
+					//ToDo: Implement
+				case TemplateTypeUSB:
+					//return USB list
+					return vm.Store.Get("state").Get("StoredUSBSettingsList")
+				case TemplateTypeTriggerActions:
+					//return TriggerAction list
+					return vm.Store.Get("state").Get("StoredTriggerActionSetsList")
+				case TemplateTypeWifi:
+					//return WiFi settings list
+					return vm.Store.Get("state").Get("StoredWifiSettingsList")
+				case TemplateTypeNetwork:
+					//return ethernet interface settings list
+					return vm.Store.Get("state").Get("StoredEthernetInterfaceSettingsList")
+				}
+				return []string{} //empty list
+			}),
+		hvue.Method(
+			"actionTemplateTypeUpdate",
+			func(vm *hvue.VM) interface{} {
+				// template type: ta.ActionData.Type
+				ta:=&jsTriggerAction{Object: vm.Get("ta")}
+				if !ta.IsActionDeploySettingsTemplate() {
+					return []string{}
+				}
+				aData := &jsActionDeploySettingsTemplate{Object: ta.ActionData}
+				switch aData.Type {
+				case TemplateTypeFullSettings:
+					//ToDo: Implement
+				case TemplateTypeBluetooth:
+					//ToDo: Implement
+				case TemplateTypeUSB:
+					//update USB list
+					vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_USB_SETTINGS_LIST)
+				case TemplateTypeTriggerActions:
+					//update TriggerAction list
+					vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST)
+				case TemplateTypeWifi:
+					//update WiFi settings template list
+					vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST)
+				case TemplateTypeNetwork:
+					//update ethernet interface settings template list
+					vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_ETHERNET_INTERFACE_SETTINGS_LIST)
+				}
+				return []string{} //empty list
 			}),
 		hvue.Computed("actiontypes", func(vm *hvue.VM) interface{} {
 			return generateSelectOptionsAction()
@@ -747,17 +807,18 @@ const templateAction = `
 					<q-item-tile label>Type</q-item-tile>
 					<q-item-tile sublabel>Name of the stored settings template to load</q-item-tile>
 					<q-item-tile>
-						<q-select v-model="ta.ActionData.Type" :options="templatetypes" color="secondary" inverted :disable="!ta.IsActive"></q-select>
+						<q-select v-model="ta.ActionData.Type" :options="templatetypes" color="secondary" @input="ta.ActionData.TemplateName=''" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
 
 			<q-item tag="label" v-if="isActionDeploySettingsTemplate">
+<select-string-from-array :values="typedTemplateList" v-model="ShowSelectTemplateModal" title="Select template" @load="ta.ActionData.TemplateName=$event"></select-string-from-array>
 				<q-item-main>
 					<q-item-tile label>Template name</q-item-tile>
 					<q-item-tile sublabel>Name of the stored settings template to load</q-item-tile>
 					<q-item-tile>
-						<q-input v-model="ta.ActionData.TemplateName" color="secondary" inverted :disable="!ta.IsActive"></q-input>
+<q-input @click="actionTemplateTypeUpdate(); ShowSelectTemplateModal=true" v-model="ta.ActionData.TemplateName" color="secondary" inverted readonly :after="[{icon: 'more_horiz', handler(){}}]" :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
