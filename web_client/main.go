@@ -80,8 +80,10 @@ func main() {
 	InitComponentsNetwork()
 	InitComponentsWiFi()
 	InitComponentsTriggerActions()
+
 	vm := hvue.NewVM(
 		hvue.El("#app"),
+		hvue.Template(templateMainApp),
 /*
 		//add "testString" to data
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
@@ -114,3 +116,46 @@ func main() {
 	js.Global.Set("vm",vm)
 	js.Global.Set("rpc", RpcClient)
 }
+
+const templateMainApp = `
+    <q-layout view="lHh Lpr fFf">
+        <q-layout-header>
+            <q-toolbar>
+                <q-toolbar-title>
+                    P4wnP1 web-frontend
+                </q-toolbar-title>
+            </q-toolbar>
+            <q-tabs>
+                <q-route-tab default slot="title" to="usb" name="tab-usb" icon="usb" label="USB Settings"></q-route-tab>
+                <q-route-tab slot="title" to="hid" name="tab-hid-script" icon="code" label="HIDScript"></q-route-tab>
+                <q-route-tab slot="title" to="hidjobs" name="tab-hid-jobs" icon="schedule" label="HID Events"></q-route-tab>
+                <q-route-tab slot="title" to="logger" name="tab-logger" icon="message" label="Event Log"></q-route-tab>
+                <q-route-tab slot="title" to="network" name="tab-network" icon="settings_ethernet" label="Network settings"></q-route-tab>
+                <q-route-tab slot="title" to="wifi" name="tab-wifi" icon="wifi" label="WiFi settings"></q-route-tab>
+                <q-route-tab slot="title" to="triggeractions" name="tab-triggeraction" icon="whatshot" label="Trigger Actions"></q-route-tab>
+            </q-tabs>
+        </q-layout-header>
+
+
+        <q-layout-footer>
+            <q-toolbar>
+                <q-toolbar-title>
+                    <div slot="subtitle">by MaMe82</div>
+                </q-toolbar-title>
+            </q-toolbar>
+        </q-layout-footer>
+
+        <q-page-container>
+            <router-view></router-view>
+
+            <q-modal v-model="!$store.state.isConnected" minimized no-route-dismiss no-esc-dismiss no-backdrop-dismiss>
+                <div style="padding: 50px">
+                    <div class="q-display-1 q-mb-md">No connection to server</div>
+                    <p>Trying to reconnect ... (attempt {{ $store.state.failedConnectionAttempts }})</p>
+                </div>
+            </q-modal>
+        </q-page-container>
+
+
+    </q-layout>
+`
