@@ -1,7 +1,10 @@
+// +build linux
+
 package hid
 
 import (
 	"encoding/binary"
+	"io"
 	"io/ioutil"
 	"os"
 	"math"
@@ -24,20 +27,46 @@ type Mouse struct {
 	buttons [3]bool
 	axis [2]int
 	devicePath string
+
+	deviceFile *os.File
 }
 
 func NewMouse(devicePath string) (mouse *Mouse, err error) {
 	//ToDo: check existence of deviceFile (+ is writable)
-	return &Mouse{
+	mouse = &Mouse{
 		devicePath: devicePath,
-	}, nil
+	}
+
+	mouse.deviceFile, err = os.OpenFile(devicePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
+	if err != nil {
+		return nil,err
+	}
+	return
 }
 
-func (m *Mouse) writeReportToFile(file string) error {
+func (m *Mouse) Close() {
+	if m.deviceFile != nil {
+		m.deviceFile.Close()
+	}
+}
+
+func (m *Mouse) writeReport(filepath string) error {
 	report, err := generateMouseReport(m.lastChangeWasAbsolute, m.buttons, m.axis)
 	if err != nil { return err }
+	//fmt.Printf("Writing %+v to %s\n", report, filepath)
+	return ioutil.WriteFile(filepath, report, os.ModePerm) //Serialize Report and write to specified file
+}
+
+func (m *Mouse) writeReportToFile(file *os.File) (err error) {
+	data, err := generateMouseReport(m.lastChangeWasAbsolute, m.buttons, m.axis)
+	if err != nil { return err }
 	//fmt.Printf("Writing %+v to %s\n", report, file)
-	return ioutil.WriteFile(file, report, os.ModePerm) //Serialize Report and write to specified file
+
+	n, err := file.Write(data)
+	if err == nil && n < len(data) {
+		err = io.ErrShortWrite
+	}
+	return err
 }
 
 func (m* Mouse) SetButtons(bt1,bt2,bt3 bool) (err error) {
@@ -59,7 +88,7 @@ func (m* Mouse) SetButtons(bt1,bt2,bt3 bool) (err error) {
 		m.lastChangeWasAbsolute = false
 		m.axis[0] = 0 //No (repeated) movement on button change
 		m.axis[1] = 0 //No (repeated) movement on button change
-		return m.writeReportToFile(m.devicePath)
+		return  m.writeReportToFile(m.deviceFile)
 	} else {
 		//no state change, no new mouse report
 		return nil
@@ -84,7 +113,7 @@ func (m* Mouse) Move(x,y int8) (err error) {
 	m.axis[0] = int(x)
 	m.axis[1] = int(y)
 	m.lastChangeWasAbsolute = false
-	return m.writeReportToFile(m.devicePath)
+	return m.writeReportToFile(m.deviceFile)
 }
 
 
@@ -100,7 +129,7 @@ func (m* Mouse) MoveTo(x,y float64) (err error) {
 	m.axis[0] = scaleAbs(x)
 	m.axis[1] = scaleAbs(y)
 	m.lastChangeWasAbsolute = true
-	return m.writeReportToFile(m.devicePath)
+	return m.writeReportToFile(m.deviceFile)
 }
 
 
@@ -125,7 +154,7 @@ func (m* Mouse) MoveStepped(x,y int16) (err error) {
 		m.axis[0] = int(stepX)
 		m.axis[1] = int(stepY)
 		m.lastChangeWasAbsolute = false
-		err = m.writeReportToFile(m.devicePath)
+		err =  m.writeReportToFile(m.deviceFile)
 		if err != nil {
 			m.axis[0] = 0
 			m.axis[1] = 0

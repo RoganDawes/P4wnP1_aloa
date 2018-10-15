@@ -131,6 +131,9 @@ func (ctl *HIDController) Abort()  {
 		hidControllerReuse.Keyboard.Close() //interrupts go routines reading from device file and lets LEDStateListeners die
 	}
 
+	if hidControllerReuse.Mouse != nil {
+		hidControllerReuse.Mouse.Close()
+	}
 
 	// Interrupt all VMs already running
 	//hidControllerReuse.CancelAllBackgroundJobs()
