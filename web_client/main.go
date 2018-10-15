@@ -119,10 +119,11 @@ func main() {
 
 const templateMainApp = `
     <q-layout view="lHh Lpr fFf">
-        <q-layout-header>
+        <q-layout-header :reveal="!$q.platform.is.desktop">
             <q-toolbar>
                 <q-toolbar-title>
                     P4wnP1 web-frontend
+					<span slot="subtitle" class="mobile-only">by MaMe82</span>
                 </q-toolbar-title>
             </q-toolbar>
             <q-tabs>
@@ -137,7 +138,7 @@ const templateMainApp = `
         </q-layout-header>
 
 
-        <q-layout-footer>
+        <q-layout-footer class="desktop-only">
             <q-toolbar>
                 <q-toolbar-title>
                     <div slot="subtitle">by MaMe82</div>

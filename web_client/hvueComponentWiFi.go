@@ -183,30 +183,47 @@ const templateWiFi = `
 	<modal-string-input v-model="showStoreModal" title="Store current WiFi Settings" @save="store($event)"></modal-string-input>
 
 <div class="row gutter-sm">
-	<div class="col-lg-4">
+		<div class="col-12">
+			<q-card>
+				<q-card-title>
+					WiFi settings
+				</q-card-title>
+
+				<q-card-main>
+					<div class="row gutter-sm">
+
+						<div class="col-6 col-sm""><q-btn :loading="deploying" class="fit" :loading="deploying" color="primary" @click="deploy(settings)" label="deploy" icon="launch"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="reset" label="reset" icon="autorenew"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>
+						<div class="col-12 col-sm"><q-btn class="fit" color="warning" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored" icon="cloud_download"></q-btn></div>
+
+					</div>
+  				</q-card-main>
+
+
+			</q-card>
+		</div>
+
+
+	<div class="col-12 col-lg">
 	<q-card class="full-height">
 		<q-card-title>
-			WiFi settings
+			Generic
 		</q-card-title>
 
-		<q-item>
-        	<q-item-side :icon="wifiStateIcon" color="primary"></q-item-side>
-			<q-item-main>
-				<q-item-tile label>{{ wifiStateText }}</q-item-tile>
-			</q-item-main>
-		</q-item>
 	
-		<q-card-actions>
-			<q-btn :loading="deploying" color="primary" @click="deploy(settings)" label="deploy"></q-btn>
-			<q-btn color="secondary" @click="reset" label="reset"></q-btn>
-			<q-btn color="primary" @click="showStoreModal=true" label="store"></q-btn>
-			<q-btn color="primary" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored"></q-btn>
-			<q-btn color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored"></q-btn>
-		</q-card-actions>
 
 		<q-list link>
 			<q-item-separator />
-			<q-list-header>Generic</q-list-header>
+			<q-item>
+	        	<q-item-side :icon="wifiStateIcon" color="primary"></q-item-side>
+				<q-item-main>
+					<q-item-tile label>{{ wifiStateText }}</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+			<q-item-separator />
 			<q-item tag="label">
 				<q-item-side>
 					<q-toggle v-model="enabled"></q-toggle>
@@ -216,9 +233,20 @@ const templateWiFi = `
 					<q-item-tile sublabel>Enable/Disable WiFi</q-item-tile>
 				</q-item-main>
 			</q-item>
+<!--
 			<q-item tag="label">
 				<q-item-side>
 					<q-toggle v-model="enableNexmon"></q-toggle>
+				</q-item-side>
+				<q-item-main>
+					<q-item-tile label>Nexmon</q-item-tile>
+					<q-item-tile sublabel>Enable/Disable modified nexmon firmware (needed for WiFi covert channel and KARMA)</q-item-tile>
+				</q-item-main>
+			</q-item>
+-->
+			<q-item tag="label" disabled>
+				<q-item-side>
+					<q-toggle :value="true" :disable="true"></q-toggle>
 				</q-item-side>
 				<q-item-main>
 					<q-item-tile label>Nexmon</q-item-tile>
@@ -248,7 +276,7 @@ const templateWiFi = `
 	</q-card>
 	</div>
 
-	<div class="col-lg-4" v-if="settings.mode == mode_sta || settings.mode == mode_failover">
+	<div class="col-12 col-lg" v-if="settings.mode == mode_sta || settings.mode == mode_failover">
 	<q-card class="full-height">
 		<q-card-title>
 			WiFi client settings
@@ -288,7 +316,7 @@ const templateWiFi = `
 	</q-card>
 	</div>
 
-	<div class="col-lg-4" v-if="settings.mode == mode_ap || settings.mode == mode_failover">
+	<div class="col-12 col-lg" v-if="settings.mode == mode_ap || settings.mode == mode_failover">
 	<q-card class="full-height">
 		<q-card-title>
 			WiFi Access Point settings
@@ -299,7 +327,6 @@ const templateWiFi = `
 
 			<template>
 				<q-item-separator />
-				<q-list-header>Access Point settings</q-list-header>
 				<q-item tag="label">
 					<q-item-main>
 						<q-item-tile label>Channel</q-item-tile>

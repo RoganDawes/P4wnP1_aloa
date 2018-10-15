@@ -289,19 +289,36 @@ const templateNetwork = `
 
 	<div class="row gutter-sm">
 
+		<div class="col-12">
+			<q-card>
+				<q-card-title>
+					Network Interface Settings
+				</q-card-title>
+
+				<q-card-main>
+					<div class="row gutter-sm">
+
+						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="deploy(current)" label="deploy" icon="launch"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
+<!--
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="UpdateFromDeployedGadgetSettings" label="reset" icon="autorenew"></q-btn></div>
+-->
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>
+						<div class="col-6 col-sm"><q-btn class="fit" color="warning" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored" icon="cloud_download"></q-btn></div>
+
+					</div>
+  				</q-card-main>
+
+
+			</q-card>
+		</div>
+
+
 		<div class="col-12 col-xl-3">
 		<q-card class="full-height">
 			<q-card-title>
-		    	Network interface settings
+		    	Generic
 			</q-card-title>
-
-			<q-card-actions>
-				<q-btn color="primary" @click="deploy(current)" label="deploy"></q-btn>
-				<q-btn color="primary" @click="showStoreModal=true" label="store"></q-btn>
-				<q-btn color="primary" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored"></q-btn>
-				<q-btn color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored"></q-btn>
-
-			</q-card-actions>
 
 			<q-list link>
 				<q-item-separator />
@@ -320,8 +337,8 @@ const templateNetwork = `
 		</q-card>
 		</div>
 
-		<div class="col-12 col-xl-9">
-			<dhcp-config :interface="current" v-if="currentWithDhcp"></dhcp-config>
+		<div class="col-12 col-xl-9" v-if="currentWithDhcp">
+			<dhcp-config :interface="current"></dhcp-config>
 		</div>
 	</div>
 </q-page>

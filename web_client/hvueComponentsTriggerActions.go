@@ -842,20 +842,12 @@ const templateTriggerActionManager = `
 					TriggerAction Manager
 				</q-card-title>
 
-<!--
-				<q-card-actions>
-    				<q-btn label="add TriggerAction" @click="addTA" icon="note_add" />
-    				<q-btn label="store template" @click="showStoreTASModal=true" icon="save" />
-    				<q-btn label="load template" @click="updateStoredTriggerActionSetsList(); showReplaceTASModal=true" icon="settings_backup_restore" />
-    				<q-btn label="insert template" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" />
-  				</q-card-actions>
--->
 				<q-card-main>
 					<div class="row gutter-sm">
-	    				<div class="col-12 col-sm"><q-btn class="fit" color="primary" label="add one" @click="addTA" icon="note_add" /></div>
-    					<div class="col-12 col-sm"><q-btn class="fit" color="secondary" label="store" @click="showStoreTASModal=true" icon="save" /></div>
-    					<div class="col-12 col-sm"><q-btn class="fit" color="warning" label="load & replace" @click="updateStoredTriggerActionSetsList(); showReplaceTASModal=true" icon="settings_backup_restore" /></div>
-    					<div class="col-12 col-sm"><q-btn class="fit" color="warning" label="load & add" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" /></div>
+	    				<div class="col-6 col-sm"><q-btn class="fit" color="primary" label="add one" @click="addTA" icon="add_box" /></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="secondary" label="store" @click="showStoreTASModal=true" icon="cloud_upload" /></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="load & replace" @click="updateStoredTriggerActionSetsList(); showReplaceTASModal=true" icon="cloud_download" /></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="load & add" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" /></div>
 					</div>
   				</q-card-main>
 

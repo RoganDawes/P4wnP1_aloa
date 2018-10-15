@@ -107,26 +107,33 @@ const (
 
 
 	<div class="row gutter-sm">
-		<div class="col-12 col-sm-6 col-md-5 col-xl-4">
+		<div class="col-12">
+			<q-card>
+				<q-card-title>
+					USB Gadget Settings
+				</q-card-title>
+
+				<q-card-main>
+					<div class="row gutter-sm">
+
+						<div class="col-6 col-sm""><q-btn class="fit" :loading="deploying" color="primary" @click="ApplyGadgetSettings" label="deploy" icon="launch"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="UpdateFromDeployedGadgetSettings" label="reset" icon="autorenew"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>
+						<div class="col-12 col-sm"><q-btn class="fit" color="warning" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored" icon="cloud_download"></q-btn></div>
+
+					</div>
+  				</q-card-main>
+
+
+			</q-card>
+		</div>
+
+
+		<div class="col-12 col-lg">
 		<q-card class="full-height">
-			<q-card-title>
-				Generic USB Gadget Settings
-			</q-card-title>
-			<q-card-actions>
-				<q-btn :loading="deploying" color="primary" @click="ApplyGadgetSettings" label="deploy"></q-btn>
-				<q-btn color="secondary" @click="UpdateFromDeployedGadgetSettings" label="reset"></q-btn>
-				<q-btn color="primary" @click="showStoreModal=true" label="store"></q-btn>
-				<q-btn color="primary" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored"></q-btn>
-				<q-btn color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored"></q-btn>
-
-
-			</q-card-actions>
-
 			<q-alert v-show="deploying" type="warning">If you're connected via Ethernet over USB, you will loose connection during deployment (deadline exceeded error)"</q-alert>
-
 			<q-list link>
-				<q-item-separator />
-
 				<q-item tag="label">
 					<q-item-side>
 						<q-toggle v-model="currentGadgetSettings.Enabled"></q-toggle>
@@ -184,15 +191,9 @@ const (
 			</q-list>
 		</q-card>
 		</div>
-		<div class="col-12 col-sm-6 col-md-5 col-xl-4">
+		<div class="col-12 col-lg">
 		<q-card class="full-height">
-			<q-card-title>
-				USB Gadget Functions
-			</q-card-title>
 			<q-list link>
-
-				<q-item-separator />
-
 				<q-item tag="label">
 					<q-item-side>
 						<q-toggle v-model="currentGadgetSettings.Use_CDC_ECM"></q-toggle>

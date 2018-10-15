@@ -39,15 +39,25 @@
 
 
 <div id="app">
+	<div id="loader">
+		<div style="height: 100vh"  class="row justify-center items-center">
+		    <q-spinner-puff color="primary" size="150" />
+		</div>
+	</div>
 </div>
+
 
 <script src="vuex.js"></script>
 <script src="lib/vue.js"></script>
-
 <script src="lib/vue-router.js"></script>
 
 <script src="lib/umd/quasar.ie.polyfills.umd.min.js"></script>
 <script src="lib/umd/quasar.mat.umd.min.js"></script>
+<script>
+var app = new Vue({
+  el: '#loader',
+})
+</script>
 <script src="codemirror/lib/codemirror.js"></script>
 <script src="codemirror/mode/javascript/javascript.js"></script>
 <script src="codemirror/addon/edit/closebrackets.js"></script>
@@ -57,7 +67,10 @@
     Vue.use(window.VueCodemirror)
 </script>
 <script src="javascript-p4wnp1-hint.js"></script>
+
+
 <script type="text/javascript" src="webapp.js"></script>
+
 
 </body>
 </html>

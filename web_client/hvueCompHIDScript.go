@@ -159,8 +159,8 @@ const (
 				<q-card-main>
 					<div class="row gutter-sm">
 	    				<div class="col-6 col-sm"><q-btn class="fit" color="primary" label="run" @click="SendAndRun()" icon="play_circle_filled" /></div>
-    					<div class="col-6 col-sm"><q-btn class="fit" color="secondary" label="store" icon="save" @click="ShowStoreHIDScriptModal=true" /></div>
-    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="load & replace" icon="settings_backup_restore" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptModal=true"/></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="secondary" label="store" icon="cloud_upload" @click="ShowStoreHIDScriptModal=true" /></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="load & replace" icon="cloud_download" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptModal=true"/></div>
     					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="load & prepend" icon="add_to_photos" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptPrependModal=true"/></div>
     					<div class="col-12 col-sm lg"><q-btn class="fit" color="negative" label="import DuckyScript" icon="accessible" @click="ShowRansom=true"/></div>
 					</div>
