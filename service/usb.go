@@ -3,19 +3,19 @@
 package service
 
 import (
-	"errors"
-	"io/ioutil"
-	"log"
-	"os"
-	"os/exec"
-	"strings"
-
 	"context"
+	"errors"
 	"fmt"
 	"github.com/mame82/P4wnP1_go/hid"
 	pb "github.com/mame82/P4wnP1_go/proto"
+	"io/ioutil"
+	"log"
 	"net"
+	"os"
+	"os/exec"
 	"regexp"
+	"strings"
+	"sync"
 	"time"
 )
 
@@ -85,7 +85,6 @@ var (
 type UsbManagerState struct {
 	UndeployedGadgetSettings *pb.GadgetSettings
 	DevicePath map[string]string
-
 }
 
 type UsbGadgetManager struct {
@@ -94,7 +93,8 @@ type UsbGadgetManager struct {
 
 	State *UsbManagerState
 	// ToDo: variable, indicating if HIDScript is usable
-	hidCtl *hid.HIDController // Points to an HID controller instance only if keyboard and/or mouse are enabled, nil otherwise
+	hidCtl             *hid.HIDController // Points to an HID controller instance only if keyboard and/or mouse are enabled, nil otherwise
+	gadgetSettingsLock *sync.Mutex
 }
 
 func (gm *UsbGadgetManager) HandleEvent(event hid.Event) {
@@ -163,8 +163,9 @@ func (gm *UsbGadgetManager) HidScriptCancelAllRunningBackgroundJobs() (err error
 
 func NewUSBGadgetManager(rooSvc *Service) (newUGM *UsbGadgetManager, err error) {
 	newUGM = &UsbGadgetManager{
-		RootSvc: rooSvc,
-		Usable: true,
+		RootSvc:            rooSvc,
+		Usable:             true,
+		gadgetSettingsLock: &sync.Mutex{},
 		State: &UsbManagerState{
 			DevicePath: map[string]string{},
 		},
@@ -519,6 +520,10 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 	if !gm.Usable {
 		return ErrUsbNotUsable
 	}
+
+	//Lock, only one change at a time
+	gm.gadgetSettingsLock.Lock()
+	defer gm.gadgetSettingsLock.Unlock()
 
 	var usesUSBEthernet bool
 

@@ -48,6 +48,7 @@
 		HIDRunningJobStateResult
 		HIDScriptResult
 		LEDSettings
+		USBRequestSettingsStorage
 		GadgetSettings
 		GadgetSettingsEthernet
 		GadgetSettingsUMS
@@ -4044,6 +4045,88 @@ func (m *LEDSettings) Unmarshal(rawBytes []byte) (*LEDSettings, error) {
 }
 
 // USB Gadget
+type USBRequestSettingsStorage struct {
+	TemplateName string
+	Settings     *GadgetSettings
+}
+
+// GetTemplateName gets the TemplateName of the USBRequestSettingsStorage.
+func (m *USBRequestSettingsStorage) GetTemplateName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.TemplateName
+}
+
+// GetSettings gets the Settings of the USBRequestSettingsStorage.
+func (m *USBRequestSettingsStorage) GetSettings() (x *GadgetSettings) {
+	if m == nil {
+		return x
+	}
+	return m.Settings
+}
+
+// MarshalToWriter marshals USBRequestSettingsStorage to the provided writer.
+func (m *USBRequestSettingsStorage) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.TemplateName) > 0 {
+		writer.WriteString(1, m.TemplateName)
+	}
+
+	if m.Settings != nil {
+		writer.WriteMessage(2, func() {
+			m.Settings.MarshalToWriter(writer)
+		})
+	}
+
+	return
+}
+
+// Marshal marshals USBRequestSettingsStorage to a slice of bytes.
+func (m *USBRequestSettingsStorage) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a USBRequestSettingsStorage from the provided reader.
+func (m *USBRequestSettingsStorage) UnmarshalFromReader(reader jspb.Reader) *USBRequestSettingsStorage {
+	for reader.Next() {
+		if m == nil {
+			m = &USBRequestSettingsStorage{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.TemplateName = reader.ReadString()
+		case 2:
+			reader.ReadMessage(func() {
+				m.Settings = m.Settings.UnmarshalFromReader(reader)
+			})
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a USBRequestSettingsStorage from a slice of bytes.
+func (m *USBRequestSettingsStorage) Unmarshal(rawBytes []byte) (*USBRequestSettingsStorage, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
 type GadgetSettings struct {
 	Enabled          bool
 	Vid              string
@@ -5260,6 +5343,11 @@ type P4WNP1Client interface {
 	GetLEDSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*LEDSettings, error)
 	SetLEDSettings(ctx context.Context, in *LEDSettings, opts ...grpcweb.CallOption) (*Empty, error)
 	MountUMSFile(ctx context.Context, in *GadgetSettingsUMS, opts ...grpcweb.CallOption) (*Empty, error)
+	StoreUSBSettings(ctx context.Context, in *USBRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error)
+	GetStoredUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*GadgetSettings, error)
+	DeployStoredUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*GadgetSettings, error)
+	StoreDeployedUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
+	ListStoredUSBSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// HIDScript / job management
 	HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error)
 	HIDRunScriptJob(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptJob, error)
@@ -5379,6 +5467,51 @@ func (c *p4WNP1Client) MountUMSFile(ctx context.Context, in *GadgetSettingsUMS, 
 	}
 
 	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) StoreUSBSettings(ctx context.Context, in *USBRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "StoreUSBSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetStoredUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*GadgetSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "GetStoredUSBSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(GadgetSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployStoredUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*GadgetSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployStoredUSBSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(GadgetSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) StoreDeployedUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "StoreDeployedUSBSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) ListStoredUSBSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
+	resp, err := c.client.RPCCall(ctx, "ListStoredUSBSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(StringMessageArray).Unmarshal(resp)
 }
 
 func (c *p4WNP1Client) HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error) {

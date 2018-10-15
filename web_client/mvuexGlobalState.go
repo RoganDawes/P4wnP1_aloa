@@ -28,10 +28,16 @@ const (
 	VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST      = "setStoredHIDScriptsList"
 
 	//USBGadget
-	VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS       = "deployCurrentGadgetSettings"
-	VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED = "updateCurrentGadgetSettingsFromDeployed"
+	VUEX_ACTION_DEPLOY_CURRENT_USB_SETTINGS = "deployCurrentUSBSettings"
+	VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS = "updateCurrentUSBSettings"
+	VUEX_ACTION_STORE_USB_SETTINGS          = "storeUSBSettings"
+	VUEX_ACTION_LOAD_USB_SETTINGS           = "loadUSBSettings"
+	VUEX_ACTION_DEPLOY_STORED_USB_SETTINGS  = "deployStoredUSBSettings"
+	VUEX_ACTION_UPDATE_STORED_USB_SETTINGS_LIST = "updateStoredUSBSettingsList"
 
-	VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO = "setCurrentGadgetSettings"
+	VUEX_MUTATION_SET_CURRENT_USB_SETTINGS     = "setCurrentUSBSettings"
+	VUEX_MUTATION_SET_STORED_USB_SETTINGS_LIST = "setStoredUSBSettingsList"
+
 
 	// Ethernet
 	VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS                = "updateAllEthernetInterfaceSettings"
@@ -102,6 +108,7 @@ type GlobalState struct {
 	StoredTriggerActionSetsList         []string `js:"StoredTriggerActionSetsList"`
 	StoredBashScriptsList               []string `js:"StoredBashScriptsList"`
 	StoredHIDScriptsList                []string `js:"StoredHIDScriptsList"`
+	StoredUSBSettingsList                []string `js:"StoredUSBSettingsList"`
 }
 
 func createGlobalStateStruct() GlobalState {
@@ -122,6 +129,7 @@ func createGlobalStateStruct() GlobalState {
 	state.StoredTriggerActionSetsList = []string{}
 	state.StoredBashScriptsList = []string{}
 	state.StoredHIDScriptsList = []string{}
+	state.StoredUSBSettingsList = []string{}
 	//Retrieve Interface settings
 	state.InterfaceSettings = NewEthernetSettingsList()
 
@@ -135,6 +143,71 @@ func createGlobalStateStruct() GlobalState {
 	state.WiFiState = NewWiFiState()
 	return state
 }
+
+func actionUpdateStoredUSBSettingsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch wsList")
+		//fetch deployed gadget settings
+		wsList, err := RpcClient.GetStoredUSBSettingsList(defaultTimeout)
+		if err != nil {
+			println("Couldn't retrieve WifiSettingsList")
+			return
+		}
+
+		//commit to current
+		println(wsList)
+		context.Commit(VUEX_MUTATION_SET_STORED_USB_SETTINGS_LIST, wsList)
+		//context.Commit(VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST, []string{"test1", "test2"})
+	}()
+
+	return
+}
+
+
+func actionStoreUSBSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, req *jsUSBRequestSettingsStorage) {
+	go func() {
+		println("Vuex dispatch store USB settings: ", req.TemplateName)
+		// convert to Go type
+		err := RpcClient.StoreUSBSettings(defaultTimeout, req.toGo())
+		if err != nil {
+			QuasarNotifyError("Error storing USB Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("New USB settings stored", "", QUASAR_NOTIFICATION_POSITION_TOP)
+	}()
+}
+
+func actionLoadUSBSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch load USB settings: ", settingsName.String())
+		// convert to Go type
+		settings, err := RpcClient.GetStoredUSBSettings(defaultTimeout, &pb.StringMessage{Msg: settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error fetching stored USB Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+
+		jsSettings := NewUSBGadgetSettings()
+		jsSettings.fromGo(settings)
+		context.Commit(VUEX_MUTATION_SET_CURRENT_USB_SETTINGS, jsSettings)
+
+		QuasarNotifySuccess("New USB settings loaded", "", QUASAR_NOTIFICATION_POSITION_TOP)
+	}()
+}
+
+func actionDeployStoredUSBSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch load USB settings: ", settingsName.String())
+		// convert to Go type
+		goUSBstettings, err := RpcClient.DeployStoredUSBSettings(defaultTimeoutMid, &pb.StringMessage{Msg: settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error deploying stored USB Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("New USB settings deployed", "", QUASAR_NOTIFICATION_POSITION_TOP)
+		jsUSBSettings := NewUSBGadgetSettings()
+		jsUSBSettings.fromGo(goUSBstettings)
+		context.Commit(VUEX_MUTATION_SET_CURRENT_USB_SETTINGS, jsUSBSettings)
+	}()
+}
+
 
 func actionUpdateAllEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) interface{} {
 
@@ -315,10 +388,10 @@ func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.A
 		}
 		//convert to JS version
 		jsGS := &jsGadgetSettings{Object: O()}
-		jsGS.fromGS(dGS)
+		jsGS.fromGo(dGS)
 
 		//commit to current
-		context.Commit("setCurrentGadgetSettings", jsGS)
+		context.Commit("setCurrentUSBSettings", jsGS)
 	}()
 
 	return
@@ -590,7 +663,7 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		defer func() { state.CurrentlyDeployingGadgetSettings = false }()
 
 		//get current GadgetSettings
-		curGS := state.CurrentGadgetSettings.toGS()
+		curGS := state.CurrentGadgetSettings.toGo()
 
 		//try to set them via gRPC (the server holds an internal state, setting != deploying)
 		err := RpcClient.SetRemoteGadgetSettings(curGS, defaultTimeoutShort)
@@ -644,7 +717,7 @@ func initMVuex() *mvuex.Store {
 			state.CurrentHIDScriptSource = newText
 			return
 		}),
-		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_GADGET_SETTINGS_TO, func(store *mvuex.Store, state *GlobalState, settings *jsGadgetSettings) {
+		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_USB_SETTINGS, func(store *mvuex.Store, state *GlobalState, settings *jsGadgetSettings) {
 			state.CurrentGadgetSettings = settings
 			return
 		}),
@@ -659,6 +732,10 @@ func initMVuex() *mvuex.Store {
 		mvuex.Mutation(VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST, func(store *mvuex.Store, state *GlobalState, wsList []interface{}) {
 			println("New ws list", wsList)
 			hvue.Set(state, "StoredWifiSettingsList", wsList)
+		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_STORED_USB_SETTINGS_LIST, func(store *mvuex.Store, state *GlobalState, usbList []interface{}) {
+			println("New USB settings list", usbList)
+			hvue.Set(state, "StoredUSBSettingsList", usbList)
 		}),
 		mvuex.Mutation(VUEX_MUTATION_SET_STORED_BASH_SCRIPTS_LIST, func(store *mvuex.Store, state *GlobalState, bsList []interface{}) {
 			hvue.Set(state, "StoredBashScriptsList", bsList)
@@ -691,9 +768,13 @@ func initMVuex() *mvuex.Store {
 			return
 		}),
 		*/
-		mvuex.Action(VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED, actionUpdateGadgetSettingsFromDeployed),
-		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS, actionDeployCurrentGadgetSettings),
+		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS, actionUpdateGadgetSettingsFromDeployed),
+		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_USB_SETTINGS, actionDeployCurrentGadgetSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS, actionUpdateRunningHidJobs),
+		mvuex.Action(VUEX_ACTION_STORE_USB_SETTINGS, actionStoreUSBSettings),
+		mvuex.Action(VUEX_ACTION_LOAD_USB_SETTINGS, actionLoadUSBSettings),
+		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_USB_SETTINGS, actionDeployStoredUSBSettings),
+		mvuex.Action(VUEX_ACTION_UPDATE_STORED_USB_SETTINGS_LIST, actionUpdateStoredUSBSettingsList),
 
 		mvuex.Action(VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS, actionDeployEthernetInterfaceSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS, actionUpdateAllEthernetInterfaceSettings),
@@ -780,7 +861,7 @@ func initMVuex() *mvuex.Store {
 	)
 
 	// fetch deployed gadget settings
-	store.Dispatch(VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED)
+	store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS)
 
 	// Update already running HID jobs
 	store.Dispatch(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS)

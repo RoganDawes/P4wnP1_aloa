@@ -15,16 +15,20 @@ type CompUSBSettingsData struct {
 	DeployPending bool               `js:"deployPending"`
 	CdcEcmDetails bool               `js:"cdcEcmDetails"`
 	RndisDetails bool                `js:"rndisDetails"`
+	ShowStoreModal bool   `js:"showStoreModal"`
+	ShowLoadModal bool   `js:"showLoadModal"`
+	ShowDeployStoredModal bool   `js:"showDeployStoredModal"`
+
 }
 
 //This becomes a method of the Vue Component and encapsulates dispatching of a Vuex action
 func (c *CompUSBSettingsData) UpdateFromDeployedGadgetSettings(vm *hvue.VM) {
-	vm.Get("$store").Call("dispatch", VUEX_ACTION_UPDATE_GADGET_SETTINGS_FROM_DEPLOYED)
+	vm.Get("$store").Call("dispatch", VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS)
 }
 
 //This becomes a method of the Vue Component and encapsulates dispatching of a Vuex action
 func (c *CompUSBSettingsData) ApplyGadgetSettings(vm *hvue.VM) {
-	vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_CURRENT_GADGET_SETTINGS)
+	vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_CURRENT_USB_SETTINGS)
 }
 
 func InitCompUSBSettings() {
@@ -42,21 +46,54 @@ func InitCompUSBSettings() {
 			func(vm *hvue.VM) interface{} {
 				return vm.Get("$store").Get("state").Get("deployingGadgetSettings")
 			}),
+		hvue.Mounted(func(vm *hvue.VM) {
+			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS)
+		}),
+		hvue.Method("store",
+			func(vm *hvue.VM, name *js.Object) {
+				sReq := NewUSBRequestSettingsStorage()
+				sReq.TemplateName = name.String()
+				sReq.Settings = &jsGadgetSettings{
+					Object: vm.Get("$store").Get("state").Get("currentGadgetSettings"),
+				}
+				println("Storing :", sReq)
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_STORE_USB_SETTINGS, sReq)
+				vm.Set("showStoreModal", false)
+			}),
+		hvue.Method("load",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_LOAD_USB_SETTINGS, name)
+			}),
+		hvue.Method("deployStored",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_STORED_USB_SETTINGS, name)
+			}),
+		hvue.Method("updateStoredSettingsList",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_USB_SETTINGS_LIST)
+			}),
+
 	)
 }
 
 func newCompUSBSettingsData(vm *hvue.VM) interface{} {
 
-	cc := &CompUSBSettingsData{
+	data := &CompUSBSettingsData{
 		Object: js.Global.Get("Object").New(),
 	}
-	cc.GadgetSettings = NewUSBGadgetSettings()
+	data.GadgetSettings = NewUSBGadgetSettings()
 
-	cc.DeployPending = false
-	cc.RndisDetails = false
-	cc.CdcEcmDetails = false
+	data.ShowStoreModal = false
+	data.ShowLoadModal = false
+	data.ShowDeployStoredModal = false
 
-	return cc
+	data.DeployPending = false
+	data.RndisDetails = false
+	data.CdcEcmDetails = false
+
+	return data
 }
 
 
@@ -64,6 +101,11 @@ func newCompUSBSettingsData(vm *hvue.VM) interface{} {
 const (
 	compUSBSettingsTemplate = `
 <q-page padding>
+	<select-string-from-array :values="$store.state.StoredUSBSettingsList" v-model="showLoadModal" title="Load USB gadget settings" @load="load($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredUSBSettingsList" v-model="showDeployStoredModal" title="Deploy stored USB gadget settings" @load="deployStored($event)"></select-string-from-array>
+	<modal-string-input v-model="showStoreModal" title="Store current USB gadget Settings" @save="store($event)"></modal-string-input>
+
+
 	<div class="row gutter-sm">
 		<div class="col-12 col-sm-6 col-md-5 col-xl-4">
 		<q-card class="full-height">
@@ -73,6 +115,10 @@ const (
 			<q-card-actions>
 				<q-btn :loading="deploying" color="primary" @click="ApplyGadgetSettings" label="deploy"></q-btn>
 				<q-btn color="secondary" @click="UpdateFromDeployedGadgetSettings" label="reset"></q-btn>
+				<q-btn color="primary" @click="showStoreModal=true" label="store"></q-btn>
+				<q-btn color="primary" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored"></q-btn>
+				<q-btn color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored"></q-btn>
+
 
 			</q-card-actions>
 

@@ -30,6 +30,7 @@ var (
 
 const (
 	cSTORE_PREFIX_WIFI_SETTINGS      = "ws_"
+	cSTORE_PREFIX_USB_SETTINGS      = "usbs_"
 	cSTORE_PREFIX_ETHERNET_INTERFACE_SETTINGS      = "eis_"
 	cSTORE_PREFIX_TRIGGER_ACTION_SET = "tas_"
 )
@@ -46,6 +47,48 @@ type server struct {
 
 	listenAddrGrpc string
 	listenAddrWeb string
+}
+
+func (s *server) StoreUSBSettings(ctx context.Context, r *pb.USBRequestSettingsStorage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_USB_SETTINGS + r.TemplateName, r.Settings, true)
+	return
+}
+
+func (s *server) GetStoredUSBSettings(ctx context.Context, m *pb.StringMessage) (gs *pb.GadgetSettings, err error) {
+	gs = &pb.GadgetSettings{}
+	err = s.rootSvc.SubSysDataStore.Get(cSTORE_PREFIX_USB_SETTINGS + m.Msg, gs)
+	return
+}
+
+func (s *server) DeployStoredUSBSettings(ctx context.Context, m *pb.StringMessage) (st *pb.GadgetSettings, err error) {
+	ws,err := s.GetStoredUSBSettings(ctx,m)
+	if err != nil { return st,err }
+	st,err = s.SetGadgetSettings(ctx, ws)
+	if err != nil {
+		return
+	}
+	_,err = s.DeployGadgetSetting(ctx, &pb.Empty{})
+	return
+}
+
+func (s *server) StoreDeployedUSBSettings(ctx context.Context, m *pb.StringMessage) (e *pb.Empty, err error) {
+	gstate, err := ParseGadgetState(USB_GADGET_NAME)
+	if err != nil { return nil,err }
+
+	return s.StoreUSBSettings(ctx, &pb.USBRequestSettingsStorage{
+		Settings: gstate,
+		TemplateName: m.Msg,
+	})
+}
+
+func (s *server) ListStoredUSBSettings(ctx context.Context, e *pb.Empty) (sa *pb.StringMessageArray, err error) {
+	res,err := s.rootSvc.SubSysDataStore.KeysPrefix(cSTORE_PREFIX_USB_SETTINGS, true)
+	if err != nil { return sa,err }
+	sa = &pb.StringMessageArray{
+		MsgArray: res,
+	}
+	return
 }
 
 func (s *server) ListStoredHIDScripts(context.Context, *pb.Empty) (*pb.StringMessageArray, error) {

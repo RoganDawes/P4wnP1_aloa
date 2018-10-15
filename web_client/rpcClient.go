@@ -30,6 +30,44 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) GetStoredUSBSettingsList(timeout time.Duration) (ws []string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	ma, err := rpc.Client.ListStoredUSBSettings(ctx, &pb.Empty{})
+	if err != nil { return ws, err }
+	return ma.MsgArray, err
+}
+
+
+func (rpc *Rpc) StoreUSBSettings(timeout time.Duration, req *pb.USBRequestSettingsStorage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_, err = rpc.Client.StoreUSBSettings(ctx, req)
+
+	return
+}
+
+func (rpc *Rpc) GetStoredUSBSettings(timeout time.Duration, req *pb.StringMessage) (settings *pb.GadgetSettings, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	settings, err = rpc.Client.GetStoredUSBSettings(ctx, req)
+
+	return
+}
+
+func (rpc *Rpc) DeployStoredUSBSettings(timeout time.Duration, req *pb.StringMessage) (state *pb.GadgetSettings, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	state, err = rpc.Client.DeployStoredUSBSettings(ctx, req)
+
+	return
+}
+
+
 func (rpc *Rpc) UploadBytesToFile(timeout time.Duration, filename string, folder pb.AccessibleFolder, content []byte, allowOverwrite bool) (err error) {
 	ctx := context.Background()
 	if timeout > 0 {
@@ -112,7 +150,6 @@ func (rpc *Rpc) DeployedEthernetInterfaceSettings(timeout time.Duration, setting
 	_, err = rpc.Client.DeployEthernetInterfaceSettings(ctx, settings)
 	return
 }
-
 
 func (rpc *Rpc) GetStoredWifiSettingsList(timeout time.Duration) (ws []string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
@@ -399,7 +436,7 @@ func (rpc *Rpc) StartListening() {
 	go func() {
 		for {
 			println("Try to connect server ...")
-			for RpcClient.ConnectionTest(time.Second*3) != nil {
+			for RpcClient.ConnectionTest(time.Millisecond * 2500) != nil {
 				println("... failed, retry for 3 seconds")
 				globalState.FailedConnectionAttempts++
 			}

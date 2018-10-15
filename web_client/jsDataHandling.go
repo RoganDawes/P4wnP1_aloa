@@ -54,6 +54,33 @@ func NewWifiRequestSettingsStorage() *jsWifiRequestSettingsStorage {
 
 /* USB Gadget types corresponding to gRPC messages */
 
+type jsUSBRequestSettingsStorage struct {
+	*js.Object
+	TemplateName string `js:"TemplateName"`
+	Settings     *jsGadgetSettings `js:"Settings"`
+}
+
+func (rs *jsUSBRequestSettingsStorage) toGo() *pb.USBRequestSettingsStorage {
+	return &pb.USBRequestSettingsStorage{
+		Settings: rs.Settings.toGo(),
+		TemplateName: rs.TemplateName,
+	}
+}
+
+func (rs *jsUSBRequestSettingsStorage) fromGo(src *pb.USBRequestSettingsStorage) {
+	rs.TemplateName = src.TemplateName
+	rs.Settings = NewUSBGadgetSettings()
+	rs.Settings.fromGo(src.Settings)
+}
+
+func NewUSBRequestSettingsStorage() *jsUSBRequestSettingsStorage {
+	res := &jsUSBRequestSettingsStorage{Object:O()}
+	res.TemplateName = ""
+	res.Settings = NewUSBGadgetSettings()
+	return res
+}
+
+
 type jsGadgetSettings struct {
 	*js.Object
 	Enabled          bool                     `js:"Enabled"`
@@ -86,7 +113,7 @@ type jsGadgetSettingsUMS struct {
 	File  string `js:"File"`
 }
 
-func (jsGS jsGadgetSettings) toGS() (gs *pb.GadgetSettings) {
+func (jsGS jsGadgetSettings) toGo() (gs *pb.GadgetSettings) {
 	return &pb.GadgetSettings{
 		Serial:           jsGS.Serial,
 		Use_SERIAL:       jsGS.Use_SERIAL,
@@ -116,7 +143,7 @@ func (jsGS jsGadgetSettings) toGS() (gs *pb.GadgetSettings) {
 	}
 }
 
-func (jsGS *jsGadgetSettings) fromGS(gs *pb.GadgetSettings) {
+func (jsGS *jsGadgetSettings) fromGo(gs *pb.GadgetSettings) {
 	println(gs)
 
 	jsGS.Enabled = gs.Enabled
@@ -162,7 +189,7 @@ func NewUSBGadgetSettings() *jsGadgetSettings {
 	gs := &jsGadgetSettings{
 		Object: O(),
 	}
-	gs.fromGS(&pb.GadgetSettings{}) //start with empty settings, but create nested structs
+	gs.fromGo(&pb.GadgetSettings{}) //start with empty settings, but create nested structs
 
 	return gs
 }

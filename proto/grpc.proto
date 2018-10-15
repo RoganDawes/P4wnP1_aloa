@@ -12,6 +12,13 @@ service P4WNP1 {
     rpc SetLEDSettings (LEDSettings) returns (Empty) {    }
     rpc MountUMSFile (GadgetSettingsUMS) returns (Empty) {    }
 
+    rpc StoreUSBSettings(USBRequestSettingsStorage) returns (Empty) {}
+    rpc GetStoredUSBSettings(StringMessage) returns (GadgetSettings) {}
+    rpc DeployStoredUSBSettings(StringMessage) returns (GadgetSettings) {}
+    rpc StoreDeployedUSBSettings(StringMessage) returns (Empty) {}
+    rpc ListStoredUSBSettings(Empty) returns (StringMessageArray) {}
+
+
     //HIDScript / job management
     rpc HIDRunScript (HIDScriptRequest) returns (HIDScriptResult) {    }
     rpc HIDRunScriptJob (HIDScriptRequest) returns (HIDScriptJob) {    }
@@ -364,6 +371,12 @@ message LEDSettings {
 /* End LED */
 
 /* USB Gadget */
+message USBRequestSettingsStorage {
+    string TemplateName = 1;
+    GadgetSettings settings = 2;
+}
+
+
 message GadgetSettings {
     bool enabled = 1;
     string vid = 2;

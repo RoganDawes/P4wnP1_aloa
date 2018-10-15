@@ -339,7 +339,12 @@ func (tam *TriggerActionManager) executeActionDeploySettingsTemplate(evt *pb.Eve
 			fmt.Println("... deploying stored settings failed: ", err.Error())
 		}
 	case pb.ActionDeploySettingsTemplate_USB:
-		// ToDo: Implement
+		_,err := tam.rootSvc.SubSysRPC.DeployStoredUSBSettings(context.Background(), &pb.StringMessage{Msg: action.TemplateName})
+		if err == nil {
+			fmt.Println("... stored settings deployed")
+		} else {
+			fmt.Println("... deploying stored settings failed: ", err.Error())
+		}
 	case pb.ActionDeploySettingsTemplate_WIFI:
 		_,err := tam.rootSvc.SubSysRPC.DeployStoredWifiSettings(context.Background(), &pb.StringMessage{Msg: action.TemplateName})
 		if err == nil {
