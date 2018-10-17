@@ -306,9 +306,9 @@ func actionUpdateCurrentHidScriptSourceFromRemoteFile(store *mvuex.Store, contex
 		newSource := string(content)
 		switch req.Mode {
 		case HID_SCRIPT_SOURCE_LOAD_MODE_APPEND:
-			newSource = state.CurrentHIDScriptSource + newSource
+			newSource = state.CurrentHIDScriptSource + "\n" + newSource
 		case HID_SCRIPT_SOURCE_LOAD_MODE_PREPEND:
-			newSource = newSource + state.CurrentHIDScriptSource
+			newSource = newSource + "\n" + state.CurrentHIDScriptSource
 		case HID_SCRIPT_SOURCE_LOAD_MODE_REPLACE:
 		default:
 		}
