@@ -8,7 +8,7 @@ P4wnP1_cli USB set --rndis 1 --cdc-ecm 1
 #   - disable DHCP option 3 (router) by passing an empty value
 #   - disable DHCP option 6 (DNS) by passing an empty value
 #   - add a DHCP range from 172.16.0.2 to 172.16.0.2 (single IP) with a lease time of 1 minute
-P4wnP1_cli NET set server -i usbeth -a 172.16.0.1 -m 255.255.255.248 -o "3:" -o "6:" -r "172.16.0.2|172.16.0.2|1m"
+P4wnP1_cli NET set server -i usbeth -a 172.16.0.1 -m 255.255.255.248 -o "3:" -o "6:" -r "172.16.0.2|172.16.0.2|5m"
 
 # Enable WiFi AP (reg US, channel 6, SSID/AP name: "P4wnP1", pre shared key: "MaMe82-P4wnP1", don't use nexmon firmware)
 # Note: As a pre-shared key is given, P4wnP1 assume the AP should use WPA2-PSK
