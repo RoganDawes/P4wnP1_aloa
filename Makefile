@@ -71,6 +71,7 @@ installkali:
 
 	cp build/P4wnP1_service /usr/local/bin/
 	cp build/P4wnP1_cli /usr/local/bin/
+	cp dist/bin/* /usr/local/bin/
 	cp dist/P4wnP1-kali.service /etc/systemd/system/P4wnP1.service
 	# copy over keymaps, scripts and www data
 	mkdir -p /usr/local/P4wnP1
@@ -88,6 +89,7 @@ installkali:
 
 	# enable service
 	systemctl enable haveged
+	systemctl enable avahi-daemon
 	systemctl enable P4wnP1.service
 
 install:
@@ -100,6 +102,7 @@ install:
 	cp -R dist/scripts /usr/local/P4wnP1/
 	cp -R dist/HIDScripts /usr/local/P4wnP1/
 	cp -R dist/www /usr/local/P4wnP1/
+	cp dist/bin/* /usr/local/bin/
 	cp build/webapp.js /usr/local/P4wnP1/www
 	cp build/webapp.js.map /usr/local/P4wnP1/www
 
