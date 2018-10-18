@@ -6,6 +6,7 @@ import (
 	"github.com/mame82/P4wnP1_go/common_web"
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"github.com/mame82/P4wnP1_go/service/datastore"
+	"time"
 )
 
 
@@ -146,7 +147,7 @@ func NewService() (svc *Service, err error) {
 
 	svc.SubSysWifi = NewWifiService(svc) //Depends on NetworkSubSys
 
-	svc.SubSysBluetooth = NewBtService(svc) //Depends on NetworkSubSys
+	svc.SubSysBluetooth = NewBtService(svc, time.Second * 120) //Depends on NetworkSubSys (try to bring up bluetooth for up to 120s in background)
 
 	svc.SubSysRPC = NewRpcServerService(svc) //Depends on all other
 
@@ -166,8 +167,16 @@ func (s *Service) Start() {
 	// Register TriggerActions
 	RegisterDefaultTriggerActions(s.SubSysTriggerActions)
 
-	// ToDo: Manual start of BT NAP, has to be replaced by settings based approach (same as other subsystems)
-	s.SubSysBluetooth.StartNAP()
+	// ToDo: 1) Manual start of BT NAP, has to be replaced by settings based approach (same as other subsystems)
+	// ToDo: 2) create a signal based method s.SubSysBluetooth.WaitTillServiceUp(timeout duration)
+	go func() {
+		timeStart := time.Now()
+		for timeSinceStart := time.Since(timeStart); !s.SubSysBluetooth.IsServiceAvailable() && timeSinceStart < time.Second*120 ;timeSinceStart = time.Since(timeStart) {
+			time.Sleep(time.Second)
+		}
+		s.SubSysBluetooth.StartNAP()
+	}()
+
 
 	// fire service started Event
 	s.SubSysEvent.Emit(ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_SERVICE_STARTED))
