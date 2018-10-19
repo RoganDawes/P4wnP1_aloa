@@ -174,6 +174,7 @@ func actionDeployCurrentBluetoothControllerInformation(store *mvuex.Store, conte
 		res, err := RpcClient.DeployBluetoothControllerInformation(defaultTimeout, state.CurrentBluetoothControllerInformation)
 		if err != nil {
 			println("Couldn't deploy BluetoothControllerInformation", err)
+			actionUpdateCurrentBluetoothControllerInformation(store, context, state)
 			return
 		}
 

@@ -208,6 +208,69 @@ const templateBluetoothController = `
 				</q-item-tile>
 			</q-item-main>
 		</q-item>
+
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="controllerInfo.CurrentSettings.Connectable" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>Connectable</q-item-tile>
+				<q-item-tile sublabel>Allow incoming connections</q-item-tile>
+			</q-item-main>
+		</q-item>
+
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="controllerInfo.CurrentSettings.Discoverable" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>Discoverable</q-item-tile>
+				<q-item-tile sublabel>P4wnP1 could be discovered by other devices if enabled (only if Connectable)</q-item-tile>
+			</q-item-main>
+		</q-item>
+
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="controllerInfo.CurrentSettings.Bondable" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>Bondable</q-item-tile>
+				<q-item-tile sublabel>Other devices could pair with P4wnP1</q-item-tile>
+			</q-item-main>
+		</q-item>
+
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="controllerInfo.CurrentSettings.HighSpeed" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>High Speed</q-item-tile>
+				<q-item-tile sublabel>Use alternate data channel (802.11)</q-item-tile>
+			</q-item-main>
+		</q-item>
+
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="controllerInfo.CurrentSettings.LowEnergy" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>Low Energy</q-item-tile>
+				<q-item-tile sublabel>Enable Bluetooth LE (Bluetooth Smart)</q-item-tile>
+			</q-item-main>
+		</q-item>
+
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="controllerInfo.CurrentSettings.SecureSimplePairing" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>Secure Simple Pairing</q-item-tile>
+				<q-item-tile sublabel>If disabled, insecure PIN based pairing is used and HighSpeed isn't available</q-item-tile>
+			</q-item-main>
+		</q-item>
+
+
+
 	</q-list>
 
 </q-card>
