@@ -75,6 +75,10 @@ func GetDefaultDHCPConfigUSB() (settings *pb.DHCPServerSettings) {
 	return
 }
 
+// Important: An Android device wants to see a valid gateway+DNS in order to get bluetooth networking workable
+// (otherwise no follow up communication would be possible, after the DHCP lease is assigned, according to my tests).
+// If this condition is full filled, there seems to be no need for a real upstream connection, in order to reach the
+// gateway IP (accessing P4wnP1 is possible in this case.
 func GetDefaultDHCPConfigBluetooth() (settings *pb.DHCPServerSettings) {
 	settings = &pb.DHCPServerSettings{
 		//CallbackScript:     "/bin/evilscript",
@@ -87,8 +91,8 @@ func GetDefaultDHCPConfigBluetooth() (settings *pb.DHCPServerSettings) {
 			&pb.DHCPServerRange{RangeLower: "172.26.0.2", RangeUpper: "172.26.0.20", LeaseTime: "5m"},
 		},
 		Options: map[uint32]string{
-			3:   "", //Disable option: Router
-			6:   "", //Disable option: DNS
+			3:   "172.26.0.1", //Disable option: Router
+			6:   "172.26.0.1", //Disable option: DNS
 		},
 	}
 	return

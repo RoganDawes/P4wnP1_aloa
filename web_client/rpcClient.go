@@ -30,6 +30,28 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) GetBluetoothControllerInformation(timeout time.Duration) (res *jsBluetoothControllerInformation, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	btCtlInfo, err := rpc.Client.GetBluetoothControllerInformation(ctx, &pb.Empty{})
+	if err != nil { return res, err }
+	res = &jsBluetoothControllerInformation{Object:O()}
+	res.fromGo(btCtlInfo)
+	return
+}
+
+func (rpc *Rpc) DeployBluetoothControllerInformation(timeout time.Duration, newSettings *jsBluetoothControllerInformation) (res *jsBluetoothControllerInformation, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	btCtlInfo, err := rpc.Client.DeployBluetoothControllerInformation(ctx, newSettings.toGo())
+	if err != nil { return res, err }
+	res = &jsBluetoothControllerInformation{Object:O()}
+	res.fromGo(btCtlInfo)
+	return
+}
+
 func (rpc *Rpc) GetStoredUSBSettingsList(timeout time.Duration) (ws []string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

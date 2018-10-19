@@ -1,3 +1,5 @@
+// +build linux,arm
+
 package service
 
 import (
@@ -122,26 +124,22 @@ func (bt *BtService) IsServiceAvailable() bool  {
 // like webclient, cli_client or ssh aren't always used), we have to fall back to "just works" mode if we want to use SSP.
 // Even if a static PIN is a security issue, using just works is even more insecure.
 // On the other hand, the idea to disable SSP didn't work out either, because this won't allow to set the broadcom bluetooth
-// adapter to high speed. Not having high speed enabled, ultimately results in connection issues for BNEP usage
+// adapter to high speed. Not having high speed enabled, ultimately results in a very slow connection for BNEP usage
 // (in fact, if a NAP is turned on without high speed, a remote device is able to pair and connect, even to receive a DHCP
-// lease from the server. The latter indicates that th IP connection (layer 3) is working, but follow up traffic doesn't
-// work (neither on layer 3 -l ike ICMP requests, nor on layer 4 - like TCP based SSH connections)
+// lease from the server, but follow up traffic way to slow)
+//
+// Additionally it seems if an Android should be able to use a NAP provided via BNEP, a DHCP server has to be running
+// and has to HAND OUT A ROUTER AND A DNS OPTION, POINTING TO THE IP OF P4wnP1.
+// Even if no upstream connection is provided, connecting to P4wnP1 is possible, if, and only if, these two DHCP options
+// are set. Otherwise the Adnroid device would stop communicating after the DHCP lease has been issued.
 // The behavior of not fully working connections has been observed using a Samsung Android phone as remote device. It has
-// not been confirmed that connection issues exist on other devices. Anyways, not having a common device working means
-// PIN based pairing without SSP isn't an option.
-// In result SSP has to be turned on in "just works" mode (we describe P4wnP1 as a device with no input and no outpu capabilities).
+// not been confirmed that connection issues exist on other devices.
 //
-// As P4wnP1 IS NOT DESIGNED WITH SECURITY IN MIND (at least no self-protection), a new issue arises:
-//
-// As soon as a bluetooth is turned on and set to be discoverable and pairable, EVERY REMOTE DEVICE IS ACCEPTED TO CONNECT AND PAIR.
-// (While WiFi access could at least be protected with WPA2). Neither the the WebClient, nor the RPC server deploy any kind of
-// MitM protection, access restriction or other security measures to protect themselves from other ways of compromise.
-// A solution has to be found to deal with that issue (in a headless way)! Possible ideas
-// - allow disabling/enabling PAIRING on demand by webclient / clie
-// - use limited PAIRING (timeout till pairing is disabled again) on boot, f.e. with a 30 second time window. Disable pairing
-// as soon as one device connected. This till leaves a race condition
-//
-// For now: Pairing in "just works" mode is always on!
+// Summary of NAP conditions:
+// - DHCP server is running and provides DHCP option 3 and 6, both pointing to the IP of the bluetooth ethernet bridge
+// - to be able to use high speed, SSP has to be enabled, which again means no PIN requests are possible
+// - if SSP is enabled, only "just works" mode could be used and thus PAIRABLE and DISCOVERABLE should only be enabled
+//   for a short duration
 
 // ToDo: Move all controller specific tasks to controller
 func (bt *BtService) StartNAP() (err error) {
@@ -168,8 +166,10 @@ func (bt *BtService) StartNAP() (err error) {
 
 	// SSP and HS enabled, this disables PIN requests but is needed for NAP to work (see comments above)
 	bt.Controller.SetPowered(false)
-	bt.Controller.SetSSP(true) //Couldn't use legacy mode (no Secure Simple Pairing, but PIN based pairing), otherwise HighSpeed couldn't be enabled
-	bt.Controller.SetHighSpeed(true) // Enable high speed mode, yeah (without high speed, NAP connections don't work as intended)
+//	bt.Controller.SetSSP(true) //Couldn't use legacy mode (no Secure Simple Pairing, but PIN based pairing), otherwise HighSpeed couldn't be enabled
+//	bt.Controller.SetHighSpeed(true) // Enable high speed mode, yeah (without high speed, NAP connections don't work as intended)
+	bt.Controller.SetSSP(false) // Fall back to PIN authentication (legacy mode)
+	bt.Controller.SetHighSpeed(false) // No high speed without SSP
 	bt.Controller.SetPowered(true)
 
 	// Configure adapter
@@ -381,3 +381,4 @@ func BoolToInt(b bool) int {
 func BoolToIntStr(b bool) string {
 	return strconv.Itoa(BoolToInt(b))
 }
+

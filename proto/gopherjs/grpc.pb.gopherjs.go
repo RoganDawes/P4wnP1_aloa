@@ -8,6 +8,8 @@
 		grpc.proto
 
 	It has these top-level messages:
+		BluetoothControllerSettings
+		BluetoothControllerInformation
 		TriggerActionSet
 		TriggerAction
 		TriggerServiceStarted
@@ -366,6 +368,486 @@ var EthernetInterfaceSettings_Mode_value = map[string]int{
 
 func (x EthernetInterfaceSettings_Mode) String() string {
 	return EthernetInterfaceSettings_Mode_name[int(x)]
+}
+
+// Bluetooth
+type BluetoothControllerSettings struct {
+	Powered                 bool
+	Connectable             bool
+	FastConnectable         bool
+	Discoverable            bool
+	Bondable                bool
+	LinkLevelSecurity       bool
+	SecureSimplePairing     bool
+	BrEdr                   bool
+	HighSpeed               bool
+	LowEnergy               bool
+	Advertising             bool
+	SecureConnections       bool
+	DebugKeys               bool
+	Privacy                 bool
+	ControllerConfiguration bool
+	StaticAddress           bool
+}
+
+// GetPowered gets the Powered of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetPowered() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Powered
+}
+
+// GetConnectable gets the Connectable of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetConnectable() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Connectable
+}
+
+// GetFastConnectable gets the FastConnectable of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetFastConnectable() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.FastConnectable
+}
+
+// GetDiscoverable gets the Discoverable of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetDiscoverable() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Discoverable
+}
+
+// GetBondable gets the Bondable of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetBondable() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Bondable
+}
+
+// GetLinkLevelSecurity gets the LinkLevelSecurity of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetLinkLevelSecurity() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.LinkLevelSecurity
+}
+
+// GetSecureSimplePairing gets the SecureSimplePairing of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetSecureSimplePairing() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.SecureSimplePairing
+}
+
+// GetBrEdr gets the BrEdr of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetBrEdr() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.BrEdr
+}
+
+// GetHighSpeed gets the HighSpeed of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetHighSpeed() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.HighSpeed
+}
+
+// GetLowEnergy gets the LowEnergy of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetLowEnergy() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.LowEnergy
+}
+
+// GetAdvertising gets the Advertising of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetAdvertising() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Advertising
+}
+
+// GetSecureConnections gets the SecureConnections of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetSecureConnections() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.SecureConnections
+}
+
+// GetDebugKeys gets the DebugKeys of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetDebugKeys() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.DebugKeys
+}
+
+// GetPrivacy gets the Privacy of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetPrivacy() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.Privacy
+}
+
+// GetControllerConfiguration gets the ControllerConfiguration of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetControllerConfiguration() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.ControllerConfiguration
+}
+
+// GetStaticAddress gets the StaticAddress of the BluetoothControllerSettings.
+func (m *BluetoothControllerSettings) GetStaticAddress() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.StaticAddress
+}
+
+// MarshalToWriter marshals BluetoothControllerSettings to the provided writer.
+func (m *BluetoothControllerSettings) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if m.Powered {
+		writer.WriteBool(1, m.Powered)
+	}
+
+	if m.Connectable {
+		writer.WriteBool(2, m.Connectable)
+	}
+
+	if m.FastConnectable {
+		writer.WriteBool(3, m.FastConnectable)
+	}
+
+	if m.Discoverable {
+		writer.WriteBool(4, m.Discoverable)
+	}
+
+	if m.Bondable {
+		writer.WriteBool(5, m.Bondable)
+	}
+
+	if m.LinkLevelSecurity {
+		writer.WriteBool(6, m.LinkLevelSecurity)
+	}
+
+	if m.SecureSimplePairing {
+		writer.WriteBool(7, m.SecureSimplePairing)
+	}
+
+	if m.BrEdr {
+		writer.WriteBool(8, m.BrEdr)
+	}
+
+	if m.HighSpeed {
+		writer.WriteBool(9, m.HighSpeed)
+	}
+
+	if m.LowEnergy {
+		writer.WriteBool(10, m.LowEnergy)
+	}
+
+	if m.Advertising {
+		writer.WriteBool(11, m.Advertising)
+	}
+
+	if m.SecureConnections {
+		writer.WriteBool(12, m.SecureConnections)
+	}
+
+	if m.DebugKeys {
+		writer.WriteBool(13, m.DebugKeys)
+	}
+
+	if m.Privacy {
+		writer.WriteBool(14, m.Privacy)
+	}
+
+	if m.ControllerConfiguration {
+		writer.WriteBool(15, m.ControllerConfiguration)
+	}
+
+	if m.StaticAddress {
+		writer.WriteBool(16, m.StaticAddress)
+	}
+
+	return
+}
+
+// Marshal marshals BluetoothControllerSettings to a slice of bytes.
+func (m *BluetoothControllerSettings) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a BluetoothControllerSettings from the provided reader.
+func (m *BluetoothControllerSettings) UnmarshalFromReader(reader jspb.Reader) *BluetoothControllerSettings {
+	for reader.Next() {
+		if m == nil {
+			m = &BluetoothControllerSettings{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Powered = reader.ReadBool()
+		case 2:
+			m.Connectable = reader.ReadBool()
+		case 3:
+			m.FastConnectable = reader.ReadBool()
+		case 4:
+			m.Discoverable = reader.ReadBool()
+		case 5:
+			m.Bondable = reader.ReadBool()
+		case 6:
+			m.LinkLevelSecurity = reader.ReadBool()
+		case 7:
+			m.SecureSimplePairing = reader.ReadBool()
+		case 8:
+			m.BrEdr = reader.ReadBool()
+		case 9:
+			m.HighSpeed = reader.ReadBool()
+		case 10:
+			m.LowEnergy = reader.ReadBool()
+		case 11:
+			m.Advertising = reader.ReadBool()
+		case 12:
+			m.SecureConnections = reader.ReadBool()
+		case 13:
+			m.DebugKeys = reader.ReadBool()
+		case 14:
+			m.Privacy = reader.ReadBool()
+		case 15:
+			m.ControllerConfiguration = reader.ReadBool()
+		case 16:
+			m.StaticAddress = reader.ReadBool()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a BluetoothControllerSettings from a slice of bytes.
+func (m *BluetoothControllerSettings) Unmarshal(rawBytes []byte) (*BluetoothControllerSettings, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type BluetoothControllerInformation struct {
+	Address           []byte
+	BluetoothVersion  uint32
+	Manufacturer      uint32
+	SupportedSettings *BluetoothControllerSettings
+	CurrentSettings   *BluetoothControllerSettings
+	ClassOfDevice     []byte
+	Name              string
+	ShortName         string
+	IsAvailable       bool
+}
+
+// GetAddress gets the Address of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetAddress() (x []byte) {
+	if m == nil {
+		return x
+	}
+	return m.Address
+}
+
+// GetBluetoothVersion gets the BluetoothVersion of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetBluetoothVersion() (x uint32) {
+	if m == nil {
+		return x
+	}
+	return m.BluetoothVersion
+}
+
+// GetManufacturer gets the Manufacturer of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetManufacturer() (x uint32) {
+	if m == nil {
+		return x
+	}
+	return m.Manufacturer
+}
+
+// GetSupportedSettings gets the SupportedSettings of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetSupportedSettings() (x *BluetoothControllerSettings) {
+	if m == nil {
+		return x
+	}
+	return m.SupportedSettings
+}
+
+// GetCurrentSettings gets the CurrentSettings of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetCurrentSettings() (x *BluetoothControllerSettings) {
+	if m == nil {
+		return x
+	}
+	return m.CurrentSettings
+}
+
+// GetClassOfDevice gets the ClassOfDevice of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetClassOfDevice() (x []byte) {
+	if m == nil {
+		return x
+	}
+	return m.ClassOfDevice
+}
+
+// GetName gets the Name of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Name
+}
+
+// GetShortName gets the ShortName of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetShortName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.ShortName
+}
+
+// GetIsAvailable gets the IsAvailable of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetIsAvailable() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.IsAvailable
+}
+
+// MarshalToWriter marshals BluetoothControllerInformation to the provided writer.
+func (m *BluetoothControllerInformation) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.Address) > 0 {
+		writer.WriteBytes(1, m.Address)
+	}
+
+	if m.BluetoothVersion != 0 {
+		writer.WriteUint32(2, m.BluetoothVersion)
+	}
+
+	if m.Manufacturer != 0 {
+		writer.WriteUint32(3, m.Manufacturer)
+	}
+
+	if m.SupportedSettings != nil {
+		writer.WriteMessage(4, func() {
+			m.SupportedSettings.MarshalToWriter(writer)
+		})
+	}
+
+	if m.CurrentSettings != nil {
+		writer.WriteMessage(5, func() {
+			m.CurrentSettings.MarshalToWriter(writer)
+		})
+	}
+
+	if len(m.ClassOfDevice) > 0 {
+		writer.WriteBytes(6, m.ClassOfDevice)
+	}
+
+	if len(m.Name) > 0 {
+		writer.WriteString(7, m.Name)
+	}
+
+	if len(m.ShortName) > 0 {
+		writer.WriteString(8, m.ShortName)
+	}
+
+	if m.IsAvailable {
+		writer.WriteBool(9, m.IsAvailable)
+	}
+
+	return
+}
+
+// Marshal marshals BluetoothControllerInformation to a slice of bytes.
+func (m *BluetoothControllerInformation) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a BluetoothControllerInformation from the provided reader.
+func (m *BluetoothControllerInformation) UnmarshalFromReader(reader jspb.Reader) *BluetoothControllerInformation {
+	for reader.Next() {
+		if m == nil {
+			m = &BluetoothControllerInformation{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Address = reader.ReadBytes()
+		case 2:
+			m.BluetoothVersion = reader.ReadUint32()
+		case 3:
+			m.Manufacturer = reader.ReadUint32()
+		case 4:
+			reader.ReadMessage(func() {
+				m.SupportedSettings = m.SupportedSettings.UnmarshalFromReader(reader)
+			})
+		case 5:
+			reader.ReadMessage(func() {
+				m.CurrentSettings = m.CurrentSettings.UnmarshalFromReader(reader)
+			})
+		case 6:
+			m.ClassOfDevice = reader.ReadBytes()
+		case 7:
+			m.Name = reader.ReadString()
+		case 8:
+			m.ShortName = reader.ReadString()
+		case 9:
+			m.IsAvailable = reader.ReadBool()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a BluetoothControllerInformation from a slice of bytes.
+func (m *BluetoothControllerInformation) Unmarshal(rawBytes []byte) (*BluetoothControllerInformation, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
 
 // Triggers, Actions and resulting TriggerActions
@@ -5335,6 +5817,9 @@ const _ = grpcweb.GrpcWebPackageIsVersion3
 // Client API for P4WNP1 service
 
 type P4WNP1Client interface {
+	// Bluetooth
+	GetBluetoothControllerInformation(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*BluetoothControllerInformation, error)
+	DeployBluetoothControllerInformation(ctx context.Context, in *BluetoothControllerInformation, opts ...grpcweb.CallOption) (*BluetoothControllerInformation, error)
 	// USB gadget
 	GetDeployedGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
 	DeployGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
@@ -5404,6 +5889,24 @@ func NewP4WNP1Client(hostname string, opts ...grpcweb.DialOption) P4WNP1Client {
 	return &p4WNP1Client{
 		client: grpcweb.NewClient(hostname, "P4wnP1_grpc.P4WNP1", opts...),
 	}
+}
+
+func (c *p4WNP1Client) GetBluetoothControllerInformation(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*BluetoothControllerInformation, error) {
+	resp, err := c.client.RPCCall(ctx, "GetBluetoothControllerInformation", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(BluetoothControllerInformation).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployBluetoothControllerInformation(ctx context.Context, in *BluetoothControllerInformation, opts ...grpcweb.CallOption) (*BluetoothControllerInformation, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployBluetoothControllerInformation", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(BluetoothControllerInformation).Unmarshal(resp)
 }
 
 func (c *p4WNP1Client) GetDeployedGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error) {

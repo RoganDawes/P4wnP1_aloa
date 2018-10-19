@@ -64,6 +64,7 @@ func main() {
 		VueRouterRoute("/network","", "<network></network>"),
 		VueRouterRoute("/wifi","", "<wifi></wifi>"),
 		VueRouterRoute("/triggeractions","", "<triggeraction-manager></triggeraction-manager>"),
+		VueRouterRoute("/bluetooth","", "<bluetooth></bluetooth>"),
 	)
 
 
@@ -80,6 +81,7 @@ func main() {
 	InitComponentsNetwork()
 	InitComponentsWiFi()
 	InitComponentsTriggerActions()
+	InitComponentsBluetooth()
 
 	vm := hvue.NewVM(
 		hvue.El("#app"),
@@ -134,6 +136,7 @@ const templateMainApp = `
                 <q-route-tab slot="title" to="network" name="tab-network" icon="settings_ethernet" label="Network settings"></q-route-tab>
                 <q-route-tab slot="title" to="wifi" name="tab-wifi" icon="wifi" label="WiFi settings"></q-route-tab>
                 <q-route-tab slot="title" to="triggeractions" name="tab-triggeraction" icon="whatshot" label="Trigger Actions"></q-route-tab>
+                <q-route-tab slot="title" to="bluetooth" name="tab-bluetooth" icon="bluetooth" label="Bluetooth"></q-route-tab>
             </q-tabs>
         </q-layout-header>
 

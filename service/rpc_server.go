@@ -4,6 +4,7 @@ package service
 
 import (
 	pb "github.com/mame82/P4wnP1_go/proto"
+	"github.com/mame82/P4wnP1_go/service/bluetooth"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"io"
@@ -47,6 +48,23 @@ type server struct {
 
 	listenAddrGrpc string
 	listenAddrWeb string
+}
+
+func (s *server) DeployBluetoothControllerInformation(ctx context.Context, newBtCiRpc *pb.BluetoothControllerInformation) (updateBtCiRpc *pb.BluetoothControllerInformation, err error) {
+	btCi := bluetooth.BluetoothControllerInformationFromRpc(newBtCiRpc)
+	updatedCi,err := s.rootSvc.SubSysBluetooth.Controller.UpdateSettingsFromChangedControllerInformation(btCi)
+	//fmt.Printf("Deployed bluetooth settings\n%+v\n%v\n", updatedCi, err)
+	if err != nil { return nil,err }
+	updateBtCiRpc = bluetooth.BluetoothControllerInformationToRpc(updatedCi)
+	return updateBtCiRpc, nil
+}
+
+func (s *server) GetBluetoothControllerInformation(ctx context.Context, e *pb.Empty) (res *pb.BluetoothControllerInformation, err error) {
+	btCi,err := s.rootSvc.SubSysBluetooth.Controller.ReadControllerInformation()
+	if err != nil { return res,err }
+	btCiRpc := bluetooth.BluetoothControllerInformationToRpc(btCi)
+	btCiRpc.IsAvailable = s.rootSvc.SubSysBluetooth.IsServiceAvailable()
+	return btCiRpc, nil
 }
 
 func (s *server) StoreUSBSettings(ctx context.Context, r *pb.USBRequestSettingsStorage) (e *pb.Empty, err error) {

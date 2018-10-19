@@ -3,6 +3,10 @@ syntax = "proto3";
 package P4wnP1_grpc;
 
 service P4WNP1 {
+    //Bluetooth
+    rpc GetBluetoothControllerInformation (Empty) returns (BluetoothControllerInformation) {}
+    rpc DeployBluetoothControllerInformation (BluetoothControllerInformation) returns (BluetoothControllerInformation) {}
+
     //USB gadget
     rpc GetDeployedGadgetSetting (Empty) returns (GadgetSettings) {    }
     rpc DeployGadgetSetting (Empty) returns (GadgetSettings) {    }
@@ -78,6 +82,38 @@ service P4WNP1 {
 
     rpc ListStoredHIDScripts(Empty) returns (StringMessageArray) {}
     rpc ListStoredBashScripts(Empty) returns (StringMessageArray) {}
+}
+
+/* Bluetooth */
+message BluetoothControllerSettings {
+    bool powered = 1;
+    bool connectable = 2;
+    bool fast_connectable = 3;
+    bool discoverable = 4;
+    bool bondable = 5;
+    bool link_level_security = 6;
+    bool secure_simple_pairing = 7;
+    bool br_edr = 8;
+    bool high_speed = 9;
+    bool low_energy = 10;
+    bool advertising = 11;
+    bool secure_connections = 12;
+    bool debug_keys = 13;
+    bool privacy = 14;
+    bool controller_configuration = 15;
+    bool static_address = 16;
+}
+
+message BluetoothControllerInformation {
+    bytes address = 1;
+    uint32 bluetooth_version = 2;
+    uint32 manufacturer = 3;
+    BluetoothControllerSettings supported_settings = 4;
+    BluetoothControllerSettings current_settings = 5;
+    bytes class_of_device = 6;
+    string name = 7;
+    string short_name = 8;
+    bool is_available = 9;
 }
 
 /* Triggers, Actions and resulting TriggerActions */
