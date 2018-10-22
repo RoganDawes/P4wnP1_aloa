@@ -114,6 +114,8 @@ func (bt *BtService) IsServiceAvailable() bool  {
 }
 
 
+
+
 // Notes: On Bluetooth settings
 // P4wnP1 is meant to run headless, which has influence on Pairing mode. There's legacy pairing (outdated and insecure)
 // which allows requesting a PIN from a remote device which wants to connect. The new Pairing mode is Secure Simple Pairing
@@ -195,6 +197,7 @@ func (bt *BtService) StartNAP() (err error) {
 	time.Sleep(time.Second) //give some time before registering NAP to SDP
 
 	// Enable PAN networking for bridge
+	/*
 	nw, err := toolz.NetworkServer(bt.Controller.DBusPath)
 	if err != nil {
 		return
@@ -204,12 +207,63 @@ func (bt *BtService) StartNAP() (err error) {
 	if err != nil {
 		return
 	}
+	*/
+	bt.RegisterNetworkServer(toolz.UUID_NETWORK_SERVER_NAP)
 
 	if mi, err := bt.RootSvc.SubSysNetwork.GetManagedInterface(BT_ETHERNET_BRIDGE_NAME); err == nil {
 		mi.ReDeploy()
 	}
 
 	return
+}
+
+func (bt *BtService) SetPIN(pin string) (err error) {
+	if !bt.IsServiceAvailable() {
+		return bluetooth.ErrBtSvcNotAvailable
+	}
+	bt.Agent.SetPIN(pin)
+	return
+}
+
+func (bt *BtService) GetPIN() (pin string, err error) {
+	if !bt.IsServiceAvailable() {
+		return pin,bluetooth.ErrBtSvcNotAvailable
+	}
+	return bt.Agent.GetPIN(), nil
+}
+
+
+func (bt *BtService) RegisterNetworkServer(uuid toolz.NetworkServerUUID) (err error) {
+	return bt.Controller.RegisterNetworkServer(uuid, BT_ETHERNET_BRIDGE_NAME)
+}
+
+func (bt *BtService) UnregisterNetworkServer(uuid toolz.NetworkServerUUID) (err error) {
+	return bt.Controller.UnregisterNetworkServer(uuid)
+}
+
+
+func (bt *BtService) ConnectNetwork(deviceMac string, uuid toolz.NetworkServerUUID) (err error) {
+	return bt.Controller.ConnectNetwork(deviceMac, uuid)
+}
+
+func (bt *BtService) DisconnectNetwork(deviceMac string) (err error) {
+	return bt.Controller.DisconnectNetwork(deviceMac)
+}
+
+func (bt *BtService) IsServerNAPEnabled() (res bool, err error) {
+	return bt.Controller.IsServerNAPEnabled()
+}
+
+func (bt *BtService) IsServerPANUEnabled() (res bool, err error) {
+	return bt.Controller.IsServerPANUEnabled()
+}
+
+func (bt *BtService) IsServerGNEnabled() (res bool, err error) {
+	return bt.Controller.IsServerGNEnabled()
+}
+
+func (bt *BtService) CheckUUIDEnabled(uuids []string) (enabled []bool, err error) {
+	return bt.Controller.CheckUUIDList(uuids)
 }
 
 func (bt *BtService) StopNAP() (err error) {

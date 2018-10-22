@@ -21,8 +21,11 @@ const (
 	//Bluetooth
 	VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION = "updateCurrentBluetoothControllerInformation"
 	VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION = "deployCurrentBluetoothControllerInformation"
+	VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_AGENT_SETTINGS = "updateCurrentBluetoothAgentSettings"
+	VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_AGENT_SETTINGS = "deployCurrentBluetoothAgentSettings"
 
 	VUEX_MUTATION_SET_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION = "setCurrentBluetoothControllerInformation"
+	VUEX_MUTATION_SET_CURRENT_BLUETOOTH_AGENT_SETTINGS = "setCurrentBluetoothAgentSettings"
 
 	//HIDScripts and jobs
 	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS                           = "updateRunningHidJobs"
@@ -107,6 +110,7 @@ type GlobalState struct {
 	InterfaceSettings                     *jsEthernetSettingsList           `js:"InterfaceSettings"`
 	WiFiState                             *jsWiFiState                      `js:"wifiState"`
 	CurrentBluetoothControllerInformation *jsBluetoothControllerInformation `js:"CurrentBluetoothControllerInformation"`
+	CurrentBluetoothAgentSettings *jsBluetoothAgentSettings `js:"CurrentBluetoothAgentSettings"`
 
 	StoredWifiSettingsList                []string                          `js:"StoredWifiSettingsList"`
 	StoredEthernetInterfaceSettingsList   []string                          `js:"StoredEthernetInterfaceSettingsList"`
@@ -138,6 +142,7 @@ func createGlobalStateStruct() GlobalState {
 	//Retrieve Interface settings
 	state.InterfaceSettings = NewEthernetSettingsList()
 	state.CurrentBluetoothControllerInformation = NewBluetoothControllerInformation()
+	state.CurrentBluetoothAgentSettings = NewBluetoothAgentSettings()
 
 	/*
 	wifiSettings, err := RpcClient.GetWifiState(time.Second * 5)
@@ -169,7 +174,7 @@ func actionUpdateCurrentBluetoothControllerInformation(store *mvuex.Store, conte
 
 func actionDeployCurrentBluetoothControllerInformation(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
-		println("Trying to deploy bluetooth controller information: ", state.CurrentBluetoothControllerInformation.CurrentSettings.Powered)
+		println("Trying to deploy bluetooth controller information: ", state.CurrentBluetoothControllerInformation)
 		//fetch deployed gadget settings
 		res, err := RpcClient.DeployBluetoothControllerInformation(defaultTimeout, state.CurrentBluetoothControllerInformation)
 		if err != nil {
@@ -178,8 +183,43 @@ func actionDeployCurrentBluetoothControllerInformation(store *mvuex.Store, conte
 			return
 		}
 
-		println("Bluetooth Controller Info after deploy: ", res.CurrentSettings.Powered)
+		println("Bluetooth Controller Info after deploy: ", res)
 		context.Commit(VUEX_MUTATION_SET_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION, res)
+	}()
+
+	return
+}
+
+func actionUpdateCurrentBluetoothAgentSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch bluetooth agent settings")
+		//fetch deployed gadget settings
+		res, err := RpcClient.GetBluetoothAgentSettings(defaultTimeout)
+		if err != nil {
+			println("Couldn't retrieve AgentSettings")
+			return
+		}
+
+		println("Bluetooth Controller Info: ", res)
+		context.Commit(VUEX_MUTATION_SET_CURRENT_BLUETOOTH_AGENT_SETTINGS, res)
+	}()
+
+	return
+}
+
+func actionDeployCurrentBluetoothAgentSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to deploy bluetooth agent settings: ", state.CurrentBluetoothAgentSettings)
+		//fetch deployed gadget settings
+		res, err := RpcClient.DeployBluetoothAgentSettings(defaultTimeout, state.CurrentBluetoothAgentSettings)
+		if err != nil {
+			println("Couldn't deploy agent settings", err)
+			actionUpdateCurrentBluetoothAgentSettings(store, context, state)
+			return
+		}
+
+		println("Bluetooth agent settings after deploy: ", res)
+		context.Commit(VUEX_MUTATION_SET_CURRENT_BLUETOOTH_AGENT_SETTINGS, res)
 	}()
 
 	return
@@ -800,6 +840,10 @@ func initMVuex() *mvuex.Store {
 			println("Updating bluetooth controller information for ", btCtlInfo.Name)
 			state.CurrentBluetoothControllerInformation = btCtlInfo
 		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_BLUETOOTH_AGENT_SETTINGS, func(store *mvuex.Store, state *GlobalState, agentSettings *jsBluetoothAgentSettings) {
+			println("Updating bluetooth agent settings for ", agentSettings)
+			state.CurrentBluetoothAgentSettings = agentSettings
+		}),
 		/*
 		mvuex.Mutation("startLogListening", func (store *mvuex.Store, state *GlobalState) {
 			state.EventReceiver.StartListening()
@@ -812,6 +856,8 @@ func initMVuex() *mvuex.Store {
 		*/
 		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION, actionUpdateCurrentBluetoothControllerInformation),
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION, actionDeployCurrentBluetoothControllerInformation),
+		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_AGENT_SETTINGS, actionUpdateCurrentBluetoothAgentSettings),
+		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_AGENT_SETTINGS, actionDeployCurrentBluetoothAgentSettings),
 
 		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS, actionUpdateGadgetSettingsFromDeployed),
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_USB_SETTINGS, actionDeployCurrentGadgetSettings),

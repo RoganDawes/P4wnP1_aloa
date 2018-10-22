@@ -30,6 +30,28 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) GetBluetoothAgentSettings(timeout time.Duration) (res *jsBluetoothAgentSettings, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	resRpc, err := rpc.Client.GetBluetoothAgentSettings(ctx, &pb.Empty{})
+	if err != nil { return res, err }
+	res = &jsBluetoothAgentSettings{Object:O()}
+	res.fromGo(resRpc)
+	return
+}
+
+func (rpc *Rpc) DeployBluetoothAgentSettings(timeout time.Duration, newSettings *jsBluetoothAgentSettings) (res *jsBluetoothAgentSettings, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	resRpc, err := rpc.Client.DeployBluetoothAgentSettings(ctx, newSettings.toGo())
+	if err != nil { return res, err }
+	res = &jsBluetoothAgentSettings{Object:O()}
+	res.fromGo(resRpc)
+	return
+}
+
 func (rpc *Rpc) GetBluetoothControllerInformation(timeout time.Duration) (res *jsBluetoothControllerInformation, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

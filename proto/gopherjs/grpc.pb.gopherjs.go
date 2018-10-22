@@ -8,6 +8,8 @@
 		grpc.proto
 
 	It has these top-level messages:
+		BluetoothAgentSettings
+		BluetoothNetworkService
 		BluetoothControllerSettings
 		BluetoothControllerInformation
 		TriggerActionSet
@@ -75,6 +77,29 @@ import (
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the jspb package it is being compiled against.
 const _ = jspb.JspbPackageIsVersion2
+
+type BluetoothNetworkServiceType int
+
+const (
+	BluetoothNetworkServiceType_NAP  BluetoothNetworkServiceType = 0
+	BluetoothNetworkServiceType_PANU BluetoothNetworkServiceType = 1
+	BluetoothNetworkServiceType_GN   BluetoothNetworkServiceType = 2
+)
+
+var BluetoothNetworkServiceType_name = map[int]string{
+	0: "NAP",
+	1: "PANU",
+	2: "GN",
+}
+var BluetoothNetworkServiceType_value = map[string]int{
+	"NAP":  0,
+	"PANU": 1,
+	"GN":   2,
+}
+
+func (x BluetoothNetworkServiceType) String() string {
+	return BluetoothNetworkServiceType_name[int(x)]
+}
 
 type GPIOInPullUpDown int
 
@@ -371,6 +396,192 @@ func (x EthernetInterfaceSettings_Mode) String() string {
 }
 
 // Bluetooth
+type BluetoothAgentSettings struct {
+	Pin string
+}
+
+// GetPin gets the Pin of the BluetoothAgentSettings.
+func (m *BluetoothAgentSettings) GetPin() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.Pin
+}
+
+// MarshalToWriter marshals BluetoothAgentSettings to the provided writer.
+func (m *BluetoothAgentSettings) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.Pin) > 0 {
+		writer.WriteString(1, m.Pin)
+	}
+
+	return
+}
+
+// Marshal marshals BluetoothAgentSettings to a slice of bytes.
+func (m *BluetoothAgentSettings) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a BluetoothAgentSettings from the provided reader.
+func (m *BluetoothAgentSettings) UnmarshalFromReader(reader jspb.Reader) *BluetoothAgentSettings {
+	for reader.Next() {
+		if m == nil {
+			m = &BluetoothAgentSettings{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.Pin = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a BluetoothAgentSettings from a slice of bytes.
+func (m *BluetoothAgentSettings) Unmarshal(rawBytes []byte) (*BluetoothAgentSettings, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type BluetoothNetworkService struct {
+	RegisterOrUnregister bool
+	ServerOrConnect      bool
+	Type                 BluetoothNetworkServiceType
+	MacOrName            string
+	BridgeName           string
+}
+
+// GetRegisterOrUnregister gets the RegisterOrUnregister of the BluetoothNetworkService.
+func (m *BluetoothNetworkService) GetRegisterOrUnregister() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.RegisterOrUnregister
+}
+
+// GetServerOrConnect gets the ServerOrConnect of the BluetoothNetworkService.
+func (m *BluetoothNetworkService) GetServerOrConnect() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.ServerOrConnect
+}
+
+// GetType gets the Type of the BluetoothNetworkService.
+func (m *BluetoothNetworkService) GetType() (x BluetoothNetworkServiceType) {
+	if m == nil {
+		return x
+	}
+	return m.Type
+}
+
+// GetMacOrName gets the MacOrName of the BluetoothNetworkService.
+func (m *BluetoothNetworkService) GetMacOrName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.MacOrName
+}
+
+// GetBridgeName gets the BridgeName of the BluetoothNetworkService.
+func (m *BluetoothNetworkService) GetBridgeName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.BridgeName
+}
+
+// MarshalToWriter marshals BluetoothNetworkService to the provided writer.
+func (m *BluetoothNetworkService) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if m.RegisterOrUnregister {
+		writer.WriteBool(1, m.RegisterOrUnregister)
+	}
+
+	if m.ServerOrConnect {
+		writer.WriteBool(2, m.ServerOrConnect)
+	}
+
+	if int(m.Type) != 0 {
+		writer.WriteEnum(3, int(m.Type))
+	}
+
+	if len(m.MacOrName) > 0 {
+		writer.WriteString(4, m.MacOrName)
+	}
+
+	if len(m.BridgeName) > 0 {
+		writer.WriteString(5, m.BridgeName)
+	}
+
+	return
+}
+
+// Marshal marshals BluetoothNetworkService to a slice of bytes.
+func (m *BluetoothNetworkService) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a BluetoothNetworkService from the provided reader.
+func (m *BluetoothNetworkService) UnmarshalFromReader(reader jspb.Reader) *BluetoothNetworkService {
+	for reader.Next() {
+		if m == nil {
+			m = &BluetoothNetworkService{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.RegisterOrUnregister = reader.ReadBool()
+		case 2:
+			m.ServerOrConnect = reader.ReadBool()
+		case 3:
+			m.Type = BluetoothNetworkServiceType(reader.ReadEnum())
+		case 4:
+			m.MacOrName = reader.ReadString()
+		case 5:
+			m.BridgeName = reader.ReadString()
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a BluetoothNetworkService from a slice of bytes.
+func (m *BluetoothNetworkService) Unmarshal(rawBytes []byte) (*BluetoothNetworkService, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
 type BluetoothControllerSettings struct {
 	Powered                 bool
 	Connectable             bool
@@ -660,15 +871,18 @@ func (m *BluetoothControllerSettings) Unmarshal(rawBytes []byte) (*BluetoothCont
 }
 
 type BluetoothControllerInformation struct {
-	Address           []byte
-	BluetoothVersion  uint32
-	Manufacturer      uint32
-	SupportedSettings *BluetoothControllerSettings
-	CurrentSettings   *BluetoothControllerSettings
-	ClassOfDevice     []byte
-	Name              string
-	ShortName         string
-	IsAvailable       bool
+	Address                  []byte
+	BluetoothVersion         uint32
+	Manufacturer             uint32
+	SupportedSettings        *BluetoothControllerSettings
+	CurrentSettings          *BluetoothControllerSettings
+	ClassOfDevice            []byte
+	Name                     string
+	ShortName                string
+	IsAvailable              bool
+	ServiceNetworkServerNap  bool
+	ServiceNetworkServerPanu bool
+	ServiceNetworkServerGn   bool
 }
 
 // GetAddress gets the Address of the BluetoothControllerInformation.
@@ -743,6 +957,30 @@ func (m *BluetoothControllerInformation) GetIsAvailable() (x bool) {
 	return m.IsAvailable
 }
 
+// GetServiceNetworkServerNap gets the ServiceNetworkServerNap of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetServiceNetworkServerNap() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.ServiceNetworkServerNap
+}
+
+// GetServiceNetworkServerPanu gets the ServiceNetworkServerPanu of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetServiceNetworkServerPanu() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.ServiceNetworkServerPanu
+}
+
+// GetServiceNetworkServerGn gets the ServiceNetworkServerGn of the BluetoothControllerInformation.
+func (m *BluetoothControllerInformation) GetServiceNetworkServerGn() (x bool) {
+	if m == nil {
+		return x
+	}
+	return m.ServiceNetworkServerGn
+}
+
 // MarshalToWriter marshals BluetoothControllerInformation to the provided writer.
 func (m *BluetoothControllerInformation) MarshalToWriter(writer jspb.Writer) {
 	if m == nil {
@@ -789,6 +1027,18 @@ func (m *BluetoothControllerInformation) MarshalToWriter(writer jspb.Writer) {
 		writer.WriteBool(9, m.IsAvailable)
 	}
 
+	if m.ServiceNetworkServerNap {
+		writer.WriteBool(10, m.ServiceNetworkServerNap)
+	}
+
+	if m.ServiceNetworkServerPanu {
+		writer.WriteBool(11, m.ServiceNetworkServerPanu)
+	}
+
+	if m.ServiceNetworkServerGn {
+		writer.WriteBool(12, m.ServiceNetworkServerGn)
+	}
+
 	return
 }
 
@@ -829,6 +1079,12 @@ func (m *BluetoothControllerInformation) UnmarshalFromReader(reader jspb.Reader)
 			m.ShortName = reader.ReadString()
 		case 9:
 			m.IsAvailable = reader.ReadBool()
+		case 10:
+			m.ServiceNetworkServerNap = reader.ReadBool()
+		case 11:
+			m.ServiceNetworkServerPanu = reader.ReadBool()
+		case 12:
+			m.ServiceNetworkServerGn = reader.ReadBool()
 		default:
 			reader.SkipField()
 		}
@@ -5820,6 +6076,9 @@ type P4WNP1Client interface {
 	// Bluetooth
 	GetBluetoothControllerInformation(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*BluetoothControllerInformation, error)
 	DeployBluetoothControllerInformation(ctx context.Context, in *BluetoothControllerInformation, opts ...grpcweb.CallOption) (*BluetoothControllerInformation, error)
+	GetBluetoothAgentSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*BluetoothAgentSettings, error)
+	DeployBluetoothAgentSettings(ctx context.Context, in *BluetoothAgentSettings, opts ...grpcweb.CallOption) (*BluetoothAgentSettings, error)
+	SetBluetoothNetworkService(ctx context.Context, in *BluetoothNetworkService, opts ...grpcweb.CallOption) (*Empty, error)
 	// USB gadget
 	GetDeployedGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
 	DeployGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
@@ -5907,6 +6166,33 @@ func (c *p4WNP1Client) DeployBluetoothControllerInformation(ctx context.Context,
 	}
 
 	return new(BluetoothControllerInformation).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetBluetoothAgentSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*BluetoothAgentSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "GetBluetoothAgentSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(BluetoothAgentSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployBluetoothAgentSettings(ctx context.Context, in *BluetoothAgentSettings, opts ...grpcweb.CallOption) (*BluetoothAgentSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployBluetoothAgentSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(BluetoothAgentSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) SetBluetoothNetworkService(ctx context.Context, in *BluetoothNetworkService, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "SetBluetoothNetworkService", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
 }
 
 func (c *p4WNP1Client) GetDeployedGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error) {

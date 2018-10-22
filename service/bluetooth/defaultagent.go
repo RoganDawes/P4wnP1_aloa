@@ -107,6 +107,10 @@ func (a *DefaultAgent) SetPIN(pin string)  {
 	a.pincode = pin
 }
 
+func (a *DefaultAgent) GetPIN() (pin string)  {
+	return a.pincode
+}
+
 func NewDefaultAgent(pincode string) (res *DefaultAgent) {
 	return &DefaultAgent{
 		pincode:    pincode,

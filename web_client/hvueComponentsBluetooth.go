@@ -8,6 +8,27 @@ import (
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 )
 
+type jsBluetoothAgentSettings struct {
+	*js.Object
+	Pin string `js:"Pin"`
+}
+
+func (target *jsBluetoothAgentSettings) fromGo(src *pb.BluetoothAgentSettings) {
+	target.Pin = src.Pin
+}
+
+func (src *jsBluetoothAgentSettings) toGo() (target *pb.BluetoothAgentSettings) {
+	target = &pb.BluetoothAgentSettings{}
+	target.Pin = src.Pin
+	return
+}
+
+func NewBluetoothAgentSettings() (res *jsBluetoothAgentSettings) {
+	res = &jsBluetoothAgentSettings{Object:O()}
+	res.Pin = ""
+	return
+}
+
 type jsBluetoothControllerSettings struct {
 	*js.Object
 	Powered                 bool `js:"Powered"`
@@ -100,6 +121,10 @@ type jsBluetoothControllerInformation struct {
 	ClassOfDevice     []byte                         `js:"ClassOfDevice"` // 3, till clear how to parse
 	Name              string                         `js:"Name"`          //[249]byte, 0x00 terminated
 	ShortName         string                         `js:"ShortName"`     //[11]byte, 0x00 terminated
+
+	ServiceNetworkServerNAP bool `js:"ServiceNetworkServerNAP"`
+	ServiceNetworkServerPANU bool `js:"ServiceNetworkServerPANU"`
+	ServiceNetworkServerGN bool `js:"ServiceNetworkServerGN"`
 }
 
 func (src *jsBluetoothControllerInformation) toGo() (target *pb.BluetoothControllerInformation) {
@@ -112,6 +137,10 @@ func (src *jsBluetoothControllerInformation) toGo() (target *pb.BluetoothControl
 	target.CurrentSettings = src.CurrentSettings.toGo()
 	target.Name = src.Name
 	target.ShortName = src.ShortName
+
+	target.ServiceNetworkServerGn = src.ServiceNetworkServerGN
+	target.ServiceNetworkServerPanu = src.ServiceNetworkServerPANU
+	target.ServiceNetworkServerNap = src.ServiceNetworkServerNAP
 	return
 }
 
@@ -127,6 +156,10 @@ func (target *jsBluetoothControllerInformation) fromGo(src *pb.BluetoothControll
 	target.CurrentSettings.fromGo(src.CurrentSettings)
 	target.Name = src.Name
 	target.ShortName = src.ShortName
+	target.ServiceNetworkServerGN = src.ServiceNetworkServerGn
+	target.ServiceNetworkServerPANU = src.ServiceNetworkServerPanu
+	target.ServiceNetworkServerNAP = src.ServiceNetworkServerNap
+
 }
 
 func NewBluetoothControllerInformation() (res *jsBluetoothControllerInformation) {
@@ -140,6 +173,11 @@ func NewBluetoothControllerInformation() (res *jsBluetoothControllerInformation)
 	res.ClassOfDevice = make([]byte, 3)
 	res.SupportedSettings = NewBluetoothControllerSettings()
 	res.CurrentSettings = NewBluetoothControllerSettings()
+
+	res.ServiceNetworkServerGN = false
+	res.ServiceNetworkServerPANU = false
+	res.ServiceNetworkServerNAP = false
+
 	return
 }
 
@@ -177,16 +215,53 @@ func InitComponentsBluetooth() {
 				return vm.Get("$store").Get("state").Get("CurrentBluetoothControllerInformation")
 			}),
 	)
+	hvue.NewComponent(
+		"bluetooth-controller-network-services",
+		hvue.Template(templateBluetoothControllerNetworkServices),
+		hvue.PropObj("controllerInfo"),
+		hvue.Computed("CurrentControllerInfo",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("$store").Get("state").Get("CurrentBluetoothControllerInformation")
+			}),
+	)
+	hvue.NewComponent(
+		"bluetooth-agent",
+		hvue.Template(templateBluetoothAgent),
+		hvue.Computed("CurrentBluetoothAgentSettings",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("$store").Get("state").Get("CurrentBluetoothAgentSettings")
+			}),
+		hvue.Mounted(func(vm *hvue.VM) {
+			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_AGENT_SETTINGS)
+		}),
+	)
 }
 
 const templateBluetoothPage = `
-<q-page>
-<bluetooth-controller :controllerInfo="CurrentControllerInfo"></bluetooth-controller>
+<q-page padding>
+
+	<div class="row gutter-sm">
+		<div class="col-12">
+			{{ CurrentControllerInfo }}
+		</div>
+
+		<div class="col-12 col-lg">
+			<bluetooth-controller :controllerInfo="CurrentControllerInfo"></bluetooth-controller>
+		</div>
+		<div class="col-12 col-lg">
+			<bluetooth-controller-network-services :controllerInfo="CurrentControllerInfo"></bluetooth-controller-network-services>
+		</div>
+		<div class="col-12 col-lg">
+			<bluetooth-agent :bluetoothAgent="CurrentBluetoothAgentSettings"></bluetooth-agent>
+		</div>
+	</div>
 </q-page>
 `
 const templateBluetoothController = `
 <q-card>
-{{ controllerInfo }}
+	<q-card-title>
+		Generic Bluetooth Controller settings
+	</q-card-title>
 
 	<q-list link>
 		<q-item tag="label">
@@ -272,6 +347,75 @@ const templateBluetoothController = `
 
 
 	</q-list>
+
+</q-card>
+`
+
+const templateBluetoothControllerNetworkServices = `
+<q-card>
+	<q-card-title>
+		BNEP server services
+		<span slot="subtitle">Bluetooth Network Encapsulation Protocol services provided by the controller</span>
+	</q-card-title>
+
+
+	<q-list link>
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="controllerInfo.ServiceNetworkServerNAP" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>NAP</q-item-tile>
+				<q-item-tile sublabel>Provide Network Access Point</q-item-tile>
+			</q-item-main>
+		</q-item>
+
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="controllerInfo.ServiceNetworkServerPANU" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>PANU</q-item-tile>
+				<q-item-tile sublabel>Provide Protable Area Network Unit</q-item-tile>
+			</q-item-main>
+		</q-item>
+
+		<q-item tag="label">
+			<q-item-side>
+				<q-toggle v-model="controllerInfo.ServiceNetworkServerGN" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
+			</q-item-side>
+			<q-item-main>
+				<q-item-tile label>GN</q-item-tile>
+				<q-item-tile sublabel>Provide Group Ad-hoc Network</q-item-tile>
+			</q-item-main>
+		</q-item>
+
+	</q-list>
+
+
+</q-card>
+`
+
+const templateBluetoothAgent = `
+<q-card>
+	<q-card-title>
+		Authentication Agent
+	</q-card-title>
+
+
+	<q-list link>
+		<q-item tag="label">
+			<q-item-main>
+				<q-item-tile label>Pin</q-item-tile>
+				<q-item-tile sublabel>PIN requested from remote devices on bonding (only if SSP is off)</q-item-tile>
+				<q-item-tile>
+					<q-input :value="CurrentBluetoothAgentSettings.Pin" @change="CurrentBluetoothAgentSettings.Pin = $event; $store.dispatch('deployCurrentBluetoothAgentSettings')" type="password" inverted></q-input>
+				</q-item-tile>
+			</q-item-main>
+		</q-item>
+
+	</q-list>
+
 
 </q-card>
 `

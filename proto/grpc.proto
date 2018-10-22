@@ -6,6 +6,9 @@ service P4WNP1 {
     //Bluetooth
     rpc GetBluetoothControllerInformation (Empty) returns (BluetoothControllerInformation) {}
     rpc DeployBluetoothControllerInformation (BluetoothControllerInformation) returns (BluetoothControllerInformation) {}
+    rpc GetBluetoothAgentSettings (Empty) returns (BluetoothAgentSettings) {}
+    rpc DeployBluetoothAgentSettings (BluetoothAgentSettings) returns (BluetoothAgentSettings) {}
+    rpc SetBluetoothNetworkService (BluetoothNetworkService) returns (Empty) {}
 
     //USB gadget
     rpc GetDeployedGadgetSetting (Empty) returns (GadgetSettings) {    }
@@ -85,6 +88,24 @@ service P4WNP1 {
 }
 
 /* Bluetooth */
+message BluetoothAgentSettings {
+    string pin = 1;
+}
+
+enum BluetoothNetworkServiceType {
+    NAP = 0;
+    PANU = 1;
+    GN = 2;
+}
+
+message BluetoothNetworkService {
+    bool register_or_unregister = 1; //true = register, false = unregister
+    bool server_or_connect = 2; //if true, try to connect to network service of remoter device given by name_mac, else open service
+    BluetoothNetworkServiceType type = 3;
+    string mac_or_name = 4;
+    string bridge_name = 5; //
+}
+
 message BluetoothControllerSettings {
     bool powered = 1;
     bool connectable = 2;
@@ -114,6 +135,10 @@ message BluetoothControllerInformation {
     string name = 7;
     string short_name = 8;
     bool is_available = 9;
+
+    bool service_network_server_nap = 10;
+    bool service_network_server_panu = 11;
+    bool service_network_server_gn = 12;
 }
 
 /* Triggers, Actions and resulting TriggerActions */
