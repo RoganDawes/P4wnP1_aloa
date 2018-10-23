@@ -456,6 +456,9 @@ message GadgetSettings {
     GadgetSettingsEthernet cdc_ecm_settings = 15; //Only applicable if CDC ECM on
     GadgetSettingsUMS ums_settings = 16;
     //EthernetInterfaceSettings ethernet_settings = 17; //only applicable if RNDIS or CDC ECM on
+    string dev_path_hid_keyboard = 18;
+    string dev_path_hid_mouse = 19;
+    string dev_path_hid_raw = 20;
 }
 
 message GadgetSettingsEthernet {

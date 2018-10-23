@@ -4882,6 +4882,10 @@ type GadgetSettings struct {
 	RndisSettings    *GadgetSettingsEthernet
 	CdcEcmSettings   *GadgetSettingsEthernet
 	UmsSettings      *GadgetSettingsUMS
+	// EthernetInterfaceSettings ethernet_settings = 17; //only applicable if RNDIS or CDC ECM on
+	DevPathHidKeyboard string
+	DevPathHidMouse    string
+	DevPathHidRaw      string
 }
 
 // GetEnabled gets the Enabled of the GadgetSettings.
@@ -5012,6 +5016,30 @@ func (m *GadgetSettings) GetUmsSettings() (x *GadgetSettingsUMS) {
 	return m.UmsSettings
 }
 
+// GetDevPathHidKeyboard gets the DevPathHidKeyboard of the GadgetSettings.
+func (m *GadgetSettings) GetDevPathHidKeyboard() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.DevPathHidKeyboard
+}
+
+// GetDevPathHidMouse gets the DevPathHidMouse of the GadgetSettings.
+func (m *GadgetSettings) GetDevPathHidMouse() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.DevPathHidMouse
+}
+
+// GetDevPathHidRaw gets the DevPathHidRaw of the GadgetSettings.
+func (m *GadgetSettings) GetDevPathHidRaw() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.DevPathHidRaw
+}
+
 // MarshalToWriter marshals GadgetSettings to the provided writer.
 func (m *GadgetSettings) MarshalToWriter(writer jspb.Writer) {
 	if m == nil {
@@ -5088,6 +5116,18 @@ func (m *GadgetSettings) MarshalToWriter(writer jspb.Writer) {
 		})
 	}
 
+	if len(m.DevPathHidKeyboard) > 0 {
+		writer.WriteString(18, m.DevPathHidKeyboard)
+	}
+
+	if len(m.DevPathHidMouse) > 0 {
+		writer.WriteString(19, m.DevPathHidMouse)
+	}
+
+	if len(m.DevPathHidRaw) > 0 {
+		writer.WriteString(20, m.DevPathHidRaw)
+	}
+
 	return
 }
 
@@ -5144,6 +5184,12 @@ func (m *GadgetSettings) UnmarshalFromReader(reader jspb.Reader) *GadgetSettings
 			reader.ReadMessage(func() {
 				m.UmsSettings = m.UmsSettings.UnmarshalFromReader(reader)
 			})
+		case 18:
+			m.DevPathHidKeyboard = reader.ReadString()
+		case 19:
+			m.DevPathHidMouse = reader.ReadString()
+		case 20:
+			m.DevPathHidRaw = reader.ReadString()
 		default:
 			reader.SkipField()
 		}
