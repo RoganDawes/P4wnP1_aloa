@@ -22,6 +22,7 @@ service P4WNP1 {
     rpc StoreUSBSettings(USBRequestSettingsStorage) returns (Empty) {}
     rpc GetStoredUSBSettings(StringMessage) returns (GadgetSettings) {}
     rpc DeployStoredUSBSettings(StringMessage) returns (GadgetSettings) {}
+    rpc DeleteStoredUSBSettings(StringMessage) returns (Empty) {}
     rpc StoreDeployedUSBSettings(StringMessage) returns (Empty) {}
     rpc ListStoredUSBSettings(Empty) returns (StringMessageArray) {}
 
@@ -55,6 +56,7 @@ service P4WNP1 {
     rpc StoreWifiSettings(WifiRequestSettingsStorage) returns (Empty) {}
     rpc GetStoredWifiSettings(StringMessage) returns (WiFiSettings) {}
     rpc DeployStoredWifiSettings(StringMessage) returns (WiFiState) {}
+    rpc DeleteStoredWifiSettings(StringMessage) returns (Empty) {}
     rpc StoreDeployedWifiSettings(StringMessage) returns (Empty) {}
     rpc ListStoredWifiSettings(Empty) returns (StringMessageArray) {}
 
@@ -66,6 +68,7 @@ service P4WNP1 {
     rpc StoreEthernetInterfaceSettings(EthernetRequestSettingsStorage) returns (Empty) {}
     rpc GetStoredEthernetInterfaceSettings(StringMessage) returns (EthernetInterfaceSettings) {}
     rpc DeployStoredEthernetInterfaceSettings(StringMessage) returns (Empty) {}
+    rpc DeleteStoredEthernetInterfaceSettings(StringMessage) returns (Empty) {}
     rpc ListStoredEthernetInterfaceSettings(Empty) returns (StringMessageArray) {}
     //ToDo: Store&Load for EthernetInterfaceSettingsList (multiple interfaces)
 
@@ -81,6 +84,7 @@ service P4WNP1 {
     rpc StoreTriggerActionSet(TriggerActionSet) returns (Empty) {}
     rpc DeployStoredTriggerActionSetReplace(StringMessage) returns (TriggerActionSet) {} // Adds a set of additional TriggerActions, returns a set of all Triggeractions registered afterwards
     rpc DeployStoredTriggerActionSetAdd(StringMessage) returns (TriggerActionSet) {} // Replaces registered TriggerActions with given set, returns a set ONLY OF ADDED TriggerActions (with assigned IDs)
+    rpc DeleteStoredTriggerActionSet(StringMessage) returns (Empty) {}
 
     // DB backup&restore
     rpc DBBackup(StringMessage) returns(Empty) {}

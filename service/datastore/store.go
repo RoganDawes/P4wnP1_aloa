@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgraph-io/badger"
-	_ "github.com/dgraph-io/badger"
 	"github.com/dgraph-io/badger/options"
 	"io/ioutil"
 	"os"
@@ -38,7 +37,6 @@ func (s *Store) Open() (err error) {
 	badgerOpts.Dir = s.Path
 	badgerOpts.ValueDir = s.Path
 	badgerOpts.SyncWrites = true
-	badgerOpts.ManagedTxns = false
 	badgerOpts.TableLoadingMode = options.FileIO
 	badgerOpts.ValueLogLoadingMode = options.FileIO
 	s.Db, err = badger.Open(badgerOpts)
@@ -59,6 +57,8 @@ func (s *Store) Clear() (err error) {
 	}
 	// ToDo: Other transactions could add/delete keys meanwhile, which should be avoided (without locking the functions accessing badger)
 	err = s.DeleteMulti(keys)
+
+	//s.Db.DropAll()
 
 	return nil
 }
@@ -154,8 +154,8 @@ func (s *Store) Restore(filePath string, replace bool) (err error) {
 				continue
 			}
 			s.Db.Update(func(txn *badger.Txn) error {
-				val, valErr := item.Value()
-				if valErr == nil {
+				return item.Value(func(val []byte) error {
+
 					// Ignore keys with empty vals, see https://github.com/dgraph-io/badger/issues/521
 					if len(val) > 0 {
 						txn.Set(restoreKey, val)
@@ -163,8 +163,8 @@ func (s *Store) Restore(filePath string, replace bool) (err error) {
 					} else {
 						fmt.Println("ignored, empty value")
 					}
-				}
-				return nil
+					return nil
+				})
 			})
 		}
 
@@ -220,7 +220,8 @@ func (s *Store) Get(key string, target interface{}) (err error) {
 		if err != nil {
 			return err
 		}
-		val, err := item.Value()
+
+		val,err := item.ValueCopy([]byte{})
 		if err != nil {
 			return err
 		}
@@ -299,7 +300,7 @@ func (s *Store) DeleteMulti(keys []string) (err error) {
 		errDel := txn.Delete([]byte(key))
 		if errDel != nil {
 			if err == badger.ErrTxnTooBig {
-				txn.Commit(nil)                 // commit current transaction
+				txn.Commit()                 // commit current transaction
 				txn = s.Db.NewTransaction(true) // replace with new transaction
 				txn.Delete([]byte(key))         // add Delete which produced error to new transaction
 			} else {
@@ -308,7 +309,7 @@ func (s *Store) DeleteMulti(keys []string) (err error) {
 			}
 		}
 	}
-	txn.Commit(nil)
+	txn.Commit()
 	txn.Discard()
 	return nil
 }

@@ -6136,6 +6136,7 @@ type P4WNP1Client interface {
 	StoreUSBSettings(ctx context.Context, in *USBRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error)
 	GetStoredUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*GadgetSettings, error)
 	DeployStoredUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*GadgetSettings, error)
+	DeleteStoredUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	StoreDeployedUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	ListStoredUSBSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// HIDScript / job management
@@ -6162,6 +6163,7 @@ type P4WNP1Client interface {
 	StoreWifiSettings(ctx context.Context, in *WifiRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error)
 	GetStoredWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*WiFiSettings, error)
 	DeployStoredWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*WiFiState, error)
+	DeleteStoredWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	StoreDeployedWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	ListStoredWifiSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// Ethernet
@@ -6171,6 +6173,7 @@ type P4WNP1Client interface {
 	StoreEthernetInterfaceSettings(ctx context.Context, in *EthernetRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error)
 	GetStoredEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*EthernetInterfaceSettings, error)
 	DeployStoredEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
+	DeleteStoredEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	ListStoredEthernetInterfaceSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// TriggerActions
 	GetDeployedTriggerActionSet(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
@@ -6181,6 +6184,7 @@ type P4WNP1Client interface {
 	StoreTriggerActionSet(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*Empty, error)
 	DeployStoredTriggerActionSetReplace(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	DeployStoredTriggerActionSetAdd(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
+	DeleteStoredTriggerActionSet(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	// DB backup&restore
 	DBBackup(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	DBRestore(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
@@ -6333,6 +6337,15 @@ func (c *p4WNP1Client) DeployStoredUSBSettings(ctx context.Context, in *StringMe
 	}
 
 	return new(GadgetSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeleteStoredUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DeleteStoredUSBSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
 }
 
 func (c *p4WNP1Client) StoreDeployedUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
@@ -6547,6 +6560,15 @@ func (c *p4WNP1Client) DeployStoredWifiSettings(ctx context.Context, in *StringM
 	return new(WiFiState).Unmarshal(resp)
 }
 
+func (c *p4WNP1Client) DeleteStoredWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DeleteStoredWifiSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
 func (c *p4WNP1Client) StoreDeployedWifiSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
 	resp, err := c.client.RPCCall(ctx, "StoreDeployedWifiSettings", in.Marshal(), opts...)
 	if err != nil {
@@ -6612,6 +6634,15 @@ func (c *p4WNP1Client) GetStoredEthernetInterfaceSettings(ctx context.Context, i
 
 func (c *p4WNP1Client) DeployStoredEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
 	resp, err := c.client.RPCCall(ctx, "DeployStoredEthernetInterfaceSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeleteStoredEthernetInterfaceSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DeleteStoredEthernetInterfaceSettings", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -6698,6 +6729,15 @@ func (c *p4WNP1Client) DeployStoredTriggerActionSetAdd(ctx context.Context, in *
 	}
 
 	return new(TriggerActionSet).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeleteStoredTriggerActionSet(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DeleteStoredTriggerActionSet", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
 }
 
 func (c *p4WNP1Client) DBBackup(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
