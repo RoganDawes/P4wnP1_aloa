@@ -188,6 +188,11 @@ func InitComponentsTriggerActions() {
 				//vm.Get("$q").Call("notify", "Add '" + storedTASName.String() +"' to current TAS")
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_ADD, storedTASName)
 			}),
+		hvue.Method("deleteStored",
+			func(vm *hvue.VM, storedTASName *js.Object) {
+				//vm.Get("$q").Call("notify", "Add '" + storedTASName.String() +"' to current TAS")
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DELETE_STORED_TRIGGER_ACTION_SET, storedTASName)
+			}),
 		hvue.Method("updateStoredTriggerActionSetsList",
 			func(vm *hvue.VM) {
 				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST)
@@ -832,8 +837,8 @@ const templateAction = `
 const templateTriggerActionManager = `
 <q-page padding>
 	<modal-string-input v-model="showStoreTASModal" title="Store selected TriggerActions" @save="storeTAS($event)"></modal-string-input>
-	<select-string-from-array :values="$store.state.StoredTriggerActionSetsList" v-model="showReplaceTASModal" title="Replace current Trigger Actions with stored set" @load="replaceCurrentTAS($event)"></select-string-from-array>
-	<select-string-from-array :values="$store.state.StoredTriggerActionSetsList" v-model="showAddTASModal" title="Add stored set to current Trigger Actions" @load="addToCurrentTAS($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredTriggerActionSetsList" v-model="showReplaceTASModal" title="Replace current Trigger Actions with stored set" @load="replaceCurrentTAS($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredTriggerActionSetsList" v-model="showAddTASModal" title="Add stored set to current Trigger Actions" @load="addToCurrentTAS($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
 
 	<div class="row gutter-sm">
 		<div class="col-12">

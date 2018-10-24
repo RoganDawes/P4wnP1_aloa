@@ -163,6 +163,11 @@ func InitComponentsWiFi() {
 				println("Loading :", name.String())
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_STORED_WIFI_SETTINGS, name)
 			}),
+		hvue.Method("deleteStored",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DELETE_STORED_WIFI_SETTINGS, name)
+			}),
 		hvue.Computed("deploying",
 			func(vm *hvue.VM) interface{} {
 				return vm.Get("$store").Get("state").Get("deployingWifiSettings")
@@ -178,8 +183,8 @@ func InitComponentsWiFi() {
 
 const templateWiFi = `
 <q-page padding>
-	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showLoadModal" title="Load WiFi settings" @load="load($event)"></select-string-from-array>
-	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showDeployStoredModal" title="Deploy stored WiFi settings" @load="deployStored($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showLoadModal" title="Load WiFi settings" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showDeployStoredModal" title="Deploy stored WiFi settings" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
 	<modal-string-input v-model="showStoreModal" title="Store current WiFi Settings" @save="store($event)"></modal-string-input>
 
 <div class="row gutter-sm">

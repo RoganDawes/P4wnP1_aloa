@@ -30,6 +30,35 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) DeleteStoredUSBSettings(timeout time.Duration, req *pb.StringMessage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_, err = rpc.Client.DeleteStoredUSBSettings(ctx, req)
+	return
+}
+
+func (rpc *Rpc) DeleteStoredWifiSettings(timeout time.Duration, req *pb.StringMessage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_, err = rpc.Client.DeleteStoredWifiSettings(ctx, req)
+	return
+}
+
+func (rpc *Rpc) DeleteStoredEthernetInterfaceSettings(timeout time.Duration, req *pb.StringMessage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_,err = rpc.Client.DeleteStoredEthernetInterfaceSettings(ctx, req)
+	return
+}
+
+func (rpc *Rpc) DeleteStoredTriggerActionsSet(timeout time.Duration, name *pb.StringMessage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_,err = rpc.Client.DeleteStoredTriggerActionSet(ctx, name)
+	return
+}
+
+
 func (rpc *Rpc) GetBluetoothAgentSettings(timeout time.Duration) (res *jsBluetoothAgentSettings, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -316,7 +345,6 @@ func (rpc *Rpc) DeployStoredEthernetInterfaceSettings(timeout time.Duration, req
 
 	return
 }
-
 
 func (rpc *Rpc) GetRunningHidJobStates(timeout time.Duration) (states []*pb.HIDRunningJobStateResult, err error) {
 	println("GetRunningHidJobStates called")

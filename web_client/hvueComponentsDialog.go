@@ -1,3 +1,5 @@
+// +build js
+
 package main
 
 import (
@@ -35,8 +37,14 @@ func InitComponentsDialog() {
 			"onLoadPressed",
 			func(vm *hvue.VM) {
 				vm.Call("$emit", "load", vm.Get("CurrentSelection"))
-				println(vm.Get("CurrentSelection"))
+				//println(vm.Get("CurrentSelection"))
 
+			},
+		),
+		hvue.Method(
+			"onDeletePressed",
+			func(vm *hvue.VM, name *js.Object) {
+				vm.Call("$emit", "delete", name)
 			},
 		),
 		hvue.PropObj(
@@ -47,6 +55,11 @@ func InitComponentsDialog() {
 			"value",
 			hvue.Required,
 			hvue.Types(hvue.PBoolean),
+			),
+		hvue.PropObj(
+			"with-delete",
+			hvue.Types(hvue.PBoolean),
+			hvue.Default(false),
 			),
 		hvue.PropObj(
 			"title",
@@ -135,6 +148,9 @@ const templateSelectStringModal = `
 					<q-item-main>
 						<q-item-tile label>{{ name }}</q-item-tile>
 					</q-item-main>
+					<q-item-side v-if="withDelete" right>
+						<q-btn icon="delete" color="negative" @click="onDeletePressed(name)" round flat />
+					</q-item-side>
 				</q-item>
 				<q-item tag="label">
 					<q-item-main>

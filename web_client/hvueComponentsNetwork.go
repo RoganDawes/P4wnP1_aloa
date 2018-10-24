@@ -112,6 +112,11 @@ func InitComponentsNetwork() {
 				println("Loading :", name.String())
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_STORED_ETHERNET_INTERFACE_SETTINGS, name)
 			}),
+		hvue.Method("deleteStored",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Deleting template :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DELETE_STORED_ETHERNET_INTERFACE_SETTINGS, name)
+			}),
 
 		// The following method doesn't make much sense anymore, but is kept as an example for working with promises
 		hvue.Mounted(func(vm *hvue.VM) {
@@ -283,8 +288,8 @@ func InitComponentsNetwork() {
 
 const templateNetwork = `
 <q-page padding>
-	<select-string-from-array :values="$store.state.StoredEthernetInterfaceSettingsList" v-model="showLoadModal" title="Load ethernet interface settings" @load="load($event)"></select-string-from-array>
-	<select-string-from-array :values="$store.state.StoredEthernetInterfaceSettingsList" v-model="showDeployStoredModal" title="Deploy stored ethernet interface settings" @load="deployStored($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredEthernetInterfaceSettingsList" v-model="showLoadModal" title="Load ethernet interface settings" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredEthernetInterfaceSettingsList" v-model="showDeployStoredModal" title="Deploy stored ethernet interface settings" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
 	<modal-string-input v-model="showStoreModal" title="Store current ethernet interface Settings" @save="store($event)"></modal-string-input>
 
 	<div class="row gutter-sm">

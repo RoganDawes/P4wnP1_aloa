@@ -65,6 +65,11 @@ func InitCompUSBSettings() {
 				println("Loading :", name.String())
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_LOAD_USB_SETTINGS, name)
 			}),
+		hvue.Method("deleteStored",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DELETE_STORED_USB_SETTINGS, name)
+			}),
 		hvue.Method("deployStored",
 			func(vm *hvue.VM, name *js.Object) {
 				println("Loading :", name.String())
@@ -101,8 +106,8 @@ func newCompUSBSettingsData(vm *hvue.VM) interface{} {
 const (
 	compUSBSettingsTemplate = `
 <q-page padding>
-	<select-string-from-array :values="$store.state.StoredUSBSettingsList" v-model="showLoadModal" title="Load USB gadget settings" @load="load($event)"></select-string-from-array>
-	<select-string-from-array :values="$store.state.StoredUSBSettingsList" v-model="showDeployStoredModal" title="Deploy stored USB gadget settings" @load="deployStored($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredUSBSettingsList" v-model="showLoadModal" title="Load USB gadget settings" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredUSBSettingsList" v-model="showDeployStoredModal" title="Deploy stored USB gadget settings" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
 	<modal-string-input v-model="showStoreModal" title="Store current USB gadget Settings" @save="store($event)"></modal-string-input>
 
 

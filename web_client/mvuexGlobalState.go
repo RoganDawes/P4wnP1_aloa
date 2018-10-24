@@ -43,6 +43,7 @@ const (
 	VUEX_ACTION_LOAD_USB_SETTINGS               = "loadUSBSettings"
 	VUEX_ACTION_DEPLOY_STORED_USB_SETTINGS      = "deployStoredUSBSettings"
 	VUEX_ACTION_UPDATE_STORED_USB_SETTINGS_LIST = "updateStoredUSBSettingsList"
+	VUEX_ACTION_DELETE_STORED_USB_SETTINGS      = "deleteStoredUSBSettings"
 
 	VUEX_MUTATION_SET_CURRENT_USB_SETTINGS     = "setCurrentUSBSettings"
 	VUEX_MUTATION_SET_STORED_USB_SETTINGS_LIST = "setStoredUSBSettingsList"
@@ -54,6 +55,7 @@ const (
 	VUEX_ACTION_LOAD_ETHERNET_INTERFACE_SETTINGS               = "loadEthernetInterfaceSettings"
 	VUEX_ACTION_DEPLOY_STORED_ETHERNET_INTERFACE_SETTINGS      = "deployStoredEthernetInterfaceSettings"
 	VUEX_ACTION_UPDATE_STORED_ETHERNET_INTERFACE_SETTINGS_LIST = "updateStoredEthernetInterfaceSettingsList"
+	VUEX_ACTION_DELETE_STORED_ETHERNET_INTERFACE_SETTINGS      = "deleteStoredEthernetInterfaceSettings"
 
 	VUEX_MUTATION_SET_STORED_ETHERNET_INTERFACE_SETTINGS_LIST = "setStoredEthernetInterfaceSettingsList"
 	VUEX_MUTATION_SET_ALL_ETHERNET_INTERFACE_SETTINGS         = "setAllEthernetInterfaceSettings"
@@ -66,6 +68,7 @@ const (
 	VUEX_ACTION_STORE_WIFI_SETTINGS              = "storeWifiSettings"
 	VUEX_ACTION_LOAD_WIFI_SETTINGS               = "loadWifiSettings"
 	VUEX_ACTION_DEPLOY_STORED_WIFI_SETTINGS      = "deployStoredWifiSettings"
+	VUEX_ACTION_DELETE_STORED_WIFI_SETTINGS      = "deleteStoredWifiSettings"
 
 	VUEX_MUTATION_SET_WIFI_STATE                = "setCurrentWifiState"
 	VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST = "setStoredWifiSettingsList"
@@ -79,6 +82,7 @@ const (
 	VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST     = "updateStoredTriggerActionSetsList"
 	VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_REPLACE   = "deployStoredTriggerActionSetReplace"
 	VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_ADD       = "deployStoredTriggerActionSetAdd"
+	VUEX_ACTION_DELETE_STORED_TRIGGER_ACTION_SET           = "deleteStoredTriggerActionSet"
 	VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_REPLACE          = "deployCurrentTriggerActionSetReplace"
 	VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_ADD              = "deployCurrentTriggerActionSetAdd"
 
@@ -153,6 +157,66 @@ func createGlobalStateStruct() GlobalState {
 	//state.WiFiSettings = NewWifiSettings()
 	state.WiFiState = NewWiFiState()
 	return state
+}
+
+func actionDeleteStoredUSBSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch delete USB settings: ", settingsName.String())
+		// convert to Go type
+		err := RpcClient.DeleteStoredUSBSettings(defaultTimeout, &pb.StringMessage{Msg: settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error deleting stored USB Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("USB settings deleted", "", QUASAR_NOTIFICATION_POSITION_TOP)
+		actionUpdateStoredUSBSettingsList(store,context,state)
+	}()
+}
+
+func actionDeleteStoredTriggerActionSet(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jsName *js.Object) {
+	go func() {
+		name := jsName.String()
+		println("Vuex delete stored TriggerActionSet: ", name)
+
+		// convert to Go type
+		msg := &pb.StringMessage{Msg: name}
+
+		err := RpcClient.DeleteStoredTriggerActionsSet(defaultTimeout, msg)
+		if err != nil {
+			QuasarNotifyError("Error deleting TriggerActionSet from store", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+			return
+		}
+		QuasarNotifySuccess("Deleted TriggerActionSet from store", name, QUASAR_NOTIFICATION_POSITION_TOP)
+
+		actionUpdateStoredTriggerActionSetsList(store, context, state)
+	}()
+}
+
+func actionDeleteStoredWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch delete WiFi settings: ", settingsName.String())
+		// convert to Go type
+		err := RpcClient.DeleteStoredWifiSettings(defaultTimeout, &pb.StringMessage{Msg: settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error deleting stored WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("Stored WiFi settings deleted", "", QUASAR_NOTIFICATION_POSITION_TOP)
+		actionUpdateStoredWifiSettingsList(store,context,state)
+	}()
+}
+
+func actionDeleteStoredEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch delete stored ethernet interface settings: ", settingsName.String())
+		// convert to Go type
+		err := RpcClient.DeleteStoredEthernetInterfaceSettings(defaultTimeoutMid, &pb.StringMessage{Msg: settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error deleting stored ethernet interface Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("Stored ethernet interface settings deleted", "", QUASAR_NOTIFICATION_POSITION_TOP)
+
+		//we update all modelview settings of vuex, to reflect the changes
+		actionUpdateStoredEthernetInterfaceSettingsList(store, context, state)
+	}()
 }
 
 func actionUpdateCurrentBluetoothControllerInformation(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
@@ -339,7 +403,7 @@ func actionLoadEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.Acti
 
 func actionDeployStoredEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
 	go func() {
-		println("Vuex dispatch load ethernet interface settings: ", settingsName.String())
+		println("Vuex dispatch deploy stored ethernet interface settings: ", settingsName.String())
 		// convert to Go type
 		err := RpcClient.DeployStoredEthernetInterfaceSettings(defaultTimeoutMid, &pb.StringMessage{Msg: settingsName.String()})
 		if err != nil {
@@ -541,7 +605,7 @@ func actionLoadWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, st
 
 func actionDeployStoredWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
 	go func() {
-		println("Vuex dispatch load WiFi settings: ", settingsName.String())
+		println("Vuex dispatch deploy stored WiFi settings: ", settingsName.String())
 		// convert to Go type
 		wstate, err := RpcClient.DeployStoredWifiSettings(defaultTimeoutMid, &pb.StringMessage{Msg: settingsName.String()})
 		if err != nil {
@@ -865,6 +929,7 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_STORE_USB_SETTINGS, actionStoreUSBSettings),
 		mvuex.Action(VUEX_ACTION_LOAD_USB_SETTINGS, actionLoadUSBSettings),
 		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_USB_SETTINGS, actionDeployStoredUSBSettings),
+		mvuex.Action(VUEX_ACTION_DELETE_STORED_USB_SETTINGS, actionDeleteStoredUSBSettings),
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_USB_SETTINGS_LIST, actionUpdateStoredUSBSettingsList),
 
 		mvuex.Action(VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS, actionDeployEthernetInterfaceSettings),
@@ -881,6 +946,7 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST, actionUpdateStoredTriggerActionSetsList),
 		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_REPLACE, actionDeployStoredTriggerActionSetReplace),
 		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_ADD, actionDeployStoredTriggerActionSetAdd),
+		mvuex.Action(VUEX_ACTION_DELETE_STORED_TRIGGER_ACTION_SET, actionDeleteStoredTriggerActionSet),
 		mvuex.Action(VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_REPLACE, actionDeployTriggerActionSetReplace),
 		mvuex.Action(VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_ADD, actionDeployTriggerActionSetAdd),
 
@@ -893,10 +959,12 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_STORE_WIFI_SETTINGS, actionStoreWifiSettings),
 		mvuex.Action(VUEX_ACTION_LOAD_WIFI_SETTINGS, actionLoadWifiSettings),
 		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_WIFI_SETTINGS, actionDeployStoredWifiSettings),
+		mvuex.Action(VUEX_ACTION_DELETE_STORED_WIFI_SETTINGS, actionDeleteStoredWifiSettings),
 
 		mvuex.Action(VUEX_ACTION_STORE_ETHERNET_INTERFACE_SETTINGS, actionStoreEthernetInterfaceSettings),
 		mvuex.Action(VUEX_ACTION_LOAD_ETHERNET_INTERFACE_SETTINGS, actionLoadEthernetInterfaceSettings),
 		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_ETHERNET_INTERFACE_SETTINGS, actionDeployStoredEthernetInterfaceSettings),
+		mvuex.Action(VUEX_ACTION_DELETE_STORED_ETHERNET_INTERFACE_SETTINGS, actionDeleteStoredEthernetInterfaceSettings),
 
 
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
