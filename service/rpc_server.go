@@ -52,6 +52,30 @@ type server struct {
 	listenAddrWeb string
 }
 
+func (s *server) DeleteStoredUSBSettings(ctx context.Context, name *pb.StringMessage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	err = s.rootSvc.SubSysDataStore.Delete(cSTORE_PREFIX_USB_SETTINGS + name.Msg)
+	return
+}
+
+func (s *server) DeleteStoredWifiSettings(ctx context.Context, name *pb.StringMessage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	err = s.rootSvc.SubSysDataStore.Delete(cSTORE_PREFIX_WIFI_SETTINGS + name.Msg)
+	return
+}
+
+func (s *server) DeleteStoredEthernetInterfaceSettings(ctx context.Context, name *pb.StringMessage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	err = s.rootSvc.SubSysDataStore.Delete(cSTORE_PREFIX_ETHERNET_INTERFACE_SETTINGS + name.Msg)
+	return
+}
+
+func (s *server) DeleteStoredTriggerActionSet(ctx context.Context, name *pb.StringMessage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	err = s.rootSvc.SubSysDataStore.Delete(cSTORE_PREFIX_TRIGGER_ACTION_SET + name.Msg)
+	return
+}
+
 func (s *server) DBBackup(ctx context.Context, filename *pb.StringMessage) (e *pb.Empty, err error) {
 	e = &pb.Empty{}
 	fname := filename.Msg
@@ -65,13 +89,14 @@ func (s *server) DBBackup(ctx context.Context, filename *pb.StringMessage) (e *p
 }
 
 func (s *server) DBRestore(ctx context.Context, filename *pb.StringMessage) (e *pb.Empty, err error) {
+	fmt.Println("DB restore: ", filename.Msg)
 	e = &pb.Empty{}
 	fname := filename.Msg
 	ext := filepath.Ext(fname)
 	if lext := strings.ToLower(ext); lext != ".db" {
 		fname = fname + ".db"
 	}
-	err = s.rootSvc.SubSysDataStore.Restore(PATH_DATA_STORE_BACKUP + "/" + fname)
+	err = s.rootSvc.SubSysDataStore.Restore(PATH_DATA_STORE_BACKUP + "/" + fname, true)
 	return
 }
 
