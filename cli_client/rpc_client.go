@@ -1,13 +1,13 @@
 package cli_client
 
 import (
-	"google.golang.org/grpc"
-	"log"
-
 	"fmt"
 	pb "github.com/mame82/P4wnP1_go/proto"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 	"io"
+	"log"
 	"time"
 )
 
@@ -354,4 +354,138 @@ func ClientHIDGetScriptJobResult(host string, port string, jobID uint32) (script
 
 	scriptRes,err = rpcClient.HIDGetScriptJobResult(context.Background(), req)
 	return
+}
+
+func ClientListTemplateType(timeout time.Duration, host string, port string, ttype pb.ActionDeploySettingsTemplate_TemplateType) (res []string, err error) {
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err) }
+	defer connection.Close()
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+	ctx := context.Background()
+	if timeout > 0 {
+		ctxNew,cancel := context.WithTimeout(ctx, timeout)
+		ctx = ctxNew
+		defer cancel()
+	}
+
+	switch ttype {
+	case pb.ActionDeploySettingsTemplate_USB:
+		ma,err := rpcClient.ListStoredUSBSettings(ctx, &pb.Empty{})
+		if err != nil { return res,err }
+		return ma.MsgArray,nil
+	case pb.ActionDeploySettingsTemplate_TRIGGER_ACTIONS:
+		ma,err := rpcClient.ListStoredTriggerActionSets(ctx, &pb.Empty{})
+		if err != nil { return res,err }
+		return ma.MsgArray,nil
+	case pb.ActionDeploySettingsTemplate_WIFI:
+		ma,err := rpcClient.ListStoredWifiSettings(ctx, &pb.Empty{})
+		if err != nil { return res,err }
+		return ma.MsgArray,nil
+	case pb.ActionDeploySettingsTemplate_NETWORK:
+		ma,err := rpcClient.ListStoredEthernetInterfaceSettings(ctx, &pb.Empty{})
+		if err != nil { return res,err }
+		return ma.MsgArray,nil
+	case pb.ActionDeploySettingsTemplate_BLUETOOTH:
+		return
+	case pb.ActionDeploySettingsTemplate_FULL_SETTINGS:
+		return
+	default:
+		return res,errors.New("unknown template type")
+	}
+
+
+}
+
+func ClientDeployTemplateType(timeout time.Duration, host string, port string, ttype pb.ActionDeploySettingsTemplate_TemplateType, name string) (err error) {
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err) }
+	defer connection.Close()
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+	ctx := context.Background()
+	if timeout > 0 {
+		ctxNew,cancel := context.WithTimeout(ctx, timeout)
+		ctx = ctxNew
+		defer cancel()
+	}
+
+	switch ttype {
+	case pb.ActionDeploySettingsTemplate_USB:
+		_,err = rpcClient.DeployStoredUSBSettings(ctx, &pb.StringMessage{Msg:name})
+	case pb.ActionDeploySettingsTemplate_TRIGGER_ACTIONS:
+		_,err = rpcClient.DeployStoredTriggerActionSetReplace(ctx, &pb.StringMessage{Msg:name})
+	case pb.ActionDeploySettingsTemplate_WIFI:
+		_,err = rpcClient.DeployStoredWifiSettings(ctx, &pb.StringMessage{Msg:name})
+	case pb.ActionDeploySettingsTemplate_NETWORK:
+		_,err = rpcClient.DeployStoredEthernetInterfaceSettings(ctx, &pb.StringMessage{Msg:name})
+	case pb.ActionDeploySettingsTemplate_BLUETOOTH:
+		return
+	case pb.ActionDeploySettingsTemplate_FULL_SETTINGS:
+		return
+	default:
+		return errors.New("unknown template type")
+	}
+
+	return
+}
+
+func ClientDBBackup(timeout time.Duration, host string, port string, name string) (err error) {
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err) }
+	defer connection.Close()
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+	ctx := context.Background()
+	if timeout > 0 {
+		ctxNew,cancel := context.WithTimeout(ctx, timeout)
+		ctx = ctxNew
+		defer cancel()
+	}
+
+	_,err = rpcClient.DBBackup(ctx, &pb.StringMessage{Msg:name})
+
+	return
+}
+
+func ClientDBRestore(timeout time.Duration, host string, port string, name string) (err error) {
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err) }
+	defer connection.Close()
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+	ctx := context.Background()
+	if timeout > 0 {
+		ctxNew,cancel := context.WithTimeout(ctx, timeout)
+		ctx = ctxNew
+		defer cancel()
+	}
+
+	_,err = rpcClient.DBRestore(ctx, &pb.StringMessage{Msg:name})
+
+	return
+}
+
+func ClientDBList(timeout time.Duration, host string, port string) (names []string, err error) {
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err) }
+	defer connection.Close()
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+	ctx := context.Background()
+	if timeout > 0 {
+		ctxNew,cancel := context.WithTimeout(ctx, timeout)
+		ctx = ctxNew
+		defer cancel()
+	}
+
+	backups,err := rpcClient.ListStoredDBBackups(ctx, &pb.Empty{})
+	if err != nil { return names, err}
+
+	return backups.MsgArray,nil
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/dgraph-io/badger"
 	_ "github.com/dgraph-io/badger"
+	"os"
 	"strings"
 )
 
@@ -33,6 +34,7 @@ func (s *Store) Open() (err error) {
 	badgerOpts.Dir = s.Path
 	badgerOpts.ValueDir = s.Path
 	badgerOpts.SyncWrites = true
+	badgerOpts.ManagedTxns = true //needed for DropAll()
 	s.Db,err = badger.Open(badgerOpts)
 	if s.serializer == nil {
 		s.serializer = NewSerializerProtobuf(false)
@@ -42,6 +44,30 @@ func (s *Store) Open() (err error) {
 
 func (s *Store) Close() {
 	s.Db.Close()
+}
+
+// ToDo: Backup and restore could be synchronized to avoid concurrent transactions
+func (s *Store) Backup(filePath string) (err error) {
+	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_,err = s.Db.Backup(f,0)
+	return
+}
+
+func (s *Store) Restore(filePath string) (err error) {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	// DB should be cleared first
+	err = s.Db.DropAll()
+	if err != nil { return }
+	err = s.Db.Load(f)
+	return
 }
 
 func (s *Store) Put(key string, value interface{}, allowOverwrite bool) (err error) {

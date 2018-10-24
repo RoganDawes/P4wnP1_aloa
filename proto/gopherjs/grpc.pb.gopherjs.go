@@ -6181,8 +6181,12 @@ type P4WNP1Client interface {
 	StoreTriggerActionSet(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*Empty, error)
 	DeployStoredTriggerActionSetReplace(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	DeployStoredTriggerActionSetAdd(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
+	// DB backup&restore
+	DBBackup(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
+	DBRestore(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	ListStoredHIDScripts(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	ListStoredBashScripts(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
+	ListStoredDBBackups(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 }
 
 type p4WNP1Client struct {
@@ -6696,6 +6700,24 @@ func (c *p4WNP1Client) DeployStoredTriggerActionSetAdd(ctx context.Context, in *
 	return new(TriggerActionSet).Unmarshal(resp)
 }
 
+func (c *p4WNP1Client) DBBackup(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DBBackup", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DBRestore(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DBRestore", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
 func (c *p4WNP1Client) ListStoredHIDScripts(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
 	resp, err := c.client.RPCCall(ctx, "ListStoredHIDScripts", in.Marshal(), opts...)
 	if err != nil {
@@ -6707,6 +6729,15 @@ func (c *p4WNP1Client) ListStoredHIDScripts(ctx context.Context, in *Empty, opts
 
 func (c *p4WNP1Client) ListStoredBashScripts(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
 	resp, err := c.client.RPCCall(ctx, "ListStoredBashScripts", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(StringMessageArray).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) ListStoredDBBackups(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
+	resp, err := c.client.RPCCall(ctx, "ListStoredDBBackups", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}

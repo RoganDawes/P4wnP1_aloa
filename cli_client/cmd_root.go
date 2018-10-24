@@ -10,13 +10,14 @@ import (
 var (
 	StrRemoteHost string
 	StrRemotePort string
+	BoolJson bool
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "P4wnP1_cli",
 	Short: "P4wnP1 (remote) CLI configuration",
-	Long: `The cli_client tool could be used to configure P4wnP1
+	Long: `The CLI client tool could be used to configure P4wnP1
 from the command line. The tool relies on RPC so it could be used 
 remotely.`,
 }
@@ -31,6 +32,7 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&StrRemoteHost, "host", "localhost", "The host with the listening P4wnP1 RPC server")
 	rootCmd.PersistentFlags().StringVar(&StrRemotePort, "port", "50051", "The port on which the P4wnP1 RPC server is listening")
+	rootCmd.PersistentFlags().BoolVar(&BoolJson, "json", false, "Output results as JSON if applicable")
 
 	/*
 	// Cobra also supports local flags, which will only run

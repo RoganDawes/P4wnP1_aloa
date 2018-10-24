@@ -82,10 +82,16 @@ service P4WNP1 {
     rpc DeployStoredTriggerActionSetReplace(StringMessage) returns (TriggerActionSet) {} // Adds a set of additional TriggerActions, returns a set of all Triggeractions registered afterwards
     rpc DeployStoredTriggerActionSetAdd(StringMessage) returns (TriggerActionSet) {} // Replaces registered TriggerActions with given set, returns a set ONLY OF ADDED TriggerActions (with assigned IDs)
 
+    // DB backup&restore
+    rpc DBBackup(StringMessage) returns(Empty) {}
+    rpc DBRestore(StringMessage) returns(Empty) {}
 
     rpc ListStoredHIDScripts(Empty) returns (StringMessageArray) {}
     rpc ListStoredBashScripts(Empty) returns (StringMessageArray) {}
+    rpc ListStoredDBBackups(Empty) returns (StringMessageArray) {}
 }
+
+
 
 /* Bluetooth */
 message BluetoothAgentSettings {

@@ -7,4 +7,5 @@ const (
 	PATH_BASH_SCRIPTS           = PATH_ROOT + "/scripts"
 	PATH_HID_SCRIPTS            = PATH_ROOT + "/HIDScripts"
 	PATH_DATA_STORE             = PATH_ROOT + "/store"
+	PATH_DATA_STORE_BACKUP      = PATH_ROOT + "/db"
 )

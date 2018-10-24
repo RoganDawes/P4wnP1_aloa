@@ -15,6 +15,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"path/filepath"
 
 	"net/http"
 	"path"
@@ -50,6 +51,38 @@ type server struct {
 	listenAddrGrpc string
 	listenAddrWeb string
 }
+
+func (s *server) DBBackup(ctx context.Context, filename *pb.StringMessage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	fname := filename.Msg
+	ext := filepath.Ext(fname)
+	if lext := strings.ToLower(ext); lext != ".db" {
+		fname = fname + ".db"
+	}
+
+	err = s.rootSvc.SubSysDataStore.Backup(PATH_DATA_STORE_BACKUP + "/" + fname)
+	return
+}
+
+func (s *server) DBRestore(ctx context.Context, filename *pb.StringMessage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	fname := filename.Msg
+	ext := filepath.Ext(fname)
+	if lext := strings.ToLower(ext); lext != ".db" {
+		fname = fname + ".db"
+	}
+	err = s.rootSvc.SubSysDataStore.Restore(PATH_DATA_STORE_BACKUP + "/" + fname)
+	return
+}
+
+func (s *server) ListStoredDBBackups(context.Context, *pb.Empty) (*pb.StringMessageArray, error) {
+	scripts,err := ListFilesOfFolder(PATH_DATA_STORE_BACKUP, ".db")
+	if err != nil { return nil,err }
+
+	return &pb.StringMessageArray{MsgArray:scripts}, nil
+}
+
+
 
 func (s *server) GetBluetoothAgentSettings(ctx context.Context, e *pb.Empty) (as *pb.BluetoothAgentSettings, err error) {
 	pin,err := s.rootSvc.SubSysBluetooth.GetPIN()

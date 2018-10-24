@@ -79,6 +79,7 @@ installkali:
 	cp -R dist/scripts /usr/local/P4wnP1/
 	cp -R dist/HIDScripts /usr/local/P4wnP1/
 	cp -R dist/www /usr/local/P4wnP1/
+	cp -R dist/db /usr/local/P4wnP1/
 	cp build/webapp.js /usr/local/P4wnP1/www
 	cp build/webapp.js.map /usr/local/P4wnP1/www
 
@@ -102,6 +103,7 @@ install:
 	cp -R dist/scripts /usr/local/P4wnP1/
 	cp -R dist/HIDScripts /usr/local/P4wnP1/
 	cp -R dist/www /usr/local/P4wnP1/
+	cp -R dist/db /usr/local/P4wnP1/
 	cp dist/bin/* /usr/local/bin/
 	cp build/webapp.js /usr/local/P4wnP1/www
 	cp build/webapp.js.map /usr/local/P4wnP1/www
