@@ -30,6 +30,50 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) GetStoredBluetoothSettingsList(timeout time.Duration) (ws []string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	ma, err := rpc.Client.ListStoredBluetoothSettings(ctx, &pb.Empty{})
+	if err != nil { return ws, err }
+	return ma.MsgArray, err
+}
+
+func (rpc *Rpc) StoreBluetoothSettings(timeout time.Duration, req *pb.BluetoothRequestSettingsStorage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_, err = rpc.Client.StoreBluetoothSettings(ctx, req)
+
+	return
+}
+
+func (rpc *Rpc) GetStoredBluetoothSettings(timeout time.Duration, req *pb.StringMessage) (settings *pb.BluetoothSettings, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	settings, err = rpc.Client.GetStoredBluetoothSettings(ctx, req)
+
+	return
+}
+
+func (rpc *Rpc) DeployStoredBluetoothSettings(timeout time.Duration, req *pb.StringMessage) (state *pb.BluetoothSettings, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	state, err = rpc.Client.DeployStoredBluetoothSettings(ctx, req)
+
+	return
+}
+
+
+func (rpc *Rpc) DeleteStoredBluetoothSettings(timeout time.Duration, req *pb.StringMessage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_, err = rpc.Client.DeleteStoredBluetoothSettings(ctx, req)
+	return
+}
+
 func (rpc *Rpc) DeleteStoredUSBSettings(timeout time.Duration, req *pb.StringMessage) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -111,7 +155,6 @@ func (rpc *Rpc) GetStoredUSBSettingsList(timeout time.Duration) (ws []string, er
 	if err != nil { return ws, err }
 	return ma.MsgArray, err
 }
-
 
 func (rpc *Rpc) StoreUSBSettings(timeout time.Duration, req *pb.USBRequestSettingsStorage) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
@@ -539,6 +582,7 @@ func (rpc *Rpc) StartListening() {
 					globalState.EventReceiver.HandleEvent(event)
 				}
 				// we end here on connection error
+				evStream.CloseSend() // fix for half-open websockets, for which the server wouldn't send a TCP RST after crash/restart, as no active client to server communication takes place
 				cancel()
 				println("EVENTLISTENING ABORTED")
 

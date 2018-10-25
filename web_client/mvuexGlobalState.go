@@ -15,6 +15,8 @@ import (
 
 var globalState *GlobalState
 
+
+
 const (
 	maxLogEntries = 500
 
@@ -23,9 +25,14 @@ const (
 	VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION = "deployCurrentBluetoothControllerInformation"
 	VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_AGENT_SETTINGS = "updateCurrentBluetoothAgentSettings"
 	VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_AGENT_SETTINGS = "deployCurrentBluetoothAgentSettings"
+	VUEX_ACTION_STORE_BLUETOOTH_SETTINGS = "storedBluetoothSettings"
+	VUEX_ACTION_DELETE_STORED_BLUETOOTH_SETTINGS = "deleteStoredBluetoothSettings"
+	VUEX_ACTION_DEPLOY_STORED_BLUETOOTH_SETTINGS = "deployStoredBluetoothSettings"
+	VUEX_ACTION_UPDATE_STORED_BLUETOOTH_SETTINGS_LIST = "setStoredBluetoothSettingsList"
 
 	VUEX_MUTATION_SET_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION = "setCurrentBluetoothControllerInformation"
 	VUEX_MUTATION_SET_CURRENT_BLUETOOTH_AGENT_SETTINGS = "setCurrentBluetoothAgentSettings"
+	VUEX_MUTATION_SET_STORED_BLUETOOTH_SETTINGS_LIST = "setStoredBluetoothSettingsList"
 
 	//HIDScripts and jobs
 	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS                           = "updateRunningHidJobs"
@@ -122,6 +129,7 @@ type GlobalState struct {
 	StoredBashScriptsList                 []string                          `js:"StoredBashScriptsList"`
 	StoredHIDScriptsList                  []string                          `js:"StoredHIDScriptsList"`
 	StoredUSBSettingsList                 []string                          `js:"StoredUSBSettingsList"`
+	StoredBluetoothSettingsList           []string                          `js:"StoredBluetoothSettingsList"`
 }
 
 func createGlobalStateStruct() GlobalState {
@@ -143,6 +151,8 @@ func createGlobalStateStruct() GlobalState {
 	state.StoredBashScriptsList = []string{}
 	state.StoredHIDScriptsList = []string{}
 	state.StoredUSBSettingsList = []string{}
+	state.StoredBluetoothSettingsList = []string{}
+
 	//Retrieve Interface settings
 	state.InterfaceSettings = NewEthernetSettingsList()
 	state.CurrentBluetoothControllerInformation = NewBluetoothControllerInformation()
@@ -158,6 +168,68 @@ func createGlobalStateStruct() GlobalState {
 	state.WiFiState = NewWiFiState()
 	return state
 }
+
+func actionUpdateStoredBluetoothSettingsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch bluetooth settings list")
+		//fetch deployed gadget settings
+		btsList, err := RpcClient.GetStoredBluetoothSettingsList(defaultTimeout)
+		if err != nil {
+			println("Couldn't retrieve BluetoothSettings list")
+			return
+		}
+
+		//commit to current
+
+		context.Commit(VUEX_MUTATION_SET_STORED_BLUETOOTH_SETTINGS_LIST, btsList)
+		//context.Commit(VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST, []string{"test1", "test2"})
+	}()
+
+	return
+}
+
+func actionDeployStoredBluetoothSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch load Bluetooth settings: ", settingsName.String())
+		// convert to Go type
+		goBluetoothStettings, err := RpcClient.DeployStoredBluetoothSettings(defaultTimeoutMid, &pb.StringMessage{Msg: settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error deploying stored Bluetooth Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("New Bluetooth settings deployed", "", QUASAR_NOTIFICATION_POSITION_TOP)
+		jsBluetoothSettings := NewBluetoothSettings()
+		jsBluetoothSettings.fromGo(goBluetoothStettings)
+		println("New bluetooth settings", jsBluetoothSettings)
+		context.Commit(VUEX_MUTATION_SET_CURRENT_BLUETOOTH_AGENT_SETTINGS, jsBluetoothSettings.As)
+		context.Commit(VUEX_MUTATION_SET_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION, jsBluetoothSettings.Ci)
+	}()
+}
+
+func actionDeleteStoredBluetoothSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch delete Bluetooth settings: ", settingsName.String())
+		// convert to Go type
+		err := RpcClient.DeleteStoredBluetoothSettings(defaultTimeout, &pb.StringMessage{Msg: settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error deleting stored Bluetooth Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("Bluetooth settings deleted", "", QUASAR_NOTIFICATION_POSITION_TOP)
+		actionUpdateStoredBluetoothSettingsList(store,context,state)
+	}()
+}
+
+func actionStoreBluetoothSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, req *jsBluetoothRequestSettingsStorage) {
+	go func() {
+		println("Vuex dispatch store Bluetooth settings: ", req.TemplateName)
+		// convert to Go type
+		err := RpcClient.StoreBluetoothSettings(defaultTimeout, req.toGo())
+		if err != nil {
+			QuasarNotifyError("Error storing Bluetooth Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("New Bluetooth settings stored", "", QUASAR_NOTIFICATION_POSITION_TOP)
+	}()
+}
+
 
 func actionDeleteStoredUSBSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
 	go func() {
@@ -875,6 +947,10 @@ func initMVuex() *mvuex.Store {
 			println("New ws list", wsList)
 			hvue.Set(state, "StoredWifiSettingsList", wsList)
 		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_STORED_BLUETOOTH_SETTINGS_LIST, func(store *mvuex.Store, state *GlobalState, wsList []interface{}) {
+			println("New Bluetooth list", wsList)
+			hvue.Set(state, "StoredBluetoothSettingsList", wsList)
+		}),
 		mvuex.Mutation(VUEX_MUTATION_SET_STORED_USB_SETTINGS_LIST, func(store *mvuex.Store, state *GlobalState, usbList []interface{}) {
 			println("New USB settings list", usbList)
 			hvue.Set(state, "StoredUSBSettingsList", usbList)
@@ -922,6 +998,11 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION, actionDeployCurrentBluetoothControllerInformation),
 		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_AGENT_SETTINGS, actionUpdateCurrentBluetoothAgentSettings),
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_AGENT_SETTINGS, actionDeployCurrentBluetoothAgentSettings),
+		mvuex.Action(VUEX_ACTION_STORE_BLUETOOTH_SETTINGS, actionStoreBluetoothSettings),
+		mvuex.Action(VUEX_ACTION_DELETE_STORED_BLUETOOTH_SETTINGS, actionDeleteStoredBluetoothSettings),
+		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_BLUETOOTH_SETTINGS, actionDeployStoredBluetoothSettings),
+		mvuex.Action(VUEX_ACTION_UPDATE_STORED_BLUETOOTH_SETTINGS_LIST, actionUpdateStoredBluetoothSettingsList),
+
 
 		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS, actionUpdateGadgetSettingsFromDeployed),
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_USB_SETTINGS, actionDeployCurrentGadgetSettings),

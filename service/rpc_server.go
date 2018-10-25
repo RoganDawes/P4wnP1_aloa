@@ -36,6 +36,7 @@ const (
 	cSTORE_PREFIX_USB_SETTINGS      = "usbs_"
 	cSTORE_PREFIX_ETHERNET_INTERFACE_SETTINGS      = "eis_"
 	cSTORE_PREFIX_TRIGGER_ACTION_SET = "tas_"
+	cSTORE_PREFIX_BLUETOOTH_SETTINGS = "bt_"
 )
 
 
@@ -50,6 +51,65 @@ type server struct {
 
 	listenAddrGrpc string
 	listenAddrWeb string
+}
+
+func (s *server) DeployBluetoothSettings(ctx context.Context, settings *pb.BluetoothSettings) (resultSettings *pb.BluetoothSettings, err error) {
+	as := settings.As
+	ci := settings.Ci
+	resultSettings = &pb.BluetoothSettings{}
+	resultSettings.Ci,err = s.DeployBluetoothControllerInformation(ctx, ci)
+	if err != nil {
+		resultSettings.As,_ = s.GetBluetoothAgentSettings(ctx,&pb.Empty{})
+		return
+	}
+	resultSettings.As,err = s.DeployBluetoothAgentSettings(ctx, as)
+	return
+}
+
+func (s *server) StoreBluetoothSettings(ctx context.Context, req *pb.BluetoothRequestSettingsStorage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_BLUETOOTH_SETTINGS + req.TemplateName, req.Settings, true)
+	return
+}
+
+func (s *server) GetStoredBluetoothSettings(ctx context.Context, templateName *pb.StringMessage) (result *pb.BluetoothSettings, err error) {
+	result = &pb.BluetoothSettings{}
+	err = s.rootSvc.SubSysDataStore.Get(cSTORE_PREFIX_BLUETOOTH_SETTINGS + templateName.Msg, result)
+	return
+}
+
+func (s *server) DeployStoredBluetoothSettings(ctx context.Context, templateName *pb.StringMessage) (e *pb.BluetoothSettings, err error) {
+	bts,err := s.GetStoredBluetoothSettings(ctx,templateName)
+	if err != nil { return bts,err }
+	return s.DeployBluetoothSettings(ctx, bts)
+}
+
+func (s *server) DeleteStoredBluetoothSettings(ctx context.Context, templateName *pb.StringMessage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	err = s.rootSvc.SubSysDataStore.Delete(cSTORE_PREFIX_BLUETOOTH_SETTINGS + templateName.Msg)
+	return
+}
+
+func (s *server) StoreDeployedBluetoothSettings(ctx context.Context, templateName *pb.StringMessage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	currentSettings := &pb.BluetoothSettings{}
+	currentSettings.Ci,err = s.GetBluetoothControllerInformation(ctx, e)
+	if err != nil { return e,err }
+	currentSettings.As,err = s.GetBluetoothAgentSettings(ctx,e)
+	if err != nil { return e,err }
+
+	return s.StoreBluetoothSettings(ctx, &pb.BluetoothRequestSettingsStorage{
+		Settings: currentSettings,
+		TemplateName: templateName.Msg,
+	})
+}
+
+func (s *server) ListStoredBluetoothSettings(ctx context.Context, e *pb.Empty) (sa *pb.StringMessageArray, err error) {
+	sa = &pb.StringMessageArray{}
+	res,err := s.rootSvc.SubSysDataStore.KeysPrefix(cSTORE_PREFIX_BLUETOOTH_SETTINGS, true)
+	if err != nil { return sa,err }
+	sa.MsgArray = res
+	return
 }
 
 func (s *server) DeleteStoredUSBSettings(ctx context.Context, name *pb.StringMessage) (e *pb.Empty, err error) {
@@ -100,21 +160,22 @@ func (s *server) DBRestore(ctx context.Context, filename *pb.StringMessage) (e *
 	return
 }
 
-func (s *server) ListStoredDBBackups(context.Context, *pb.Empty) (*pb.StringMessageArray, error) {
+func (s *server) ListStoredDBBackups(ctx context.Context, e *pb.Empty) (ma *pb.StringMessageArray, err error) {
+	ma = &pb.StringMessageArray{}
 	scripts,err := ListFilesOfFolder(PATH_DATA_STORE_BACKUP, ".db")
-	if err != nil { return nil,err }
-
-	return &pb.StringMessageArray{MsgArray:scripts}, nil
+	if err != nil { return ma,err }
+	ma.MsgArray = scripts
+	return
 }
 
 
 
 func (s *server) GetBluetoothAgentSettings(ctx context.Context, e *pb.Empty) (as *pb.BluetoothAgentSettings, err error) {
+	as = &pb.BluetoothAgentSettings{}
+
 	pin,err := s.rootSvc.SubSysBluetooth.GetPIN()
-	if err != nil { return nil,err }
-	as = &pb.BluetoothAgentSettings{
-		Pin: pin,
-	}
+	if err != nil { return as,err }
+	as.Pin = pin
 	return
 }
 
@@ -125,6 +186,7 @@ func (s *server) DeployBluetoothAgentSettings(ctx context.Context, src *pb.Bluet
 
 // Unused, Server services are deployed via BluetoothControllerInformation
 func (s *server) SetBluetoothNetworkService(ctx context.Context, btNwSvc *pb.BluetoothNetworkService) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
 	uuid := toolz.UUID_NETWORK_SERVER_NAP
 	switch btNwSvc.Type {
 	case pb.BluetoothNetworkServiceType_NAP:
@@ -161,12 +223,13 @@ func (s *server) DeployBluetoothControllerInformation(ctx context.Context, newBt
 	bridgeNameGn := BT_ETHERNET_BRIDGE_NAME
 	updatedCi,err := s.rootSvc.SubSysBluetooth.Controller.UpdateSettingsFromChangedControllerInformation(btCi, bridgeNameNap, bridgeNamePanu, bridgeNameGn)
 	fmt.Printf("Deployed bluetooth settings\n%+v\n%v\n", updatedCi, err)
-	if err != nil { return nil,err }
+	if err != nil { return &pb.BluetoothControllerInformation{},err }
 	updateBtCiRpc = bluetooth.BluetoothControllerInformationToRpc(updatedCi)
 	return updateBtCiRpc, nil
 }
 
 func (s *server) GetBluetoothControllerInformation(ctx context.Context, e *pb.Empty) (res *pb.BluetoothControllerInformation, err error) {
+	res = &pb.BluetoothControllerInformation{}
 	btCi,err := s.rootSvc.SubSysBluetooth.Controller.ReadControllerInformation()
 	if err != nil { return res,err }
 	btCiRpc := bluetooth.BluetoothControllerInformationToRpc(btCi)
@@ -189,7 +252,7 @@ func (s *server) GetStoredUSBSettings(ctx context.Context, m *pb.StringMessage) 
 
 func (s *server) DeployStoredUSBSettings(ctx context.Context, m *pb.StringMessage) (st *pb.GadgetSettings, err error) {
 	ws,err := s.GetStoredUSBSettings(ctx,m)
-	if err != nil { return st,err }
+	if err != nil { return &pb.GadgetSettings{},err }
 	st,err = s.SetGadgetSettings(ctx, ws)
 	if err != nil {
 		return
@@ -200,7 +263,7 @@ func (s *server) DeployStoredUSBSettings(ctx context.Context, m *pb.StringMessag
 
 func (s *server) StoreDeployedUSBSettings(ctx context.Context, m *pb.StringMessage) (e *pb.Empty, err error) {
 	gstate, err := ParseGadgetState(USB_GADGET_NAME)
-	if err != nil { return nil,err }
+	if err != nil { return &pb.Empty{},err }
 
 	return s.StoreUSBSettings(ctx, &pb.USBRequestSettingsStorage{
 		Settings: gstate,
@@ -209,26 +272,27 @@ func (s *server) StoreDeployedUSBSettings(ctx context.Context, m *pb.StringMessa
 }
 
 func (s *server) ListStoredUSBSettings(ctx context.Context, e *pb.Empty) (sa *pb.StringMessageArray, err error) {
+	sa = &pb.StringMessageArray{}
 	res,err := s.rootSvc.SubSysDataStore.KeysPrefix(cSTORE_PREFIX_USB_SETTINGS, true)
 	if err != nil { return sa,err }
-	sa = &pb.StringMessageArray{
-		MsgArray: res,
-	}
+	sa.MsgArray = res
 	return
 }
 
-func (s *server) ListStoredHIDScripts(context.Context, *pb.Empty) (*pb.StringMessageArray, error) {
+func (s *server) ListStoredHIDScripts(context.Context, *pb.Empty) (sa *pb.StringMessageArray, err error) {
+	sa = &pb.StringMessageArray{}
 	scripts,err := ListFilesOfFolder(PATH_HID_SCRIPTS, ".js", ".javascript")
-	if err != nil { return nil,err }
-
-	return &pb.StringMessageArray{MsgArray:scripts}, nil
+	if err != nil { return sa,err }
+	sa.MsgArray = scripts
+	return
 }
 
-func (s *server) ListStoredBashScripts(context.Context, *pb.Empty) (*pb.StringMessageArray, error) {
+func (s *server) ListStoredBashScripts(context.Context, *pb.Empty) (sa *pb.StringMessageArray, err error) {
+	sa = &pb.StringMessageArray{}
 	scripts,err := ListFilesOfFolder(PATH_BASH_SCRIPTS, ".sh", ".bash")
-	if err != nil { return nil,err }
-
-	return &pb.StringMessageArray{MsgArray:scripts}, nil
+	if err != nil { return sa,err }
+	sa.MsgArray = scripts
+	return
 }
 
 func (s *server) DeployStoredTriggerActionSetReplace(ctx context.Context, msg *pb.StringMessage) (tas *pb.TriggerActionSet, err error) {
@@ -256,13 +320,12 @@ func (s *server) StoreTriggerActionSet(ctx context.Context, set *pb.TriggerActio
 }
 
 func (s *server) ListStoredTriggerActionSets(ctx context.Context, e *pb.Empty) (tas *pb.StringMessageArray, err error) {
+	tas = &pb.StringMessageArray{}
 	res, err := s.rootSvc.SubSysDataStore.KeysPrefix(cSTORE_PREFIX_TRIGGER_ACTION_SET, true)
 	if err != nil {
 		return tas, err
 	}
-	tas = &pb.StringMessageArray{
-		MsgArray: res,
-	}
+	tas.MsgArray = res
 	return
 }
 
@@ -323,7 +386,7 @@ func (s *server) StoreDeployedWifiSettings(ctx context.Context, m *pb.StringMess
 
 func (s *server) DeployStoredWifiSettings(ctx context.Context, m *pb.StringMessage) (st *pb.WiFiState, err error) {
 	ws,err := s.GetStoredWifiSettings(ctx,m)
-	if err != nil { return st,err }
+	if err != nil { return &pb.WiFiState{},err }
 	return s.DeployWiFiSettings(ctx, ws)
 }
 
@@ -340,11 +403,10 @@ func (s *server) GetStoredWifiSettings(ctx context.Context, m *pb.StringMessage)
 }
 
 func (s *server) ListStoredWifiSettings(ctx context.Context, e *pb.Empty) (sa *pb.StringMessageArray, err error) {
+	sa = &pb.StringMessageArray{}
 	res,err := s.rootSvc.SubSysDataStore.KeysPrefix(cSTORE_PREFIX_WIFI_SETTINGS, true)
 	if err != nil { return sa,err }
-	sa = &pb.StringMessageArray{
-		MsgArray: res,
-	}
+	sa.MsgArray = res
 	return
 }
 
@@ -641,11 +703,10 @@ func (s *server) DeployStoredEthernetInterfaceSettings(ctx context.Context, msg 
 }
 
 func (s *server) ListStoredEthernetInterfaceSettings(ctx context.Context, empty *pb.Empty) (messages *pb.StringMessageArray, err error) {
+	messages = &pb.StringMessageArray{}
 	res,err := s.rootSvc.SubSysDataStore.KeysPrefix(cSTORE_PREFIX_ETHERNET_INTERFACE_SETTINGS, true)
 	if err != nil { return messages,err }
-	messages = &pb.StringMessageArray{
-		MsgArray: res,
-	}
+	messages.MsgArray = res
 	return
 }
 

@@ -55,9 +55,10 @@ func main() {
 	// ToDo: delete because debug
 	RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second*10)
 
-	router := NewVueRouter(
+	router := NewVueRouter("/usb",
 		VueRouterRoute("/usb","", "<usb-settings></usb-settings>"),
-		VueRouterRoute("/","", "<usb-settings></usb-settings>"),
+		// route below could be used for an easter egg
+		//VueRouterRoute("/","", "<usb-settings></usb-settings>"),
 		VueRouterRoute("/hid","", "<hid-script></hid-script>"),
 		VueRouterRoute("/hidjobs","", "<hid-job-event-overview></hid-job-event-overview>"),
 		VueRouterRoute("/logger","", "<logger :max-entries='7'></logger>"),

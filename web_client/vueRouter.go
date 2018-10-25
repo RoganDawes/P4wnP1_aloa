@@ -37,7 +37,7 @@ func VueRouterRoute(path, name, template string) VueRouterOption {
 	}
 }
 
-func NewVueRouter(opts ...VueRouterOption) *js.Object {
+func NewVueRouter(defaultRoute string, opts ...VueRouterOption) *js.Object {
 	c := &VueRouterConfig{Object:O()}
 	c.Routes = js.Global.Get("Array").New()
 
@@ -45,7 +45,11 @@ func NewVueRouter(opts ...VueRouterOption) *js.Object {
 		opt(c)
 	}
 
-	return js.Global.Get("VueRouter").New(c)
+	jsrouter := js.Global.Get("VueRouter").New(c)
+	if len(defaultRoute) > 0 {
+		jsrouter.Call("replace", defaultRoute)
+	}
+	return jsrouter
 }
 
 

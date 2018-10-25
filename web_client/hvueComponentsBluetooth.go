@@ -8,6 +8,73 @@ import (
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 )
 
+type jsBluetoothRequestSettingsStorage struct {
+	*js.Object
+	TemplateName string `js:"TemplateName"`
+	Settings     *jsBluetoothSettings `js:"Settings"`
+}
+
+func (rs *jsBluetoothRequestSettingsStorage) toGo() *pb.BluetoothRequestSettingsStorage {
+	return &pb.BluetoothRequestSettingsStorage{
+		TemplateName: rs.TemplateName,
+		Settings: rs.Settings.toGo(),
+	}
+}
+
+func (rs *jsBluetoothRequestSettingsStorage) fromGo(src *pb.BluetoothRequestSettingsStorage) {
+	rs.TemplateName = src.TemplateName
+	rs.Settings = NewBluetoothSettings()
+	rs.Settings.fromGo(src.Settings)
+}
+
+func NewBluetoothRequestSettingsStorage() (res *jsBluetoothRequestSettingsStorage) {
+	res = &jsBluetoothRequestSettingsStorage{Object:O()}
+	res.TemplateName = ""
+	res.Settings = NewBluetoothSettings()
+	return res
+}
+
+func NewBluetoothRequestSettingsStorageFromArgs(as *jsBluetoothAgentSettings, ci *jsBluetoothControllerInformation, templateName string) (res *jsBluetoothRequestSettingsStorage) {
+	res = &jsBluetoothRequestSettingsStorage{Object:O()}
+	res.TemplateName = templateName
+	res.Settings = NewBluetoothSettings()
+	res.Settings.fromASandCI(as,ci)
+	return res
+}
+
+type jsBluetoothSettings struct {
+	*js.Object
+	Ci *jsBluetoothControllerInformation `js:"Ci"`
+	As *jsBluetoothAgentSettings `js:"As"`
+}
+
+func (target *jsBluetoothSettings) fromGo(src *pb.BluetoothSettings) {
+	target.As = NewBluetoothAgentSettings()
+	target.As.fromGo(src.As)
+	target.Ci = NewBluetoothControllerInformation()
+	target.Ci.fromGo(src.Ci)
+}
+
+func (target *jsBluetoothSettings) fromASandCI(as *jsBluetoothAgentSettings, ci *jsBluetoothControllerInformation) {
+	target.As = as
+	target.Ci = ci
+}
+
+func (src *jsBluetoothSettings) toGo() (target *pb.BluetoothSettings) {
+	target = &pb.BluetoothSettings{
+		Ci: src.Ci.toGo(),
+		As: src.As.toGo(),
+	}
+	return target
+}
+
+func NewBluetoothSettings() (res *jsBluetoothSettings) {
+	res = &jsBluetoothSettings{Object:O()}
+	res.As = NewBluetoothAgentSettings()
+	res.Ci = NewBluetoothControllerInformation()
+	return
+}
+
 type jsBluetoothAgentSettings struct {
 	*js.Object
 	Pin string `js:"Pin"`
@@ -186,14 +253,16 @@ func InitComponentsBluetooth() {
 		"bluetooth",
 		hvue.Template(templateBluetoothPage),
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
-			data := &struct {
+			data := struct {
 				*js.Object
-		//		ControllerInfo *jsBluetoothControllerInformation `js:"ControllerInfo"`
+				ShowStoreModal bool   `js:"showStoreModal"`
+				ShowDeployStoredModal bool   `js:"showDeployStoredModal"`
+//				TemplateName   string `js:"templateName"`
 			}{Object: O()}
-
-		//	data.ControllerInfo = NewBluetoothControllerInformation()
-
-			return data
+			data.ShowStoreModal = false
+			data.ShowDeployStoredModal = false
+//			data.TemplateName = ""
+			return &data
 		}),
 		hvue.Computed("CurrentControllerInfo",
 			func(vm *hvue.VM) interface{} {
@@ -202,6 +271,38 @@ func InitComponentsBluetooth() {
 		hvue.Computed("available", func(vm *hvue.VM) interface{} {
 			return true
 		}),
+		hvue.Computed("CurrentBluetoothAgentSettings",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("$store").Get("state").Get("CurrentBluetoothAgentSettings")
+			}),
+		hvue.Method("store",
+			func(vm *hvue.VM, name *js.Object) {
+				ci := &jsBluetoothControllerInformation{
+					Object: vm.Get("$store").Get("state").Get("CurrentBluetoothControllerInformation"),
+				}
+				as := &jsBluetoothAgentSettings{
+					Object: vm.Get("$store").Get("state").Get("CurrentBluetoothAgentSettings"),
+				}
+				sReq := NewBluetoothRequestSettingsStorageFromArgs(as,ci,name.String())
+				println("Storing :", sReq)
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_STORE_BLUETOOTH_SETTINGS, sReq)
+				vm.Set("showStoreModal", false)
+			}),
+		hvue.Method("deleteStored",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DELETE_STORED_BLUETOOTH_SETTINGS, name)
+			}),
+		hvue.Method("deployStored",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_STORED_BLUETOOTH_SETTINGS, name)
+			}),
+		hvue.Method("updateStoredSettingsList",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_BLUETOOTH_SETTINGS_LIST)
+			}),
+
 		hvue.Mounted(func(vm *hvue.VM) {
 			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION)
 		}),
@@ -227,10 +328,7 @@ func InitComponentsBluetooth() {
 	hvue.NewComponent(
 		"bluetooth-agent",
 		hvue.Template(templateBluetoothAgent),
-		hvue.Computed("CurrentBluetoothAgentSettings",
-			func(vm *hvue.VM) interface{} {
-				return vm.Get("$store").Get("state").Get("CurrentBluetoothAgentSettings")
-			}),
+		hvue.PropObj("bluetoothAgent"),
 		hvue.Mounted(func(vm *hvue.VM) {
 			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_AGENT_SETTINGS)
 		}),
@@ -240,7 +338,28 @@ func InitComponentsBluetooth() {
 const templateBluetoothPage = `
 <q-page padding>
 
+	<select-string-from-array :values="$store.state.StoredBluetoothSettingsList" v-model="showDeployStoredModal" title="Deploy stored bluetooth settings" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+	<modal-string-input v-model="showStoreModal" title="Store bluetooth settings" @save="store($event)"></modal-string-input>
+
+
 	<div class="row gutter-sm">
+
+		<div class="col-12">
+			<q-card>
+				<q-card-title>
+					Bluetooth Settings
+				</q-card-title>
+
+				<q-card-main>
+					<div class="row gutter-sm">
+						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>
+					</div>
+  				</q-card-main>
+			</q-card>
+		</div>
+
+
 		<div class="col-12">
 			{{ CurrentControllerInfo }}
 		</div>
@@ -409,7 +528,7 @@ const templateBluetoothAgent = `
 				<q-item-tile label>Pin</q-item-tile>
 				<q-item-tile sublabel>PIN requested from remote devices on bonding (only if SSP is off)</q-item-tile>
 				<q-item-tile>
-					<q-input :value="CurrentBluetoothAgentSettings.Pin" @change="CurrentBluetoothAgentSettings.Pin = $event; $store.dispatch('deployCurrentBluetoothAgentSettings')" type="password" inverted></q-input>
+					<q-input :value="bluetoothAgent.Pin" @change="bluetoothAgent.Pin = $event; $store.dispatch('deployCurrentBluetoothAgentSettings')" type="password" inverted></q-input>
 				</q-item-tile>
 			</q-item-main>
 		</q-item>
