@@ -8,6 +8,8 @@
 		grpc.proto
 
 	It has these top-level messages:
+		BluetoothRequestSettingsStorage
+		BluetoothSettings
 		BluetoothAgentSettings
 		BluetoothNetworkService
 		BluetoothControllerSettings
@@ -396,6 +398,174 @@ func (x EthernetInterfaceSettings_Mode) String() string {
 }
 
 // Bluetooth
+type BluetoothRequestSettingsStorage struct {
+	TemplateName string
+	Settings     *BluetoothSettings
+}
+
+// GetTemplateName gets the TemplateName of the BluetoothRequestSettingsStorage.
+func (m *BluetoothRequestSettingsStorage) GetTemplateName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.TemplateName
+}
+
+// GetSettings gets the Settings of the BluetoothRequestSettingsStorage.
+func (m *BluetoothRequestSettingsStorage) GetSettings() (x *BluetoothSettings) {
+	if m == nil {
+		return x
+	}
+	return m.Settings
+}
+
+// MarshalToWriter marshals BluetoothRequestSettingsStorage to the provided writer.
+func (m *BluetoothRequestSettingsStorage) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.TemplateName) > 0 {
+		writer.WriteString(1, m.TemplateName)
+	}
+
+	if m.Settings != nil {
+		writer.WriteMessage(2, func() {
+			m.Settings.MarshalToWriter(writer)
+		})
+	}
+
+	return
+}
+
+// Marshal marshals BluetoothRequestSettingsStorage to a slice of bytes.
+func (m *BluetoothRequestSettingsStorage) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a BluetoothRequestSettingsStorage from the provided reader.
+func (m *BluetoothRequestSettingsStorage) UnmarshalFromReader(reader jspb.Reader) *BluetoothRequestSettingsStorage {
+	for reader.Next() {
+		if m == nil {
+			m = &BluetoothRequestSettingsStorage{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.TemplateName = reader.ReadString()
+		case 2:
+			reader.ReadMessage(func() {
+				m.Settings = m.Settings.UnmarshalFromReader(reader)
+			})
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a BluetoothRequestSettingsStorage from a slice of bytes.
+func (m *BluetoothRequestSettingsStorage) Unmarshal(rawBytes []byte) (*BluetoothRequestSettingsStorage, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type BluetoothSettings struct {
+	Ci *BluetoothControllerInformation
+	As *BluetoothAgentSettings
+}
+
+// GetCi gets the Ci of the BluetoothSettings.
+func (m *BluetoothSettings) GetCi() (x *BluetoothControllerInformation) {
+	if m == nil {
+		return x
+	}
+	return m.Ci
+}
+
+// GetAs gets the As of the BluetoothSettings.
+func (m *BluetoothSettings) GetAs() (x *BluetoothAgentSettings) {
+	if m == nil {
+		return x
+	}
+	return m.As
+}
+
+// MarshalToWriter marshals BluetoothSettings to the provided writer.
+func (m *BluetoothSettings) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if m.Ci != nil {
+		writer.WriteMessage(1, func() {
+			m.Ci.MarshalToWriter(writer)
+		})
+	}
+
+	if m.As != nil {
+		writer.WriteMessage(2, func() {
+			m.As.MarshalToWriter(writer)
+		})
+	}
+
+	return
+}
+
+// Marshal marshals BluetoothSettings to a slice of bytes.
+func (m *BluetoothSettings) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a BluetoothSettings from the provided reader.
+func (m *BluetoothSettings) UnmarshalFromReader(reader jspb.Reader) *BluetoothSettings {
+	for reader.Next() {
+		if m == nil {
+			m = &BluetoothSettings{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			reader.ReadMessage(func() {
+				m.Ci = m.Ci.UnmarshalFromReader(reader)
+			})
+		case 2:
+			reader.ReadMessage(func() {
+				m.As = m.As.UnmarshalFromReader(reader)
+			})
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a BluetoothSettings from a slice of bytes.
+func (m *BluetoothSettings) Unmarshal(rawBytes []byte) (*BluetoothSettings, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
 type BluetoothAgentSettings struct {
 	Pin string
 }
@@ -6125,6 +6295,13 @@ type P4WNP1Client interface {
 	GetBluetoothAgentSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*BluetoothAgentSettings, error)
 	DeployBluetoothAgentSettings(ctx context.Context, in *BluetoothAgentSettings, opts ...grpcweb.CallOption) (*BluetoothAgentSettings, error)
 	SetBluetoothNetworkService(ctx context.Context, in *BluetoothNetworkService, opts ...grpcweb.CallOption) (*Empty, error)
+	DeployBluetoothSettings(ctx context.Context, in *BluetoothSettings, opts ...grpcweb.CallOption) (*BluetoothSettings, error)
+	StoreBluetoothSettings(ctx context.Context, in *BluetoothRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error)
+	GetStoredBluetoothSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*BluetoothSettings, error)
+	DeployStoredBluetoothSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*BluetoothSettings, error)
+	DeleteStoredBluetoothSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
+	StoreDeployedBluetoothSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
+	ListStoredBluetoothSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// USB gadget
 	GetDeployedGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
 	DeployGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
@@ -6247,6 +6424,69 @@ func (c *p4WNP1Client) SetBluetoothNetworkService(ctx context.Context, in *Bluet
 	}
 
 	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployBluetoothSettings(ctx context.Context, in *BluetoothSettings, opts ...grpcweb.CallOption) (*BluetoothSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployBluetoothSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(BluetoothSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) StoreBluetoothSettings(ctx context.Context, in *BluetoothRequestSettingsStorage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "StoreBluetoothSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetStoredBluetoothSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*BluetoothSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "GetStoredBluetoothSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(BluetoothSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployStoredBluetoothSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*BluetoothSettings, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployStoredBluetoothSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(BluetoothSettings).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeleteStoredBluetoothSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DeleteStoredBluetoothSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) StoreDeployedBluetoothSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "StoreDeployedBluetoothSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) ListStoredBluetoothSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
+	resp, err := c.client.RPCCall(ctx, "ListStoredBluetoothSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(StringMessageArray).Unmarshal(resp)
 }
 
 func (c *p4WNP1Client) GetDeployedGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error) {

@@ -9,6 +9,15 @@ service P4WNP1 {
     rpc GetBluetoothAgentSettings (Empty) returns (BluetoothAgentSettings) {}
     rpc DeployBluetoothAgentSettings (BluetoothAgentSettings) returns (BluetoothAgentSettings) {}
     rpc SetBluetoothNetworkService (BluetoothNetworkService) returns (Empty) {}
+    rpc DeployBluetoothSettings (BluetoothSettings) returns (BluetoothSettings) {}
+
+    rpc StoreBluetoothSettings(BluetoothRequestSettingsStorage) returns (Empty) {}
+    rpc GetStoredBluetoothSettings(StringMessage) returns (BluetoothSettings) {}
+    rpc DeployStoredBluetoothSettings(StringMessage) returns (BluetoothSettings) {}
+    rpc DeleteStoredBluetoothSettings(StringMessage) returns (Empty) {}
+    rpc StoreDeployedBluetoothSettings(StringMessage) returns (Empty) {}
+    rpc ListStoredBluetoothSettings(Empty) returns (StringMessageArray) {}
+
 
     //USB gadget
     rpc GetDeployedGadgetSetting (Empty) returns (GadgetSettings) {    }
@@ -98,6 +107,18 @@ service P4WNP1 {
 
 
 /* Bluetooth */
+message BluetoothRequestSettingsStorage {
+    string TemplateName = 1;
+    BluetoothSettings settings = 2;
+}
+
+
+
+message BluetoothSettings {
+    BluetoothControllerInformation ci = 1; //Parts interpreted as settings: current_settings, name, service_network_server_nap, service_network_server_panu, service_network_server_gn
+    BluetoothAgentSettings as = 2;
+}
+
 message BluetoothAgentSettings {
     string pin = 1;
 }
