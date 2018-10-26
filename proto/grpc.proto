@@ -95,6 +95,12 @@ service P4WNP1 {
     rpc DeployStoredTriggerActionSetAdd(StringMessage) returns (TriggerActionSet) {} // Replaces registered TriggerActions with given set, returns a set ONLY OF ADDED TriggerActions (with assigned IDs)
     rpc DeleteStoredTriggerActionSet(StringMessage) returns (Empty) {}
 
+    //TriggerAction for cli (trigger group send and wait for group receive)
+    rpc WaitTriggerGroupReceive(TriggerGroupReceive) returns (Empty) {}
+    rpc FireActionGroupSend(ActionGroupSend) returns (Empty) {}
+
+
+
     // DB backup&restore
     rpc DBBackup(StringMessage) returns(Empty) {}
     rpc DBRestore(StringMessage) returns(Empty) {}

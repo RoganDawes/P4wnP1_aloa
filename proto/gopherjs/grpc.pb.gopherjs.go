@@ -6362,6 +6362,9 @@ type P4WNP1Client interface {
 	DeployStoredTriggerActionSetReplace(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	DeployStoredTriggerActionSetAdd(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	DeleteStoredTriggerActionSet(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
+	// TriggerAction for cli (trigger group send and wait for group receive)
+	WaitTriggerGroupReceive(ctx context.Context, in *TriggerGroupReceive, opts ...grpcweb.CallOption) (*Empty, error)
+	FireActionGroupSend(ctx context.Context, in *ActionGroupSend, opts ...grpcweb.CallOption) (*Empty, error)
 	// DB backup&restore
 	DBBackup(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	DBRestore(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
@@ -6973,6 +6976,24 @@ func (c *p4WNP1Client) DeployStoredTriggerActionSetAdd(ctx context.Context, in *
 
 func (c *p4WNP1Client) DeleteStoredTriggerActionSet(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
 	resp, err := c.client.RPCCall(ctx, "DeleteStoredTriggerActionSet", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) WaitTriggerGroupReceive(ctx context.Context, in *TriggerGroupReceive, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "WaitTriggerGroupReceive", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) FireActionGroupSend(ctx context.Context, in *ActionGroupSend, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "FireActionGroupSend", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}

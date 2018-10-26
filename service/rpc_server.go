@@ -7,24 +7,23 @@ import (
 	"errors"
 	"fmt"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/mame82/P4wnP1_go/common"
+	"github.com/mame82/P4wnP1_go/common_web"
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"github.com/mame82/P4wnP1_go/service/bluetooth"
 	"github.com/mame82/mblue-toolz/toolz"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
-	"path/filepath"
-
 	"net/http"
+	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/mame82/P4wnP1_go/common"
-	"io/ioutil"
-	"os"
 )
 
 var (
@@ -51,6 +50,69 @@ type server struct {
 
 	listenAddrGrpc string
 	listenAddrWeb string
+}
+
+func (s *server) WaitTriggerGroupReceive(rpcCtx context.Context, triggerGR *pb.TriggerGroupReceive) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	triggerVal := triggerGR.Value
+	triggerGroupName := triggerGR.GroupName
+
+	//register a proper event listener
+	evtRcv := s.rootSvc.SubSysEvent.RegisterReceiver(common_web.EVT_TRIGGER)
+	defer evtRcv.Cancel()
+
+Outer:
+	for {
+		select {
+		case evt := <- evtRcv.EventQueue:
+			// avoid consuming empty messages, because channel is closed
+			if evt == nil {
+				break Outer // abort loop on "nil" event, as this indicates the EventQueue channel has been closed
+			}
+			// check if received trigger event applies to TriggerGroupReceive
+			if ttEvt := common_web.EvtTriggerType(evt.Values[0].GetTint64()); ttEvt == common_web.TRIGGER_EVT_TYPE_GROUP_RECEIVE {
+				evGroupName,evValue,err := DeconstructEventTriggerGroupReceive(evt)
+				if err != nil {
+					continue // error parsing as groupReceiveEvent --> ignore
+				}
+				//check if group matches
+				if evGroupName != triggerGroupName {
+					continue // don't handle on group mismatch, but return without error
+				}
+				// check if received value matches
+				if evValue != triggerVal {
+					continue // don't handle on value mismatch, but return without error
+				}
+
+				//consume remaining events (shouldn't be necessary)
+				//for len(evtRcv.EventQueue) > 0 { <- evtRcv.EventQueue }
+
+				// if here, we have a hit and exit the loop without error
+				break Outer
+			}
+		case <- evtRcv.Ctx.Done():
+			// evvent Receiver cancelled or unregistered
+			err = errors.New("EventListener for WaitTriggerGroupReceive aborted")
+			break Outer
+		case <- rpcCtx.Done():
+			// evvent Receiver cancelled or unregistered
+			err = errors.New("RPC call to WaitTriggerGroupReceive aborted")
+			break Outer
+		}
+	}
+
+/*
+	if err != nil {
+		fmt.Println("Aborted")
+	}
+*/
+	return
+}
+
+func (s *server) FireActionGroupSend(ctx context.Context, gs *pb.ActionGroupSend) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	s.rootSvc.SubSysEvent.Emit(ConstructEventTriggerGroupReceive(gs.GroupName, gs.Value))
+	return
 }
 
 func (s *server) DeployBluetoothSettings(ctx context.Context, settings *pb.BluetoothSettings) (resultSettings *pb.BluetoothSettings, err error) {

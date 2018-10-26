@@ -149,11 +149,11 @@ func NewService() (svc *Service, err error) {
 
 	svc.SubSysBluetooth = NewBtService(svc, time.Second * 120) //Depends on NetworkSubSys (try to bring up bluetooth for up to 120s in background)
 
-	svc.SubSysRPC = NewRpcServerService(svc) //Depends on all other
-
 	svc.SubSysTriggerActions = NewTriggerActionManager(svc) //Depends on EventManager, UsbGadgetManager (to trigger HID scripts)
 
 	svc.SubSysDwc2ConnectWatcher = NewDwc2ConnectWatcher(svc) // Depends on EventManager, should be started before USB gadget settings are deployed (to avoid missing initial state change)
+
+	svc.SubSysRPC = NewRpcServerService(svc) //Depends on all other
 	return
 }
 

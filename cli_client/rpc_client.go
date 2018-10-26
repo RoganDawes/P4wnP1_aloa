@@ -38,6 +38,35 @@ func ClientConnectServer(rpcHost string, rpcPort string) (
 	return
 }
 
+func ClientTriggerGroupWait(host string, port string, groupname string, value int32) (err error) {
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { return errors.New(fmt.Sprintf("Could not connect to P4wnP1 RPC server: %v", err)) }
+	defer connection.Close()
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+	ctx := context.Background()
+
+	_,err = rpcClient.WaitTriggerGroupReceive(ctx, &pb.TriggerGroupReceive{GroupName: groupname, Value: value})
+
+	return
+}
+func ClientTriggerGroupSend(host string, port string, groupname string, value int32) (err error) {
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { return errors.New(fmt.Sprintf("Could not connect to P4wnP1 RPC server: %v", err)) }
+	defer connection.Close()
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+	ctx := context.Background()
+	ctx,cancel := context.WithTimeout(ctx,TIMEOUT_SHORT)
+	defer cancel()
+
+	_,err = rpcClient.FireActionGroupSend(ctx, &pb.ActionGroupSend{GroupName: groupname, Value: value})
+
+	return
+}
+
 func ClientCreateTempDir(host string, port string, dir string, prefix string) (resultPath string, err error) {
 	return clientCreateTempDirOfFile(host,port,dir,prefix,true)
 }
