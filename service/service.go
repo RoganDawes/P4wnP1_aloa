@@ -135,7 +135,7 @@ func NewService() (svc *Service, err error) {
 	svc.SubSysEvent = NewEventManager(20)
 
 	svc.SubSysLed = NewLedService()
-	svc.SubSysNetwork, err = NewNetworkManager()
+	svc.SubSysNetwork, err = NewNetworkManager(svc) //Depends on EvenSubSys
 	if err != nil {
 		return nil, err
 	}

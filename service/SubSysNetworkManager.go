@@ -1,24 +1,27 @@
 package service
 
 import (
+	"errors"
+	"fmt"
 	//"github.com/docker/libcontainer/netlink"
 	"github.com/mame82/P4wnP1_go/netlink"
-	"net"
-	"log"
-	"io/ioutil"
-	"os"
-	"fmt"
-
 	pb "github.com/mame82/P4wnP1_go/proto"
-	"errors"
+	"github.com/mame82/P4wnP1_go/service/util"
+	"io/ioutil"
+	"log"
+	"net"
+	"os"
+	"os/exec"
+	"sync"
 )
 
 var (
 	ErrUnmanagedInterface = errors.New("Not a managed network interface")
 )
 
-func NewNetworkManager() (nm *NetworkManager, err error){
+func NewNetworkManager(rootService *Service) (nm *NetworkManager, err error){
 	nm = &NetworkManager{
+		rootSvc: rootService,
 		ManagedInterfaces: make(map[string]*NetworkInterfaceManager),
 	}
 
@@ -42,10 +45,11 @@ func NewNetworkManager() (nm *NetworkManager, err error){
 
 type NetworkManager struct {
 	ManagedInterfaces map[string]*NetworkInterfaceManager
+	rootSvc *Service
 }
 
 func (nm *NetworkManager) AddManagedInterface(startupConfig *pb.EthernetInterfaceSettings) (err error) {
-	nim,err := NewNetworkInterfaceManager(startupConfig.Name, startupConfig)
+	nim,err := NewNetworkInterfaceManager(nm, startupConfig.Name, startupConfig)
 	if err != nil { return err }
 	nm.ManagedInterfaces[startupConfig.Name] = nim
 	return
@@ -78,12 +82,39 @@ type NetworkInterfaceState struct {
 
 // ToDo: interface watcher (up/down --> auto redeploy)
 type NetworkInterfaceManager struct {
+	nm *NetworkManager
 	InterfaceName string
 	state *NetworkInterfaceState
+
+	CmdDnsmasq        *exec.Cmd
+	mutexDnsmasq      *sync.Mutex
+	LoggerDnsmasq     *util.TeeLogger
+	leaseMonitor *dnsmasqLeaseMonitor
 }
 
 func (nim *NetworkInterfaceManager) GetState() (res *NetworkInterfaceState) {
 	return nim.state
+}
+
+func (nim *NetworkInterfaceManager) OnHandedOutDhcpLease(lease *DhcpLease) {
+	fmt.Printf("Lease monitor %s LEASE: %v\n", nim.InterfaceName, lease)
+	// should never happen (dnsmasq output parsing error otherwise)
+	if nim.InterfaceName != lease.Iface {
+		fmt.Println("Interface of handed out DHCP lease doesn't match managed interface, ignoring ...")
+		return
+	}
+
+	//generate trigger event
+	nim.nm.rootSvc.SubSysEvent.Emit(ConstructEventTriggerDHCPLease(lease.Iface, lease.Mac.String(), lease.Ip.String(), lease.Host))
+}
+
+func (nim *NetworkInterfaceManager) OnReceivedDhcpRelease(release *DhcpLease) {
+	fmt.Printf("Lease monitor %s RELEASE: %v\n", nim.InterfaceName, release)
+	// should never happen (dnsmasq output parsing error otherwise)
+	if nim.InterfaceName != release.Iface {
+		fmt.Println("Interface for received DHCP release doesn't match managed interface, ignoring ...")
+		return
+	}
 }
 
 func (nim *NetworkInterfaceManager) ReDeploy() (err error) {
@@ -110,10 +141,8 @@ func (nim *NetworkInterfaceManager) DeploySettings(settings *pb.EthernetInterfac
 	}
 
 	//stop DHCP server / client if still running
-	running, _, err := IsDHCPServerRunning(settings.Name)
-	if (err == nil) && running {StopDHCPServer(settings.Name)}
-	running, _, err = IsDHCPClientRunning(settings.Name)
-	if (err == nil) && running {StopDHCPClient(settings.Name)}
+	nim.StopDHCPServer()
+	nim.StopDHCPClient()
 
 	switch settings.Mode {
 	case pb.EthernetInterfaceSettings_MANUAL:
@@ -172,7 +201,7 @@ func (nim *NetworkInterfaceManager) DeploySettings(settings *pb.EthernetInterfac
 			err = DHCPCreateConfigFile(settings.DhcpServerSettings, confName)
 			if err != nil {return err}
 			//stop already running DHCPServers for the interface
-			StopDHCPServer(ifName)
+			nim.StopDHCPServer()
 
 			//special case: if the interface name is USB_ETHERNET_BRIDGE_NAME, we delete the old lease file
 			// the flushing of still running leases is needed, as after USB reinit, RNDIS hosts aren't guaranteed to
@@ -189,7 +218,7 @@ func (nim *NetworkInterfaceManager) DeploySettings(settings *pb.EthernetInterfac
 			}
 
 			//start the DHCP server
-			err = StartDHCPServer(ifName, confName)
+			err = nim.StartDHCPServer(confName)
 			if err != nil {return err}
 		} else {
 			log.Printf("Setting Interface %s to DOWN\n", iface.Name)
@@ -206,7 +235,7 @@ func (nim *NetworkInterfaceManager) DeploySettings(settings *pb.EthernetInterfac
 			err = netlink.NetworkSetMulticast(iface, true)
 			if err != nil { return err }
 
-			StartDHCPClient(settings.Name)
+			nim.StartDHCPClient()
 		} else {
 			log.Printf("Setting Interface %s to DOWN\n", iface.Name)
 			err = netlink.NetworkLinkDown(iface)
@@ -224,39 +253,22 @@ func (nim *NetworkInterfaceManager) DeploySettings(settings *pb.EthernetInterfac
 	return nil
 }
 
-func NewNetworkInterfaceManager(ifaceName string, startupSettings *pb.EthernetInterfaceSettings) (nim *NetworkInterfaceManager, err error) {
+func NewNetworkInterfaceManager(nm *NetworkManager, ifaceName string, startupSettings *pb.EthernetInterfaceSettings) (nim *NetworkInterfaceManager, err error) {
 	nim = &NetworkInterfaceManager{
+		nm: nm,
 		InterfaceName: ifaceName,
 		state: &NetworkInterfaceState{},
+		mutexDnsmasq: &sync.Mutex{},
+		LoggerDnsmasq: util.NewTeeLogger(false),
 	}
+	nim.leaseMonitor = NewDnsmasqLeaseMonitor(nim)
+
+	//nim.LoggerDnsmasq.SetPrefix("dnsmasq-" + ifaceName + ": ")
+	nim.LoggerDnsmasq.AddOutput(nim.leaseMonitor)
+
+
 	nim.state.CurrentSettings = startupSettings
 	nim.ReDeploy()
-
-	// Deploy startup configuration, to have an initial, defined state
-
-	/*
-	// Startup settings (always DHCP client, Interface up)
-	nim.state.CurrentSettings = &pb.EthernetInterfaceSettings{
-		Name: ifaceName,
-		Mode: pb.EthernetInterfaceSettings_DHCP_CLIENT,
-		Enabled: true,
-		SettingsInUse: true,
-		DhcpServerSettings: &pb.DHCPServerSettings{
-			CallbackScript: "",
-			DoNotBindInterface: false,
-			LeaseFile: nameLeaseFileDHCPSrv(ifaceName),
-			ListenInterface: ifaceName,
-			ListenPort: 0,
-			NotAuthoritative: false,
-			Options: map[uint32]string{
-				3: "",
-				6: "",
-			},
-			Ranges: []*pb.DHCPServerRange{},
-			StaticHosts: []*pb.DHCPServerStaticHost{},
-		},
-	}
-	*/
 
 	return
 }

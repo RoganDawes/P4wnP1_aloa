@@ -178,7 +178,7 @@ func ConstructEventTrigger(triggerType common_web.EvtTriggerType) *pb.Event {
 	}
 }
 
-func ConstructEventTriggerDHCPLease(iface, mac, ip string) *pb.Event {
+func ConstructEventTriggerDHCPLease(iface, mac, ip string, hostname string) *pb.Event {
 	return &pb.Event{
 		Type: common_web.EVT_TRIGGER,
 		Values: []*pb.EventValue{
@@ -186,6 +186,7 @@ func ConstructEventTriggerDHCPLease(iface, mac, ip string) *pb.Event {
 			{Val: &pb.EventValue_Tstring{Tstring: iface}},
 			{Val: &pb.EventValue_Tstring{Tstring: mac}},
 			{Val: &pb.EventValue_Tstring{Tstring: ip}},
+			{Val: &pb.EventValue_Tstring{Tstring: hostname}},
 		},
 	}
 }

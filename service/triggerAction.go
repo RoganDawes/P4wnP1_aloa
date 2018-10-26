@@ -400,7 +400,7 @@ func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *
 	case triggerTypeGpioIn:
 		gpioPin := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioNum
 		gpioPinName := pb.GPIONum_name[int32(gpioPin)]
-		preScript += fmt.Sprintf("var GPIO_PIN=%s;\n", gpioPinName)
+		preScript += fmt.Sprintf("var GPIO_PIN='%s';\n", gpioPinName)
 	case triggerTypeGroupReceiveSequence:
 		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.GroupName
 		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.Values
@@ -425,12 +425,14 @@ func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *
 		iface := evt.Values[1].GetTstring()
 		mac := evt.Values[2].GetTstring()
 		ip := evt.Values[3].GetTstring()
-		preScript += fmt.Sprintf("var DHCP_LEASE_IFACE=%s;\n", iface)
-		preScript += fmt.Sprintf("var DHCP_LEASE_MAC=%s;\n", mac)
-		preScript += fmt.Sprintf("var DHCP_LEASE_IP=%s;\n", ip)
+		host := evt.Values[4].GetTstring()
+		preScript += fmt.Sprintf("var DHCP_LEASE_IFACE='%s';\n", iface)
+		preScript += fmt.Sprintf("var DHCP_LEASE_MAC='%s';\n", mac)
+		preScript += fmt.Sprintf("var DHCP_LEASE_IP='%s';\n", ip)
+		preScript += fmt.Sprintf("var DHCP_LEASE_HOST='%s';\n", host)
 	case triggerTypeSshLogin:
 		loginUser := evt.Values[1].GetTstring()
-		preScript += fmt.Sprintf("var SSH_LOGIN_USER=%s;\n", loginUser)
+		preScript += fmt.Sprintf("var SSH_LOGIN_USER='%s';\n", loginUser)
 
 	}
 
@@ -490,10 +492,12 @@ func (tam *TriggerActionManager) executeActionBashScript(evt *pb.Event, ta *pb.T
 		iface := evt.Values[1].GetTstring()
 		mac := evt.Values[2].GetTstring()
 		ip := evt.Values[3].GetTstring()
+		host := evt.Values[4].GetTstring()
 		env = append(env,
 			fmt.Sprintf("DHCP_LEASE_IFACE=%s", iface),
 			fmt.Sprintf("DHCP_LEASE_MAC=%s", mac),
 			fmt.Sprintf("DHCP_LEASE_IP=%s", ip),
+			fmt.Sprintf("DHCP_LEASE_HOST=\"%s\"", host),
 		)
 	case triggerTypeSshLogin:
 		loginUser := evt.Values[1].GetTstring()
@@ -530,7 +534,8 @@ func (tam *TriggerActionManager) executeActionLog(evt *pb.Event, ta *pb.TriggerA
 		iface := evt.Values[1].GetTstring()
 		mac := evt.Values[2].GetTstring()
 		ip := evt.Values[3].GetTstring()
-		logMessage += fmt.Sprintf(" (DHCP_LEASE_IFACE=%s, DHCP_LEASE_MAC=%s, DHCP_LEASE_IP=%s)", iface, mac, ip)
+		host := evt.Values[4].GetTstring()
+		logMessage += fmt.Sprintf(" (DHCP_LEASE_IFACE=%s, DHCP_LEASE_MAC=%s, DHCP_LEASE_IP=%s, DHCP_LEASE_HOST='%s')", iface, mac, ip, host)
 	case triggerTypeSshLogin:
 		loginUser := evt.Values[1].GetTstring()
 		logMessage += fmt.Sprintf(" (SSH_LOGIN_USER=%s)", loginUser)

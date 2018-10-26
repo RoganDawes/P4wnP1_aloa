@@ -1,10 +1,12 @@
 package util
 
 import (
+	"bufio"
+	"bytes"
 	"io"
 	"log"
-	"sync"
 	"os"
+	"sync"
 )
 
 type TeeLogger struct {
@@ -18,11 +20,29 @@ type sublogger struct {
 	*TeeLogger
 }
 
+/*
 // struct to present an additional io.Writer, wrapping TeeLogger to ise its Print() method
 func (sl sublogger) Write(p []byte) (n int, err error) {
 	sl.TeeLogger.Print(string(p))
 	return len(p), nil
 }
+*/
+
+// struct to present an additional io.Writer, wrapping TeeLogger to ise its Print() method
+func  (sl sublogger) Write(p []byte) (n int, err error) {
+	//fmt.Printf("%s: %s", lw.Prefix, string(p))
+
+	lineScanner := bufio.NewScanner(bytes.NewReader(p))
+	lineScanner.Split(bufio.ScanLines)
+	for lineScanner.Scan() {
+		sl.TeeLogger.Print(string(lineScanner.Bytes()))
+		//fmt.Printf("%s: %s\n", lw.Prefix, string(lineScanner.Bytes()))
+	}
+
+
+	return len(p),nil
+}
+
 
 func NewTeeLogger(addStdout bool) (res *TeeLogger) {
 	res = &TeeLogger{
@@ -38,6 +58,7 @@ func NewTeeLogger(addStdout bool) (res *TeeLogger) {
 	res.LogWriter = sublogger{ TeeLogger: res }
 	res.SetFlags(log.Ltime)
 	res.SetOutput(res)
+	log.Println()
 	return res
 }
 
