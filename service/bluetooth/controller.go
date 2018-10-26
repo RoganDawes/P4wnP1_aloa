@@ -228,6 +228,14 @@ func (c *Controller) UpdateSettingsFromChangedControllerInformation(newCi *btmgm
 	}
 
 	// Update changeable toggles
+	if currentCi.CurrentSettings.SecureSimplePairing != newCi.CurrentSettings.SecureSimplePairing {
+		err := c.SetSSP(newCi.CurrentSettings.SecureSimplePairing)
+		if err != nil {
+			fmt.Println("Error setting bluetooth SSP")
+			currentCi,_ = c.ReadControllerInformation()
+			return currentCi,err
+		}
+	}
 
 	if currentCi.CurrentSettings.Connectable != newCi.CurrentSettings.Connectable {
 		err := c.SetConnectable(newCi.CurrentSettings.Connectable)
@@ -257,14 +265,6 @@ func (c *Controller) UpdateSettingsFromChangedControllerInformation(newCi *btmgm
 		err := c.SetLowEnergy(newCi.CurrentSettings.LowEnergy)
 		if err != nil {
 			fmt.Println("Error setting bluetooth LowEnergy")
-			currentCi,_ = c.ReadControllerInformation()
-			return currentCi,err
-		}
-	}
-	if currentCi.CurrentSettings.SecureSimplePairing != newCi.CurrentSettings.SecureSimplePairing {
-		err := c.SetSSP(newCi.CurrentSettings.SecureSimplePairing)
-		if err != nil {
-			fmt.Println("Error setting bluetooth SSP")
 			currentCi,_ = c.ReadControllerInformation()
 			return currentCi,err
 		}
@@ -301,8 +301,6 @@ func (c *Controller) UpdateSettingsFromChangedControllerInformation(newCi *btmgm
 			return currentCi,err
 		}
 	}
-
-	// Update provided network services if needed
 
 	currentServices,err := c.CheckUUIDList([]string{bt_uuid.NAP_UUID, bt_uuid.PANU_UUID, bt_uuid.GN_UUID})
 	if err != nil { return currentCi, err }

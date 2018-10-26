@@ -10,8 +10,6 @@ import (
 	"github.com/mame82/P4wnP1_go/common"
 	"github.com/mame82/P4wnP1_go/common_web"
 	pb "github.com/mame82/P4wnP1_go/proto"
-	"github.com/mame82/P4wnP1_go/service/bluetooth"
-	"github.com/mame82/mblue-toolz/toolz"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"io"
@@ -233,71 +231,27 @@ func (s *server) ListStoredDBBackups(ctx context.Context, e *pb.Empty) (ma *pb.S
 
 
 func (s *server) GetBluetoothAgentSettings(ctx context.Context, e *pb.Empty) (as *pb.BluetoothAgentSettings, err error) {
-	as = &pb.BluetoothAgentSettings{}
-
-	pin,err := s.rootSvc.SubSysBluetooth.GetPIN()
-	if err != nil { return as,err }
-	as.Pin = pin
-	return
+	return s.rootSvc.SubSysBluetooth.GetBluetoothAgentSettings()
 }
 
 func (s *server) DeployBluetoothAgentSettings(ctx context.Context, src *pb.BluetoothAgentSettings) (res *pb.BluetoothAgentSettings, err error) {
-	err = s.rootSvc.SubSysBluetooth.SetPIN(src.Pin)
-	return s.GetBluetoothAgentSettings(ctx, nil)
+	return s.rootSvc.SubSysBluetooth.DeployBluetoothAgentSettings(src)
 }
 
 // Unused, Server services are deployed via BluetoothControllerInformation
 func (s *server) SetBluetoothNetworkService(ctx context.Context, btNwSvc *pb.BluetoothNetworkService) (e *pb.Empty, err error) {
 	e = &pb.Empty{}
-	uuid := toolz.UUID_NETWORK_SERVER_NAP
-	switch btNwSvc.Type {
-	case pb.BluetoothNetworkServiceType_NAP:
-		uuid = toolz.UUID_NETWORK_SERVER_NAP
-	case pb.BluetoothNetworkServiceType_PANU:
-		uuid = toolz.UUID_NETWORK_SERVER_PANU
-	case pb.BluetoothNetworkServiceType_GN:
-		uuid = toolz.UUID_NETWORK_SERVER_GN
-	}
-	if btNwSvc.ServerOrConnect {
-		// start server for given network service
-		if btNwSvc.RegisterOrUnregister {
-			return e,s.rootSvc.SubSysBluetooth.RegisterNetworkServer(uuid)
-		} else {
-			return e,s.rootSvc.SubSysBluetooth.UnregisterNetworkServer(uuid)
-		}
-	} else {
-		//(dis)connect from/to given network network service of given remote device
-
-		if btNwSvc.RegisterOrUnregister {
-			// register == connect
-			return e,s.rootSvc.SubSysBluetooth.ConnectNetwork(btNwSvc.MacOrName, uuid)
-		} else {
-			// unregister == disconnect
-			return e,s.rootSvc.SubSysBluetooth.DisconnectNetwork(btNwSvc.MacOrName)
-		}
-	}
+	err = s.rootSvc.SubSysBluetooth.DeployBluetoothNetworkService(btNwSvc)
+	return
 }
 
 func (s *server) DeployBluetoothControllerInformation(ctx context.Context, newBtCiRpc *pb.BluetoothControllerInformation) (updateBtCiRpc *pb.BluetoothControllerInformation, err error) {
-	btCi := bluetooth.BluetoothControllerInformationFromRpc(newBtCiRpc)
-	bridgeNameNap := BT_ETHERNET_BRIDGE_NAME
-	bridgeNamePanu := BT_ETHERNET_BRIDGE_NAME
-	bridgeNameGn := BT_ETHERNET_BRIDGE_NAME
-	updatedCi,err := s.rootSvc.SubSysBluetooth.Controller.UpdateSettingsFromChangedControllerInformation(btCi, bridgeNameNap, bridgeNamePanu, bridgeNameGn)
-	fmt.Printf("Deployed bluetooth settings\n%+v\n%v\n", updatedCi, err)
-	if err != nil { return &pb.BluetoothControllerInformation{},err }
-	updateBtCiRpc = bluetooth.BluetoothControllerInformationToRpc(updatedCi)
-	return updateBtCiRpc, nil
+	return s.rootSvc.SubSysBluetooth.DeployBluetoothControllerInformation(newBtCiRpc)
 }
 
 func (s *server) GetBluetoothControllerInformation(ctx context.Context, e *pb.Empty) (res *pb.BluetoothControllerInformation, err error) {
 	res = &pb.BluetoothControllerInformation{}
-	btCi,err := s.rootSvc.SubSysBluetooth.Controller.ReadControllerInformation()
-	if err != nil { return res,err }
-	btCiRpc := bluetooth.BluetoothControllerInformationToRpc(btCi)
-	btCiRpc.IsAvailable = s.rootSvc.SubSysBluetooth.IsServiceAvailable()
-
-	return btCiRpc, nil
+	return s.rootSvc.SubSysBluetooth.GetControllerInformation()
 }
 
 func (s *server) StoreUSBSettings(ctx context.Context, r *pb.USBRequestSettingsStorage) (e *pb.Empty, err error) {

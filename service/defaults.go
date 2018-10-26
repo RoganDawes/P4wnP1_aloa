@@ -16,6 +16,29 @@ const (
 	WIFI_ETHERNET_IFACE_NAME = "wlan0"
 )
 
+func GetDefaultBluetoothSettings() (*pb.BluetoothSettings) {
+	return &pb.BluetoothSettings{
+		Ci: &pb.BluetoothControllerInformation{
+			ServiceNetworkServerPanu: false,
+			ServiceNetworkServerGn: false,
+			ServiceNetworkServerNap: true,
+			Name: "P4wnP1",
+			CurrentSettings: &pb.BluetoothControllerSettings{
+				Powered: true,
+				Connectable: true,
+				Bondable: true,
+				Discoverable: true,
+				LowEnergy: false,
+				SecureSimplePairing: false, //we start with PIN based auth
+				HighSpeed: false, // not possible with SSP off
+			},
+		},
+		As: &pb.BluetoothAgentSettings{
+			Pin: "1337",
+		},
+	}
+}
+
 func GetDefaultNetworkSettingsBluetooth() (*pb.EthernetInterfaceSettings) {
 	ifSettings := &pb.EthernetInterfaceSettings{
 		Name:       BT_ETHERNET_BRIDGE_NAME,

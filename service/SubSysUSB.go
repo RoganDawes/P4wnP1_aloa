@@ -283,10 +283,10 @@ Polls for presence of "usb0" / "usb1" till one of both is active or timeout is r
 
 func pollForUSBEthernet(timeout time.Duration) error {
 	for startTime := time.Now(); time.Since(startTime) < timeout; {
-		if present, _ := CheckInterfaceExistence("usb0"); present {
+		if present := CheckInterfaceExistence("usb0"); present {
 			return nil
 		}
-		if present, _ := CheckInterfaceExistence("usb1"); present {
+		if present := CheckInterfaceExistence("usb1"); present {
 			return nil
 		}
 

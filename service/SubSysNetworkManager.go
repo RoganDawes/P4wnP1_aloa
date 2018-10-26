@@ -325,13 +325,13 @@ func SetBridgeForwardDelay(name string, fd uint) (err error) {
 }
 
 
-
-func CheckInterfaceExistence(name string) (res bool, err error) {
-	_, err = net.InterfaceByName(name)
+// ToDo: remove error part
+func CheckInterfaceExistence(name string) (res bool) {
+	_, err := net.InterfaceByName(name)
 	if err != nil {
-		return false, err
+		return false
 	}
-	return true, err
+	return true
 }
 
 func NetworkLinkUp(name string) (err error) {

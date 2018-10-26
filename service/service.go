@@ -6,6 +6,7 @@ import (
 	"github.com/mame82/P4wnP1_go/common_web"
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"github.com/mame82/P4wnP1_go/service/datastore"
+	"log"
 	"time"
 )
 
@@ -147,26 +148,31 @@ func NewService() (svc *Service, err error) {
 
 	svc.SubSysWifi = NewWifiService(svc) //Depends on NetworkSubSys
 
-	svc.SubSysBluetooth = NewBtService(svc, time.Second * 120) //Depends on NetworkSubSys (try to bring up bluetooth for up to 120s in background)
-
 	svc.SubSysTriggerActions = NewTriggerActionManager(svc) //Depends on EventManager, UsbGadgetManager (to trigger HID scripts)
 
 	svc.SubSysDwc2ConnectWatcher = NewDwc2ConnectWatcher(svc) // Depends on EventManager, should be started before USB gadget settings are deployed (to avoid missing initial state change)
+
+	svc.SubSysBluetooth = NewBtService(svc, time.Second * 120) //Depends on NetworkSubSys (try to bring up bluetooth for up to 120s in background)
 
 	svc.SubSysRPC = NewRpcServerService(svc) //Depends on all other
 	return
 }
 
 func (s *Service) Start() {
+	log.Println("Starting service ...")
+
 	s.SubSysEvent.Start()
 	s.SubSysDwc2ConnectWatcher.Start()
 	s.SubSysLed.Start()
 	s.SubSysRPC.StartRpcServerAndWeb("0.0.0.0", "50051", "8000", PATH_WEBROOT) //start gRPC service
+	log.Println("Starting TriggerAction event listener ...")
 	s.SubSysTriggerActions.Start()
 
 	// Register TriggerActions
+	log.Println("Register default TriggerActions ...")
 	RegisterDefaultTriggerActions(s.SubSysTriggerActions)
 
+	/*
 	// ToDo: 1) Manual start of BT NAP, has to be replaced by settings based approach (same as other subsystems)
 	// ToDo: 2) create a signal based method s.SubSysBluetooth.WaitTillServiceUp(timeout duration)
 	go func() {
@@ -176,9 +182,10 @@ func (s *Service) Start() {
 		}
 		s.SubSysBluetooth.StartNAP()
 	}()
-
+	*/
 
 	// fire service started Event
+	log.Println("Fire service started event ...")
 	s.SubSysEvent.Emit(ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_SERVICE_STARTED))
 }
 
@@ -186,7 +193,7 @@ func (s *Service) Stop() {
 	s.SubSysTriggerActions.Stop()
 	s.SubSysLed.Stop()
 
-	s.SubSysBluetooth.StopNAP()
+	s.SubSysBluetooth.Stop()
 	s.SubSysDwc2ConnectWatcher.Stop()
 	s.SubSysEvent.Stop()
 }

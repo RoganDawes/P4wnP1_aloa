@@ -50,7 +50,7 @@ func (nim *NetworkInterfaceManager) StartDHCPClient() (err error) {
 	log.Printf("Starting DHCP client for interface '%s'...\n", nameIface)
 
 	//check if interface is valid
-	if_exists,_ := CheckInterfaceExistence(nameIface)
+	if_exists := CheckInterfaceExistence(nameIface)
 	if !if_exists {
 		return errors.New(fmt.Sprintf("The given interface '%s' doesn't exist", nameIface))
 	}
@@ -71,7 +71,7 @@ func (nim *NetworkInterfaceManager) StartDHCPClient() (err error) {
 
 func (nim *NetworkInterfaceManager) IsDHCPClientRunning() (running bool, pid int, err error) {
 	nameIface := nim.InterfaceName
-	if_exists,_ := CheckInterfaceExistence(nameIface)
+	if_exists := CheckInterfaceExistence(nameIface)
 	if !if_exists {
 		return false, 0, errors.New(fmt.Sprintf("The given interface '%s' doesn't exist", nameIface))
 	}
@@ -112,7 +112,7 @@ func (nim *NetworkInterfaceManager) StopDHCPClient() (err error) {
 	log.Printf("Stopping DHCP client for interface '%s'...\n", nameIface)
 
 	//check if interface is valid
-	if_exists,_ := CheckInterfaceExistence(nameIface)
+	if_exists := CheckInterfaceExistence(nameIface)
 	if !if_exists {
 		return errors.New(fmt.Sprintf("The given interface '%s' doesn't exist", nameIface))
 	}
@@ -147,7 +147,7 @@ func (nim *NetworkInterfaceManager) StartDHCPServer(configPath string) (err erro
 	log.Printf("Starting dnsmasq for interface '%s' with config '%s'...\n", nameIface, configPath)
 
 	//check if interface is valid
-	if_exists,_ := CheckInterfaceExistence(nameIface)
+	if_exists := CheckInterfaceExistence(nameIface)
 	if !if_exists {
 		return errors.New(fmt.Sprintf("The given interface '%s' doesn't exist", nameIface))
 	}

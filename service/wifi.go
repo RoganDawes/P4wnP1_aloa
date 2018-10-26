@@ -449,7 +449,7 @@ func NewWifiService(rootSvc *Service) (res *WiFiService) {
 	}
 
 	//Check interface existence
-	if exists, _ := CheckInterfaceExistence(ifName); !exists {
+	if exists := CheckInterfaceExistence(ifName); !exists {
 		panic(errors.New(fmt.Sprintf("WiFi interface '%s' not present")))
 	}
 
