@@ -39,7 +39,6 @@ func (evm *EventManager) Start() {
 	log.Println("Event Manager: Starting event dispatcher")
 	go evm.register_unregister()
 	go evm.dispatch()
-
 }
 
 func (evm *EventManager) Stop() {
@@ -71,10 +70,11 @@ func (em *EventManager) RegisterReceiver(filterEventType int64) *EventReceiver {
 	}
 
 
-	go func() {
-		em.registerReceiver <- er
-		er.isRegistered = true //asynchronous registering, as soon as possible
 
+	em.registerReceiver <- er
+	er.isRegistered = true
+
+	go func() {
 		<- er.Ctx.Done() //continue watching and assure unregister as soon as possible if canceled
 		em.UnregisterReceiver(er)
 
