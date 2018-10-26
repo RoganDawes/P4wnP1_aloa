@@ -24,7 +24,7 @@
 		TriggerSSHLogin
 		TriggerDHCPLeaseGranted
 		TriggerGroupReceive
-		TriggerGroupReceiveSequence
+		TriggerGroupReceiveMulti
 		TriggerGPIOIn
 		ActionStartBashScript
 		ActionStartHIDScript
@@ -101,6 +101,32 @@ var BluetoothNetworkServiceType_value = map[string]int{
 
 func (x BluetoothNetworkServiceType) String() string {
 	return BluetoothNetworkServiceType_name[int(x)]
+}
+
+type GroupReceiveMultiType int
+
+const (
+	GroupReceiveMultiType_SEQUENCE       GroupReceiveMultiType = 0
+	GroupReceiveMultiType_AND            GroupReceiveMultiType = 1
+	GroupReceiveMultiType_OR             GroupReceiveMultiType = 2
+	GroupReceiveMultiType_EXACT_SEQUENCE GroupReceiveMultiType = 3
+)
+
+var GroupReceiveMultiType_name = map[int]string{
+	0: "SEQUENCE",
+	1: "AND",
+	2: "OR",
+	3: "EXACT_SEQUENCE",
+}
+var GroupReceiveMultiType_value = map[string]int{
+	"SEQUENCE":       0,
+	"AND":            1,
+	"OR":             2,
+	"EXACT_SEQUENCE": 3,
+}
+
+func (x GroupReceiveMultiType) String() string {
+	return GroupReceiveMultiType_name[int(x)]
 }
 
 type GPIOInPullUpDown int
@@ -1373,7 +1399,7 @@ type TriggerAction struct {
 	//	*TriggerAction_SshLogin
 	//	*TriggerAction_DhcpLeaseGranted
 	//	*TriggerAction_GroupReceive
-	//	*TriggerAction_GroupReceiveSequence
+	//	*TriggerAction_GroupReceiveMulti
 	//	*TriggerAction_GpioIn
 	Trigger isTriggerAction_Trigger
 	// Types that are valid to be assigned to Action:
@@ -1432,9 +1458,9 @@ type TriggerAction_GroupReceive struct {
 	GroupReceive *TriggerGroupReceive
 }
 
-// TriggerAction_GroupReceiveSequence is assignable to Trigger
-type TriggerAction_GroupReceiveSequence struct {
-	GroupReceiveSequence *TriggerGroupReceiveSequence
+// TriggerAction_GroupReceiveMulti is assignable to Trigger
+type TriggerAction_GroupReceiveMulti struct {
+	GroupReceiveMulti *TriggerGroupReceiveMulti
 }
 
 // TriggerAction_GpioIn is assignable to Trigger
@@ -1480,7 +1506,7 @@ func (*TriggerAction_WifiConnectedAsSta) isTriggerAction_Trigger()    {}
 func (*TriggerAction_SshLogin) isTriggerAction_Trigger()              {}
 func (*TriggerAction_DhcpLeaseGranted) isTriggerAction_Trigger()      {}
 func (*TriggerAction_GroupReceive) isTriggerAction_Trigger()          {}
-func (*TriggerAction_GroupReceiveSequence) isTriggerAction_Trigger()  {}
+func (*TriggerAction_GroupReceiveMulti) isTriggerAction_Trigger()     {}
 func (*TriggerAction_GpioIn) isTriggerAction_Trigger()                {}
 func (*TriggerAction_BashScript) isTriggerAction_Action()             {}
 func (*TriggerAction_HidScript) isTriggerAction_Action()              {}
@@ -1601,10 +1627,10 @@ func (m *TriggerAction) GetGroupReceive() (x *TriggerGroupReceive) {
 	return x
 }
 
-// GetGroupReceiveSequence gets the GroupReceiveSequence of the TriggerAction.
-func (m *TriggerAction) GetGroupReceiveSequence() (x *TriggerGroupReceiveSequence) {
-	if v, ok := m.GetTrigger().(*TriggerAction_GroupReceiveSequence); ok {
-		return v.GroupReceiveSequence
+// GetGroupReceiveMulti gets the GroupReceiveMulti of the TriggerAction.
+func (m *TriggerAction) GetGroupReceiveMulti() (x *TriggerGroupReceiveMulti) {
+	if v, ok := m.GetTrigger().(*TriggerAction_GroupReceiveMulti); ok {
+		return v.GroupReceiveMulti
 	}
 	return x
 }
@@ -1720,10 +1746,10 @@ func (m *TriggerAction) MarshalToWriter(writer jspb.Writer) {
 				t.GroupReceive.MarshalToWriter(writer)
 			})
 		}
-	case *TriggerAction_GroupReceiveSequence:
-		if t.GroupReceiveSequence != nil {
+	case *TriggerAction_GroupReceiveMulti:
+		if t.GroupReceiveMulti != nil {
 			writer.WriteMessage(13, func() {
-				t.GroupReceiveSequence.MarshalToWriter(writer)
+				t.GroupReceiveMulti.MarshalToWriter(writer)
 			})
 		}
 	case *TriggerAction_GpioIn:
@@ -1865,8 +1891,8 @@ func (m *TriggerAction) UnmarshalFromReader(reader jspb.Reader) *TriggerAction {
 			})
 		case 13:
 			reader.ReadMessage(func() {
-				m.Trigger = &TriggerAction_GroupReceiveSequence{
-					GroupReceiveSequence: new(TriggerGroupReceiveSequence).UnmarshalFromReader(reader),
+				m.Trigger = &TriggerAction_GroupReceiveMulti{
+					GroupReceiveMulti: new(TriggerGroupReceiveMulti).UnmarshalFromReader(reader),
 				}
 			})
 		case 14:
@@ -2361,38 +2387,38 @@ func (m *TriggerGroupReceive) Unmarshal(rawBytes []byte) (*TriggerGroupReceive, 
 	return m, nil
 }
 
-type TriggerGroupReceiveSequence struct {
-	GroupName        string
-	IgnoreOutOfOrder bool
-	Values           []int32
+type TriggerGroupReceiveMulti struct {
+	GroupName string
+	Values    []int32
+	Type      GroupReceiveMultiType
 }
 
-// GetGroupName gets the GroupName of the TriggerGroupReceiveSequence.
-func (m *TriggerGroupReceiveSequence) GetGroupName() (x string) {
+// GetGroupName gets the GroupName of the TriggerGroupReceiveMulti.
+func (m *TriggerGroupReceiveMulti) GetGroupName() (x string) {
 	if m == nil {
 		return x
 	}
 	return m.GroupName
 }
 
-// GetIgnoreOutOfOrder gets the IgnoreOutOfOrder of the TriggerGroupReceiveSequence.
-func (m *TriggerGroupReceiveSequence) GetIgnoreOutOfOrder() (x bool) {
-	if m == nil {
-		return x
-	}
-	return m.IgnoreOutOfOrder
-}
-
-// GetValues gets the Values of the TriggerGroupReceiveSequence.
-func (m *TriggerGroupReceiveSequence) GetValues() (x []int32) {
+// GetValues gets the Values of the TriggerGroupReceiveMulti.
+func (m *TriggerGroupReceiveMulti) GetValues() (x []int32) {
 	if m == nil {
 		return x
 	}
 	return m.Values
 }
 
-// MarshalToWriter marshals TriggerGroupReceiveSequence to the provided writer.
-func (m *TriggerGroupReceiveSequence) MarshalToWriter(writer jspb.Writer) {
+// GetType gets the Type of the TriggerGroupReceiveMulti.
+func (m *TriggerGroupReceiveMulti) GetType() (x GroupReceiveMultiType) {
+	if m == nil {
+		return x
+	}
+	return m.Type
+}
+
+// MarshalToWriter marshals TriggerGroupReceiveMulti to the provided writer.
+func (m *TriggerGroupReceiveMulti) MarshalToWriter(writer jspb.Writer) {
 	if m == nil {
 		return
 	}
@@ -2401,38 +2427,38 @@ func (m *TriggerGroupReceiveSequence) MarshalToWriter(writer jspb.Writer) {
 		writer.WriteString(1, m.GroupName)
 	}
 
-	if m.IgnoreOutOfOrder {
-		writer.WriteBool(2, m.IgnoreOutOfOrder)
-	}
-
 	if len(m.Values) > 0 {
 		writer.WriteInt32Slice(3, m.Values)
+	}
+
+	if int(m.Type) != 0 {
+		writer.WriteEnum(4, int(m.Type))
 	}
 
 	return
 }
 
-// Marshal marshals TriggerGroupReceiveSequence to a slice of bytes.
-func (m *TriggerGroupReceiveSequence) Marshal() []byte {
+// Marshal marshals TriggerGroupReceiveMulti to a slice of bytes.
+func (m *TriggerGroupReceiveMulti) Marshal() []byte {
 	writer := jspb.NewWriter()
 	m.MarshalToWriter(writer)
 	return writer.GetResult()
 }
 
-// UnmarshalFromReader unmarshals a TriggerGroupReceiveSequence from the provided reader.
-func (m *TriggerGroupReceiveSequence) UnmarshalFromReader(reader jspb.Reader) *TriggerGroupReceiveSequence {
+// UnmarshalFromReader unmarshals a TriggerGroupReceiveMulti from the provided reader.
+func (m *TriggerGroupReceiveMulti) UnmarshalFromReader(reader jspb.Reader) *TriggerGroupReceiveMulti {
 	for reader.Next() {
 		if m == nil {
-			m = &TriggerGroupReceiveSequence{}
+			m = &TriggerGroupReceiveMulti{}
 		}
 
 		switch reader.GetFieldNumber() {
 		case 1:
 			m.GroupName = reader.ReadString()
-		case 2:
-			m.IgnoreOutOfOrder = reader.ReadBool()
 		case 3:
 			m.Values = reader.ReadInt32Slice()
+		case 4:
+			m.Type = GroupReceiveMultiType(reader.ReadEnum())
 		default:
 			reader.SkipField()
 		}
@@ -2441,8 +2467,8 @@ func (m *TriggerGroupReceiveSequence) UnmarshalFromReader(reader jspb.Reader) *T
 	return m
 }
 
-// Unmarshal unmarshals a TriggerGroupReceiveSequence from a slice of bytes.
-func (m *TriggerGroupReceiveSequence) Unmarshal(rawBytes []byte) (*TriggerGroupReceiveSequence, error) {
+// Unmarshal unmarshals a TriggerGroupReceiveMulti from a slice of bytes.
+func (m *TriggerGroupReceiveMulti) Unmarshal(rawBytes []byte) (*TriggerGroupReceiveMulti, error) {
 	reader := jspb.NewReader(rawBytes)
 
 	m = m.UnmarshalFromReader(reader)

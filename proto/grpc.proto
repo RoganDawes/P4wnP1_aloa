@@ -200,7 +200,7 @@ message TriggerAction {
         TriggerSSHLogin sshLogin = 10;
         TriggerDHCPLeaseGranted dhcpLeaseGranted = 11;
         TriggerGroupReceive groupReceive = 12;
-        TriggerGroupReceiveSequence groupReceiveSequence = 13;
+        TriggerGroupReceiveMulti groupReceiveMulti = 13;
         TriggerGPIOIn gpioIn = 14;
     }
 
@@ -227,10 +227,19 @@ message TriggerGroupReceive{  // fired when the correct value is received on the
     string groupName = 1;
     int32 value = 2;
 }
-message TriggerGroupReceiveSequence{  // fired when the correct value is received on the group channel
+
+enum GroupReceiveMultiType {
+    SEQUENCE = 0; // values have to occur in order (other values allowed in between)
+    AND = 1; //logical and ("all" values have to occur, could be unordered)
+    OR = 2; //logical or ("one of" the values has to occur)
+    EXACT_SEQUENCE = 3; // values have to occur in order (other values are NOT allowed in between)
+
+}
+
+message TriggerGroupReceiveMulti{
     string groupName = 1;
-    bool IgnoreOutOfOrder = 2;
     repeated int32 values = 3;
+    GroupReceiveMultiType type = 4;
 }
 enum GPIOInPullUpDown {
     UP = 0;

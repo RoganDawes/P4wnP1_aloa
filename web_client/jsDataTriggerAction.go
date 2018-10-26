@@ -12,16 +12,16 @@ import (
 type triggerType int
 type actionType int
 const (
-	TriggerServiceStarted = triggerType(0)
-	TriggerUsbGadgetConnected = triggerType(1)
+	TriggerServiceStarted        = triggerType(0)
+	TriggerUsbGadgetConnected    = triggerType(1)
 	TriggerUsbGadgetDisconnected = triggerType(2)
-	TriggerWifiAPStarted = triggerType(3)
-	TriggerWifiConnectedAsSta = triggerType(4)
-	TriggerSshLogin = triggerType(5)
-	TriggerDhcpLeaseGranted = triggerType(6)
-	TriggerGPIOIn = triggerType(7)
-	TriggerGroupReceive = triggerType(8)
-	TriggerGroupReceiveSequence = triggerType(9)
+	TriggerWifiAPStarted         = triggerType(3)
+	TriggerWifiConnectedAsSta    = triggerType(4)
+	TriggerSshLogin              = triggerType(5)
+	TriggerDhcpLeaseGranted      = triggerType(6)
+	TriggerGPIOIn                = triggerType(7)
+	TriggerGroupReceive          = triggerType(8)
+	TriggerGroupReceiveMulti     = triggerType(9)
 
 	ActionLog = actionType(0)
 	ActionHidScript = actionType(1)
@@ -31,16 +31,16 @@ const (
 	ActionGroupSend = actionType(5)
 )
 var triggerNames = map[triggerType]string{
-	TriggerServiceStarted: "service started",
-	TriggerUsbGadgetConnected: "USB gadget connected to host",
+	TriggerServiceStarted:        "service started",
+	TriggerUsbGadgetConnected:    "USB gadget connected to host",
 	TriggerUsbGadgetDisconnected: "USB Gadget disconnected from host",
-	TriggerWifiAPStarted: "WiFi Access Point is up",
-	TriggerWifiConnectedAsSta: "joined existing WiFi",
-	TriggerSshLogin: "SSH user login",
-	TriggerDhcpLeaseGranted: "DHCP lease issued",
-	TriggerGPIOIn: "input on GPIO",
-	TriggerGroupReceive: "a value on a group channel",
-	TriggerGroupReceiveSequence: "value sequence on a group channel",
+	TriggerWifiAPStarted:         "WiFi Access Point is up",
+	TriggerWifiConnectedAsSta:    "joined existing WiFi",
+	TriggerSshLogin:              "SSH user login",
+	TriggerDhcpLeaseGranted:      "DHCP lease issued",
+	TriggerGPIOIn:                "input on GPIO",
+	TriggerGroupReceive:          "a value on a group channel",
+	TriggerGroupReceiveMulti:     "multiple values on a group channel",
 }
 var actionNames = map[actionType]string{
 	ActionLog: "write log entry",
@@ -60,7 +60,7 @@ var availableTriggers = []triggerType{
 	TriggerGPIOIn,
 	TriggerSshLogin,
 	TriggerGroupReceive,
-	TriggerGroupReceiveSequence,
+	TriggerGroupReceiveMulti,
 }
 var availableActions = []actionType {
 	ActionLog,
@@ -154,11 +154,12 @@ func (dst *jsTriggerAction) fromGo(src *pb.TriggerAction) {
 		dstTrigger := &jsTriggerGroupReceive{Object: dst.TriggerData}
 		dstTrigger.GroupName = srcTrigger.GroupReceive.GroupName
 		dstTrigger.Value = srcTrigger.GroupReceive.Value
-	case *pb.TriggerAction_GroupReceiveSequence:
-		dst.ChangeTriggerType(TriggerGroupReceiveSequence)
-		dstTrigger := &jsTriggerGroupReceiveSequence{Object: dst.TriggerData}
-		dstTrigger.GroupName = srcTrigger.GroupReceiveSequence.GroupName
-		dstTrigger.ValueSequence = srcTrigger.GroupReceiveSequence.Values
+	case *pb.TriggerAction_GroupReceiveMulti:
+		dst.ChangeTriggerType(TriggerGroupReceiveMulti)
+		dstTrigger := &jsTriggerGroupReceiveMulti{Object: dst.TriggerData}
+		dstTrigger.GroupName = srcTrigger.GroupReceiveMulti.GroupName
+		dstTrigger.Values = srcTrigger.GroupReceiveMulti.Values
+		dstTrigger.Type = GroupReceiveMultiType(srcTrigger.GroupReceiveMulti.Type)
 	default:
 		// change nothing
 	}
@@ -273,12 +274,13 @@ func (ta *jsTriggerAction) toGo() (res *pb.TriggerAction) {
 				Value: triggerData.Value,
 			},
 		}
-	case TriggerGroupReceiveSequence:
-		triggerData := &jsTriggerGroupReceiveSequence{Object: ta.TriggerData}
-		res.Trigger = &pb.TriggerAction_GroupReceiveSequence{
-			GroupReceiveSequence: &pb.TriggerGroupReceiveSequence {
+	case TriggerGroupReceiveMulti:
+		triggerData := &jsTriggerGroupReceiveMulti{Object: ta.TriggerData}
+		res.Trigger = &pb.TriggerAction_GroupReceiveMulti{
+			GroupReceiveMulti: &pb.TriggerGroupReceiveMulti {
 				GroupName: triggerData.GroupName,
-				Values: triggerData.ValueSequence,
+				Values: triggerData.Values,
+				Type: pb.GroupReceiveMultiType(triggerData.Type),
 			},
 		}
 	default:
@@ -387,11 +389,11 @@ func (ta *jsTriggerAction) ChangeTriggerType(newTt triggerType) {
 		d.GroupName = "Group1"
 		d.Value = 0
 		data = d.Object
-	case TriggerGroupReceiveSequence:
-		d := &jsTriggerGroupReceiveSequence{Object:O()}
+	case TriggerGroupReceiveMulti:
+		d := &jsTriggerGroupReceiveMulti{Object: O()}
 		d.GroupName = "Group1"
-		d.IgnoreOutOfOrder = false
-		d.ValueSequence = []int32{1,1}
+		d.Type = GroupReceiveMultiType_SEQUENCE
+		d.Values = []int32{1,2}
 		data = d.Object
 	default:
 		println("Unknown trigger type")
@@ -429,8 +431,8 @@ func (ta *jsTriggerAction) IsTriggerGPIOIn() bool {
 func (ta *jsTriggerAction) IsTriggerGroupReceive() bool {
 	return ta.TriggerType == TriggerGroupReceive
 }
-func (ta *jsTriggerAction) IsTriggerGroupReceiveSequence() bool {
-	return ta.TriggerType == TriggerGroupReceiveSequence
+func (ta *jsTriggerAction) IsTriggerGroupReceiveMulti() bool {
+	return ta.TriggerType == TriggerGroupReceiveMulti
 }
 
 
@@ -477,12 +479,30 @@ type jsTriggerGroupReceive struct {
 	GroupName string `js:"GroupName"`
 	Value int32 `js:"Value"`
 }
-type jsTriggerGroupReceiveSequence struct {
+
+type jsTriggerGroupReceiveMulti struct {
 	*js.Object
-	GroupName string `js:"GroupName"`
-	IgnoreOutOfOrder bool `js:"IgnoreOutOfOrder"`
-	ValueSequence []int32 `js:"ValueSequence"`
+	GroupName string                `js:"GroupName"`
+	Type      GroupReceiveMultiType `js:"Type"`
+	Values    []int32               `js:"Values"`
 }
+type GroupReceiveMultiType int
+const (
+	GroupReceiveMultiType_SEQUENCE       GroupReceiveMultiType = 0
+	GroupReceiveMultiType_AND            GroupReceiveMultiType = 1
+	GroupReceiveMultiType_OR             GroupReceiveMultiType = 2
+	GroupReceiveMultiType_EXACT_SEQUENCE GroupReceiveMultiType = 3
+)
+var groupReceiveMultiNames = map[GroupReceiveMultiType]string{
+	GroupReceiveMultiType_SEQUENCE: "Ordered Sequence (out-of-oreder values allowed)",
+	GroupReceiveMultiType_AND: "All (logical AND)",
+	GroupReceiveMultiType_OR: "One of (logical OR)",
+	GroupReceiveMultiType_EXACT_SEQUENCE: "Exact ordered sequence",
+}
+var availableGroupReceiveMulti = []GroupReceiveMultiType{GroupReceiveMultiType_SEQUENCE, GroupReceiveMultiType_EXACT_SEQUENCE, GroupReceiveMultiType_AND, GroupReceiveMultiType_OR}
+
+
+
 type jsTriggerGPIOIn struct {
 	*js.Object
 	GpioNum GPIONum `js:"GpioNum"`

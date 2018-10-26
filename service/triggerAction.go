@@ -30,20 +30,20 @@ const (
 	triggerTypeSshLogin
 	triggerTypeDhcpLeaseGranted
 	triggerTypeGroupReceive
-	triggerTypeGroupReceiveSequence
+	triggerTypeGroupReceiveMulti
 	triggerTypeGpioIn
 )
 var triggerTypeString = map[triggerType]string {
-	triggerTypeServiceStarted: "TRIGGER_SERVICE_STARTED",
-	triggerTypeUsbGadgetConnected: "TRIGGER_USB_GADGET_CONNECTED",
+	triggerTypeServiceStarted:        "TRIGGER_SERVICE_STARTED",
+	triggerTypeUsbGadgetConnected:    "TRIGGER_USB_GADGET_CONNECTED",
 	triggerTypeUsbGadgetDisconnected: "TRIGGER_USB_GADGET_DISCONNECTED",
-	triggerTypeWifiAPStarted: "TRIGGER_WIFI_AP_STARTED",
-	triggerTypeWifiConnectedAsSta: "TRIGGER_WIFI_CONNECTED_AS_STA",
-	triggerTypeSshLogin: "TRIGGER_SSH_LOGIN",
-	triggerTypeDhcpLeaseGranted: "TRIGGER_DHCP_LEASE_GRANTED",
-	triggerTypeGroupReceive: "TRIGGER_GROUP_RECEIVE",
-	triggerTypeGroupReceiveSequence: "TRIGGER_GROUP_RECEIVE_SEQUENCE",
-	triggerTypeGpioIn: "TRIGGER_GPIO_IN",
+	triggerTypeWifiAPStarted:         "TRIGGER_WIFI_AP_STARTED",
+	triggerTypeWifiConnectedAsSta:    "TRIGGER_WIFI_CONNECTED_AS_STA",
+	triggerTypeSshLogin:              "TRIGGER_SSH_LOGIN",
+	triggerTypeDhcpLeaseGranted:      "TRIGGER_DHCP_LEASE_GRANTED",
+	triggerTypeGroupReceive:          "TRIGGER_GROUP_RECEIVE",
+	triggerTypeGroupReceiveMulti:     "TRIGGER_GROUP_RECEIVE_SEQUENCE",
+	triggerTypeGpioIn:                "TRIGGER_GPIO_IN",
 }
 
 type actionType int
@@ -85,8 +85,8 @@ func retrieveTriggerActionTypes(ta *pb.TriggerAction) (ttype triggerType, atype 
 		ttype = triggerTypeDhcpLeaseGranted
 	case *pb.TriggerAction_GroupReceive:
 		ttype = triggerTypeGroupReceive
-	case *pb.TriggerAction_GroupReceiveSequence:
-		ttype = triggerTypeGroupReceiveSequence
+	case *pb.TriggerAction_GroupReceiveMulti:
+		ttype = triggerTypeGroupReceiveMulti
 	case *pb.TriggerAction_GpioIn:
 		ttype = triggerTypeGpioIn
 	case nil:
@@ -273,9 +273,9 @@ func (tam *TriggerActionManager) onGroupReceive(evt *pb.Event, ta *pb.TriggerAct
 		}
 		tam.executeAction(evt, ta, tt, at) // fire action
 		return nil
-	case triggerTypeGroupReceiveSequence:
+	case triggerTypeGroupReceiveMulti:
 	//	fmt.Println("### Processing GroupReceive event for trigger type GroupReceiveSequence")
-		triggerGroupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.GroupName
+		triggerGroupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.GroupName
 		if evGroupName != triggerGroupName {
 			return nil
 		}
@@ -401,9 +401,10 @@ func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *
 		gpioPin := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioNum
 		gpioPinName := pb.GPIONum_name[int32(gpioPin)]
 		preScript += fmt.Sprintf("var GPIO_PIN='%s';\n", gpioPinName)
-	case triggerTypeGroupReceiveSequence:
-		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.GroupName
-		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.Values
+	case triggerTypeGroupReceiveMulti:
+		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.GroupName
+		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.Values
+		rtype := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.Type
 		// create bash array of values
 		jsArray := "["
 		for idx,v := range values {
@@ -416,6 +417,7 @@ func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *
 		jsArray += "]"
 		preScript += fmt.Sprintf("var GROUP='%s';\n", groupName)
 		preScript += fmt.Sprintf("var VALUES=%s;\n", jsArray)
+		preScript += fmt.Sprintf("var MULTI_TYPE='%s';\n", pb.GroupReceiveMultiType_name[int32(rtype)])
 	case triggerTypeGroupReceive:
 		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.GroupName
 		value := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.Value
@@ -470,9 +472,10 @@ func (tam *TriggerActionManager) executeActionBashScript(evt *pb.Event, ta *pb.T
 		gpioPin := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioNum
 		gpioPinName := pb.GPIONum_name[int32(gpioPin)]
 		env = append(env, fmt.Sprintf("GPIO_PIN=%s", gpioPinName))
-	case triggerTypeGroupReceiveSequence:
-		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.GroupName
-		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.Values
+	case triggerTypeGroupReceiveMulti:
+		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.GroupName
+		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.Values
+		rtype := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.Type
 		// create bash array of values
 		bashArray := "("
 		for _,v := range values { bashArray += fmt.Sprintf("%d ", v)}
@@ -480,6 +483,7 @@ func (tam *TriggerActionManager) executeActionBashScript(evt *pb.Event, ta *pb.T
 		env = append(env,
 			fmt.Sprintf("GROUP='%s'", groupName),
 			fmt.Sprintf("VALUES=%s", bashArray),
+			fmt.Sprintf("MULTI_TYPE='%s'", pb.GroupReceiveMultiType_name[int32(rtype)]),
 		)
 	case triggerTypeGroupReceive:
 		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.GroupName
@@ -522,14 +526,15 @@ func (tam *TriggerActionManager) executeActionLog(evt *pb.Event, ta *pb.TriggerA
 		gpioPin := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioNum
 		gpioPinName := pb.GPIONum_name[int32(gpioPin)]
 		logMessage += fmt.Sprintf(" (GPIO_PIN=%s)", gpioPinName)
-	case triggerTypeGroupReceiveSequence:
-		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.GroupName
-		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence).GroupReceiveSequence.Values
+	case triggerTypeGroupReceiveMulti:
+		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.GroupName
+		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.Values
 		logMessage += fmt.Sprintf(" (GROUP='%s', VALUES=%v)", groupName, values)
 	case triggerTypeGroupReceive:
 		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.GroupName
-		value := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.Value
-		logMessage += fmt.Sprintf(" (GROUP='%s', VALUE=%d)", groupName, value)
+		values := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.Value
+		typeName := pb.GroupReceiveMultiType_name[int32(ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.Type)]
+		logMessage += fmt.Sprintf(" (GROUP='%s', VALUES=%+v, VALUE='%d')", groupName, values, typeName)
 	case triggerTypeDhcpLeaseGranted:
 		iface := evt.Values[1].GetTstring()
 		mac := evt.Values[2].GetTstring()
@@ -579,7 +584,7 @@ func taTriggerTypeMatchesEvtTriggerType(ttype triggerType, evt *pb.Event) bool {
 			return true
 		}
 	case common_web.TRIGGER_EVT_TYPE_GROUP_RECEIVE:
-		if ttype == triggerTypeGroupReceive || ttype == triggerTypeGroupReceiveSequence {
+		if ttype == triggerTypeGroupReceive || ttype == triggerTypeGroupReceiveMulti {
 			return true
 		}
 	case common_web.TRIGGER_EVT_TYPE_GPIO_IN:
@@ -604,10 +609,20 @@ func (tam *TriggerActionManager) AddTriggerAction(ta *pb.TriggerAction) (taAdded
 	taAdded = ta
 
 	//if new ta trigger is GroupReceiveSequence, add a SequenceChecker
-	if triggerGrpRcv,match := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence); match {
+	if triggerGrpRcv,match := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti); match {
 		tam.groupReceiveSequenceCheckersMutex.Lock()
 		//fmt.Printf("##### New val checker %+v\n", triggerGrpRcv.GroupReceiveSequence.Values)
-		tam.groupReceiveSequenceCheckers[ta] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveSequence.Values, triggerGrpRcv.GroupReceiveSequence.IgnoreOutOfOrder)
+		switch triggerGrpRcv.GroupReceiveMulti.Type {
+		case pb.GroupReceiveMultiType_AND:
+			tam.groupReceiveSequenceCheckers[ta] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveMulti.Values, util.ValueSeqType_AND)
+		case pb.GroupReceiveMultiType_OR:
+			tam.groupReceiveSequenceCheckers[ta] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveMulti.Values, util.ValueSeqType_OR)
+		case pb.GroupReceiveMultiType_SEQUENCE:
+			tam.groupReceiveSequenceCheckers[ta] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveMulti.Values, util.ValueSeqType_SEQUENCE)
+		case pb.GroupReceiveMultiType_EXACT_SEQUENCE:
+			tam.groupReceiveSequenceCheckers[ta] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveMulti.Values, util.ValueSeqType_EXACT_SEQUENCE)
+		}
+
 		tam.groupReceiveSequenceCheckersMutex.Unlock()
 	}
 
@@ -627,7 +642,7 @@ func (tam *TriggerActionManager) RemoveTriggerAction(removeTa *pb.TriggerAction)
 			tam.registeredTriggerActions.TriggerActions = append(tam.registeredTriggerActions.TriggerActions[:idx], tam.registeredTriggerActions.TriggerActions[idx+1:]...)
 
 			//if target ta trigger had a sequenceChecker assigned, remove it
-			if _,match := ta.Trigger.(*pb.TriggerAction_GroupReceiveSequence); match {
+			if _,match := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti); match {
 				tam.groupReceiveSequenceCheckersMutex.Lock()
 				delete(tam.groupReceiveSequenceCheckers, ta)
 				tam.groupReceiveSequenceCheckersMutex.Unlock()
@@ -664,7 +679,7 @@ func (tam *TriggerActionManager) UpdateTriggerAction(srcTa *pb.TriggerAction, ad
 		if targetTA.Immutable { return ErrTaImmutable }
 
 		//if target ta trigger had a sequenceChecker assigned, remove it
-		if _,match := targetTA.Trigger.(*pb.TriggerAction_GroupReceiveSequence); match {
+		if _,match := targetTA.Trigger.(*pb.TriggerAction_GroupReceiveMulti); match {
 			tam.groupReceiveSequenceCheckersMutex.Lock()
 			delete(tam.groupReceiveSequenceCheckers, targetTA)
 			tam.groupReceiveSequenceCheckersMutex.Unlock()
@@ -677,9 +692,19 @@ func (tam *TriggerActionManager) UpdateTriggerAction(srcTa *pb.TriggerAction, ad
 		targetTA.Trigger = srcTa.Trigger
 
 		//if new ta trigger is GroupReceiveSequence, add a SequenceChecker
-		if triggerGrpRcv,match := targetTA.Trigger.(*pb.TriggerAction_GroupReceiveSequence); match {
+		if triggerGrpRcv,match := targetTA.Trigger.(*pb.TriggerAction_GroupReceiveMulti); match {
 			tam.groupReceiveSequenceCheckersMutex.Lock()
-			tam.groupReceiveSequenceCheckers[targetTA] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveSequence.Values, triggerGrpRcv.GroupReceiveSequence.IgnoreOutOfOrder)
+
+			switch triggerGrpRcv.GroupReceiveMulti.Type {
+			case pb.GroupReceiveMultiType_AND:
+				tam.groupReceiveSequenceCheckers[targetTA] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveMulti.Values, util.ValueSeqType_AND)
+			case pb.GroupReceiveMultiType_OR:
+				tam.groupReceiveSequenceCheckers[targetTA] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveMulti.Values, util.ValueSeqType_OR)
+			case pb.GroupReceiveMultiType_SEQUENCE:
+				tam.groupReceiveSequenceCheckers[targetTA] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveMulti.Values, util.ValueSeqType_SEQUENCE)
+			case pb.GroupReceiveMultiType_EXACT_SEQUENCE:
+				tam.groupReceiveSequenceCheckers[targetTA] = util.NewValueSequenceChecker(triggerGrpRcv.GroupReceiveMulti.Values, util.ValueSeqType_EXACT_SEQUENCE)
+			}
 			tam.groupReceiveSequenceCheckersMutex.Unlock()
 		}
 		return nil

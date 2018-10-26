@@ -42,6 +42,24 @@ func generateSelectOptionsAction() *js.Object {
 	return tts
 }
 
+func generateSelectOptionsGroupReceiveMultiType() *js.Object {
+	tts := js.Global.Get("Array").New()
+	type option struct {
+		*js.Object
+		Label string `js:"label"`
+		Value GroupReceiveMultiType `js:"value"`
+	}
+
+	for _, value := range availableGroupReceiveMulti {
+		label := groupReceiveMultiNames[value]
+		o := option{Object:O()}
+		o.Value = value
+		o.Label = label
+		tts.Call("push", o)
+	}
+	return tts
+}
+
 func generateSelectOptionsGPIOOutValue() *js.Object {
 	tts := js.Global.Get("Array").New()
 	type option struct {
@@ -239,21 +257,28 @@ func InitComponentsTriggerActions() {
 				strTrigger += t.GroupName
 				strTrigger += ": " + strconv.Itoa(int(t.Value))
 				strTrigger += ")"
-			case ta.IsTriggerGroupReceiveSequence():
-				t := jsTriggerGroupReceiveSequence{Object: ta.TriggerData}
+			case ta.IsTriggerGroupReceiveMulti():
+				t := jsTriggerGroupReceiveMulti{Object: ta.TriggerData}
 				strTrigger += " ("
-				strTrigger += t.GroupName
-				strTrigger += ": ["
-				for idx,val  := range t.ValueSequence {
+				strTrigger += t.GroupName + ": "
+				switch t.Type {
+				case GroupReceiveMultiType_SEQUENCE:
+					strTrigger += "sequence of"
+				case GroupReceiveMultiType_EXACT_SEQUENCE:
+					strTrigger += "exact sequence of"
+				case GroupReceiveMultiType_OR:
+					strTrigger += "one of"
+				case GroupReceiveMultiType_AND:
+					strTrigger += "all from"
+				}
+				strTrigger += " ["
+				for idx,val  := range t.Values {
 					if idx != 0 {
 						strTrigger += ", "
 					}
 					strTrigger += strconv.Itoa(int(val))
 				}
 				strTrigger += "]"
-				if !t.IgnoreOutOfOrder {
-					strTrigger += ", out-of-order allowed"
-				}
 				strTrigger += ")"
 			case ta.IsTriggerGPIOIn():
 				t := jsTriggerGPIOIn{Object: ta.TriggerData}
@@ -361,6 +386,9 @@ func InitComponentsTriggerActions() {
 		hvue.Computed("pullupdown", func(vm *hvue.VM) interface{} {
 			return generateSelectOptionsGPIOInPullUpDown()
 		}),
+		hvue.Computed("groupReceiveMultiSelect", func(vm *hvue.VM) interface{} {
+			return generateSelectOptionsGroupReceiveMultiType()
+		}),
 		hvue.Computed("edge", func(vm *hvue.VM) interface{} {
 			return generateSelectOptionsGPIOInEdges()
 		}),
@@ -378,44 +406,44 @@ func InitComponentsTriggerActions() {
 				ta.ChangeTriggerType(tType)
 			}),
 		hvue.Method(
-			"TriggerGroupReceiveSequenceAddValue",
+			"TriggerGroupReceiveMultiAddValue",
 			func(vm *hvue.VM, newVal *js.Object) {
 				println("Force add", newVal)
 				ta := &jsTriggerAction{Object: vm.Get("ta")}
-				if !ta.IsTriggerGroupReceiveSequence() { return }
+				if !ta.IsTriggerGroupReceiveMulti() { return }
 
-				// cast data Object to jsTriggerGroupReceiveSequence
-				tgrs := &jsTriggerGroupReceiveSequence{Object:ta.TriggerData}
+				// cast data Object to jsTriggerGroupReceiveMulti
+				tgrs := &jsTriggerGroupReceiveMulti{Object: ta.TriggerData}
 				strVal := newVal.String()
 				if intVal,errconv := strconv.Atoi(strVal); errconv == nil {
 					//append to Values
-					tgrs.ValueSequence = append(tgrs.ValueSequence, int32(intVal))
+					tgrs.Values = append(tgrs.Values, int32(intVal))
 				}
 			}),
 		hvue.ComputedWithGetSet(
-			"TriggerGroupReceiveSequenceValues",
+			"TriggerGroupReceiveMultiValues",
 			func(vm *hvue.VM) interface{} {
 				ta := &jsTriggerAction{Object: vm.Get("ta")}
-				if !ta.IsTriggerGroupReceiveSequence() { return []string{} }
+				if !ta.IsTriggerGroupReceiveMulti() { return []string{} }
 
-				// cast data Object to jsTriggerGroupReceiveSequence
-				tgrs := &jsTriggerGroupReceiveSequence{Object:ta.TriggerData}
+				// cast data Object to jsTriggerGroupReceiveMulti
+				tgrs := &jsTriggerGroupReceiveMulti{Object: ta.TriggerData}
 
-				res := make([]string, len(tgrs.ValueSequence))
-				for idx,intVal := range tgrs.ValueSequence {
+				res := make([]string, len(tgrs.Values))
+				for idx,intVal := range tgrs.Values {
 					res[idx] = strconv.Itoa(int(intVal))
 				}
 				return res
 			},
 			func(vm *hvue.VM, newValue *js.Object) {
 				ta := &jsTriggerAction{Object: vm.Get("ta")}
-				if !ta.IsTriggerGroupReceiveSequence() { return }
+				if !ta.IsTriggerGroupReceiveMulti() { return }
 
-				// cast data Object to jsTriggerGroupReceiveSequence
-				tgrs := &jsTriggerGroupReceiveSequence{Object:ta.TriggerData}
+				// cast data Object to jsTriggerGroupReceiveMulti
+				tgrs := &jsTriggerGroupReceiveMulti{Object: ta.TriggerData}
 
 				// clear old array
-				tgrs.ValueSequence = []int32{}
+				tgrs.Values = []int32{}
 
 				// iterate over newValue, which is assumed to be an Array of strings
 				for idx := 0; idx < newValue.Length(); idx++ {
@@ -424,7 +452,7 @@ func InitComponentsTriggerActions() {
 					// try to cast to int
 					if intVal,errconv := strconv.Atoi(strVal); errconv == nil {
 						//append to Values
-						tgrs.ValueSequence = append(tgrs.ValueSequence, int32(intVal))
+						tgrs.Values = append(tgrs.Values, int32(intVal))
 					}
 				}
 			}),
@@ -434,8 +462,8 @@ func InitComponentsTriggerActions() {
 		hvue.Computed("isTriggerGroupReceive", func(vm *hvue.VM) interface{} {
 			return (&jsTriggerAction{Object: vm.Get("ta")}).IsTriggerGroupReceive()
 		}),
-		hvue.Computed("isTriggerGroupReceiveSequence", func(vm *hvue.VM) interface{} {
-			return (&jsTriggerAction{Object: vm.Get("ta")}).IsTriggerGroupReceiveSequence()
+		hvue.Computed("isTriggerGroupReceiveMulti", func(vm *hvue.VM) interface{} {
+			return (&jsTriggerAction{Object: vm.Get("ta")}).IsTriggerGroupReceiveMulti()
 		}),
 	)
 	hvue.NewComponent(
@@ -659,7 +687,7 @@ const templateTrigger = `
 				</q-item-main>
 			</q-item>
 
-			<q-item tag="label" v-if="isTriggerGroupReceive || isTriggerGroupReceiveSequence">
+			<q-item tag="label" v-if="isTriggerGroupReceive || isTriggerGroupReceiveMulti">
 				<q-item-main>
 					<q-item-tile label>Group name</q-item-tile>
 					<q-item-tile sublabel>Only values send for this group name are regarded</q-item-tile>
@@ -677,16 +705,17 @@ const templateTrigger = `
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
-			<q-item tag="label" v-if="isTriggerGroupReceiveSequence">
+			<q-item tag="label" v-if="isTriggerGroupReceiveMulti">
 				<q-item-main>
 					<q-item-tile label>Values</q-item-tile>
-					<q-item-tile sublabel>The numeric value sequence which has to be received to activate the trigger</q-item-tile>
+					<q-item-tile sublabel>The numeric values which has to be received to activate the trigger</q-item-tile>
 					<q-item-tile>
-						<q-chips-input v-model="TriggerGroupReceiveSequenceValues" @duplicate="TriggerGroupReceiveSequenceAddValue($event)" type="number" decimals="0" inverted :disable="!ta.IsActive"></q-chips-input>
+						<q-chips-input v-model="TriggerGroupReceiveMultiValues" @duplicate="TriggerGroupReceiveMultiAddValue($event)" type="number" decimals="0" inverted :disable="!ta.IsActive"></q-chips-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
-			<q-item tag="label" link :disabled="!ta.IsActive" v-if="isTriggerGroupReceiveSequence">
+<!--
+			<q-item tag="label" link :disabled="!ta.IsActive" v-if="isTriggerGroupReceiveMulti">
 				<q-item-side>
 					<q-toggle v-model="ta.TriggerData.IgnoreOutOfOrder" :disable="!ta.IsActive"></q-toggle>
 				</q-item-side>
@@ -695,6 +724,17 @@ const templateTrigger = `
 					<q-item-tile sublabel>If enabled the sequence may be interrupted by other values. If disabled they have to arrive in exact order.</q-item-tile>
 				</q-item-main>
 			</q-item>
+-->
+			<q-item tag="label" v-if="isTriggerGroupReceiveMulti">
+				<q-item-main>
+					<q-item-tile label>Type</q-item-tile>
+					<q-item-tile sublabel>Chose how values should be checked (logical OR, logical AND, sequence or exact sequence</q-item-tile>
+					<q-item-tile>
+						<q-select v-model="ta.TriggerData.Type" :options="groupReceiveMultiSelect" inverted :disable="!ta.IsActive"></q-select>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
 
 
 			<q-item tag="label" v-if="isTriggerGPIOIn">
