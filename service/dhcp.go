@@ -57,8 +57,7 @@ func (nim *NetworkInterfaceManager) StartDHCPClient() (err error) {
 
 
 	//We use the run command and allow dhcpcd to daemonize
-
-	proc := exec.Command("/sbin/dhcpcd", "-C", "wpa_supplicant", nameIface) //we avoid starting wpa_supplicant along with the dhcp client
+	proc := exec.Command("/sbin/dhcpcd", "-b", "-C", "wpa_supplicant", nameIface) //we avoid starting wpa_supplicant along with the dhcp client
 	dhcpcd_out, err := proc.CombinedOutput()
 	//err = proc.Run()
 	if err != nil { return err}
