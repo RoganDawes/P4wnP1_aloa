@@ -636,12 +636,12 @@ func NewEthernetRequestSettingsStorage() *jsEthernetRequestSettingsStorage {
 
 
 
-type jsEthernetSettingsList struct {
+type jsEthernetSettingsArray struct {
 	*js.Object
 	Interfaces *js.Object `js:"interfaces"` //every object property represents an EthernetSettings struct, the key is the interface name
 }
 
-func (isl *jsEthernetSettingsList) fromGo(src *pb.DeployedEthernetInterfaceSettings) {
+func (isl *jsEthernetSettingsArray) fromGo(src *pb.DeployedEthernetInterfaceSettings) {
 	//Options array (converted from map)
 	isl.Interfaces = js.Global.Get("Array").New()
 	for _, ifSets := range src.List {
@@ -649,9 +649,28 @@ func (isl *jsEthernetSettingsList) fromGo(src *pb.DeployedEthernetInterfaceSetti
 		jsIfSets.fromGo(ifSets)
 		isl.Interfaces.Call("push", jsIfSets)
 	}
+
+
+	// sort the resulting array
+	/*
+	store.state.InterfaceSettings.interfaces.sort(function(a,b) {
+		return a.name>b.name ? 1 : (a.name<b.name ? -1 : 0);
+	})
+	*/
+
+	isl.Interfaces.Call("sort", func(a *jsEthernetInterfaceSettings, b *jsEthernetInterfaceSettings) int {
+		switch {
+		case a.Name > b.Name:
+			return 1
+		case a.Name < b.Name:
+			return -1
+		default:
+			return 0
+		}
+	})
 }
 
-func (isl *jsEthernetSettingsList) updateSingleInterface(updatedSettings *jsEthernetInterfaceSettings) {
+func (isl *jsEthernetSettingsArray) updateSingleInterface(updatedSettings *jsEthernetInterfaceSettings) {
 	//Options array (converted from map)
 	for i:=0; i<isl.Interfaces.Length(); i++ {
 		 settings := &jsEthernetInterfaceSettings{Object:isl.Interfaces.Index(i)}
@@ -668,8 +687,8 @@ func (isl *jsEthernetSettingsList) updateSingleInterface(updatedSettings *jsEthe
 
 }
 
-func NewEthernetSettingsList() (res *jsEthernetSettingsList) {
-	res = &jsEthernetSettingsList{Object:O()}
+func NewEthernetSettingsList() (res *jsEthernetSettingsArray) {
+	res = &jsEthernetSettingsArray{Object: O()}
 	res.Interfaces = js.Global.Get("Array").New()
 	return
 }
@@ -940,7 +959,7 @@ func (target *jsDHCPServerStaticHost) fromGo(src *pb.DHCPServerStaticHost) {
 }
 
 /* EVENT LOGGER */
-type jsEventReceiver struct {
+type jsEventProcessor struct {
 	*js.Object
 	LogArray      *js.Object         `js:"logArray"`
 	HidEventArray *js.Object         `js:"eventHidArray"`
@@ -948,20 +967,20 @@ type jsEventReceiver struct {
 	JobList       *jsHidJobStateList `js:"jobList"` //Needs to be exposed to JS in order to use JobList.UpdateEntry() from this JS object
 }
 
-func NewEventReceiver(maxEntries int, jobList *jsHidJobStateList) *jsEventReceiver {
-	eventReceiver := &jsEventReceiver{
+func NewEventProcessor(maxEntries int, jobList *jsHidJobStateList) *jsEventProcessor {
+	eventProcesssor := &jsEventProcessor{
 		Object: js.Global.Get("Object").New(),
 	}
 
-	eventReceiver.LogArray = js.Global.Get("Array").New()
-	eventReceiver.HidEventArray = js.Global.Get("Array").New()
-	eventReceiver.MaxEntries = maxEntries
-	eventReceiver.JobList = jobList
+	eventProcesssor.LogArray = js.Global.Get("Array").New()
+	eventProcesssor.HidEventArray = js.Global.Get("Array").New()
+	eventProcesssor.MaxEntries = maxEntries
+	eventProcesssor.JobList = jobList
 
-	return eventReceiver
+	return eventProcesssor
 }
 
-func (data *jsEventReceiver) handleHidEvent(hEv *jsHidEvent) {
+func (data *jsEventProcessor) handleHidEvent(hEv *jsHidEvent) {
 	println("Received HID EVENT", hEv)
 	switch hEv.EvType {
 	case common_web.HidEventType_JOB_STARTED:
@@ -998,13 +1017,13 @@ func (data *jsEventReceiver) handleHidEvent(hEv *jsHidEvent) {
 	case common_web.HidEventType_JOB_CANCELLED:
 		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, true, false, hEv.Message, hEv.Message, hEv.EvLogTime, "")
 	default:
-		println("unhandled hid event "+common_web.EventType_name[hEv.EvType], hEv)
+		println("unhandled hid event "+common_web.EventTypeHIDName[hEv.EvType], hEv)
 	}
 
 }
 
 /* This method gets internalized and therefor the mutex won't be accessible*/
-func (data *jsEventReceiver) HandleEvent(ev *pb.Event) {
+func (data *jsEventProcessor) HandleEvent(ev *pb.Event) {
 	go func() {
 		jsEv := NewJsEventFromNative(ev)
 		switch jsEv.Type {

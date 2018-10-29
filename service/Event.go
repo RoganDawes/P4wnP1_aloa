@@ -156,8 +156,16 @@ type EventReceiver struct {
 	FilterEventType int64
 }
 
-func ConstructEventLog(source string, level int, message string) *pb.Event {
+func ConstructEventNotifyStateChange(stateType common_web.EvtStateChangeType) *pb.Event {
+	return &pb.Event{
+		Type: common_web.EVT_NOTIFY_STATE_CHANGE,
+		Values: []*pb.EventValue{
+			{Val: &pb.EventValue_Tint64{Tint64: int64(stateType)}},
+		},
+	}
+}
 
+func ConstructEventLog(source string, level int, message string) *pb.Event {
 	tJson, _ := time.Now().MarshalJSON()
 
 	return &pb.Event{

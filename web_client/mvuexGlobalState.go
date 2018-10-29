@@ -3,11 +3,14 @@
 package main
 
 import (
+	"context"
 	"github.com/gopherjs/gopherjs/js"
+	"github.com/mame82/P4wnP1_go/common_web"
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 	"github.com/mame82/hvue"
 	"github.com/mame82/mvuex"
 	"github.com/pkg/errors"
+	"io"
 	"path/filepath"
 	"strings"
 	"time"
@@ -15,24 +18,30 @@ import (
 
 var globalState *GlobalState
 
-
-
 const (
 	maxLogEntries = 500
+
+	VUEX_ACTION_UPDATE_ALL_STATES = "updateAllStates"
+
+	//Events
+	VUEX_ACTION_START_EVENT_LISTEN = "startEventListen"
+	VUEX_ACTION_STOP_EVENT_LISTEN  = "stopEventListen"
+
+	VUEX_MUTATION_SET_EVENT_LISTENER_RUNNING = "setEventListenerRunning"
 
 	//Bluetooth
 	VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION = "updateCurrentBluetoothControllerInformation"
 	VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION = "deployCurrentBluetoothControllerInformation"
-	VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_AGENT_SETTINGS = "updateCurrentBluetoothAgentSettings"
-	VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_AGENT_SETTINGS = "deployCurrentBluetoothAgentSettings"
-	VUEX_ACTION_STORE_BLUETOOTH_SETTINGS = "storedBluetoothSettings"
-	VUEX_ACTION_DELETE_STORED_BLUETOOTH_SETTINGS = "deleteStoredBluetoothSettings"
-	VUEX_ACTION_DEPLOY_STORED_BLUETOOTH_SETTINGS = "deployStoredBluetoothSettings"
-	VUEX_ACTION_UPDATE_STORED_BLUETOOTH_SETTINGS_LIST = "setStoredBluetoothSettingsList"
+	VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_AGENT_SETTINGS         = "updateCurrentBluetoothAgentSettings"
+	VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_AGENT_SETTINGS         = "deployCurrentBluetoothAgentSettings"
+	VUEX_ACTION_STORE_BLUETOOTH_SETTINGS                        = "storedBluetoothSettings"
+	VUEX_ACTION_DELETE_STORED_BLUETOOTH_SETTINGS                = "deleteStoredBluetoothSettings"
+	VUEX_ACTION_DEPLOY_STORED_BLUETOOTH_SETTINGS                = "deployStoredBluetoothSettings"
+	VUEX_ACTION_UPDATE_STORED_BLUETOOTH_SETTINGS_LIST           = "setStoredBluetoothSettingsList"
 
 	VUEX_MUTATION_SET_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION = "setCurrentBluetoothControllerInformation"
-	VUEX_MUTATION_SET_CURRENT_BLUETOOTH_AGENT_SETTINGS = "setCurrentBluetoothAgentSettings"
-	VUEX_MUTATION_SET_STORED_BLUETOOTH_SETTINGS_LIST = "setStoredBluetoothSettingsList"
+	VUEX_MUTATION_SET_CURRENT_BLUETOOTH_AGENT_SETTINGS         = "setCurrentBluetoothAgentSettings"
+	VUEX_MUTATION_SET_STORED_BLUETOOTH_SETTINGS_LIST           = "setStoredBluetoothSettingsList"
 
 	//HIDScripts and jobs
 	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS                           = "updateRunningHidJobs"
@@ -107,29 +116,34 @@ const (
 
 type GlobalState struct {
 	*js.Object
-	Title                                 string                            `js:"title"`
-	CurrentHIDScriptSource                string                            `js:"currentHIDScriptSource"`
-	CurrentGadgetSettings                 *jsGadgetSettings                 `js:"currentGadgetSettings"`
-	CurrentlyDeployingGadgetSettings      bool                              `js:"deployingGadgetSettings"`
-	CurrentlyDeployingWifiSettings        bool                              `js:"deployingWifiSettings"`
-	EventReceiver                         *jsEventReceiver                  `js:"eventReceiver"`
-	HidJobList                            *jsHidJobStateList                `js:"hidJobList"`
-	TriggerActionList                     *jsTriggerActionSet               `js:"triggerActionList"`
-	IsModalEnabled                        bool                              `js:"isModalEnabled"`
-	IsConnected                           bool                              `js:"isConnected"`
-	FailedConnectionAttempts              int                               `js:"failedConnectionAttempts"`
-	InterfaceSettings                     *jsEthernetSettingsList           `js:"InterfaceSettings"`
+	Title                            string                   `js:"title"`
+	CurrentHIDScriptSource           string                   `js:"currentHIDScriptSource"`
+	CurrentGadgetSettings            *jsGadgetSettings        `js:"currentGadgetSettings"`
+	CurrentlyDeployingGadgetSettings bool                     `js:"deployingGadgetSettings"`
+	CurrentlyDeployingWifiSettings   bool                     `js:"deployingWifiSettings"`
+	EventProcessor                   *jsEventProcessor        `js:"EventProcessor"`
+	HidJobList                       *jsHidJobStateList       `js:"hidJobList"`
+	TriggerActionList                *jsTriggerActionSet      `js:"triggerActionList"`
+	IsModalEnabled                   bool                     `js:"isModalEnabled"`
+	IsConnected                      bool                     `js:"isConnected"`
+	FailedConnectionAttempts         int                      `js:"failedConnectionAttempts"`
+	InterfaceSettings                *jsEthernetSettingsArray `js:"InterfaceSettings"`
 	WiFiState                             *jsWiFiState                      `js:"wifiState"`
 	CurrentBluetoothControllerInformation *jsBluetoothControllerInformation `js:"CurrentBluetoothControllerInformation"`
-	CurrentBluetoothAgentSettings *jsBluetoothAgentSettings `js:"CurrentBluetoothAgentSettings"`
+	CurrentBluetoothAgentSettings         *jsBluetoothAgentSettings         `js:"CurrentBluetoothAgentSettings"`
 
-	StoredWifiSettingsList                []string                          `js:"StoredWifiSettingsList"`
-	StoredEthernetInterfaceSettingsList   []string                          `js:"StoredEthernetInterfaceSettingsList"`
-	StoredTriggerActionSetsList           []string                          `js:"StoredTriggerActionSetsList"`
-	StoredBashScriptsList                 []string                          `js:"StoredBashScriptsList"`
-	StoredHIDScriptsList                  []string                          `js:"StoredHIDScriptsList"`
-	StoredUSBSettingsList                 []string                          `js:"StoredUSBSettingsList"`
-	StoredBluetoothSettingsList           []string                          `js:"StoredBluetoothSettingsList"`
+	StoredWifiSettingsList              []string `js:"StoredWifiSettingsList"`
+	StoredEthernetInterfaceSettingsList []string `js:"StoredEthernetInterfaceSettingsList"`
+	StoredTriggerActionSetsList         []string `js:"StoredTriggerActionSetsList"`
+	StoredBashScriptsList               []string `js:"StoredBashScriptsList"`
+	StoredHIDScriptsList                []string `js:"StoredHIDScriptsList"`
+	StoredUSBSettingsList               []string `js:"StoredUSBSettingsList"`
+	StoredBluetoothSettingsList         []string `js:"StoredBluetoothSettingsList"`
+
+	ConnectRetryCount            int  `js:"ConnectRetryCount"`
+	EventListenerRunning         bool `js:"EventListenerRunning"`
+	EventListenerShouldBeRunning bool `js:"EventListenerShouldBeRunning"`
+	EventListenerCancelFunc      context.CancelFunc // not accessible from JS !!!
 }
 
 func createGlobalStateStruct() GlobalState {
@@ -140,7 +154,7 @@ func createGlobalStateStruct() GlobalState {
 	state.CurrentlyDeployingWifiSettings = false
 	state.HidJobList = NewHIDJobStateList()
 	state.TriggerActionList = NewTriggerActionSet()
-	state.EventReceiver = NewEventReceiver(maxLogEntries, state.HidJobList)
+	state.EventProcessor = NewEventProcessor(maxLogEntries, state.HidJobList)
 	state.IsConnected = false
 	state.IsModalEnabled = false
 	state.FailedConnectionAttempts = 0
@@ -158,15 +172,161 @@ func createGlobalStateStruct() GlobalState {
 	state.CurrentBluetoothControllerInformation = NewBluetoothControllerInformation()
 	state.CurrentBluetoothAgentSettings = NewBluetoothAgentSettings()
 
-	/*
-	wifiSettings, err := RpcClient.GetWifiState(time.Second * 5)
-	if err != nil {
-		panic("Couldn't retrieve WiFi settings")
-	}
-	*/
 	//state.WiFiSettings = NewWifiSettings()
 	state.WiFiState = NewWiFiState()
+
+	//Events
+	state.EventListenerRunning = false
+	state.EventListenerShouldBeRunning = false
+
+	state.ConnectRetryCount = 0
 	return state
+}
+
+func processEvent(evt *pb.Event, store *mvuex.Store, state *GlobalState) {
+	println("New event", evt)
+
+	typeName := common_web.EventTypeName[evt.Type]
+	switch evt.Type {
+	case common_web.EVT_NOTIFY_STATE_CHANGE:
+		chgType := evt.Values[0].GetTint64()
+		println("State change notify", common_web.EventTypeStateChangeName[chgType])
+		switch common_web.EvtStateChangeType(chgType) {
+		case common_web.STATE_CHANGE_EVT_TYPE_LED:
+			println("Notify LED change, nothing to do")
+		case common_web.STATE_CHANGE_EVT_TYPE_USB:
+			store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS)
+			store.Dispatch(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS)
+		case common_web.STATE_CHANGE_EVT_TYPE_NETWORK:
+			store.Dispatch(VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS)
+		case common_web.STATE_CHANGE_EVT_TYPE_HID:
+			store.Dispatch(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS) // handled by dedicated listener
+		case common_web.STATE_CHANGE_EVT_TYPE_WIFI:
+			store.Dispatch(VUEX_ACTION_UPDATE_WIFI_STATE)
+		case common_web.STATE_CHANGE_EVT_TYPE_TRIGGER_ACTIONS:
+			store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER)
+		case common_web.STATE_CHANGE_EVT_TYPE_BLUETOOTH:
+			store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION)
+			store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_AGENT_SETTINGS)
+		case common_web.STATE_CHANGE_EVT_TYPE_STORED_BASH_SCRIPTS_LIST:
+			store.Dispatch(VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST)
+		case common_web.STATE_CHANGE_EVT_TYPE_STORED_HID_SCRIPTS_LIST:
+			store.Dispatch(VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST)
+		case common_web.STATE_CHANGE_EVT_TYPE_STORED_USB_SETTINGS_LIST:
+			store.Dispatch(VUEX_ACTION_UPDATE_STORED_USB_SETTINGS_LIST)
+		case common_web.STATE_CHANGE_EVT_TYPE_STORED_ETHERNET_INTERFACE_SETTINGS_LIST:
+			store.Dispatch(VUEX_ACTION_UPDATE_STORED_ETHERNET_INTERFACE_SETTINGS_LIST)
+		case common_web.STATE_CHANGE_EVT_TYPE_STORED_WIFI_SETTINGS_LIST:
+			store.Dispatch(VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST)
+		case common_web.STATE_CHANGE_EVT_TYPE_STORED_BLUETOOTH_SETTINGS_LIST:
+			store.Dispatch(VUEX_ACTION_UPDATE_STORED_BLUETOOTH_SETTINGS_LIST)
+		case common_web.STATE_CHANGE_EVT_TYPE_STORED_TRIGGER_ACTION_SETS_LIST:
+			store.Dispatch(VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST)
+		}
+	default:
+		// events which aren't of type "notify state change" are processed by the EventProcessor
+		state.EventProcessor.HandleEvent(evt)
+		println("Unhandled event of type ", typeName, evt)
+	}
+}
+
+func actionUpdateAllStates(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	println("Updating all states")
+	store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS)
+	store.Dispatch(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS)
+	store.Dispatch(VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS)
+	store.Dispatch(VUEX_ACTION_UPDATE_WIFI_STATE)
+	store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION)
+	store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_AGENT_SETTINGS)
+	store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER)
+
+	store.Dispatch(VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST)
+	store.Dispatch(VUEX_ACTION_UPDATE_STORED_USB_SETTINGS_LIST)
+	store.Dispatch(VUEX_ACTION_UPDATE_STORED_ETHERNET_INTERFACE_SETTINGS_LIST)
+	store.Dispatch(VUEX_ACTION_UPDATE_STORED_WIFI_SETTINGS_LIST)
+	store.Dispatch(VUEX_ACTION_UPDATE_STORED_BLUETOOTH_SETTINGS_LIST)
+	store.Dispatch(VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST)
+	store.Dispatch(VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST)
+
+}
+
+func actionStartEventListen(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	globalState.EventListenerShouldBeRunning = true
+	go func() {
+		for state.EventListenerShouldBeRunning {
+			println("Starting store event listener")
+
+			evStream, cancel, err := RpcClient.StartEventListening(time.Second * 2)
+			if err != nil {
+				println("Couldn't start event listener or connect to server ...")
+				//return
+				if globalState.EventListenerShouldBeRunning {
+					// unintended disconnect, sleep, increase retry count, reconnect
+					state.ConnectRetryCount++
+					time.Sleep(time.Second * 2) // We add an addional timeout, to avoid immediate reconnect if `startEventListening` fails without consuming the timeout
+					continue
+				} else {
+					// set retry count to zero
+					state.ConnectRetryCount = 0
+					break
+				}
+			}
+			println(" ... Event listener started")
+
+			defer cancel()
+			defer evStream.CloseSend()
+
+			if state.EventListenerCancelFunc != nil {
+				globalState.EventListenerCancelFunc() // cancel old event listeners
+			}
+			globalState.EventListenerCancelFunc = cancel
+			//state.EventListenerRunning = true  // should be done with mutation
+			store.Commit(VUEX_MUTATION_SET_EVENT_LISTENER_RUNNING, true)
+			store.Dispatch(VUEX_ACTION_UPDATE_ALL_STATES)
+
+			// dummy, retrieve and print events
+			for {
+				newEvent, err := evStream.Recv() //Error if Websocket connection fails/aborts, but success is indicated only if stream data is received
+				if err != nil {
+					if err == io.EOF {
+						println("Event listening aborted because end of event stream was reached")
+					} else {
+						println("Event listening aborted because of error", err)
+					}
+					break
+				}
+
+				// only print event
+				processEvent(newEvent, store, state)
+
+			}
+
+			println("Stopped store event listener")
+
+			//state.EventListenerRunning = false // should be done with mutation
+			store.Commit(VUEX_MUTATION_SET_EVENT_LISTENER_RUNNING, false)
+			globalState.EventListenerCancelFunc = nil
+
+		}
+
+	}()
+
+	return
+}
+
+func actionStopEventListen(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	// Note: this action accesses `globalState` instead of `state`
+	// both values point to the vuex state, but globalState holds fields only accessible from Go
+	// (like the `EventListenerCancelFunc` which is used here).
+	// Even if those fields would be exposed to JS by tagging them , they couldn't be externalized/internalized
+	// correctly by gopherjs, as there's no JavaScript representation of the underlying Go objects.
+
+	println("Stopping event listener")
+	globalState.EventListenerShouldBeRunning = false
+	if globalState.EventListenerCancelFunc != nil {
+		println("Calling event listener cancel func")
+		globalState.EventListenerCancelFunc()
+	}
 }
 
 func actionUpdateStoredBluetoothSettingsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
@@ -214,7 +374,7 @@ func actionDeleteStoredBluetoothSettings(store *mvuex.Store, context *mvuex.Acti
 			QuasarNotifyError("Error deleting stored Bluetooth Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 		}
 		QuasarNotifySuccess("Bluetooth settings deleted", "", QUASAR_NOTIFICATION_POSITION_TOP)
-		actionUpdateStoredBluetoothSettingsList(store,context,state)
+		actionUpdateStoredBluetoothSettingsList(store, context, state)
 	}()
 }
 
@@ -230,7 +390,6 @@ func actionStoreBluetoothSettings(store *mvuex.Store, context *mvuex.ActionConte
 	}()
 }
 
-
 func actionDeleteStoredUSBSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
 	go func() {
 		println("Vuex dispatch delete USB settings: ", settingsName.String())
@@ -240,7 +399,7 @@ func actionDeleteStoredUSBSettings(store *mvuex.Store, context *mvuex.ActionCont
 			QuasarNotifyError("Error deleting stored USB Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 		}
 		QuasarNotifySuccess("USB settings deleted", "", QUASAR_NOTIFICATION_POSITION_TOP)
-		actionUpdateStoredUSBSettingsList(store,context,state)
+		actionUpdateStoredUSBSettingsList(store, context, state)
 	}()
 }
 
@@ -272,7 +431,7 @@ func actionDeleteStoredWifiSettings(store *mvuex.Store, context *mvuex.ActionCon
 			QuasarNotifyError("Error deleting stored WiFi Settings", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
 		}
 		QuasarNotifySuccess("Stored WiFi settings deleted", "", QUASAR_NOTIFICATION_POSITION_TOP)
-		actionUpdateStoredWifiSettingsList(store,context,state)
+		actionUpdateStoredWifiSettingsList(store, context, state)
 	}()
 }
 
@@ -363,17 +522,17 @@ func actionDeployCurrentBluetoothAgentSettings(store *mvuex.Store, context *mvue
 
 func actionUpdateStoredUSBSettingsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
-		println("Trying to fetch wsList")
+		println("Trying to fetch stored USB settings list")
 		//fetch deployed gadget settings
-		wsList, err := RpcClient.GetStoredUSBSettingsList(defaultTimeout)
+		usbsList, err := RpcClient.GetStoredUSBSettingsList(defaultTimeout)
 		if err != nil {
-			println("Couldn't retrieve WifiSettingsList")
+			println("Couldn't retrieve USB SettingsList")
 			return
 		}
 
 		//commit to current
-		println(wsList)
-		context.Commit(VUEX_MUTATION_SET_STORED_USB_SETTINGS_LIST, wsList)
+		println(usbsList)
+		context.Commit(VUEX_MUTATION_SET_STORED_USB_SETTINGS_LIST, usbsList)
 		//context.Commit(VUEX_MUTATION_SET_STORED_WIFI_SETTINGS_LIST, []string{"test1", "test2"})
 	}()
 
@@ -427,7 +586,7 @@ func actionDeployStoredUSBSettings(store *mvuex.Store, context *mvuex.ActionCont
 func actionUpdateAllEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) interface{} {
 
 	return NewPromise(func() (res interface{}, err error) {
-
+		println("Trying to fetch all deployed Ethernet Interface settings")
 		ifSettings, err := RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second * 5)
 		if err != nil {
 			err = errors.New("Couldn't retrieve interface settings")
@@ -560,15 +719,15 @@ func actionUpdateStoredBashScriptsList(store *mvuex.Store, context *mvuex.Action
 	go func() {
 		println("Trying to fetch stored BashScripts list")
 		//fetch deployed gadget settings
-		wsList, err := RpcClient.GetStoredBashScriptsList(defaultTimeout)
+		bsList, err := RpcClient.GetStoredBashScriptsList(defaultTimeout)
 		if err != nil {
 			println("Couldn't retrieve stored BashScripts list")
 			return
 		}
 
 		//commit to current
-		println(wsList)
-		context.Commit(VUEX_MUTATION_SET_STORED_BASH_SCRIPTS_LIST, wsList)
+		println(bsList)
+		context.Commit(VUEX_MUTATION_SET_STORED_BASH_SCRIPTS_LIST, bsList)
 	}()
 
 	return
@@ -578,15 +737,15 @@ func actionUpdateStoredHIDScriptsList(store *mvuex.Store, context *mvuex.ActionC
 	go func() {
 		println("Trying to fetch stored HIDScripts list")
 		//fetch deployed gadget settings
-		wsList, err := RpcClient.GetStoredHIDScriptsList(defaultTimeout)
+		hidsList, err := RpcClient.GetStoredHIDScriptsList(defaultTimeout)
 		if err != nil {
 			println("Couldn't retrieve  stored HIDScripts list")
 			return
 		}
 
 		//commit to current
-		println(wsList)
-		context.Commit(VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST, wsList)
+		println(hidsList)
+		context.Commit(VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST, hidsList)
 	}()
 
 	return
@@ -594,6 +753,7 @@ func actionUpdateStoredHIDScriptsList(store *mvuex.Store, context *mvuex.ActionC
 
 func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
+		println("Trying to fetch deployed USB gadget settings")
 		//fetch deployed gadget settings
 		dGS, err := RpcClient.GetDeployedGadgetSettings(defaultTimeoutShort)
 		if err != nil {
@@ -613,7 +773,8 @@ func actionUpdateGadgetSettingsFromDeployed(store *mvuex.Store, context *mvuex.A
 
 func actionUpdateWifiState(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
-		//fetch deployed gadget settings
+		println("Trying to fetch deployed WiFi state list")
+		//fetch WiFi state
 		state, err := RpcClient.GetWifiState(defaultTimeout)
 		if err != nil {
 			println("Couldn't retrieve deployed WiFi settings")
@@ -629,7 +790,7 @@ func actionUpdateWifiState(store *mvuex.Store, context *mvuex.ActionContext, sta
 
 func actionUpdateStoredWifiSettingsList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
-		println("Trying to fetch wsList")
+		println("Trying to fetch stored wifi settings list")
 		//fetch deployed gadget settings
 		wsList, err := RpcClient.GetStoredWifiSettingsList(defaultTimeout)
 		if err != nil {
@@ -709,6 +870,7 @@ func actionDeployWifiSettings(store *mvuex.Store, context *mvuex.ActionContext, 
 
 func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
+		println("Trying to fetch data for running HIDScript jobs")
 		//fetch deployed gadget settings
 		jobstates, err := RpcClient.GetRunningHidJobStates(defaultTimeout)
 		if err != nil {
@@ -731,7 +893,7 @@ func actionUpdateStoredTriggerActionSetsList(store *mvuex.Store, context *mvuex.
 		//fetch deployed gadget settings
 		tasList, err := RpcClient.ListStoredTriggerActionSets(defaultTimeout)
 		if err != nil {
-			println("Couldn't retrieve WifiSettingsList")
+			println("Couldn't retrieve TriggerActions list")
 			return
 		}
 
@@ -746,6 +908,7 @@ func actionUpdateStoredTriggerActionSetsList(store *mvuex.Store, context *mvuex.
 
 func actionUpdateCurrentTriggerActionsFromServer(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
+		println("Trying to fetch current TriggerActions from server")
 		tastate, err := RpcClient.GetDeployedTriggerActionSet(defaultTimeout)
 		if err != nil {
 			QuasarNotifyError("Error fetching deployed TriggerActions", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
@@ -920,7 +1083,7 @@ func actionDeployEthernetInterfaceSettings(store *mvuex.Store, context *mvuex.Ac
 
 func initMVuex() *mvuex.Store {
 	state := createGlobalStateStruct()
-	globalState = &state //make accessible through global var
+	globalState = &state //make accessible through global var (things like mutexes aren't accessible from JS and thus not externalized/internalized)
 	store := mvuex.NewStore(
 		mvuex.State(state),
 		mvuex.Mutation("setModalEnabled", func(store *mvuex.Store, state *GlobalState, enabled bool) {
@@ -947,9 +1110,9 @@ func initMVuex() *mvuex.Store {
 			println("New ws list", wsList)
 			hvue.Set(state, "StoredWifiSettingsList", wsList)
 		}),
-		mvuex.Mutation(VUEX_MUTATION_SET_STORED_BLUETOOTH_SETTINGS_LIST, func(store *mvuex.Store, state *GlobalState, wsList []interface{}) {
-			println("New Bluetooth list", wsList)
-			hvue.Set(state, "StoredBluetoothSettingsList", wsList)
+		mvuex.Mutation(VUEX_MUTATION_SET_STORED_BLUETOOTH_SETTINGS_LIST, func(store *mvuex.Store, state *GlobalState, btsList []interface{}) {
+			println("New Bluetooth list", btsList)
+			hvue.Set(state, "StoredBluetoothSettingsList", btsList)
 		}),
 		mvuex.Mutation(VUEX_MUTATION_SET_STORED_USB_SETTINGS_LIST, func(store *mvuex.Store, state *GlobalState, usbList []interface{}) {
 			println("New USB settings list", usbList)
@@ -967,10 +1130,9 @@ func initMVuex() *mvuex.Store {
 		mvuex.Mutation(VUEX_MUTATION_SET_STORED_ETHERNET_INTERFACE_SETTINGS_LIST, func(store *mvuex.Store, state *GlobalState, eisList []interface{}) {
 			hvue.Set(state, "StoredEthernetInterfaceSettingsList", eisList)
 		}),
-		mvuex.Mutation(VUEX_MUTATION_SET_ALL_ETHERNET_INTERFACE_SETTINGS, func(store *mvuex.Store, state *GlobalState, eifSettings *jsEthernetSettingsList) {
+		mvuex.Mutation(VUEX_MUTATION_SET_ALL_ETHERNET_INTERFACE_SETTINGS, func(store *mvuex.Store, state *GlobalState, eifSettings *jsEthernetSettingsArray) {
 			println("Updating all ethernet interface settings: ", eifSettings)
 			state.InterfaceSettings = eifSettings
-
 		}),
 		mvuex.Mutation(VUEX_MUTATION_SET_SINGLE_ETHERNET_INTERFACE_SETTINGS, func(store *mvuex.Store, state *GlobalState, ifSettings *jsEthernetInterfaceSettings) {
 			println("Updating ethernet interface settings for ", ifSettings.Name)
@@ -984,16 +1146,11 @@ func initMVuex() *mvuex.Store {
 			println("Updating bluetooth agent settings for ", agentSettings)
 			state.CurrentBluetoothAgentSettings = agentSettings
 		}),
-		/*
-		mvuex.Mutation("startLogListening", func (store *mvuex.Store, state *GlobalState) {
-			state.EventReceiver.StartListening()
-			return
+		mvuex.Mutation(VUEX_MUTATION_SET_EVENT_LISTENER_RUNNING, func(store *mvuex.Store, state *GlobalState, running *js.Object) {
+			state.EventListenerRunning = running.Bool()
 		}),
-		mvuex.Mutation("stopLogListening", func (store *mvuex.Store, state *GlobalState) {
-			state.EventReceiver.StopListening()
-			return
-		}),
-		*/
+		mvuex.Action(VUEX_ACTION_UPDATE_ALL_STATES, actionUpdateAllStates),
+
 		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION, actionUpdateCurrentBluetoothControllerInformation),
 		mvuex.Action(VUEX_ACTION_DEPLOY_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION, actionDeployCurrentBluetoothControllerInformation),
 		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_AGENT_SETTINGS, actionUpdateCurrentBluetoothAgentSettings),
@@ -1048,6 +1205,9 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_DELETE_STORED_ETHERNET_INTERFACE_SETTINGS, actionDeleteStoredEthernetInterfaceSettings),
 
 
+		mvuex.Action(VUEX_ACTION_START_EVENT_LISTEN, actionStartEventListen),
+		mvuex.Action(VUEX_ACTION_STOP_EVENT_LISTEN, actionStopEventListen),
+
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
 			return state.TriggerActionList.TriggerActions
 		}),
@@ -1062,6 +1222,9 @@ func initMVuex() *mvuex.Store {
 				return !(job.HasSucceeded || job.HasFailed)
 			})
 			return filtered
+		}),
+		mvuex.Getter("isConnected", func(state *GlobalState) interface{} {
+			return state.EventListenerRunning
 		}),
 
 		mvuex.Getter("hidjobsFailed", func(state *GlobalState) interface{} {
@@ -1096,8 +1259,6 @@ func initMVuex() *mvuex.Store {
 			}
 			return selectWS
 		}),
-
-
 	)
 
 	// fetch deployed gadget settings
@@ -1119,7 +1280,7 @@ func initMVuex() *mvuex.Store {
 
 	/*
 	// Start Event Listening
-	state.EventReceiver.StartListening()
+	state.EventProcessor.StartListening()
 	*/
 
 	return store

@@ -114,6 +114,7 @@ func (s *server) FireActionGroupSend(ctx context.Context, gs *pb.ActionGroupSend
 }
 
 func (s *server) DeployBluetoothSettings(ctx context.Context, settings *pb.BluetoothSettings) (resultSettings *pb.BluetoothSettings, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_BLUETOOTH))
 	as := settings.As
 	ci := settings.Ci
 	resultSettings = &pb.BluetoothSettings{}
@@ -127,6 +128,7 @@ func (s *server) DeployBluetoothSettings(ctx context.Context, settings *pb.Bluet
 }
 
 func (s *server) StoreBluetoothSettings(ctx context.Context, req *pb.BluetoothRequestSettingsStorage) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_BLUETOOTH_SETTINGS_LIST))
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_BLUETOOTH_SETTINGS + req.TemplateName, req.Settings, true)
 	return
@@ -139,18 +141,21 @@ func (s *server) GetStoredBluetoothSettings(ctx context.Context, templateName *p
 }
 
 func (s *server) DeployStoredBluetoothSettings(ctx context.Context, templateName *pb.StringMessage) (e *pb.BluetoothSettings, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_BLUETOOTH))
 	bts,err := s.GetStoredBluetoothSettings(ctx,templateName)
 	if err != nil { return bts,err }
 	return s.DeployBluetoothSettings(ctx, bts)
 }
 
 func (s *server) DeleteStoredBluetoothSettings(ctx context.Context, templateName *pb.StringMessage) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_BLUETOOTH_SETTINGS_LIST))
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysDataStore.Delete(cSTORE_PREFIX_BLUETOOTH_SETTINGS + templateName.Msg)
 	return
 }
 
 func (s *server) StoreDeployedBluetoothSettings(ctx context.Context, templateName *pb.StringMessage) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_BLUETOOTH_SETTINGS_LIST))
 	e = &pb.Empty{}
 	currentSettings := &pb.BluetoothSettings{}
 	currentSettings.Ci,err = s.GetBluetoothControllerInformation(ctx, e)
@@ -173,24 +178,28 @@ func (s *server) ListStoredBluetoothSettings(ctx context.Context, e *pb.Empty) (
 }
 
 func (s *server) DeleteStoredUSBSettings(ctx context.Context, name *pb.StringMessage) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_USB_SETTINGS_LIST))
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysDataStore.Delete(cSTORE_PREFIX_USB_SETTINGS + name.Msg)
 	return
 }
 
 func (s *server) DeleteStoredWifiSettings(ctx context.Context, name *pb.StringMessage) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_WIFI_SETTINGS_LIST))
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysDataStore.Delete(cSTORE_PREFIX_WIFI_SETTINGS + name.Msg)
 	return
 }
 
 func (s *server) DeleteStoredEthernetInterfaceSettings(ctx context.Context, name *pb.StringMessage) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_ETHERNET_INTERFACE_SETTINGS_LIST))
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysDataStore.Delete(cSTORE_PREFIX_ETHERNET_INTERFACE_SETTINGS + name.Msg)
 	return
 }
 
 func (s *server) DeleteStoredTriggerActionSet(ctx context.Context, name *pb.StringMessage) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_TRIGGER_ACTION_SETS_LIST))
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysDataStore.Delete(cSTORE_PREFIX_TRIGGER_ACTION_SET + name.Msg)
 	return
@@ -235,17 +244,20 @@ func (s *server) GetBluetoothAgentSettings(ctx context.Context, e *pb.Empty) (as
 }
 
 func (s *server) DeployBluetoothAgentSettings(ctx context.Context, src *pb.BluetoothAgentSettings) (res *pb.BluetoothAgentSettings, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_BLUETOOTH))
 	return s.rootSvc.SubSysBluetooth.DeployBluetoothAgentSettings(src)
 }
 
 // Unused, Server services are deployed via BluetoothControllerInformation
 func (s *server) SetBluetoothNetworkService(ctx context.Context, btNwSvc *pb.BluetoothNetworkService) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_BLUETOOTH))
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysBluetooth.DeployBluetoothNetworkService(btNwSvc)
 	return
 }
 
 func (s *server) DeployBluetoothControllerInformation(ctx context.Context, newBtCiRpc *pb.BluetoothControllerInformation) (updateBtCiRpc *pb.BluetoothControllerInformation, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_BLUETOOTH))
 	return s.rootSvc.SubSysBluetooth.DeployBluetoothControllerInformation(newBtCiRpc)
 }
 
@@ -255,6 +267,7 @@ func (s *server) GetBluetoothControllerInformation(ctx context.Context, e *pb.Em
 }
 
 func (s *server) StoreUSBSettings(ctx context.Context, r *pb.USBRequestSettingsStorage) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_USB_SETTINGS_LIST))
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_USB_SETTINGS + r.TemplateName, r.Settings, true)
 	return
@@ -267,6 +280,7 @@ func (s *server) GetStoredUSBSettings(ctx context.Context, m *pb.StringMessage) 
 }
 
 func (s *server) DeployStoredUSBSettings(ctx context.Context, m *pb.StringMessage) (st *pb.GadgetSettings, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_USB))
 	ws,err := s.GetStoredUSBSettings(ctx,m)
 	if err != nil { return &pb.GadgetSettings{},err }
 	st,err = s.SetGadgetSettings(ctx, ws)
@@ -312,6 +326,7 @@ func (s *server) ListStoredBashScripts(context.Context, *pb.Empty) (sa *pb.Strin
 }
 
 func (s *server) DeployStoredTriggerActionSetReplace(ctx context.Context, msg *pb.StringMessage) (tas *pb.TriggerActionSet, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_TRIGGER_ACTIONS))
 	// load set from store
 	tas = &pb.TriggerActionSet{}
 	err = s.rootSvc.SubSysDataStore.Get(cSTORE_PREFIX_TRIGGER_ACTION_SET + msg.Msg, tas)
@@ -321,6 +336,7 @@ func (s *server) DeployStoredTriggerActionSetReplace(ctx context.Context, msg *p
 }
 
 func (s *server) DeployStoredTriggerActionSetAdd(ctx context.Context, msg *pb.StringMessage) (tas *pb.TriggerActionSet, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_TRIGGER_ACTIONS))
 	// load set from store
 	tas = &pb.TriggerActionSet{}
 	err = s.rootSvc.SubSysDataStore.Get(cSTORE_PREFIX_TRIGGER_ACTION_SET + msg.Msg, tas)
@@ -330,6 +346,7 @@ func (s *server) DeployStoredTriggerActionSetAdd(ctx context.Context, msg *pb.St
 }
 
 func (s *server) StoreTriggerActionSet(ctx context.Context, set *pb.TriggerActionSet) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_TRIGGER_ACTION_SETS_LIST))
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_TRIGGER_ACTION_SET+ set.Name, set, true)
 	return
@@ -350,6 +367,7 @@ func (s *server) GetDeployedTriggerActionSet(context.Context, *pb.Empty) (*pb.Tr
 }
 
 func (s *server) DeployTriggerActionSetReplace(ctx context.Context, tas *pb.TriggerActionSet) (resTas *pb.TriggerActionSet, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_TRIGGER_ACTIONS))
 	// Clear old set, but keep immutables
 	s.rootSvc.SubSysTriggerActions.ClearTriggerActions(true)
 	// Add the new set
@@ -359,6 +377,7 @@ func (s *server) DeployTriggerActionSetReplace(ctx context.Context, tas *pb.Trig
 }
 
 func (s *server) DeployTriggerActionSetAdd(ctx context.Context, tas *pb.TriggerActionSet) (resTas *pb.TriggerActionSet, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_TRIGGER_ACTIONS))
 	addedTA := make([]*pb.TriggerAction, 0)
 	for _,ta := range tas.TriggerActions {
 		// we don't allow adding immutable settings via RPC call
@@ -374,6 +393,7 @@ func (s *server) DeployTriggerActionSetAdd(ctx context.Context, tas *pb.TriggerA
 }
 
 func (s *server) DeployTriggerActionSetRemove(ctx context.Context, removeTas *pb.TriggerActionSet) (removedTas *pb.TriggerActionSet, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_TRIGGER_ACTIONS))
 	removedOnes := make([]*pb.TriggerAction,0)
 	for _,removeTa := range removeTas.TriggerActions {
 		removed,err := s.rootSvc.SubSysTriggerActions.RemoveTriggerAction(removeTa)
@@ -394,6 +414,7 @@ func (s *server) Stop() error {
 }
 
 func (s *server) StoreDeployedWifiSettings(ctx context.Context, m *pb.StringMessage) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_WIFI_SETTINGS_LIST))
 	return s.StoreWifiSettings(ctx, &pb.WifiRequestSettingsStorage{
 		Settings: s.rootSvc.SubSysWifi.State.CurrentSettings,
 		TemplateName: m.Msg,
@@ -401,12 +422,14 @@ func (s *server) StoreDeployedWifiSettings(ctx context.Context, m *pb.StringMess
 }
 
 func (s *server) DeployStoredWifiSettings(ctx context.Context, m *pb.StringMessage) (st *pb.WiFiState, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_WIFI))
 	ws,err := s.GetStoredWifiSettings(ctx,m)
 	if err != nil { return &pb.WiFiState{},err }
 	return s.DeployWiFiSettings(ctx, ws)
 }
 
 func (s *server) StoreWifiSettings(ctx context.Context, r *pb.WifiRequestSettingsStorage) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_WIFI))
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_WIFI_SETTINGS + r.TemplateName, r.Settings, true)
 	return
@@ -427,6 +450,7 @@ func (s *server) ListStoredWifiSettings(ctx context.Context, e *pb.Empty) (sa *p
 }
 
 func (s *server) DeployWiFiSettings(ctx context.Context, wset *pb.WiFiSettings) (wstate *pb.WiFiState, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_WIFI))
 	return s.rootSvc.SubSysWifi.DeploySettings(wset)
 }
 
@@ -573,11 +597,13 @@ func (s *server) HIDGetRunningScriptJobs(ctx context.Context, rEmpty *pb.Empty) 
 }
 
 func (s *server) HIDCancelAllScriptJobs(ctx context.Context, rEmpty *pb.Empty) (empty *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_HID))
 	err = s.rootSvc.SubSysUSB.HidScriptCancelAllRunningBackgroundJobs()
 	return
 }
 
 func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) (empty *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_HID))
 	job,err := s.rootSvc.SubSysUSB.HidScriptGetBackgroundJobByID(int(sJob.Id))
 	if err != nil { return nil, err }
 
@@ -586,6 +612,7 @@ func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) 
 }
 
 func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptRequest) (scriptRes *pb.HIDScriptResult, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_HID))
 	err = s.rootSvc.SubSysUSB.HidScriptUsable()
 	if err != nil { return }
 
@@ -614,6 +641,7 @@ func (s *server) HIDRunScript(ctx context.Context, scriptReq *pb.HIDScriptReques
 }
 
 func (s *server) HIDRunScriptJob(ctx context.Context, scriptReq *pb.HIDScriptRequest) (rJob *pb.HIDScriptJob, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_HID))
 	err = s.rootSvc.SubSysUSB.HidScriptUsable()
 	if err != nil { return }
 
@@ -684,6 +712,7 @@ func (s *server) GetAllDeployedEthernetInterfaceSettings(ctx context.Context, em
 }
 
 func (s *server) DeployEthernetInterfaceSettings(ctx context.Context, es *pb.EthernetInterfaceSettings) (empty *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_NETWORK))
 	log.Printf("Trying to deploy ethernet interface settings %v", es)
 
 	empty = &pb.Empty{}
@@ -699,6 +728,7 @@ func (s *server) DeployEthernetInterfaceSettings(ctx context.Context, es *pb.Eth
 }
 
 func (s *server) StoreEthernetInterfaceSettings(ctx context.Context, req *pb.EthernetRequestSettingsStorage) (empty *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_ETHERNET_INTERFACE_SETTINGS_LIST))
 	empty = &pb.Empty{}
 	ifName := req.Settings.Name
 	storageKey := cSTORE_PREFIX_ETHERNET_INTERFACE_SETTINGS + ifName + "_" + req.TemplateName
@@ -713,6 +743,7 @@ func (s *server) GetStoredEthernetInterfaceSettings(ctx context.Context, m *pb.S
 }
 
 func (s *server) DeployStoredEthernetInterfaceSettings(ctx context.Context, msg *pb.StringMessage) (empty *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_HID))
 	eis,err := s.GetStoredEthernetInterfaceSettings(ctx, msg)
 	if err != nil { return empty,err }
 	return s.DeployEthernetInterfaceSettings(ctx, eis)
@@ -727,6 +758,7 @@ func (s *server) ListStoredEthernetInterfaceSettings(ctx context.Context, empty 
 }
 
 func (s *server) MountUMSFile(ctx context.Context, gsu *pb.GadgetSettingsUMS) (*pb.Empty, error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_USB))
 	log.Printf("Trying to mount iamge `%s` to UMS ...", gsu.File)
 	err := MountUMSFile(gsu.File)
 	return nil, err
@@ -750,6 +782,7 @@ func (s *server) GetDeployedGadgetSetting(ctx context.Context, e *pb.Empty) (gs 
 }
 
 func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetSettings, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_USB))
 	gs_backup,_ := ParseGadgetState(USB_GADGET_NAME)
 
 	//ToDo: Former gadgets are destroyed without testing if there're changes, this should be aborted if GadgetSettingsState == GetDeployedGadgetSettings()
@@ -771,6 +804,7 @@ func (s *server) GetGadgetSettings(context.Context, *pb.Empty) (*pb.GadgetSettin
 }
 
 func (s *server) SetGadgetSettings(ctx context.Context, gs *pb.GadgetSettings) (res *pb.GadgetSettings, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_USB))
 	if err = ValidateGadgetSetting(*gs); err != nil {
 		//We return the validation error and the current (unchanged) GadgetSettingsState
 		res = s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings
@@ -792,6 +826,7 @@ func (s *server) GetLEDSettings(context.Context, *pb.Empty) (res *pb.LEDSettings
 }
 
 func (s *server) SetLEDSettings(ctx context.Context, ls *pb.LEDSettings) (*pb.Empty, error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_LED))
 	log.Printf("SetLEDSettings %+v", ls)
 	s.rootSvc.SubSysLed.DeploySettings(ls)
 	return &pb.Empty{}, nil

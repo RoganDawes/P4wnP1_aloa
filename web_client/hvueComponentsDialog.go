@@ -129,6 +129,25 @@ func InitComponentsDialog() {
 			hvue.Types(hvue.PBoolean),
 		),
 	)
+
+	hvue.NewComponent(
+		"disconnect-modal",
+		hvue.Template(templateDisconnectModal),
+		hvue.ComputedWithGetSet(
+			"visible",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("value")
+			},
+			func(vm *hvue.VM, newValue *js.Object) {
+				vm.Call("$emit", "input", newValue)
+			},
+			),
+		hvue.PropObj(
+			"value",
+			hvue.Required,
+			hvue.Types(hvue.PBoolean),
+		),
+	)
 }
 
 const templateSelectStringModal = `
@@ -196,9 +215,29 @@ const templateInputStringModal = `
 	</q-modal>
 </div>
 `
+
+const templateDisconnectModal = `
+<div>
+	<q-modal v-model="visible">
+		<q-modal-layout>
+			<q-toolbar slot="header">
+				<q-toolbar-title>
+					Not connection to server
+				</q-toolbar-title>
+			</q-toolbar>
+
+			<div  class="layout-padding">
+      			<p>No connection to server</p>
+				<p>Trying to reconnect ... Attempt: {{ $store.state.ConnectRetryCount }}</p>
+			</div>
+		</q-modal-layout>
+	</q-modal>
+</div>
+`
+
 const templateRansomModal = `
 <div>
-	<q-modal v-model="visible" content-css="background: red;" no-route-dismiss no-backdrop-dismiss>
+	<q-modal v-model="visible" content-css="background: red;" no-esc-dismiss no-route-dismiss no-backdrop-dismiss>
 			<div style="color: white; font-size: 1.5em; font-family: monospace; padding: 10%">
 				
 You became victim of a VERY SILLY IDEA</br>

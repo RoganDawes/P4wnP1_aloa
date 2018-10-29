@@ -197,7 +197,7 @@ const templateWiFi = `
 				<q-card-main>
 					<div class="row gutter-sm">
 
-						<div class="col-6 col-sm""><q-btn :loading="deploying" class="fit" :loading="deploying" color="primary" @click="deploy(settings)" label="deploy" icon="launch"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn :loading="deploying" class="fit" color="primary" @click="deploy(settings)" label="deploy" icon="launch"></q-btn></div>
 						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
 						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="reset" label="reset" icon="autorenew"></q-btn></div>
 						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>

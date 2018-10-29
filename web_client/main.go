@@ -3,10 +3,9 @@
 package main
 
 import (
-//	"honnef.co/go/js/dom"
+	//	"honnef.co/go/js/dom"
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/mame82/hvue"
-	"time"
 	"github.com/mame82/mvuex"
 )
 
@@ -48,12 +47,14 @@ func Router(router *js.Object) hvue.ComponentOption {
 func main() {
 	println(GetBaseURL())
 
-
+println("====================---------")
 	store := InitGlobalState() //sets Vuex store in JS window.store
-	RpcClient.StartListening() //Start event listening after global state is initiated (contains the event handlers)
+	store.Dispatch(VUEX_ACTION_START_EVENT_LISTEN)
+
+//	RpcClient.StartListening() //Start event listening after global state is initiated (contains the event handlers)
 
 	// ToDo: delete because debug
-	RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second*10)
+//	RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second*10)
 
 	router := NewVueRouter("/usb",
 		VueRouterRoute("/usb","", "<usb-settings></usb-settings>"),
@@ -125,7 +126,7 @@ const templateMainApp = `
         <q-layout-header :reveal="!$q.platform.is.desktop">
             <q-toolbar>
                 <q-toolbar-title>
-                    P4wnP1 web-frontend
+                    P4wnP1 web-frontend ({{ $store.getters.isConnected }})
 					<span slot="subtitle" class="mobile-only">by MaMe82</span>
                 </q-toolbar-title>
             </q-toolbar>
@@ -153,12 +154,15 @@ const templateMainApp = `
         <q-page-container>
             <router-view></router-view>
 
-            <q-modal v-model="!$store.state.isConnected" minimized no-route-dismiss no-esc-dismiss no-backdrop-dismiss>
+			<disconnect-modal :value="!$store.getters.isConnected"></disconnect-modal>
+<!--
+            <q-modal v-model="!$store.getters.isConnected" minimized no-route-dismiss no-esc-dismiss no-backdrop-dismiss>
                 <div style="padding: 50px">
                     <div class="q-display-1 q-mb-md">No connection to server</div>
                     <p>Trying to reconnect ... (attempt {{ $store.state.failedConnectionAttempts }})</p>
                 </div>
             </q-modal>
+-->
         </q-page-container>
 
 

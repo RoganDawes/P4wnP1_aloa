@@ -1,11 +1,19 @@
 package common_web
 
 const (
-	EVT_ANY     = int64(0)
-	EVT_LOG     = int64(1)
-	EVT_HID     = int64(3)
-	EVT_TRIGGER = int64(4)
+	EVT_ANY                 = int64(0)
+	EVT_LOG                 = int64(1)
+	EVT_HID                 = int64(3)
+	EVT_TRIGGER             = int64(4)
+	EVT_NOTIFY_STATE_CHANGE = int64(5) // fired if settings or a state changes (inform client about needed state update)
 )
+
+var EventTypeName = map[int64]string{
+	EVT_TRIGGER:             "TRIGGER",
+	EVT_LOG:                 "LOG",
+	EVT_NOTIFY_STATE_CHANGE: "NOTIFY_STATE_CHANGE",
+	EVT_HID:                 "HID",
+}
 
 type EvtTriggerType int64
 
@@ -21,6 +29,37 @@ const (
 	TRIGGER_EVT_TYPE_GROUP_RECEIVE           = EvtTriggerType(8) //used for group receive and group receive sequence
 )
 
+type EvtStateChangeType int64
+
+const (
+	STATE_CHANGE_EVT_TYPE_USB             = EvtStateChangeType(0)
+	STATE_CHANGE_EVT_TYPE_WIFI            = EvtStateChangeType(1)
+	STATE_CHANGE_EVT_TYPE_NETWORK         = EvtStateChangeType(2)
+	STATE_CHANGE_EVT_TYPE_BLUETOOTH       = EvtStateChangeType(3)
+	STATE_CHANGE_EVT_TYPE_HID             = EvtStateChangeType(4)
+	STATE_CHANGE_EVT_TYPE_TRIGGER_ACTIONS = EvtStateChangeType(5)
+	STATE_CHANGE_EVT_TYPE_LED             = EvtStateChangeType(6)
+
+	STATE_CHANGE_EVT_TYPE_STORED_HID_SCRIPTS_LIST                 = EvtStateChangeType(7)
+	STATE_CHANGE_EVT_TYPE_STORED_USB_SETTINGS_LIST                = EvtStateChangeType(8)
+	STATE_CHANGE_EVT_TYPE_STORED_ETHERNET_INTERFACE_SETTINGS_LIST = EvtStateChangeType(9)
+	STATE_CHANGE_EVT_TYPE_STORED_WIFI_SETTINGS_LIST               = EvtStateChangeType(10)
+	STATE_CHANGE_EVT_TYPE_STORED_BLUETOOTH_SETTINGS_LIST          = EvtStateChangeType(11)
+	STATE_CHANGE_EVT_TYPE_STORED_TRIGGER_ACTION_SETS_LIST         = EvtStateChangeType(12)
+	STATE_CHANGE_EVT_TYPE_STORED_BASH_SCRIPTS_LIST                = EvtStateChangeType(13)
+	STATE_CHANGE_EVT_TYPE_STORED_GLOBAL_SETTINGS_LIST             = EvtStateChangeType(14)
+)
+
+var EventTypeStateChangeName = map[int64]string{
+	int64(STATE_CHANGE_EVT_TYPE_USB):             "USB",
+	int64(STATE_CHANGE_EVT_TYPE_WIFI):            "WIFI",
+	int64(STATE_CHANGE_EVT_TYPE_NETWORK):         "NETWORK",
+	int64(STATE_CHANGE_EVT_TYPE_BLUETOOTH):       "BLUETOOTH",
+	int64(STATE_CHANGE_EVT_TYPE_HID):             "HID",
+	int64(STATE_CHANGE_EVT_TYPE_TRIGGER_ACTIONS): "TRIGGER_ACTIONS",
+	int64(STATE_CHANGE_EVT_TYPE_LED):             "LED",
+}
+
 const (
 	HidEventType_JOB_STARTED                    = int64(0)
 	HidEventType_JOB_STOPPED                    = int64(1)
@@ -34,7 +73,7 @@ const (
 	HidEventType_JOB_NO_FREE_VM                 = int64(9)
 )
 
-var EventType_name = map[int64]string{
+var EventTypeHIDName = map[int64]string{
 	0: "JOB STARTED",
 	1: "JOB STOPPED",
 	2: "CONTROLLER ABORTED",

@@ -4,13 +4,12 @@ package main
 
 import (
 	"context"
+	"errors"
 	"github.com/johanbrandhorst/protobuf/grpcweb"
 	"github.com/mame82/P4wnP1_go/common_web"
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
-	"io"
 	"sync"
 	"time"
-	"errors"
 )
 
 type Rpc struct {
@@ -334,7 +333,7 @@ func (rpc *Rpc) GetWifiState(timeout time.Duration) (state *jsWiFiState, err err
 }
 
 
-func (rpc *Rpc) GetAllDeployedEthernetInterfaceSettings(timeout time.Duration) (settingsList *jsEthernetSettingsList, err error) {
+func (rpc *Rpc) GetAllDeployedEthernetInterfaceSettings(timeout time.Duration) (settingsList *jsEthernetSettingsArray, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -344,7 +343,7 @@ func (rpc *Rpc) GetAllDeployedEthernetInterfaceSettings(timeout time.Duration) (
 		return nil, err
 	}
 
-	settingsList = &jsEthernetSettingsList{Object: O()}
+	settingsList = &jsEthernetSettingsArray{Object: O()}
 	settingsList.fromGo(deployedSettings)
 
 	return settingsList, nil
@@ -533,9 +532,10 @@ func (rpc *Rpc) ConnectionTest(timeout time.Duration) (err error) {
 	return nil
 }
 
+/*
 func (rpc *Rpc) StartListening() {
 
-	println("Start listening called", globalState.EventReceiver)
+	println("Start listening called", globalState.EventProcessor)
 
 	//Note: This method is responsible for handling server streaming of events
 	// It isn't possible to use the stream for connection watching (heartbeat), for the following reasons
@@ -579,7 +579,7 @@ func (rpc *Rpc) StartListening() {
 					}
 
 					//println("Event: ", event)
-					globalState.EventReceiver.HandleEvent(event)
+					globalState.EventProcessor.HandleEvent(event)
 				}
 				// we end here on connection error
 				evStream.CloseSend() // fix for half-open websockets, for which the server wouldn't send a TCP RST after crash/restart, as no active client to server communication takes place
@@ -606,3 +606,38 @@ func (rpc *Rpc) StartListening() {
 func (rpc *Rpc) StopListening() {
 	rpc.eventListeningCancel()
 }
+*/
+
+func (rpc *Rpc) StartEventListening(timeout time.Duration) (eventStream pb.P4WNP1_EventListenClient, cancel context.CancelFunc, err error) {
+
+	println("Start listening called", globalState.EventProcessor)
+
+	// Notes:
+	// - rpc.Client.EventListen doesn't return an error if the gRPC server is not running or not reachable (we can't
+	// cancel the context based on a timeout, as eventListen is meant to read an endless stream)
+	// - in contrast, a call to a RPC method which isn't meant for server streaming, could fail after timeout
+	// - to determine if the server is connectible at all, a connection test RPC method is called upfront
+	// - additionally it should be noted, that even if the server streaming gRPC call to `EventListen` couldn't
+	// detect that the server isn't connectible, a call to the `Recv()` method of the resulting stream object errors
+	// in case an already existing server connection is lost (the server resets the underlying socket, but has to be running to do so)
+
+
+	//Check if server is reachable (with timeout)
+	for RpcClient.ConnectionTest(timeout) != nil {
+		return eventStream,cancel,errors.New("Server not reachable")
+	}
+
+
+	println("... success")
+	globalState.IsConnected = true
+	globalState.FailedConnectionAttempts = 0
+
+	ctx, cancel := context.WithCancel(context.Background())
+	rpc.eventListeningCancel = cancel
+
+	// try RPC call
+	evStream, err := rpc.Client.EventListen(ctx, &pb.EventRequest{ListenType: common_web.EVT_ANY}) //No error if Websocket connection fails
+
+	return evStream,cancel,err
+}
+

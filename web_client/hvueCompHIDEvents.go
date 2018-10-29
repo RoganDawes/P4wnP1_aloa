@@ -27,11 +27,11 @@ func InitCompHIDEvents() {
 		hvue.DataFunc(newCompHIDEventsData),
 		hvue.Computed("events",
 			func(vm *hvue.VM) interface{} {
-				return vm.Get("$store").Get("state").Get("eventReceiver").Get("eventHidArray")
+				return vm.Get("$store").Get("state").Get("EventProcessor").Get("eventHidArray")
 			}),
 		hvue.Method("evIdToString", func(vm *hvue.VM, evID int64) (res string) {
 			println("EvID", evID)
-			return common_web.EventType_name[evID]
+			return common_web.EventTypeHIDName[evID]
 		}),
 	)
 
