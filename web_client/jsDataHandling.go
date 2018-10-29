@@ -419,9 +419,16 @@ func (jl *jsHidJobStateList) UpdateEntry(id, vmId int64, hasFailed, hasSucceeded
 	hvue.Set(jl.Jobs, key, j)
 }
 
+func (jl *jsHidJobStateList) Clear() {
+	hvue.Set(jl,"jobs",O())
+}
+
+
 func (jl *jsHidJobStateList) DeleteEntry(id int64) {
-	jl.Jobs.Delete(strconv.Itoa(int(id))) //JS version
-	//delete(jl.Jobs, strconv.Itoa(int(id)))
+	key := strconv.Itoa(int(id))
+	hvue.Delete(jl.Jobs, key) // vue reactive version
+	//jl.Jobs.Delete(key) //JS version
+	//delete(jl.Jobs, key) // go version
 }
 
 /* WiFi settings */

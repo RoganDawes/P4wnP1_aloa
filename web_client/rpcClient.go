@@ -29,6 +29,24 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) CancelHIDScriptJob(timeout time.Duration, jobID uint32) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_,err = rpc.Client.HIDCancelScriptJob(ctx, &pb.HIDScriptJob{
+		Id:jobID,
+	})
+	return
+}
+
+func (rpc *Rpc) CancelAllHIDScriptJobs(timeout time.Duration) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_,err = rpc.Client.HIDCancelAllScriptJobs(ctx, &pb.Empty{})
+	return
+}
+
 func (rpc *Rpc) GetStoredBluetoothSettingsList(timeout time.Duration) (ws []string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

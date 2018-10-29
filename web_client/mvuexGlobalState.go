@@ -45,12 +45,16 @@ const (
 
 	//HIDScripts and jobs
 	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS                           = "updateRunningHidJobs"
+	VUEX_ACTION_REMOVE_SUCCEEDED_HID_JOBS                           = "removeSucceededHidJobs"
+	VUEX_ACTION_REMOVE_FAILED_HID_JOBS                           = "removeFailedHidJobs"
 	VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST                    = "updateStoredHIDScriptsList"
 	VUEX_ACTION_UPDATE_CURRENT_HID_SCRIPT_SOURCE_FROM_REMOTE_FILE = "updateCurrentHidScriptSourceFromRemoteFile"
 	VUEX_ACTION_STORE_CURRENT_HID_SCRIPT_SOURCE_TO_REMOTE_FILE    = "storeCurrentHidScriptSourceToRemoteFile"
+	VUEX_ACTION_CANCEL_HID_JOB = "cancelHIDJob"
 
 	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO = "setCurrentHIDScriptSource"
 	VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST      = "setStoredHIDScriptsList"
+	VUEX_MUTATION_DELETE_HID_JOB_ID      = "deleteHIDJobID"
 
 	//USBGadget
 	VUEX_ACTION_DEPLOY_CURRENT_USB_SETTINGS     = "deployCurrentUSBSettings"
@@ -248,6 +252,52 @@ func actionUpdateAllStates(store *mvuex.Store, context *mvuex.ActionContext, sta
 	store.Dispatch(VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST)
 	store.Dispatch(VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST)
 
+}
+
+func actionCancelHidJob(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jobID *js.Object)  {
+
+
+	go func() {
+		id := uint32(jobID.Int())
+		println("Cancel HIDScript job", id)
+		//fetch deployed gadget settings
+		err := RpcClient.CancelHIDScriptJob(defaultTimeout, id)
+		if err != nil {
+			println("Couldn't cancel HIDScript job", err)
+			return
+		}
+
+		// ToDo: update HIDScriptJob list (should be done event based)
+	}()
+
+
+	return
+}
+
+func actionRemoveSucceededHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState)  {
+	vJobs := state.HidJobList.Jobs                        //vue object, no real array --> values have to be extracted to filter
+	jobs := js.Global.Get("Object").Call("values", vJobs) //converted to native JS array (has filter method available
+	filtered := jobs.Call("filter", func(job *jsHidJobState) bool {
+		return job.HasSucceeded
+	})
+	for i:=0; i< filtered.Length(); i++ {
+		job := &jsHidJobState{Object: filtered.Index(i)}
+		store.Commit(VUEX_MUTATION_DELETE_HID_JOB_ID, job.Id)
+	}
+	return
+}
+
+func actionRemoveFailedHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState)  {
+	vJobs := state.HidJobList.Jobs                        //vue object, no real array --> values have to be extracted to filter
+	jobs := js.Global.Get("Object").Call("values", vJobs) //converted to native JS array (has filter method available
+	filtered := jobs.Call("filter", func(job *jsHidJobState) bool {
+		return job.HasFailed
+	})
+	for i:=0; i< filtered.Length(); i++ {
+		job := &jsHidJobState{Object: filtered.Index(i)}
+		store.Commit(VUEX_MUTATION_DELETE_HID_JOB_ID, job.Id)
+	}
+	return
 }
 
 func actionStartEventListen(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
@@ -878,6 +928,8 @@ func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext
 			return
 		}
 
+		state.HidJobList.Clear()
+
 		for _, jobstate := range jobstates {
 			println("updateing jobstate", jobstate)
 			state.HidJobList.UpdateEntry(jobstate.Id, jobstate.VmId, false, false, "initial job state", "", time.Now().String(), jobstate.Source)
@@ -1149,6 +1201,13 @@ func initMVuex() *mvuex.Store {
 		mvuex.Mutation(VUEX_MUTATION_SET_EVENT_LISTENER_RUNNING, func(store *mvuex.Store, state *GlobalState, running *js.Object) {
 			state.EventListenerRunning = running.Bool()
 		}),
+		mvuex.Mutation(VUEX_MUTATION_DELETE_HID_JOB_ID, func(store *mvuex.Store, state *GlobalState, jobID *js.Object) {
+			id := jobID.Int()
+			state.HidJobList.DeleteEntry(int64(id))
+
+		}),
+
+
 		mvuex.Action(VUEX_ACTION_UPDATE_ALL_STATES, actionUpdateAllStates),
 
 		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_BLUETOOTH_CONTROLLER_INFORMATION, actionUpdateCurrentBluetoothControllerInformation),
@@ -1208,6 +1267,11 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_START_EVENT_LISTEN, actionStartEventListen),
 		mvuex.Action(VUEX_ACTION_STOP_EVENT_LISTEN, actionStopEventListen),
 
+		mvuex.Action(VUEX_ACTION_REMOVE_SUCCEEDED_HID_JOBS, actionRemoveSucceededHidJobs),
+		mvuex.Action(VUEX_ACTION_REMOVE_FAILED_HID_JOBS, actionRemoveFailedHidJobs),
+		mvuex.Action(VUEX_ACTION_CANCEL_HID_JOB, actionCancelHidJob),
+
+
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
 			return state.TriggerActionList.TriggerActions
 		}),
@@ -1237,6 +1301,7 @@ func initMVuex() *mvuex.Store {
 		}),
 
 		mvuex.Getter("hidjobsSucceeded", func(state *GlobalState) interface{} {
+			println("Getter HID JOBS SUCCEEDED")
 			vJobs := state.HidJobList.Jobs                        //vue object, no real array --> values have to be extracted to filter
 			jobs := js.Global.Get("Object").Call("values", vJobs) //converted to native JS array (has filter method available
 			filtered := jobs.Call("filter", func(job *jsHidJobState) bool {
@@ -1244,6 +1309,7 @@ func initMVuex() *mvuex.Store {
 			})
 			return filtered
 		}),
+
 
 		mvuex.Getter("storedWifiSettingsSelect", func(state *GlobalState) interface{} {
 			selectWS := js.Global.Get("Array").New()
@@ -1270,18 +1336,9 @@ func initMVuex() *mvuex.Store {
 	// Update WiFi state
 	store.Dispatch(VUEX_ACTION_UPDATE_WIFI_STATE)
 
-	/*
-	// Update ethernet interface state (done by component)
-	store.Dispatch(VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS)
-	*/
-
 	// propagate Vuex store to global scope to allow injecting it to Vue by setting the "store" option
 	js.Global.Set("store", store)
 
-	/*
-	// Start Event Listening
-	state.EventProcessor.StartListening()
-	*/
 
 	return store
 }

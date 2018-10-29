@@ -171,6 +171,19 @@ const templateSelectStringModal = `
 						<q-btn icon="delete" color="negative" @click="onDeletePressed(name)" round flat />
 					</q-item-side>
 				</q-item>
+<!--
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile>
+							<q-btn color="primary" v-show="CurrentSelection != undefined" label="ok" @click="onLoadPressed(); visible=false"/>							
+							<q-btn color="secondary" v-close-overlay label="close" />
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+-->
+			</q-list>
+
+			<q-list slot="footer">
 				<q-item tag="label">
 					<q-item-main>
 						<q-item-tile>
@@ -180,6 +193,7 @@ const templateSelectStringModal = `
 					</q-item-main>
 				</q-item>
 			</q-list>
+
 		</q-modal-layout>
 	</q-modal>
 `

@@ -35,6 +35,11 @@ func InitCompHIDJobs() {
 	hvue.NewComponent(
 		"hid-job-overview-item",
 		hvue.Template(compHIDJobOverViewItemTemplate),
+		hvue.Method("cancel", func(vm *hvue.VM) {
+			job := &jsHidJobState{Object:vm.Get("job")}
+			println("Aborting job :", job.Id)
+			vm.Get("$store").Call("dispatch", VUEX_ACTION_CANCEL_HID_JOB, job.Id)
+		}),
 		hvue.Computed("jobstate",
 			func(vm *hvue.VM) interface{} {
 				//fetch job and cast back to jobstate
@@ -120,21 +125,46 @@ ScriptSource   string `js:"textSource"`
 			</q-popover>
 		</q-btn>
 	</q-item-side>
+   	<q-item-side right v-if="!job.hasSucceeded && !job.hasFailed">
+		<q-btn flat round dense color="negative" icon="cancel" @click="cancel">
+			<q-popover>
+				cancel HIDScript job {{ job.id }}
+			</q-popover>
+		</q-btn>
+	</q-item-side>
 </q-item>
 `
 
 
 
-	//{ "evtype": 0, "vmId": 2, "jobId": 3, "hasError": false, "result": "null", "error": "", "message": "Script started", "time": "2018-07-30 04:56:42.297533 +0000 UTC m=+7625.097825001" }
-	compHIDJobOverviewTemplate = `
+//{ "evtype": 0, "vmId": 2, "jobId": 3, "hasError": false, "result": "null", "error": "", "message": "Script started", "time": "2018-07-30 04:56:42.297533 +0000 UTC m=+7625.097825001" }
+compHIDJobOverviewTemplate = `
 	<q-card class="full-height">
 		<q-list>
 			<q-list-header>Running</q-list-header>
 			<hid-job-overview-item v-for="job in $store.getters.hidjobsRunning" :job="job" :key="job.id"></hid-job-overview-item>
-			<q-list-header>Succeeded</q-list-header>
-			<hid-job-overview-item v-for="job in $store.getters.hidjobsSucceeded" :job="job" :key="job.id"></hid-job-overview-item>
-			<q-list-header>Failed</q-list-header>
-			<hid-job-overview-item v-for="job in $store.getters.hidjobsFailed" :job="job" :key="job.id"></hid-job-overview-item>
+		</q-list>
+		<q-list>
+			<q-collapsible  opened icon-toggle>
+				<template slot="header">
+					<q-item-main label="Succeeded" :sublabel="'(' + $store.getters.hidjobsSucceeded.length + ' successful jobs)'"/>
+					<q-item-side v-if="$store.getters.hidjobsSucceeded.length > 0" right>
+						<q-btn icon="delete" color="red" @click="$store.dispatch('removeSucceededHidJobs')" round inverted flat />
+					</q-item-side>
+				</template>
+				<hid-job-overview-item v-for="job in $store.getters.hidjobsSucceeded" :job="job" :key="job.id"></hid-job-overview-item>
+			</q-collapsible>
+		</q-list>
+		<q-list>
+			<q-collapsible  opened icon-toggle>
+				<template slot="header">
+					<q-item-main label="Failed" :sublabel="'(' + $store.getters.hidjobsFailed.length + ' failed jobs)'"/>
+					<q-item-side v-if="$store.getters.hidjobsFailed.length > 0" right>
+						<q-btn icon="delete" color="red" @click="$store.dispatch('removeFailedHidJobs')" round inverted flat />
+					</q-item-side>
+				</template>
+				<hid-job-overview-item v-for="job in $store.getters.hidjobsFailed" :job="job" :key="job.id"></hid-job-overview-item>
+			</q-collapsible>
 		</q-list>
 	</q-card>
 

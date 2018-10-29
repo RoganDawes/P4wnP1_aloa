@@ -604,8 +604,9 @@ func (s *server) HIDCancelAllScriptJobs(ctx context.Context, rEmpty *pb.Empty) (
 
 func (s *server) HIDCancelScriptJob(ctx context.Context, sJob *pb.HIDScriptJob) (empty *pb.Empty, err error) {
 	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_HID))
+	empty = &pb.Empty{}
 	job,err := s.rootSvc.SubSysUSB.HidScriptGetBackgroundJobByID(int(sJob.Id))
-	if err != nil { return nil, err }
+	if err != nil { return empty, err }
 
 	job.Cancel()
 	return
