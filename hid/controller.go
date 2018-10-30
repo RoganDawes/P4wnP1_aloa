@@ -1,3 +1,4 @@
+// +build linux
 
 package hid
 
@@ -301,12 +302,14 @@ func (ctl *HIDController) CancelAllBackgroundJobs() {
 	for job,_ := range oldList {
 		fmt.Printf("Cancelling Job %d\n", job.Id)
 		job.Cancel()
+		/*
 		ctl.emitEvent(Event{
 			Job:job,
 			Vm:job.executingVM,
 			Type:EventType_JOB_CANCELLED,
 			Message:"Script execution cancelled",
 		})
+		*/
 	}
 	globalJobList = make(map[*AsyncOttoJob]bool) //Create new empty list
 	globalJobListMutex.Unlock()

@@ -234,7 +234,7 @@ type jsLogEvent struct {
 	EvLogSource  string `js:"source"`
 	EvLogLevel   int    `js:"level"`
 	EvLogMessage string `js:"message"`
-	EvLogTime    string `js:"time"`
+	EvLogTime    int64 `js:"time"`
 }
 
 //HID event
@@ -247,7 +247,7 @@ type jsHidEvent struct {
 	Result    string `js:"result"`
 	Error     string `js:"error"`
 	Message   string `js:"message"`
-	EvLogTime string `js:"time"`
+	EvLogTime int64 `js:"time"`
 }
 
 func (jsEv *jsEvent) toLogEvent() (res *jsLogEvent, err error) {
@@ -273,10 +273,11 @@ func (jsEv *jsEvent) toLogEvent() (res *jsLogEvent, err error) {
 		return nil, eNoLogEvent
 	}
 
-	res.EvLogTime, ok = jsEv.Values[3].(string)
+	res.EvLogTime, ok = jsEv.Values[3].(int64)
 	if !ok {
 		return nil, eNoLogEvent
 	}
+	println("EvLogTime", res.EvLogTime)
 
 	return res, nil
 }
@@ -323,7 +324,7 @@ func (jsEv *jsEvent) toHidEvent() (res *jsHidEvent, err error) {
 		return nil, eNoHidEvent
 	}
 
-	res.EvLogTime, ok = jsEv.Values[7].(string)
+	res.EvLogTime, ok = jsEv.Values[7].(int64)
 	if !ok {
 		return nil, eNoHidEvent
 	}
@@ -341,7 +342,7 @@ type jsHidJobState struct {
 	LastMessage  string `js:"lastMessage"`
 	TextResult   string `js:"textResult"`
 	//	TextError      string `js:"textError"`
-	LastUpdateTime string `js:"lastUpdateTime"` //JSON timestamp from server
+	LastUpdateTime int64 `js:"lastUpdateTime"` //JSON timestamp from server
 	ScriptSource   string `js:"textSource"`
 }
 
@@ -392,7 +393,7 @@ func NewHIDJobStateList() *jsHidJobStateList {
 // state list, directly, but instead uses the "Vue.set()" method to update the object, while making vue aware of it.
 // This means: THE "UpdateEntry" METHOD RELIES ON THE PRESENCE OF THE "Vue" OBJECT IN JAVASCRIPT GLOBAL SCOPE. This again
 // means Vue.JS has to be loaded, BEFORE THIS METHOD IS CALLED"
-func (jl *jsHidJobStateList) UpdateEntry(id, vmId int64, hasFailed, hasSucceeded bool, message, textResult, lastUpdateTime, scriptSource string) {
+func (jl *jsHidJobStateList) UpdateEntry(id, vmId int64, hasFailed, hasSucceeded bool, message string, textResult string, lastUpdateTime int64, scriptSource string) {
 	key := strconv.Itoa(int(id))
 
 	//Check if job exists, update existing one if already present
@@ -998,29 +999,10 @@ func (data *jsEventProcessor) handleHidEvent(hEv *jsHidEvent) {
 		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, false, hEv.Message, hEv.Error, hEv.EvLogTime, "")
 
 		QuasarNotifyError("HIDScript job " + strconv.Itoa(int(hEv.JobId)) + " failed", hEv.Error, QUASAR_NOTIFICATION_POSITION_TOP)
-	/*
-		notification := &QuasarNotification{Object: O()}
-		notification.Message = "HIDScript job " + strconv.Itoa(int(hEv.JobId)) + " failed"
-		notification.Detail = hEv.Error
-		notification.Position = QUASAR_NOTIFICATION_POSITION_TOP
-		notification.Type = QUASAR_NOTIFICATION_TYPE_NEGATIVE
-		notification.Timeout = 5000
-		QuasarNotify(notification)
-	*/
 	case common_web.HidEventType_JOB_SUCCEEDED:
 		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, hEv.HasError, true, hEv.Message, hEv.Result, hEv.EvLogTime, "")
 
 		QuasarNotifySuccess("HIDScript job " + strconv.Itoa(int(hEv.JobId)) + " succeeded", hEv.Result, QUASAR_NOTIFICATION_POSITION_TOP)
-
-	/*
-		notification := &QuasarNotification{Object: O()}
-		notification.Message = "HIDScript job " + strconv.Itoa(int(hEv.JobId)) + " succeeded"
-		notification.Detail = hEv.Result
-		notification.Position = QUASAR_NOTIFICATION_POSITION_TOP
-		notification.Type = QUASAR_NOTIFICATION_TYPE_POSITIVE
-		notification.Timeout = 5000
-		QuasarNotify(notification)
-	*/
 	case common_web.HidEventType_JOB_CANCELLED:
 		data.JobList.UpdateEntry(hEv.JobId, hEv.VMId, true, false, hEv.Message, hEv.Message, hEv.EvLogTime, "")
 	default:

@@ -547,7 +547,7 @@ func (tam *TriggerActionManager) executeActionLog(evt *pb.Event, ta *pb.TriggerA
 	}
 
 	fmt.Printf("Trigger '%s' fired -> executing action '%s'\n", triggerName, actionName)
-	tam.rootSvc.SubSysEvent.Emit(ConstructEventLog("TriggerAction", 0, logMessage))
+	tam.rootSvc.SubSysEvent.Emit(ConstructEventLog("TriggerAction", LOG_LEVEL_INFORMATION, logMessage))
 }
 
 // checks if the triggerType of the given event (if trigger event at all), matches the TriggerType of the TriggerAction

@@ -167,6 +167,13 @@ func (avm *AsyncOttoVM) RunAsync(ctx context.Context, src interface{}, anonymous
 				if caught == haltirq {
 					job.ResultErr = errors.New(fmt.Sprintf("Execution of job %d on VM %d interrupted\n", job.Id, avm.Id))
 
+					avm.emitEvent(Event{
+						Job:job,
+						Vm:job.executingVM,
+						Type:EventType_JOB_CANCELLED,
+						Message:"Script execution cancelled",
+					})
+
 					// signal Job finished
 					job.SetFinished()
 					return

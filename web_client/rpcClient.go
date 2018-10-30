@@ -29,6 +29,40 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) UploadContentToTempFile(timeout time.Duration, content []byte) (filename string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	//create hex string of content MD5 sum
+	filename = BytesToMD5(content)
+
+	//upload file to `/tmp/{md5_hash_hex}`
+	_,err = rpc.Client.FSWriteFile(ctx,
+		&pb.WriteFileRequest{
+			Data:content,
+			Append:false,
+			Filename:filename,
+			Folder: pb.AccessibleFolder_TMP,
+			MustNotExist:false,
+		})
+
+	return
+}
+
+func (rpc *Rpc) RunHIDScriptJob(timeout time.Duration, filepath string) (job *pb.HIDScriptJob, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	//upload file to `/tmp/{md5_hash_hex}`
+	return rpc.Client.HIDRunScriptJob(
+		ctx,
+		&pb.HIDScriptRequest{
+			ScriptPath:     filepath,
+			TimeoutSeconds: uint32(0),
+		},
+	)
+}
+
 func (rpc *Rpc) CancelHIDScriptJob(timeout time.Duration, jobID uint32) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

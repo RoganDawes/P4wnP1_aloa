@@ -1,15 +1,15 @@
 package service
 
 import (
-	"errors"
-	"fmt"
-	pb "github.com/mame82/P4wnP1_go/proto"
 	"context"
+	"fmt"
+	"github.com/mame82/P4wnP1_go/common_web"
+	"github.com/mame82/P4wnP1_go/hid"
+	pb "github.com/mame82/P4wnP1_go/proto"
+	"log"
 	"sync"
 	"time"
-	"log"
-	"github.com/mame82/P4wnP1_go/hid"
-	"github.com/mame82/P4wnP1_go/common_web"
+	"errors"
 )
 
 type EventManager struct {
@@ -53,7 +53,7 @@ func (em *EventManager) Emit(event *pb.Event) {
 }
 
 func (em *EventManager) Write(p []byte) (n int, err error) {
-	ev := ConstructEventLog("logWriter", 1, string(p))
+	ev := ConstructEventLog("logWriter", LOG_LEVEL_INFORMATION, string(p))
 	em.Emit(ev)
 	return len(p), nil
 }
@@ -165,8 +165,32 @@ func ConstructEventNotifyStateChange(stateType common_web.EvtStateChangeType) *p
 	}
 }
 
-func ConstructEventLog(source string, level int, message string) *pb.Event {
-	tJson, _ := time.Now().MarshalJSON()
+/*
+	case 1:
+		return prefix + "critical"
+	case 2:
+		return prefix + "error"
+	case 3:
+		return prefix + "warning"
+	case 4:
+		return prefix + "information"
+	case 5:
+		return prefix + "verbose"
+ */
+type LogLevel int
+const (
+	LOG_LEVEL_UNDEFINED LogLevel = iota
+	LOG_LEVEL_CRITICAL
+	LOG_LEVEL_ERROR
+	LOG_LEVEL_WARNING
+	LOG_LEVEL_INFORMATION
+	LOG_LEVEL_VERBOSE
+)
+
+func ConstructEventLog(source string, level LogLevel, message string) *pb.Event {
+	//tJson, _ := time.Now().MarshalJSON()
+
+	unixTimeMillis := time.Now().UnixNano() / 1e6
 
 	return &pb.Event{
 		Type: common_web.EVT_LOG,
@@ -174,7 +198,7 @@ func ConstructEventLog(source string, level int, message string) *pb.Event {
 			{Val: &pb.EventValue_Tstring{Tstring: source}},
 			{Val: &pb.EventValue_Tint64{Tint64: int64(level)}},
 			{Val: &pb.EventValue_Tstring{Tstring: message}},
-			{Val: &pb.EventValue_Tstring{Tstring: string(tJson)}},
+			{Val: &pb.EventValue_Tint64{Tint64: unixTimeMillis}}, //retrieve time in nano second accuracy and scale down to milliseconds
 		},
 	}
 }
@@ -266,7 +290,8 @@ func ConstructEventHID(hidEvent hid.Event) *pb.Event {
 		vmID = eVM.Id
 	}
 
-	tJson, _ := time.Now().MarshalJSON()
+
+	unixTimeMillis := time.Now().UnixNano() / 1e6
 
 	return &pb.Event{
 		Type: common_web.EVT_HID, //Type
@@ -278,7 +303,7 @@ func ConstructEventHID(hidEvent hid.Event) *pb.Event {
 			{Val: &pb.EventValue_Tstring{Tstring: resString}},          //result String
 			{Val: &pb.EventValue_Tstring{Tstring: errString}},          //error String (message in case of error)
 			{Val: &pb.EventValue_Tstring{Tstring: message}},            //Mesage text of event
-			{Val: &pb.EventValue_Tstring{Tstring: string(tJson)}},      //Timestamp of event genration
+			{Val: &pb.EventValue_Tint64{Tint64: unixTimeMillis}},      //Timestamp of event genration
 		},
 	}
 }

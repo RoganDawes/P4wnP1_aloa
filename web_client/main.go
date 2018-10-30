@@ -47,19 +47,18 @@ func Router(router *js.Object) hvue.ComponentOption {
 func main() {
 	println(GetBaseURL())
 
-println("====================---------")
 	store := InitGlobalState() //sets Vuex store in JS window.store
-	store.Dispatch(VUEX_ACTION_START_EVENT_LISTEN)
 
 //	RpcClient.StartListening() //Start event listening after global state is initiated (contains the event handlers)
 
 	// ToDo: delete because debug
 //	RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second*10)
 
-	router := NewVueRouter("/usb",
-		VueRouterRoute("/usb","", "<usb-settings></usb-settings>"),
+	router := NewVueRouter(
+		"/usb",
 		// route below could be used for an easter egg
 		//VueRouterRoute("/","", "<usb-settings></usb-settings>"),
+		VueRouterRoute("/usb","", "<usb-settings></usb-settings>"),
 		VueRouterRoute("/hid","", "<hid-script></hid-script>"),
 		VueRouterRoute("/hidjobs","", "<hid-job-event-overview></hid-job-event-overview>"),
 		VueRouterRoute("/logger","", "<logger :max-entries='7'></logger>"),
@@ -88,25 +87,7 @@ println("====================---------")
 	vm := hvue.NewVM(
 		hvue.El("#app"),
 		hvue.Template(templateMainApp),
-/*
-		//add "testString" to data
-		hvue.DataFunc(func(vm *hvue.VM) interface{} {
-			data := struct{
-				*js.Object
-				TestString string `js:"testString"`
-				SelectedTab string `js:"selectedTab"`
-			}{Object: O()}
-			data.SelectedTab = "USB"
-			data.TestString = "type('hello');"
-			return &data
-		}),
-*/
 		//add console to app as computed property, to allow debug output on vue events
-		hvue.Computed(
-			"console",
-			func(vm *hvue.VM) interface{} {
-			return js.Global.Get("console")
-		}),
 		hvue.Computed("state", func(vm *hvue.VM) interface{} {
 			return vm.Get("$store").Get("state") //works only with Vuex store option added
 		}),
@@ -118,7 +99,6 @@ println("====================---------")
 	)
 	// ToDo: remove next lines, debug code
 	js.Global.Set("vm",vm)
-	js.Global.Set("rpc", RpcClient)
 }
 
 const templateMainApp = `
@@ -132,13 +112,13 @@ const templateMainApp = `
             </q-toolbar>
             <q-tabs>
                 <q-route-tab default slot="title" to="usb" name="tab-usb" icon="usb" label="USB Settings"></q-route-tab>
-                <q-route-tab slot="title" to="hid" name="tab-hid-script" icon="code" label="HIDScript"></q-route-tab>
-                <q-route-tab slot="title" to="hidjobs" name="tab-hid-jobs" icon="schedule" label="HID Events"></q-route-tab>
-                <q-route-tab slot="title" to="logger" name="tab-logger" icon="message" label="Event Log"></q-route-tab>
-                <q-route-tab slot="title" to="network" name="tab-network" icon="settings_ethernet" label="Network settings"></q-route-tab>
                 <q-route-tab slot="title" to="wifi" name="tab-wifi" icon="wifi" label="WiFi settings"></q-route-tab>
-                <q-route-tab slot="title" to="triggeractions" name="tab-triggeraction" icon="whatshot" label="Trigger Actions"></q-route-tab>
                 <q-route-tab slot="title" to="bluetooth" name="tab-bluetooth" icon="bluetooth" label="Bluetooth"></q-route-tab>
+                <q-route-tab slot="title" to="network" name="tab-network" icon="settings_ethernet" label="Network settings"></q-route-tab>
+                <q-route-tab slot="title" to="triggeractions" name="tab-triggeraction" icon="whatshot" label="Trigger Actions"></q-route-tab>
+                <q-route-tab slot="title" to="hid" name="tab-hid-script" icon="keyboard" label="HIDScript"></q-route-tab>
+ <!--               <q-route-tab slot="title" to="hidjobs" name="tab-hid-jobs" icon="schedule" label="HID Events"></q-route-tab> -->
+                <q-route-tab slot="title" to="logger" name="tab-logger" icon="message" label="Event Log"></q-route-tab>
             </q-tabs>
         </q-layout-header>
 
@@ -155,14 +135,6 @@ const templateMainApp = `
             <router-view></router-view>
 
 			<disconnect-modal :value="!$store.getters.isConnected"></disconnect-modal>
-<!--
-            <q-modal v-model="!$store.getters.isConnected" minimized no-route-dismiss no-esc-dismiss no-backdrop-dismiss>
-                <div style="padding: 50px">
-                    <div class="q-display-1 q-mb-md">No connection to server</div>
-                    <p>Trying to reconnect ... (attempt {{ $store.state.failedConnectionAttempts }})</p>
-                </div>
-            </q-modal>
--->
         </q-page-container>
 
 

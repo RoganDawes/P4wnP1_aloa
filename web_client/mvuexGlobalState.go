@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -45,12 +46,14 @@ const (
 
 	//HIDScripts and jobs
 	VUEX_ACTION_UPDATE_RUNNING_HID_JOBS                           = "updateRunningHidJobs"
-	VUEX_ACTION_REMOVE_SUCCEEDED_HID_JOBS                           = "removeSucceededHidJobs"
-	VUEX_ACTION_REMOVE_FAILED_HID_JOBS                           = "removeFailedHidJobs"
+	VUEX_ACTION_REMOVE_SUCCEEDED_HID_JOBS                         = "removeSucceededHidJobs"
+	VUEX_ACTION_REMOVE_FAILED_HID_JOBS                            = "removeFailedHidJobs"
 	VUEX_ACTION_UPDATE_STORED_HID_SCRIPTS_LIST                    = "updateStoredHIDScriptsList"
 	VUEX_ACTION_UPDATE_CURRENT_HID_SCRIPT_SOURCE_FROM_REMOTE_FILE = "updateCurrentHidScriptSourceFromRemoteFile"
 	VUEX_ACTION_STORE_CURRENT_HID_SCRIPT_SOURCE_TO_REMOTE_FILE    = "storeCurrentHidScriptSourceToRemoteFile"
-	VUEX_ACTION_CANCEL_HID_JOB = "cancelHIDJob"
+	VUEX_ACTION_CANCEL_HID_JOB                                    = "cancelHIDJob"
+	VUEX_ACTION_CANCEL_ALL_HID_JOBS                               = "cancelAllHIDJobs"
+	VUEX_ACTION_AND_AND_RUN_HID_SCRIPT                            = "sendAndRunHIDScript"
 
 	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO = "setCurrentHIDScriptSource"
 	VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST      = "setStoredHIDScriptsList"
@@ -155,6 +158,7 @@ func createGlobalStateStruct() GlobalState {
 	state.Title = "P4wnP1 by MaMe82"
 	state.CurrentHIDScriptSource = initHIDScript
 	state.CurrentGadgetSettings = NewUSBGadgetSettings()
+	state.CurrentlyDeployingGadgetSettings = false
 	state.CurrentlyDeployingWifiSettings = false
 	state.HidJobList = NewHIDJobStateList()
 	state.TriggerActionList = NewTriggerActionSet()
@@ -204,7 +208,7 @@ func processEvent(evt *pb.Event, store *mvuex.Store, state *GlobalState) {
 		case common_web.STATE_CHANGE_EVT_TYPE_NETWORK:
 			store.Dispatch(VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS)
 		case common_web.STATE_CHANGE_EVT_TYPE_HID:
-			store.Dispatch(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS) // handled by dedicated listener
+			//store.Dispatch(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS) // handled by dedicated listener
 		case common_web.STATE_CHANGE_EVT_TYPE_WIFI:
 			store.Dispatch(VUEX_ACTION_UPDATE_WIFI_STATE)
 		case common_web.STATE_CHANGE_EVT_TYPE_TRIGGER_ACTIONS:
@@ -254,9 +258,34 @@ func actionUpdateAllStates(store *mvuex.Store, context *mvuex.ActionContext, sta
 
 }
 
+func actionSendAndRunHIDScript(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, scriptContent *js.Object)  {
+	go func() {
+		strScriptContent := scriptContent.String()
+
+		println("Send and run HIDScript job")
+		//fetch deployed gadget settings
+		filename,err := RpcClient.UploadContentToTempFile(defaultTimeout, []byte(strScriptContent))
+		if err != nil {
+			println("Couldn't upload HIDScript job", err)
+			QuasarNotifyError("Error uploading script", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
+			return
+		}
+
+		job,err := RpcClient.RunHIDScriptJob(defaultTimeout, "/tmp/" + filename)
+		if err != nil {
+			println("Couldn't start HIDScript job", err)
+			QuasarNotifyError("Error starting script as background job", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
+			return
+		}
+
+		QuasarNotifySuccess("Script started successfully", "Job ID " + strconv.Itoa(int(job.Id)), QUASAR_NOTIFICATION_POSITION_TOP)
+
+		// ToDo: update HIDScriptJob list (should be done event based)
+	}()
+	return
+}
+
 func actionCancelHidJob(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jobID *js.Object)  {
-
-
 	go func() {
 		id := uint32(jobID.Int())
 		println("Cancel HIDScript job", id)
@@ -269,8 +298,21 @@ func actionCancelHidJob(store *mvuex.Store, context *mvuex.ActionContext, state 
 
 		// ToDo: update HIDScriptJob list (should be done event based)
 	}()
+	return
+}
 
+func actionCancelAllHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState)  {
+	go func() {
+		println("Cancel all HIDScript jobs")
+		//fetch deployed gadget settings
+		err := RpcClient.CancelAllHIDScriptJobs(defaultTimeout)
+		if err != nil {
+			println("Couldn't cancel all HIDScript jobs", err)
+			return
+		}
 
+		// ToDo: update HIDScriptJob list (should be done event based)
+	}()
 	return
 }
 
@@ -932,7 +974,8 @@ func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext
 
 		for _, jobstate := range jobstates {
 			println("updateing jobstate", jobstate)
-			state.HidJobList.UpdateEntry(jobstate.Id, jobstate.VmId, false, false, "initial job state", "", time.Now().String(), jobstate.Source)
+			timeNowUnixMilli := time.Now().UnixNano()/1e6
+			state.HidJobList.UpdateEntry(jobstate.Id, jobstate.VmId, false, false, "initial job state", "", timeNowUnixMilli, jobstate.Source)
 		}
 	}()
 
@@ -1115,6 +1158,7 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		notification.Timeout = 2000
 		QuasarNotify(notification)
 
+		return
 	}()
 
 	return
@@ -1267,9 +1311,12 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_START_EVENT_LISTEN, actionStartEventListen),
 		mvuex.Action(VUEX_ACTION_STOP_EVENT_LISTEN, actionStopEventListen),
 
+
 		mvuex.Action(VUEX_ACTION_REMOVE_SUCCEEDED_HID_JOBS, actionRemoveSucceededHidJobs),
 		mvuex.Action(VUEX_ACTION_REMOVE_FAILED_HID_JOBS, actionRemoveFailedHidJobs),
 		mvuex.Action(VUEX_ACTION_CANCEL_HID_JOB, actionCancelHidJob),
+		mvuex.Action(VUEX_ACTION_CANCEL_ALL_HID_JOBS, actionCancelAllHidJobs),
+		mvuex.Action(VUEX_ACTION_AND_AND_RUN_HID_SCRIPT, actionSendAndRunHIDScript),
 
 
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
@@ -1327,6 +1374,9 @@ func initMVuex() *mvuex.Store {
 		}),
 	)
 
+	store.Dispatch(VUEX_ACTION_START_EVENT_LISTEN)
+
+/*
 	// fetch deployed gadget settings
 	store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS)
 
@@ -1335,14 +1385,14 @@ func initMVuex() *mvuex.Store {
 
 	// Update WiFi state
 	store.Dispatch(VUEX_ACTION_UPDATE_WIFI_STATE)
-
-	// propagate Vuex store to global scope to allow injecting it to Vue by setting the "store" option
-	js.Global.Set("store", store)
-
+*/
 
 	return store
 }
 
 func InitGlobalState() *mvuex.Store {
-	return initMVuex()
+	store := initMVuex()
+	// propagate Vuex store to global scope to allow injecting it to Vue by setting the "store" option
+	js.Global.Set("store", store)
+	return store
 }

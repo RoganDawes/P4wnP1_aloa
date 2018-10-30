@@ -5,34 +5,11 @@ package main
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/mame82/hvue"
-	"strconv"
 )
 
 type CompHIDScriptCodeEditorData struct {
 	*js.Object
 	CodeMirrorOptions *CodeMirrorOptionsType `js:"codemirrorOptions"`
-}
-
-// ToDo: Change into action of vuex store
-func SendAndRun(vm *hvue.VM) {
-	sourceCode := vm.Get("$store").Get("state").Get("currentHIDScriptSource").String()
-	md5 := StringToMD5(sourceCode) //Calculate MD5 hexstring of current script content
-
-	go func() {
-		timeout := uint32(0)
-		err := UploadHIDScript(md5, sourceCode)
-		if err != nil {
-			QuasarNotifyError("Error uploading script", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
-			return
-		}
-		job,err := RunHIDScript(md5, timeout)
-		if err != nil {
-			QuasarNotifyError("Error starting script as background job", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
-			return
-		}
-
-		QuasarNotifySuccess("Script started successfully", "Job ID " + strconv.Itoa(int(job.Id)), QUASAR_NOTIFICATION_POSITION_TOP)
-	}()
 }
 
 type CodeMirrorMode struct {
@@ -80,7 +57,6 @@ func InitComponentsHIDScript() {
 		"hid-script-code-editor",
 		hvue.Template(compHIDScriptCodeEditorTemplate),
 		hvue.DataFunc(newCompHIDScriptCodeEditorData),
-		hvue.Method("SendAndRun",	SendAndRun),
 		hvue.ComputedWithGetSet(
 			"scriptContent",
 			func(vm *hvue.VM) interface{} {
@@ -133,7 +109,10 @@ func InitComponentsHIDScript() {
 				vm.Get("$q").Call("notify", "store " + name.String())
 				vm.Store.Call("dispatch", VUEX_ACTION_STORE_CURRENT_HID_SCRIPT_SOURCE_TO_REMOTE_FILE, name)
 			}),
-		hvue.Method("SendAndRun",	SendAndRun),
+		hvue.Method("SendAndRun",	func (vm *hvue.VM) {
+			sourceCode := vm.Get("$store").Get("state").Get("currentHIDScriptSource").String()
+			vm.Store.Call("dispatch", VUEX_ACTION_AND_AND_RUN_HID_SCRIPT, sourceCode)
+		}),
 	)
 }
 

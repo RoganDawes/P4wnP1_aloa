@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/gopherjs/gopherjs/js"
 	"github.com/mame82/hvue"
 )
 
@@ -30,21 +31,24 @@ func InitCompLogger()  {
 	hvue.NewComponent(
 		"logger",
 		hvue.Template(compLoggerTemplate),
-//		hvue.DataFunc(NewLoggerData),
-//		hvue.MethodsOf(&CompLoggerData{}),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := &struct {
+				*js.Object
+				Pagination *jsDataTablePagination `js:"pagination"`
+			}{Object:O()}
+
+			data.Pagination = newPagination(0, 1)
+
+			return data
+		}),
 		hvue.Method("logLevelClass", LogLevelClass),
 		hvue.PropObj("max-entries", hvue.Types(hvue.PNumber), hvue.Default(5)),
-		hvue.Created(func(vm *hvue.VM) {
-			println("OnCreated")
-//			vm.Call("StartListening")
-		}),
-		hvue.Destroyed(func(vm *hvue.VM) {
-			println("OnDestroyed")
-//			vm.Call("StopListening")
-		}),
 
 		hvue.Computed("classFromLevel", func(vm *hvue.VM) interface{} {
 			return "info"
+		}),
+		hvue.Method("formatDate", func(vm *hvue.VM, timestamp *js.Object) interface{} {
+			return js.Global.Get("Quasar").Get("utils").Get("date").Call("formatDate", timestamp, "YYYY-MM-DD HH:mm:ss Z")
 		}),
 		hvue.Computed("logArray",
 			func(vm *hvue.VM) interface{} {
@@ -57,7 +61,24 @@ func InitCompLogger()  {
 const (
 
 	compLoggerTemplate = `
-<q-page>
+<q-page padding>
+	<q-card>
+		<div>
+			<q-table
+				:data="logArray"
+				:columns="[{name:'logTime', field: 'time', label: 'Time', align: 'left'}, {name:'logSource', field: 'source', label: 'Source', align: 'left'}, {name:'logLevel', field: 'level', label: 'Level', align: 'left'}, {name:'logMessage', field: 'message', label: 'Message', align: 'left'}]"
+				row-key="name"
+				:pagination="pagination"
+				hide-bottom
+			>
+  <q-td slot="body-cell-logTime" slot-scope="props" :props="props">
+    {{ formatDate(props.value) }}
+  </q-td>
+			</q-table>
+		</div>
+	</q-card>
+
+<!--
 	<div class="logger">
 	<table class="log-entries">
 		<tr>
@@ -74,6 +95,7 @@ const (
 	    </tr>
 	</table>
 	</div>
+-->
 </q-page>
 `
 )

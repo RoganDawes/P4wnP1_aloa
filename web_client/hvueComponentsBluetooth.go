@@ -359,19 +359,23 @@ const templateBluetoothPage = `
 			</q-card>
 		</div>
 
-
+<!--
 		<div class="col-12">
 			{{ CurrentControllerInfo }}
 		</div>
-
+-->
 		<div class="col-12 col-lg">
 			<bluetooth-controller :controllerInfo="CurrentControllerInfo"></bluetooth-controller>
 		</div>
 		<div class="col-12 col-lg">
-			<bluetooth-controller-network-services :controllerInfo="CurrentControllerInfo"></bluetooth-controller-network-services>
-		</div>
-		<div class="col-12 col-lg">
-			<bluetooth-agent :bluetoothAgent="CurrentBluetoothAgentSettings"></bluetooth-agent>
+<div class="row gutter-y-sm">
+			<div class="col-12">
+				<bluetooth-controller-network-services :controllerInfo="CurrentControllerInfo"></bluetooth-controller-network-services>
+			</div>
+			<div class="col-12">
+				<bluetooth-agent :bluetoothAgent="CurrentBluetoothAgentSettings"></bluetooth-agent>
+			</div>
+</div>
 		</div>
 	</div>
 </q-page>

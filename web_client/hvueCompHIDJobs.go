@@ -123,13 +123,16 @@ ScriptSource   string `js:"textSource"`
 			<q-popover>
 				{{ job.textResult }}
 			</q-popover>
+			<q-tooltip>
+				show job result
+			</q-tooltip>
 		</q-btn>
 	</q-item-side>
    	<q-item-side right v-if="!job.hasSucceeded && !job.hasFailed">
 		<q-btn flat round dense color="negative" icon="cancel" @click="cancel">
-			<q-popover>
+			<q-tooltip>
 				cancel HIDScript job {{ job.id }}
-			</q-popover>
+			</q-tooltip>
 		</q-btn>
 	</q-item-side>
 </q-item>
@@ -141,15 +144,31 @@ ScriptSource   string `js:"textSource"`
 compHIDJobOverviewTemplate = `
 	<q-card class="full-height">
 		<q-list>
-			<q-list-header>Running</q-list-header>
-			<hid-job-overview-item v-for="job in $store.getters.hidjobsRunning" :job="job" :key="job.id"></hid-job-overview-item>
+			<q-collapsible opened icon-toggle>
+				<template slot="header">
+					<q-item-main label="Running jobs" :sublabel="'(' + $store.getters.hidjobsRunning.length + ' running jobs)'"/>
+					<q-item-side v-if="$store.getters.hidjobsRunning.length > 0" right>
+						<q-btn icon="cancel" color="red" @click="$store.dispatch('cancelAllHIDJobs')" round inverted flat>
+							<q-tooltip>
+								cancel all running HIDScript jobs
+							</q-tooltip>
+						</q-btn>
+					</q-item-side>
+				</template>
+				<hid-job-overview-item v-for="job in $store.getters.hidjobsRunning" :job="job" :key="job.id"></hid-job-overview-item>
+			</q-collapsible>
 		</q-list>
+
 		<q-list>
-			<q-collapsible  opened icon-toggle>
+			<q-collapsible opened icon-toggle>
 				<template slot="header">
 					<q-item-main label="Succeeded" :sublabel="'(' + $store.getters.hidjobsSucceeded.length + ' successful jobs)'"/>
 					<q-item-side v-if="$store.getters.hidjobsSucceeded.length > 0" right>
-						<q-btn icon="delete" color="red" @click="$store.dispatch('removeSucceededHidJobs')" round inverted flat />
+						<q-btn icon="delete" color="red" @click="$store.dispatch('removeSucceededHidJobs')" round inverted flat>
+							<q-tooltip>
+								delete succeeded HID jobs from list
+							</q-tooltip>
+						</q-btn>
 					</q-item-side>
 				</template>
 				<hid-job-overview-item v-for="job in $store.getters.hidjobsSucceeded" :job="job" :key="job.id"></hid-job-overview-item>
@@ -160,7 +179,12 @@ compHIDJobOverviewTemplate = `
 				<template slot="header">
 					<q-item-main label="Failed" :sublabel="'(' + $store.getters.hidjobsFailed.length + ' failed jobs)'"/>
 					<q-item-side v-if="$store.getters.hidjobsFailed.length > 0" right>
-						<q-btn icon="delete" color="red" @click="$store.dispatch('removeFailedHidJobs')" round inverted flat />
+						<q-btn icon="delete" color="red" @click="$store.dispatch('removeFailedHidJobs')" round inverted flat>
+							<q-tooltip>
+								delete failed HID jobs from list
+							</q-tooltip>
+						</q-btn>
+
 					</q-item-side>
 				</template>
 				<hid-job-overview-item v-for="job in $store.getters.hidjobsFailed" :job="job" :key="job.id"></hid-job-overview-item>

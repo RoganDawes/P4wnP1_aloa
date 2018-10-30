@@ -3,12 +3,9 @@
 package main
 
 import (
-	"github.com/gopherjs/gopherjs/js"
 	"crypto/md5"
 	"encoding/hex"
-	"time"
-	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
-	"context"
+	"github.com/gopherjs/gopherjs/js"
 )
 
 func O() *js.Object {
@@ -27,6 +24,14 @@ func StringToMD5(input string) string {
 	return string(dst)
 }
 
+func BytesToMD5(input []byte) string {
+	sum := md5.Sum(input)
+	dst := make([]byte, hex.EncodedLen(len(sum)))
+	hex.Encode(dst, sum[:])
+	return string(dst)
+}
+
+/*
 func UploadHIDScript(filename string, content string) (err error) {
 	ctx,cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -66,3 +71,4 @@ func RunHIDScript(filename string, timeoutSeconds uint32) (job *pb.HIDScriptJob,
 	)
 
 }
+*/

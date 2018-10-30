@@ -29,8 +29,11 @@ func InitCompHIDEvents() {
 			func(vm *hvue.VM) interface{} {
 				return vm.Get("$store").Get("state").Get("EventProcessor").Get("eventHidArray")
 			}),
+		hvue.Method("formatDate", func(vm *hvue.VM, timestamp *js.Object) interface{} {
+			return js.Global.Get("Quasar").Get("utils").Get("date").Call("formatDate", timestamp, "YYYY-MM-DD HH:mm:ss Z")
+		}),
 		hvue.Method("evIdToString", func(vm *hvue.VM, evID int64) (res string) {
-			println("EvID", evID)
+			//println("EvID", evID)
 			return common_web.EventTypeHIDName[evID]
 		}),
 	)
@@ -45,11 +48,15 @@ const (
 		<div>
 			<q-table
 				:data="events"
-				:columns="[{name:'type', field: 'evtype', label: 'Event Type', align: 'left'}, {name:'vmid', field: 'vmId', label: 'VM ID', align: 'left'}, {name:'jobid', field: 'jobId', label: 'Job ID', align: 'left'}, {name:'haserror', field: 'hasError', label: 'Has error', align: 'left'}, {name:'res', field: 'result', label: 'Result', align: 'left'}, {name:'errormsg', field: 'error', label: 'Error', align: 'left'}, {name:'msg', field: 'message', label: 'Message', align: 'left'}, {name:'timestamp', field: 'time', label: 'Time', align: 'left'}]"
+				:columns="[{name:'timestamp', field: 'time', label: 'Time', align: 'left'}, {name:'type', field: 'evtype', label: 'Event Type', align: 'left'}, {name:'vmid', field: 'vmId', label: 'VM ID', align: 'left'}, {name:'jobid', field: 'jobId', label: 'Job ID', align: 'left'}, {name:'haserror', field: 'hasError', label: 'Has error', align: 'left'}, {name:'res', field: 'result', label: 'Result', align: 'left'}, {name:'errormsg', field: 'error', label: 'Error', align: 'left'}, {name:'msg', field: 'message', label: 'Message', align: 'left'}]"
 				row-key="name"
 				:pagination="pagination"
 				hide-bottom
 			>
+
+				<q-td slot="body-cell-timestamp" slot-scope="props" :props="props">
+					{{ formatDate(props.value) }}
+				</q-td>
 
 				<q-td slot="body-cell-type" slot-scope="props" :props="props">
 					{{ evIdToString(props.value) }}
