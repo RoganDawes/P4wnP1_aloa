@@ -770,7 +770,7 @@ func (s *server) GetDeployedGadgetSetting(ctx context.Context, e *pb.Empty) (gs 
 
 	gs.DevPathHidKeyboard = s.rootSvc.SubSysUSB.State.DevicePath[USB_FUNCTION_HID_KEYBOARD_name]
 	gs.DevPathHidMouse = s.rootSvc.SubSysUSB.State.DevicePath[USB_FUNCTION_HID_MOUSE_name]
-	gs.DevPathHidMouse = s.rootSvc.SubSysUSB.State.DevicePath[USB_FUNCTION_HID_RAW_name]
+	gs.DevPathHidRaw = s.rootSvc.SubSysUSB.State.DevicePath[USB_FUNCTION_HID_RAW_name]
 
 	if err == nil {
 		j_usbset, _ := json.Marshal(gs)
