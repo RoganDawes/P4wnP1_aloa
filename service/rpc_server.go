@@ -292,7 +292,7 @@ func (s *server) DeployStoredUSBSettings(ctx context.Context, m *pb.StringMessag
 }
 
 func (s *server) StoreDeployedUSBSettings(ctx context.Context, m *pb.StringMessage) (e *pb.Empty, err error) {
-	gstate, err := ParseGadgetState(USB_GADGET_NAME)
+	gstate, err := s.rootSvc.SubSysUSB.ParseGadgetState(USB_GADGET_NAME)
 	if err != nil { return &pb.Empty{},err }
 
 	return s.StoreUSBSettings(ctx, &pb.USBRequestSettingsStorage{
@@ -766,28 +766,28 @@ func (s *server) MountUMSFile(ctx context.Context, gsu *pb.GadgetSettingsUMS) (*
 }
 
 func (s *server) GetDeployedGadgetSetting(ctx context.Context, e *pb.Empty) (gs *pb.GadgetSettings, err error) {
-	gs, err = ParseGadgetState(USB_GADGET_NAME)
+	log.Printf("Called get deployed gadget settings\n")
+	gs, err = s.rootSvc.SubSysUSB.ParseGadgetState(USB_GADGET_NAME)
+
+	if err != nil {
+		log.Printf("Error parsing current gadget config: %v", err)
+		return
+	}
 
 	gs.DevPathHidKeyboard = s.rootSvc.SubSysUSB.State.DevicePath[USB_FUNCTION_HID_KEYBOARD_name]
 	gs.DevPathHidMouse = s.rootSvc.SubSysUSB.State.DevicePath[USB_FUNCTION_HID_MOUSE_name]
 	gs.DevPathHidRaw = s.rootSvc.SubSysUSB.State.DevicePath[USB_FUNCTION_HID_RAW_name]
 
-	if err == nil {
-		j_usbset, _ := json.Marshal(gs)
-		log.Printf("Gadget settings requested %v", string(j_usbset))
-	} else {
-		log.Printf("Error parsing current gadget config: %v", err)
-	}
-
 	return
 }
 
 func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetSettings, err error) {
+	log.Printf("Called DeployGadgetSettings\n")
 	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_USB))
-	gs_backup,_ := ParseGadgetState(USB_GADGET_NAME)
+	gs_backup,_ := s.rootSvc.SubSysUSB.ParseGadgetState(USB_GADGET_NAME)
 
 	//ToDo: Former gadgets are destroyed without testing if there're changes, this should be aborted if GadgetSettingsState == GetDeployedGadgetSettings()
-	DestroyGadget(USB_GADGET_NAME)
+	//s.rootSvc.SubSysUSB.DestroyGadget(USB_GADGET_NAME) //already done by deploy
 
 	errg := s.rootSvc.SubSysUSB.DeployGadgetSettings(s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings)
 	err = nil
@@ -796,7 +796,7 @@ func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetS
 		s.rootSvc.SubSysUSB.DeployGadgetSettings(gs_backup) //We don't catch the error, as the old settings should have been working
 	}
 
-	gs, _ = ParseGadgetState(USB_GADGET_NAME) //Return settings from deployed gadget
+	gs, _ = s.rootSvc.SubSysUSB.ParseGadgetState(USB_GADGET_NAME) //Return settings from deployed gadget
 	return
 }
 

@@ -225,18 +225,18 @@ func ValidateGadgetSetting(gs pb.GadgetSettings) error {
 	}
 
 	//check endpoint consumption
-	sum_ep := 0
-	if gs.Use_RNDIS { sum_ep += USB_EP_USAGE_RNDIS }
-	if gs.Use_CDC_ECM { sum_ep += USB_EP_USAGE_CDC_ECM }
-	if gs.Use_UMS { sum_ep += USB_EP_USAGE_UMS }
-	if gs.Use_HID_MOUSE { sum_ep += USB_EP_USAGE_HID_MOUSE }
-	if gs.Use_HID_RAW { sum_ep += USB_EP_USAGE_HID_RAW }
-	if gs.Use_HID_KEYBOARD { sum_ep += USB_EP_USAGE_HID_KEYBOARD }
-	if gs.Use_SERIAL { sum_ep+= USB_EP_USAGE_CDC_SERIAL }
+	sumEp := 0
+	if gs.Use_RNDIS { sumEp += USB_EP_USAGE_RNDIS }
+	if gs.Use_CDC_ECM { sumEp += USB_EP_USAGE_CDC_ECM }
+	if gs.Use_UMS { sumEp += USB_EP_USAGE_UMS }
+	if gs.Use_HID_MOUSE { sumEp += USB_EP_USAGE_HID_MOUSE }
+	if gs.Use_HID_RAW { sumEp += USB_EP_USAGE_HID_RAW }
+	if gs.Use_HID_KEYBOARD { sumEp += USB_EP_USAGE_HID_KEYBOARD }
+	if gs.Use_SERIAL { sumEp += USB_EP_USAGE_CDC_SERIAL }
 
-	strConsumption := fmt.Sprintf("Gadget Settings consume %v out of %v available USB Endpoints\n", sum_ep, USB_EP_USAGE_MAX)
+	strConsumption := fmt.Sprintf("Gadget Settings consume %v out of %v available USB Endpoints\n", sumEp, USB_EP_USAGE_MAX)
 	log.Print(strConsumption)
-	if sum_ep > USB_EP_USAGE_MAX { return errors.New(strConsumption)}
+	if sumEp > USB_EP_USAGE_MAX { return errors.New(strConsumption)}
 
 	//check if composite gadget is enabled without functions
 	if gs.Enabled &&
@@ -247,7 +247,7 @@ func ValidateGadgetSetting(gs pb.GadgetSettings) error {
 		!gs.Use_HID_RAW &&
 		!gs.Use_UMS &&
 		!gs.Use_SERIAL {
-			return errors.New("If the composite gadget isn't disabled, as least one function has to be enabled")
+			return errors.New("if the composite gadget isn't disabled, as least one function has to be enabled")
 	}
 
 	return nil
@@ -294,7 +294,7 @@ func pollForUSBEthernet(timeout time.Duration) error {
 		time.Sleep(100*time.Millisecond)
 		fmt.Print(".")
 	}
-	return errors.New(fmt.Sprintf("Timeout %v reached before usb0 or usb1 became ready"))
+	return errors.New(fmt.Sprintf("timeout %v reached before usb0 or usb1 became ready", timeout))
 }
 
 
@@ -326,61 +326,67 @@ func CheckLibComposite() error {
 func getUDCName() (string, error) {
 	files, err := ioutil.ReadDir("/sys/class/udc")
 	if err != nil {
-		return "", errors.New("Couldn't find working UDC driver")
+		return "", errors.New("couldn't find working UDC driver")
 	}
 	if len(files) < 1 {
-		return "", errors.New("Couldn't find working UDC driver")
+		return "", errors.New("couldn't find working UDC driver")
 	}
 	return files[0].Name(), nil
 
 }
 
-func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) {
+func (gm *UsbGadgetManager) ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) {
 	err = nil
 	result = &pb.GadgetSettings{}
 
-	//gadget_root := "./test"
-	gadget_dir := USB_GADGET_DIR_BASE + "/" + gadgetName
+	fmt.Println("ParseGadgetState before lock ...")
+	//Don't parse while deploying
+	gm.gadgetSettingsLock.Lock()
+	defer gm.gadgetSettingsLock.Unlock()
+
+	fmt.Println("ParseGadgetState beyond lock ...")
+
+	gadgetDir := USB_GADGET_DIR_BASE + "/" + gadgetName
 
 	//check if root exists, return error otherwise
-	if _, err = os.Stat(gadget_dir); os.IsNotExist(err) {
-		err = errors.New(fmt.Sprintf("Gadget %s doesn't exist", gadgetName))
+	if _, err = os.Stat(gadgetDir); os.IsNotExist(err) {
+		err = errors.New(fmt.Sprintf("gadget %s doesn't exist", gadgetName))
 		result = nil
 		return
 	}
 
 	//ToDo: check if enabled (UDC in functionfs is set to content of /sys/class/udc)
 
-	if res, err := ioutil.ReadFile(gadget_dir + "/idVendor"); err != nil {
-		err1 := errors.New(fmt.Sprintf("Gadget %s error reading Vid", gadgetName))
+	if res, err := ioutil.ReadFile(gadgetDir + "/idVendor"); err != nil {
+		err1 := errors.New(fmt.Sprintf("gadget %s error reading Vid", gadgetName))
 		return nil, err1
 	} else {
 		result.Vid = strings.TrimSuffix(string(res), "\n")
 	}
 
-	if res, err := ioutil.ReadFile(gadget_dir + "/idProduct"); err != nil {
-		err1 := errors.New(fmt.Sprintf("Gadget %s error reading Pid", gadgetName))
+	if res, err := ioutil.ReadFile(gadgetDir + "/idProduct"); err != nil {
+		err1 := errors.New(fmt.Sprintf("gadget %s error reading Pid", gadgetName))
 		return nil, err1
 	} else {
 		result.Pid = strings.TrimSuffix(string(res), "\n")
 	}
 
-	if res, err := ioutil.ReadFile(gadget_dir + "/strings/0x409/serialnumber"); err != nil {
-		err1 := errors.New(fmt.Sprintf("Gadget %s error reading Serial", gadgetName))
+	if res, err := ioutil.ReadFile(gadgetDir + "/strings/0x409/serialnumber"); err != nil {
+		err1 := errors.New(fmt.Sprintf("gadget %s error reading Serial", gadgetName))
 		return nil, err1
 	} else {
 		result.Serial = strings.TrimSuffix(string(res), "\n")
 	}
 
-	if res, err := ioutil.ReadFile(gadget_dir + "/strings/0x409/manufacturer"); err != nil {
-		err1 := errors.New(fmt.Sprintf("Gadget %s error reading Manufacturer", gadgetName))
+	if res, err := ioutil.ReadFile(gadgetDir + "/strings/0x409/manufacturer"); err != nil {
+		err1 := errors.New(fmt.Sprintf("gadget %s error reading Manufacturer", gadgetName))
 		return nil, err1
 	} else {
 		result.Manufacturer = strings.TrimSuffix(string(res), "\n")
 	}
 
-	if res, err := ioutil.ReadFile(gadget_dir + "/strings/0x409/product"); err != nil {
-		err1 := errors.New(fmt.Sprintf("Gadget %s error reading Product", gadgetName))
+	if res, err := ioutil.ReadFile(gadgetDir + "/strings/0x409/product"); err != nil {
+		err1 := errors.New(fmt.Sprintf("gadget %s error reading Product", gadgetName))
 		return nil, err1
 	} else {
 		result.Product = strings.TrimSuffix(string(res), "\n")
@@ -389,20 +395,20 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 	//Check enabled functions in configuration
 
 	//USB RNDIS
-	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/rndis.usb0"); !os.IsNotExist(err1) {
+	if _, err1 := os.Stat(gadgetDir +"/configs/c.1/rndis.usb0"); !os.IsNotExist(err1) {
 		result.Use_RNDIS = true
 
 		result.RndisSettings = &pb.GadgetSettingsEthernet{}
 
-		if res, err := ioutil.ReadFile(gadget_dir + "/functions/rndis.usb0/host_addr"); err != nil {
-			err1 := errors.New(fmt.Sprintf("Gadget %s error reading RNDIS host_addr", gadgetName))
+		if res, err := ioutil.ReadFile(gadgetDir + "/functions/rndis.usb0/host_addr"); err != nil {
+			err1 := errors.New(fmt.Sprintf("gadget %s error reading RNDIS host_addr", gadgetName))
 			return nil, err1
 		} else {
 			result.RndisSettings.HostAddr = strings.TrimSuffix(string(res), "\000\n")
 		}
 
-		if res, err := ioutil.ReadFile(gadget_dir + "/functions/rndis.usb0/dev_addr"); err != nil {
-			err1 := errors.New(fmt.Sprintf("Gadget %s error reading RNDIS dev_addr", gadgetName))
+		if res, err := ioutil.ReadFile(gadgetDir + "/functions/rndis.usb0/dev_addr"); err != nil {
+			err1 := errors.New(fmt.Sprintf("gadget %s error reading RNDIS dev_addr", gadgetName))
 			return nil, err1
 		} else {
 			result.RndisSettings.DevAddr = strings.TrimSuffix(string(res), "\000\n")
@@ -416,20 +422,20 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 	}
 
 	//USB CDC ECM
-	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/ecm.usb1"); !os.IsNotExist(err1) {
+	if _, err1 := os.Stat(gadgetDir +"/configs/c.1/ecm.usb1"); !os.IsNotExist(err1) {
 		result.Use_CDC_ECM = true
 
 		result.CdcEcmSettings = &pb.GadgetSettingsEthernet{}
 
-		if res, err := ioutil.ReadFile(gadget_dir + "/functions/ecm.usb1/host_addr"); err != nil {
-			err1 := errors.New(fmt.Sprintf("Gadget %s error reading CDC ECM host_addr", gadgetName))
+		if res, err := ioutil.ReadFile(gadgetDir + "/functions/ecm.usb1/host_addr"); err != nil {
+			err1 := errors.New(fmt.Sprintf("gadget %s error reading CDC ECM host_addr", gadgetName))
 			return nil, err1
 		} else {
 			result.CdcEcmSettings.HostAddr = strings.TrimSuffix(string(res), "\000\n")
 		}
 
-		if res, err := ioutil.ReadFile(gadget_dir + "/functions/ecm.usb1/dev_addr"); err != nil {
-			err1 := errors.New(fmt.Sprintf("Gadget %s error reading CDC ECM dev_addr", gadgetName))
+		if res, err := ioutil.ReadFile(gadgetDir + "/functions/ecm.usb1/dev_addr"); err != nil {
+			err1 := errors.New(fmt.Sprintf("gadget %s error reading CDC ECM dev_addr", gadgetName))
 			return nil, err1
 		} else {
 			result.CdcEcmSettings.DevAddr = strings.TrimSuffix(string(res), "\000\n")
@@ -444,33 +450,33 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 	}
 
 	//USB serial
-	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/acm.GS0"); !os.IsNotExist(err1) {
+	if _, err1 := os.Stat(gadgetDir +"/configs/c.1/acm.GS0"); !os.IsNotExist(err1) {
 		result.Use_SERIAL = true
 	}
 
 	//USB HID Keyboard
-	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/"+USB_FUNCTION_HID_KEYBOARD_name); !os.IsNotExist(err1) {
+	if _, err1 := os.Stat(gadgetDir +"/configs/c.1/"+USB_FUNCTION_HID_KEYBOARD_name); !os.IsNotExist(err1) {
 		result.Use_HID_KEYBOARD = true
 	}
 
 	//USB HID Mouse
-	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/"+USB_FUNCTION_HID_MOUSE_name); !os.IsNotExist(err1) {
+	if _, err1 := os.Stat(gadgetDir +"/configs/c.1/"+USB_FUNCTION_HID_MOUSE_name); !os.IsNotExist(err1) {
 		result.Use_HID_MOUSE = true
 	}
 
 	//USB HID Raw
-	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/"+USB_FUNCTION_HID_RAW_name); !os.IsNotExist(err1) {
+	if _, err1 := os.Stat(gadgetDir +"/configs/c.1/"+USB_FUNCTION_HID_RAW_name); !os.IsNotExist(err1) {
 		result.Use_HID_RAW = true
 	}
 
 	//USB Mass Storage
-	if _, err1 := os.Stat(gadget_dir+"/configs/c.1/mass_storage.ms1"); !os.IsNotExist(err1) {
+	if _, err1 := os.Stat(gadgetDir +"/configs/c.1/mass_storage.ms1"); !os.IsNotExist(err1) {
 		result.Use_UMS = true
 		result.UmsSettings = &pb.GadgetSettingsUMS{}
 
 		//Check if running as CD-Rom
-		if res, err := ioutil.ReadFile(gadget_dir + "/functions/mass_storage.ms1/lun.0/cdrom"); err != nil {
-			err1 := errors.New(fmt.Sprintf("Gadget %s error reading USB Mass Storage cdrom emulation state", gadgetName))
+		if res, err := ioutil.ReadFile(gadgetDir + "/functions/mass_storage.ms1/lun.0/cdrom"); err != nil {
+			err1 := errors.New(fmt.Sprintf("gadget %s error reading USB Mass Storage cdrom emulation state", gadgetName))
 			return nil, err1
 		} else {
 			if strings.HasPrefix(string(res), "1") {
@@ -479,8 +485,8 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 		}
 
 		//Check name of backing file
-		if res, err := ioutil.ReadFile(gadget_dir + "/functions/mass_storage.ms1/lun.0/file"); err != nil {
-			err1 := errors.New(fmt.Sprintf("Gadget %s error reading USB Mass Storage image file setting", gadgetName))
+		if res, err := ioutil.ReadFile(gadgetDir + "/functions/mass_storage.ms1/lun.0/file"); err != nil {
+			err1 := errors.New(fmt.Sprintf("gadget %s error reading USB Mass Storage image file setting", gadgetName))
 			return nil, err1
 		} else {
 			result.UmsSettings.File = strings.TrimSuffix(string(res), "\000\n")
@@ -488,15 +494,15 @@ func ParseGadgetState(gadgetName string) (result *pb.GadgetSettings, err error) 
 	}
 
 	//check if UDC is set (Gadget enabled)
-	udc_name, _ := getUDCName()
+	udcName, _ := getUDCName()
 
-	if res, err := ioutil.ReadFile(gadget_dir + "/UDC"); err != nil {
-		err1 := errors.New(fmt.Sprintf("Gadget %s error reading UDC", gadgetName))
+	if res, err := ioutil.ReadFile(gadgetDir + "/UDC"); err != nil {
+		err1 := errors.New(fmt.Sprintf("gadget %s error reading UDC", gadgetName))
 		return nil, err1
 	} else {
-		udc_name_set := strings.TrimSuffix(string(res), "\n")
-		//log.Printf("UDC test: udc_name_set %s, udc_name %s", udc_name_set, udc_name)
-		if udc_name == udc_name_set {
+		udcNameSet := strings.TrimSuffix(string(res), "\n")
+		//log.Printf("UDC test: udcNameSet %s, udcName %s", udcNameSet, udcName)
+		if udcName == udcNameSet {
 			result.Enabled = true
 		}
 	}
@@ -511,7 +517,7 @@ func MountUMSFile(filename string) error {
 	funcdir := USB_GADGET_DIR + "/functions/mass_storage.ms1"
 	err := ioutil.WriteFile(funcdir+"/lun.0/file", []byte(filename), os.ModePerm)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Settings backing file for USB Mass Storage failed: %v", err))
+		return errors.New(fmt.Sprintf("settings backing file for USB Mass Storage failed: %v", err))
 	}
 	return nil
 }
@@ -521,18 +527,23 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 		return ErrUsbNotUsable
 	}
 
+	fmt.Println("DeployGadgetSettings before lock ...")
+
 	//Lock, only one change at a time
 	gm.gadgetSettingsLock.Lock()
 	defer gm.gadgetSettingsLock.Unlock()
+	fmt.Println("DeployGadgetSettings beyond lock ...")
+
+	fmt.Println("... deconstruct old gadget")
+	gm.DestroyGadget(USB_GADGET_NAME)
 
 	var usesUSBEthernet bool
 
-	//gadget_root := "./test"
-	gadget_root := USB_GADGET_DIR_BASE
+	gadgetRoot := USB_GADGET_DIR_BASE
 
 	//check if root exists, return error otherwise
-	if _, err := os.Stat(gadget_root); os.IsNotExist(err) {
-		return errors.New("Configfs path for gadget doesn't exist")
+	if _, err := os.Stat(gadgetRoot); os.IsNotExist(err) {
+		return errors.New("configfs path for gadget doesn't exist")
 	}
 
 	//ToDo: check if UDC is present and usable
@@ -719,12 +730,12 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 
 	//get UDC driver name and bind to gadget
 	if settings.Enabled {
-		udc_name, err := getUDCName()
+		udcName, err := getUDCName()
 		if err != nil {
 			return err
 		}
-		log.Printf("Enabeling gadget for UDC: %s\n", udc_name)
-		if err = ioutil.WriteFile(USB_GADGET_DIR+"/UDC", []byte(udc_name), os.ModePerm); err != nil {
+		log.Printf("Enabeling gadget for UDC: %s\n", udcName)
+		if err = ioutil.WriteFile(USB_GADGET_DIR+"/UDC", []byte(udcName), os.ModePerm); err != nil {
 			return err
 		}
 
@@ -808,23 +819,25 @@ func enumDevicePath(funcName string) (devPath string, err error){
 }
 
 func (gm *UsbGadgetManager) DestroyAllGadgets() error {
-	//gadget_root := "./test"
-	gadget_root := USB_GADGET_DIR_BASE
+
+	//gadgetRoot := "./test"
+	gadgetRoot := USB_GADGET_DIR_BASE
 
 	//check if root exists, return error otherwise
-	if _, err := os.Stat(gadget_root); os.IsNotExist(err) {
-		return errors.New("Configfs path for gadget doesn't exist")
+	if _, err := os.Stat(gadgetRoot); os.IsNotExist(err) {
+		return errors.New("configfs path for gadget doesn't exist")
 	}
 
-	gadget_dirs, err := ioutil.ReadDir(gadget_root)
+	gadgetDirs, err := ioutil.ReadDir(gadgetRoot)
 	if err != nil {
-		return errors.New("No gadgets")
+		return errors.New("no gadgets")
 	}
 
-	for _, gadget_dir_obj := range gadget_dirs {
-		gadget_name := gadget_dir_obj.Name()
-		log.Println("Found gadget: " + gadget_name)
-		err = DestroyGadget(gadget_name)
+	for _, gadgetDirObj := range gadgetDirs {
+		gadgetName := gadgetDirObj.Name()
+		log.Println("Found gadget: " + gadgetName)
+
+		err = gm.DestroyGadget(gadgetName)
 		if err != nil {
 			log.Println(err) //don't return, continue with next
 		}
@@ -837,72 +850,74 @@ func (gm *UsbGadgetManager) DestroyAllGadgets() error {
 	return nil
 }
 
-func DestroyGadget(Gadget_name string) error {
-	//gadget_root := "./test"
-	gadget_dir := USB_GADGET_DIR_BASE + "/" + Gadget_name
+func (gm *UsbGadgetManager) DestroyGadget(gadgetName string) error {
+
+
+
+	gadgetDir := USB_GADGET_DIR_BASE + "/" + gadgetName
 
 	//check if root exists, return error otherwise
 	if _, err := os.Stat(USB_GADGET_DIR_BASE); os.IsNotExist(err) {
-		return errors.New("Gadget " + Gadget_name + " doesn't exist")
+		return errors.New("Gadget " + gadgetName + " doesn't exist")
 	}
-	log.Println("Deconstructing gadget " + Gadget_name + "...")
+	log.Println("Deconstructing gadget " + gadgetName + "...")
 
 	//Assure gadget gets unbound from UDC
-	ioutil.WriteFile(gadget_dir+"/UDC", []byte("\x00"), os.ModePerm)
+	ioutil.WriteFile(gadgetDir+"/UDC", []byte("\x00"), os.ModePerm)
 
 	//Iterate over configurations
-	config_dirs, _ := ioutil.ReadDir(gadget_dir + "/configs")
-	for _, conf_dir_obj := range config_dirs {
-		conf_name := conf_dir_obj.Name()
-		conf_dir := gadget_dir + "/configs/" + conf_name
-		log.Println("Found config: " + conf_name)
+	configDirs, _ := ioutil.ReadDir(gadgetDir + "/configs")
+	for _, confDirObj := range configDirs {
+		confName := confDirObj.Name()
+		confDir := gadgetDir + "/configs/" + confName
+		log.Println("Found config: " + confName)
 
 		//find linked functions
-		conf_content, _ := ioutil.ReadDir(conf_dir)
-		for _, function := range conf_content {
+		confContents, _ := ioutil.ReadDir(confDir)
+		for _, function := range confContents {
 			//Remove link from function to config
 			if function.Mode()&os.ModeSymlink > 0 {
-				log.Println("\tRemoving function " + function.Name() + " from config " + conf_name)
-				os.Remove(conf_dir + "/" + function.Name())
+				log.Println("\tRemoving function " + function.Name() + " from config " + confName)
+				os.Remove(confDir + "/" + function.Name())
 			}
 		}
 
 		//find string directories in config
-		strings_content, _ := ioutil.ReadDir(conf_dir + "/strings")
-		for _, str := range strings_content {
-			string_dir := str.Name()
+		stringsContents, _ := ioutil.ReadDir(confDir + "/strings")
+		for _, str := range stringsContents {
+			stringDir := str.Name()
 			//Remove string from config
-			log.Println("\tRemoving string dir '" + string_dir + "' from configuration")
-			os.Remove(conf_dir + "/strings/" + string_dir)
+			log.Println("\tRemoving string dir '" + stringDir + "' from configuration")
+			os.Remove(confDir + "/strings/" + stringDir)
 		}
 
 		//Check if there's an OS descriptor refering this config
-		if _, err := os.Stat(gadget_dir + "/os_desc/" + conf_name); !os.IsNotExist(err) {
-			log.Println("\tDeleting link to '" + conf_name + "' from gadgets OS descriptor")
-			os.Remove(gadget_dir + "/os_desc/" + conf_name)
+		if _, err := os.Stat(gadgetDir + "/os_desc/" + confName); !os.IsNotExist(err) {
+			log.Println("\tDeleting link to '" + confName + "' from gadgets OS descriptor")
+			os.Remove(gadgetDir + "/os_desc/" + confName)
 		}
 
 		// remove config folder, finally
-		log.Println("\tDeleting configuration '" + conf_name + "'")
-		os.Remove(conf_dir)
+		log.Println("\tDeleting configuration '" + confName + "'")
+		os.Remove(confDir)
 	}
 
 	// remove functions
-	log.Println("Removing functions from '" + Gadget_name + "'")
-	os.RemoveAll(gadget_dir + "/functions/")
+	log.Println("Removing functions from '" + gadgetName + "'")
+	os.RemoveAll(gadgetDir + "/functions/")
 
 	//find string directories in gadget
-	strings_content, _ := ioutil.ReadDir(gadget_dir + "/strings")
-	for _, str := range strings_content {
-		string_dir := str.Name()
+	stringsContents, _ := ioutil.ReadDir(gadgetDir + "/strings")
+	for _, str := range stringsContents {
+		stringDir := str.Name()
 		//Remove string from config
-		log.Println("Removing string dir '" + string_dir + "' from " + Gadget_name)
-		os.Remove(gadget_dir + "/strings/" + string_dir)
+		log.Println("Removing string dir '" + stringDir + "' from " + gadgetName)
+		os.Remove(gadgetDir + "/strings/" + stringDir)
 	}
 
 	//And now remove the gadget itself
-	log.Println("Removing gadget " + Gadget_name)
-	os.Remove(gadget_dir)
+	log.Println("Removing gadget " + gadgetName)
+	os.Remove(gadgetDir)
 
 	return nil
 }
