@@ -67,12 +67,16 @@ func (em *EventManager) RegisterReceiver(filterEventType int64) *EventReceiver {
 		Ctx:             ctx,
 		Cancel:          cancel,
 		FilterEventType: filterEventType,
+		waitRegister: make(chan struct{}),
 	}
 
 
 
 	em.registerReceiver <- er
 	er.isRegistered = true
+
+	// wait till registration is assured
+	<-er.waitRegister
 
 	go func() {
 		<- er.Ctx.Done() //continue watching and assure unregister as soon as possible if canceled
@@ -133,6 +137,8 @@ loop:
 			em.registeredReceiversMutex.Lock()
 			em.registeredReceivers[er] = true
 			fmt.Printf("Registered event receiver type %d, overall receiver count %d\n", er.FilterEventType, len(em.registeredReceivers))
+			// signal registration by closing wait channel
+			close(er.waitRegister)
 			em.registeredReceiversMutex.Unlock()
 		case er := <- em.unregisterReceiver:
 			em.registeredReceiversMutex.Lock()
@@ -149,6 +155,7 @@ loop:
 }
 
 type EventReceiver struct {
+	waitRegister chan struct{}
 	isRegistered    bool
 	Ctx             context.Context
 	Cancel          context.CancelFunc
