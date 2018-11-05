@@ -72,7 +72,7 @@ installkali:
 	cp build/P4wnP1_service /usr/local/bin/
 	cp build/P4wnP1_cli /usr/local/bin/
 	cp dist/bin/* /usr/local/bin/
-	cp dist/P4wnP1-kali.service /etc/systemd/system/P4wnP1.service
+	cp dist/P4wnP1.service /etc/systemd/system/P4wnP1.service
 	# copy over keymaps, scripts and www data
 	mkdir -p /usr/local/P4wnP1
 	cp -R dist/keymaps /usr/local/P4wnP1/
