@@ -60,7 +60,6 @@ func (em *EventManager) Write(p []byte) (n int, err error) {
 
 func (em *EventManager) RegisterReceiver(filterEventType int64) *EventReceiver {
 	//	fmt.Println("!!!Event listener registered for " + strconv.Itoa(int(filterEventType)))
-
 	ctx, cancel := context.WithCancel(context.Background())
 	er := &EventReceiver{
 		EventQueue:      make(chan *pb.Event, 10), //allow buffering 10 events per receiver
@@ -133,11 +132,11 @@ func (em *EventManager) register_unregister() {
 loop:
 	for {
 		select {
-		case er := <- em.registerReceiver:
+		case er := <- em.registerReceiver:  // Fix: this would already unlock the RegisterReceiver method ...
 			em.registeredReceiversMutex.Lock()
-			em.registeredReceivers[er] = true
+			em.registeredReceivers[er] = true // ... but only at this point it is assured that the Listener receives events ...
 			fmt.Printf("Registered event receiver type %d, overall receiver count %d\n", er.FilterEventType, len(em.registeredReceivers))
-			// signal registration by closing wait channel
+			// ... this is solved by signaling the successful registration by closing wait channel (the registerReceiver method doesn't return before this channel is closed)
 			close(er.waitRegister)
 			em.registeredReceiversMutex.Unlock()
 		case er := <- em.unregisterReceiver:
