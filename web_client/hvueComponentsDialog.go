@@ -8,6 +8,7 @@ import (
 )
 
 func InitComponentsDialog() {
+
 	hvue.NewComponent(
 		"select-string-from-array",
 		hvue.Template(templateSelectStringModal),
@@ -22,7 +23,7 @@ func InitComponentsDialog() {
 		}),
 		hvue.Mounted(func(vm *hvue.VM) {
 			vm.Set("CurrentSelection", vm.Get("values").Index(0))
-			println("Index 0 on mount", vm.Get("values").Index(0))
+//			println("Index 0 on mount", vm.Get("values").Index(0))
 		}),
 		hvue.ComputedWithGetSet(
 			"visible",
@@ -38,7 +39,6 @@ func InitComponentsDialog() {
 			func(vm *hvue.VM) {
 				vm.Call("$emit", "load", vm.Get("CurrentSelection"))
 				//println(vm.Get("CurrentSelection"))
-
 			},
 		),
 		hvue.Method(

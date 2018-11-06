@@ -66,6 +66,7 @@ func main() {
 		VueRouterRoute("/wifi","", "<wifi></wifi>"),
 		VueRouterRoute("/triggeractions","", "<triggeraction-manager></triggeraction-manager>"),
 		VueRouterRoute("/bluetooth","", "<bluetooth></bluetooth>"),
+		VueRouterRoute("/generic","", "<generic></generic>"),
 	)
 
 
@@ -83,6 +84,7 @@ func main() {
 	InitComponentsWiFi()
 	InitComponentsTriggerActions()
 	InitComponentsBluetooth()
+	InitComponentsGeneric()
 
 	vm := hvue.NewVM(
 		hvue.El("#app"),
@@ -119,6 +121,7 @@ const templateMainApp = `
                 <q-route-tab slot="title" to="hid" name="tab-hid-script" icon="keyboard" label="HIDScript"></q-route-tab>
  <!--               <q-route-tab slot="title" to="hidjobs" name="tab-hid-jobs" icon="schedule" label="HID Events"></q-route-tab> -->
                 <q-route-tab slot="title" to="logger" name="tab-logger" icon="message" label="Event Log"></q-route-tab>
+                <q-route-tab slot="title" to="generic" name="tab-generic" icon="settings" label="Generic settings"></q-route-tab>
             </q-tabs>
         </q-layout-header>
 
