@@ -501,9 +501,9 @@ func InitComponentsTriggerActions() {
 				aData := &jsActionDeploySettingsTemplate{Object: ta.ActionData}
 				switch aData.Type {
 				case TemplateTypeFullSettings:
-					//ToDo: Implement
+					return vm.Store.Get("state").Get("StoredMasterTemplateList")
 				case TemplateTypeBluetooth:
-					//ToDo: Implement
+					return vm.Store.Get("state").Get("StoredBluetoothSettingsList")
 				case TemplateTypeUSB:
 					//return USB list
 					return vm.Store.Get("state").Get("StoredUSBSettingsList")

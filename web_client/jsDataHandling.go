@@ -14,6 +14,71 @@ import (
 var eNoLogEvent = errors.New("No log event")
 var eNoHidEvent = errors.New("No HID event")
 
+
+type jsMasterTemplate struct {
+	*js.Object
+	TemplateNameBluetooth      string   `js:"TemplateNameBluetooth"`
+	TemplateNameUSB            string   `js:"TemplateNameUSB"`
+	TemplateNameWiFi           string   `js:"TemplateNameWiFi"`
+	TemplateNameTriggerActions string   `js:"TemplateNameTriggerActions"`
+	TemplateNamesNetwork       []string `js:"TemplateNamesNetwork"`
+}
+
+func (target *jsMasterTemplate) fromGo(src *pb.MasterTemplate) {
+	target.TemplateNamesNetwork = src.TemplateNamesNetwork
+	target.TemplateNameBluetooth = src.TemplateNameBluetooth
+	target.TemplateNameWiFi = src.TemplateNameWifi
+	target.TemplateNameUSB = src.TemplateNameUsb
+	target.TemplateNameTriggerActions = src.TemplateNameTriggerActions
+}
+
+func (src *jsMasterTemplate) toGo() (target *pb.MasterTemplate) {
+	target = &pb.MasterTemplate{}
+	target.TemplateNamesNetwork = src.TemplateNamesNetwork
+	target.TemplateNameBluetooth = src.TemplateNameBluetooth
+	target.TemplateNameWifi = src.TemplateNameWiFi
+	target.TemplateNameUsb = src.TemplateNameUSB
+	target.TemplateNameTriggerActions = src.TemplateNameTriggerActions
+	return target
+}
+
+func NewMasterTemplate() (res *jsMasterTemplate) {
+	res = &jsMasterTemplate{Object: O()}
+	res.TemplateNameBluetooth = ""
+	res.TemplateNameWiFi = ""
+	res.TemplateNameUSB = ""
+	res.TemplateNameTriggerActions = ""
+	res.TemplateNamesNetwork = []string{}
+
+	return res
+}
+
+type jsRequestMasterTemplateStorage struct {
+	*js.Object
+	TemplateName string `js:"TemplateName"`
+	Template     *jsMasterTemplate `js:"Template"`
+}
+
+func (rs *jsRequestMasterTemplateStorage) toGo() *pb.RequestMasterTemplateStorage {
+	return &pb.RequestMasterTemplateStorage{
+		TemplateName: rs.TemplateName,
+		Template: rs.Template.toGo(),
+	}
+}
+
+func (rs *jsRequestMasterTemplateStorage) fromGo(src *pb.RequestMasterTemplateStorage) {
+	rs.TemplateName = src.TemplateName
+	rs.Template = NewMasterTemplate()
+	rs.Template.fromGo(src.Template)
+}
+
+func NewRequestMasterTemplateStorage() (res *jsRequestMasterTemplateStorage) {
+	res = &jsRequestMasterTemplateStorage{Object:O()}
+	res.Template = NewMasterTemplate()
+	res.TemplateName = ""
+	return res
+}
+
 type jsLoadHidScriptSourceMode int
 const (
 	HID_SCRIPT_SOURCE_LOAD_MODE_PREPEND jsLoadHidScriptSourceMode = iota

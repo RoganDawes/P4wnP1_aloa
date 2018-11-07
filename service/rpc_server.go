@@ -34,6 +34,7 @@ const (
 	cSTORE_PREFIX_ETHERNET_INTERFACE_SETTINGS      = "eis_"
 	cSTORE_PREFIX_TRIGGER_ACTION_SET = "tas_"
 	cSTORE_PREFIX_BLUETOOTH_SETTINGS = "bt_"
+	cSTORE_PREFIX_MASTER_TEMPLATE = "master_"
 )
 
 
@@ -48,6 +49,73 @@ type server struct {
 
 	listenAddrGrpc string
 	listenAddrWeb string
+}
+
+func (s *server) DeployMasterTemplate(ctx context.Context, mt *pb.MasterTemplate) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+
+	//ignore templates with name of length 0
+	if len(mt.TemplateNameTriggerActions) > 0 {
+		_,err = s.DeployStoredTriggerActionSetReplace(ctx, &pb.StringMessage{Msg: mt.TemplateNameTriggerActions})
+		if err != nil { return }
+
+	}
+
+	for _,nnw := range mt.TemplateNamesNetwork {
+		_,err = s.DeployStoredEthernetInterfaceSettings(ctx, &pb.StringMessage{Msg: nnw})
+		if err != nil { return }
+	}
+
+	if len(mt.TemplateNameBluetooth) > 0 {
+		_, err = s.DeployStoredBluetoothSettings(ctx, &pb.StringMessage{Msg: mt.TemplateNameBluetooth})
+		if err != nil { return }
+	}
+	if len(mt.TemplateNameUsb) > 0 {
+		_, err = s.DeployStoredUSBSettings(ctx, &pb.StringMessage{Msg: mt.TemplateNameUsb})
+		if err != nil { return }
+	}
+	if len(mt.TemplateNameWifi) > 0 {
+		_, err = s.DeployStoredWifiSettings(ctx, &pb.StringMessage{Msg: mt.TemplateNameWifi})
+		if err != nil {	return }
+	}
+	return
+}
+
+func (s *server) StoreMasterTemplate(ctx context.Context, r *pb.RequestMasterTemplateStorage) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_GLOBAL_SETTINGS_LIST))
+	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_MASTER_TEMPLATE + r.TemplateName, r.Template, true)
+	return
+
+}
+
+func (s *server) GetStoredMasterTemplate(ctx context.Context, templateName *pb.StringMessage) (result *pb.MasterTemplate, err error) {
+	result = &pb.MasterTemplate{}
+	err = s.rootSvc.SubSysDataStore.Get(cSTORE_PREFIX_MASTER_TEMPLATE + templateName.Msg, result)
+	return
+}
+
+func (s *server) DeployStoredMasterTemplate(ctx context.Context, templateName *pb.StringMessage) (re *pb.MasterTemplate, err error) {
+	re,err = s.GetStoredMasterTemplate(ctx,templateName)
+	if err != nil { return }
+	_,err = s.DeployMasterTemplate(ctx, re)
+	return
+}
+
+func (s *server) DeleteStoredMasterTemplate(ctx context.Context, templateName *pb.StringMessage) (e *pb.Empty, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_GLOBAL_SETTINGS_LIST))
+	e = &pb.Empty{}
+	err = s.rootSvc.SubSysDataStore.Delete(cSTORE_PREFIX_MASTER_TEMPLATE + templateName.Msg)
+	return
+}
+
+func (s *server) ListStoredMasterTemplate(ctx context.Context, e *pb.Empty) (sa *pb.StringMessageArray, err error) {
+	sa = &pb.StringMessageArray{}
+	res,err := s.rootSvc.SubSysDataStore.KeysPrefix(cSTORE_PREFIX_MASTER_TEMPLATE, true)
+	if err != nil { return sa,err }
+	sa.MsgArray = res
+	return
 }
 
 func (s *server) WaitTriggerGroupReceive(rpcCtx context.Context, triggerGR *pb.TriggerGroupReceive) (e *pb.Empty, err error) {
@@ -414,7 +482,7 @@ func (s *server) Stop() error {
 }
 
 func (s *server) StoreDeployedWifiSettings(ctx context.Context, m *pb.StringMessage) (e *pb.Empty, err error) {
-	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_WIFI_SETTINGS_LIST))
+	//defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_WIFI_SETTINGS_LIST))
 	return s.StoreWifiSettings(ctx, &pb.WifiRequestSettingsStorage{
 		Settings: s.rootSvc.SubSysWifi.State.CurrentSettings,
 		TemplateName: m.Msg,
@@ -429,7 +497,7 @@ func (s *server) DeployStoredWifiSettings(ctx context.Context, m *pb.StringMessa
 }
 
 func (s *server) StoreWifiSettings(ctx context.Context, r *pb.WifiRequestSettingsStorage) (e *pb.Empty, err error) {
-	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_WIFI))
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_STORED_WIFI_SETTINGS_LIST))
 	e = &pb.Empty{}
 	err = s.rootSvc.SubSysDataStore.Put(cSTORE_PREFIX_WIFI_SETTINGS + r.TemplateName, r.Settings, true)
 	return

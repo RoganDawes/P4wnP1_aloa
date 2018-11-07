@@ -330,7 +330,12 @@ func (tam *TriggerActionManager) executeActionDeploySettingsTemplate(evt *pb.Eve
 
 	switch action.Type {
 	case pb.ActionDeploySettingsTemplate_FULL_SETTINGS:
-		// ToDo: Implement
+		_,err := tam.rootSvc.SubSysRPC.DeployStoredMasterTemplate(context.Background(), &pb.StringMessage{Msg: action.TemplateName})
+		if err == nil {
+			fmt.Println("... stored settings deployed")
+		} else {
+			fmt.Println("... deploying stored settings failed: ", err.Error())
+		}
 	case pb.ActionDeploySettingsTemplate_NETWORK:
 		_,err := tam.rootSvc.SubSysRPC.DeployStoredEthernetInterfaceSettings(context.Background(), &pb.StringMessage{Msg: action.TemplateName})
 		if err == nil {
@@ -353,7 +358,12 @@ func (tam *TriggerActionManager) executeActionDeploySettingsTemplate(evt *pb.Eve
 			fmt.Println("... deploying stored settings failed: ", err.Error())
 		}
 	case pb.ActionDeploySettingsTemplate_BLUETOOTH:
-		// ToDo: Implement
+		_,err := tam.rootSvc.SubSysRPC.DeployStoredBluetoothSettings(context.Background(), &pb.StringMessage{Msg: action.TemplateName})
+		if err == nil {
+			fmt.Println("... stored settings deployed")
+		} else {
+			fmt.Println("... deploying stored settings failed: ", err.Error())
+		}
 	case pb.ActionDeploySettingsTemplate_TRIGGER_ACTIONS:
 		_,err := tam.rootSvc.SubSysRPC.DeployStoredTriggerActionSetReplace(context.Background(), &pb.StringMessage{Msg: action.TemplateName})
 		if err == nil {

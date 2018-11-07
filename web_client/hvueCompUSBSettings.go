@@ -121,10 +121,10 @@ const (
 				<q-card-main>
 					<div class="row gutter-sm">
 
-						<div class="col-6 col-sm""><q-btn class="fit" :loading="deploying" color="primary" @click="ApplyGadgetSettings" label="deploy" icon="launch"></q-btn></div>
-						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
-						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="UpdateFromDeployedGadgetSettings" label="reset" icon="autorenew"></q-btn></div>
-						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>
+						<div class="col-6 col-sm"><q-btn class="fit" :loading="deploying" color="primary" @click="ApplyGadgetSettings" label="deploy" icon="launch"></q-btn></div>
+						<div class="col-6 col-sm"><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
+						<div class="col-6 col-sm"><q-btn class="fit" color="secondary" @click="UpdateFromDeployedGadgetSettings" label="reset" icon="autorenew"></q-btn></div>
+						<div class="col-6 col-sm"><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>
 						<div class="col-12 col-sm"><q-btn class="fit" color="warning" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored" icon="cloud_download"></q-btn></div>
 
 					</div>

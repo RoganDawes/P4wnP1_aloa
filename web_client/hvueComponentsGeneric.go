@@ -8,26 +8,6 @@ import (
 	"strings"
 )
 
-type jsMasterTemplate struct {
-	*js.Object
-	TemplateNameBluetooth      string   `js:"TemplateNameBluetooth"`
-	TemplateNameUSB            string   `js:"TemplateNameUSB"`
-	TemplateNameWiFi           string   `js:"TemplateNameWiFi"`
-	TemplateNameTriggerActions string   `js:"TemplateNameTriggerActions"`
-	TemplateNamesNetwork       []string `js:"TemplateNamesNetwork"`
-}
-
-func NewMasterTemplate() (res *jsMasterTemplate) {
-	res = &jsMasterTemplate{Object: O()}
-	res.TemplateNameBluetooth = ""
-	res.TemplateNameWiFi = ""
-	res.TemplateNameUSB = ""
-	res.TemplateNameTriggerActions = ""
-	res.TemplateNamesNetwork = []string{}
-
-	return res
-}
-
 func InitComponentsGeneric() {
 
 	hvue.NewComponent(
@@ -48,7 +28,7 @@ func InitComponentsGeneric() {
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			data := &struct {
 				*js.Object
-				MasterTemplate *jsMasterTemplate `js:"MasterTemplate"`
+				//MasterTemplate *jsMasterTemplate `js:"MasterTemplate"`
 
 				ShowTemplateSelectBluetooth bool `js:"ShowTemplateSelectBluetooth"`
 				ShowTemplateSelectWiFi bool `js:"ShowTemplateSelectWiFi"`
@@ -56,17 +36,76 @@ func InitComponentsGeneric() {
 				ShowTemplateSelectTriggerAction bool `js:"ShowTemplateSelectTriggerAction"`
 				ShowTemplateSelectNetwork bool `js:"ShowTemplateSelectNetwork"`
 
+				ShowStoreModal bool   `js:"showStoreModal"`
+				ShowLoadModal bool   `js:"showLoadModal"`
+				ShowDeployStoredModal bool   `js:"showDeployStoredModal"`
+
+
 			}{Object: O()}
 
-			data.MasterTemplate = NewMasterTemplate()
+			//data.MasterTemplate = NewMasterTemplate()
 			data.ShowTemplateSelectBluetooth = false
 			data.ShowTemplateSelectWiFi = false
 			data.ShowTemplateSelectUSB = false
 			data.ShowTemplateSelectTriggerAction = false
 			data.ShowTemplateSelectNetwork = false
 
+			data.ShowStoreModal = false
+			data.ShowLoadModal = false
+			data.ShowDeployStoredModal = false
+
+
 			return data
 		}),
+		hvue.PropObj("value", hvue.Required),
+		hvue.ComputedWithGetSet(
+			"MasterTemplate",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("value")
+			},
+			func(vm *hvue.VM, newValue *js.Object) {
+				vm.Emit("input", newValue)
+			},
+		),
+		hvue.Method("deploy",
+			func(vm *hvue.VM, masterTemplate *jsMasterTemplate) {
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_MASTER_TEMPLATE, masterTemplate)
+			}),
+
+		hvue.Method("store",
+			func(vm *hvue.VM, name *js.Object) {
+				sReq := NewRequestMasterTemplateStorage()
+				sReq.TemplateName = name.String()
+				sReq.Template = &jsMasterTemplate{
+					Object: vm.Get("$store").Get("state").Get("CurrentMasterTemplate"),
+				}
+				println("Storing :", sReq)
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_STORE_MASTER_TEMPLATE, sReq)
+				vm.Set("showStoreModal", false)
+			}),
+		hvue.Method("load",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_LOAD_MASTER_TEMPLATE, name)
+			}),
+		hvue.Method("deleteStored",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DELETE_STORED_MASTER_TEMPLATE, name)
+			}),
+		hvue.Method("deployStored",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Loading :", name.String())
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_STORED_MASTER_TEMPLATE, name)
+			}),
+		hvue.Method("updateStoredSettingsList",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_MASTER_TEMPLATE_LIST)
+			}),
+		hvue.Mounted(func(vm *hvue.VM) {
+			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_MASTER_TEMPLATE_LIST)
+		}),
+
 	)
 	hvue.NewComponent(
 		"database",
@@ -209,19 +248,19 @@ func InitComponentsGeneric() {
 const compGeneric = `
 <q-page padding>
 	<div class="row gutter-sm">
-		<div class="col-12 col-lg">
-			<master-template />
+		<div class="col-12 col-xl">
+			<master-template v-model="$store.state.CurrentMasterTemplate" />
 		</div>
 
-		<div class="col-12 col-lg">
+		<div class="col-12 col-xl">
 			<startup-settings />
 		</div>
 
-		<div class="col-12 col-lg">
+		<div class="col-12 col-xl">
 			<system />
 		</div>
 
-		<div class="col-12 col-lg">
+		<div class="col-12 col-xl">
 			<database />
 		</div>
 
@@ -249,42 +288,144 @@ const compMasterTemplate = `
 		Master Template
 	</q-card-title>
 
-	{{ $data }}
+<!--	{{ $data }} -->
 
 	<q-card-main>
-		
+		<select-string-from-array :values="$store.state.StoredMasterTemplateList" v-model="showLoadModal" title="Load USB Master Template" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+		<select-string-from-array :values="$store.state.StoredMasterTemplateList" v-model="showDeployStoredModal" title="Deploy stored Master Template" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+		<modal-string-input v-model="showStoreModal" title="Store current Master Template" @save="store($event)"></modal-string-input>
+
 
 		<div class="row gutter-sm">
 
-			<q-item tag="label">
-<select-string-from-array :values="$store.state.StoredUSBSettingsList"  v-model="ShowTemplateSelectUSB" title="Select USB template" @load="MasterTemplate.TemplateNameUSB=$event"></select-string-from-array>
+			<div class="col-12">
+				<div class="row gutter-sm">
+					<div class="col-6 col-sm"><q-btn class="fit" color="primary" @click="deploy(MasterTemplate)" label="deploy" icon="launch"></q-btn></div>
+					<div class="col-6 col-sm"><q-btn class="fit" color="primary" @click="showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
+					<div class="col-6 col-sm"><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>
+					<div class="col-6 col-sm"><q-btn class="fit" color="warning" @click="showLoadModal=true" label="load stored" icon="cloud_download"></q-btn></div>
+
+				</div>
+			</div>
+
+
+			<!-- TriggerActions template -->
+			
+			<q-item tag="div" class="col-12">
+				<select-string-from-array :values="$store.state.StoredTriggerActionSetsList"  v-model="ShowTemplateSelectTriggerAction" title="Select TriggerActions template" @load="MasterTemplate.TemplateNameTriggerActions=$event"></select-string-from-array>
+				<q-item-side icon="whatshot" color primary />
+				<q-item-main>
+					<q-item-tile label>TriggerActions Template</q-item-tile>
+<!--
+					<q-item-tile sublabel>If not empty, the selected TriggerActions are deployed along with the master template</q-item-tile>
+-->
+					<q-item-tile>
+						<div class="row no-wrap">
+							<div class="fit">
+								<q-input v-model="MasterTemplate.TemplateNameTriggerActions" color="primary" inverted readonly clearable></q-input>
+							</div>
+							<div><q-btn icon="more" color="primary" @click="ShowTemplateSelectTriggerAction=true" flat /></div>
+							<div><q-btn v-if="MasterTemplate.TemplateNameTriggerActions.length > 0" icon="clear" color="primary" @click="MasterTemplate.TemplateNameTriggerActions=''" flat /></div>
+						</div>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+
+			<!-- USB template -->
+			<q-item tag="div" class="col-12">
+				<select-string-from-array :values="$store.state.StoredUSBSettingsList"  v-model="ShowTemplateSelectUSB" title="Select USB template" @load="MasterTemplate.TemplateNameUSB=$event"></select-string-from-array>
+				<q-item-side icon="usb" color primary />
 				<q-item-main>
 					<q-item-tile label>USB Template</q-item-tile>
+<!--
 					<q-item-tile sublabel>If not empty, the selected USB settings are deployed along with the master template</q-item-tile>
+-->
 					<q-item-tile>
-<q-input @click="ShowTemplateSelectUSB=true" v-model="MasterTemplate.TemplateNameUSB" color="primary" inverted readonly :after="[{icon: 'more_horiz', handler(){}}]"></q-input>
+						<div class="row no-wrap">
+							<div class="fit">
+								<q-input v-model="MasterTemplate.TemplateNameUSB" color="primary" inverted readonly clearable></q-input>
+							</div>
+							<div><q-btn icon="more" color="primary" @click="ShowTemplateSelectUSB=true" flat /></div>
+							<div><q-btn v-if="MasterTemplate.TemplateNameUSB.length > 0" icon="clear" color="primary" @click="MasterTemplate.TemplateNameUSB=''" flat /></div>
+						</div>
+
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
 
-			<q-item tag="label">
-<select-network-templates 
-	:values="$store.state.StoredEthernetInterfaceSettingsList" 
-	:show="ShowTemplateSelectNetwork" 
-	@show="ShowTemplateSelectNetwork=$event"
-	title="Select Network templates" 
-	v-model="MasterTemplate.TemplateNamesNetwork" 
-/>
+			<!-- WiFi template -->
+			<q-item tag="div" class="col-12">
+				<select-string-from-array :values="$store.state.StoredWifiSettingsList"  v-model="ShowTemplateSelectWiFi" title="Select WiFi template" @load="MasterTemplate.TemplateNameWiFi=$event"></select-string-from-array>
+				<q-item-side icon="wifi" color primary />
+				<q-item-main>
+					<q-item-tile label>WiFi Template</q-item-tile>
+<!--
+					<q-item-tile sublabel>If not empty, the selected WiFi settings are deployed along with the master template</q-item-tile>
+-->
+					<q-item-tile>
+						<div class="row no-wrap">
+							<div class="fit">
+								<q-input v-model="MasterTemplate.TemplateNameWiFi" color="primary" inverted readonly clearable></q-input>
+							</div>
+							<div><q-btn icon="more" color="primary" @click="ShowTemplateSelectWiFi=true" flat /></div>
+							<div><q-btn v-if="MasterTemplate.TemplateNameWiFi.length > 0" icon="clear" color="primary" @click="MasterTemplate.TemplateNameWiFi=''" flat /></div>
+						</div>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+			<!-- Bluetooth template -->
+			<q-item tag="div" class="col-12">
+				<select-string-from-array :values="$store.state.StoredBluetoothSettingsList"  v-model="ShowTemplateSelectBluetooth" title="Select Bluetooth template" @load="MasterTemplate.TemplateNameBluetooth=$event"></select-string-from-array>
+				<q-item-side icon="bluetooth" color primary />
+				<q-item-main>
+					<q-item-tile label>Bluetooth Template</q-item-tile>
+<!--
+					<q-item-tile sublabel>If not empty, the selected Bluetooth settings are deployed along with the master template</q-item-tile>
+-->
+					<q-item-tile>
+						<div class="row no-wrap">
+							<div class="fit">
+								<q-input v-model="MasterTemplate.TemplateNameBluetooth" color="primary" inverted readonly clearable></q-input>
+							</div>
+							<div><q-btn icon="more" color="primary" @click="ShowTemplateSelectBluetooth=true" flat /></div>
+							<div><q-btn v-if="MasterTemplate.TemplateNameBluetooth.length > 0" icon="clear" color="primary" @click="MasterTemplate.TemplateNameBluetooth=''" flat /></div>
+						</div>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+			<q-item tag="div" class="col-12">
+				<select-network-templates 
+					:values="$store.state.StoredEthernetInterfaceSettingsList" 
+					:show="ShowTemplateSelectNetwork" 
+					@show="ShowTemplateSelectNetwork=$event"
+					title="Select Network templates" 
+					v-model="MasterTemplate.TemplateNamesNetwork" 
+				/>
+				<q-item-side icon="settings_ethernet" color primary />
 				<q-item-main>
 					<q-item-tile label>Networks templates</q-item-tile>
+					<q-item-tile sublabel>Only one template could be selected per interface.</q-item-tile>
+<!--
 					<q-item-tile sublabel>If not empty, the selected network templates are deployed along with the master template. Only one template could be selected per interface.</q-item-tile>
+-->
 					<q-item-tile>
-<q-chips-input v-model="MasterTemplate.TemplateNamesNetwork"  color="primary" inverted :after="[{icon: 'add', handler(){ShowTemplateSelectNetwork=true}}]" />
+						<div class="row no-wrap">
+							<div class="fit">
+<!--
+								<q-chips-input v-model="MasterTemplate.TemplateNamesNetwork"  color="primary" inverted clearable />
+-->
+								<q-chips-input v-model="MasterTemplate.TemplateNamesNetwork"  color="primary" inverted readonly />
+							</div>
+							<div><q-btn icon="more" color="primary" @click="ShowTemplateSelectNetwork=true" flat /></div>
+							<div><q-btn v-if="MasterTemplate.TemplateNamesNetwork.length > 0" icon="clear" color="primary" @click="MasterTemplate.TemplateNamesNetwork=[]" flat /></div>
+						</div>
+
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
-
-
 
 		</div>
 	</q-card-main>

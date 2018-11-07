@@ -111,6 +111,19 @@ const (
 
 	VUEX_MUTATION_SET_STORED_TRIGGER_ACTIONS_SETS_LIST = "setStoredTriggerActionSetsList"
 
+	//Master templates
+	VUEX_ACTION_DEPLOY_MASTER_TEMPLATE             = "deployMasterTemplate"
+	VUEX_ACTION_UPDATE_STORED_MASTER_TEMPLATE_LIST = "updateStoredMasterTemplateList"
+	VUEX_ACTION_STORE_MASTER_TEMPLATE              = "storeMasterTemplate"
+	VUEX_ACTION_LOAD_MASTER_TEMPLATE               = "loadMasterTemplate"
+	VUEX_ACTION_DEPLOY_STORED_MASTER_TEMPLATE      = "deployStoredMasterTemplate"
+	VUEX_ACTION_DELETE_STORED_MASTER_TEMPLATE      = "deleteStoredMasterTemplate"
+
+	VUEX_MUTATION_SET_CURRENT_MASTER_TEMPLATE                = "setCurrentMasterTemplate"
+	VUEX_MUTATION_SET_STORED_MASTER_TEMPLATE_LIST = "setStoredMasterTemplateList"
+
+
+
 	//Bash scripts (used by TriggerActions)
 	VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST = "updateStoredBashScriptsList"
 
@@ -138,6 +151,7 @@ type GlobalState struct {
 	WiFiState                             *jsWiFiState                      `js:"wifiState"`
 	CurrentBluetoothControllerInformation *jsBluetoothControllerInformation `js:"CurrentBluetoothControllerInformation"`
 	CurrentBluetoothAgentSettings         *jsBluetoothAgentSettings         `js:"CurrentBluetoothAgentSettings"`
+	CurrentMasterTemplate         *jsMasterTemplate         `js:"CurrentMasterTemplate"`
 
 	StoredWifiSettingsList              []string `js:"StoredWifiSettingsList"`
 	StoredEthernetInterfaceSettingsList []string `js:"StoredEthernetInterfaceSettingsList"`
@@ -146,6 +160,7 @@ type GlobalState struct {
 	StoredHIDScriptsList                []string `js:"StoredHIDScriptsList"`
 	StoredUSBSettingsList               []string `js:"StoredUSBSettingsList"`
 	StoredBluetoothSettingsList         []string `js:"StoredBluetoothSettingsList"`
+	StoredMasterTemplateList         []string `js:"StoredMasterTemplateList"`
 
 	ConnectRetryCount            int  `js:"ConnectRetryCount"`
 	EventListenerRunning         bool `js:"EventListenerRunning"`
@@ -166,6 +181,7 @@ func createGlobalStateStruct() GlobalState {
 	state.IsConnected = false
 	state.IsModalEnabled = false
 	state.FailedConnectionAttempts = 0
+	state.CurrentMasterTemplate = NewMasterTemplate()
 
 	state.StoredWifiSettingsList = []string{}
 	state.StoredEthernetInterfaceSettingsList = []string{}
@@ -174,6 +190,7 @@ func createGlobalStateStruct() GlobalState {
 	state.StoredHIDScriptsList = []string{}
 	state.StoredUSBSettingsList = []string{}
 	state.StoredBluetoothSettingsList = []string{}
+	state.StoredMasterTemplateList = []string{}
 
 	//Retrieve Interface settings
 	state.InterfaceSettings = NewEthernetSettingsList()
@@ -230,6 +247,8 @@ func processEvent(evt *pb.Event, store *mvuex.Store, state *GlobalState) {
 			store.Dispatch(VUEX_ACTION_UPDATE_STORED_BLUETOOTH_SETTINGS_LIST)
 		case common_web.STATE_CHANGE_EVT_TYPE_STORED_TRIGGER_ACTION_SETS_LIST:
 			store.Dispatch(VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST)
+		case common_web.STATE_CHANGE_EVT_TYPE_STORED_GLOBAL_SETTINGS_LIST:
+			store.Dispatch(VUEX_ACTION_UPDATE_STORED_MASTER_TEMPLATE_LIST)
 		}
 	default:
 		// events which aren't of type "notify state change" are processed by the EventProcessor
@@ -257,6 +276,95 @@ func actionUpdateAllStates(store *mvuex.Store, context *mvuex.ActionContext, sta
 	store.Dispatch(VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST)
 
 }
+
+func actionDeployMasterTemplate(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, mt *jsMasterTemplate) {
+	go func() {
+		println("Vuex dispatch " + VUEX_ACTION_DEPLOY_MASTER_TEMPLATE)
+		// convert to Go type
+		err := RpcClient.DeployMasterTemplate(defaultTimeoutMid, mt.toGo())
+		if err != nil {
+			QuasarNotifyError("Error deploying stored master template", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("Master template deployed", "", QUASAR_NOTIFICATION_POSITION_TOP)
+	}()
+}
+
+func actionUpdateStoredMasterTemplateList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch master template list")
+		//fetch deployed gadget settings
+		mtList, err := RpcClient.GetStoredMasterTemplateList(defaultTimeout)
+		if err != nil {
+			println("Couldn't retrieve MasterTemplate list")
+			return
+		}
+
+		//commit to current
+
+		context.Commit(VUEX_MUTATION_SET_STORED_MASTER_TEMPLATE_LIST, mtList)
+	}()
+
+	return
+}
+
+func actionStoreMasterTemplate(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, req *jsRequestMasterTemplateStorage) {
+	go func() {
+		println("Vuex dispatch store MasterTemplate: ", req.TemplateName)
+		// convert to Go type
+		err := RpcClient.StoreMasterTemplate(defaultTimeout, req.toGo())
+		if err != nil {
+			QuasarNotifyError("Error storing MasterTemplate", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("New MasterTemplate stored", "", QUASAR_NOTIFICATION_POSITION_TOP)
+	}()
+}
+
+func actionLoadMasterTemplate(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, settingsName *js.Object) {
+	go func() {
+		println("Vuex dispatch load MasterTemplate: ", settingsName.String())
+		// convert to Go type
+		template, err := RpcClient.GetStoredMasterTemplate(defaultTimeout, &pb.StringMessage{Msg: settingsName.String()})
+		if err != nil {
+			QuasarNotifyError("Error fetching stored MasterTemplate", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+
+		jsMT := NewMasterTemplate()
+		jsMT.fromGo(template)
+		context.Commit(VUEX_MUTATION_SET_CURRENT_MASTER_TEMPLATE, jsMT)
+
+		QuasarNotifySuccess("New MasterTemplate loaded", "", QUASAR_NOTIFICATION_POSITION_TOP)
+	}()
+}
+
+func actionDeployStoredMasterTemplate(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, templateName *js.Object) {
+	go func() {
+		println("Vuex dispatch load MasterTemplate: ", templateName.String())
+		// convert to Go type
+		goMT, err := RpcClient.DeployStoredMasterTemplate(defaultTimeoutMid, &pb.StringMessage{Msg: templateName.String()})
+		if err != nil {
+			QuasarNotifyError("Error deploying stored MasterTemplate", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("New MasterTemplate deployed", "", QUASAR_NOTIFICATION_POSITION_TOP)
+		jsMT := NewMasterTemplate()
+		jsMT.fromGo(goMT)
+		context.Commit(VUEX_MUTATION_SET_CURRENT_MASTER_TEMPLATE, jsMT)
+	}()
+}
+
+func actionDeleteStoredMasterTemplate(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, templateName *js.Object) {
+	go func() {
+		println("Vuex dispatch delete MasterTemplate: ", templateName.String())
+		// convert to Go type
+		err := RpcClient.DeleteStoredMasterTemplate(defaultTimeout, &pb.StringMessage{Msg: templateName.String()})
+		if err != nil {
+			QuasarNotifyError("Error deleting stored MasterTemplate", err.Error(), QUASAR_NOTIFICATION_POSITION_BOTTOM)
+		}
+		QuasarNotifySuccess("MasterTemplate deleted", "", QUASAR_NOTIFICATION_POSITION_TOP)
+		actionUpdateStoredMasterTemplateList(store, context, state)
+	}()
+}
+
+
 
 func actionSendAndRunHIDScript(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, scriptContent *js.Object)  {
 	go func() {
@@ -1250,6 +1358,20 @@ func initMVuex() *mvuex.Store {
 			state.HidJobList.DeleteEntry(int64(id))
 
 		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_MASTER_TEMPLATE, func(store *mvuex.Store, state *GlobalState, newMasterTemplate *jsMasterTemplate) {
+			hvue.Set(state,"CurrentMasterTemplate", newMasterTemplate)
+		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_STORED_MASTER_TEMPLATE_LIST, func(store *mvuex.Store, state *GlobalState, mtList []interface{}) {
+			hvue.Set(state, "StoredMasterTemplateList", mtList)
+		}),
+
+
+		mvuex.Action(VUEX_ACTION_DEPLOY_MASTER_TEMPLATE, actionDeployMasterTemplate),
+		mvuex.Action(VUEX_ACTION_UPDATE_STORED_MASTER_TEMPLATE_LIST, actionUpdateStoredMasterTemplateList),
+		mvuex.Action(VUEX_ACTION_STORE_MASTER_TEMPLATE, actionStoreMasterTemplate),
+		mvuex.Action(VUEX_ACTION_LOAD_MASTER_TEMPLATE, actionLoadMasterTemplate),
+		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_MASTER_TEMPLATE, actionDeployStoredMasterTemplate),
+		mvuex.Action(VUEX_ACTION_DELETE_STORED_MASTER_TEMPLATE, actionDeleteStoredMasterTemplate),
 
 
 		mvuex.Action(VUEX_ACTION_UPDATE_ALL_STATES, actionUpdateAllStates),

@@ -100,6 +100,15 @@ service P4WNP1 {
     rpc FireActionGroupSend(ActionGroupSend) returns (Empty) {}
 
 
+    //MasterTemplates
+    rpc DeployMasterTemplate(MasterTemplate) returns (Empty) {}
+
+    rpc StoreMasterTemplate(RequestMasterTemplateStorage) returns (Empty) {}
+    rpc GetStoredMasterTemplate(StringMessage) returns (MasterTemplate) {}
+    rpc DeployStoredMasterTemplate(StringMessage) returns (MasterTemplate) {}
+    rpc DeleteStoredMasterTemplate(StringMessage) returns (Empty) {}
+    rpc ListStoredMasterTemplate(Empty) returns (StringMessageArray) {}
+
 
     // DB backup&restore
     rpc DBBackup(StringMessage) returns(Empty) {}
@@ -110,6 +119,19 @@ service P4WNP1 {
     rpc ListStoredDBBackups(Empty) returns (StringMessageArray) {}
 }
 
+/* MasterTemplates */
+message MasterTemplate {
+    string template_name_bluetooth = 1;
+    string template_name_usb = 2;
+    string template_name_wifi = 3;
+    string template_name_trigger_actions = 4;
+    repeated string template_names_network = 5;
+}
+
+message RequestMasterTemplateStorage {
+    string TemplateName = 1;
+    MasterTemplate template = 2;
+}
 
 
 /* Bluetooth */
@@ -117,8 +139,6 @@ message BluetoothRequestSettingsStorage {
     string TemplateName = 1;
     BluetoothSettings settings = 2;
 }
-
-
 
 message BluetoothSettings {
     BluetoothControllerInformation ci = 1; //Parts interpreted as settings: current_settings, name, service_network_server_nap, service_network_server_panu, service_network_server_gn
@@ -272,6 +292,16 @@ enum GPIONum {
     NUM_18 = 17;
     NUM_19 = 18;
     NUM_20 = 19;
+    NUM_21 = 20;
+    NUM_22 = 21;
+    NUM_23 = 22;
+    NUM_24 = 23;
+    NUM_25 = 24;
+    NUM_26 = 25;
+    NUM_27 = 26;
+    NUM_28 = 27;
+    NUM_29 = 28;
+    NUM_30 = 29;
 }
 message TriggerGPIOIn {
     GPIONum gpioNum = 1;

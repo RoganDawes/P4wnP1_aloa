@@ -8,6 +8,8 @@
 		grpc.proto
 
 	It has these top-level messages:
+		MasterTemplate
+		RequestMasterTemplateStorage
 		BluetoothRequestSettingsStorage
 		BluetoothSettings
 		BluetoothAgentSettings
@@ -198,6 +200,16 @@ const (
 	GPIONum_NUM_18 GPIONum = 17
 	GPIONum_NUM_19 GPIONum = 18
 	GPIONum_NUM_20 GPIONum = 19
+	GPIONum_NUM_21 GPIONum = 20
+	GPIONum_NUM_22 GPIONum = 21
+	GPIONum_NUM_23 GPIONum = 22
+	GPIONum_NUM_24 GPIONum = 23
+	GPIONum_NUM_25 GPIONum = 24
+	GPIONum_NUM_26 GPIONum = 25
+	GPIONum_NUM_27 GPIONum = 26
+	GPIONum_NUM_28 GPIONum = 27
+	GPIONum_NUM_29 GPIONum = 28
+	GPIONum_NUM_30 GPIONum = 29
 )
 
 var GPIONum_name = map[int]string{
@@ -221,6 +233,16 @@ var GPIONum_name = map[int]string{
 	17: "NUM_18",
 	18: "NUM_19",
 	19: "NUM_20",
+	20: "NUM_21",
+	21: "NUM_22",
+	22: "NUM_23",
+	23: "NUM_24",
+	24: "NUM_25",
+	25: "NUM_26",
+	26: "NUM_27",
+	27: "NUM_28",
+	28: "NUM_29",
+	29: "NUM_30",
 }
 var GPIONum_value = map[string]int{
 	"NUM_1":  0,
@@ -243,6 +265,16 @@ var GPIONum_value = map[string]int{
 	"NUM_18": 17,
 	"NUM_19": 18,
 	"NUM_20": 19,
+	"NUM_21": 20,
+	"NUM_22": 21,
+	"NUM_23": 22,
+	"NUM_24": 23,
+	"NUM_25": 24,
+	"NUM_26": 25,
+	"NUM_27": 26,
+	"NUM_28": 27,
+	"NUM_29": 28,
+	"NUM_30": 29,
 }
 
 func (x GPIONum) String() string {
@@ -421,6 +453,212 @@ var EthernetInterfaceSettings_Mode_value = map[string]int{
 
 func (x EthernetInterfaceSettings_Mode) String() string {
 	return EthernetInterfaceSettings_Mode_name[int(x)]
+}
+
+// MasterTemplates
+type MasterTemplate struct {
+	TemplateNameBluetooth      string
+	TemplateNameUsb            string
+	TemplateNameWifi           string
+	TemplateNameTriggerActions string
+	TemplateNamesNetwork       []string
+}
+
+// GetTemplateNameBluetooth gets the TemplateNameBluetooth of the MasterTemplate.
+func (m *MasterTemplate) GetTemplateNameBluetooth() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.TemplateNameBluetooth
+}
+
+// GetTemplateNameUsb gets the TemplateNameUsb of the MasterTemplate.
+func (m *MasterTemplate) GetTemplateNameUsb() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.TemplateNameUsb
+}
+
+// GetTemplateNameWifi gets the TemplateNameWifi of the MasterTemplate.
+func (m *MasterTemplate) GetTemplateNameWifi() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.TemplateNameWifi
+}
+
+// GetTemplateNameTriggerActions gets the TemplateNameTriggerActions of the MasterTemplate.
+func (m *MasterTemplate) GetTemplateNameTriggerActions() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.TemplateNameTriggerActions
+}
+
+// GetTemplateNamesNetwork gets the TemplateNamesNetwork of the MasterTemplate.
+func (m *MasterTemplate) GetTemplateNamesNetwork() (x []string) {
+	if m == nil {
+		return x
+	}
+	return m.TemplateNamesNetwork
+}
+
+// MarshalToWriter marshals MasterTemplate to the provided writer.
+func (m *MasterTemplate) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.TemplateNameBluetooth) > 0 {
+		writer.WriteString(1, m.TemplateNameBluetooth)
+	}
+
+	if len(m.TemplateNameUsb) > 0 {
+		writer.WriteString(2, m.TemplateNameUsb)
+	}
+
+	if len(m.TemplateNameWifi) > 0 {
+		writer.WriteString(3, m.TemplateNameWifi)
+	}
+
+	if len(m.TemplateNameTriggerActions) > 0 {
+		writer.WriteString(4, m.TemplateNameTriggerActions)
+	}
+
+	for _, val := range m.TemplateNamesNetwork {
+		writer.WriteString(5, val)
+	}
+
+	return
+}
+
+// Marshal marshals MasterTemplate to a slice of bytes.
+func (m *MasterTemplate) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a MasterTemplate from the provided reader.
+func (m *MasterTemplate) UnmarshalFromReader(reader jspb.Reader) *MasterTemplate {
+	for reader.Next() {
+		if m == nil {
+			m = &MasterTemplate{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.TemplateNameBluetooth = reader.ReadString()
+		case 2:
+			m.TemplateNameUsb = reader.ReadString()
+		case 3:
+			m.TemplateNameWifi = reader.ReadString()
+		case 4:
+			m.TemplateNameTriggerActions = reader.ReadString()
+		case 5:
+			m.TemplateNamesNetwork = append(m.TemplateNamesNetwork, reader.ReadString())
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a MasterTemplate from a slice of bytes.
+func (m *MasterTemplate) Unmarshal(rawBytes []byte) (*MasterTemplate, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+type RequestMasterTemplateStorage struct {
+	TemplateName string
+	Template     *MasterTemplate
+}
+
+// GetTemplateName gets the TemplateName of the RequestMasterTemplateStorage.
+func (m *RequestMasterTemplateStorage) GetTemplateName() (x string) {
+	if m == nil {
+		return x
+	}
+	return m.TemplateName
+}
+
+// GetTemplate gets the Template of the RequestMasterTemplateStorage.
+func (m *RequestMasterTemplateStorage) GetTemplate() (x *MasterTemplate) {
+	if m == nil {
+		return x
+	}
+	return m.Template
+}
+
+// MarshalToWriter marshals RequestMasterTemplateStorage to the provided writer.
+func (m *RequestMasterTemplateStorage) MarshalToWriter(writer jspb.Writer) {
+	if m == nil {
+		return
+	}
+
+	if len(m.TemplateName) > 0 {
+		writer.WriteString(1, m.TemplateName)
+	}
+
+	if m.Template != nil {
+		writer.WriteMessage(2, func() {
+			m.Template.MarshalToWriter(writer)
+		})
+	}
+
+	return
+}
+
+// Marshal marshals RequestMasterTemplateStorage to a slice of bytes.
+func (m *RequestMasterTemplateStorage) Marshal() []byte {
+	writer := jspb.NewWriter()
+	m.MarshalToWriter(writer)
+	return writer.GetResult()
+}
+
+// UnmarshalFromReader unmarshals a RequestMasterTemplateStorage from the provided reader.
+func (m *RequestMasterTemplateStorage) UnmarshalFromReader(reader jspb.Reader) *RequestMasterTemplateStorage {
+	for reader.Next() {
+		if m == nil {
+			m = &RequestMasterTemplateStorage{}
+		}
+
+		switch reader.GetFieldNumber() {
+		case 1:
+			m.TemplateName = reader.ReadString()
+		case 2:
+			reader.ReadMessage(func() {
+				m.Template = m.Template.UnmarshalFromReader(reader)
+			})
+		default:
+			reader.SkipField()
+		}
+	}
+
+	return m
+}
+
+// Unmarshal unmarshals a RequestMasterTemplateStorage from a slice of bytes.
+func (m *RequestMasterTemplateStorage) Unmarshal(rawBytes []byte) (*RequestMasterTemplateStorage, error) {
+	reader := jspb.NewReader(rawBytes)
+
+	m = m.UnmarshalFromReader(reader)
+
+	if err := reader.Err(); err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
 
 // Bluetooth
@@ -6391,6 +6629,13 @@ type P4WNP1Client interface {
 	// TriggerAction for cli (trigger group send and wait for group receive)
 	WaitTriggerGroupReceive(ctx context.Context, in *TriggerGroupReceive, opts ...grpcweb.CallOption) (*Empty, error)
 	FireActionGroupSend(ctx context.Context, in *ActionGroupSend, opts ...grpcweb.CallOption) (*Empty, error)
+	// MasterTemplates
+	DeployMasterTemplate(ctx context.Context, in *MasterTemplate, opts ...grpcweb.CallOption) (*Empty, error)
+	StoreMasterTemplate(ctx context.Context, in *RequestMasterTemplateStorage, opts ...grpcweb.CallOption) (*Empty, error)
+	GetStoredMasterTemplate(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*MasterTemplate, error)
+	DeployStoredMasterTemplate(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*MasterTemplate, error)
+	DeleteStoredMasterTemplate(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
+	ListStoredMasterTemplate(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// DB backup&restore
 	DBBackup(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	DBRestore(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
@@ -7025,6 +7270,60 @@ func (c *p4WNP1Client) FireActionGroupSend(ctx context.Context, in *ActionGroupS
 	}
 
 	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployMasterTemplate(ctx context.Context, in *MasterTemplate, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployMasterTemplate", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) StoreMasterTemplate(ctx context.Context, in *RequestMasterTemplateStorage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "StoreMasterTemplate", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetStoredMasterTemplate(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*MasterTemplate, error) {
+	resp, err := c.client.RPCCall(ctx, "GetStoredMasterTemplate", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(MasterTemplate).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployStoredMasterTemplate(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*MasterTemplate, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployStoredMasterTemplate", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(MasterTemplate).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeleteStoredMasterTemplate(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "DeleteStoredMasterTemplate", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) ListStoredMasterTemplate(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
+	resp, err := c.client.RPCCall(ctx, "ListStoredMasterTemplate", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(StringMessageArray).Unmarshal(resp)
 }
 
 func (c *p4WNP1Client) DBBackup(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {

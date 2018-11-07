@@ -29,6 +29,56 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) DeployMasterTemplate(timeout time.Duration, mt *pb.MasterTemplate) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_,err = rpc.Client.DeployMasterTemplate(ctx,mt)
+	return
+}
+
+func (rpc *Rpc) GetStoredMasterTemplateList(timeout time.Duration) (ws []string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	ma, err := rpc.Client.ListStoredMasterTemplate(ctx, &pb.Empty{})
+	if err != nil { return ws, err }
+	return ma.MsgArray, err
+}
+
+func (rpc *Rpc) StoreMasterTemplate(timeout time.Duration, req *pb.RequestMasterTemplateStorage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_, err = rpc.Client.StoreMasterTemplate(ctx, req)
+
+	return
+}
+
+func (rpc *Rpc) GetStoredMasterTemplate(timeout time.Duration, req *pb.StringMessage) (template *pb.MasterTemplate, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	template, err = rpc.Client.GetStoredMasterTemplate(ctx, req)
+
+	return
+}
+
+func (rpc *Rpc) DeployStoredMasterTemplate(timeout time.Duration, req *pb.StringMessage) (state *pb.MasterTemplate, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	state, err = rpc.Client.DeployStoredMasterTemplate(ctx, req)
+
+	return
+}
+
+func (rpc *Rpc) DeleteStoredMasterTemplate(timeout time.Duration, req *pb.StringMessage) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_, err = rpc.Client.DeleteStoredMasterTemplate(ctx, req)
+	return
+}
+
 func (rpc *Rpc) UploadContentToTempFile(timeout time.Duration, content []byte) (filename string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
