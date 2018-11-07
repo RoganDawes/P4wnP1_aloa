@@ -177,110 +177,6 @@ func (x GPIOInEdge) String() string {
 	return GPIOInEdge_name[int(x)]
 }
 
-type GPIONum int
-
-const (
-	GPIONum_NUM_1  GPIONum = 0
-	GPIONum_NUM_2  GPIONum = 1
-	GPIONum_NUM_3  GPIONum = 2
-	GPIONum_NUM_4  GPIONum = 3
-	GPIONum_NUM_5  GPIONum = 4
-	GPIONum_NUM_6  GPIONum = 5
-	GPIONum_NUM_7  GPIONum = 6
-	GPIONum_NUM_8  GPIONum = 7
-	GPIONum_NUM_9  GPIONum = 8
-	GPIONum_NUM_10 GPIONum = 9
-	GPIONum_NUM_11 GPIONum = 10
-	GPIONum_NUM_12 GPIONum = 11
-	GPIONum_NUM_13 GPIONum = 12
-	GPIONum_NUM_14 GPIONum = 13
-	GPIONum_NUM_15 GPIONum = 14
-	GPIONum_NUM_16 GPIONum = 15
-	GPIONum_NUM_17 GPIONum = 16
-	GPIONum_NUM_18 GPIONum = 17
-	GPIONum_NUM_19 GPIONum = 18
-	GPIONum_NUM_20 GPIONum = 19
-	GPIONum_NUM_21 GPIONum = 20
-	GPIONum_NUM_22 GPIONum = 21
-	GPIONum_NUM_23 GPIONum = 22
-	GPIONum_NUM_24 GPIONum = 23
-	GPIONum_NUM_25 GPIONum = 24
-	GPIONum_NUM_26 GPIONum = 25
-	GPIONum_NUM_27 GPIONum = 26
-	GPIONum_NUM_28 GPIONum = 27
-	GPIONum_NUM_29 GPIONum = 28
-	GPIONum_NUM_30 GPIONum = 29
-)
-
-var GPIONum_name = map[int]string{
-	0:  "NUM_1",
-	1:  "NUM_2",
-	2:  "NUM_3",
-	3:  "NUM_4",
-	4:  "NUM_5",
-	5:  "NUM_6",
-	6:  "NUM_7",
-	7:  "NUM_8",
-	8:  "NUM_9",
-	9:  "NUM_10",
-	10: "NUM_11",
-	11: "NUM_12",
-	12: "NUM_13",
-	13: "NUM_14",
-	14: "NUM_15",
-	15: "NUM_16",
-	16: "NUM_17",
-	17: "NUM_18",
-	18: "NUM_19",
-	19: "NUM_20",
-	20: "NUM_21",
-	21: "NUM_22",
-	22: "NUM_23",
-	23: "NUM_24",
-	24: "NUM_25",
-	25: "NUM_26",
-	26: "NUM_27",
-	27: "NUM_28",
-	28: "NUM_29",
-	29: "NUM_30",
-}
-var GPIONum_value = map[string]int{
-	"NUM_1":  0,
-	"NUM_2":  1,
-	"NUM_3":  2,
-	"NUM_4":  3,
-	"NUM_5":  4,
-	"NUM_6":  5,
-	"NUM_7":  6,
-	"NUM_8":  7,
-	"NUM_9":  8,
-	"NUM_10": 9,
-	"NUM_11": 10,
-	"NUM_12": 11,
-	"NUM_13": 12,
-	"NUM_14": 13,
-	"NUM_15": 14,
-	"NUM_16": 15,
-	"NUM_17": 16,
-	"NUM_18": 17,
-	"NUM_19": 18,
-	"NUM_20": 19,
-	"NUM_21": 20,
-	"NUM_22": 21,
-	"NUM_23": 22,
-	"NUM_24": 23,
-	"NUM_25": 24,
-	"NUM_26": 25,
-	"NUM_27": 26,
-	"NUM_28": 27,
-	"NUM_29": 28,
-	"NUM_30": 29,
-}
-
-func (x GPIONum) String() string {
-	return GPIONum_name[int(x)]
-}
-
 type GPIOOutValue int
 
 const (
@@ -2719,17 +2615,17 @@ func (m *TriggerGroupReceiveMulti) Unmarshal(rawBytes []byte) (*TriggerGroupRece
 }
 
 type TriggerGPIOIn struct {
-	GpioNum    GPIONum
+	GpioName   string
 	PullUpDown GPIOInPullUpDown
 	GpioInEdge GPIOInEdge
 }
 
-// GetGpioNum gets the GpioNum of the TriggerGPIOIn.
-func (m *TriggerGPIOIn) GetGpioNum() (x GPIONum) {
+// GetGpioName gets the GpioName of the TriggerGPIOIn.
+func (m *TriggerGPIOIn) GetGpioName() (x string) {
 	if m == nil {
 		return x
 	}
-	return m.GpioNum
+	return m.GpioName
 }
 
 // GetPullUpDown gets the PullUpDown of the TriggerGPIOIn.
@@ -2754,8 +2650,8 @@ func (m *TriggerGPIOIn) MarshalToWriter(writer jspb.Writer) {
 		return
 	}
 
-	if int(m.GpioNum) != 0 {
-		writer.WriteEnum(1, int(m.GpioNum))
+	if len(m.GpioName) > 0 {
+		writer.WriteString(1, m.GpioName)
 	}
 
 	if int(m.PullUpDown) != 0 {
@@ -2785,7 +2681,7 @@ func (m *TriggerGPIOIn) UnmarshalFromReader(reader jspb.Reader) *TriggerGPIOIn {
 
 		switch reader.GetFieldNumber() {
 		case 1:
-			m.GpioNum = GPIONum(reader.ReadEnum())
+			m.GpioName = reader.ReadString()
 		case 2:
 			m.PullUpDown = GPIOInPullUpDown(reader.ReadEnum())
 		case 3:
@@ -3064,16 +2960,16 @@ func (m *ActionLog) Unmarshal(rawBytes []byte) (*ActionLog, error) {
 }
 
 type ActionGPIOOut struct {
-	GpioNum GPIONum
-	Value   GPIOOutValue
+	GpioName string
+	Value    GPIOOutValue
 }
 
-// GetGpioNum gets the GpioNum of the ActionGPIOOut.
-func (m *ActionGPIOOut) GetGpioNum() (x GPIONum) {
+// GetGpioName gets the GpioName of the ActionGPIOOut.
+func (m *ActionGPIOOut) GetGpioName() (x string) {
 	if m == nil {
 		return x
 	}
-	return m.GpioNum
+	return m.GpioName
 }
 
 // GetValue gets the Value of the ActionGPIOOut.
@@ -3090,8 +2986,8 @@ func (m *ActionGPIOOut) MarshalToWriter(writer jspb.Writer) {
 		return
 	}
 
-	if int(m.GpioNum) != 0 {
-		writer.WriteEnum(1, int(m.GpioNum))
+	if len(m.GpioName) > 0 {
+		writer.WriteString(1, m.GpioName)
 	}
 
 	if int(m.Value) != 0 {
@@ -3117,7 +3013,7 @@ func (m *ActionGPIOOut) UnmarshalFromReader(reader jspb.Reader) *ActionGPIOOut {
 
 		switch reader.GetFieldNumber() {
 		case 1:
-			m.GpioNum = GPIONum(reader.ReadEnum())
+			m.GpioName = reader.ReadString()
 		case 2:
 			m.Value = GPIOOutValue(reader.ReadEnum())
 		default:
@@ -6642,6 +6538,8 @@ type P4WNP1Client interface {
 	ListStoredHIDScripts(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	ListStoredBashScripts(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	ListStoredDBBackups(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
+	// GPIO
+	GetAvailableGpios(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 }
 
 type p4WNP1Client struct {
@@ -7364,6 +7262,15 @@ func (c *p4WNP1Client) ListStoredBashScripts(ctx context.Context, in *Empty, opt
 
 func (c *p4WNP1Client) ListStoredDBBackups(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
 	resp, err := c.client.RPCCall(ctx, "ListStoredDBBackups", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(StringMessageArray).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) GetAvailableGpios(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
+	resp, err := c.client.RPCCall(ctx, "GetAvailableGpios", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}

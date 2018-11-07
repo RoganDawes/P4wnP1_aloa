@@ -123,6 +123,9 @@ const (
 	VUEX_MUTATION_SET_STORED_MASTER_TEMPLATE_LIST = "setStoredMasterTemplateList"
 
 
+	//GPIO
+	VUEX_ACTION_UPDATE_GPIO_NAMES_LIST = "updateGpioNamesList"
+	VUEX_MUTATION_SET_GPIO_NAMES_LIST = "setStoredGpioNamesList"
 
 	//Bash scripts (used by TriggerActions)
 	VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST = "updateStoredBashScriptsList"
@@ -161,6 +164,7 @@ type GlobalState struct {
 	StoredUSBSettingsList               []string `js:"StoredUSBSettingsList"`
 	StoredBluetoothSettingsList         []string `js:"StoredBluetoothSettingsList"`
 	StoredMasterTemplateList         []string `js:"StoredMasterTemplateList"`
+	GpioNamesList         []string `js:"GpioNamesList"`
 
 	ConnectRetryCount            int  `js:"ConnectRetryCount"`
 	EventListenerRunning         bool `js:"EventListenerRunning"`
@@ -191,6 +195,7 @@ func createGlobalStateStruct() GlobalState {
 	state.StoredUSBSettingsList = []string{}
 	state.StoredBluetoothSettingsList = []string{}
 	state.StoredMasterTemplateList = []string{}
+	state.GpioNamesList = []string{}
 
 	//Retrieve Interface settings
 	state.InterfaceSettings = NewEthernetSettingsList()
@@ -276,6 +281,26 @@ func actionUpdateAllStates(store *mvuex.Store, context *mvuex.ActionContext, sta
 	store.Dispatch(VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST)
 
 }
+
+func actionUpdateGpioNamesList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch GPIO names list")
+		//fetch deployed gadget settings
+		gpioList, err := RpcClient.GetGpioNamesList(defaultTimeout)
+		if err != nil {
+			println("Couldn't retrieve GPIO names list")
+			return
+		}
+
+		//commit to current
+
+		context.Commit(VUEX_MUTATION_SET_GPIO_NAMES_LIST, gpioList)
+	}()
+
+	return
+}
+
+
 
 func actionDeployMasterTemplate(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, mt *jsMasterTemplate) {
 	go func() {
@@ -1364,7 +1389,12 @@ func initMVuex() *mvuex.Store {
 		mvuex.Mutation(VUEX_MUTATION_SET_STORED_MASTER_TEMPLATE_LIST, func(store *mvuex.Store, state *GlobalState, mtList []interface{}) {
 			hvue.Set(state, "StoredMasterTemplateList", mtList)
 		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_GPIO_NAMES_LIST, func(store *mvuex.Store, state *GlobalState, mtList []interface{}) {
+			hvue.Set(state, "GpioNamesList", mtList)
+		}),
 
+
+		mvuex.Action(VUEX_ACTION_UPDATE_GPIO_NAMES_LIST, actionUpdateGpioNamesList),
 
 		mvuex.Action(VUEX_ACTION_DEPLOY_MASTER_TEMPLATE, actionDeployMasterTemplate),
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_MASTER_TEMPLATE_LIST, actionUpdateStoredMasterTemplateList),
@@ -1498,6 +1528,7 @@ func initMVuex() *mvuex.Store {
 
 	store.Dispatch(VUEX_ACTION_START_EVENT_LISTEN)
 
+	store.Dispatch(VUEX_ACTION_UPDATE_GPIO_NAMES_LIST) //Should be done one time at store start (not intended to change)
 /*
 	// fetch deployed gadget settings
 	store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS)

@@ -78,19 +78,20 @@ func generateSelectOptionsGPIOOutValue() *js.Object {
 	return tts
 }
 
-func generateSelectOptionsGPIONum() *js.Object {
+func generateSelectOptionsGPIONames(vm *hvue.VM) *js.Object {
 	tts := js.Global.Get("Array").New()
 	type option struct {
 		*js.Object
 		Label string `js:"label"`
-		Value GPIONum `js:"value"`
+		Value string `js:"value"`
 	}
 
-	for _, value := range availableGPIONums {
-		label := gpioNumNames[value]
+	gpioNames := vm.Store.Get("state").Get("GpioNamesList")
+	for i := 0; i < gpioNames.Length(); i++ {
+		gpioName := gpioNames.Index(i).String()
 		o := option{Object:O()}
-		o.Value = value
-		o.Label = label
+		o.Value = gpioName
+		o.Label = gpioName
 		tts.Call("push", o)
 	}
 	return tts
@@ -283,7 +284,7 @@ func InitComponentsTriggerActions() {
 			case ta.IsTriggerGPIOIn():
 				t := jsTriggerGPIOIn{Object: ta.TriggerData}
 				strTrigger += " ("
-				strTrigger += gpioNumNames[t.GpioNum]
+				strTrigger += t.GpioName
 				strTrigger += ": " + gpioInEdgeNames[t.Edge]
 				strTrigger += ", resistor: " + gpioInPullUpDownNames[t.PullUpDown]
 				strTrigger += ")"
@@ -304,7 +305,7 @@ func InitComponentsTriggerActions() {
 			case ta.IsActionGPIOOut():
 				a := jsActionGPIOOut{Object: ta.ActionData}
 				strAction += " ("
-				strAction += gpioNumNames[a.GpioNum]
+				strAction += a.GpioName
 				strAction += ": " + gpioOutValueNames[a.Value]
 				strAction += ")"
 			case ta.IsActionBashScript():
@@ -392,8 +393,8 @@ func InitComponentsTriggerActions() {
 		hvue.Computed("edge", func(vm *hvue.VM) interface{} {
 			return generateSelectOptionsGPIOInEdges()
 		}),
-		hvue.Computed("gpionum", func(vm *hvue.VM) interface{} {
-			return generateSelectOptionsGPIONum()
+		hvue.Computed("gpioname", func(vm *hvue.VM) interface{} {
+			return generateSelectOptionsGPIONames(vm)
 		}),
 		hvue.ComputedWithGetSet(
 			"triggerType",
@@ -554,8 +555,8 @@ func InitComponentsTriggerActions() {
 		hvue.Computed("gpiooutvalues", func(vm *hvue.VM) interface{} {
 			return generateSelectOptionsGPIOOutValue()
 		}),
-		hvue.Computed("gpionum", func(vm *hvue.VM) interface{} {
-			return generateSelectOptionsGPIONum()
+		hvue.Computed("gpioname", func(vm *hvue.VM) interface{} {
+			return generateSelectOptionsGPIONames(vm)
 		}),
 		hvue.Computed("templatetypes", func(vm *hvue.VM) interface{} {
 			return generateSelectOptionsTemplateTypes()
@@ -742,7 +743,7 @@ const templateTrigger = `
 					<q-item-tile label>GPIO Number</q-item-tile>
 					<q-item-tile sublabel>The number of the GPIO to monitor</q-item-tile>
 					<q-item-tile>
-						<q-select v-model="ta.TriggerData.GpioNum" :options="gpionum" inverted :disable="!ta.IsActive"></q-select>
+						<q-select v-model="ta.TriggerData.GpioName" :options="gpioname" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
@@ -810,7 +811,7 @@ const templateAction = `
 					<q-item-tile label>GPIO Number</q-item-tile>
 					<q-item-tile sublabel>The number of the GPIO to output on</q-item-tile>
 					<q-item-tile>
-						<q-select v-model="ta.ActionData.GpioNum" :options="gpionum" color="secondary" inverted :disable="!ta.IsActive"></q-select>
+						<q-select v-model="ta.ActionData.GpioName" :options="gpioname" color="secondary" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>

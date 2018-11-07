@@ -121,6 +121,7 @@ type Service struct {
 	SubSysBluetooth      *BtService
 	SubSysRPC            *server
 	SubSysTriggerActions *TriggerActionManager
+	SubSysGpio *GpioManager
 
 	SubSysDwc2ConnectWatcher *Dwc2ConnectWatcher
 }
@@ -148,11 +149,15 @@ func NewService() (svc *Service, err error) {
 
 	svc.SubSysWifi = NewWifiService(svc) //Depends on NetworkSubSys
 
-	svc.SubSysTriggerActions = NewTriggerActionManager(svc) //Depends on EventManager, UsbGadgetManager (to trigger HID scripts)
+	svc.SubSysGpio = NewGpioManager(svc) //Depends on event subsys
+
+	svc.SubSysTriggerActions = NewTriggerActionManager(svc) //Depends on EventManager, UsbGadgetManager (to trigger HID scripts) and GpioManager
 
 	svc.SubSysDwc2ConnectWatcher = NewDwc2ConnectWatcher(svc) // Depends on EventManager, should be started before USB gadget settings are deployed (to avoid missing initial state change)
 
 	svc.SubSysBluetooth = NewBtService(svc, time.Second * 120) //Depends on NetworkSubSys (try to bring up bluetooth for up to 120s in background)
+
+
 
 	svc.SubSysRPC = NewRpcServerService(svc) //Depends on all other
 	return
@@ -163,6 +168,7 @@ func (s *Service) Start() {
 
 	s.SubSysEvent.Start()
 	s.SubSysDwc2ConnectWatcher.Start()
+	s.SubSysGpio.Start()
 	s.SubSysLed.Start()
 	s.SubSysRPC.StartRpcServerAndWeb("0.0.0.0", "50051", "8000", PATH_WEBROOT) //start gRPC service
 	log.Println("Starting TriggerAction event listener ...")
@@ -192,7 +198,7 @@ func (s *Service) Start() {
 func (s *Service) Stop() {
 	s.SubSysTriggerActions.Stop()
 	s.SubSysLed.Stop()
-
+	s.SubSysGpio.Stop()
 	s.SubSysBluetooth.Stop()
 	s.SubSysDwc2ConnectWatcher.Stop()
 	s.SubSysEvent.Stop()

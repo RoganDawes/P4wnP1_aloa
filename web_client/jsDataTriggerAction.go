@@ -114,7 +114,7 @@ func (dst *jsTriggerAction) fromGo(src *pb.TriggerAction) {
 		dst.ChangeActionType(ActionGPIOOut)
 		dstAction := &jsActionGPIOOut{Object: dst.ActionData}
 		dstAction.Value = GPIOOutValue(srcAction.GpioOut.Value)
-		dstAction.GpioNum = GPIONum(srcAction.GpioOut.GpioNum)
+		dstAction.GpioName = srcAction.GpioOut.GpioName
 	case *pb.TriggerAction_GroupSend:
 		dst.ChangeActionType(ActionGroupSend)
 		dstAction := &jsActionGroupSend{Object: dst.ActionData}
@@ -146,7 +146,7 @@ func (dst *jsTriggerAction) fromGo(src *pb.TriggerAction) {
 	case *pb.TriggerAction_GpioIn:
 		dst.ChangeTriggerType(TriggerGPIOIn)
 		dstTrigger := &jsTriggerGPIOIn{Object: dst.TriggerData}
-		dstTrigger.GpioNum = GPIONum(srcTrigger.GpioIn.GpioNum)
+		dstTrigger.GpioName = srcTrigger.GpioIn.GpioName
 		dstTrigger.Edge = GPIOInEdge(srcTrigger.GpioIn.GpioInEdge)
 		dstTrigger.PullUpDown = GPIOInPullUpDown(srcTrigger.GpioIn.PullUpDown)
 	case *pb.TriggerAction_GroupReceive:
@@ -206,7 +206,7 @@ func (ta *jsTriggerAction) toGo() (res *pb.TriggerAction) {
 		actionData := &jsActionGPIOOut{Object: ta.ActionData}
 		res.Action = &pb.TriggerAction_GpioOut{
 			GpioOut: &pb.ActionGPIOOut{
-				GpioNum: pb.GPIONum(actionData.GpioNum),
+				GpioName: actionData.GpioName,
 				Value: pb.GPIOOutValue(actionData.Value),
 			},
 		}
@@ -261,7 +261,7 @@ func (ta *jsTriggerAction) toGo() (res *pb.TriggerAction) {
 		triggerData := &jsTriggerGPIOIn{Object: ta.TriggerData}
 		res.Trigger = &pb.TriggerAction_GpioIn{
 			GpioIn: &pb.TriggerGPIOIn{
-				GpioNum: pb.GPIONum(triggerData.GpioNum),
+				GpioName: triggerData.GpioName,
 				PullUpDown: pb.GPIOInPullUpDown(triggerData.PullUpDown),
 				GpioInEdge: pb.GPIOInEdge(triggerData.Edge),
 			},
@@ -314,7 +314,7 @@ func (ta *jsTriggerAction) ChangeActionType(newAt actionType) {
 		data = d.Object
 	case ActionGPIOOut:
 		d := &jsActionGPIOOut{Object:O()}
-		d.GpioNum = 1
+		d.GpioName = ""
 		d.Value = GPIOOutValueHigh
 		data = d.Object
 	case ActionGroupSend:
@@ -381,7 +381,7 @@ func (ta *jsTriggerAction) ChangeTriggerType(newTt triggerType) {
 	case TriggerGPIOIn:
 		d := &jsTriggerGPIOIn{Object:O()}
 		d.Edge = GPIOInEdgeRising
-		d.GpioNum = 2
+		d.GpioName = ""
 		d.PullUpDown = GPIOInPullUp
 		data = d.Object
 	case TriggerGroupReceive:
@@ -505,7 +505,7 @@ var availableGroupReceiveMulti = []GroupReceiveMultiType{GroupReceiveMultiType_S
 
 type jsTriggerGPIOIn struct {
 	*js.Object
-	GpioNum GPIONum `js:"GpioNum"`
+	GpioName string `js:"GpioName"`
 	PullUpDown GPIOInPullUpDown `js:"PullUpDown"` //PullUp resistor, pull down otherwise
 	Edge GPIOInEdge `js:"Edge"` // 0 == GPIO.RISING, 1 == GPIO.FALLING, every value > 1 == GPIO.BOTH
 }
@@ -546,7 +546,7 @@ type jsActionDeploySettingsTemplate struct {
 }
 type jsActionGPIOOut struct {
 	*js.Object
-	GpioNum GPIONum `js:"GpioNum"`
+	GpioName string `js:"GpioName"`
 	Value GPIOOutValue `js:"Value"` //PullUp resistor, pull down otherwise
 }
 type GPIOOutValue int
@@ -570,53 +570,6 @@ type jsActionLog struct {
 	*js.Object
 }
 
-type GPIONum int
-const GPIO_NUM_1 = GPIONum(pb.GPIONum_NUM_1)
-const GPIO_NUM_2 = GPIONum(pb.GPIONum_NUM_2)
-const GPIO_NUM_3 = GPIONum(pb.GPIONum_NUM_3)
-const GPIO_NUM_4 = GPIONum(pb.GPIONum_NUM_4)
-const GPIO_NUM_5 = GPIONum(pb.GPIONum_NUM_5)
-const GPIO_NUM_6 = GPIONum(pb.GPIONum_NUM_6)
-const GPIO_NUM_7 = GPIONum(pb.GPIONum_NUM_7)
-const GPIO_NUM_8 = GPIONum(pb.GPIONum_NUM_8)
-const GPIO_NUM_9 = GPIONum(pb.GPIONum_NUM_9)
-const GPIO_NUM_10 = GPIONum(pb.GPIONum_NUM_10)
-const GPIO_NUM_11 = GPIONum(pb.GPIONum_NUM_11)
-const GPIO_NUM_12 = GPIONum(pb.GPIONum_NUM_12)
-const GPIO_NUM_13 = GPIONum(pb.GPIONum_NUM_13)
-const GPIO_NUM_14 = GPIONum(pb.GPIONum_NUM_14)
-const GPIO_NUM_15 = GPIONum(pb.GPIONum_NUM_15)
-const GPIO_NUM_16 = GPIONum(pb.GPIONum_NUM_16)
-const GPIO_NUM_17 = GPIONum(pb.GPIONum_NUM_17)
-const GPIO_NUM_18 = GPIONum(pb.GPIONum_NUM_18)
-const GPIO_NUM_19 = GPIONum(pb.GPIONum_NUM_19)
-const GPIO_NUM_20 = GPIONum(pb.GPIONum_NUM_20)
-var gpioNumNames = map[GPIONum]string{
-	GPIO_NUM_1: "GPIO 1",
-	GPIO_NUM_2: "GPIO 2",
-	GPIO_NUM_3: "GPIO 3",
-	GPIO_NUM_4: "GPIO 4",
-	GPIO_NUM_5: "GPIO 5",
-	GPIO_NUM_6: "GPIO 6",
-	GPIO_NUM_7: "GPIO 7",
-	GPIO_NUM_8: "GPIO 8",
-	GPIO_NUM_9: "GPIO 9",
-	GPIO_NUM_10: "GPIO 10",
-	GPIO_NUM_11: "GPIO 11",
-	GPIO_NUM_12: "GPIO 12",
-	GPIO_NUM_13: "GPIO 13",
-	GPIO_NUM_14: "GPIO 14",
-	GPIO_NUM_15: "GPIO 15",
-	GPIO_NUM_16: "GPIO 16",
-	GPIO_NUM_17: "GPIO 17",
-	GPIO_NUM_18: "GPIO 18",
-	GPIO_NUM_19: "GPIO 19",
-	GPIO_NUM_20: "GPIO 20",
-}
-var availableGPIONums = []GPIONum{
-	GPIO_NUM_1, GPIO_NUM_2, GPIO_NUM_3, GPIO_NUM_4, GPIO_NUM_5, GPIO_NUM_6, GPIO_NUM_7, GPIO_NUM_8, GPIO_NUM_9, GPIO_NUM_10,
-	GPIO_NUM_11, GPIO_NUM_12, GPIO_NUM_13, GPIO_NUM_14, GPIO_NUM_15, GPIO_NUM_16, GPIO_NUM_17, GPIO_NUM_18, GPIO_NUM_19, GPIO_NUM_20,
-}
 
 type TemplateType int
 const TemplateTypeFullSettings = TemplateType(pb.ActionDeploySettingsTemplate_FULL_SETTINGS)

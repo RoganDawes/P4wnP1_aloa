@@ -51,6 +51,12 @@ type server struct {
 	listenAddrWeb string
 }
 
+func (s *server) GetAvailableGpios(context.Context, *pb.Empty) (res *pb.StringMessageArray, err error) {
+	res = &pb.StringMessageArray{}
+	res.MsgArray,err = s.rootSvc.SubSysGpio.GetAvailableGpioNames()
+	return
+}
+
 func (s *server) DeployMasterTemplate(ctx context.Context, mt *pb.MasterTemplate) (e *pb.Empty, err error) {
 	e = &pb.Empty{}
 

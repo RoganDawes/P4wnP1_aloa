@@ -252,8 +252,18 @@ func (tam *TriggerActionManager) onUsbGadgetDisconnected(evt *pb.Event, ta *pb.T
 }
 
 func (tam *TriggerActionManager) onGpioIn(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType) error {
-	//ToDo: only trigger if PIN matches, important: Enum values have to be parsed for matching (0 != PIN0)
+	evtGpioName, evtGpioLevel,err := DeconstructEventTriggerGpioIn(evt)
+	if err != nil { return err }
+
+	taGpioName := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioName
+
+	if taGpioName != evtGpioName {
+		return nil // ignore
+	}
+
 	tam.executeAction(evt, ta, tt, at)
+	fmt.Printf("Gpio in trigger '%s' new state: %v\n", evtGpioName, evtGpioLevel)
+
 	return nil
 }
 
@@ -380,10 +390,10 @@ func (tam *TriggerActionManager) executeActionGPIOOut(evt *pb.Event, ta *pb.Trig
 	triggerName := triggerTypeString[tt]
 	actionName := actionTypeString[at]
 
-	gpioNumName := pb.GPIONum_name[int32(action.GpioNum)]
+	gpioNumName := action.GpioName
 	fmt.Printf("Trigger '%s' fired -> executing action '%s' ('%s')\n", triggerName, actionName, gpioNumName)
 
-	// ToDo: Implement
+	tam.rootSvc.SubSysGpio.FireGpioAction(action)
 }
 
 func (tam *TriggerActionManager) executeActionGroupSend(evt *pb.Event, ta *pb.TriggerAction, tt triggerType, at actionType, action *pb.ActionGroupSend) {
@@ -408,9 +418,14 @@ func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *
 
 	switch tt {
 	case triggerTypeGpioIn:
-		gpioPin := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioNum
-		gpioPinName := pb.GPIONum_name[int32(gpioPin)]
+		gpioPinName := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioName
 		preScript += fmt.Sprintf("var GPIO_PIN='%s';\n", gpioPinName)
+		_,level,_ := DeconstructEventTriggerGpioIn(evt)
+		if level {
+			preScript += fmt.Sprintf("var GPIO_LEVEL=true;\n")
+		} else {
+			preScript += fmt.Sprintf("var GPIO_LEVEL=false;\n")
+		}
 	case triggerTypeGroupReceiveMulti:
 		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.GroupName
 		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.Values
@@ -479,9 +494,14 @@ func (tam *TriggerActionManager) executeActionBashScript(evt *pb.Event, ta *pb.T
 
 	switch tt {
 	case triggerTypeGpioIn:
-		gpioPin := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioNum
-		gpioPinName := pb.GPIONum_name[int32(gpioPin)]
+		gpioPinName := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioName
 		env = append(env, fmt.Sprintf("GPIO_PIN=%s", gpioPinName))
+		_,level,_ := DeconstructEventTriggerGpioIn(evt)
+		if level {
+			env = append(env, fmt.Sprintf("GPIO_LEVEL='HIGH'"))
+		} else {
+			env = append(env, fmt.Sprintf("GPIO_LEVEL='LOW'"))
+		}
 	case triggerTypeGroupReceiveMulti:
 		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.GroupName
 		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.Values
@@ -533,9 +553,9 @@ func (tam *TriggerActionManager) executeActionLog(evt *pb.Event, ta *pb.TriggerA
 
 	switch tt {
 	case triggerTypeGpioIn:
-		gpioPin := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioNum
-		gpioPinName := pb.GPIONum_name[int32(gpioPin)]
-		logMessage += fmt.Sprintf(" (GPIO_PIN=%s)", gpioPinName)
+		gpioPinName := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioName
+		_,level,_ := DeconstructEventTriggerGpioIn(evt)
+		logMessage += fmt.Sprintf(" (GPIO_PIN=%s GPIO_HIGH=%v)", gpioPinName, level)
 	case triggerTypeGroupReceiveMulti:
 		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.GroupName
 		values := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.Values
@@ -634,6 +654,11 @@ func (tam *TriggerActionManager) AddTriggerAction(ta *pb.TriggerAction) (taAdded
 		}
 
 		tam.groupReceiveSequenceCheckersMutex.Unlock()
+	}
+
+	//if trigger is GpioIn, configure GPIO
+	if triggerGpioIn,match := ta.Trigger.(*pb.TriggerAction_GpioIn); match {
+		tam.rootSvc.SubSysGpio.DeployGpioTrigger(triggerGpioIn.GpioIn)
 	}
 
 	return taAdded,nil

@@ -254,6 +254,39 @@ func ConstructEventTriggerGroupReceive(groupName string, value int32) *pb.Event 
 	}
 }
 
+func ConstructEventTriggerGpioIn(gpioName string, level bool) *pb.Event {
+	return &pb.Event{
+		Type: common_web.EVT_TRIGGER,
+		Values: []*pb.EventValue{
+			{Val: &pb.EventValue_Tint64{Tint64: int64(common_web.TRIGGER_EVT_TYPE_GPIO_IN)}},
+			{Val: &pb.EventValue_Tstring{Tstring: gpioName}},
+			{Val: &pb.EventValue_Tbool{Tbool: level}},
+		},
+	}
+}
+
+func DeconstructEventTriggerGpioIn(evt *pb.Event) (gpioName string, level bool, err error) {
+	e := errors.New("Malformed GpioEvent")
+	if evt.Type != common_web.EVT_TRIGGER {
+		err = e
+		return
+	}
+	if evTypeInt64,match := evt.Values[0].Val.(*pb.EventValue_Tint64); !match {
+		err = e
+		return
+	} else {
+		evType := common_web.EvtTriggerType(evTypeInt64.Tint64)
+		if evType != common_web.TRIGGER_EVT_TYPE_GPIO_IN {
+			err = e
+			return
+		}
+	}
+
+	gpioName = evt.Values[1].GetTstring()
+	level = evt.Values[2].GetTbool()
+	return
+}
+
 func DeconstructEventTriggerGroupReceive(evt *pb.Event) (groupName string, value int32, err error) {
 	e := errors.New("Malformed GroupReceiveEvent")
 	if evt.Type != common_web.EVT_TRIGGER {
