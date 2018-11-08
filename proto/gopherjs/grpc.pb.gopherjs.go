@@ -6517,6 +6517,7 @@ type P4WNP1Client interface {
 	DeployTriggerActionSetReplace(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	DeployTriggerActionSetAdd(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	DeployTriggerActionSetRemove(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
+	DeployTriggerActionSetUpdate(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
 	ListStoredTriggerActionSets(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	StoreTriggerActionSet(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*Empty, error)
 	DeployStoredTriggerActionSetReplace(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*TriggerActionSet, error)
@@ -7100,6 +7101,15 @@ func (c *p4WNP1Client) DeployTriggerActionSetAdd(ctx context.Context, in *Trigge
 
 func (c *p4WNP1Client) DeployTriggerActionSetRemove(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*TriggerActionSet, error) {
 	resp, err := c.client.RPCCall(ctx, "DeployTriggerActionSetRemove", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(TriggerActionSet).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) DeployTriggerActionSetUpdate(ctx context.Context, in *TriggerActionSet, opts ...grpcweb.CallOption) (*TriggerActionSet, error) {
+	resp, err := c.client.RPCCall(ctx, "DeployTriggerActionSetUpdate", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}

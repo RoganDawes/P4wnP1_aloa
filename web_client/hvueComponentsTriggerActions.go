@@ -346,11 +346,17 @@ func InitComponentsTriggerActions() {
 		hvue.Method(
 			"updateTA",
 			func(vm *hvue.VM) {
-				println("update ta: ", vm.Get("ta"))
+				ta_obj := vm.Get("ta")
+				println("update ta: ", ta_obj)
+/*
 				//Replace the whole TriggerActionSet of server with the current one from vuex store
 				// ToDo: This has to be changed to update a single action (inconssistnecy with multiple clients, all TA IDs change, overhead of transferring a whole set) -> has to be implemented like deleteTA logic
 				currentTas := vm.Get("$store").Get("state").Get("triggerActionList") //Current TriggerActionSet of ViewModel
 				vm.Get("$store").Call("dispatch", VUEX_ACTION_DEPLOY_TRIGGER_ACTION_SET_REPLACE, currentTas)
+*/
+				updateTas := NewTriggerActionSet()
+				updateTas.UpdateEntry(&jsTriggerAction{Object: ta_obj})
+				vm.Get("$store").Call("dispatch", VUEX_ACTION_UPDATE_TRIGGER_ACTIONS, updateTas)
 			}),
 		hvue.Method(
 			"cancelUpdateTA",

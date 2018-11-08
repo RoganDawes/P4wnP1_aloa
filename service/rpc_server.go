@@ -51,6 +51,19 @@ type server struct {
 	listenAddrWeb string
 }
 
+func (s *server) DeployTriggerActionSetUpdate(ctx context.Context, updateTas *pb.TriggerActionSet) (resultingTas *pb.TriggerActionSet, err error) {
+	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_TRIGGER_ACTIONS))
+	for _, updateTa := range updateTas.TriggerActions {
+		// try to find the trigger action to update by ID
+		if s.rootSvc.SubSysTriggerActions.UpdateTriggerAction(updateTa, false) != nil {
+			// coudln't find the given action, return with error
+			return &s.rootSvc.SubSysTriggerActions.registeredTriggerActions,errors.New(fmt.Sprintf("Couldn't find trigger action with id %d", updateTa.Id))
+		}
+	}
+	resultingTas = &s.rootSvc.SubSysTriggerActions.registeredTriggerActions
+	return
+}
+
 func (s *server) GetAvailableGpios(context.Context, *pb.Empty) (res *pb.StringMessageArray, err error) {
 	res = &pb.StringMessageArray{}
 	res.MsgArray,err = s.rootSvc.SubSysGpio.GetAvailableGpioNames()

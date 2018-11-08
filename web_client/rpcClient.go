@@ -563,6 +563,13 @@ func (rpc *Rpc) DeployTriggerActionsSetRemove(timeout time.Duration, set *pb.Tri
 	return rpc.Client.DeployTriggerActionSetRemove(ctx, set)
 }
 
+func (rpc *Rpc) DeployTriggerActionsSetUpdate(timeout time.Duration, set *pb.TriggerActionSet) (res *pb.TriggerActionSet, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	return rpc.Client.DeployTriggerActionSetUpdate(ctx, set)
+}
+
 func (rpc *Rpc) DeployTriggerActionsSetAdd(timeout time.Duration, set *pb.TriggerActionSet) (res *pb.TriggerActionSet, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

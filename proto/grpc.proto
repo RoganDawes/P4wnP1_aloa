@@ -88,6 +88,7 @@ service P4WNP1 {
     rpc DeployTriggerActionSetReplace(TriggerActionSet) returns (TriggerActionSet) {} // Replaces registered TriggerActions with given set, returns a set ONLY OF ADDED TriggerActions (with assigned IDs)
     rpc DeployTriggerActionSetAdd(TriggerActionSet) returns (TriggerActionSet) {} //  Adds a set of additional TriggerActions, returns a set of all Triggeractions registered afterwards
     rpc DeployTriggerActionSetRemove(TriggerActionSet) returns (TriggerActionSet) {} // Removes registered TriggerActions from given set, returns a set ONLY OF REMOVED TriggerActions (with assigned IDs)
+    rpc DeployTriggerActionSetUpdate(TriggerActionSet) returns (TriggerActionSet) {} // Updates already registered TriggerActions from given set, returns aall regitered TriggerActions
 
     rpc ListStoredTriggerActionSets(Empty) returns (StringMessageArray) {}
     rpc StoreTriggerActionSet(TriggerActionSet) returns (Empty) {}

@@ -101,6 +101,7 @@ const (
 	VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER = "updateCurrentTriggerActionsFromServer"
 	VUEX_ACTION_ADD_NEW_TRIGGER_ACTION                     = "addTriggerAction"
 	VUEX_ACTION_REMOVE_TRIGGER_ACTIONS                     = "removeTriggerActions"
+	VUEX_ACTION_UPDATE_TRIGGER_ACTIONS                     = "updateTriggerActions"
 	VUEX_ACTION_STORE_TRIGGER_ACTION_SET                   = "storeTriggerActionSet"
 	VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST     = "updateStoredTriggerActionSetsList"
 	VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_REPLACE   = "deployStoredTriggerActionSetReplace"
@@ -1169,6 +1170,28 @@ func actionAddNewTriggerAction(store *mvuex.Store, context *mvuex.ActionContext,
 	return
 }
 
+func actionUpdateTriggerActions(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jsTas *jsTriggerActionSet) {
+	go func() {
+		goTa,err := RpcClient.DeployTriggerActionsSetUpdate(defaultTimeout, jsTas.toGo())
+		if err != nil {
+			actionUpdateCurrentTriggerActionsFromServer(store, context, state)
+			return
+		}
+
+		//actionUpdateCurrentTriggerActionsFromServer(store, context, state)
+		state.TriggerActionList.Flush()
+
+		for _, ta := range goTa.TriggerActions {
+
+			jsTA := NewTriggerAction()
+			jsTA.fromGo(ta)
+			state.TriggerActionList.UpdateEntry(jsTA)
+		}
+	}()
+
+	return
+}
+
 func actionRemoveTriggerActions(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jsTas *jsTriggerActionSet) {
 	go func() {
 		RpcClient.DeployTriggerActionsSetRemove(defaultTimeout, jsTas.toGo())
@@ -1435,6 +1458,7 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER, actionUpdateCurrentTriggerActionsFromServer),
 		mvuex.Action(VUEX_ACTION_ADD_NEW_TRIGGER_ACTION, actionAddNewTriggerAction),
 		mvuex.Action(VUEX_ACTION_REMOVE_TRIGGER_ACTIONS, actionRemoveTriggerActions),
+		mvuex.Action(VUEX_ACTION_UPDATE_TRIGGER_ACTIONS, actionUpdateTriggerActions),
 		mvuex.Action(VUEX_ACTION_STORE_TRIGGER_ACTION_SET, actionStoreTriggerActionSet),
 		mvuex.Action(VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST, actionUpdateStoredTriggerActionSetsList),
 		mvuex.Action(VUEX_ACTION_DEPLOY_STORED_TRIGGER_ACTION_SET_REPLACE, actionDeployStoredTriggerActionSetReplace),
