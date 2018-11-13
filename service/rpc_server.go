@@ -55,11 +55,15 @@ func (s *server) DeployTriggerActionSetUpdate(ctx context.Context, updateTas *pb
 	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_TRIGGER_ACTIONS))
 	for _, updateTa := range updateTas.TriggerActions {
 		// try to find the trigger action to update by ID
+		fmt.Printf("Updating TriggerAction %d ...\n", updateTa.Id)
 		if s.rootSvc.SubSysTriggerActions.UpdateTriggerAction(updateTa, false) != nil {
+			fmt.Printf("Updating TriggerAction %d failed: %v\n", updateTa.Id, err)
 			// coudln't find the given action, return with error
 			return &s.rootSvc.SubSysTriggerActions.registeredTriggerActions,errors.New(fmt.Sprintf("Couldn't find trigger action with id %d", updateTa.Id))
 		}
+		fmt.Printf("Updating TriggerAction %d succeeded\n", updateTa.Id)
 	}
+
 	resultingTas = &s.rootSvc.SubSysTriggerActions.registeredTriggerActions
 	return
 }

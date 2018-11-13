@@ -218,6 +218,7 @@ func InitComponentsTriggerActions() {
 			}),
 		hvue.Mounted(func(vm *hvue.VM) {
 			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER)
+			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_GPIO_NAMES_LIST)
 		}),
 	)
 
@@ -537,9 +538,9 @@ func InitComponentsTriggerActions() {
 				aData := &jsActionDeploySettingsTemplate{Object: ta.ActionData}
 				switch aData.Type {
 				case TemplateTypeFullSettings:
-					//ToDo: Implement
+					vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_MASTER_TEMPLATE_LIST)
 				case TemplateTypeBluetooth:
-					//ToDo: Implement
+					vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_BLUETOOTH_SETTINGS_LIST)
 				case TemplateTypeUSB:
 					//update USB list
 					vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_USB_SETTINGS_LIST)

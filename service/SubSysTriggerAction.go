@@ -628,6 +628,40 @@ func taTriggerTypeMatchesEvtTriggerType(ttype triggerType, evt *pb.Event) bool {
 	return false
 }
 
+// removes the given TriggerAction
+// ToDo: for now only the ID is compared, to assure we don't remove a TriggerAction which has been changed meanwhile, we should deep-compare the whole object
+func (tam *TriggerActionManager) RemoveTriggerAction(removeTa *pb.TriggerAction) (taRemoved *pb.TriggerAction, err error) {
+	tam.registeredTriggerActionMutex.Lock()
+	defer tam.registeredTriggerActionMutex.Unlock()
+
+
+	for idx,ta := range tam.registeredTriggerActions.TriggerActions {
+		if ta.Id == removeTa.Id {
+			// remove element (not a problem for running `for`-loop, as it is interrupted here)
+			tam.registeredTriggerActions.TriggerActions = append(tam.registeredTriggerActions.TriggerActions[:idx], tam.registeredTriggerActions.TriggerActions[idx+1:]...)
+
+			//if target ta trigger had a sequenceChecker assigned, remove it
+			if _,match := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti); match {
+				tam.groupReceiveSequenceCheckersMutex.Lock()
+				delete(tam.groupReceiveSequenceCheckers, ta)
+				tam.groupReceiveSequenceCheckersMutex.Unlock()
+			}
+
+			return ta, nil
+		}
+	}
+	return nil, ErrTaNotFound
+
+}
+
+func (tam *TriggerActionManager) GetTriggerActionByID(Id uint32) (ta *pb.TriggerAction ,err error) {
+	for _,ta = range tam.registeredTriggerActions.TriggerActions {
+		if ta.Id == Id {
+			return ta, nil
+		}
+	}
+	return nil, ErrTaNotFound
+}
 
 // returns the TriggerAction with assigned ID
 func (tam *TriggerActionManager) AddTriggerAction(ta *pb.TriggerAction) (taAdded *pb.TriggerAction, err error) {
@@ -664,40 +698,6 @@ func (tam *TriggerActionManager) AddTriggerAction(ta *pb.TriggerAction) (taAdded
 	return taAdded,nil
 }
 
-// removes the given TriggerAction
-// ToDo: for now only the ID is compared, to assure we don't remove a TriggerAction which has been changed meanwhile, we should deep-compare the whole object
-func (tam *TriggerActionManager) RemoveTriggerAction(removeTa *pb.TriggerAction) (taRemoved *pb.TriggerAction, err error) {
-	tam.registeredTriggerActionMutex.Lock()
-	defer tam.registeredTriggerActionMutex.Unlock()
-
-
-	for idx,ta := range tam.registeredTriggerActions.TriggerActions {
-		if ta.Id == removeTa.Id {
-			// remove element (not a problem for running `for`-loop, as it is interrupted here)
-			tam.registeredTriggerActions.TriggerActions = append(tam.registeredTriggerActions.TriggerActions[:idx], tam.registeredTriggerActions.TriggerActions[idx+1:]...)
-
-			//if target ta trigger had a sequenceChecker assigned, remove it
-			if _,match := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti); match {
-				tam.groupReceiveSequenceCheckersMutex.Lock()
-				delete(tam.groupReceiveSequenceCheckers, ta)
-				tam.groupReceiveSequenceCheckersMutex.Unlock()
-			}
-
-			return ta, nil
-		}
-	}
-	return nil, ErrTaNotFound
-
-}
-
-func (tam *TriggerActionManager) GetTriggerActionByID(Id uint32) (ta *pb.TriggerAction ,err error) {
-	for _,ta = range tam.registeredTriggerActions.TriggerActions {
-		if ta.Id == Id {
-			return ta, nil
-		}
-	}
-	return nil, ErrTaNotFound
-}
 
 func (tam *TriggerActionManager) UpdateTriggerAction(srcTa *pb.TriggerAction, addIfMissing bool) (err error) {
 	tam.registeredTriggerActionMutex.Lock()
@@ -742,6 +742,12 @@ func (tam *TriggerActionManager) UpdateTriggerAction(srcTa *pb.TriggerAction, ad
 			}
 			tam.groupReceiveSequenceCheckersMutex.Unlock()
 		}
+
+		//if trigger is GpioIn, configure GPIO
+		if triggerGpioIn,match := targetTA.Trigger.(*pb.TriggerAction_GpioIn); match {
+			tam.rootSvc.SubSysGpio.DeployGpioTrigger(triggerGpioIn.GpioIn)
+		}
+
 		return nil
 	}
 
@@ -783,6 +789,19 @@ func (tam *TriggerActionManager) GetCurrentTriggerActionSet() (ta *pb.TriggerAct
 	return &pb.TriggerActionSet{ TriggerActions: resTAs }
 	*/
 	return &tam.registeredTriggerActions
+}
+
+func (tam *TriggerActionManager) redeployGpioForAllTas() {
+	tam.registeredTriggerActionMutex.Lock()
+	defer tam.registeredTriggerActionMutex.Unlock()
+	tam.rootSvc.SubSysGpio.ResetPins()
+	for _,ta := range tam.registeredTriggerActions.TriggerActions {
+		ttype, _ := retrieveTriggerActionTypes(ta)
+		if ttype == triggerTypeGpioIn {
+			gpioIn := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn
+			tam.rootSvc.SubSysGpio.DeployGpioTrigger(gpioIn)
+		}
+	}
 }
 
 func (tam *TriggerActionManager) Start() {

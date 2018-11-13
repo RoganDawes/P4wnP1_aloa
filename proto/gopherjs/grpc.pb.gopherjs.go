@@ -2615,9 +2615,10 @@ func (m *TriggerGroupReceiveMulti) Unmarshal(rawBytes []byte) (*TriggerGroupRece
 }
 
 type TriggerGPIOIn struct {
-	GpioName   string
-	PullUpDown GPIOInPullUpDown
-	GpioInEdge GPIOInEdge
+	GpioName       string
+	PullUpDown     GPIOInPullUpDown
+	GpioInEdge     GPIOInEdge
+	DebounceMillis int64
 }
 
 // GetGpioName gets the GpioName of the TriggerGPIOIn.
@@ -2644,6 +2645,14 @@ func (m *TriggerGPIOIn) GetGpioInEdge() (x GPIOInEdge) {
 	return m.GpioInEdge
 }
 
+// GetDebounceMillis gets the DebounceMillis of the TriggerGPIOIn.
+func (m *TriggerGPIOIn) GetDebounceMillis() (x int64) {
+	if m == nil {
+		return x
+	}
+	return m.DebounceMillis
+}
+
 // MarshalToWriter marshals TriggerGPIOIn to the provided writer.
 func (m *TriggerGPIOIn) MarshalToWriter(writer jspb.Writer) {
 	if m == nil {
@@ -2660,6 +2669,10 @@ func (m *TriggerGPIOIn) MarshalToWriter(writer jspb.Writer) {
 
 	if int(m.GpioInEdge) != 0 {
 		writer.WriteEnum(3, int(m.GpioInEdge))
+	}
+
+	if m.DebounceMillis != 0 {
+		writer.WriteInt64(4, m.DebounceMillis)
 	}
 
 	return
@@ -2686,6 +2699,8 @@ func (m *TriggerGPIOIn) UnmarshalFromReader(reader jspb.Reader) *TriggerGPIOIn {
 			m.PullUpDown = GPIOInPullUpDown(reader.ReadEnum())
 		case 3:
 			m.GpioInEdge = GPIOInEdge(reader.ReadEnum())
+		case 4:
+			m.DebounceMillis = reader.ReadInt64()
 		default:
 			reader.SkipField()
 		}

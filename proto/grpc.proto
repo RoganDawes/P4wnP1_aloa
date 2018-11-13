@@ -279,6 +279,7 @@ message TriggerGPIOIn {
     string gpio_name = 1;
     GPIOInPullUpDown pullUpDown = 2;
     GPIOInEdge gpioInEdge = 3;
+    int64 debounce_millis = 4;
 }
 
 

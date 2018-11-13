@@ -280,6 +280,7 @@ func actionUpdateAllStates(store *mvuex.Store, context *mvuex.ActionContext, sta
 	store.Dispatch(VUEX_ACTION_UPDATE_STORED_BLUETOOTH_SETTINGS_LIST)
 	store.Dispatch(VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST)
 	store.Dispatch(VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST)
+	store.Dispatch(VUEX_ACTION_UPDATE_GPIO_NAMES_LIST)
 
 }
 
