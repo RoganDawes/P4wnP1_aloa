@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/conn/physic"
 	"time"
@@ -13,12 +14,12 @@ import (
 
 var (
 	EEdgeDetectNotRunning = errors.New("edge detection not running")
-	EEdgeDetectAborted = errors.New("edge detection aborted")
+	EEdgeDetectAborted    = errors.New("edge detection aborted")
 )
 
 type steadyTimeLevel struct {
 	SteadyTime time.Duration
-	Level gpio.Level
+	Level      gpio.Level
 }
 
 type P4wnp1PinIO struct {
@@ -30,17 +31,16 @@ type P4wnp1PinIO struct {
 	edgeDetectionMutex    *sync.Mutex
 	*/
 
-	edge gpio.Edge
-	pull gpio.Pull
-	edgeDetectionAbort bool
+	edge                 gpio.Edge
+	pull                 gpio.Pull
+	edgeDetectionAbort   bool
 	edgeDetectionChannel chan steadyTimeLevel //Every time a valid edge is detected, this channel returns the duration since the last valid edge (==steadyTime. could be used for debounce) and the gpio.Level during edge event
-	waitForEdgeStopped bool
-	lastEdgeTime time.Time
+	waitForEdgeStopped   bool
+	lastEdgeTime         time.Time
 }
 
 func (p *P4wnp1PinIO) startEdgeDetection(pull gpio.Pull, edge gpio.Edge, preserveUnconsumed bool) (err error) {
-	fmt.Println("starting edge detection for", p.Name() , "...")
-
+	fmt.Println("starting edge detection for", p.Name(), "...")
 
 	p.lastEdgeTime = time.Now()
 	if preserveUnconsumed {
@@ -102,7 +102,7 @@ func (p *P4wnp1PinIO) startEdgeDetection(pull gpio.Pull, edge gpio.Edge, preserv
 
 			// Send the steadyTimeLeve along the channel
 			stl := steadyTimeLevel{
-				Level: level,
+				Level:      level,
 				SteadyTime: timeSinceLastEdge,
 			}
 
@@ -114,7 +114,7 @@ func (p *P4wnp1PinIO) startEdgeDetection(pull gpio.Pull, edge gpio.Edge, preserv
 			} else {
 				//pop old stl from channel if needed
 				for len(p.edgeDetectionChannel) > 0 {
-					<- p.edgeDetectionChannel
+					<-p.edgeDetectionChannel
 				}
 				p.edgeDetectionChannel <- stl //put latest stl to channel
 			}
@@ -130,29 +130,25 @@ func (p *P4wnp1PinIO) startEdgeDetection(pull gpio.Pull, edge gpio.Edge, preserv
 		fmt.Println("... edge detection for", p.Name(), "stopped")
 	}()
 
-
 	fmt.Println("... edge detection for", p.Name(), "started")
-	fmt.Printf("p: %+v\n",p)
 	return
 }
 
 func (p *P4wnp1PinIO) isEdgeDetectionRunning() bool {
 	if p.edgeDetectionChannel == nil {
-		fmt.Println("edge detection not running")
-		fmt.Printf("p: %+v\n",p)
+		//fmt.Println("edge detection not running")
 		return false
 	}
-	fmt.Println("edge detection running")
+	//fmt.Println("edge detection running")
 	return true
 }
 
 func (p *P4wnp1PinIO) stopEdgeDetection() error {
-	fmt.Println("stopping edge detection for", p.Name(), "...")
-
 	if !p.isEdgeDetectionRunning() {
 		return EEdgeDetectNotRunning
 	}
 
+	fmt.Println("stopping edge detection for", p.Name(), "...")
 	p.edgeDetectionAbort = true
 
 	// hackish approach to end WaitForEdge, by toggling Pull resistors (see comments in startEdgeDetection for details)
@@ -168,10 +164,8 @@ func (p *P4wnp1PinIO) stopEdgeDetection() error {
 
 	// wait till stop success is indicated
 	if p.edgeDetectionChannel != nil { // if channel still exists
-		<-p.edgeDetectionChannel	//wait for close
+		<-p.edgeDetectionChannel //wait for close
 	}
-
-
 
 	return nil
 }
@@ -180,34 +174,34 @@ func (p P4wnp1PinIO) Edge() gpio.Edge {
 	return p.edge
 }
 
-
 func (p *P4wnp1PinIO) ExtWaitForEdge(ctx context.Context, debounceDuration time.Duration) (level gpio.Level, err error) {
 	useDebounce := debounceDuration > 0
 
 	for { // the select statement is wrapped into a for loop, to account for edges not fulfilling the debounceDuration criteria
 		select {
-		case steadyTimeLevel,channelOpen := <- p.edgeDetectionChannel:
+		case steadyTimeLevel, channelOpen := <-p.edgeDetectionChannel:
 			//channel closed, so we return error
 			if !channelOpen {
-				return level,EEdgeDetectNotRunning
+				return level, EEdgeDetectNotRunning
 			}
 			if !useDebounce {
 				// no debounce needed, ultimately return the edge change
-				return steadyTimeLevel.Level,nil
+				return steadyTimeLevel.Level, nil
 			} else {
 				// we have to assure that no other edge change event occurs in debounce duration (steady level) before returning
 				if steadyTimeLevel.SteadyTime >= debounceDuration {
 					//detected edge fulfills debounce criteria
-					return steadyTimeLevel.Level,nil
+					return steadyTimeLevel.Level, nil
 				}
 				// else ignore edge
 				fmt.Printf("Ignored detected edge as invalidated by debounce: %v\n", steadyTimeLevel)
 			}
 		case <-ctx.Done():
-			return level,EEdgeDetectAborted
+			return level, EEdgeDetectAborted
 		}
 	}
 }
+
 /*
 func (p P4wnp1PinIO) String() string {
 	return p.piPin.String()
@@ -230,15 +224,16 @@ func (p P4wnp1PinIO) Function() string {
 }
 
 func (p *P4wnp1PinIO) In(pull gpio.Pull, edge gpio.Edge) (err error) {
-	fmt.Println("Called In() on ", p.Name())
 	p.stopEdgeDetection()
 	// bring up edgeDetection go routine (again) if needed
 	err = p.piPin.In(pull, edge)
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 	p.pull = pull
 	p.edge = edge
 	if edge != gpio.NoEdge {
-		p.startEdgeDetection(pull,edge,false) //don't preserve unconsumed events
+		p.startEdgeDetection(pull, edge, false) //don't preserve unconsumed events
 	}
 	return err
 }
@@ -268,12 +263,9 @@ func (p *P4wnp1PinIO) Out(l gpio.Level) error {
 func (p *P4wnp1PinIO) PWM(duty gpio.Duty, f physic.Frequency) error {
 	//stop edge detection, if needed
 	p.stopEdgeDetection()
-	return p.piPin.PWM(duty,f)
+	return p.piPin.PWM(duty, f)
 }
 
 func NewP4wnp1PinIO(p gpio.PinIO) *P4wnp1PinIO {
 	return &P4wnp1PinIO{piPin: p}
 }
-
-
-

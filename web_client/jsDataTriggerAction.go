@@ -149,6 +149,7 @@ func (dst *jsTriggerAction) fromGo(src *pb.TriggerAction) {
 		dstTrigger.GpioName = srcTrigger.GpioIn.GpioName
 		dstTrigger.Edge = GPIOInEdge(srcTrigger.GpioIn.GpioInEdge)
 		dstTrigger.PullUpDown = GPIOInPullUpDown(srcTrigger.GpioIn.PullUpDown)
+		dstTrigger.DebounceMillis = srcTrigger.GpioIn.DebounceMillis
 	case *pb.TriggerAction_GroupReceive:
 		dst.ChangeTriggerType(TriggerGroupReceive)
 		dstTrigger := &jsTriggerGroupReceive{Object: dst.TriggerData}
@@ -264,6 +265,7 @@ func (ta *jsTriggerAction) toGo() (res *pb.TriggerAction) {
 				GpioName: triggerData.GpioName,
 				PullUpDown: pb.GPIOInPullUpDown(triggerData.PullUpDown),
 				GpioInEdge: pb.GPIOInEdge(triggerData.Edge),
+				DebounceMillis: triggerData.DebounceMillis,
 			},
 		}
 	case TriggerGroupReceive:
@@ -383,6 +385,7 @@ func (ta *jsTriggerAction) ChangeTriggerType(newTt triggerType) {
 		d.Edge = GPIOInEdgeRising
 		d.GpioName = ""
 		d.PullUpDown = GPIOInPullUp
+		d.DebounceMillis = 0
 		data = d.Object
 	case TriggerGroupReceive:
 		d := &jsTriggerGroupReceive{Object:O()}
@@ -508,6 +511,7 @@ type jsTriggerGPIOIn struct {
 	GpioName string `js:"GpioName"`
 	PullUpDown GPIOInPullUpDown `js:"PullUpDown"` //PullUp resistor, pull down otherwise
 	Edge GPIOInEdge `js:"Edge"` // 0 == GPIO.RISING, 1 == GPIO.FALLING, every value > 1 == GPIO.BOTH
+	DebounceMillis int64 `js:"DebounceMillis"`
 }
 type GPIOInPullUpDown int
 const GPIOInPullUp = GPIOInPullUpDown(0)

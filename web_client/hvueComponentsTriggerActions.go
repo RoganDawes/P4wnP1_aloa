@@ -288,6 +288,7 @@ func InitComponentsTriggerActions() {
 				strTrigger += t.GpioName
 				strTrigger += ": " + gpioInEdgeNames[t.Edge]
 				strTrigger += ", resistor: " + gpioInPullUpDownNames[t.PullUpDown]
+				strTrigger += ", debounce: " + strconv.Itoa(int(t.DebounceMillis)) + "ms"
 				strTrigger += ")"
 			}
 
@@ -769,6 +770,15 @@ const templateTrigger = `
 					<q-item-tile sublabel>What edge (level change) has to occur to fire the trigger</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="ta.TriggerData.Edge" :options="edge" inverted :disable="!ta.IsActive"></q-select>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+			<q-item tag="label" v-if="isTriggerGPIOIn">
+				<q-item-main>
+					<q-item-tile label>Debounce duration</q-item-tile>
+					<q-item-tile sublabel>Successive edge events in this duration are ignored</q-item-tile>
+					<q-item-tile>
+						<q-input v-model="ta.TriggerData.DebounceMillis" type="number" suffix="ms" decimals="0" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
