@@ -3,7 +3,7 @@ package mgenetlink
 import (
 	"fmt"
 	"github.com/mame82/P4wnP1_go/mnetlink"
-	"github.com/pkg/errors"
+	"errors"
 	"golang.org/x/sys/unix"
 )
 

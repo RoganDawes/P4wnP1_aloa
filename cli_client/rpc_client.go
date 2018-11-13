@@ -3,7 +3,7 @@ package cli_client
 import (
 	"fmt"
 	pb "github.com/mame82/P4wnP1_go/proto"
-	"github.com/pkg/errors"
+	"errors"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"io"

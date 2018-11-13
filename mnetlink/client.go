@@ -2,7 +2,7 @@ package mnetlink
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
+	"errors"
 	"golang.org/x/sys/unix"
 	"math/rand"
 	"os"

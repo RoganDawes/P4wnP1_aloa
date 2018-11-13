@@ -9,7 +9,7 @@ import (
 	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
 	"github.com/mame82/hvue"
 	"github.com/mame82/mvuex"
-	"github.com/pkg/errors"
+	"errors"
 	"io"
 	"path/filepath"
 	"strconv"

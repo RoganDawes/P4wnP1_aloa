@@ -13,7 +13,7 @@ import (
 	"github.com/mame82/mblue-toolz/btmgmt"
 	"github.com/mame82/mblue-toolz/dbusHelper"
 	"github.com/mame82/mblue-toolz/toolz"
-	"github.com/pkg/errors"
+	"errors"
 	pb "github.com/mame82/P4wnP1_go/proto"
 
 )
