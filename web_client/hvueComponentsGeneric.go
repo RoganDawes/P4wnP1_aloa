@@ -17,6 +17,24 @@ func InitComponentsGeneric() {
 	hvue.NewComponent(
 		"startup-settings",
 		hvue.Template(compStartupSettings),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := &struct {
+				*js.Object
+				MasterTemplateName string `js:"MasterTemplateName"`
+
+				ShowTemplateSelect bool `js:"ShowTemplateSelect"`
+			}{Object: O()}
+
+			data.ShowTemplateSelect = false
+			data.MasterTemplateName = "startup"
+			//data.MasterTemplate = NewMasterTemplate()
+			return data
+		}),
+		hvue.Method("selectMasterTemplate",
+			func(vm *hvue.VM, name *js.Object) {
+				println("Selecting Startup Master Template :", name.String())
+				vm.Set("MasterTemplateName", name)
+			}),
 	)
 	hvue.NewComponent(
 		"system",
@@ -276,6 +294,22 @@ const compStartupSettings = `
 
 	<q-card-main>
 		<div class="row gutter-sm">
+			<q-item tag="div" class="col-12">
+				<select-string-from-array :values="$store.state.StoredMasterTemplateList" v-model="ShowTemplateSelect" title="Select Master Template used on startup" @load="selectMasterTemplate($event)"></select-string-from-array>
+				<q-item-side icon="whatshot" color primary />
+				<q-item-main>
+					<q-item-tile label>Startup Master Template</q-item-tile>
+					<q-item-tile sublabel>The template which is loaded on service start</q-item-tile>
+					<q-item-tile>
+						<div class="row no-wrap">
+							<div class="fit">
+								<q-input v-model="MasterTemplateName" color="primary" inverted readonly clearable></q-input>
+							</div>
+							<div><q-btn icon="more" color="primary" @click="ShowTemplateSelect=true" flat /></div>
+						</div>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
 
 		</div>
 	</q-card-main>
@@ -291,7 +325,7 @@ const compMasterTemplate = `
 <!--	{{ $data }} -->
 
 	<q-card-main>
-		<select-string-from-array :values="$store.state.StoredMasterTemplateList" v-model="showLoadModal" title="Load USB Master Template" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+		<select-string-from-array :values="$store.state.StoredMasterTemplateList" v-model="showLoadModal" title="Load stored Master Template" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
 		<select-string-from-array :values="$store.state.StoredMasterTemplateList" v-model="showDeployStoredModal" title="Deploy stored Master Template" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
 		<modal-string-input v-model="showStoreModal" title="Store current Master Template" @save="store($event)"></modal-string-input>
 

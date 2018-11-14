@@ -151,11 +151,12 @@ func generateSelectOptionsTemplateTypes() *js.Object {
 	return tts
 }
 
+/*
 type TriggerActionCompData struct {
 	*js.Object
-	EditMode bool `js:"EditMode"`
+	Edit bool `js:"Edit"`
 }
-
+*/
 
 
 func InitComponentsTriggerActions() {
@@ -176,9 +177,23 @@ func InitComponentsTriggerActions() {
 			data.TemplateName = ""
 			return &data
 		}),
+		hvue.Method("editTa",
+			func(vm *hvue.VM, taID *js.Object) {
+				vm.Get("$refs").Index(taID.Int()).Index(0).Call("setEditMode", true)
+			}),
 		hvue.Method("addTA",
 			func(vm *hvue.VM) {
-				vm.Get("$store").Call("dispatch", VUEX_ACTION_ADD_NEW_TRIGGER_ACTION)
+				promise := vm.Get("$store").Call("dispatch", VUEX_ACTION_ADD_NEW_TRIGGER_ACTION)
+				promise.Call("then",
+					func(value *js.Object) {
+						// set the trigger action into edit mode
+						vm.Call("editTa", value)
+					},
+					func(reason *js.Object) {
+						println("add TriggerAction failed", reason)
+					},
+				)
+
 			}),
 		hvue.Method("storeTAS",
 			func(vm *hvue.VM, name *js.Object) {
@@ -219,6 +234,9 @@ func InitComponentsTriggerActions() {
 		hvue.Mounted(func(vm *hvue.VM) {
 			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_CURRENT_TRIGGER_ACTIONS_FROM_SERVER)
 			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_GPIO_NAMES_LIST)
+
+			js.Global.Set("tam",vm)
+
 		}),
 	)
 
@@ -227,13 +245,64 @@ func InitComponentsTriggerActions() {
 	hvue.NewComponent(
 		"TriggerAction",
 		hvue.Template(templateTriggerAction),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := &struct {
+				*js.Object
+				Edit bool `js:"Edit"`
+			}{Object:O()}
+			data.Edit = false
+			return data
+		}),
 		hvue.PropObj("ta"),
+		hvue.PropObj("edit",
+			hvue.Types(hvue.PBoolean),
+		),
+		hvue.Method("setEditMode",
+			func(vm *hvue.VM, enabled bool) {
+				vm.Data.Set("Edit", enabled)
+			}),
+		hvue.Mounted(func(vm *hvue.VM) {
+			vm.Set("Edit", vm.Get("edit"))
+		}),
 	)
 
 	hvue.NewComponent(
 		"TriggerActionOverview",
 		hvue.Template(templateTriggerActionOverview),
 		hvue.PropObj("ta"),
+		hvue.PropObj("edit",
+			hvue.Types(hvue.PBoolean),
+			),
+/*
+		hvue.Mounted(func(vm *hvue.VM) {
+			data := TriggerActionCompData{Object: vm.Data}
+			data.Edit = vm.Get("edit").Bool()
+		}),
+*/
+		/*
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := &TriggerActionCompData{Object: O()}
+			data.Edit = false
+
+			return data
+		}),
+		*/
+		hvue.ComputedWithGetSet("EditMode",
+			func(vm *hvue.VM) interface{} {
+				/*
+				data := TriggerActionCompData{Object: vm.Data}
+				return data.Edit
+				*/
+				return vm.Get("edit")
+			},
+			func(vm *hvue.VM, newValue *js.Object) {
+/*
+				data := TriggerActionCompData{Object: vm.Data}
+				data.Edit = newValue.Bool()
+*/
+				// Emit event for editmode change
+				vm.Emit("edit", newValue)
+			}),
 		hvue.Computed("computedColor", func(vm *hvue.VM) interface{} {
 			ta := &jsTriggerAction{Object: vm.Get("ta")}
 			switch {
@@ -329,22 +398,7 @@ func InitComponentsTriggerActions() {
 			}
 			return strAction
 		}),
-		hvue.Mounted(func(vm *hvue.VM) {
-			data := TriggerActionCompData{Object: vm.Data}
-			data.EditMode = vm.Get("overview").Bool()
-		}),
-		hvue.DataFunc(func(vm *hvue.VM) interface{} {
-			data := &TriggerActionCompData{Object: O()}
-			data.EditMode = false
 
-			return data
-		}),
-		hvue.Method(
-			"enableEditMode",
-			func(vm *hvue.VM) {
-				data := TriggerActionCompData{Object: vm.Data}
-				data.EditMode = true
-			}),
 		hvue.Method(
 			"updateTA",
 			func(vm *hvue.VM) {
@@ -603,7 +657,7 @@ func InitComponentsTriggerActions() {
 const templateTriggerAction = `
 <div>
 <!-- {{ ta }} -->
-	<TriggerActionOverview :ta="ta"></TriggerActionOverview>
+	<TriggerActionOverview :ta="ta" :edit="Edit" @edit="Edit=$event"></TriggerActionOverview>
 </div>
 `
 const templateTriggerActionOverview = `
@@ -632,7 +686,7 @@ const templateTriggerActionOverview = `
 		</span>
 
 		<div slot="right" v-if="!ta.Immutable">
-			<q-btn color="primary" icon="edit" @click="enableEditMode" flat></q-btn>
+			<q-btn color="primary" icon="edit" @click="EditMode=true" flat></q-btn>
 			<q-btn color="negative" icon="delete" @click="deleteTA" flat></q-btn>
 		</div>
 	</q-card-title>
@@ -710,7 +764,7 @@ const templateTrigger = `
 					<q-item-tile label>Value</q-item-tile>
 					<q-item-tile sublabel>The numeric value which has to be received to activate the trigger</q-item-tile>
 					<q-item-tile>
-						<q-input v-model="ta.TriggerData.Value" type="number" decimals="0" inverted :disable="!ta.IsActive"></q-input>
+						<q-input v-model="ta.TriggerData.Value" type="number" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
@@ -778,7 +832,7 @@ const templateTrigger = `
 					<q-item-tile label>Debounce duration</q-item-tile>
 					<q-item-tile sublabel>Successive edge events in this duration are ignored</q-item-tile>
 					<q-item-tile>
-						<q-input v-model="ta.TriggerData.DebounceMillis" type="number" suffix="ms" decimals="0" inverted :disable="!ta.IsActive"></q-input>
+						<q-input v-model="ta.TriggerData.DebounceMillis" type="number" suffix="ms" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
@@ -857,7 +911,7 @@ const templateAction = `
 					<q-item-tile label>Value</q-item-tile>
 					<q-item-tile sublabel>The numeric value which is sent to the group channel</q-item-tile>
 					<q-item-tile>
-						<q-input v-model="ta.ActionData.Value" color="secondary"  type="number" decimals="0" inverted :disable="!ta.IsActive"></q-input>
+						<q-input v-model="ta.ActionData.Value" color="secondary"  type="number" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
 				</q-item-main>
 			</q-item>
@@ -919,7 +973,7 @@ const templateTriggerActionManager = `
 		</div>
 
 		<div class="col-12 col-lg-6" v-for="ta in $store.getters.triggerActions"> 
-			<TriggerAction :key="ta.Id" :ta="ta" overview></TriggerAction>
+			<TriggerAction :ref="ta.Id" :key="ta.Id" :ta="ta" :edit="false"></TriggerAction>
 		</div>
 	</div>
 </q-page>	

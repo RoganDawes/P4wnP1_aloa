@@ -1136,7 +1136,8 @@ func actionUpdateStoredTriggerActionSetsList(store *mvuex.Store, context *mvuex.
 	return
 }
 
-func actionUpdateCurrentTriggerActionsFromServer(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+func actionUpdateCurrentTriggerActionsFromServer(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) *js.Object{
+/*
 	go func() {
 		println("Trying to fetch current TriggerActions from server")
 		tastate, err := RpcClient.GetDeployedTriggerActionSet(defaultTimeout)
@@ -1157,18 +1158,59 @@ func actionUpdateCurrentTriggerActionsFromServer(store *mvuex.Store, context *mv
 	}()
 
 	return
+*/
+	return NewPromise(func() (res interface{}, err error) {
+		println("Trying to fetch current TriggerActions from server")
+		tastate, err := RpcClient.GetDeployedTriggerActionSet(defaultTimeout)
+		if err != nil {
+			QuasarNotifyError("Error fetching deployed TriggerActions", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
+			return false,err
+		}
+
+		// ToDo: Clear list berfore adding back elements
+		state.TriggerActionList.Flush()
+
+		for _, ta := range tastate.TriggerActions {
+
+			jsTA := NewTriggerAction()
+			jsTA.fromGo(ta)
+			state.TriggerActionList.UpdateEntry(jsTA)
+		}
+
+		return true,err
+	}).Object
+
 }
 
-func actionAddNewTriggerAction(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
-	go func() {
+func actionAddNewTriggerAction(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) interface{} {
+	return NewPromise(func() (res interface{}, err error) {
 		newTA := NewTriggerAction()
 		newTA.IsActive = false // don't activate by default
-		RpcClient.DeployTriggerActionsSetAdd(defaultTimeout, &pb.TriggerActionSet{TriggerActions: []*pb.TriggerAction{newTA.toGo()}})
+		added,_ := RpcClient.DeployTriggerActionsSetAdd(defaultTimeout, &pb.TriggerActionSet{TriggerActions: []*pb.TriggerAction{newTA.toGo()}})
+		if added != nil && (len(added.TriggerActions) == 1) {
+			res = added.TriggerActions[0].Id
+			println("TriggerAction with ID", res, "added")
 
-		actionUpdateCurrentTriggerActionsFromServer(store, context, state)
-	}()
+		} else {
+			err = errors.New("couldn't add TriggerAction")
+		}
 
-	return
+		return
+	}).Call("then",
+		func(resAddPromise *js.Object) interface{} {
+			// set the trigger action into edit mode
+			updatePromise := actionUpdateCurrentTriggerActionsFromServer(store, context, state)
+
+			return updatePromise.Call("then",
+				func(resUpdatePromise *js.Object) interface{} {
+					// set the trigger action into edit mode
+					return resAddPromise
+				},
+			)
+		},
+	)
+
+
 }
 
 func actionUpdateTriggerActions(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jsTas *jsTriggerActionSet) {
