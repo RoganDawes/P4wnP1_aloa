@@ -30,6 +30,8 @@ type BtService struct {
 	BrName           string
 	//bridgeIfDeployed bool
 
+	defaultSettings *pb.BluetoothSettings //This settings are changed if the BluetoothService isn't up, but settings are deployed (Master Template on startup)
+
 	Agent *bluetooth.DefaultAgent
 
 	serviceAvailableLock *sync.Mutex
@@ -70,6 +72,7 @@ func NewBtService(rootService *Service, retryTimeout time.Duration) (res *BtServ
 		Agent:   bluetooth.NewDefaultAgent("1337"),
 		BrName:  BT_ETHERNET_BRIDGE_NAME,
 		serviceAvailableLock: &sync.Mutex{},
+		defaultSettings:GetDefaultBluetoothSettings(),
 	}
 
 	log.Println("Starting Bluetooth sub system...")
@@ -101,12 +104,12 @@ func NewBtService(rootService *Service, retryTimeout time.Duration) (res *BtServ
 			res.Agent.Start(toolz.AGENT_CAP_NO_INPUT_NO_OUTPUT)
 
 			// Deploy default settings
-			defaultSettings := GetDefaultBluetoothSettings()
-			_,err := res.DeployBluetoothControllerInformation(defaultSettings.Ci)
+
+			_,err := res.DeployBluetoothControllerInformation(res.defaultSettings.Ci)
 			if err != nil {
 				log.Println("Not able to deploy default bluetooth settings: ", err.Error())
 			} else {
-				_,err = res.DeployBluetoothAgentSettings(defaultSettings.As)
+				_,err = res.DeployBluetoothAgentSettings(res.defaultSettings.As)
 				if err != nil {
 					log.Println("Not able to deploy default bluetooth agent settings: ", err.Error())
 				}
@@ -117,6 +120,10 @@ func NewBtService(rootService *Service, retryTimeout time.Duration) (res *BtServ
 
 
 	return
+}
+
+func (bt *BtService) ReplaceDefaultSettings(s *pb.BluetoothSettings) {
+	bt.defaultSettings = s
 }
 
 func (bt *BtService) Stop() {

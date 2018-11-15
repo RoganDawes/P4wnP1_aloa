@@ -3,6 +3,8 @@
 package service
 
 import (
+	"context"
+	"fmt"
 	"github.com/mame82/P4wnP1_go/common_web"
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"github.com/mame82/P4wnP1_go/service/datastore"
@@ -129,7 +131,7 @@ type Service struct {
 func NewService() (svc *Service, err error) {
 	svc = &Service{}
 
-	svc.SubSysDataStore, err = datastore.Open(PATH_DATA_STORE)
+	svc.SubSysDataStore, err = datastore.Open(PATH_DATA_STORE, PATH_DATA_STORE_BACKUP + "/init.db")
 	if err != nil {
 		return nil, err
 	}
@@ -175,20 +177,13 @@ func (s *Service) Start() {
 	s.SubSysTriggerActions.Start()
 
 	// Register TriggerActions
+	/*
 	log.Println("Register default TriggerActions ...")
 	RegisterDefaultTriggerActions(s.SubSysTriggerActions)
-
-	/*
-	// ToDo: 1) Manual start of BT NAP, has to be replaced by settings based approach (same as other subsystems)
-	// ToDo: 2) create a signal based method s.SubSysBluetooth.WaitTillServiceUp(timeout duration)
-	go func() {
-		timeStart := time.Now()
-		for timeSinceStart := time.Since(timeStart); !s.SubSysBluetooth.IsServiceAvailable() && timeSinceStart < time.Second*120 ;timeSinceStart = time.Since(timeStart) {
-			time.Sleep(time.Second)
-		}
-		s.SubSysBluetooth.StartNAP()
-	}()
 	*/
+	fmt.Println("Trying to deploy master template...")
+	_,err := s.SubSysRPC.DeployStoredMasterTemplate(context.Background(), &pb.StringMessage{Msg:"startup"})
+	fmt.Println("...!!!!! MASTER TEMPLATE:", err)
 
 	// fire service started Event
 	log.Println("Fire service started event ...")

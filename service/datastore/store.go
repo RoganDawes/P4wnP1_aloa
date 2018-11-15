@@ -32,17 +32,39 @@ type Store struct {
 	serializer Serializer
 }
 
-func (s *Store) Open() (err error) {
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return true, err
+}
+
+func (s *Store) Open(initDbBackupPath string) (err error) {
 	badgerOpts := badger.DefaultOptions
 	badgerOpts.Dir = s.Path
 	badgerOpts.ValueDir = s.Path
 	badgerOpts.SyncWrites = true
 	badgerOpts.TableLoadingMode = options.FileIO
 	badgerOpts.ValueLogLoadingMode = options.FileIO
+
+	// check if DB dir exists
+	exists,err := exists(s.Path)
+	if err != nil { return err }
+
 	s.Db, err = badger.Open(badgerOpts)
 	if s.serializer == nil {
 		s.serializer = NewSerializerProtobuf(false)
 	}
+
+	//If the s.Path didn't exist, we have a clean and empty DB at this point and thus restore a initial db
+	if !exists {
+		err = s.Restore(initDbBackupPath, true)
+	}
+
 	return err
 }
 
@@ -314,11 +336,11 @@ func (s *Store) DeleteMulti(keys []string) (err error) {
 	return nil
 }
 
-func Open(path string) (store *Store, err error) {
+func Open(workPath string, initDbBackupPath string) (store *Store, err error) {
 	store = &Store{
-		Path: path,
+		Path: workPath,
 	}
-	if err = store.Open(); err != nil {
+	if err = store.Open(initDbBackupPath); err != nil {
 		return nil, err
 	}
 	return

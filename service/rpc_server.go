@@ -10,6 +10,7 @@ import (
 	"github.com/mame82/P4wnP1_go/common"
 	"github.com/mame82/P4wnP1_go/common_web"
 	pb "github.com/mame82/P4wnP1_go/proto"
+	"github.com/mame82/P4wnP1_go/service/bluetooth"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"io"
@@ -77,30 +78,64 @@ func (s *server) GetAvailableGpios(context.Context, *pb.Empty) (res *pb.StringMe
 func (s *server) DeployMasterTemplate(ctx context.Context, mt *pb.MasterTemplate) (e *pb.Empty, err error) {
 	e = &pb.Empty{}
 
+	fmt.Println("Deploying master template ...")
+
 	//ignore templates with name of length 0
 	if len(mt.TemplateNameTriggerActions) > 0 {
+		fmt.Printf("... deploying TriggerActions '%s' ...\n", mt.TemplateNameTriggerActions)
 		_,err = s.DeployStoredTriggerActionSetReplace(ctx, &pb.StringMessage{Msg: mt.TemplateNameTriggerActions})
-		if err != nil { return }
-
+		if err != nil {
+			fmt.Printf("... error deploying TriggerActions '%s'\n", mt.TemplateNameTriggerActions)
+			return
+		}
+		fmt.Printf("... succeeded deploying TriggerActions '%s'\n", mt.TemplateNameTriggerActions)
 	}
 
 	for _,nnw := range mt.TemplateNamesNetwork {
+		fmt.Printf("... deploying Network Interface Settings '%s' ...\n", nnw)
 		_,err = s.DeployStoredEthernetInterfaceSettings(ctx, &pb.StringMessage{Msg: nnw})
-		if err != nil { return }
+		if err != nil {
+			fmt.Printf("... error deploying Network Interface Settings '%s'\n", nnw)
+			return
+		}
+		fmt.Printf("... succeeded deploying Network Interface Settings '%s'\n", nnw)
 	}
 
 	if len(mt.TemplateNameBluetooth) > 0 {
-		_, err = s.DeployStoredBluetoothSettings(ctx, &pb.StringMessage{Msg: mt.TemplateNameBluetooth})
-		if err != nil { return }
+		fmt.Printf("... deploying Bluetooth settings '%s' ...\n", mt.TemplateNameBluetooth)
+		_, btErr := s.DeployStoredBluetoothSettings(ctx, &pb.StringMessage{Msg: mt.TemplateNameBluetooth})
+		if btErr != nil {
+			if btErr == bluetooth.ErrBtSvcNotAvailable {
+				fmt.Printf("... ignoring Bluetooth error '%s'\n", mt.TemplateNameBluetooth)
+
+			} else {
+				fmt.Printf("... error deploying Bluetooth settings '%s'\n", mt.TemplateNameBluetooth)
+				return
+			}
+			fmt.Printf("... error deploying Bluetooth settings '%s'\n", mt.TemplateNameBluetooth)
+		}
+		fmt.Printf("... succeeded deploying Bluetooth settings '%s'\n", mt.TemplateNameBluetooth)
 	}
 	if len(mt.TemplateNameUsb) > 0 {
+		fmt.Printf("... deploying USB settings '%s' ...\n", mt.TemplateNameUsb)
 		_, err = s.DeployStoredUSBSettings(ctx, &pb.StringMessage{Msg: mt.TemplateNameUsb})
-		if err != nil { return }
+		if err != nil {
+			fmt.Printf("... error deploying USB settings '%s'\n", mt.TemplateNameUsb)
+			return
+		}
+		fmt.Printf("... succeeded deploying USB settings '%s'\n", mt.TemplateNameUsb)
 	}
 	if len(mt.TemplateNameWifi) > 0 {
+		fmt.Printf("... deploying WiFi settings '%s' ...\n", mt.TemplateNameWifi)
 		_, err = s.DeployStoredWifiSettings(ctx, &pb.StringMessage{Msg: mt.TemplateNameWifi})
-		if err != nil {	return }
+		if err != nil {
+			fmt.Printf("... error deploying WiFi settings '%s'\n", mt.TemplateNameWifi)
+			return
+		}
+		fmt.Printf("... succeeded deploying WiFi settings '%s'\n", mt.TemplateNameWifi)
 	}
+
+	fmt.Println("... master template deployed successfully")
 	return
 }
 
@@ -206,6 +241,9 @@ func (s *server) FireActionGroupSend(ctx context.Context, gs *pb.ActionGroupSend
 
 func (s *server) DeployBluetoothSettings(ctx context.Context, settings *pb.BluetoothSettings) (resultSettings *pb.BluetoothSettings, err error) {
 	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_BLUETOOTH))
+	//Overwrite default settings, in case the bluetooth sub system comes up later
+	s.rootSvc.SubSysBluetooth.ReplaceDefaultSettings(settings)
+
 	as := settings.As
 	ci := settings.Ci
 	resultSettings = &pb.BluetoothSettings{}
@@ -805,7 +843,7 @@ func (s *server) GetAllDeployedEthernetInterfaceSettings(ctx context.Context, em
 
 func (s *server) DeployEthernetInterfaceSettings(ctx context.Context, es *pb.EthernetInterfaceSettings) (empty *pb.Empty, err error) {
 	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_NETWORK))
-	log.Printf("Trying to deploy ethernet interface settings %v", es)
+	log.Printf("Trying to deploy ethernet interface settings %v\n", es)
 
 	empty = &pb.Empty{}
 	iname := es.Name
@@ -814,7 +852,7 @@ func (s *server) DeployEthernetInterfaceSettings(ctx context.Context, es *pb.Eth
 
 	err = nim.DeploySettings(es)
 	if err != nil {
-		log.Printf("Error deploying ethernet interface settings %v", err)
+		log.Printf("Error deploying ethernet interface settings %v\n", err)
 	}
 	return
 }
