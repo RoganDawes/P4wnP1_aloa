@@ -22,7 +22,17 @@ from the command line. The tool relies on RPC so it could be used
 remotely.`,
 }
 
+func GenBashComplete() {
+	target := "/etc/bash_completion.d/p4wnp1.sh"
+	if _, err := os.Stat(target); os.IsNotExist(err) {
+		rootCmd.GenBashCompletionFile(target)
+	}
+}
+
 func Execute() {
+	// ToDo: this should be changed to a dedicated command which is sourced in in .bashrc to assure updates on start of bash
+	GenBashComplete()
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
