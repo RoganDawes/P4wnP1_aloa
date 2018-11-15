@@ -6548,6 +6548,9 @@ type P4WNP1Client interface {
 	DeployStoredMasterTemplate(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*MasterTemplate, error)
 	DeleteStoredMasterTemplate(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	ListStoredMasterTemplate(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
+	// Startup Master Template
+	GetStartupMasterTemplate(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessage, error)
+	SetStartupMasterTemplate(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	// DB backup&restore
 	DBBackup(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	DBRestore(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
@@ -6556,6 +6559,9 @@ type P4WNP1Client interface {
 	ListStoredDBBackups(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// GPIO
 	GetAvailableGpios(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
+	// System
+	Shutdown(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*Empty, error)
+	Reboot(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*Empty, error)
 }
 
 type p4WNP1Client struct {
@@ -7249,6 +7255,24 @@ func (c *p4WNP1Client) ListStoredMasterTemplate(ctx context.Context, in *Empty, 
 	return new(StringMessageArray).Unmarshal(resp)
 }
 
+func (c *p4WNP1Client) GetStartupMasterTemplate(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessage, error) {
+	resp, err := c.client.RPCCall(ctx, "GetStartupMasterTemplate", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(StringMessage).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) SetStartupMasterTemplate(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "SetStartupMasterTemplate", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
 func (c *p4WNP1Client) DBBackup(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error) {
 	resp, err := c.client.RPCCall(ctx, "DBBackup", in.Marshal(), opts...)
 	if err != nil {
@@ -7301,4 +7325,22 @@ func (c *p4WNP1Client) GetAvailableGpios(ctx context.Context, in *Empty, opts ..
 	}
 
 	return new(StringMessageArray).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) Shutdown(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "Shutdown", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) Reboot(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*Empty, error) {
+	resp, err := c.client.RPCCall(ctx, "Reboot", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(Empty).Unmarshal(resp)
 }

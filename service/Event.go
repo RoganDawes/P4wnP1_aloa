@@ -106,7 +106,7 @@ loop:
 			em.registeredReceiversMutex.Lock()
 			for receiver := range em.registeredReceivers {
 				// check if this receiver is listening for this event type
-				if receiver.isRegistered && (receiver.FilterEventType == evToDispatch.Type || receiver.FilterEventType == common_web.EVT_ANY) {
+				if receiver != nil && receiver.isRegistered && (receiver.FilterEventType == evToDispatch.Type || receiver.FilterEventType == common_web.EVT_ANY) {
 					receiver.EventQueue <- evToDispatch
 				}
 			}

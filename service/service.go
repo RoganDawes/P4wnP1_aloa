@@ -9,6 +9,7 @@ import (
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"github.com/mame82/P4wnP1_go/service/datastore"
 	"log"
+	"syscall"
 	"time"
 )
 
@@ -32,6 +33,7 @@ func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 	}
 	tam.AddTriggerAction(serviceUpRunScript)
 
+	/*
 	logServiceStart := &pb.TriggerAction{
 		IsActive: true,
 		Trigger: &pb.TriggerAction_ServiceStarted{
@@ -108,6 +110,7 @@ func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 		},
 	}
 	tam.AddTriggerAction(logSSHLogin)
+	*/
 }
 
 type Service struct {
@@ -126,10 +129,16 @@ type Service struct {
 	SubSysGpio *GpioManager
 
 	SubSysDwc2ConnectWatcher *Dwc2ConnectWatcher
+
+	Ctx context.Context
+	Cancel context.CancelFunc
+	rebootOnStop bool
+	shutdownOnStop bool
 }
 
 func NewService() (svc *Service, err error) {
 	svc = &Service{}
+	svc.Ctx,svc.Cancel = context.WithCancel(context.Background())
 
 	svc.SubSysDataStore, err = datastore.Open(PATH_DATA_STORE, PATH_DATA_STORE_BACKUP + "/init.db")
 	if err != nil {
@@ -165,7 +174,7 @@ func NewService() (svc *Service, err error) {
 	return
 }
 
-func (s *Service) Start() {
+func (s *Service) Start() (context.Context, context.CancelFunc) {
 	log.Println("Starting service ...")
 
 	s.SubSysEvent.Start()
@@ -181,13 +190,48 @@ func (s *Service) Start() {
 	log.Println("Register default TriggerActions ...")
 	RegisterDefaultTriggerActions(s.SubSysTriggerActions)
 	*/
-	fmt.Println("Trying to deploy master template...")
-	_,err := s.SubSysRPC.DeployStoredMasterTemplate(context.Background(), &pb.StringMessage{Msg:"startup"})
-	fmt.Println("...!!!!! MASTER TEMPLATE:", err)
+
+
+	scriptFallback := false
+	//retrieve Startup MasterTemplate name from store
+	msgTemplateName := &pb.StringMessage{}
+	errTemplateName := s.SubSysDataStore.Get(cSTORE_STARTUP_MASTER_TEMPLATE, msgTemplateName)
+	if errTemplateName == nil {
+		startupTemplate := msgTemplateName.Msg
+		fmt.Printf("Loading MasterTemplate '%s' for startup ...\n", startupTemplate)
+
+		// Deploy MasterTemplate
+		_,errDeployStartupTemplate := s.SubSysRPC.DeployStoredMasterTemplate(context.Background(), &pb.StringMessage{Msg:startupTemplate})
+		if errDeployStartupTemplate != nil {
+			fmt.Printf("... error deploying Startup MasterTemplate '%s': %v\n", startupTemplate, errDeployStartupTemplate)
+			scriptFallback = true
+		}
+	} else {
+		fmt.Println("... error retrieving name for Startup MasterTemplate")
+		scriptFallback = true
+	}
+
+	if scriptFallback {
+		fmt.Println("... Fallback: Deploying TriggerAction for script based startup with 'servicestart.sh'")
+		RegisterDefaultTriggerActions(s.SubSysTriggerActions)
+	}
+
 
 	// fire service started Event
 	log.Println("Fire service started event ...")
 	s.SubSysEvent.Emit(ConstructEventTrigger(common_web.TRIGGER_EVT_TYPE_SERVICE_STARTED))
+
+	return s.Ctx, s.Cancel
+}
+
+func (s *Service) Reboot() {
+	s.rebootOnStop = true
+	s.Cancel()
+}
+
+func (s *Service) Shutdown() {
+	s.shutdownOnStop = true
+	s.Cancel()
 }
 
 func (s *Service) Stop() {
@@ -197,4 +241,16 @@ func (s *Service) Stop() {
 	s.SubSysBluetooth.Stop()
 	s.SubSysDwc2ConnectWatcher.Stop()
 	s.SubSysEvent.Stop()
+
+	if s.rebootOnStop {
+		fmt.Println("Rebooting...")
+		syscall.Sync()
+		syscall.Reboot(syscall.LINUX_REBOOT_CMD_RESTART)
+	}
+
+	if s.shutdownOnStop {
+		fmt.Println("Shutdown...")
+		syscall.Sync()
+		syscall.Reboot(syscall.LINUX_REBOOT_CMD_POWER_OFF)
+	}
 }

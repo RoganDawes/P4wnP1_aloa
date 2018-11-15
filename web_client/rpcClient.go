@@ -29,6 +29,53 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+
+
+func (rpc *Rpc) GetStartupMasterTemplate(timeout time.Duration) (name string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	mtmsg,err := rpc.Client.GetStartupMasterTemplate(ctx, &pb.Empty{})
+	if err != nil {
+		return
+	}
+	return mtmsg.Msg, nil
+}
+
+func (rpc *Rpc) SetStartupMasterTemplate(timeout time.Duration, name string) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_,err = rpc.Client.SetStartupMasterTemplate(ctx, &pb.StringMessage{Msg:name})
+	return
+}
+
+func (rpc *Rpc) DBBackup(timeout time.Duration, name string) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_,err = rpc.Client.DBBackup(ctx, &pb.StringMessage{Msg: name})
+	return
+}
+
+func (rpc *Rpc) DBRestore(timeout time.Duration, name string) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_,err = rpc.Client.DBRestore(ctx, &pb.StringMessage{Msg: name})
+	return
+}
+
+func (rpc *Rpc) Shutdown(timeout time.Duration) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_,err = rpc.Client.Shutdown(ctx, &pb.Empty{})
+	return
+}
+
+func (rpc *Rpc) Reboot(timeout time.Duration) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_,err = rpc.Client.Reboot(ctx, &pb.Empty{})
+	return
+}
+
 func (rpc *Rpc) GetGpioNamesList(timeout time.Duration) (ws []string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

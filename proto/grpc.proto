@@ -110,6 +110,10 @@ service P4WNP1 {
     rpc DeleteStoredMasterTemplate(StringMessage) returns (Empty) {}
     rpc ListStoredMasterTemplate(Empty) returns (StringMessageArray) {}
 
+    // Startup Master Template
+    rpc GetStartupMasterTemplate(Empty) returns (StringMessage) {}
+    rpc SetStartupMasterTemplate(StringMessage) returns (Empty) {}
+
 
     // DB backup&restore
     rpc DBBackup(StringMessage) returns(Empty) {}
@@ -121,6 +125,10 @@ service P4WNP1 {
 
     /* GPIO */
     rpc GetAvailableGpios(Empty) returns (StringMessageArray) {}
+
+    /* System */
+    rpc Shutdown(Empty) returns (Empty) {}
+    rpc Reboot(Empty) returns (Empty) {}
 }
 
 /* MasterTemplates */

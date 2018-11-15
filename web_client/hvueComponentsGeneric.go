@@ -20,25 +20,35 @@ func InitComponentsGeneric() {
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			data := &struct {
 				*js.Object
-				MasterTemplateName string `js:"MasterTemplateName"`
-
 				ShowTemplateSelect bool `js:"ShowTemplateSelect"`
 			}{Object: O()}
 
 			data.ShowTemplateSelect = false
-			data.MasterTemplateName = "startup"
-			//data.MasterTemplate = NewMasterTemplate()
 			return data
 		}),
 		hvue.Method("selectMasterTemplate",
 			func(vm *hvue.VM, name *js.Object) {
-				println("Selecting Startup Master Template :", name.String())
-				vm.Set("MasterTemplateName", name)
+				promise := vm.Store.Call("dispatch", VUEX_ACTION_SET_STARTUP_MASTER_TEMPLATE_NAME, name)
+				promise.Call("then", func(val interface{}) {
+					vm.Store.Call("dispatch", VUEX_ACTION_GET_STARTUP_MASTER_TEMPLATE_NAME)
+				})
 			}),
+
 	)
+
 	hvue.NewComponent(
 		"system",
 		hvue.Template(compSystem),
+		hvue.Method("shutdown",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_SHUTDOWN)
+			},
+		),
+		hvue.Method("reboot",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_REBOOT)
+			},
+		),
 	)
 	hvue.NewComponent(
 		"master-template",
@@ -303,7 +313,7 @@ const compStartupSettings = `
 					<q-item-tile>
 						<div class="row no-wrap">
 							<div class="fit">
-								<q-input v-model="MasterTemplateName" color="primary" inverted readonly clearable></q-input>
+								<q-input v-model="$store.state.CurrentStartupMasterTemplateName" color="primary" inverted readonly clearable></q-input>
 							</div>
 							<div><q-btn icon="more" color="primary" @click="ShowTemplateSelect=true" flat /></div>
 						</div>
@@ -474,8 +484,8 @@ const compSystem = `
 
 	<q-card-main>
 		<div class="row gutter-sm">
-			<div class="col"> <q-btn class="fit" color="warning" label="reboot" icon="refresh" /> </div>
-			<div class="col"> <q-btn class="fit" color="negative" label="shutdown" icon="power_settings_new" /> </div>
+			<div class="col"> <q-btn class="fit" color="warning" label="reboot" icon="refresh" @click="reboot" /> </div>
+			<div class="col"> <q-btn class="fit" color="negative" label="shutdown" icon="power_settings_new" @click="shutdown"/> </div>
 		</div>
 	</q-card-main>
 </q-card>

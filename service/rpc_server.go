@@ -36,6 +36,7 @@ const (
 	cSTORE_PREFIX_TRIGGER_ACTION_SET = "tas_"
 	cSTORE_PREFIX_BLUETOOTH_SETTINGS = "bt_"
 	cSTORE_PREFIX_MASTER_TEMPLATE = "master_"
+	cSTORE_STARTUP_MASTER_TEMPLATE = "startup_master"
 )
 
 
@@ -50,6 +51,32 @@ type server struct {
 
 	listenAddrGrpc string
 	listenAddrWeb string
+}
+
+func (s *server) GetStartupMasterTemplate(ctx context.Context, e *pb.Empty) (msg *pb.StringMessage, err error) {
+	msg = &pb.StringMessage{}
+	err = s.rootSvc.SubSysDataStore.Get(cSTORE_STARTUP_MASTER_TEMPLATE, msg)
+	fmt.Printf("Retrieved startup MasterTemplate name '%s'\n", msg.Msg)
+	return
+}
+
+func (s *server) SetStartupMasterTemplate(ctx context.Context, msg *pb.StringMessage) (e *pb.Empty, err error) {
+	fmt.Printf("Setting startup MasterTemplate name to '%s'\n", msg.Msg)
+	e = &pb.Empty{}
+	err = s.rootSvc.SubSysDataStore.Put(cSTORE_STARTUP_MASTER_TEMPLATE, msg, true)
+	return
+}
+
+func (s *server) Shutdown(context.Context, *pb.Empty) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	s.rootSvc.Shutdown()
+	return
+}
+
+func (s *server) Reboot(context.Context, *pb.Empty) (e *pb.Empty, err error) {
+	e = &pb.Empty{}
+	s.rootSvc.Reboot()
+	return
 }
 
 func (s *server) DeployTriggerActionSetUpdate(ctx context.Context, updateTas *pb.TriggerActionSet) (resultingTas *pb.TriggerActionSet, err error) {

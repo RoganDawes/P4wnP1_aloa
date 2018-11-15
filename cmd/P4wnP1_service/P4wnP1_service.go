@@ -32,7 +32,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	svc.Start()
+	ctx,_ := svc.Start()
 
 /*
 	// ToDo: Remove this (testing only)
@@ -53,8 +53,14 @@ func main() {
 	fmt.Println("P4wnP1 service initialized, stop with SIGTERM or SIGINT")
 	sig := make(chan os.Signal)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-	s := <-sig
-	log.Printf("Signal (%v) received, ending P4wnP1_service ...\n", s)
+	select {
+	case s := <-sig:
+		log.Printf("Signal (%v) received, ending P4wnP1_service ...\n", s)
+	case <- ctx.Done():
+		log.Printf("Service cancelled, ending P4wnP1_service ...\n")
+	}
+
+
 	svc.Stop()
 	return
 }

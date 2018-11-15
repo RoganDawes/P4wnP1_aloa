@@ -57,7 +57,7 @@ const (
 
 	VUEX_MUTATION_SET_CURRENT_HID_SCRIPT_SOURCE_TO = "setCurrentHIDScriptSource"
 	VUEX_MUTATION_SET_STORED_HID_SCRIPTS_LIST      = "setStoredHIDScriptsList"
-	VUEX_MUTATION_DELETE_HID_JOB_ID      = "deleteHIDJobID"
+	VUEX_MUTATION_DELETE_HID_JOB_ID                = "deleteHIDJobID"
 
 	//USBGadget
 	VUEX_ACTION_DEPLOY_CURRENT_USB_SETTINGS     = "deployCurrentUSBSettings"
@@ -120,18 +120,30 @@ const (
 	VUEX_ACTION_DEPLOY_STORED_MASTER_TEMPLATE      = "deployStoredMasterTemplate"
 	VUEX_ACTION_DELETE_STORED_MASTER_TEMPLATE      = "deleteStoredMasterTemplate"
 
-	VUEX_MUTATION_SET_CURRENT_MASTER_TEMPLATE                = "setCurrentMasterTemplate"
+	VUEX_MUTATION_SET_CURRENT_MASTER_TEMPLATE     = "setCurrentMasterTemplate"
 	VUEX_MUTATION_SET_STORED_MASTER_TEMPLATE_LIST = "setStoredMasterTemplateList"
-
 
 	//GPIO
 	VUEX_ACTION_UPDATE_GPIO_NAMES_LIST = "updateGpioNamesList"
-	VUEX_MUTATION_SET_GPIO_NAMES_LIST = "setStoredGpioNamesList"
+	VUEX_MUTATION_SET_GPIO_NAMES_LIST  = "setStoredGpioNamesList"
 
 	//Bash scripts (used by TriggerActions)
 	VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST = "updateStoredBashScriptsList"
 
 	VUEX_MUTATION_SET_STORED_BASH_SCRIPTS_LIST = "setStoredBashScriptsList"
+
+	//System
+	VUEX_ACTION_REBOOT   = "reboot"
+	VUEX_ACTION_SHUTDOWN = "shutdown"
+
+	//DB
+	VUEX_ACTION_BACKUP_DB  = "backupDB"
+	VUEX_ACTION_RESTORE_DB = "restoreDB"
+
+	//startup Master template
+	VUEX_ACTION_SET_STARTUP_MASTER_TEMPLATE_NAME           = "setStartupMasterTemplateName"
+	VUEX_ACTION_GET_STARTUP_MASTER_TEMPLATE_NAME           = "getStartupMasterTemplateName"
+	VUEX_MUTATION_SET_CURRENT_STARTUP_MASTER_TEMPLATE_NAME = "setCurrentStartupMasterTemplateName"
 
 	defaultTimeoutShort = time.Second * 5
 	defaultTimeout      = time.Second * 10
@@ -140,22 +152,23 @@ const (
 
 type GlobalState struct {
 	*js.Object
-	Title                            string                   `js:"title"`
-	CurrentHIDScriptSource           string                   `js:"currentHIDScriptSource"`
-	CurrentGadgetSettings            *jsGadgetSettings        `js:"currentGadgetSettings"`
-	CurrentlyDeployingGadgetSettings bool                     `js:"deployingGadgetSettings"`
-	CurrentlyDeployingWifiSettings   bool                     `js:"deployingWifiSettings"`
-	EventProcessor                   *jsEventProcessor        `js:"EventProcessor"`
-	HidJobList                       *jsHidJobStateList       `js:"hidJobList"`
-	TriggerActionList                *jsTriggerActionSet      `js:"triggerActionList"`
-	IsModalEnabled                   bool                     `js:"isModalEnabled"`
-	IsConnected                      bool                     `js:"isConnected"`
-	FailedConnectionAttempts         int                      `js:"failedConnectionAttempts"`
-	InterfaceSettings                *jsEthernetSettingsArray `js:"InterfaceSettings"`
+	Title                                 string                            `js:"title"`
+	CurrentHIDScriptSource                string                            `js:"currentHIDScriptSource"`
+	CurrentGadgetSettings                 *jsGadgetSettings                 `js:"currentGadgetSettings"`
+	CurrentlyDeployingGadgetSettings      bool                              `js:"deployingGadgetSettings"`
+	CurrentlyDeployingWifiSettings        bool                              `js:"deployingWifiSettings"`
+	EventProcessor                        *jsEventProcessor                 `js:"EventProcessor"`
+	HidJobList                            *jsHidJobStateList                `js:"hidJobList"`
+	TriggerActionList                     *jsTriggerActionSet               `js:"triggerActionList"`
+	IsModalEnabled                        bool                              `js:"isModalEnabled"`
+	IsConnected                           bool                              `js:"isConnected"`
+	FailedConnectionAttempts              int                               `js:"failedConnectionAttempts"`
+	InterfaceSettings                     *jsEthernetSettingsArray          `js:"InterfaceSettings"`
 	WiFiState                             *jsWiFiState                      `js:"wifiState"`
 	CurrentBluetoothControllerInformation *jsBluetoothControllerInformation `js:"CurrentBluetoothControllerInformation"`
 	CurrentBluetoothAgentSettings         *jsBluetoothAgentSettings         `js:"CurrentBluetoothAgentSettings"`
-	CurrentMasterTemplate         *jsMasterTemplate         `js:"CurrentMasterTemplate"`
+	CurrentMasterTemplate                 *jsMasterTemplate                 `js:"CurrentMasterTemplate"`
+	CurrentStartupMasterTemplateName      string                            `js:"CurrentStartupMasterTemplateName"`
 
 	StoredWifiSettingsList              []string `js:"StoredWifiSettingsList"`
 	StoredEthernetInterfaceSettingsList []string `js:"StoredEthernetInterfaceSettingsList"`
@@ -164,8 +177,8 @@ type GlobalState struct {
 	StoredHIDScriptsList                []string `js:"StoredHIDScriptsList"`
 	StoredUSBSettingsList               []string `js:"StoredUSBSettingsList"`
 	StoredBluetoothSettingsList         []string `js:"StoredBluetoothSettingsList"`
-	StoredMasterTemplateList         []string `js:"StoredMasterTemplateList"`
-	GpioNamesList         []string `js:"GpioNamesList"`
+	StoredMasterTemplateList            []string `js:"StoredMasterTemplateList"`
+	GpioNamesList                       []string `js:"GpioNamesList"`
 
 	ConnectRetryCount            int  `js:"ConnectRetryCount"`
 	EventListenerRunning         bool `js:"EventListenerRunning"`
@@ -187,6 +200,7 @@ func createGlobalStateStruct() GlobalState {
 	state.IsModalEnabled = false
 	state.FailedConnectionAttempts = 0
 	state.CurrentMasterTemplate = NewMasterTemplate()
+	state.CurrentStartupMasterTemplateName = ""
 
 	state.StoredWifiSettingsList = []string{}
 	state.StoredEthernetInterfaceSettingsList = []string{}
@@ -282,6 +296,81 @@ func actionUpdateAllStates(store *mvuex.Store, context *mvuex.ActionContext, sta
 	store.Dispatch(VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST)
 	store.Dispatch(VUEX_ACTION_UPDATE_GPIO_NAMES_LIST)
 
+	store.Dispatch(VUEX_ACTION_GET_STARTUP_MASTER_TEMPLATE_NAME)
+
+}
+
+func actionGetStartupMasterTemplateName(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) interface{} {
+	println("Called actionGetStartupMasterTemplateName ...")
+	return NewPromise(func() (result interface{}, err error) {
+		result, err = RpcClient.GetStartupMasterTemplate(defaultTimeout)
+		if err == nil {
+			// update store before returning promise result
+			context.Commit(VUEX_MUTATION_SET_CURRENT_STARTUP_MASTER_TEMPLATE_NAME, result)
+		}
+		return result, err
+	})
+}
+
+func actionSetStartupMasterTemplateName(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, name *js.Object) interface{} {
+	return NewPromise(func() (result interface{}, err error) {
+		println("Setting startup MasterTemplate name to:", name.String())
+		err = RpcClient.SetStartupMasterTemplate(defaultTimeout, name.String())
+		result = true
+		return
+	})
+}
+
+func actionBackupDB(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, name *js.Object) {
+	go func() {
+		println("Creating DB backup:" + name.String())
+		//fetch deployed gadget settings
+		err := RpcClient.DBBackup(defaultTimeout, name.String())
+		if err != nil {
+			println("Error for RPC BackupDB call", err)
+			return
+		}
+	}()
+	return
+}
+
+func actionRestoreDB(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, name *js.Object) {
+	go func() {
+		println("Restoring DB Backup:", name.String())
+		//fetch deployed gadget settings
+		err := RpcClient.DBRestore(defaultTimeout, name.String())
+		if err != nil {
+			println("Error for RPC RestoreDB call", err)
+			return
+		}
+	}()
+	return
+}
+
+func actionReboot(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Reboot...")
+		//fetch deployed gadget settings
+		err := RpcClient.Reboot(defaultTimeout)
+		if err != nil {
+			println("Error for RPC reboot call", err)
+			return
+		}
+	}()
+	return
+}
+
+func actionShutdown(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Shutdown...")
+		//fetch deployed gadget settings
+		err := RpcClient.Shutdown(defaultTimeout)
+		if err != nil {
+			println("Error for RPC shutdown call", err)
+			return
+		}
+	}()
+	return
 }
 
 func actionUpdateGpioNamesList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
@@ -301,8 +390,6 @@ func actionUpdateGpioNamesList(store *mvuex.Store, context *mvuex.ActionContext,
 
 	return
 }
-
-
 
 func actionDeployMasterTemplate(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, mt *jsMasterTemplate) {
 	go func() {
@@ -391,36 +478,34 @@ func actionDeleteStoredMasterTemplate(store *mvuex.Store, context *mvuex.ActionC
 	}()
 }
 
-
-
-func actionSendAndRunHIDScript(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, scriptContent *js.Object)  {
+func actionSendAndRunHIDScript(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, scriptContent *js.Object) {
 	go func() {
 		strScriptContent := scriptContent.String()
 
 		println("Send and run HIDScript job")
 		//fetch deployed gadget settings
-		filename,err := RpcClient.UploadContentToTempFile(defaultTimeout, []byte(strScriptContent))
+		filename, err := RpcClient.UploadContentToTempFile(defaultTimeout, []byte(strScriptContent))
 		if err != nil {
 			println("Couldn't upload HIDScript job", err)
 			QuasarNotifyError("Error uploading script", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			return
 		}
 
-		job,err := RpcClient.RunHIDScriptJob(defaultTimeout, "/tmp/" + filename)
+		job, err := RpcClient.RunHIDScriptJob(defaultTimeout, "/tmp/"+filename)
 		if err != nil {
 			println("Couldn't start HIDScript job", err)
 			QuasarNotifyError("Error starting script as background job", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			return
 		}
 
-		QuasarNotifySuccess("Script started successfully", "Job ID " + strconv.Itoa(int(job.Id)), QUASAR_NOTIFICATION_POSITION_TOP)
+		QuasarNotifySuccess("Script started successfully", "Job ID "+strconv.Itoa(int(job.Id)), QUASAR_NOTIFICATION_POSITION_TOP)
 
 		// ToDo: update HIDScriptJob list (should be done event based)
 	}()
 	return
 }
 
-func actionCancelHidJob(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jobID *js.Object)  {
+func actionCancelHidJob(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jobID *js.Object) {
 	go func() {
 		id := uint32(jobID.Int())
 		println("Cancel HIDScript job", id)
@@ -436,7 +521,7 @@ func actionCancelHidJob(store *mvuex.Store, context *mvuex.ActionContext, state 
 	return
 }
 
-func actionCancelAllHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState)  {
+func actionCancelAllHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	go func() {
 		println("Cancel all HIDScript jobs")
 		//fetch deployed gadget settings
@@ -451,26 +536,26 @@ func actionCancelAllHidJobs(store *mvuex.Store, context *mvuex.ActionContext, st
 	return
 }
 
-func actionRemoveSucceededHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState)  {
+func actionRemoveSucceededHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	vJobs := state.HidJobList.Jobs                        //vue object, no real array --> values have to be extracted to filter
 	jobs := js.Global.Get("Object").Call("values", vJobs) //converted to native JS array (has filter method available
 	filtered := jobs.Call("filter", func(job *jsHidJobState) bool {
 		return job.HasSucceeded
 	})
-	for i:=0; i< filtered.Length(); i++ {
+	for i := 0; i < filtered.Length(); i++ {
 		job := &jsHidJobState{Object: filtered.Index(i)}
 		store.Commit(VUEX_MUTATION_DELETE_HID_JOB_ID, job.Id)
 	}
 	return
 }
 
-func actionRemoveFailedHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState)  {
+func actionRemoveFailedHidJobs(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
 	vJobs := state.HidJobList.Jobs                        //vue object, no real array --> values have to be extracted to filter
 	jobs := js.Global.Get("Object").Call("values", vJobs) //converted to native JS array (has filter method available
 	filtered := jobs.Call("filter", func(job *jsHidJobState) bool {
 		return job.HasFailed
 	})
-	for i:=0; i< filtered.Length(); i++ {
+	for i := 0; i < filtered.Length(); i++ {
 		job := &jsHidJobState{Object: filtered.Index(i)}
 		store.Commit(VUEX_MUTATION_DELETE_HID_JOB_ID, job.Id)
 	}
@@ -1109,7 +1194,7 @@ func actionUpdateRunningHidJobs(store *mvuex.Store, context *mvuex.ActionContext
 
 		for _, jobstate := range jobstates {
 			println("updateing jobstate", jobstate)
-			timeNowUnixMilli := time.Now().UnixNano()/1e6
+			timeNowUnixMilli := time.Now().UnixNano() / 1e6
 			state.HidJobList.UpdateEntry(jobstate.Id, jobstate.VmId, false, false, "initial job state", "", timeNowUnixMilli, jobstate.Source)
 		}
 	}()
@@ -1136,35 +1221,35 @@ func actionUpdateStoredTriggerActionSetsList(store *mvuex.Store, context *mvuex.
 	return
 }
 
-func actionUpdateCurrentTriggerActionsFromServer(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) *js.Object{
-/*
-	go func() {
-		println("Trying to fetch current TriggerActions from server")
-		tastate, err := RpcClient.GetDeployedTriggerActionSet(defaultTimeout)
-		if err != nil {
-			QuasarNotifyError("Error fetching deployed TriggerActions", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
-			return
-		}
+func actionUpdateCurrentTriggerActionsFromServer(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) *js.Object {
+	/*
+		go func() {
+			println("Trying to fetch current TriggerActions from server")
+			tastate, err := RpcClient.GetDeployedTriggerActionSet(defaultTimeout)
+			if err != nil {
+				QuasarNotifyError("Error fetching deployed TriggerActions", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
+				return
+			}
 
-		// ToDo: Clear list berfore adding back elements
-		state.TriggerActionList.Flush()
+			// ToDo: Clear list berfore adding back elements
+			state.TriggerActionList.Flush()
 
-		for _, ta := range tastate.TriggerActions {
+			for _, ta := range tastate.TriggerActions {
 
-			jsTA := NewTriggerAction()
-			jsTA.fromGo(ta)
-			state.TriggerActionList.UpdateEntry(jsTA)
-		}
-	}()
+				jsTA := NewTriggerAction()
+				jsTA.fromGo(ta)
+				state.TriggerActionList.UpdateEntry(jsTA)
+			}
+		}()
 
-	return
-*/
+		return
+	*/
 	return NewPromise(func() (res interface{}, err error) {
 		println("Trying to fetch current TriggerActions from server")
 		tastate, err := RpcClient.GetDeployedTriggerActionSet(defaultTimeout)
 		if err != nil {
 			QuasarNotifyError("Error fetching deployed TriggerActions", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
-			return false,err
+			return false, err
 		}
 
 		// ToDo: Clear list berfore adding back elements
@@ -1177,7 +1262,7 @@ func actionUpdateCurrentTriggerActionsFromServer(store *mvuex.Store, context *mv
 			state.TriggerActionList.UpdateEntry(jsTA)
 		}
 
-		return true,err
+		return true, err
 	}).Object
 
 }
@@ -1186,7 +1271,7 @@ func actionAddNewTriggerAction(store *mvuex.Store, context *mvuex.ActionContext,
 	return NewPromise(func() (res interface{}, err error) {
 		newTA := NewTriggerAction()
 		newTA.IsActive = false // don't activate by default
-		added,_ := RpcClient.DeployTriggerActionsSetAdd(defaultTimeout, &pb.TriggerActionSet{TriggerActions: []*pb.TriggerAction{newTA.toGo()}})
+		added, _ := RpcClient.DeployTriggerActionsSetAdd(defaultTimeout, &pb.TriggerActionSet{TriggerActions: []*pb.TriggerAction{newTA.toGo()}})
 		if added != nil && (len(added.TriggerActions) == 1) {
 			res = added.TriggerActions[0].Id
 			println("TriggerAction with ID", res, "added")
@@ -1210,12 +1295,11 @@ func actionAddNewTriggerAction(store *mvuex.Store, context *mvuex.ActionContext,
 		},
 	)
 
-
 }
 
 func actionUpdateTriggerActions(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, jsTas *jsTriggerActionSet) {
 	go func() {
-		goTa,err := RpcClient.DeployTriggerActionsSetUpdate(defaultTimeout, jsTas.toGo())
+		goTa, err := RpcClient.DeployTriggerActionsSetUpdate(defaultTimeout, jsTas.toGo())
 		if err != nil {
 			actionUpdateCurrentTriggerActionsFromServer(store, context, state)
 			return
@@ -1450,13 +1534,16 @@ func initMVuex() *mvuex.Store {
 
 		}),
 		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_MASTER_TEMPLATE, func(store *mvuex.Store, state *GlobalState, newMasterTemplate *jsMasterTemplate) {
-			hvue.Set(state,"CurrentMasterTemplate", newMasterTemplate)
+			hvue.Set(state, "CurrentMasterTemplate", newMasterTemplate)
 		}),
 		mvuex.Mutation(VUEX_MUTATION_SET_STORED_MASTER_TEMPLATE_LIST, func(store *mvuex.Store, state *GlobalState, mtList []interface{}) {
 			hvue.Set(state, "StoredMasterTemplateList", mtList)
 		}),
 		mvuex.Mutation(VUEX_MUTATION_SET_GPIO_NAMES_LIST, func(store *mvuex.Store, state *GlobalState, mtList []interface{}) {
 			hvue.Set(state, "GpioNamesList", mtList)
+		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_CURRENT_STARTUP_MASTER_TEMPLATE_NAME, func(store *mvuex.Store, state *GlobalState, name *js.Object) {
+			state.CurrentStartupMasterTemplateName = name.String()
 		}),
 
 
@@ -1538,6 +1625,16 @@ func initMVuex() *mvuex.Store {
 		mvuex.Action(VUEX_ACTION_AND_AND_RUN_HID_SCRIPT, actionSendAndRunHIDScript),
 
 
+		mvuex.Action(VUEX_ACTION_SHUTDOWN, actionShutdown),
+		mvuex.Action(VUEX_ACTION_REBOOT, actionReboot),
+
+		mvuex.Action(VUEX_ACTION_BACKUP_DB, actionBackupDB),
+		mvuex.Action(VUEX_ACTION_RESTORE_DB, actionRestoreDB),
+
+		mvuex.Action(VUEX_ACTION_GET_STARTUP_MASTER_TEMPLATE_NAME, actionGetStartupMasterTemplateName),
+		mvuex.Action(VUEX_ACTION_SET_STARTUP_MASTER_TEMPLATE_NAME, actionSetStartupMasterTemplateName),
+
+
 		mvuex.Getter("triggerActions", func(state *GlobalState) interface{} {
 			return state.TriggerActionList.TriggerActions
 		}),
@@ -1596,16 +1693,16 @@ func initMVuex() *mvuex.Store {
 	store.Dispatch(VUEX_ACTION_START_EVENT_LISTEN)
 
 	store.Dispatch(VUEX_ACTION_UPDATE_GPIO_NAMES_LIST) //Should be done one time at store start (not intended to change)
-/*
-	// fetch deployed gadget settings
-	store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS)
+	/*
+		// fetch deployed gadget settings
+		store.Dispatch(VUEX_ACTION_UPDATE_CURRENT_USB_SETTINGS)
 
-	// Update already running HID jobs
-	store.Dispatch(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS)
+		// Update already running HID jobs
+		store.Dispatch(VUEX_ACTION_UPDATE_RUNNING_HID_JOBS)
 
-	// Update WiFi state
-	store.Dispatch(VUEX_ACTION_UPDATE_WIFI_STATE)
-*/
+		// Update WiFi state
+		store.Dispatch(VUEX_ACTION_UPDATE_WIFI_STATE)
+	*/
 
 	return store
 }
