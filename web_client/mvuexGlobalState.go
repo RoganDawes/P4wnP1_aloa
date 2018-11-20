@@ -71,6 +71,11 @@ const (
 	VUEX_MUTATION_SET_CURRENT_USB_SETTINGS     = "setCurrentUSBSettings"
 	VUEX_MUTATION_SET_STORED_USB_SETTINGS_LIST = "setStoredUSBSettingsList"
 
+	VUEX_ACTION_UPDATE_UMS_IMAGE_CDROM_LIST      = "updateUmsImageCdromList"
+	VUEX_ACTION_UPDATE_UMS_IMAGE_FLASHDRIVE_LIST = "updateUmsImageFlashdriveList"
+	VUEX_MUTATION_SET_UMS_IMAGE_CDROM_LIST       = "setUmsImageCdromList"
+	VUEX_MUTATION_SET_UMS_IMAGE_FLASHDRIVE_LIST  = "setUmsImageFlashdriveList"
+
 	// Ethernet
 	VUEX_ACTION_UPDATE_ALL_ETHERNET_INTERFACE_SETTINGS         = "updateAllEthernetInterfaceSettings"
 	VUEX_ACTION_DEPLOY_ETHERNET_INTERFACE_SETTINGS             = "deployEthernetInterfaceSettings"
@@ -137,8 +142,10 @@ const (
 	VUEX_ACTION_SHUTDOWN = "shutdown"
 
 	//DB
-	VUEX_ACTION_BACKUP_DB  = "backupDB"
-	VUEX_ACTION_RESTORE_DB = "restoreDB"
+	VUEX_ACTION_BACKUP_DB                    = "backupDB"
+	VUEX_ACTION_RESTORE_DB                   = "restoreDB"
+	VUEX_ACTION_UPDATE_STORED_DB_BACKUP_LIST = "updateStoredDBBackupList"
+	VUEX_MUTATION_SET_DB_BACKUP_LIST         = "setDBBackupList"
 
 	//startup Master template
 	VUEX_ACTION_SET_STARTUP_MASTER_TEMPLATE_NAME           = "setStartupMasterTemplateName"
@@ -178,7 +185,10 @@ type GlobalState struct {
 	StoredUSBSettingsList               []string `js:"StoredUSBSettingsList"`
 	StoredBluetoothSettingsList         []string `js:"StoredBluetoothSettingsList"`
 	StoredMasterTemplateList            []string `js:"StoredMasterTemplateList"`
+	DBBackupList                        []string `js:"DBBackupList"`
 	GpioNamesList                       []string `js:"GpioNamesList"`
+	UmsImageListCdrom                   []string `js:"UmsImageListCdrom"`
+	UmsImageListFlashdrive              []string `js:"UmsImageListFlashdrive"`
 
 	ConnectRetryCount            int  `js:"ConnectRetryCount"`
 	EventListenerRunning         bool `js:"EventListenerRunning"`
@@ -211,6 +221,9 @@ func createGlobalStateStruct() GlobalState {
 	state.StoredBluetoothSettingsList = []string{}
 	state.StoredMasterTemplateList = []string{}
 	state.GpioNamesList = []string{}
+	state.DBBackupList = []string{}
+	state.UmsImageListCdrom = []string{}
+	state.UmsImageListFlashdrive = []string{}
 
 	//Retrieve Interface settings
 	state.InterfaceSettings = NewEthernetSettingsList()
@@ -295,9 +308,64 @@ func actionUpdateAllStates(store *mvuex.Store, context *mvuex.ActionContext, sta
 	store.Dispatch(VUEX_ACTION_UPDATE_STORED_TRIGGER_ACTION_SETS_LIST)
 	store.Dispatch(VUEX_ACTION_UPDATE_STORED_BASH_SCRIPTS_LIST)
 	store.Dispatch(VUEX_ACTION_UPDATE_GPIO_NAMES_LIST)
+	store.Dispatch(VUEX_ACTION_UPDATE_STORED_DB_BACKUP_LIST)
 
 	store.Dispatch(VUEX_ACTION_GET_STARTUP_MASTER_TEMPLATE_NAME)
 
+}
+
+func actionUpdateUmsImageCdromList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch UMS images for CD-ROM list")
+		//fetch deployed gadget settings
+		dbBackupList, err := RpcClient.GetUmsImageCdromList(defaultTimeout)
+		if err != nil {
+			println("Couldn't retrieve UMS images for CD-ROM list")
+			return
+		}
+
+		//commit to current
+
+		context.Commit(VUEX_MUTATION_SET_UMS_IMAGE_CDROM_LIST, dbBackupList)
+	}()
+
+	return
+}
+
+func actionUpdateUmsImageFlashdriveList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch UMS images for flashdrive list")
+		//fetch deployed gadget settings
+		dbBackupList, err := RpcClient.GetUmsImageFlashdriveList(defaultTimeout)
+		if err != nil {
+			println("Couldn't retrieve UMS images for flashdrive list")
+			return
+		}
+
+		//commit to current
+
+		context.Commit(VUEX_MUTATION_SET_UMS_IMAGE_FLASHDRIVE_LIST, dbBackupList)
+	}()
+
+	return
+}
+
+func actionUpdateStoredDBBackupList(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
+	go func() {
+		println("Trying to fetch GPIO names list")
+		//fetch deployed gadget settings
+		dbBackupList, err := RpcClient.GetStoredDBBackupList(defaultTimeout)
+		if err != nil {
+			println("Couldn't retrieve GPIO names list")
+			return
+		}
+
+		//commit to current
+
+		context.Commit(VUEX_MUTATION_SET_DB_BACKUP_LIST, dbBackupList)
+	}()
+
+	return
 }
 
 func actionGetStartupMasterTemplateName(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) interface{} {
@@ -334,7 +402,8 @@ func actionBackupDB(store *mvuex.Store, context *mvuex.ActionContext, state *Glo
 	return
 }
 
-func actionRestoreDB(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, name *js.Object) {
+func actionRestoreDB(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState, name *js.Object) interface{} {
+	/*
 	go func() {
 		println("Restoring DB Backup:", name.String())
 		//fetch deployed gadget settings
@@ -345,6 +414,21 @@ func actionRestoreDB(store *mvuex.Store, context *mvuex.ActionContext, state *Gl
 		}
 	}()
 	return
+	*/
+
+	return NewPromise(func() (result interface{}, err error) {
+		println("Restoring DB Backup:", name.String())
+		//fetch deployed gadget settings
+		err = RpcClient.DBRestore(defaultTimeout, name.String())
+		if err != nil {
+			println("Error for RPC RestoreDB call", err)
+		}
+		return result, err
+	}).Call("then", func(successVal *js.Object) {
+		println("RestoreDB succeeded, reloading state")
+		context.Dispatch(VUEX_ACTION_UPDATE_ALL_STATES)
+	})
+
 }
 
 func actionReboot(store *mvuex.Store, context *mvuex.ActionContext, state *GlobalState) {
@@ -1546,7 +1630,21 @@ func initMVuex() *mvuex.Store {
 			state.CurrentStartupMasterTemplateName = name.String()
 		}),
 
+		mvuex.Mutation(VUEX_MUTATION_SET_DB_BACKUP_LIST, func(store *mvuex.Store, state *GlobalState, dbBackupList []interface{}) {
+			hvue.Set(state, "DBBackupList", dbBackupList)
+		}),
 
+		mvuex.Mutation(VUEX_MUTATION_SET_UMS_IMAGE_CDROM_LIST, func(store *mvuex.Store, state *GlobalState, dbBackupList []interface{}) {
+			hvue.Set(state, "UmsImageListCdrom", dbBackupList)
+		}),
+		mvuex.Mutation(VUEX_MUTATION_SET_UMS_IMAGE_FLASHDRIVE_LIST, func(store *mvuex.Store, state *GlobalState, dbBackupList []interface{}) {
+			hvue.Set(state, "UmsImageListFlashdrive", dbBackupList)
+		}),
+
+		mvuex.Action(VUEX_ACTION_UPDATE_UMS_IMAGE_CDROM_LIST, actionUpdateUmsImageCdromList),
+		mvuex.Action(VUEX_ACTION_UPDATE_UMS_IMAGE_FLASHDRIVE_LIST, actionUpdateUmsImageFlashdriveList),
+
+		mvuex.Action(VUEX_ACTION_UPDATE_STORED_DB_BACKUP_LIST, actionUpdateStoredDBBackupList),
 		mvuex.Action(VUEX_ACTION_UPDATE_GPIO_NAMES_LIST, actionUpdateGpioNamesList),
 
 		mvuex.Action(VUEX_ACTION_DEPLOY_MASTER_TEMPLATE, actionDeployMasterTemplate),

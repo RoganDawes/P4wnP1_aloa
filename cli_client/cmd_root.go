@@ -2,6 +2,7 @@ package cli_client
 
 import (
 	"fmt"
+	"github.com/mame82/P4wnP1_go/common_web"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -17,9 +18,11 @@ var (
 var rootCmd = &cobra.Command{
 	Use:   "P4wnP1_cli",
 	Short: "P4wnP1 (remote) CLI configuration",
-	Long: `The CLI client tool could be used to configure P4wnP1
+	Long: `The CLI client tool could be used to configure P4wnP1 A.L.O.A.
 from the command line. The tool relies on RPC so it could be used 
-remotely.`,
+remotely.
+
+` + "Version: " + common_web.VERSION,
 }
 
 func GenBashComplete() {

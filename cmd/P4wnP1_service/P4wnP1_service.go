@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/mame82/P4wnP1_go/common_web"
 	"github.com/mame82/P4wnP1_go/service"
 	"log"
 	"os"
@@ -14,19 +15,8 @@ import (
 
 
 func main() {
-
 	//ToDo: Check for root privs
-
-
-	/*
-	log.Printf("Keyboard devFile: %s\n", service.HidDevPath[service.USB_FUNCTION_HID_KEYBOARD_name])
-	log.Printf("Mouse devFile: %s\n", service.HidDevPath[service.USB_FUNCTION_HID_MOUSE_name])
-	log.Printf("HID RAW devFile: %s\n", service.HidDevPath[service.USB_FUNCTION_HID_RAW_name])
-	*/
-
-	// ToDo: The webroot has to be changed to /usr/local/P4wnP1/www
-
-
+	fmt.Println("P4wnP1 A.L.O.A. " + common_web.VERSION)
 
 	svc,err := service.NewService()
 	if err != nil {
@@ -35,7 +25,6 @@ func main() {
 	ctx,_ := svc.Start()
 
 /*
-	// ToDo: Remove this (testing only)
 	//Send some log messages for testing
 	textfill := "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea"
 	i := 0

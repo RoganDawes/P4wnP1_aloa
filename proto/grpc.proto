@@ -35,6 +35,8 @@ service P4WNP1 {
     rpc StoreDeployedUSBSettings(StringMessage) returns (Empty) {}
     rpc ListStoredUSBSettings(Empty) returns (StringMessageArray) {}
 
+    rpc ListUmsImageCdrom(Empty) returns (StringMessageArray) {}
+    rpc ListUmsImageFlashdrive(Empty) returns (StringMessageArray) {}
 
     //HIDScript / job management
     rpc HIDRunScript (HIDScriptRequest) returns (HIDScriptResult) {    }

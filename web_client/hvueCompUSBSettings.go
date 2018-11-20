@@ -18,6 +18,7 @@ type CompUSBSettingsData struct {
 	ShowStoreModal bool   `js:"showStoreModal"`
 	ShowLoadModal bool   `js:"showLoadModal"`
 	ShowDeployStoredModal bool   `js:"showDeployStoredModal"`
+	ShowUmsModal bool   `js:"ShowUmsModal"`
 
 }
 
@@ -81,6 +82,42 @@ func InitCompUSBSettings() {
 			}),
 
 	)
+
+	hvue.NewComponent("ums-settings",
+		hvue.Template(compUSBUmsSettingsTemplate),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := &struct {
+				*js.Object
+				ShowImageSelect bool `js:"ShowImageSelect"`
+			}{Object: O()}
+			data.ShowImageSelect = false
+			return data
+		}),
+		hvue.PropObj("value"),
+		hvue.PropObj(
+			"show",
+			hvue.Required,
+			hvue.Types(hvue.PBoolean),
+		),
+		hvue.ComputedWithGetSet(
+			"visible",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("show")
+			},
+			func(vm *hvue.VM, newValue *js.Object) {
+				vm.Call("$emit", "show", newValue)
+			},
+		),
+		hvue.Method("updateFileLists",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_UMS_IMAGE_CDROM_LIST)
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_UMS_IMAGE_FLASHDRIVE_LIST)
+			}),
+		hvue.Mounted(func(vm *hvue.VM) {
+			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_UMS_IMAGE_CDROM_LIST)
+			vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_UMS_IMAGE_FLASHDRIVE_LIST)
+		}),
+	)
 }
 
 func newCompUSBSettingsData(vm *hvue.VM) interface{} {
@@ -98,14 +135,81 @@ func newCompUSBSettingsData(vm *hvue.VM) interface{} {
 	data.RndisDetails = false
 	data.CdcEcmDetails = false
 
+	data.ShowUmsModal = false
+
 	return data
 }
 
 
 
 const (
+	compUSBUmsSettingsTemplate = `
+	<q-modal v-model="visible">
+		<q-modal-layout>
+			<q-toolbar slot="header">
+				<q-toolbar-title>
+					USB Mass Storage
+    				<span slot="subtitle">
+      					{{ value }}
+    				</span>
+				</q-toolbar-title>
+			</q-toolbar>
+
+			<q-list>
+				<q-item tag="label">
+					<q-item-side>
+						<q-toggle v-model="value.Cdrom"></q-toggle>
+					</q-item-side>
+					<q-item-main>
+						<q-item-tile label>CD-Rom</q-item-tile>
+						<q-item-tile sublabel>If enabled, a CD-ROM drinve is emulated instead of a writable flash-drive</q-item-tile>
+					</q-item-main>
+				</q-item>
+
+
+			<q-item tag="div" class="col-12">
+				<select-string-from-array :values="value.Cdrom ? $store.state.UmsImageListCdrom : $store.state.UmsImageListFlashdrive"  v-model="ShowImageSelect" title="Select TriggerActions template" @load="value.File=$event"></select-string-from-array>
+				<q-item-side icon="archive" color primary />
+				<q-item-main>
+					<q-item-tile label>Image file to use</q-item-tile>
+<!--
+					<q-item-tile sublabel>If not empty, the selected TriggerActions are deployed along with the master template</q-item-tile>
+-->
+					<q-item-tile>
+						<div class="row no-wrap">
+							<div class="fit">
+								<q-input v-model="value.File" color="primary" inverted readonly clearable></q-input>
+							</div>
+							<div><q-btn icon="more" color="primary" @click="updateFileLists();ShowImageSelect=true" flat /></div>
+							<div><q-btn v-if="value.File.length > 0" icon="clear" color="primary" @click="value.File=''" flat /></div>
+						</div>
+					</q-item-tile>
+				</q-item-main>
+			</q-item>
+
+
+
+			</q-list>
+
+
+			<q-list slot="footer">
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile>
+							<q-btn color="secondary" v-close-overlay label="close" />
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</q-list>
+
+		</q-modal-layout>
+	</q-modal>
+
+`
 	compUSBSettingsTemplate = `
 <q-page padding>
+	<ums-settings :show="ShowUmsModal" @show="ShowUmsModal=$event" v-model="currentGadgetSettings.UmsSettings" />
+
 	<select-string-from-array :values="$store.state.StoredUSBSettingsList" v-model="showLoadModal" title="Load USB gadget settings" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
 	<select-string-from-array :values="$store.state.StoredUSBSettingsList" v-model="showDeployStoredModal" title="Deploy stored USB gadget settings" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
 	<modal-string-input v-model="showStoreModal" title="Store current USB gadget Settings" @save="store($event)"></modal-string-input>
@@ -115,7 +219,7 @@ const (
 		<div class="col-12">
 			<q-card>
 				<q-card-title>
-					USB Gadget Settings ({{ deploying }})
+					USB Gadget Settings ({{ currentGadgetSettings.UmsSettings }})
 				</q-card-title>
 
 				<q-card-main>
@@ -292,7 +396,7 @@ const (
 				</q-item>
 				<q-item tag="label">
 					<q-item-side>
-						<q-toggle v-model="currentGadgetSettings.Use_Serial"></q-toggle>
+						<q-toggle v-model="currentGadgetSettings.Use_SERIAL"></q-toggle>
 					</q-item-side>
 					<q-item-main>
 						<q-item-tile label>Serial Interface</q-item-tile>
@@ -307,6 +411,10 @@ const (
 						<q-item-tile label>Mass Storage</q-item-tile>
 						<q-item-tile sublabel>Emulates USB flash drive or CD-ROM</q-item-tile>
 					</q-item-main>
+					<q-item-side right v-if="currentGadgetSettings.Use_UMS">
+						<div><q-btn icon="more" color="primary" flat @click="ShowUmsModal=true" /></div>
+					</q-item-side>
+
 				</q-item>
 			</q-list>	
 		</q-card>

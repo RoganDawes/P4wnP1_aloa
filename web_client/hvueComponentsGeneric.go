@@ -138,6 +138,29 @@ func InitComponentsGeneric() {
 	hvue.NewComponent(
 		"database",
 		hvue.Template(compDatabase),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := &struct {
+				*js.Object
+				ShowLoad bool `js:"ShowLoad"`
+				ShowStore bool `js:"ShowStore"`
+			}{Object: O()}
+
+			data.ShowLoad = false
+			data.ShowStore = false
+			return data
+		}),
+		hvue.Method("load",
+			func(vm *hvue.VM, val *js.Object) {
+				vm.Store.Call("dispatch", VUEX_ACTION_RESTORE_DB, val)
+			}),
+		hvue.Method("store",
+			func(vm *hvue.VM, val *js.Object) {
+				vm.Store.Call("dispatch", VUEX_ACTION_BACKUP_DB, val)
+			}),
+		hvue.Method("updateList",
+			func(vm *hvue.VM) {
+				vm.Store.Call("dispatch", VUEX_ACTION_UPDATE_STORED_DB_BACKUP_LIST)
+			}),
 	)
 
 
@@ -281,17 +304,20 @@ const compGeneric = `
 		</div>
 
 		<div class="col-12 col-xl">
-			<startup-settings />
-		</div>
+		<div class="row gutter-sm">
+			<div class="col-12 col-xl-6">
+				<system />
+			</div>
 
-		<div class="col-12 col-xl">
-			<system />
-		</div>
+			<div class="col-12 col-xl-6">
+				<database />
+			</div>
 
-		<div class="col-12 col-xl">
-			<database />
+			<div class="col-12">
+				<startup-settings />
+			</div>
 		</div>
-
+		</div>
 	</div>
 </q-page>
 `
@@ -493,14 +519,18 @@ const compSystem = `
 
 const compDatabase = `
 <q-card>
+
+	<select-string-from-array v-model="ShowLoad" :values="$store.state.DBBackupList" title="Select DB backup" @load="load($event)"></select-string-from-array>
+	<modal-string-input v-model="ShowStore" title="Store current Master Template" @save="store($event)"></modal-string-input>
+
 	<q-card-title>
 		Database
 	</q-card-title>
 
 	<q-card-main>
 		<div class="row gutter-sm">
-			<div class="col"> <q-btn class="fit" color="primary" label="backup" icon="cloud_upload" /> </div>
-			<div class="col"> <q-btn class="fit" color="negative" label="restore" icon="cloud_download" /> </div>
+			<div class="col"> <q-btn class="fit" color="primary" label="backup" icon="cloud_upload" @click="ShowStore=true" /> </div>
+			<div class="col"> <q-btn class="fit" color="negative" label="restore" icon="cloud_download" @click="updateList();ShowLoad=true" /> </div>
 		</div>
 	</q-card-main>
 </q-card>

@@ -8,4 +8,6 @@ const (
 	PATH_HID_SCRIPTS            = PATH_ROOT + "/HIDScripts"
 	PATH_DATA_STORE             = PATH_ROOT + "/store"
 	PATH_DATA_STORE_BACKUP      = PATH_ROOT + "/db"
+	PATH_IMAGE_CDROM            = PATH_ROOT + "/ums/cdrom"
+	PATH_IMAGE_FLASHDRIVE       = PATH_ROOT + "/ums/flashdrive"
 )

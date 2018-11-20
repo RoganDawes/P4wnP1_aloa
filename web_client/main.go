@@ -108,7 +108,7 @@ const templateMainApp = `
         <q-layout-header :reveal="!$q.platform.is.desktop">
             <q-toolbar>
                 <q-toolbar-title>
-                    P4wnP1 web-frontend ({{ $store.getters.isConnected }})
+                    P4wnP1 A.L.O.A.
 					<span slot="subtitle" class="mobile-only">by MaMe82</span>
                 </q-toolbar-title>
             </q-toolbar>

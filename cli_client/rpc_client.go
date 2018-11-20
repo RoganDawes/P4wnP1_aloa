@@ -75,6 +75,21 @@ func ClientCreateTempFile(host string, port string, dir string, prefix string) (
 	return clientCreateTempDirOfFile(host,port,dir,prefix,false)
 }
 
+func ClientMountUMSImage(host string, port string, file string, cdrom bool) (err error) {
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {return}
+	defer connection.Close()
+	client := pb.NewP4WNP1Client(connection)
+	_,err = client.MountUMSFile(
+		context.Background(),
+		&pb.GadgetSettingsUMS{
+			File: file,
+			Cdrom: cdrom,
+		})
+	return
+}
+
 func clientCreateTempDirOfFile(host string, port string, dir string, prefix string, dirOnlyNoFile bool) (resultPath string, err error) {
 	address := host + ":" + port
 	connection, err := grpc.Dial(address, grpc.WithInsecure())
@@ -417,9 +432,13 @@ func ClientListTemplateType(timeout time.Duration, host string, port string, tty
 		if err != nil { return res,err }
 		return ma.MsgArray,nil
 	case pb.ActionDeploySettingsTemplate_BLUETOOTH:
-		return
+		ma,err := rpcClient.ListStoredBluetoothSettings(ctx, &pb.Empty{})
+		if err != nil { return res,err }
+		return ma.MsgArray,nil
 	case pb.ActionDeploySettingsTemplate_FULL_SETTINGS:
-		return
+		ma,err := rpcClient.ListStoredMasterTemplate(ctx, &pb.Empty{})
+		if err != nil { return res,err }
+		return ma.MsgArray,nil
 	default:
 		return res,errors.New("unknown template type")
 	}
@@ -451,9 +470,9 @@ func ClientDeployTemplateType(timeout time.Duration, host string, port string, t
 	case pb.ActionDeploySettingsTemplate_NETWORK:
 		_,err = rpcClient.DeployStoredEthernetInterfaceSettings(ctx, &pb.StringMessage{Msg:name})
 	case pb.ActionDeploySettingsTemplate_BLUETOOTH:
-		return
+		_,err = rpcClient.DeployStoredBluetoothSettings(ctx, &pb.StringMessage{Msg:name})
 	case pb.ActionDeploySettingsTemplate_FULL_SETTINGS:
-		return
+		_,err = rpcClient.DeployStoredMasterTemplate(ctx, &pb.StringMessage{Msg:name})
 	default:
 		return errors.New("unknown template type")
 	}

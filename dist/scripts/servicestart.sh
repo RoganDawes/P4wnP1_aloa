@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Enable USB functions RNDIS, CDC ECM (don't disable other functions which already have been enabled)
-P4wnP1_cli USB set --rndis 1 --cdc-ecm 1
+P4wnP1_cli usb set --rndis 1 --cdc-ecm 1
 
 # Configure USB ethernet interface "usbeth" to run a DHCP server
 #   - use IPv4 172.16.0.1 for interface with netmask 255.255.255.252

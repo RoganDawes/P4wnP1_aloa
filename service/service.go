@@ -27,7 +27,7 @@ func RegisterDefaultTriggerActions(tam *TriggerActionManager) {
 		},
 		Action: &pb.TriggerAction_BashScript{
 			BashScript: &pb.ActionStartBashScript{
-				ScriptName: "servicestart.sh", // ToDo: Remove path component
+				ScriptName: "servicestart.sh",
 			},
 		},
 	}

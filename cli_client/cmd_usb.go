@@ -226,7 +226,7 @@ func cobraUsbGetDeployed(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	rootCmd.AddCommand(usbCmd)
+//	rootCmd.AddCommand(usbCmd)
 	usbCmd.AddCommand(usbGetCmd)
 	usbCmd.AddCommand(usbSetCmd)
 	usbGetCmd.AddCommand(usbGetDeployedCmd)

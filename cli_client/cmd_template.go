@@ -51,6 +51,7 @@ var (
 
 func listTemplateType(ttype pb.ActionDeploySettingsTemplate_TemplateType) (err error) {
 	fmt.Println("Templates of type", ttype, ":")
+	fmt.Println("------------------------------------")
 	list,err := ClientListTemplateType(TIMEOUT_MEDIUM, StrRemoteHost, StrRemotePort, ttype)
 	if err != nil {
 		fmt.Println("Error retrieving templates: ", err.Error())
@@ -59,6 +60,7 @@ func listTemplateType(ttype pb.ActionDeploySettingsTemplate_TemplateType) (err e
 	for _,s := range list {
 		fmt.Println(s)
 	}
+	fmt.Println()
 	return nil
 }
 

@@ -228,6 +228,8 @@ func (jsGS *jsGadgetSettings) fromGo(gs *pb.GadgetSettings) {
 	jsGS.RndisSettings = &jsGadgetSettingsEthernet{
 		Object: O(),
 	}
+	jsGS.RndisSettings.DevAddr = ""
+	jsGS.RndisSettings.HostAddr = ""
 	if gs.RndisSettings != nil {
 		jsGS.RndisSettings.HostAddr = gs.RndisSettings.HostAddr
 		jsGS.RndisSettings.DevAddr = gs.RndisSettings.DevAddr
@@ -236,6 +238,8 @@ func (jsGS *jsGadgetSettings) fromGo(gs *pb.GadgetSettings) {
 	jsGS.CdcEcmSettings = &jsGadgetSettingsEthernet{
 		Object: O(),
 	}
+	jsGS.CdcEcmSettings.DevAddr = ""
+	jsGS.CdcEcmSettings.HostAddr = ""
 	if gs.CdcEcmSettings != nil {
 		jsGS.CdcEcmSettings.HostAddr = gs.CdcEcmSettings.HostAddr
 		jsGS.CdcEcmSettings.DevAddr = gs.CdcEcmSettings.DevAddr
@@ -244,6 +248,8 @@ func (jsGS *jsGadgetSettings) fromGo(gs *pb.GadgetSettings) {
 	jsGS.UmsSettings = &jsGadgetSettingsUMS{
 		Object: O(),
 	}
+	jsGS.UmsSettings.Cdrom = false
+	jsGS.UmsSettings.File = ""
 	if gs.UmsSettings != nil {
 		jsGS.UmsSettings.File = gs.UmsSettings.File
 		jsGS.UmsSettings.Cdrom = gs.UmsSettings.Cdrom

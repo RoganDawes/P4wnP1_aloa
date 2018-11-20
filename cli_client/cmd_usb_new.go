@@ -39,6 +39,7 @@ var (
 	tmpUsbProduct        = "P4wnP1 by MaMe82"
 )
 
+
 func PrintGadgetSettings(gs *pb.GadgetSettings, useJson bool) {
 	res := ""
 	if useJson {
@@ -130,6 +131,57 @@ func usbSet(cmd *cobra.Command, args []string) {
 	return
 }
 
+func usbMount(cmd *cobra.Command, args []string) {
+	gs, err := ClientGetGadgetSettings(StrRemoteHost, StrRemotePort)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	/*
+	gs.Pid = tmpUsbPid
+	gs.Vid = tmpUsbVid
+	gs.Product = tmpUsbProduct
+	gs.Manufacturer = tmpUsbManufacturer
+	gs.Serial = tmpUsbSerialnumber
+	gs.Enabled = !tmpUsbDisableGadget
+	gs.Use_RNDIS = tmpUsbUseRNDIS
+	gs.Use_CDC_ECM = tmpUsbUseECM
+	gs.Use_SERIAL = tmpUsbUseSerial
+	gs.Use_HID_KEYBOARD = tmpUsbUseHIDKeyboard
+	gs.Use_HID_MOUSE = tmpUsbUseHIDMouse
+	gs.Use_HID_RAW = tmpUsbUseHIDRaw
+	gs.Use_UMS = tmpUsbUseUMS
+	*/
+
+	if gs.Use_UMS {
+		//gs.UmsSettings.Cdrom = tmpUsbUMSCdromMode
+		if cmd.Flags().Lookup("ums-file").Changed {
+			fmt.Printf("Serving USB Mass Storage from '%s'\n", tmpUMSFile)
+			//gs.UmsSettings.File = tmpUMSFile
+			ClientMountUMSImage(StrRemoteHost, StrRemotePort, tmpUsbUMSFile, tmpUsbUMSCdromMode)
+		}
+	} else {
+		fmt.Println("UMS disabled")
+		os.Exit(-1)
+	}
+
+
+	return
+}
+
+func usbGet(cmd *cobra.Command, args []string) {
+	if gs, err := ClientGetGadgetSettings(StrRemoteHost, StrRemotePort); err == nil {
+		if BoolJson {
+			PrintGadgetSettings(gs,true)
+		} else {
+			PrintGadgetSettings(gs,false)
+		}
+	} else {
+		log.Println(err)
+	}
+}
+
 func usbGetDevicePath(dev devPath) {
 	gs, err := ClientGetDeployedGadgetSettings(StrRemoteHost, StrRemotePort)
 	if err != nil {
@@ -214,9 +266,17 @@ func init() {
 		Run:   usbSet,
 	}
 
+	cmdUsbMount := &cobra.Command{
+		Use:   "mount",
+		Short: "mount CDRom/block device image, if UMS is enabled",
+		Long:  ``,
+		Run:   usbMount,
+	}
+
 	cmdUsbGet := &cobra.Command{
 		Use:   "get",
 		Short: "Retrieve information on current USB gadget settings",
+		Run: usbGet,
 	}
 	cmdUsbGetDevice := &cobra.Command{
 		Use:   "device",
@@ -248,7 +308,7 @@ func init() {
 	}
 
 	rootCmd.AddCommand(cmdUsb)
-	cmdUsb.AddCommand(cmdUsbDeploy, cmdUsbSet, cmdUsbGet)
+	cmdUsb.AddCommand(cmdUsbDeploy, cmdUsbSet, cmdUsbGet, cmdUsbMount)
 	cmdUsbGet.AddCommand(cmdUsbGetDevice)
 	cmdUsbGetDevice.AddCommand(cmdUsbGetDeviceKbd)
 	cmdUsbGetDevice.AddCommand(cmdUsbGetDeviceMouse)
@@ -271,4 +331,8 @@ func init() {
 	cmdUsbSet.Flags().StringVarP(&tmpUsbPid, "pid", "p", "0x1347", "Product ID (format '0x1347')")
 	cmdUsbSet.Flags().StringVarP(&tmpUsbManufacturer, "manufacturer", "f", "MaMe82", "Manufacturer string")
 	cmdUsbSet.Flags().StringVarP(&tmpUsbProduct, "product", "o", "P4wnP1 by MaMe82", "Product name string")
+
+	cmdUsbMount.Flags().BoolVar(&tmpUsbUMSCdromMode, "ums-cdrom", false, "If this flag is set, UMS emulates a CD-Rom instead of a flashdrive (ignored, if UMS disabled)")
+	cmdUsbMount.Flags().StringVar(&tmpUsbUMSFile, "ums-file", "", "Path to the image or block device backing UMS (ignored, if UMS disabled)")
+
 }

@@ -29,6 +29,47 @@ func NewRpcClient(addr string) Rpc {
 	return rcl
 }
 
+func (rpc *Rpc) GetUmsImageFlashdriveList(timeout time.Duration) (ws []string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	ma, err := rpc.Client.ListUmsImageFlashdrive(ctx, &pb.Empty{})
+	if err != nil { return ws, err }
+	return ma.MsgArray, err
+}
+
+func (rpc *Rpc) GetUmsImageCdromList(timeout time.Duration) (ws []string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	ma, err := rpc.Client.ListUmsImageCdrom(ctx, &pb.Empty{})
+	if err != nil { return ws, err }
+	return ma.MsgArray, err
+}
+
+func (rpc *Rpc) GetStoredDBBackupList(timeout time.Duration) (ws []string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	ma, err := rpc.Client.ListStoredDBBackups(ctx, &pb.Empty{})
+	if err != nil { return ws, err }
+	return ma.MsgArray, err
+}
+
+func (rpc *Rpc) DBBackup(timeout time.Duration, name string) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_,err = rpc.Client.DBBackup(ctx, &pb.StringMessage{Msg: name})
+	return
+}
+
+func (rpc *Rpc) DBRestore(timeout time.Duration, name string) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_,err = rpc.Client.DBRestore(ctx, &pb.StringMessage{Msg: name})
+	return
+}
+
 
 
 func (rpc *Rpc) GetStartupMasterTemplate(timeout time.Duration) (name string, err error) {
@@ -45,20 +86,6 @@ func (rpc *Rpc) SetStartupMasterTemplate(timeout time.Duration, name string) (er
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	_,err = rpc.Client.SetStartupMasterTemplate(ctx, &pb.StringMessage{Msg:name})
-	return
-}
-
-func (rpc *Rpc) DBBackup(timeout time.Duration, name string) (err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	_,err = rpc.Client.DBBackup(ctx, &pb.StringMessage{Msg: name})
-	return
-}
-
-func (rpc *Rpc) DBRestore(timeout time.Duration, name string) (err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	_,err = rpc.Client.DBRestore(ctx, &pb.StringMessage{Msg: name})
 	return
 }
 

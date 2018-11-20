@@ -6491,6 +6491,8 @@ type P4WNP1Client interface {
 	DeleteStoredUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	StoreDeployedUSBSettings(ctx context.Context, in *StringMessage, opts ...grpcweb.CallOption) (*Empty, error)
 	ListStoredUSBSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
+	ListUmsImageCdrom(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
+	ListUmsImageFlashdrive(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// HIDScript / job management
 	HIDRunScript(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptResult, error)
 	HIDRunScriptJob(ctx context.Context, in *HIDScriptRequest, opts ...grpcweb.CallOption) (*HIDScriptJob, error)
@@ -6793,6 +6795,24 @@ func (c *p4WNP1Client) StoreDeployedUSBSettings(ctx context.Context, in *StringM
 
 func (c *p4WNP1Client) ListStoredUSBSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
 	resp, err := c.client.RPCCall(ctx, "ListStoredUSBSettings", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(StringMessageArray).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) ListUmsImageCdrom(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
+	resp, err := c.client.RPCCall(ctx, "ListUmsImageCdrom", in.Marshal(), opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return new(StringMessageArray).Unmarshal(resp)
+}
+
+func (c *p4WNP1Client) ListUmsImageFlashdrive(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error) {
+	resp, err := c.client.RPCCall(ctx, "ListUmsImageFlashdrive", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}

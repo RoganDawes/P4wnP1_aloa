@@ -13,6 +13,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
@@ -25,8 +26,8 @@ const (
 	USB_EP_USAGE_HID_MOUSE = 1
 	USB_EP_USAGE_RNDIS = 2
 	USB_EP_USAGE_CDC_ECM = 2
-	USB_EP_USAGE_CDC_SERIAL = 2 //ToDo: check, taken from docs
-	USB_EP_USAGE_UMS = 2 //ToDo check, taken from docs
+	USB_EP_USAGE_CDC_SERIAL = 2
+	USB_EP_USAGE_UMS = 2
 	USB_EP_USAGE_MAX = 7
 
 	USB_GADGET_NAME = "mame82_gadget"
@@ -490,6 +491,9 @@ func (gm *UsbGadgetManager) ParseGadgetState(gadgetName string) (result *pb.Gadg
 			return nil, err1
 		} else {
 			result.UmsSettings.File = strings.TrimSuffix(string(res), "\000\n")
+
+			// remove path
+			result.UmsSettings.File = filepath.Base(result.UmsSettings.File)
 		}
 	}
 
@@ -511,7 +515,7 @@ func (gm *UsbGadgetManager) ParseGadgetState(gadgetName string) (result *pb.Gadg
 
 }
 
-// This command is working on the active gadget directly, so changes aren't refelcted back
+// This command is working on the active gadget directly, so changes aren't reflected back
 // to the GadgetSettingsState
 func MountUMSFile(filename string) error {
 	funcdir := USB_GADGET_DIR + "/functions/mass_storage.ms1"
@@ -715,7 +719,13 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 		ioutil.WriteFile(funcdir+"/lun.0/nofua", []byte("0"), os.ModePerm) // Don't restrict to read-only (is implied by cdrom=1 if needed, but causes issues on backend FS if enabled)
 
 		//Provide the backing image
-		ioutil.WriteFile(funcdir+"/lun.0/file", []byte(settings.UmsSettings.File), os.ModePerm) // Set backing file (or block device) for USB Mass Storage
+		file := settings.UmsSettings.File
+		if settings.UmsSettings.Cdrom {
+			file = PATH_IMAGE_CDROM + "/" + file
+		} else {
+			file = PATH_IMAGE_FLASHDRIVE + "/" + file
+		}
+		ioutil.WriteFile(funcdir+"/lun.0/file", []byte(file), os.ModePerm) // Set backing file (or block device) for USB Mass Storage
 
 		err := os.Symlink(funcdir, USB_GADGET_DIR+"/configs/c.1/"+"mass_storage.ms1")
 		if err != nil {

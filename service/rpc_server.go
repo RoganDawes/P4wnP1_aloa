@@ -53,6 +53,23 @@ type server struct {
 	listenAddrWeb string
 }
 
+func (s *server) ListUmsImageFlashdrive(ctx context.Context, e *pb.Empty) (sa *pb.StringMessageArray, err error) {
+	sa = &pb.StringMessageArray{}
+	scripts,err := ListFilesOfFolder(PATH_IMAGE_FLASHDRIVE, ".img", ".bin")
+	if err != nil { return sa,err }
+	sa.MsgArray = scripts
+	return
+}
+
+func (s *server) ListUmsImageCdrom(ctx context.Context, e *pb.Empty) (sa *pb.StringMessageArray, err error) {
+	sa = &pb.StringMessageArray{}
+	scripts,err := ListFilesOfFolder(PATH_IMAGE_CDROM, ".iso")
+	if err != nil { return sa,err }
+	sa.MsgArray = scripts
+	return
+}
+
+
 func (s *server) GetStartupMasterTemplate(ctx context.Context, e *pb.Empty) (msg *pb.StringMessage, err error) {
 	msg = &pb.StringMessage{}
 	err = s.rootSvc.SubSysDataStore.Get(cSTORE_STARTUP_MASTER_TEMPLATE, msg)
