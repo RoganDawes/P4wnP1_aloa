@@ -3,12 +3,10 @@ package cli_client
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
+	pb "github.com/mame82/P4wnP1_go/proto"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc/status"
 	"log"
 	"os"
-	pb "github.com/mame82/P4wnP1_go/proto"
 )
 
 type devPath int
@@ -37,6 +35,8 @@ var (
 	tmpUsbPid            = "0x1347"
 	tmpUsbManufacturer   = "MaMe82"
 	tmpUsbProduct        = "P4wnP1 by MaMe82"
+
+
 )
 
 
@@ -79,85 +79,84 @@ func PrintGadgetSettings(gs *pb.GadgetSettings, useJson bool) {
 }
 
 func usbSet(cmd *cobra.Command, args []string) {
-	gs, err := ClientGetGadgetSettings(StrRemoteHost, StrRemotePort)
+	newGs, err := ClientGetDeployedGadgetSettings(StrRemoteHost, StrRemotePort)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	gs.Pid = tmpUsbPid
-	gs.Vid = tmpUsbVid
-	gs.Product = tmpUsbProduct
-	gs.Manufacturer = tmpUsbManufacturer
-	gs.Serial = tmpUsbSerialnumber
-	gs.Enabled = !tmpUsbDisableGadget
-	gs.Use_RNDIS = tmpUsbUseRNDIS
-	gs.Use_CDC_ECM = tmpUsbUseECM
-	gs.Use_SERIAL = tmpUsbUseSerial
-	gs.Use_HID_KEYBOARD = tmpUsbUseHIDKeyboard
-	gs.Use_HID_MOUSE = tmpUsbUseHIDMouse
-	gs.Use_HID_RAW = tmpUsbUseHIDRaw
-	gs.Use_UMS = tmpUsbUseUMS
+	fPid := cmd.Flags().Lookup("pid")
+	fVid := cmd.Flags().Lookup("vid")
+	fProduct := cmd.Flags().Lookup("product")
+	fManufacturer := cmd.Flags().Lookup("manufacturer")
+	fSerialno := cmd.Flags().Lookup("sn")
+
+	if fVid.Changed {
+		newGs.Vid = tmpUsbVid
+	}
+	if fPid.Changed {
+		newGs.Pid = tmpUsbPid
+	}
+	if fManufacturer.Changed {
+		newGs.Manufacturer = tmpUsbManufacturer
+	}
+	if fProduct.Changed {
+		newGs.Product = tmpUsbProduct
+	}
+	if fSerialno.Changed {
+		newGs.Serial = tmpUsbSerialnumber
+	}
+
+
+	newGs.Enabled = !tmpUsbDisableGadget
+	newGs.Use_RNDIS = tmpUsbUseRNDIS
+	newGs.Use_CDC_ECM = tmpUsbUseECM
+	newGs.Use_SERIAL = tmpUsbUseSerial
+	newGs.Use_HID_KEYBOARD = tmpUsbUseHIDKeyboard
+	newGs.Use_HID_MOUSE = tmpUsbUseHIDMouse
+	newGs.Use_HID_RAW = tmpUsbUseHIDRaw
+	newGs.Use_UMS = tmpUsbUseUMS
 
 
 	if tmpUsbUseUMS {
-		gs.UmsSettings.Cdrom = tmpUsbUMSCdromMode
+		newGs.UmsSettings.Cdrom = tmpUsbUMSCdromMode
 		if cmd.Flags().Lookup("ums-file").Changed {
-			fmt.Printf("Serving USB Mass Storage from '%s'\n", tmpUMSFile)
-			gs.UmsSettings.File = tmpUMSFile
+			fmt.Printf("Serving USB Mass Storage from '%s'\n", tmpUsbUMSFile)
+			newGs.UmsSettings.File = tmpUsbUMSFile
 		}
 	}
 
 	//Update service settings
-	err = ClientSetGadgetSettings(StrRemoteHost, StrRemotePort, *gs)
+	deployedGs,err := ClientDeployGadgetSettings(StrRemoteHost, StrRemotePort, newGs)
 	if err != nil {
-		fmt.Printf("Error setting new gadget settings: %v\n", status.Convert(err).Message())
+		fmt.Printf("Error deploying Gadget Settings: %v\nReverted to:\n%+v", err, deployedGs)
 		os.Exit(-1)
 		return
 	}
 
-	//deploy updated settings and fetch result (effectively deployed settings)
-	if gs, err := ClientDeployGadgetSettings(StrRemoteHost, StrRemotePort); err != nil {
-		fmt.Printf("Error deploying Gadget Settings: %v\nReverted to:\n%s", err, spew.Sdump(gs))
-		os.Exit(-1)
-	}
+
 	if BoolJson {
-		PrintGadgetSettings(gs,true)
+		PrintGadgetSettings(deployedGs,true)
 	} else {
 		fmt.Println("Successfully deployed USB gadget settings")
-		PrintGadgetSettings(gs,false)
+		PrintGadgetSettings(deployedGs,false)
 	}
 
 	return
 }
 
 func usbMount(cmd *cobra.Command, args []string) {
-	gs, err := ClientGetGadgetSettings(StrRemoteHost, StrRemotePort)
+	gs, err := ClientGetDeployedGadgetSettings(StrRemoteHost, StrRemotePort)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	/*
-	gs.Pid = tmpUsbPid
-	gs.Vid = tmpUsbVid
-	gs.Product = tmpUsbProduct
-	gs.Manufacturer = tmpUsbManufacturer
-	gs.Serial = tmpUsbSerialnumber
-	gs.Enabled = !tmpUsbDisableGadget
-	gs.Use_RNDIS = tmpUsbUseRNDIS
-	gs.Use_CDC_ECM = tmpUsbUseECM
-	gs.Use_SERIAL = tmpUsbUseSerial
-	gs.Use_HID_KEYBOARD = tmpUsbUseHIDKeyboard
-	gs.Use_HID_MOUSE = tmpUsbUseHIDMouse
-	gs.Use_HID_RAW = tmpUsbUseHIDRaw
-	gs.Use_UMS = tmpUsbUseUMS
-	*/
 
 	if gs.Use_UMS {
 		//gs.UmsSettings.Cdrom = tmpUsbUMSCdromMode
 		if cmd.Flags().Lookup("ums-file").Changed {
-			fmt.Printf("Serving USB Mass Storage from '%s'\n", tmpUMSFile)
+			fmt.Printf("Serving USB Mass Storage from '%s'\n", tmpUsbUMSFile)
 			//gs.UmsSettings.File = tmpUMSFile
 			ClientMountUMSImage(StrRemoteHost, StrRemotePort, tmpUsbUMSFile, tmpUsbUMSCdromMode)
 		}
@@ -171,7 +170,7 @@ func usbMount(cmd *cobra.Command, args []string) {
 }
 
 func usbGet(cmd *cobra.Command, args []string) {
-	if gs, err := ClientGetGadgetSettings(StrRemoteHost, StrRemotePort); err == nil {
+	if gs, err := ClientGetDeployedGadgetSettings(StrRemoteHost, StrRemotePort); err == nil {
 		if BoolJson {
 			PrintGadgetSettings(gs,true)
 		} else {
@@ -334,5 +333,7 @@ func init() {
 
 	cmdUsbMount.Flags().BoolVar(&tmpUsbUMSCdromMode, "ums-cdrom", false, "If this flag is set, UMS emulates a CD-Rom instead of a flashdrive (ignored, if UMS disabled)")
 	cmdUsbMount.Flags().StringVar(&tmpUsbUMSFile, "ums-file", "", "Path to the image or block device backing UMS (ignored, if UMS disabled)")
+
+	cmdUsb.PersistentFlags().BoolVar(&BoolJson, "json", false, "Output results as JSON if applicable")
 
 }

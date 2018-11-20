@@ -6479,9 +6479,7 @@ type P4WNP1Client interface {
 	ListStoredBluetoothSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*StringMessageArray, error)
 	// USB gadget
 	GetDeployedGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
-	DeployGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
-	GetGadgetSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error)
-	SetGadgetSettings(ctx context.Context, in *GadgetSettings, opts ...grpcweb.CallOption) (*GadgetSettings, error)
+	DeployGadgetSetting(ctx context.Context, in *GadgetSettings, opts ...grpcweb.CallOption) (*GadgetSettings, error)
 	GetLEDSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*LEDSettings, error)
 	SetLEDSettings(ctx context.Context, in *LEDSettings, opts ...grpcweb.CallOption) (*Empty, error)
 	MountUMSFile(ctx context.Context, in *GadgetSettingsUMS, opts ...grpcweb.CallOption) (*Empty, error)
@@ -6694,26 +6692,8 @@ func (c *p4WNP1Client) GetDeployedGadgetSetting(ctx context.Context, in *Empty, 
 	return new(GadgetSettings).Unmarshal(resp)
 }
 
-func (c *p4WNP1Client) DeployGadgetSetting(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error) {
+func (c *p4WNP1Client) DeployGadgetSetting(ctx context.Context, in *GadgetSettings, opts ...grpcweb.CallOption) (*GadgetSettings, error) {
 	resp, err := c.client.RPCCall(ctx, "DeployGadgetSetting", in.Marshal(), opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return new(GadgetSettings).Unmarshal(resp)
-}
-
-func (c *p4WNP1Client) GetGadgetSettings(ctx context.Context, in *Empty, opts ...grpcweb.CallOption) (*GadgetSettings, error) {
-	resp, err := c.client.RPCCall(ctx, "GetGadgetSettings", in.Marshal(), opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return new(GadgetSettings).Unmarshal(resp)
-}
-
-func (c *p4WNP1Client) SetGadgetSettings(ctx context.Context, in *GadgetSettings, opts ...grpcweb.CallOption) (*GadgetSettings, error) {
-	resp, err := c.client.RPCCall(ctx, "SetGadgetSettings", in.Marshal(), opts...)
 	if err != nil {
 		return nil, err
 	}

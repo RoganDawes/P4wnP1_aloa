@@ -108,17 +108,6 @@ func clientCreateTempDirOfFile(host string, port string, dir string, prefix stri
 	return
 }
 
-/*
-func ClientUploadFileFromSrcPath(host string, port string, srcPath string, destPath string, forceOverwrite bool) (err error) {
-	//open local file for reading
-	flag := os.O_RDONLY
-	f, err := os.OpenFile(srcPath, flag, os.ModePerm)
-	if err != nil { return err }
-	defer f.Close()
-
-	return  ClientUploadFile(host,port,f,destPath,forceOverwrite)
-}
-*/
 
 func ClientRegisterEvent(host string, port string,  evtType int64) (err error) {
 	// open gRPC Client
@@ -205,28 +194,51 @@ func ClientGetLED(host string, port string) (ls *pb.LEDSettings, err error) {
 	return
 }
 
-func ClientGetGadgetSettings(host string, port string) (gs *pb.GadgetSettings, err error) {
-	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
-	defer conn.Close()
-	defer cancel()
-	if err != nil { return 	}
+func ClientReboot(host string, port string, timeout time.Duration) (err error) {
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err) }
+	defer connection.Close()
 
-	gs, err = client.GetGadgetSettings(ctx, &pb.Empty{})
-	if err != nil {
-		log.Printf("Error getting USB Gadget Settings: %+v", err)
+	rpcClient := pb.NewP4WNP1Client(connection)
+	ctx := context.Background()
+	if timeout > 0 {
+		ctxNew,cancel := context.WithTimeout(ctx, timeout)
+		ctx = ctxNew
+		defer cancel()
 	}
 
+	_,err = rpcClient.Reboot(ctx, &pb.Empty{})
 	return
 }
 
-func ClientDeployGadgetSettings(host string, port string) (gs *pb.GadgetSettings, err error) {
+func ClientShutdown(host string, port string, timeout time.Duration) (err error) {
+	address := host + ":" + port
+	connection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil { log.Fatalf("Could not connect to P4wnP1 RPC server: %v", err) }
+	defer connection.Close()
+
+	rpcClient := pb.NewP4WNP1Client(connection)
+	ctx := context.Background()
+	if timeout > 0 {
+		ctxNew,cancel := context.WithTimeout(ctx, timeout)
+		ctx = ctxNew
+		defer cancel()
+	}
+
+	_,err = rpcClient.Shutdown(ctx, &pb.Empty{})
+	return
+}
+
+
+func ClientDeployGadgetSettings(host string, port string, newGs *pb.GadgetSettings) (gs *pb.GadgetSettings, err error) {
 	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
 	defer conn.Close()
 	defer cancel()
 	if err != nil { return 	}
 
 
-	gs, err = client.DeployGadgetSetting(ctx, &pb.Empty{})
+	gs, err = client.DeployGadgetSetting(ctx, newGs)
 	if err != nil {
 		log.Printf("Error deploying current USB Gadget Settings: %+v", err)
 		//We have an error case, thus gs isn't submitted by the gRPC server (even if the value is provided)
@@ -249,23 +261,6 @@ func ClientGetDeployedGadgetSettings(host string, port string) (gs *pb.GadgetSet
 		log.Printf("Error getting USB Gadget Settings count: %+v", err)
 	}
 
-	return
-}
-
-
-func ClientSetGadgetSettings(host string, port string, gs pb.GadgetSettings) (err error) {
-	conn, client, ctx, cancel, err := ClientConnectServer(host, port)
-	defer conn.Close()
-	defer cancel()
-	if err != nil { return }
-
-	_, err = client.SetGadgetSettings(ctx, &gs)
-	//Only forward the error
-	/*
-	if err != nil {
-		log.Printf("Error setting GadgetSettings %d: %+v", gs, err)
-	}
-	*/
 	return
 }
 

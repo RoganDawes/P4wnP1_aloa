@@ -678,6 +678,7 @@ func (rpc *Rpc) GetDeployedGadgetSettings(timeout time.Duration) (*pb.GadgetSett
 
 }
 
+/*
 func (rpc *Rpc) SetRemoteGadgetSettings(targetGS *pb.GadgetSettings, timeout time.Duration) (err error) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
 	println("SetRemoteGadgetSettings called")
@@ -696,15 +697,16 @@ func (rpc *Rpc) SetRemoteGadgetSettings(targetGS *pb.GadgetSettings, timeout tim
 
 	return nil
 }
+*/
 
-func (rpc *Rpc) DeployRemoteGadgetSettings(timeout time.Duration) (*pb.GadgetSettings, error) {
+func (rpc *Rpc) DeployRemoteGadgetSettings(timeout time.Duration, targetGS *pb.GadgetSettings) (*pb.GadgetSettings, error) {
 	//gs := vue.GetVM(c).Get("gadgetSettings")
 	println("DeployRemoteGadgetSettings called")
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	return rpc.Client.DeployGadgetSetting(ctx, &pb.Empty{})
+	return rpc.Client.DeployGadgetSetting(ctx, targetGS)
 
 }
 

@@ -456,11 +456,7 @@ func (s *server) DeployStoredUSBSettings(ctx context.Context, m *pb.StringMessag
 	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_USB))
 	ws,err := s.GetStoredUSBSettings(ctx,m)
 	if err != nil { return &pb.GadgetSettings{},err }
-	st,err = s.SetGadgetSettings(ctx, ws)
-	if err != nil {
-		return
-	}
-	_,err = s.DeployGadgetSetting(ctx, &pb.Empty{})
+	st,err = s.DeployGadgetSetting(ctx, ws)
 	return
 }
 
@@ -954,15 +950,14 @@ func (s *server) GetDeployedGadgetSetting(ctx context.Context, e *pb.Empty) (gs 
 	return
 }
 
-func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetSettings, err error) {
+func (s *server) DeployGadgetSetting(ctx context.Context, newGs *pb.GadgetSettings) (gs *pb.GadgetSettings, err error) {
 	log.Printf("Called DeployGadgetSettings\n")
 	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_USB))
 	gs_backup,_ := s.rootSvc.SubSysUSB.ParseGadgetState(USB_GADGET_NAME)
 
-	//ToDo: Former gadgets are destroyed without testing if there're changes, this should be aborted if GadgetSettingsState == GetDeployedGadgetSettings()
-	//s.rootSvc.SubSysUSB.DestroyGadget(USB_GADGET_NAME) //already done by deploy
 
-	errg := s.rootSvc.SubSysUSB.DeployGadgetSettings(s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings)
+
+	errg := s.rootSvc.SubSysUSB.DeployGadgetSettings(newGs)
 	err = nil
 	if errg != nil {
 		err = errors.New(fmt.Sprintf("Deploying new gadget settings failed, reverted to old ones: %v", errg))
@@ -970,22 +965,6 @@ func (s *server) DeployGadgetSetting(context.Context, *pb.Empty) (gs *pb.GadgetS
 	}
 
 	gs, _ = s.rootSvc.SubSysUSB.ParseGadgetState(USB_GADGET_NAME) //Return settings from deployed gadget
-	return
-}
-
-func (s *server) GetGadgetSettings(context.Context, *pb.Empty) (*pb.GadgetSettings, error) {
-	return s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings, nil
-}
-
-func (s *server) SetGadgetSettings(ctx context.Context, gs *pb.GadgetSettings) (res *pb.GadgetSettings, err error) {
-	defer s.rootSvc.SubSysEvent.Emit(ConstructEventNotifyStateChange(common_web.STATE_CHANGE_EVT_TYPE_USB))
-	if err = ValidateGadgetSetting(*gs); err != nil {
-		//We return the validation error and the current (unchanged) GadgetSettingsState
-		res = s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings
-		return
-	}
-	s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings = gs
-	res = s.rootSvc.SubSysUSB.State.UndeployedGadgetSettings
 	return
 }
 

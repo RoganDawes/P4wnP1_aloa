@@ -151,8 +151,9 @@ func (w *KeyboardLEDStateWatcher) RetrieveNewListener() (l *KeyboardLEDStateList
 // of the listener to deal with this interrupt and close the channel after the interrupt is consumed (wrting to the channel
 // happens only once)
 // - close ledStateFile
-func (w *KeyboardLEDStateWatcher) Stop() error {
-	w.ledStateFile.Close() //produces an error in readLoop which gets translated to an interrupt
+func (w *KeyboardLEDStateWatcher) Stop() (err error) {
+	//ToDo: A crash occurs from time to time, if the underlying file is already gone (gadget destroyed), this has to be called before the file is removed
+	err = w.ledStateFile.Close() //produces an error in readLoop which gets translated to an interrupt
 	return nil
 }
 

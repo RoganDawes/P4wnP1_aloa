@@ -2,6 +2,7 @@ package cli_client
 
 import (
 	"github.com/spf13/cobra"
+	"os"
 
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"fmt"
@@ -12,35 +13,25 @@ var blink_count uint32
 
 // usbCmd represents the usb command
 var ledCmd = &cobra.Command{
-	Use:   "LED",
+	Use:   "led",
 	Short: "Set or Get LED state of P4wnP1",
-}
-
-var ledGetCmd = &cobra.Command{
-	Use:   "get",
-	Short: "Get LED blink count",
 	Run: func(cmd *cobra.Command, args []string) {
-		if ls, err := ClientGetLED(StrRemoteHost, StrRemotePort); err == nil {
-			fmt.Printf("LED blink count %v\n", ls.BlinkCount)
-		} else {
-			log.Println(err)
-		}
-	},
-}
-
-var ledSetCmd = &cobra.Command{
-	Use:   "set",
-	Short: "Set LED blink count",
-	Run: func(cmd *cobra.Command, args []string) {
-		blink := cmd.Flags().Lookup("blink")
-		if blink.Changed {
+		if cmd.Flags().Lookup("blink").Changed {
+			// blink flag has been set
 			if err := ClientSetLED(StrRemoteHost, StrRemotePort, pb.LEDSettings{BlinkCount: blink_count}); err == nil {
-				fmt.Printf("LED blink count set to %v\n", blink.Value)
+				fmt.Printf("LED blink count set to %v\n", blink_count)
 			} else {
 				log.Println(err)
+				os.Exit(-1)
 			}
 		} else {
-			cmd.Usage()
+			// blink flag has not been set, retrieve current blink count
+			if ls, err := ClientGetLED(StrRemoteHost, StrRemotePort); err == nil {
+				fmt.Printf("LED blink count %v\n", ls.BlinkCount)
+			} else {
+				log.Println(err)
+				os.Exit(-1)
+			}
 		}
 	},
 }
@@ -48,8 +39,6 @@ var ledSetCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(ledCmd)
-	ledCmd.AddCommand(ledGetCmd)
-	ledCmd.AddCommand(ledSetCmd)
 
-	ledSetCmd.Flags().Uint32VarP(&blink_count,"blink", "b", 0,"Set blink count (0: Off, 1..254: blink n times, >254: On)")
+	ledCmd.Flags().Uint32VarP(&blink_count,"blink", "b", 0,"Set blink count (0: Off, 1..254: blink n times, >254: On)")
 }

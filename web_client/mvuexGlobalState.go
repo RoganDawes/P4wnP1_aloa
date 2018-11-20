@@ -1504,15 +1504,9 @@ func actionDeployCurrentGadgetSettings(store *mvuex.Store, context *mvuex.Action
 		//get current GadgetSettings
 		curGS := state.CurrentGadgetSettings.toGo()
 
-		//try to set them via gRPC (the server holds an internal state, setting != deploying)
-		err := RpcClient.SetRemoteGadgetSettings(curGS, defaultTimeoutShort)
-		if err != nil {
-			QuasarNotifyError("Error in pre-check of new USB gadget settings", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
-			return
-		}
 
 		//try to deploy the, now set, remote GadgetSettings via gRPC
-		_, err = RpcClient.DeployRemoteGadgetSettings(defaultTimeout)
+		_, err := RpcClient.DeployRemoteGadgetSettings(defaultTimeout, curGS)
 		if err != nil {
 			QuasarNotifyError("Error while deploying new USB gadget settings", err.Error(), QUASAR_NOTIFICATION_POSITION_TOP)
 			return

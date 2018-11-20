@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# Enable USB functions RNDIS, CDC ECM (don't disable other functions which already have been enabled)
-P4wnP1_cli usb set --rndis 1 --cdc-ecm 1
+# fallback script, called in case the configured 'Startup Master Template' fails
+# the script uses the CLI client to do basic configuration and make P4wnP1 reachable
+# Additionally it serves as example on how to use the CLI client to configure P4wnP1 A.L.O.A.
+
+# Enable USB functions RNDIS, CDC ECM
+P4wnP1_cli usb set --vid 0x1d6c --pid 0x1347 --manufacturer "MaMe82" --sn "deadbeef1337" --product "P4wnP1 by MaMe82" --rndis --cdc-ecm
 
 # Configure USB ethernet interface "usbeth" to run a DHCP server
 #   - use IPv4 172.16.0.1 for interface with netmask 255.255.255.252
@@ -22,4 +26,4 @@ P4wnP1_cli WIFI set ap -r US -c 6 -s "💥🖥💥 Ⓟ➃ⓌⓃ🅟❶" -k "MaMe
 #   - add a DHCP range from 172.24.0.10 to 172.24.0.20 with a lease time of 5 minutes
 P4wnP1_cli NET set server -i wlan0 -a 172.24.0.1 -m 255.255.255.0 -o "3:" -o "6:" -r "172.24.0.10|172.24.0.20|5m"
 
-P4wnP1_cli LED set -b 5
+P4wnP1_cli led -b 2

@@ -42,7 +42,7 @@ var triggerTypeString = map[triggerType]string {
 	triggerTypeSshLogin:              "TRIGGER_SSH_LOGIN",
 	triggerTypeDhcpLeaseGranted:      "TRIGGER_DHCP_LEASE_GRANTED",
 	triggerTypeGroupReceive:          "TRIGGER_GROUP_RECEIVE",
-	triggerTypeGroupReceiveMulti:     "TRIGGER_GROUP_RECEIVE_SEQUENCE",
+	triggerTypeGroupReceiveMulti:     "TRIGGER_GROUP_RECEIVE_MULTI",
 	triggerTypeGpioIn:                "TRIGGER_GPIO_IN",
 }
 
@@ -495,12 +495,12 @@ func (tam *TriggerActionManager) executeActionBashScript(evt *pb.Event, ta *pb.T
 	switch tt {
 	case triggerTypeGpioIn:
 		gpioPinName := ta.Trigger.(*pb.TriggerAction_GpioIn).GpioIn.GpioName
-		env = append(env, fmt.Sprintf("GPIO_PIN=%s", gpioPinName))
+		env = append(env, fmt.Sprintf("GPIO_PIN='%s'", gpioPinName))
 		_,level,_ := DeconstructEventTriggerGpioIn(evt)
 		if level {
-			env = append(env, fmt.Sprintf("GPIO_LEVEL='HIGH'"))
+			env = append(env, fmt.Sprintf("GPIO_LEVEL=HIGH"))
 		} else {
-			env = append(env, fmt.Sprintf("GPIO_LEVEL='LOW'"))
+			env = append(env, fmt.Sprintf("GPIO_LEVEL=LOW"))
 		}
 	case triggerTypeGroupReceiveMulti:
 		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceiveMulti).GroupReceiveMulti.GroupName
@@ -511,15 +511,15 @@ func (tam *TriggerActionManager) executeActionBashScript(evt *pb.Event, ta *pb.T
 		for _,v := range values { bashArray += fmt.Sprintf("%d ", v)}
 		bashArray += ")"
 		env = append(env,
-			fmt.Sprintf("GROUP='%s'", groupName),
+			fmt.Sprintf("GROUP=%s", groupName),
 			fmt.Sprintf("VALUES=%s", bashArray),
-			fmt.Sprintf("MULTI_TYPE='%s'", pb.GroupReceiveMultiType_name[int32(rtype)]),
+			fmt.Sprintf("MULTI_TYPE=%s", pb.GroupReceiveMultiType_name[int32(rtype)]),
 		)
 	case triggerTypeGroupReceive:
 		groupName := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.GroupName
 		value := ta.Trigger.(*pb.TriggerAction_GroupReceive).GroupReceive.Value
 		env = append(env,
-			fmt.Sprintf("GROUP='%s'", groupName),
+			fmt.Sprintf("GROUP=%s", groupName),
 			fmt.Sprintf("VALUE=%d", value),
 		)
 	case triggerTypeDhcpLeaseGranted:

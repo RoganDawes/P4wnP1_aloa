@@ -922,7 +922,7 @@ const templateAction = `
 			<q-item tag="label" v-if="isActionDeploySettingsTemplate">
 				<q-item-main>
 					<q-item-tile label>Type</q-item-tile>
-					<q-item-tile sublabel>Name of the stored settings template to load</q-item-tile>
+					<q-item-tile sublabel>Select the type of the template to load</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="ta.ActionData.Type" :options="templatetypes" color="secondary" @input="ta.ActionData.TemplateName=''" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>

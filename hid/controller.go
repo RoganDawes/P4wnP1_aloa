@@ -61,12 +61,17 @@ type HIDController struct {
 	ctx context.Context
 	cancel context.CancelFunc
 	eventHandler EventHandler
+
+	abortLock *sync.Mutex
+	isAborted bool
 }
 
 func NewHIDController(ctx context.Context, keyboardDevicePath string, keyboardMapPath string, mouseDevicePath string) (ctl *HIDController, err error) {
 	//ToDo: check if hidcontroller could work with a context with cancellation, which then could be cancelled on reuse of the object
 	if hidControllerReuse == nil {
 		hidControllerReuse = &HIDController{}
+		hidControllerReuse.abortLock = &sync.Mutex{}
+		hidControllerReuse.isAborted = true
 
 		hidControllerReuse.initMasterVM()
 		//clone VM to pool
@@ -81,6 +86,11 @@ func NewHIDController(ctx context.Context, keyboardDevicePath string, keyboardMa
 		hidControllerReuse.Mouse = nil
 	}
 
+
+	hidControllerReuse.abortLock.Lock()
+	defer hidControllerReuse.abortLock.Unlock()
+
+	hidControllerReuse.isAborted = false
 
 	ctx,cancel := context.WithCancel(ctx)
 	hidControllerReuse.ctx = ctx
@@ -125,6 +135,14 @@ func (ctl *HIDController) emitEvent(event Event) {
 }
 
 func (ctl *HIDController) Abort()  {
+	ctl.abortLock.Lock()
+	defer ctl.abortLock.Unlock()
+
+	if ctl.isAborted {
+		return
+	}
+	ctl.isAborted = true
+
 	// stop the old LED reader if present
 	// !! Keyboard.Close() has to be called before sending IRQ to VMs (there're JS function which register
 	// blocking callbacks to the Keyboard's LED reader, which would hinder the VM interrupt in triggering)

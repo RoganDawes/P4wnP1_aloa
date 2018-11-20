@@ -84,7 +84,7 @@ var (
 )
 
 type UsbManagerState struct {
-	UndeployedGadgetSettings *pb.GadgetSettings
+	//UndeployedGadgetSettings *pb.GadgetSettings
 	DevicePath map[string]string
 }
 
@@ -186,8 +186,8 @@ func NewUSBGadgetManager(rooSvc *Service) (newUGM *UsbGadgetManager, err error) 
 
 
 	defGS := GetDefaultGadgetSettings()
-	newUGM.State.UndeployedGadgetSettings = &defGS //preload state with default settings
-	err = newUGM.DeployGadgetSettings(newUGM.State.UndeployedGadgetSettings)
+	//newUGM.State.UndeployedGadgetSettings = &defGS //preload state with default settings
+	err = newUGM.DeployGadgetSettings(&defGS)
 	if err != nil {
 		newUGM.Usable = false
 		return newUGM,nil
@@ -197,7 +197,7 @@ func NewUSBGadgetManager(rooSvc *Service) (newUGM *UsbGadgetManager, err error) 
 
 
 
-func ValidateGadgetSetting(gs pb.GadgetSettings) error {
+func ValidateGadgetSetting(gs *pb.GadgetSettings) error {
 	/* ToDo: validations
 	- Done: check host_addr/dev_addr of RNDIS + CDC ECM to be valid MAC addresses via regex
 	- check host_addr/dev_addr of RNDIS + CDC ECM for duplicates
@@ -495,6 +495,8 @@ func (gm *UsbGadgetManager) ParseGadgetState(gadgetName string) (result *pb.Gadg
 			// remove path
 			result.UmsSettings.File = filepath.Base(result.UmsSettings.File)
 		}
+	} else {
+		result.UmsSettings = &pb.GadgetSettingsUMS{}
 	}
 
 	//check if UDC is set (Gadget enabled)
@@ -526,19 +528,34 @@ func MountUMSFile(filename string) error {
 	return nil
 }
 
-func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) error {
+func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) (err error) {
 	if !gm.Usable {
 		return ErrUsbNotUsable
 	}
 
-	fmt.Println("DeployGadgetSettings before lock ...")
+	//fmt.Println("DeployGadgetSettings before lock ...")
 
 	//Lock, only one change at a time
 	gm.gadgetSettingsLock.Lock()
-	defer gm.gadgetSettingsLock.Unlock()
-	fmt.Println("DeployGadgetSettings beyond lock ...")
+	//defer gm.gadgetSettingsLock.Unlock()
+	defer func() {
+		//fmt.Println("UNLOCKING DeployGadgetSettings")
+		gm.gadgetSettingsLock.Unlock()
+	}()
+	//fmt.Println("DeployGadgetSettings beyond lock ...")
+
+	err = ValidateGadgetSetting(settings)
+	if err != nil {
+		return
+	}
+
+	//Crash fix: abort HID controller before destorying gadget, to avoid crashes by attempting to close filedescriptors of non existent files
+	if gm.hidCtl != nil {
+		gm.hidCtl.Abort()
+	}
 
 	fmt.Println("... deconstruct old gadget")
+	//ToDo: Former gadgets are destroyed without testing if there're changes, this should be aborted if GadgetSettingsState == GetDeployedGadgetSettings()
 	gm.DestroyGadget(USB_GADGET_NAME)
 
 	var usesUSBEthernet bool
@@ -746,10 +763,12 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 		}
 		log.Printf("Enabeling gadget for UDC: %s\n", udcName)
 		if err = ioutil.WriteFile(USB_GADGET_DIR+"/UDC", []byte(udcName), os.ModePerm); err != nil {
+			fmt.Println("... error enabling gadget:", err)
 			return err
 		}
 
-		//update device path'
+		//update device path
+		log.Println("Retrieving path to HID devices")
 		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_KEYBOARD_name); errF == nil  { gm.State.DevicePath[USB_FUNCTION_HID_KEYBOARD_name] = devPath }
 		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_MOUSE_name); errF == nil  { gm.State.DevicePath[USB_FUNCTION_HID_MOUSE_name] = devPath }
 		if devPath,errF := enumDevicePath(USB_FUNCTION_HID_RAW_name); errF == nil  { gm.State.DevicePath[USB_FUNCTION_HID_RAW_name] = devPath }
@@ -759,6 +778,7 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) er
 			devPathKeyboard := gm.State.DevicePath[USB_FUNCTION_HID_KEYBOARD_name]
 			devPathMouse := gm.State.DevicePath[USB_FUNCTION_HID_MOUSE_name]
 
+			//log.Printf("Starting HID controller (kbd %s, mouse %s)...\n", devPathKeyboard, devPathMouse)
 			var errH error
 			gm.hidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, PATH_KEYBOARD_LANGUAGE_MAPS, devPathMouse)
 			gm.hidCtl.SetEventHandler(gm)

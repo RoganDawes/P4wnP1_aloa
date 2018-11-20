@@ -21,9 +21,8 @@ service P4WNP1 {
 
     //USB gadget
     rpc GetDeployedGadgetSetting (Empty) returns (GadgetSettings) {    }
-    rpc DeployGadgetSetting (Empty) returns (GadgetSettings) {    }
-    rpc GetGadgetSettings (Empty) returns (GadgetSettings) {    }
-    rpc SetGadgetSettings (GadgetSettings) returns (GadgetSettings) {    }
+    rpc DeployGadgetSetting (GadgetSettings) returns (GadgetSettings) {    }
+
     rpc GetLEDSettings (Empty) returns (LEDSettings) {    }
     rpc SetLEDSettings (LEDSettings) returns (Empty) {    }
     rpc MountUMSFile (GadgetSettingsUMS) returns (Empty) {    }

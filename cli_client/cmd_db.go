@@ -94,4 +94,6 @@ func init() {
 	cmdDBBackup.Flags().StringVarP(&tmpDBBackupName, "name", "n", "","Name of backup")
 	cmdDBRestore.Flags().StringVarP(&tmpDBBackupName, "name", "n", "","Name of backup")
 
+	cmdDBList.Flags().BoolVar(&BoolJson, "json", false, "Output results as JSON if applicable")
+
 }

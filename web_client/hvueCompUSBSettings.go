@@ -219,7 +219,7 @@ const (
 		<div class="col-12">
 			<q-card>
 				<q-card-title>
-					USB Gadget Settings ({{ currentGadgetSettings.UmsSettings }})
+					USB Gadget Settings
 				</q-card-title>
 
 				<q-card-main>

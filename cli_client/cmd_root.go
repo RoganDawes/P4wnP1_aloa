@@ -11,6 +11,7 @@ import (
 var (
 	StrRemoteHost string
 	StrRemotePort string
+
 	BoolJson bool
 )
 
@@ -45,7 +46,6 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&StrRemoteHost, "host", "localhost", "The host with the listening P4wnP1 RPC server")
 	rootCmd.PersistentFlags().StringVar(&StrRemotePort, "port", "50051", "The port on which the P4wnP1 RPC server is listening")
-	rootCmd.PersistentFlags().BoolVar(&BoolJson, "json", false, "Output results as JSON if applicable")
 
 	/*
 	// Cobra also supports local flags, which will only run
