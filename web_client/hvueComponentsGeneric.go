@@ -355,7 +355,7 @@ const compStartupSettings = `
 const compMasterTemplate = `
 <q-card>
 	<q-card-title>
-		Master Template
+		Master Template Editor
 	</q-card-title>
 
 <!--	{{ $data }} -->
