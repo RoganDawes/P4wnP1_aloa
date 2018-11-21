@@ -31,7 +31,7 @@ func init(){
 */
 
 var wifiCmd = &cobra.Command{
-	Use:   "WIFI",
+	Use:   "wifi",
 	Short: "Configure WiFi (spawn Access Point or join WiFi networks)",
 }
 
@@ -190,7 +190,7 @@ func createWifiStaSettings(reg string, strSSID string, strPSK string, nonexmon b
 
 func init() {
 	rootCmd.AddCommand(wifiCmd)
-	wifiCmd.AddCommand(wifiGetCmd)
+	//wifiCmd.AddCommand(wifiGetCmd)
 	wifiCmd.AddCommand(wifiSetCmd)
 	wifiSetCmd.AddCommand(wifiSetAPCmd)
 	wifiSetCmd.AddCommand(wifiSetStaCmd)

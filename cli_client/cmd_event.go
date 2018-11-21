@@ -9,7 +9,7 @@ var tmpEventID int64
 
 // usbCmd represents the usb command
 var evtCmd = &cobra.Command{
-	Use:   "EVT",
+	Use:   "evt",
 	Short: "Receive P4wnP1 service events",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := receiveEvent(tmpEventID)

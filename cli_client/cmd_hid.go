@@ -21,7 +21,7 @@ var (
 )
 
 var hidCmd = &cobra.Command{
-	Use:   "HID",
+	Use:   "hid",
 	Short: "Use keyboard or mouse functionality",
 }
 

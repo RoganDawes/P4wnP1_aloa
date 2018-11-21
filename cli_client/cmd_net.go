@@ -35,7 +35,7 @@ func init(){
 */
 
 var netCmd = &cobra.Command{
-	Use:   "NET",
+	Use:   "net",
 	Short: "Configure Network settings of ethernet interfaces (including USB ethernet if enabled)",
 }
 
@@ -272,7 +272,7 @@ func checkIPv4(ip4 string) error {
 
 func init() {
 	rootCmd.AddCommand(netCmd)
-	netCmd.AddCommand(netGetCmd)
+//	netCmd.AddCommand(netGetCmd)
 	netCmd.AddCommand(netSetCmd)
 	netSetCmd.AddCommand(netSetManualCmd)
 	netSetCmd.AddCommand(netSetDHCPClientCmd)
