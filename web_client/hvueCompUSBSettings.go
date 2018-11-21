@@ -149,26 +149,23 @@ const (
 			<q-toolbar slot="header">
 				<q-toolbar-title>
 					USB Mass Storage
-    				<span slot="subtitle">
-      					{{ value }}
-    				</span>
 				</q-toolbar-title>
 			</q-toolbar>
 
 			<q-list>
 				<q-item tag="label">
 					<q-item-side>
-						<q-toggle v-model="value.Cdrom"></q-toggle>
+						<q-toggle v-model="value.Cdrom" @input="value.File=''"></q-toggle>
 					</q-item-side>
 					<q-item-main>
 						<q-item-tile label>CD-Rom</q-item-tile>
-						<q-item-tile sublabel>If enabled, a CD-ROM drinve is emulated instead of a writable flash-drive</q-item-tile>
+						<q-item-tile sublabel>If enabled, a CD-ROM drive is emulated instead of a writable flashdrive</q-item-tile>
 					</q-item-main>
 				</q-item>
 
 
 			<q-item tag="div" class="col-12">
-				<select-string-from-array :values="value.Cdrom ? $store.state.UmsImageListCdrom : $store.state.UmsImageListFlashdrive"  v-model="ShowImageSelect" title="Select TriggerActions template" @load="value.File=$event"></select-string-from-array>
+				<select-string-from-array :values="value.Cdrom ? $store.state.UmsImageListCdrom : $store.state.UmsImageListFlashdrive"  v-model="ShowImageSelect" title="Select image" @load="value.File=$event"></select-string-from-array>
 				<q-item-side icon="archive" color primary />
 				<q-item-main>
 					<q-item-tile label>Image file to use</q-item-tile>
