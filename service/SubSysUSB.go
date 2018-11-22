@@ -104,6 +104,12 @@ func (gm *UsbGadgetManager) HandleEvent(event hid.Event) {
 }
 
 func (gm *UsbGadgetManager) HidScriptUsable() error {
+	// Fix: If a TriggerAction fires a HIDScript during Deployment of GadgetSettings, this method is called
+	// upfront, to check if mouse or keyboard are up
+	// We avoid returning false, if Deployment is still going on (undefined state), so we block
+	gm.gadgetSettingsLock.Lock()
+	defer gm.gadgetSettingsLock.Unlock()
+
 	if gm.hidCtl == nil {
 		return ErrHidNotUsable
 	}
@@ -537,11 +543,7 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) (e
 
 	//Lock, only one change at a time
 	gm.gadgetSettingsLock.Lock()
-	//defer gm.gadgetSettingsLock.Unlock()
-	defer func() {
-		//fmt.Println("UNLOCKING DeployGadgetSettings")
-		gm.gadgetSettingsLock.Unlock()
-	}()
+	defer gm.gadgetSettingsLock.Unlock()
 	//fmt.Println("DeployGadgetSettings beyond lock ...")
 
 	err = ValidateGadgetSetting(settings)

@@ -464,7 +464,10 @@ func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *
 	}
 
 	err := tam.rootSvc.SubSysUSB.HidScriptUsable()
-	if err != nil { return }
+	if err != nil {
+		fmt.Printf("Couldn't start HIDScript: %v\n", err)
+		return
+	}
 
 	scriptFile, err := ioutil.ReadFile(scriptPath)
 	if err != nil {
