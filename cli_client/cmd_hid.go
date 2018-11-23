@@ -189,7 +189,7 @@ func cobraHidRun(cmd *cobra.Command, args []string) {
 	res,err := ClientHIDRunScript(StrRemoteHost, StrRemotePort, serverScriptFilePath, tmpHidTimeout)
 	if err != nil { log.Fatal(err) }
 
-	fmt.Println(res.ResultJson)
+	fmt.Printf("Result:\n%s\n", res.ResultJson)
 	return
 }
 

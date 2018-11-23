@@ -150,7 +150,7 @@ func ClientUploadFile(host string, port string, src io.Reader, folder pb.Accessi
 		})
 	if err != nil {return}
 
-	fmt.Printf("Start appending to %s in folder\n", filename, pb.AccessibleFolder_name[int32(folder)])
+	fmt.Printf("Start appending to '%s' in folder '%s'\n", filename, pb.AccessibleFolder_name[int32(folder)])
 
 	// start appending chunks read from source file to remote file (Remote file is closed and opened every time, but
 	// this avoids client to server streaming, which would be hard to implement for gRPC-web
