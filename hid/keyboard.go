@@ -413,7 +413,6 @@ func (kbd *HIDKeyboard) PressKeySequence(reports []KeyboardOutReport) (err error
 	delay := kbd.KeyDelay
 	if kbd.KeyDelayJitter > 0 { delay += rand.Intn(kbd.KeyDelayJitter)}
 	if delay > 0 { time.Sleep(time.Millisecond * time.Duration(delay)) }
-
 	return nil
 }
 

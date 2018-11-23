@@ -407,7 +407,7 @@ func (ctl *HIDController) jsLayout(call otto.FunctionCall) (res otto.Value) {
 func (ctl *HIDController) jsTypingSpeed(call otto.FunctionCall) (res otto.Value) {
 	if ctl.Keyboard == nil { log.Println(ErrNoKeyboard);  oErr,_ := otto.ToValue(ErrNoKeyboard); return oErr }
 	typeDelay := call.Argument(0) //delay between keypresses in milliseconds
-	typeJitter := call.Argument(0) //additional random jitter between keypresses, maximum in milliseconds
+	typeJitter := call.Argument(1) //additional random jitter between keypresses, maximum in milliseconds
 
 	if delay,err:= typeDelay.ToInteger();err != nil || delay < 0 {
 		log.Printf("HIDScript typingSpeed: First argument has to be positive integer, representing the delay between key presses in milliseconds\n")
