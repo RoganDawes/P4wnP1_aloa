@@ -35,6 +35,14 @@ func InitCompHIDJobs() {
 	hvue.NewComponent(
 		"hid-job-overview-item",
 		hvue.Template(compHIDJobOverViewItemTemplate),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			data := &struct {
+				*js.Object
+				ShowDetails bool `js:"ShowDetails"`
+			}{Object: O()}
+			data.ShowDetails = false
+			return data
+		}),
 		hvue.Method("cancel", func(vm *hvue.VM) {
 			job := &jsHidJobState{Object:vm.Get("job")}
 			println("Aborting job :", job.Id)
@@ -91,6 +99,61 @@ func InitCompHIDJobs() {
 		hvue.PropObj("job", hvue.Required),
 	)
 
+	hvue.NewComponent(
+		"job-detail-modal",
+		hvue.Template(templateHIDJobDetails),
+		hvue.ComputedWithGetSet(
+			"visible",
+			func(vm *hvue.VM) interface{} {
+				return vm.Get("value")
+			},
+			func(vm *hvue.VM, newValue *js.Object) {
+				vm.Call("$emit", "input", newValue)
+			},
+		),
+		hvue.PropObj(
+			"value",
+			hvue.Required,
+			hvue.Types(hvue.PBoolean),
+		),
+		hvue.PropObj(
+			"job",
+			hvue.Required,
+		),
+		hvue.Computed("jobstate",
+			func(vm *hvue.VM) interface{} {
+				//fetch job and cast back to jobstate
+				job := &jsHidJobState{Object:vm.Get("job")}
+				switch {
+				case job.HasFailed && !job.HasSucceeded:
+					return "FAILED"
+				case job.HasSucceeded && !job.HasFailed:
+					return "SUCCEEDED"
+				case !(job.HasFailed || job.HasSucceeded):
+					return "RUNNING"
+				default:
+					return "UNKNOWN_STATE"
+
+				}
+			}),
+		hvue.Computed("jobcolor",
+			func(vm *hvue.VM) interface{} {
+				//fetch job and cast back to jobstate
+				job := &jsHidJobState{Object:vm.Get("job")}
+				switch {
+				case job.HasFailed && !job.HasSucceeded:
+					return "negative"
+				case job.HasSucceeded && !job.HasFailed:
+					return "positive"
+				case !(job.HasFailed || job.HasSucceeded):
+					return "warning"
+				default:
+					return "info"
+
+				}
+			}),
+	)
+
 }
 
 const (
@@ -109,32 +172,115 @@ ScriptSource   string `js:"textSource"`
 }
  */
 
+	templateHIDJobDetails = `
+<q-modal v-model="visible">
+	<q-modal-layout>
+		<q-toolbar slot="header">
+			<q-toolbar-title>
+				HIDScript job details
+			</q-toolbar-title>
+		</q-toolbar>
+
+		<div class="row gutter-sm">
+			<div class="col-3">
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile label>Job ID</q-item-tile>
+						<q-item-tile>
+							<q-input readonly v-model="job.id" inverted></q-input>
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</div>
+			<div class="col-3">
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile label>VM ID</q-item-tile>
+						<q-item-tile>
+							<q-input readonly v-model="job.vmId" inverted></q-input>
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</div>
+			<div class="col-6">
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile label>Sate</q-item-tile>
+						<q-item-tile>
+							<q-input readonly :color="jobcolor" v-model="jobstate" inverted></q-input>
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</div>
+
+			<div class="col-12">
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile label>HIDScript result</q-item-tile>
+						<q-item-tile>
+							<q-input readonly :color="jobcolor" v-model="job.textResult" inverted></q-input>
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</div>
+
+			<div class="col-12">
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile label>HIDScript source</q-item-tile>
+						<q-item-tile>
+							<q-input readonly type="textarea" v-model="job.textSource" inverted></q-input>
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</div>
+
+
+			<div class="col-12">
+				<q-item tag="label">
+					<q-item-main>
+						<q-item-tile>
+							<q-btn color="secondary" v-close-overlay label="close" />
+						</q-item-tile>
+					</q-item-main>
+				</q-item>
+			</div>
+		</div>
+	</q-modal-layout>
+</q-modal>
+`
+
 
 	compHIDJobOverViewItemTemplate = `
 <q-item highlight>
+	<job-detail-modal v-model="ShowDetails" :job="job"></job-detail-modal>
+
 	<q-item-side :icon="jobicon" :color="jobcolor" />
 	<q-item-main>
 		<q-item-tile label>Job {{ job.id }}</q-item-tile>
 		<q-item-tile sublabel>State {{ jobstate }} </q-item-tile>
 	</q-item-main>
 
-   	<q-item-side right v-if="job.hasSucceeded || job.hasFailed">
-		<q-btn flat round dense icon="more_horiz">
-			<q-popover>
-				{{ job.textResult }}
-			</q-popover>
-			<q-tooltip>
-				show job result
-			</q-tooltip>
-		</q-btn>
+
+   	<q-item-side right>
+		<div class="row no-wrap">
+			<div v-if="!job.hasSucceeded && !job.hasFailed">
+				<q-btn flat round dense color="negative" icon="cancel" @click="cancel">
+					<q-tooltip>
+						cancel HIDScript job {{ job.id }}
+					</q-tooltip>
+				</q-btn>
+			</div>
+			<div>
+				<q-btn flat round dense icon="info" @click="ShowDetails=true">
+					<q-tooltip>
+						show HIDScript job details
+					</q-tooltip>
+				</q-btn>
+			</div>
+		</div>
 	</q-item-side>
-   	<q-item-side right v-if="!job.hasSucceeded && !job.hasFailed">
-		<q-btn flat round dense color="negative" icon="cancel" @click="cancel">
-			<q-tooltip>
-				cancel HIDScript job {{ job.id }}
-			</q-tooltip>
-		</q-btn>
-	</q-item-side>
+
 </q-item>
 `
 

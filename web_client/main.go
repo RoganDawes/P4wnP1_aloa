@@ -45,14 +45,10 @@ func Router(router *js.Object) hvue.ComponentOption {
 
 
 func main() {
-	println(GetBaseURL())
+	//println(GetBaseURL())
 
 	store := InitGlobalState() //sets Vuex store in JS window.store
 
-//	RpcClient.StartListening() //Start event listening after global state is initiated (contains the event handlers)
-
-	// ToDo: delete because debug
-//	RpcClient.GetAllDeployedEthernetInterfaceSettings(time.Second*10)
 
 	router := NewVueRouter(
 		"/usb",

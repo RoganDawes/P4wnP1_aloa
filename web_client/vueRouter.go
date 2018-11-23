@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/mame82/hvue"
-
 )
 
 //Very simple vue-router binding, support only Component templates for routes
@@ -36,6 +35,8 @@ func VueRouterRoute(path, name, template string) VueRouterOption {
 		config.Routes.Call("push", route)
 	}
 }
+
+
 
 func NewVueRouter(defaultRoute string, opts ...VueRouterOption) *js.Object {
 	c := &VueRouterConfig{Object:O()}
