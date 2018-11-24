@@ -17,6 +17,9 @@
             "LEFT_GUI": [{"Modifiers": ["MOD_LEFT_GUI"], "Keys": []}],
             "RIGHT_GUI": [{"Modifiers": ["MOD_RIGHT_GUI"], "Keys": []}],
 
+            "SPACE": [{"Modifiers": [], "Keys": ["KEY_SPACE"]}],
+            "SPACEBAR": [{"Modifiers": [], "Keys": ["KEY_SPACE"]}],
+
             "ENTER": [{"Modifiers": [], "Keys": ["KEY_ENTER"]}],
             "RETURN": [{"Modifiers": [], "Keys": ["KEY_ENTER"]}],
 
