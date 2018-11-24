@@ -1,4 +1,4 @@
-package service
+package common
 
 const (
 	PATH_ROOT                   = "/usr/local/P4wnP1"

@@ -55,7 +55,7 @@ type server struct {
 
 func (s *server) ListUmsImageFlashdrive(ctx context.Context, e *pb.Empty) (sa *pb.StringMessageArray, err error) {
 	sa = &pb.StringMessageArray{}
-	scripts,err := ListFilesOfFolder(PATH_IMAGE_FLASHDRIVE, ".img", ".bin")
+	scripts,err := ListFilesOfFolder(common.PATH_IMAGE_FLASHDRIVE, ".img", ".bin")
 	if err != nil { return sa,err }
 	sa.MsgArray = scripts
 	return
@@ -63,7 +63,7 @@ func (s *server) ListUmsImageFlashdrive(ctx context.Context, e *pb.Empty) (sa *p
 
 func (s *server) ListUmsImageCdrom(ctx context.Context, e *pb.Empty) (sa *pb.StringMessageArray, err error) {
 	sa = &pb.StringMessageArray{}
-	scripts,err := ListFilesOfFolder(PATH_IMAGE_CDROM, ".iso")
+	scripts,err := ListFilesOfFolder(common.PATH_IMAGE_CDROM, ".iso")
 	if err != nil { return sa,err }
 	sa.MsgArray = scripts
 	return
@@ -386,7 +386,7 @@ func (s *server) DBBackup(ctx context.Context, filename *pb.StringMessage) (e *p
 		fname = fname + ".db"
 	}
 
-	err = s.rootSvc.SubSysDataStore.Backup(PATH_DATA_STORE_BACKUP + "/" + fname)
+	err = s.rootSvc.SubSysDataStore.Backup(common.PATH_DATA_STORE_BACKUP + "/" + fname)
 	return
 }
 
@@ -398,13 +398,13 @@ func (s *server) DBRestore(ctx context.Context, filename *pb.StringMessage) (e *
 	if lext := strings.ToLower(ext); lext != ".db" {
 		fname = fname + ".db"
 	}
-	err = s.rootSvc.SubSysDataStore.Restore(PATH_DATA_STORE_BACKUP + "/" + fname, true)
+	err = s.rootSvc.SubSysDataStore.Restore(common.PATH_DATA_STORE_BACKUP + "/" + fname, true)
 	return
 }
 
 func (s *server) ListStoredDBBackups(ctx context.Context, e *pb.Empty) (ma *pb.StringMessageArray, err error) {
 	ma = &pb.StringMessageArray{}
-	scripts,err := ListFilesOfFolder(PATH_DATA_STORE_BACKUP, ".db")
+	scripts,err := ListFilesOfFolder(common.PATH_DATA_STORE_BACKUP, ".db")
 	if err != nil { return ma,err }
 	ma.MsgArray = scripts
 	return
@@ -480,7 +480,7 @@ func (s *server) ListStoredUSBSettings(ctx context.Context, e *pb.Empty) (sa *pb
 
 func (s *server) ListStoredHIDScripts(context.Context, *pb.Empty) (sa *pb.StringMessageArray, err error) {
 	sa = &pb.StringMessageArray{}
-	scripts,err := ListFilesOfFolder(PATH_HID_SCRIPTS, ".js", ".javascript")
+	scripts,err := ListFilesOfFolder(common.PATH_HID_SCRIPTS, ".js", ".javascript")
 	if err != nil { return sa,err }
 	sa.MsgArray = scripts
 	return
@@ -488,7 +488,7 @@ func (s *server) ListStoredHIDScripts(context.Context, *pb.Empty) (sa *pb.String
 
 func (s *server) ListStoredBashScripts(context.Context, *pb.Empty) (sa *pb.StringMessageArray, err error) {
 	sa = &pb.StringMessageArray{}
-	scripts,err := ListFilesOfFolder(PATH_BASH_SCRIPTS, ".sh", ".bash")
+	scripts,err := ListFilesOfFolder(common.PATH_BASH_SCRIPTS, ".sh", ".bash")
 	if err != nil { return sa,err }
 	sa.MsgArray = scripts
 	return
@@ -672,9 +672,9 @@ func (s *server) FSWriteFile(ctx context.Context, req *pb.WriteFileRequest) (emp
 	case pb.AccessibleFolder_TMP:
 		filePath = "/tmp" + filePath
 	case pb.AccessibleFolder_BASH_SCRIPTS:
-		filePath = PATH_BASH_SCRIPTS + filePath
+		filePath = common.PATH_BASH_SCRIPTS + filePath
 	case pb.AccessibleFolder_HID_SCRIPTS:
-		filePath = PATH_HID_SCRIPTS + filePath
+		filePath = common.PATH_HID_SCRIPTS + filePath
 	default:
 		err = errors.New("Unknown folder")
 		return
@@ -692,9 +692,9 @@ func (s *server) FSReadFile(ctx context.Context, req *pb.ReadFileRequest) (resp 
 	case pb.AccessibleFolder_TMP:
 		filePath = "/tmp" + filePath
 	case pb.AccessibleFolder_BASH_SCRIPTS:
-		filePath = PATH_BASH_SCRIPTS + filePath
+		filePath = common.PATH_BASH_SCRIPTS + filePath
 	case pb.AccessibleFolder_HID_SCRIPTS:
-		filePath = PATH_HID_SCRIPTS + filePath
+		filePath = common.PATH_HID_SCRIPTS + filePath
 	default:
 		err = errors.New("Unknown folder")
 		return

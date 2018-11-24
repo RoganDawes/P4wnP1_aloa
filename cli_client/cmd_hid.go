@@ -1,6 +1,8 @@
 package cli_client
 
 import (
+	"context"
+	"github.com/mame82/P4wnP1_go/common"
 	"github.com/spf13/cobra"
 	"fmt"
 	"path/filepath"
@@ -16,8 +18,8 @@ import (
 
 var (
 	tmpHidCommands = ""
-	tmpRunFromServerPath = ""
-	tmpHidTimeout = uint32(0) // values < 0 = endless
+	tmpRunStored   = ""
+	tmpHidTimeout  = uint32(0) // values < 0 = endless
 )
 
 var hidCmd = &cobra.Command{
@@ -91,7 +93,7 @@ var hidJobCancelCmd = &cobra.Command{
 // The logic above applies to both, running scripts synchronous with `run` or asynchronous with `job`
 
 
-func parseHIDRunScripCmd(cmd *cobra.Command, args []string) (serverScriptPath string, err error) {
+func parseHIDRunScriptCmd(cmd *cobra.Command, args []string) (serverScriptPath string, err error) {
 	/*
 	readFromStdin := false
 	localFile := false //if true readFilePath refers to a file on the host of the rpcClient, else to a file on the rpcServer
@@ -104,7 +106,7 @@ func parseHIDRunScripCmd(cmd *cobra.Command, args []string) (serverScriptPath st
 
 
 	cFlagSet := cmd.Flags().ShorthandLookup("c").Changed
-	rFlagSet := cmd.Flags().ShorthandLookup("r").Changed
+	rFlagSet := cmd.Flags().ShorthandLookup("n").Changed
 
 	switch {
 	case !rFlagSet && !cFlagSet:
@@ -125,13 +127,13 @@ func parseHIDRunScripCmd(cmd *cobra.Command, args []string) (serverScriptPath st
 			} else {
 				// assume RPC client is run from same host as RPC server and the script path refers to a local file
 				transferNeeded = false
-				serverScriptPath = args[0]
+				serverScriptPath = common.PATH_HID_SCRIPTS + "/" + args[0]
 			}
 		}
 	case rFlagSet:
 		// the flag represents a script path on the RPC server, no matter where the RPC client is running, so we assume the script is already there
 		transferNeeded = false
-		serverScriptPath = tmpRunFromServerPath
+		serverScriptPath = common.PATH_HID_SCRIPTS + "/" + tmpRunStored
 	case cFlagSet:
 		// script content is provided by parameter and needs to be transferred
 		transferNeeded = true
@@ -178,15 +180,17 @@ func parseHIDRunScripCmd(cmd *cobra.Command, args []string) (serverScriptPath st
 		if err != nil { return "",errors.New(fmt.Sprintf("Error transfering HIDScript content to P4wnP1 Server: %v", err))}
 	}
 
-
 	return
 }
 
 func cobraHidRun(cmd *cobra.Command, args []string) {
-	serverScriptFilePath, err := parseHIDRunScripCmd(cmd,args)
+	serverScriptFilePath, err := parseHIDRunScriptCmd(cmd,args)
 	if err != nil { log.Fatal(err)}
 
-	res,err := ClientHIDRunScript(StrRemoteHost, StrRemotePort, serverScriptFilePath, tmpHidTimeout)
+	ctx,cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	res,err := ClientHIDRunScript(StrRemoteHost, StrRemotePort, ctx, serverScriptFilePath, tmpHidTimeout)
 	if err != nil { log.Fatal(err) }
 
 	fmt.Printf("Result:\n%s\n", res.ResultJson)
@@ -195,7 +199,7 @@ func cobraHidRun(cmd *cobra.Command, args []string) {
 
 
 func cobraHidJob(cmd *cobra.Command, args []string) {
-	serverScriptFilePath, err := parseHIDRunScripCmd(cmd,args)
+	serverScriptFilePath, err := parseHIDRunScriptCmd(cmd,args)
 	if err != nil { log.Fatal(err)}
 
 
@@ -226,10 +230,10 @@ func init() {
 	hidJobCmd.AddCommand(hidJobCancelCmd)
 
 	hidRunCmd.Flags().StringVarP(&tmpHidCommands, "commands","c", "", "HIDScript commands to run, given as string")
-	hidRunCmd.Flags().StringVarP(&tmpRunFromServerPath, "server-path","r", "", "Load HIDScript from given path on P4wnP1 server")
+	hidRunCmd.Flags().StringVarP(&tmpRunStored, "name","n", "", "Run a stored HIDScript")
 	hidRunCmd.Flags().Uint32VarP(&tmpHidTimeout, "timeout","t", 0, "Interrupt HIDScript after this timeout (seconds)")
 
 	hidJobCmd.Flags().StringVarP(&tmpHidCommands, "commands","c", "", "HIDScript commands to run, given as string")
-	hidJobCmd.Flags().StringVarP(&tmpRunFromServerPath, "server-path","r", "", "Load HIDScript from given path on P4wnP1 server")
+	hidJobCmd.Flags().StringVarP(&tmpRunStored, "name","n", "", "Run a stored HIDScript")
 	hidJobCmd.Flags().Uint32VarP(&tmpHidTimeout, "timeout","t", 0, "Interrupt HIDScript after this timeout (seconds)")
 }

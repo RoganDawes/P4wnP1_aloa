@@ -4,7 +4,7 @@ import (
 	"fmt"
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"errors"
-	"golang.org/x/net/context"
+	"context"
 	"google.golang.org/grpc"
 	"io"
 	"log"
@@ -320,7 +320,7 @@ func ClientDeployWifiSettings(host string, port string, settings *pb.WiFiSetting
 	return
 }
 
-func ClientHIDRunScript(host string, port string, scriptPath string, timeoutSeconds uint32) (scriptRes *pb.HIDScriptResult, err error) {
+func ClientHIDRunScript(host string, port string, ctx context.Context, scriptPath string, timeoutSeconds uint32) (scriptRes *pb.HIDScriptResult, err error) {
 	scriptReq := &pb.HIDScriptRequest{
 		ScriptPath: scriptPath,
 		TimeoutSeconds: timeoutSeconds,
@@ -332,10 +332,8 @@ func ClientHIDRunScript(host string, port string, scriptPath string, timeoutSeco
 	defer connection.Close()
 
 	rpcClient := pb.NewP4WNP1Client(connection)
-//	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 30)
-//	defer cancel()
 
-	scriptRes,err = rpcClient.HIDRunScript(context.Background(), scriptReq)
+	scriptRes,err = rpcClient.HIDRunScript(ctx, scriptReq)
 	return
 }
 

@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/mame82/P4wnP1_go/common"
 	"github.com/mame82/P4wnP1_go/hid"
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"io/ioutil"
@@ -740,9 +741,9 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) (e
 		//Provide the backing image
 		file := settings.UmsSettings.File
 		if settings.UmsSettings.Cdrom {
-			file = PATH_IMAGE_CDROM + "/" + file
+			file = common.PATH_IMAGE_CDROM + "/" + file
 		} else {
-			file = PATH_IMAGE_FLASHDRIVE + "/" + file
+			file = common.PATH_IMAGE_FLASHDRIVE + "/" + file
 		}
 		ioutil.WriteFile(funcdir+"/lun.0/file", []byte(file), os.ModePerm) // Set backing file (or block device) for USB Mass Storage
 
@@ -782,12 +783,12 @@ func (gm *UsbGadgetManager) DeployGadgetSettings(settings *pb.GadgetSettings) (e
 
 			//log.Printf("Starting HID controller (kbd %s, mouse %s)...\n", devPathKeyboard, devPathMouse)
 			var errH error
-			gm.hidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, PATH_KEYBOARD_LANGUAGE_MAPS, devPathMouse)
+			gm.hidCtl, errH = hid.NewHIDController(context.Background(), devPathKeyboard, common.PATH_KEYBOARD_LANGUAGE_MAPS, devPathMouse)
 			gm.hidCtl.SetEventHandler(gm)
 			if errH != nil {
-				log.Printf("ERROR: Couldn't bring up an instance of HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s'\nReason: %v\n", devPathKeyboard, devPathMouse, PATH_KEYBOARD_LANGUAGE_MAPS, errH)
+				log.Printf("ERROR: Couldn't bring up an instance of HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s'\nReason: %v\n", devPathKeyboard, devPathMouse, common.PATH_KEYBOARD_LANGUAGE_MAPS, errH)
 			} else {
-				log.Printf("HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s' initialized\n", devPathKeyboard, devPathMouse, PATH_KEYBOARD_LANGUAGE_MAPS)
+				log.Printf("HIDController for keyboard: '%s', mouse: '%s' and mapping path '%s' initialized\n", devPathKeyboard, devPathMouse, common.PATH_KEYBOARD_LANGUAGE_MAPS)
 			}
 		} else {
 			if gm.hidCtl != nil { gm.hidCtl.Abort() }

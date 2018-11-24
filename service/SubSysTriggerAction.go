@@ -413,7 +413,7 @@ func (tam *TriggerActionManager) executeActionStartHidScript(evt *pb.Event, ta *
 
 	fmt.Printf("Trigger '%s' fired -> executing action '%s' ('%s')\n", triggerName, actionName, action.ScriptName)
 
-	scriptPath := PATH_HID_SCRIPTS + "/" + action.ScriptName
+	scriptPath := common.PATH_HID_SCRIPTS + "/" + action.ScriptName
 	preScript := fmt.Sprintf("var TRIGGER='%s';\n", triggerName)
 
 	switch tt {
@@ -490,7 +490,7 @@ func (tam *TriggerActionManager) executeActionBashScript(evt *pb.Event, ta *pb.T
 	triggerName := triggerTypeString[tt]
 	actionName := actionTypeString[at]
 
-	scriptPath := PATH_BASH_SCRIPTS + "/" + action.ScriptName
+	scriptPath := common.PATH_BASH_SCRIPTS + "/" + action.ScriptName
 	env := []string{
 		fmt.Sprintf("TRIGGER=%s", triggerName),
 	}

@@ -5,6 +5,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/mame82/P4wnP1_go/common"
 	"github.com/mame82/P4wnP1_go/common_web"
 	pb "github.com/mame82/P4wnP1_go/proto"
 	"github.com/mame82/P4wnP1_go/service/datastore"
@@ -140,7 +141,7 @@ func NewService() (svc *Service, err error) {
 	svc = &Service{}
 	svc.Ctx,svc.Cancel = context.WithCancel(context.Background())
 
-	svc.SubSysDataStore, err = datastore.Open(PATH_DATA_STORE, PATH_DATA_STORE_BACKUP + "/init.db")
+	svc.SubSysDataStore, err = datastore.Open(common.PATH_DATA_STORE, common.PATH_DATA_STORE_BACKUP + "/init.db")
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +182,7 @@ func (s *Service) Start() (context.Context, context.CancelFunc) {
 	s.SubSysDwc2ConnectWatcher.Start()
 	s.SubSysGpio.Start()
 	s.SubSysLed.Start()
-	s.SubSysRPC.StartRpcServerAndWeb("0.0.0.0", "50051", "8000", PATH_WEBROOT) //start gRPC service
+	s.SubSysRPC.StartRpcServerAndWeb("0.0.0.0", "50051", "8000", common.PATH_WEBROOT) //start gRPC service
 	log.Println("Starting TriggerAction event listener ...")
 	s.SubSysTriggerActions.Start()
 
