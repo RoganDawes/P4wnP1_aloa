@@ -983,15 +983,15 @@ refers to the stored HIDScript). This could either be achieved with a single CLI
 Once more let us add additional goals:
 - it should be assured, that the USB configuration has the keyboard functionality enabled (the current setup doesn't do
 this and the TriggerAction couldn't start the HIDScript in case the USB keyboard is disabled)
-- the setup shoot applied at boot, without the need to manually load the TriggerAction set. It has to survive a reboot
-of P4wnP1.
+- the created setup should applied at boot of P4wnP1 A.L.O.A., without the need of manually loading of the TriggerAction 
+set. The setup has to survive a reboot of P4wnP1.
 
 To achieve the two additional goals, we have to dive into a new topic and ...
 
-#### Introduce Master Templates
+#### Introduce Master Templates and Startup Master Template
 
-Before we look into Master Templates, we do something we haven't done because everything just worked. We define a valid
-USB configurations, matching our task:
+Before we look into Master Templates, we do something we haven't done, yet, because everything just worked as intended 
+so far: We define a valid USB configurations, matching our task!
 
 - device serial number: 123456789
 - device product name: Auto Writer
@@ -1002,7 +1002,7 @@ USB configurations, matching our task:
   - HID keyboard
   - HID mouse
   
-Let's take a look into the usage screen of the proper CLI command first:
+Let's take a look into the usage screen of the CLI command, which could bes used to deploy these settings, first:
 
 ``` 
 root@kali:~# P4wnP1_cli usb set -h
@@ -1035,7 +1035,8 @@ Global Flags:
       --port string   The port on which the P4wnP1 RPC server is listening (default "50051")
 ``` 
 
-A ton of options, deploying our defined USB setup could be done like this:
+The command has a bunch of flags, but there exists a bunch of changeable USB settings, too. 
+Deploying our defined USB setup could be done like this, using the CLI:
 
 ```
 root@kali:~# P4wnP1_cli usb set \
@@ -1064,37 +1065,219 @@ Functions:
     Mass Storage: false
 ```
 
-The result output of the (long) command shows the intended settings. Let us check the "USB settings" tab of the 
-webclient to confirm. All changes should be reflected, if nothing went wrong.
+The result output of the (longish) command shows the resulting USB settings. Let us check the "USB settings" tab of the 
+webclient to confirm that they have been applied. All changes should be reflected, if nothing went wrong.
 
-Although it is perfectly possible to deploy a USB setup via CLI, there are several benefits using the webclient in favor
-of the CLI in this case:
+Although it is perfectly possible to deploy a USB setup using the CLI, there are several benefits using the webclient 
+in favor of the CLI. In this case:
 - changing the settings from the webclient is easier and more convenient
-- the webclient has a local state, thus settings could be changed (one by one), without deploying them 
-- the webclient could store its current settings (which don't have to be deployed necessarily) to persistent templates
+- the webclient holds an internal settings state, this allows defining USB settings without actually deploying them (the
+CLI on the other hand, could only manipulate settings by deploying them. This, again, resets the while USB stack of 
+P4wnP1 and all dependent functionality. F.e. already running HIDScript would be interrupted or USB network interfaces 
+are redeployed 
+- the current settings of the webclient could be stored to a persistent template, without deploying them upfront
 - the CLI client, (currently) isn't able to store USB settings
 
-So it would have been a better choice to use the webclient to change the USB settings to our needs. The good thing
-about the CLI approach used here: If the settings have already been deployed, we know that they work (before storing
-them to a template).
+In our current case, it is obviously a better choice to use the webclient for the needed changes to the USB settings. 
+The good thing about the CLI approach (we already used here): As the CLI forced us to deploy the USB settings, we could
+confirm that they are working, before we store them into a persistent template.
+
+Let's go on with storing the USB settings:
 
 Again we hit the "store" button, this time in the "USB settings" tab. Once more we call the template `tutorial1` (there
 is no conflict with the TriggerAction template stored under the same name, because a different namespace is used for 
 USB settings).
 
 
-We have to stored templates now:
-- one for the TriggerAction set, named `tutorial1`
-- one for the USB settings, also name `tutorial1`
+Now we have two new and persistently stored templates::
+1) a template for the TriggerAction set, named `tutorial1`
+2) a template for the USB settings, also name `tutorial1`
 
-Assuming the state (of current USB settings, TriggerActions or both) changed somehow, we could reload the settings with 
-a single CLI command:
+Assuming the state (of current USB settings, TriggerActions or both) changed somehow, we could reload both of the 
+stored settings at once, by issuing the following CLI command:
 
 ```
 P4wnP1_cli template deploy --usb tutorial1 --trigger-actions tutorial1
 ```
 
-But even if we define a new TriggerAction doing this for the on "service start" trigger, for example with an action 
-executing a bash script, we run into a chicken-egg problem.
+The command `P4wnP1 template deploy` could load a template for each of the sub systems of P4wnP1 A.L.O.A. in a single
+run (for the network subsystem multiple templates could be loaded, one per each adapter). Deploying templates for
+various subsystems is considered a common task while working with P4wnP1 A.L.O.A., because in most cases it should be 
+necessary to reconfigure several subsystems to reach a single goal. To account for this, so called *Master Templates*
+have been introduced.
 
-We can't deploy settings 
+A Master Template could consist of:
+- a already stored TriggerAction set template
+- a already stored USB settings template
+- a already stored WiFi settings template
+- a already stored Bluetooth settings template
+- multiple stored Network settings templates (one per each adapter)
+
+A Master Templated could be defined, stored or loaded, using the "Master Template Editor" from the "Generic Settings"
+tab of the webclient. Using the webclient is a convenient way to define Master Templates, as it supports you by only
+allowing to select templates, which have been already stored for the respective sub systems (and currently the 
+webclient is the only way to define Master Templates).
+
+So lets define a Master Template for our current task:
+1) Navigate to the "Generic Settings" tab of the webclient
+2) On the "Master Template Editor" click on the small button on the right to the "TriggerActions Template" field
+3) From the Dialog choose the `tutorial1` template and confirm with "OK" button
+4) If you selected the wrong template, re-open the dialog and select a different one or use the "x" icon on the right 
+to "TriggerAction Template" to delete the current selection
+5) Repeat the steps for the "USB Template" selection, again choose `tutorial1` (which is a different template for
+the USB sub system, although it shares the name with the one for the TriggerActions)
+6) Check that the correct templates have been selected for bot, USB and TriggerActions, and all other Templates are left 
+empty
+7) Store the new Master Template, by hitting the "Store" button and providing the name `tutorial1`
+
+To confirm if that the template has been stored, you could use the "Load Stored" button - the template should be listed
+in the selection. Cancel the "Load Store" dialog again.
+
+Now hit the "Deploy Stored" button, select the template named `startup` and confirm with "OK".
+
+In contrast to the "Load Stored" function, which loads a stored template to the Master Template Editor, the 
+"Deploy Stored" function applies all settings of a Master Template to the corresponding sub systems of P4wnP1, 
+immediately (without even loading them to the Master Template Editor).
+
+As the `startup` Master Template overwrites the current WiFi settings, it could happen that you have lost the connection
+to the webclient and need to reconnect to the P4wnP1 WiFi network.
+
+Once you've reconnected successfully and inspect the current USB settings and current TriggerActions, the settings we
+stored earlier have been overwritten by the sub settings of the `startup` Master Template.
+
+There are two ways to deploy the `tutorial1` Master Template again:
+1) Deploying it using the "Deploy Stored" dialog from the "Master Template Editor" (as done with the `startup` Master 
+Template a minute, ago)   
+2) Deploying it using the CLI client with `P4wnP1_cli template deploy --full tutorial1` (the `--full` flag is an alias 
+for Master Template)
+
+Beeing able to deploy the Master Template `tutorial1`, we already achieved one of our new goals:
+ 
+It is assured, that the USB configuration has the keyboard functionality enabled when we load our keystroke injection
+setup. 
+
+A quick summary on how this works:
+- the Master Template `tutorial1` loads USB settings, called `tutorial1` which have
+  - USB keyboard and USB mouse enabled
+- the Master Template `tutorial1` loads a TriggerAction set with a single TriggerAction
+  - the TriggerAction starts the HID script `tutorial1.js` each time P4wnP1 gets attached to an USB host
+    - the HIDScript starts typing, once the `waitLED` trigger fires (keyboard driver ready) and ends after a successive
+    LED change 
+ 
+
+The only remaining goal is the following: The created setup should applied at boot of P4wnP1 A.L.O.A., without the need 
+of manually loading of the TriggerAction set. The setup has to survive a reboot of P4wnP1.
+
+This goal could be achieved pretty easy now. The "Generic Settings" tab of the webclient presents a card called
+*Startup Master Template*. Changing the Startup Master Template to `tutorial1` at this point would have immediate effect
+and it would likely *destroy the working boot configuration of P4wnP1 A.L.O.A.". 
+
+
+**Important: If a Master Template has sub templates left empty (f.e. if there is no Bluetooth template selected), the 
+respective sub system isn't reconfigured when the Master Template is loaded. While this comes in handy for runtime 
+reconfiguration without resetting already running sub systems like the USB stack or WiFi stack if not needed, Master 
+Templates used as Startup Master Template leave sub systems without defined templates in an UNDEFINED STATE. If, for 
+example, no valid WiFi template is provided, it is unlikely that P4wnP1 A.L.O.A. will be reachable via WiFi after 
+reboot**
+
+So before deploying our new `tutorial1` Master Template as Startup Master Template, we assure proper settings are loaded 
+for the other subsystem. We do that like this:
+
+1) From the "Master Template Editor" hit the "Load Stored" button and reload the `tutorial1` template to the editor.
+2) The template should have `tutorial1` set for "TriggerActions Template" and for "USB template"
+3) For "WiFi Template" select the template named `startup` 
+4) For "Bluetooth Template" select the template named `startup` 
+5) For "Network Templates" select the templates named:
+    1) `bteth_startup` 
+    2) `usbeth_startup`
+    3) `wlan0_startup_dhcp_server`
+6) Overwrite the `tutorial1` Master Template with the new settings (hit "Store", enter `tutorial1` and confirm with 
+"OK")
+7) Double check that the changes have applied, by hitting "Load Stored", again, and selecting `tutorial1`. All 
+subsections of the loaded Master Template should look like described here.
+
+Now we are ready to deploy our new Master Template as Startup Master Template. After doing so we hit the "reboot" 
+button.
+
+Once rebooted, P4wnP1 A.L.O.A. should trigger the HIDScript automatically (and should still be reachable via WiFi, 
+to allow reconfiguration)
+
+**Congratulations, all goals achieved**
+
+You have learned about the very basic workflow concepts of P4wnP1 A.L.O.A.
+
+## 3. Where to go from here
+
+Under construction
+
+- bash scripts
+- GPIO
+- nexmon (karma)
+- WiFi covert channel example
+- bluetooth NAP
+
+## 4. Rescue: Help, I can't reach P4wnP1 A.L.O.A. as i messed up the configuration
+ 
+P4wnP1 A.L.O.A. doesn't protect you from misconfiguration, which render it unusable (as a root console wouldn't protect
+you from running `rm -rf /`).
+
+In case you messed everything up, here some ideas how to fix things:
+
+### Database backup
+
+Before you take critical changes to a still working P4wnP1 configuration, create a database backup. This could either be 
+done from the "Generic Settings" tab of the webclient or the the CLI, with the `P4wnP1_cli db backup` command.
+The backup will be stored in the folder `/usr/local/P4wnP1/db` under the chosen name.
+The "restore" function or `P4wnP1_cli db restore` command could be used to restore a given backup.
+A backup contains all stored templates (USB, WiFi, Network, Bluetooth, TriggerActions, MasterTemplates) and the Startup
+Master Template which has been set. The backup doesn't include HIDScripts or BashScripts, as both are stored as files
+to allow easy editing.
+
+### I have no backup and messed everything
+
+When P4wnP1 A.L.O.A. starts, it checks if a database exists. If the database doesn't exist it fills a new database based
+on an initial backup which ships with P4wnP1 A.L.O.A.
+
+The initial backup is stored at `/usr/local/P4wnP1/db/init.db` and **should never be deleted or overwritten**.
+
+In order to force P4wnP1 to re-create the actual database has to be deleted. This could be achieved by mounting the 
+P4wnP1 A.L.O.A. SD card on a system which is capable of writing EXT partitions.
+
+Once done, delete the folder `/usr/local/P4wnP1/store` from the SD card's root partition. This deletes the database and
+thus forces re-creation once P4wnP1 is booted, again 
+
+### I have a backup, but can't access P4wnP1 to restore it
+
+If you can't restore an existing database, because you have no access, you could still follow the steps from "I have no 
+backup and messed everything". In addition to deletion of the `/usr/local/P4wnP1/store` replace the 
+`/usr/local/P4wnP1/db/init.db` file with the one from your backup (be sure to have a backup copy of init.db).
+
+This should re-create your custom DB once P4wnP1 is rebooted.
+
+### I messed the Startup Master Template of my backup
+
+If you have a backup for which the Startup Master Template doesn't work. You have to do some additional steps, as it
+isn't possible to change the Startup Template directly in a backup.
+
+First follow the steps from "I have no backup and messed everything" which re-create the initial P4wnP1 database.
+After a reboot of P4wnP1, you should be able to access P4wnP1's webclient remotely, again.
+
+Move on to the "Generic Settings" and restore your own backup (the one with the wrong Startup Master Template).
+
+The "Startup Master Template" should show your "broken" Master Template as selected. If this isn't the case, reload
+the browser tab hosting the webclient application.
+
+Again, navigate to the "Generic Settings" tab and select a Startup Master Template which is known to work.
+
+At this point you should be ready to reboot. 
+
+### non of the above helped
+
+Sorry, seems you have to recreate your P4wnP1 A.L.O.A. SD crad from a clean image.
+
+## 5. Credits
+
+Under construction
+
+## 6. Licencing (3rd party under construction)
+
