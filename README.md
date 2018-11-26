@@ -131,9 +131,11 @@ With introducing of the so called "TriggerActions" and by combining them with th
 storage for all sub systems) all the requirements could be satisfied. Details on TriggerActions could be find in the 
 WorkFlow section.
 
+# Usage tutorial
+
 ## 2. Workflow part 1 - HIDScript
 
-P4wnP1 A.L.O.A. has no static configuration (or payloads). In fact it has no static workflow at all.
+P4wnP1 A.L.O.A. doesn't use concepts like static configuration or payloads. In fact it has no static workflow at all.
  
 P4wnP1 A.L.O.A. is meant to be as flexible as possible, to allow using it in all possible scenarios (including the ones
 I couldn't think of while creating P4wnP1 A.L.O.A.).
@@ -149,13 +151,13 @@ Now let's start with one of the most basic tasks:
 
 ### 2.1 Run a keystroke injection against a host, which has P4wnP1 attached via USB
 
-The minimum configuration requirements to achieve this goal are:
+The minimum configuration requirement to achieve this goal is:
 - The USB sub system is configured to emulate at least a keyboard
 - There is a way to access P4wnP1 (remotely), in order to initiate the keystroke injection
 
 The default configuration of P4wnP1's (unmodified image) meets these requirements already:
-- the USB settings are initialized to provide **keyboard**, mouse and ethernet (both, RNDIS and CDC ECM) 
-- P4wnP1 could already be accessed using one of the following methods:
+- the USB settings are initialized to provide **keyboard**, mouse and ethernet over USB (both, RNDIS and CDC ECM) 
+- P4wnP1 could already be accessed remotely, using one of the following methods:
 	- WiFi
 	  - the Access Point name should be obvious
 	  - the password is `MaMe82-P4wnP1`
@@ -174,19 +176,19 @@ The default configuration of P4wnP1's (unmodified image) meets these requirement
 - The webclient could be reached over all three connections on port 8000 via HTTP
 
 *Note:
-Deploying a HTTPS connection is currently not in scope of the project. So please keep this in mind, if you use the 
-webclient with sensitive data (like WiFi credentials). The whole project isn't built with security in mind (and it is 
-unlikely that this will ever get a requirement). So keep in mind to deploy appropriate measures (f.e. restricting access
+Deploying a HTTPS connection is currently not in scope of the project. So please keep this in mind, if you handle 
+sensitive data, like WiFi credentials, in the webclient. The whole project isn't built with security in mind (and it is 
+unlikely that this will ever get a requirement). So please deploy appropriate measures (f.e. restricting access
 to webclient with iptables, if the Access Point is configured with Open Authentication; don't keep Bluetooth 
 Discoverability and Connectability enabled without PIN protection etc. etc.)*
 
 At this point I assume:
 1) You have attached P4wnP1 to some target host via USB (the innermost of the Raspberry's micro USB ports is the one to 
 use)
-2) The USB host has an application running, which is able to receive the keystrokes and has keyboard input focus (f.e. 
-a text editor)
-3) You are remotely connected to P4wnP1 via SSH (the best way should be WiFi), preferably not from the same host which 
-has the USB connection attached 
+2) The USB host runs an application, which is able to receive the keystrokes and has the current keyboard input focus 
+(f.e. a text editor)
+3) You are remotely connected to P4wnP1 via SSH (the best way is WiFi), preferably the SSH connection is running from
+a different host, then the the one which has P4wnP1 A.L.O.A. attached over USB
 
 In order to run the CLI client from the SSH session, issue the following command:
 ```
@@ -222,9 +224,9 @@ Use "P4wnP1_cli [command] --help" for more information about a command.
 ```
 
 
-The resulting usage help screen shows, that the CLI uses different commands to interact with various subsystems of 
+The help screen already shows, that the CLI client uses different commands to interact with the various subsystems of 
 P4wnP1 A.L.O.A. Most of these commands have own sub-commands, again. The help for each command or sub-command could be 
-accessed by appending `-h`:
+accessed by appending `-h` to the CLI command:
 
 ```
 root@kali:~# P4wnP1_cli hid run -h
@@ -259,16 +261,19 @@ null
 
 On the USB host "Hello World" should have been typed to the application with keyboard focus.
 
-*If your SSH client runs on the USB host, the "Hello world" is typed somewhere into the result output of the CLI command
-(it doesn't belong to the output, but has been typed in between).*
+*If your SSH client runs on the USB host itself, the typed "Hello world" ends up somewhere between the resulting output 
+of the CLI command (it doesn't belong to the output, but has been typed in between).*
 
-Goal achieved. We injected keystrokes to the target. Much reading for a simple task, but again, this section is meant to
-explain basic concepts.
+**Goal achieved. We injected keystrokes to the target.**
+ 
+Much reading for a simple task like keystroke injection, but again, this section is meant to explain basic concepts.
 
 ### 2.2 Moving on to more sophisticated language features of HIDScript
 
 If you managed to run the "Hello world" keystroke injection, this is a good point to explore some additional HIDScript
-features. We already know the `type` command, here are some more: 
+features. 
+
+We already know the `type` command, but let's try and discuss some more sophisticated HIDScript commands: 
 
 #### Pressing special keys and combinations
 
@@ -277,32 +282,40 @@ The `type` command supports pressing return, by encoding a "new line" character 
 P4wnP1_cli hid run -c 'type("line 1\nline 2\nline 3 followed by pressing RETURN three times\n\n\n")'
 ```
 
-But what about special keys or key combinations ? The `press` command comes to help!
+But what about special keys or key combinations? 
 
-Pressing CTRL+ALT+DELETE
+The `press` command comes to help!
+
+Let's use `press` to send CTRL+ALT+DELETE to the USB host:
 
 ```
 P4wnP1_cli hid run -c 'press("CTRL ALT DELETE")'
 ```
 
-*Note: all 3 keys have been modifiers in the last example*
+*Note: Two of keys have been modifiers (CTRL and ALT) and only one has been an actual key (DELETE)*
 
-Press the non-modifier key A:
+Let's press the key 'A' without any modifier key:
 
 ```
 P4wnP1_cli hid run -c 'press("A")'
 ```
 
-*Note: The resulting output should be a lowercase 'a', because `press` interprets 'A' as key. In contrast, the `type`
-command would try to press a key combination, which results in an uppercase 'A' output character.*
+The resulting output should be a lowercase 'a', because `press("A")` interprets 'A' as key. The command `type("A")`, 
+on the other hand, tries to press a key combination which should result in an uppercase 'A' output character.
 
-Combine a modifier and a non-modifier key, to get an uppercase 'A' as resulting character:
+Let's combine a modifier and a non-modifier key, in order to produce an uppercase 'A' output character (mimic the 
+behavior of `type("A"):
 
 ```
 P4wnP1_cli hid run -c 'press("SHIFT A")'
 ```
 
-Combine `press` and `type`.
+This should have produced an uppercase A output.
+
+It is important to understand, that `press` interprets the given its key arguments as keys, while type tries to find the
+appropriate key combinations to produce the intended output characters.   
+
+In a last example, let's combine `press` and `type`.
 
 ```
 P4wnP1_cli hid run -c 'type("before caps\n"); press("CAPS"); type("after caps\n"); press("CAPS");'
@@ -315,35 +328,47 @@ other lowercase although both strings have been given in lower case.
 Additional notes on key presses with `press`: 
 
 I don't want to dive into the depth of USB keyboard reports inner workings, but some things are worth mentioning to 
-pinpoint the limits and possibilities of the `press` command (which is based on raw keyboard reports):
+pinpoint the limits and possibilities of the `press` command (which itself works based on raw keyboard reports):
 - a keyboard report can contain up to 8 modifier keys at once
-- the modifier keys are: LEFT_CTRL, RIGHT_CTRL, LEFT_ALT, RIGHT_ALT, LEFT_SHIFT, RIGHT_SHIFT, LEFT_GUI, RIGHT_GUI
-- P4wnP1 allows aliases for common modifiers
+- the modifier keys are
+  - LEFT_CTRL
+  - RIGHT_CTRL
+  - LEFT_ALT
+  - RIGHT_ALT
+  - LEFT_SHIFT
+  - RIGHT_SHIFT
+  - LEFT_GUI
+  - RIGHT_GUI
+- P4wnP1 allows using aliases for common modifiers
   - CTRL == CONTROL == LEFT_CTRL
   - ALT == LEFT_ALT
   - SHIFT == LEFT_SHIFT
   - WIN == GUI == LEFT_GUI
-- in addition to the modifiers, up to eight keys could be added
+- in addition to the modifiers, `press` consumes up to six normal or special keys
   - normal keys represent characters and special keys
   - example of special keys: BACKSPACE, ENTER (== RETURN), F1 .. F12)
+  - the keys are language layout agnostic (`press("Z")` results in USB_KEY_Z fo EN_US keyboard layout, but produces
+  USB_KEY_Y for a German layout. This corresponds to pressing the hardware key 'Z' on a German keyboard, which would 
+  produce a USB_KEY_Y, too.)
   - `/usr/local/P4wnP1/keymaps/common.json` holds a formatted JSON keymap with all possible keys (be careful not to 
   change the file) 
-- adding multiple keys to the press command, doesn't result in a key sequence, but in pressing all the given keys at the
-same time
+- **adding multiple keys to the a single `press` command, doesn't produce a key sequence.** All given given keys are 
+pressed at the same time and release at the same time.
 - `press` releases keys automatically, this means a sequence like "hold ALT, press TAB, press TAB, release ALT" 
 currently isn't possible 
 
 #### Keyboard layout
 
-The HIDScript command to change the keyboard layout is `layout(language map string)`.
+The HIDScript command to change the keyboard layout is `layout(<language map name>)`.
 
-Here's an example on how to switch keyboard layout, multiple times in a single script:
+The following example switches keyboard layout to 'US' types something and switches the layout to 'German' before it
+goes on typing:
 
 ```
 P4wnP1_cli hid run -c 'layout("us"); type("Typing with EN_US layout\n");layout("de"); type("Typing with German layout supporting special chars üäö\n");'
 ```
  
-The output result of the command given above, depends on the layout used by the USB host. 
+The output result of the command given above, depends on the target layout used by the USB host. 
 
 On a host with German keyboard layout the result looks like this:
 ```
@@ -356,12 +381,14 @@ Typing with EN_US layout
 Tzping with German lazout supporting special chars [';
 ```
 
-Please note, that the intended output is only achieved, if P4wnP1's keyboard layout aligns with the one of the USB host. 
-To achieve, this is the obvious aim of the `layout` command. 
+Please note, that the intended output is only achieved, if P4wnP1's keyboard layout aligns with the keyboard layout
+actually used by the USB host. 
+
+The `layout` command allows to align P4wwP1's internal layout to the one of the target USB host. 
 
 Being able to change the layout in the middle of a running HIDScript, could come in handy: Who knows, maybe you like to 
-brute force the target host's keyboard layout by issuing commands with changing layouts till they achieve the desired 
-effect.
+brute force the target host's keyboard layout by issuing commands with changing layouts till one of the typed commands
+achieves the desired effect.
 
 **Important:** The layout has global effect. This means if multiple HIDScripts are running concurrently and one of the 
 scripts sets a new layout, all other scripts are effected immediately, too.
@@ -369,20 +396,22 @@ scripts sets a new layout, all other scripts are effected immediately, too.
 #### Typing speed
 
 By default P4wnP1 injects keystrokes as fast as possible. Depending on your goal, this could be a bit too much (think of 
-detecting keystroke injection attacks based on typing speed). HIDScript supports a command to change this behavior.
+counter measures which prevent keystroke injection based on behavior analysis of typing speed). HIDScript supports a 
+command to change this behavior.
 
 `typingSpeed(delayMillis, jitterMillis)`
 
-The first argument is a delay in milliseconds, which is applied before each single keystroke. The second argument is an 
-additional jitter in milliseconds. A random delay between 0 milliseconds and jitter is applied additionally.
+The first argument to the `typingSpeed` command represents a constant delay in milliseconds, which is applied between 
+two keystrokes. The second argument is an additional jitter in milliseconds. It adds an additional random delay, which 
+scales between 0 and the given jitter in milliseconds, to the static delay provided with the first argument.
 
-Let's try it to type slower:
+Let's try to use `typingSpeed` to slow down the typing:
 
 ```
 P4wnP1_cli hid run -c 'typingSpeed(100,0); type("Hello world")'
 ```
 
-Instead of a constant delay, try a random jitter:
+Next, instead of a constant delay, we try a random jitter:
 ```
 P4wnP1_cli hid run -c 'typingSpeed(0,500); type("Writing with random jitter up to 500 milliseconds")'
 ```
@@ -397,65 +426,81 @@ the scripts sets a new typing speed, all other scripts are effected immediately,
 
 #### Wait for LED report
 
-This HIDScript feature needs a bit of explanation.
+Waiting for LED report, or to be precise LED state changes, is one of the more sophisticated keyboard features of 
+HIDScript. It could be very powerful but needs a bit of explanation.
 
-You may have noticed that (depending on the host OS) the keyboard state modifiers across multiple connected keyboards.
-For example, if you connect two keyboards to a Windows host, and toggle CAPSLOCK on one of the, the CAPSLOCK LED changes
-on both of them. 
+You may have noticed that (depending on the USB host's OS) the keyboard state modifiers (NUM LOCK, SCROLL LOCK, 
+CAPS LOCK) are shared across multiple connected keyboards. For example, if you connect two keyboards to a Windows host, 
+and toggle CAPS LOCK on one of them, the CAPS LOCK LED changes on both keyboards. 
 
-If the state modifier state is shared across multiple keyboards on a given OS, could be tested exactly like this.
+Exactly this test could be used, to determine if the keyboard state modifiers are shared across all keyboards for a 
+given OS. 
 
-In case a USB host supports this kind of state sharing, P4wnP1's HIDScript language could make use out of it.
+In case a USB host supports this kind of state sharing (for example Windows does), P4wnP1's HIDScript language could 
+make use out of it.
 
 Imagine the following scenario:
 
 P4wnP1 is connected to a USB host and you want to apply keystroke injection, but you don't want the HIDScript to 
 run the keystrokes immediately. Instead the HIDScript should sit and wait till you hit NUMLOCK, CAPSLOCK or SCROLLLOCK
 on the host's real keyboard. Why? Maybe you're involved in an engagement, somebody walked in and you don't want that
-this somebody could see how a ton of characters magically are typed into a console window which suddenly popped up.
-So you wait till somebody walks out, hit NUMLOCK and ultimately a console window pops up and a ton of character 
-magically are ... yes you got it. It could be done like this:
+this exact "somebody" could see how magically a huge amount of characters are typed into a console window which suddenly
+popped up. So you wait till "somebody" walks out, hit NUM LOCK and ultimately a console window pops up and a huge amount
+of characters are magically type ... I think you got it. 
+
+The described behavior could be achieved like this:
 
 ```
-P4wnP1_cli hid run -c 'waitLED(NUM); type("A ton of characters\n")'
+P4wnP1_cli hid run -c 'waitLED(NUM); type("A huge amount of characters\n")'
 ```
 
-If you tested the command above, you might encounter cases where the keystrokes immediately are issued, even if NUMLOCK
-wasn't pressed (and the LED didn't toggle), after starting the script.
+If you tested the command above, typing should only start if NUM LOCK is pressed on the USB host's hardware keyboard, 
+but you might encounter cases where the keystrokes immediately are issued, even if NUM LOCK wasn't pressed (and the 
+keyboard LED hasn't hacnged).
 
-This is intended behavior and there's a good reason for it. Maybe you have used other keyboard scripting languages,
-before which target USB devices capable of injecting keystrokes. Most of them have a common problem:
+This is intended behavior and the reason for this is another use case for the `waitLED` command:
+ 
+Maybe you have used other keyboard scripting languages and other USB devices capable of injecting keystrokes, before. 
+Most of these devices share a common problem: You don't know when to start typing! 
 
-You don't know when to start typing! If you type immediately after the USB device is powered, it is likely that the USB
-host didn't finished device enumeration and hasn't managed to bring up the keyboard driver. So your keystrokes are lost.
-To overcome this you could add a delay, before keystroke injection starts. But how long should this delay be? Five 
-seconds, 10 seconds, 30 seconds ? The answer is: it depends! It depends on how fast the host is able to enumerate the 
-device and bring up the driver. In fact you couldn't know how long this takes, without testing against the actual 
-target.
+If you start typing immediately after the USB device is powered up, it is likely that the USB host hasn't finished 
+device enumeration and thus hasn't managed to bring up the keyboard drivers. Ultimately your keystrokes are lost.
+
+To overcome this you could add a delay before the keystroke injection starts. But how long should this delay be? Five 
+seconds, 10 seconds, 30 seconds ? 
+
+The answer is: it depends! It depends on how fast the host is able to enumerate the device and bring up the keyboard 
+driver. In fact you couldn't know how long this takes, without testing against the actual target.
 
 But as we have already learned, Operating Systems like Windows share the LED state across multiple keyboards.
-This means if the NUMLOCK LED of the host keyboard is ON and you attach a second keyboard, the NUMLOCK LED on this 
-keyboard has to be set to ON, too. If the NUMLOCK LED would have been OFF, anyways, the newly attached keyboard receives
-the LED state anyways (all LEDs off in this case). The interesting thing about this, is that this "LED update" could
-only happen, if the keyboard driver of the USB host has finished loading.
+This means if the NUMLOCK LED of the host keyboard is set to ON before you attach a second keyboard, the NUMLOCK LED 
+on this new keyboard has to be set to ON, too, once attached. If the NUM LOCK LED would have been set to OFF, anyways, 
+the newly attached keyboard receives the LED state (all LEDs off in this case). The interesting thing about this is,
+that this "LED update" could only be send from the USB host to the attached keyboard, if the keyboard driver has 
+finished loading (sending LED state wouldn't be possible otherwise).
 
-Isn't that beautiful, the USB host tells us: "I'm ready to receive keystrokes". There is no need to play around with 
+Isn't that beautiful? The USB host tells us: "I'm ready to receive keystrokes". There is no need to play around with 
 initial delays. 
 
-But here's the problem: We connect P4wnP1 to an USB host. We run a HIDScript starting with `waitLED` instead of a delay
-and start typing afterwards, but nothing happens. Why? It is likely that we missed the LED state update, because it
-arrived before we started the HIDScript at all. Exactly this is the reason, why P4wnP1 preserves all recognized LED 
-state changes, unless at least one running HIDScript consumes them by calling `waitLED` (or `waitLEDRepeat`).
+But here is another problem: Assume we connect P4wnP1 to an USB host. We run a HIDScript starting with `waitLED` instead
+of a hand crafted delay. Typing starts after the `waitLED`, but nothing happens - our keystrokes are lost, anyways! Why? 
+Because, it is likely that we missed the LED state update, as it arrived before we even started our HIDScript. 
 
-It is worth mentioning, that `waitLED` returns ONLY if the received LED state differs from P4wnP1's internal state.
-This means, even if we listen for a change on any LED with `waitLED(ANY)` it still could happen, that we receive an 
-initial LED state from a USB host after attaching P4wnP1 to it, which doesn't differ from P4wnP1's internal state.
-In this case `waitLED(ANY)` would block forever (or till a real LED change happens).
+Exactly this "race condition" is the reason why P4wnP1 preserves all recognized LED state changes, unless at least one 
+HIDScript consumes them by calling `waitLED` (or `waitLEDRepeat`). This could result in the behavior describe earlier,
+where a `waitLED` returns immediately, even though no LED change occurred. We now know: The LED change indeed occurred, 
+but it could have happened much earlier (berfore we even started the HIDScript), because the state change was preserved.
+We also know, that this behavior is needed to avoid missing LED state changes, in case `waitLED` is used to test for
+"USB host's keyboard driver readiness".
 
+*Note: It is worth mentioning, that `waitLED` returns ONLY if the received LED state differs from P4wnP1's internal 
+state. This means, even if we listen for a change on any LED with `waitLED(ANY)` it still could happen, that we receive 
+an initial LED state from a USB host, which doesn't differ from P4wnP1's internal state. In this case `waitLED(ANY)` 
+would block forever (or till a real LED change happens).
 This special case could be handled by calling `waitLED(ANY_OR_NONE)`, which returns as soon as a new LED state arrive,
-even if it doesn't result in a change.
+even if it doesn't result in a change.*
 
-Enough explanation, let's get practical ... before we do so, we have to change the hardware setup a bit:
+**Enough explanation, let's get practical ... before we do so, we have to change the hardware setup a bit:**
 
 Attach an external power supply to the second USB port of the Raspberry Pi Zero (the outer one). This assures that
 P4wnP1 doesn't loose power when detached from the USB host, as it doesn't rely on bus power anymore. The USB port which
@@ -468,20 +513,21 @@ P4wnP1_cli hid run -c 'while (true) {waitLED(ANY);type("Attached\n");}'
 ``` 
 
 Detach P4wnP1 from the USB host (and make sure it is kept powered on)! Reattach it to the USB host ...
-Everytime you reattach P4wnP1 to the host, "Attached" should be typed out.
+Every time you reattach P4wnP1 to the host, "Attached" should be typed out to the host.
 
-This teaches us 3 things:
+This taught us 3 facts:
 1) `waitLED` could be used as initial command in scripts, to start typing as soon as the keyboard driver is ready
 2) `waitLED` isn't the perfect choice, to pause HID scripts until a LED changing key is pressed on the USB host, as 
 preserved state changes could unblock the command in an unintended way
 3) Providing more complex HIDScript as parameter to the CLI isn't very convenient
 
-We aren't done with the `waitLED` command, yet. But before going on lets leave the CLI.
+As we still aren't done with the `waitLED` command, we take care of the third fact, now. Let us leave the CLI.
 
 - abort the P4wnP1 CLI with CTRL+C (in case the looping HIDScript is still running)
-- open a browser on the host yor have been using for the SSH connection to P4wnP1
-- the webclient could be accessed via the same IP as the SSH server, the port is 8000 (for WiFi `http://172.24.0.1:8000`)
-- navigate to the "HIDScript" tab
+- open a browser on the host yor have been using for the SSH connection to P4wnP1 (not the USB host)
+- the webclient could be accessed via the same IP as the SSH server, the port is 8000 (for WiFi 
+`http://172.24.0.1:8000`)
+- navigate to the "HIDScript" tab in the now opened webclient
 - from there you could load and store HIDScripts (we don't do this for now, although `ms_snake.js` is a very good 
 example for the power of LED based triggers)
 
@@ -521,9 +567,10 @@ So the `waitLED` command returns a JavaScript object looking like this:
 }
 ```
 
-In my case, `NUM` became true. In your case it maybe was `CAPS`. It doesn't matter, what does matter is the fact, that
-this return value gives the opportunity to take branching decisions in a HIDScript, based on LED state changes issued 
-from the target USB host.
+In my case, `NUM` became true. In your case it maybe was `CAPS`. It doesn't matter which LED it was. "hat does matter is 
+the fact, that the return value gives the opportunity to examine the LED change which makes the command return and thus
+it could be used to take branching decisions in your HIDScript (based on LED state changes issued from the USB host's
+real keyboard).
 
 Let's try an example:
 
@@ -543,13 +590,14 @@ while (true) {
 ``` 
 
 Assuming the given script is already running, pressing NUM on the USB host should result in typing out "NUM has been 
-toggled", while pressing SCROLL LOCK results in the type text "SCROLL has been toggled". This behavior repeats, until
-CAPS LOCK is pressed and the resulting LED changes ends the loop.
+toggled", while pressing SCROLL LOCK results in the typed text "SCROLL has been toggled". This behavior repeats, until
+CAPS LOCK is pressed and the resulting LED change aborts the loop and ends the HIDScript.
 
-Puhhh ... a bunch of text on this command, there still some things left.
+Puhhh ... a bunch of text on this command for a single HIDScript command, but there still some things left.
 
-We provided arguments like `NUM`, `ANY` or `ANY_OR_NONE` commands to `waitLED` without much explanation.
-In fact `waitLED` accepts up to two arguments: 
+We provided arguments like `NUM`, `ANY` or `ANY_OR_NONE` to the `waitLED` command, without further explanation.
+
+The `waitLED` accepts up to two arguments: 
 
 The first argument, as you might have guessed, is a whitelist filter for the LEDs to watch. Valid arguments are:
 - `ANY` (react on a change to any of the LEDs)
@@ -560,34 +608,38 @@ The first argument, as you might have guessed, is a whitelist filter for the LED
 - multiple filters could be combined like this `CAPS | NUM`, `NUM | SCROLL`
 
 The second argument, we haven't used so far, is a timeout duration in milliseconds. If no LED change occurred during 
-this timeout, `waitLED` returns and has `TIMEOUT: true` set in the result object (additionally `ERROR` is set to true 
-and `ERRORTEXT` indcates a timeout).
+this timeout duration, `waitLED` returns and has `TIMEOUT: true` set in the resulting object (additionally `ERROR` is 
+set to true and `ERRORTEXT` indicates a timeout).
 
-The following command would wait for a change on the NUM LED for up to 5 seconds:
+The following command would wait for a change on the NUM LED, but aborts waiting after 5 seconds:
 
 ```
 waitLED(NUM,5000)
 ```
 
-Even though `waitLED` is a very powerful command if used correctly, it doesn't solve the easy task of robustly pausing
-a script till a state modifier key is pressed on the target USB host (rember: unintended return, caused by preserved LED
-state changes).
+Even though `waitLED` is a very powerful command if used correctly, it hasn't helped to deal with our easy task of 
+robustly pausing a HIDScript till a state modifier key is pressed on the target USB host (remember: We wanted to pause
+execution to assure the unwanted "somebody" walked out before typing starts, but `waitLED` occasionally returned early, 
+because of preserved LED state changes).
 
-This is where `waitLEDRepeat` joins the game.
+This is where `waitLEDRepeat` joins the game and comes to rescue.
 
 Paste the following script into the editor and try to make the command return. Inspect the HIDScript results afterwards.
 ```
 return waitLEDRepeat(ANY)
 ```
 
-You should quickly notice, that the same LED has to be changed frequently times, in order to make the command return.
-It doesn't return if different LEDs change or if the changes happen to slow. The provided argument (`ANY` in the 
-example) serves the same purpose as with `waitLED`. It is a whitelist filter. `waitLEDRepeat(NUM)` would only return
-on changes for the NUM LOCK LED - no matter how fast and often you'd press CAPS, it won't return.
+You should quickly notice, that the same LED has to be changed multiple times frequently, in order to make the 
+`waitLEDRepeat` command return. The `waitLEDRepeat` command wouldn't return if differing LEDs change state or if the 
+LED changes on a single LED are occurring too slow. 
+
+The argument provided to `waitLEDRepeat` (which is `ANY` in the example) serves the exact same purpose as for `waitLED`. 
+It is a whitelist filter. For example `waitLEDRepeat(NUM)` would only return for changes of the NUM LOCK LED - no matter
+how fast and often you'd hammer on the CAPS LOCK key, it wouldn't return unlees NUM LOCK is pressed frequently.
 
 By default, one of the whitelisted LEDs has to change 3 times and the delay between two successive changes mustn't be
-greater than 800 milliseconds. This behavior could be influenced, by providing additional arguments like in this 
-example:
+greater than 800 milliseconds in order to make `waitLEDRepeat` return. This behavior could tuned, by providing 
+additional arguments like shown in this example:
 
 ```
 filter = ANY;		// same filters as for waitLED
@@ -601,39 +653,43 @@ waitLEDRepeat(filter, num_changes, max_delay, timeout); //wait till a LED freque
 
 So that's how to interact with LED reports from an USB host in HIDScript.
 
-There's one thing left, which should be known: `waitLEDRepeat` doesn't differ from `waitLED`, when it comes to 
-consumption of preserved LED state changes. Anyways, it is much harder to trigger it unintended. So `waitLEDRepeat` is
-the right choice, if the task is to pause HIDScripts till human interaction happens. Of course it could be used for
-branching, too. 
+*Note: `waitLEDRepeat` doesn't differ from `waitLED`, when it comes to consumption of preserved LED state changes. 
+Anyways, it is much harder to trigger it unintended.*
+ 
+So `waitLEDRepeat` is the right choice, if the task is to pause HIDScripts till human interaction happens. Of course it 
+could be used for branching, too, as it provides the same return object as `waitLED` does. 
 
+Up to this point we gained a good bit of knowledge about HIDScript (of course not about everything, we haven't even 
+looked into mouse control capabilities of this scripting language). Anyways, this tutorial is about P4wnP1 A.L.O.A. 
+workflow and basic concepts. So we don't look into other HIDScript features, for now, and move on.
 
-Up to this point we gained a good bit of knowledge on HIDScript (of course not everything, we haven't even looked into 
-mouse control). Anyways, this text is about P4wnP1 A.L.O.A. workflow and concepts. So we don't look into mouse support
-right now.
-
-Let's summarize what information we gathered about P4wnP1's workflow and concepts so far:
+Let's summarize what we learned about P4wnP1's workflow and concepts so far:
 - we could start actions like keystroke injection from the CLI client, on-demand
-- we could use the webclient to achieve the same goal
-- with an external powers supply connected, we could change USB hosts and go on working seamlessly 
-- we could configure the USB stack exactly to our needs ()and change the configuration at runtime)
-- we could write multi purpose HIDScripts, with complex logic based on JavaScript (support for functions, loops, 
+- we could use the webclient to achieve the same, while having additional control over HIDScript jobs
+- if we connect an external power supply to P4wnP1 A.L.O.A., we attach/detach to/from different USB hosts and already 
+started HIDScripts go on working seamlessly 
+- we could configure the USB stack exactly to our needs (and change its configuration at runtime, without rebooting 
+P4wnP1)
+- we could write multi purpose HIDScripts, with complex logic based on JavaScript (with support for functions, loops, 
 branching etc. etc.)
 
 ### 3. Workflow part 2 - Templating and TriggerActions
 
-Before moving on to the other major concepts of P4wnP1 A.L.O.A. let's refine our first goal, which was to "run a 
-keystroke injection against a USB host":
+Before go on with the other major concepts of P4wnP1 A.L.O.A. let's refine our first goal, which was to "run a keystroke 
+injection against a USB host":
 
 - The new goal is to type "Hello world" into the editor of a Windows USB host (notepad.exe). 
 - The editor should be opened by P4wnP1 (not manually by the user).
-- The editor should automatically be closed, when any of the keyboard LEDs of the USB host is toggled once.
+- The editor should automatically be closed, when any of the keyboard LEDs of the USB host is toggled.
 - Everytime P4wnP1 is attached to the USB host, this behavior should repeat (with external power supply, no reboot of 
 P4wnP1)
-- The script should only run ones, unless P4wnP1 is re-attached to the USB host, even if successive keyboard LED changes
-occur. 
-- Even if P4wnP1 is rebooted, the same behavior should be recoverable without recreating everything from scratch.
+- The process *should only run once*, unless P4wnP1 is re-attached to the USB host, even if successive keyboard LED 
+changes occur after the HIDScript has been started.
+- Even if P4wnP1 is rebooted, the same behavior should be recoverable without recreating detail of the setup from 
+scratch, again.
 
-Starting notepad, typing "Hellow world" and closing notepad after a LED change could be done with this HIDScript: 
+Starting notepad, typing "Hello world" and closing notepad after a LED change could be done with the things we learned 
+so far. An according HIDScript could look something like this: 
 
 ```
 // Starting notepad
@@ -655,39 +711,45 @@ press("RIGHT");         // move focus to next button (don't save) with RIGHT ARR
 press("SPACEBAR");      // confirm dialog with space
 ```
 
-The only thing new here is the `delay` command, which doesn't need much explanation. It delays execution for the given
-amount of milliseconds. The script could be pasted into the webclient HIDScript editor and started with "run" in order 
-to test it.
+The only thing new in this script is the `delay` command, which doesn't need much explanation. It delays execution for 
+the given amount of milliseconds. 
+
+The script could be pasted into the webclient HIDScript editor and started with "run" in order to test it.
 
 It should work as intended, so we are nearly done. In order to be able reuse the script, even after a reboot, we store 
-it persistently. This could be done by hitting the "store" button in the HIDScript tab of the webclient. After entering
-the name `tutorial1` and confirming the dialog the script should be stored. We could confirm this, by hitting the 
-"Load & Replace" button in the webclient, the stored script should be in the list and named `tutorial1.js` (the `.js`
-extension is appended automatically, if not already done in the "store" dialog).
+it persistently. This could be achieved by hitting the "store" button in the HIDScript tab of the webclient. After 
+entering a name (we use `tutorial1` for now) and confirming the dialog, the HIDScript should have been stored. 
+We could check this, by hitting the "Load & Replace" button in the webclient. The stored script should occur in the list
+of stored scripts with the name `tutorial1.js` (the `.js` extension is appended automatically, if it hasn't been 
+provided in the "store" dialog, already).
 
-**Warning: If a name of an existing file is written to the store dialog, the file gets overwritten without further
-confirmation.**
+**Warning: If a name of an already existing file used in the store dialog, the respective file gets overwritten without 
+asking for further confirmation.**
 
-Let's try to start the exact same script via CLI from a SSH session now:
+Let's try to start the stored script using the CLI client from a SSH session, like this:
 ```
 P4wnP1_cli hid run tutorial1.js
 ```
 
-So it is possible to start the HIDScript from other applications, supporting shell command or from a bash script.
+This should have worked. This means, it is possible to start stored HIDScripts from all applications which support shell
+commands or from a simple bash script, by using the P4wnP1 A.L.O.A. CLI client.
 
 It would even be possible to start the script remotely from a CLI client compiled for Windows. Assuming the Windows host
-is able to reach P4wnP1 A.L.O.A. via WiFi and the IP of P4wnP1 is set to `172.24.0.1` the command would look like this:
+is able to reach P4wnP1 A.L.O.A. via WiFi and the IP of P4wnP1 is set to `172.24.0.1` the proper command would look like
+this:
 ```
 P4wnP1_cli.exe --host 172.24.0.1 hid run tutorial1.js
 ```
 
 *Note: At the time of this writing, I haven't decided yet if P4wnP1 A.L.O.A. ships a CLI binary for each and every 
 possible platform and architecture. But it is likely that precompiled versions for major platforms are provided. If
-not this shouldn't be a problem. As cross compilation of the Go code takes less than a minute.*
+not - this isn't a big problem, as cross-compilation of the CLI client's Go code takes less than a minute.*
 
-The next step is to allow the script to start again, when P4wnP1 is re-attached to the USB host. A approach we already
-used, is to wrap everything into a loop and prepend a `waitLED(ANY_OR_NONE)` to continue when the USB host signals that
-the keyboard driver is ready to receive input. A modified script could look like this:
+The next step is to allow the script to run again, every time P4wnP1 is re-attached to a USB host. A approach we already
+used to achieve such a behavior, was to wrap everything into a loop and prepend a `waitLED(ANY_OR_NONE)`. The
+`waitLED(ANY_OR_NONE)` assured tha the loop only continues, if the target USB host signals that the keyboard driver is 
+ready to receive input by sending an update of the global keyboard LED sate. An accordingly modified script could look 
+like this:
 
 ```
 while (true) {
@@ -713,68 +775,84 @@ while (true) {
 }
 ```
 
-Indeed the script would run, every time we attach P4wnP1 to the host, but it isn't very robust, because there's a second
-`waitLED` involved before notepad is closed. There are several error cases, for example if P4wnP1 is detached before
-the "Hello world" is written. The blocking `waitLED` would be the one before `press("ALT F4")` now and execution would 
-continue from this point on reattach.
+The script given above, indeed, would run, every time P4wnP1 is attached to an USB host. But the script isn't very 
+robust, because there's a second `waitLED` involved, which waits till notepad.exe should be is closed, again. 
 
-A definitive kill criteria for this approach: The requirement that the script should be run only once isn't met anymore.
-Hitting NUM LOCK repeatedly would restart the script, again and again.
+Doing it like this involves several issues. For example if P4wnP1 is detached before the "Hello world" is typed out, the
+now blocking `waitLED` would be the one before `press("ALT F4")` and execution would continue at exact this point of
+the HIDScript once P4wnP1 is attached to a (maybe different) USB host, again.
 
-So how to solve this ?
+A definitive kill criteria for the chosen approach is the following problem: The requirement that the script should be 
+run only once after attaching P4wnP1 to an USB host couldn't be met, as hitting NUM LOCK multiple times would restart 
+the script over and over.
+
+So how do we solve this ?
 
 #### Let's introduce TriggerActions
 
-The solution to the problem are TriggerActions. As the name implies, the concept is to fire actions, based on predefined
-triggers.
+The solution to the problem are so called "TriggerActions". As the name implies, this P4wnP1 A.L.O.A. workflow concept 
+fires actions based on predefined triggers.
 
 To get an idea of what I'm talking about, head over to the "TRIGGER ACTIONS" tab on the webclient. Depending on the 
-current setup, there may already exist TriggerActions, which doesn't matter for now.
+current setup, there may already exist TriggerActions. We don't care for existing TriggerActions, now.
 
-Hitting the "ADD ONE" button add a new TriggerActions and opens it in edit mode. The TriggerAction is turned off by 
-default and has to be enabled in order to be editable. So we toggle the enable switch.
+Hit the "ADD ONE" button and a new TriggerActions should be added and instantly opened in edit mode. 
+The new TriggerAction is disabled by default and has to be enabled in order to make it editable. So we toggle the enable
+switch.
 
 Now from the pull down menu called "Trigger" the option "USB gadget connected to host" should be selected. The action
-should have a preset of "write log entry". We leave it like this and hit the "Update" button. The newly added 
-TriggerAction should be visible in the overview now (the one with the highest ID) and show a summary of the selected
-Trigger and selected Action.
+should have a preset of "write log entry" selected. We leave it like this and hit the "Update" button. 
 
-To test how the trigger works, navigate to the "Event Log" tab of the webclient. Make sure you have the webclient open
-via WiFi (not USB ethernet). Apply external power to P4wnP1, disconnect it from the USB host and connect it again.
-A log message should be pushed to the client immediately every time P4wnP1 is attached to the USB host.
+The newly added TriggerAction should be visible in the TriggerActions overview now (the one with the highest ID) and 
+show a summary of the selected Trigger and selected Action in readable form.
 
-Repeating this a few times, it becomes pretty obvious that this trigger fires in an early USB enumeration phase. To be 
-precise: When this trigger fires, it is clear that P4wnP1 has been connected to the USB host, but there's no guarantee
-that the host managed to load all needed drivers. In fact it is very unlikely that the USB keyboard driver is loaded 
-when the trigger fires. We have to keep this in mind.
+To test if the newly defined TriggerAction works, navigate over to the "Event Log" tab of the webclient. 
+Make sure you have the webclient opened via WiFi (not USB ethernet). Apply external power to P4wnP1, disconnect it from 
+the USB host and connect it again. A log message should be pushed to the client every time P4wnP1 is attached to a USB 
+host, immediately.
 
-Before we move on with our task, we do an additional test. Heading back to the "TriggerAction" tab and pressing the 
-little blue button looking like a pen, on our newly created TriggerAction we end up in edit mode again. Enable the 
-`One shot` switch now. Head back to the "Event Log" and detach and re-attach P4wnP1 from the USB host again. This time
-the Trigger fires only once, no matter how often P4wnP1 is re-attached to the USB host afterwards. It is worth 
-mentioning that a "One shot" TriggerAction isn't deleted after the TriggerFired, instead the TriggerAction is disabled.
-Re-enabling allows to reuse the TriggerAction without redefining it. Nothing gets lost until the red "trash" button is
-hit on a TriggerAction.
+If you repeated this a few times, you maybe noticed that the "USB gadget connected to host" trigger fires very fast
+(or in an early stage of USB enumeration phase). To be more precise: When this trigger fires, it is known that P4wnP1 
+was connected to a USB host, but there is no guarantee that the USB host managed to load all needed USB device drivers. 
+**In fact it is very unlikely that the USB keyboard driver is loaded when the trigger fires. We have to keep this in 
+mind.**
 
-**Warning: If the delete button for a TriggerAction is clicked, the TriggerAction is deleted without further 
+Before we move on with our task, we do an additional test. Heading back to the "TriggerAction" tab and we press the 
+little blue button looking like a pen for our newly created TriggerAction. We end up in edit mode again.
+ 
+This time, we enable the `One shot` option. Head back to the "Event Log" afterwards, and again, detach and re-attach 
+P4wnP1 from the USB host. This time the TriggerAction should fire only once. No matter how often P4wnP1 is re-attached 
+to the USB host afterwards, no new log message indicating a USB connect should be created. 
+
+It is worth mentioning that a "One shot" TriggerAction isn't deleted after the Trigger has fired. Instead the 
+TriggerAction is disabled, again. Re-enabling allows reusing a TriggerAction without redefining it. Nothing gets lost 
+until the red "trash" button is hit on a TriggerAction, which will delete the respective TriggerAction.
+
+**Warning: If the delete button for a TriggerAction is clicked, the TriggerAction is deleted permanently without further 
 confirmation.**
 
 At this point let's do the obvious. We edit the created TriggerAction and select "start a HIDScript" instead of "write
-log entry" for the action to execute. A new input field called "script name" is shown. Clicking on this input field 
-brings up a selection dialog for all stored HIDScripts, including our newly created `tutorial1.js`.
+log entry" for the action to execute. Additionally we disable "one-shot", again. A new input field called "script name" 
+is shown. Clicking on this input field brings up a selection dialog for all stored HIDScripts, including our formerly 
+created `tutorial1.js` HIDScript.
 
-Before we test if this works, a quick note on the action "write log entry": P4wnP1 A.L.O.A. doesn't keep track of 
-TriggerActions which have already be fired. This means the log entries created by a "write log entry" action are 
-delivered to all listening client, but not stored (for various reasons). The webclient on the other hand stores the log
-entry until the single page application is reloaded. The same applies to events related to HIDScript jobs. If a 
-HIDScript ends (with success or error), a vent is fired and delivered to the webclient. In fact the webclient has a 
-runtime state, which holds more information than the core service. If the runtime state of the webclient grows to large,
-one only needs to reload the client to clear "historical" sate information. If the core service would store historical
-information, it would get out of resources very soon. Thus this concept applies to most sub systems of P4wnP1 A.L.O.A.
+*Before we test if this works, let me make a quick note on the action "write log entry": P4wnP1 A.L.O.A. doesn't keep 
+track of Triggers which have already be fired. This means the log entries created by a "write log entry" action are 
+delivered to all listening client, but aren't stored by the P4wnP1 service (for various reasons). The webclient on the 
+other hand stores the log entry until the the webclient itself is reloaded. The same applies to events, which are 
+related to HIDScript jobs. If a HIDScript ends (with success or error), an event pushed to all currently open 
+webclients. In summary, each webclient has a runtime state, which holds more information than the core service, itself. 
+If the runtime state of the webclient grows to large (too much memory usage), one only needs to reload the client to 
+clear "historical" sate information. If the core service would behave the same and store every historical information, 
+it would run out of resources very soon. Thus this concept applies to most sub systems of P4wnP1 A.L.O.A.*
 
-Now back to our task. We have a TriggerAction ready, which fires our HIDScript every time P4wnP1 is attached to an USB
-host. Depending on the USB host, this works more or less reliably. In my test setup it didn't work at all and there's
-a reason. Let's review the first few lines our HIDScript:
+Now back to our task. We have a TriggerAction ready, which should fire our HIDScript every time P4wnP1 is attached to 
+an USB host. 
+
+Depending on the target USB host, this works more or less reliably. In my test setup it didn't work at all and there's
+a reason:
+ 
+Let's review the first few lines our HIDScript:
 
 ```
 // Starting notepad
@@ -784,10 +862,12 @@ type("notepad.exe\n"); 	// type 'notepad.exe' to the run dialog, append a RETURN
 ... snip ...
 ```
 
-Recalling the fact, that the "USB gadget connected" Trigger fires in early USB enumeration phase, when the USB host's 
-keyboard driver hasn't necessarily loaded, the problem becomes obvious. We have to prepend some kind of delay to the
-script to assure the keyboard driver is up. As we already know that it isn't possible to predict the optimal delay, we
-go with the `waitLED(ANY_OR_NONE)` approach, instead. The new script should look like this:
+Recalling the fact, that the "USB gadget connected" Trigger fires in early USB enumeration phase and the USB host's 
+keyboard driver hasn't necessarily been loaded, the problem becomes obvious. We have to prepend some kind of delay to 
+the script to assure the keyboard driver is up (otherwise our keystrokes would end up in nowhere).
+
+As we already know that it isn't possible to predict the optimal delay, we go with the `waitLED(ANY_OR_NONE)` approach, 
+explained earlier. The new script looks like this:
 ```
 waitLED(ANY_OR_NONE);   //assure keyboard driver is ready
 
@@ -810,24 +890,28 @@ press("RIGHT");         // move focus to next button (don't save) with RIGHT ARR
 press("SPACEBAR");      // confirm dialog with space
 ```
 
-Now store the modified script under the exact same name `tutorial1`, as already pointed out, the old script gets 
-overwritten without further confirmation. There's no need to adjust the TriggerAction, because the script name hasn't 
-changed.
+Storing the modified script under the exact same name (`tutorial1`) overwrites the former HIDScript without further
+confirmation, as already pointed out. Thus there is no need to adjust our TriggerAction, as the HIDScript name the 
+TriggerAction refers hasn't changed.
 
-At this point everything should work as intended. Anyways, if P4wnP1 is rebooted or looses power, the HIDScript persists
-but the TriggerAction is gone. To cope with that, TriggerActions could be stored, too.
+With this little change everything should work as intended and the script should trigger everytime we attach to an USB 
+host, but only run once.
 
-The "store" button in the "TriggerAction" tab works exactly like the one in the HIDScript editor. It is worth mentioning
-that all currently active TriggerActions get stored if the "store" dialog is confirmed (including the disabled ones).
-Best practice is to delete all TriggerActions which don't belong to the task in current scope before storing (they 
-already should have been stored earlier) and only store a small set of TriggerActions relevant to the current task, 
-using a proper name. There're two options to load back stored TriggerActions:
+Now, if P4wnP1 is rebooted or looses power, our HIDScript would survive, because we have stored it persistently, but the
+TriggerAction would be gone. Needless to say, that TriggerActions could be stored persistently, too.
+
+The "store" button in the "TriggerAction" tab works exactly like the one in the HIDScript editor. It should be noted
+that *all currently active TriggerActions* will be stored if the "store" dialog is confirmed (including the disabled 
+ones).
+The best practice is to delete all TriggerActions which don't belong to the task in current scope before storing (they 
+should have been stored earlier, if needed) and to only store the small set of TriggerActions relevant to the current 
+task, using a proper name. There are two options to load back stored TriggerActions to the active ones:
  - "load & replace" clears all active trigger actions and loads only the stored ones
  - "load & add" keeps the already active TriggerActions and adds in the stored ones. Thus "load & add" could be used to 
- build a complex TriggerAction set out of smaller sets. The resulting set could then again be stored.
+ build a complex TriggerAction set out of smaller sets. The resulting set could then, again, be stored.
  
-So for now, we should only store our single TriggerAction, which runs the HID script. The name could be `tutorial1` 
-again and won't conflict with the HIDScript called `tutorial1`.
+For now we should only store our single TriggerAction, which starts out HIDScript. The name we use to store is 
+`tutorial1` again and won't conflict with the HIDScript called `tutorial1`.
 
 Confirm successful storing, by hitting the "load&replace" button in the "TriggerAction" tab. The stored TriggerAction 
 set should be in the list and named `tutorial1`.
@@ -836,12 +920,15 @@ set should be in the list and named `tutorial1`.
 next to each action. Hitting the button permanently deletes the respective TriggerAction set, without further 
 confirmation**
 
-At this point we could safely delete our TriggerAction from the "TriggerActions" tab (!!not from the load dialog!!).
+At this point we could safely delete our TriggerAction from the "TriggerActions" tab (!!not with the trash button from 
+one of the load dialogs!!).
 
-With the TriggerAction deleted, nothing happens if we detach and re-attach P4wnP1 from the USB host.
+With the TriggerAction deleted from the active ones, nothing happens if we detach and re-attach P4wnP1 from the USB 
+host.
 
-The stored TriggerAction set persists reboots. Instead of reloading the TriggerAction set from with the webclient, we
-test the CLI.
+Anyways, the stored TriggerAction set `tutorial1` will persists reboots and could be reloaded at anytime. 
+
+Instead of reloading the TriggerAction set from with the webclient, we try to accomplish that using the CLI client.
 
 Lets take a quick look into the help screen of the `template deploy` sub-command:
  
@@ -867,11 +954,147 @@ Global Flags:
 
 ``` 
 
-The usage screen shows, that TriggerAction Templates could be deployed with the `-t` flag. By running the following 
-command our TriggerAction should get loaded again and thus the HIDScript should trigger like in our tests, if P4wnP1 is
-detached/re-attached from the USB host:
+The usage screen shows, that TriggerAction Templates could be deployed with the `-t` flag. We run the following command,
+to restore the stored TriggerAction set:
 
 ``` 
 P4wnP1_cli template deploy -t tutorial1
 ``` 
 
+The TriggerAction which fires out HIDScript on USB host connections is now loaded again and should be shown in the 
+TriggerActions tab of the webclient. If P4wnP1 A.L.O.A. is attached to an USB host, the script should run again.
+
+Storing, loading and deploying of templates is one of the two main concepts behind P4wnP1's automation workflow, 
+the other one are the already known TriggerActions. It is worth mentioning, that not only TriggerAction sets could be
+stored and loaded as templates themselves, but that TriggerActions could be used to deploy already stored templates, if 
+that makes sense.
+
+Revisiting our tasks, it seems all defined requirements are met now:
+- we typed "Hello world" into the editor of a Windows USB host 
+- the editor is opened by P4wnP1, not manually by the user
+- the editor is closed automatically, when one of the keyboard LEDs toggled once
+- every time P4wnP1 is attached to a USB host, this behavior repeats
+- the HIDScript runs only once, unless P4wnP1 is re-attached to the USB host, even if successive keyboard LED changes
+occur
+- if P4wnP1 is rebooted, the same behavior could be recovered by loading the stored TriggerAction set (which again 
+refers to the stored HIDScript). This could either be achieved with a single CLI command or with a simple "load&add" or
+"load&replace" from the webclient's trigger action tab.
+
+Once more let us add additional goals:
+- it should be assured, that the USB configuration has the keyboard functionality enabled (the current setup doesn't do
+this and the TriggerAction couldn't start the HIDScript in case the USB keyboard is disabled)
+- the setup shoot applied at boot, without the need to manually load the TriggerAction set. It has to survive a reboot
+of P4wnP1.
+
+To achieve the two additional goals, we have to dive into a new topic and ...
+
+#### Introduce Master Templates
+
+Before we look into Master Templates, we do something we haven't done because everything just worked. We define a valid
+USB configurations, matching our task:
+
+- device serial number: 123456789
+- device product name: Auto Writer
+- device manufacturer: The Creator
+- Product ID: 0x9876
+- Vendor ID: 0x1D6B
+- enabled USB functions
+  - HID keyboard
+  - HID mouse
+  
+Let's take a look into the usage screen of the proper CLI command first:
+
+``` 
+root@kali:~# P4wnP1_cli usb set -h
+set USB Gadget settings
+
+Usage:
+  P4wnP1_cli usb set [flags]
+
+Flags:
+  -e, --cdc-ecm               Use the CDC ECM gadget function
+  -n, --disable               If this flag is set, the gadget stays inactive after deployment (not bound to UDC)
+  -h, --help                  help for set
+  -k, --hid-keyboard          Use the HID KEYBOARD gadget function
+  -m, --hid-mouse             Use the HID MOUSE gadget function
+  -g, --hid-raw               Use the HID RAW gadget function
+  -f, --manufacturer string   Manufacturer string (default "MaMe82")
+  -p, --pid string            Product ID (format '0x1347') (default "0x1347")
+  -o, --product string        Product name string (default "P4wnP1 by MaMe82")
+  -r, --rndis                 Use the RNDIS gadget function
+  -s, --serial                Use the SERIAL gadget function
+  -x, --sn string             Serial number (alpha numeric) (default "deadbeef1337")
+  -u, --ums                   Use the USB Mass Storage gadget function
+      --ums-cdrom             If this flag is set, UMS emulates a CD-Rom instead of a flashdrive (ignored, if UMS disabled)
+      --ums-file string       Path to the image or block device backing UMS (ignored, if UMS disabled)
+  -v, --vid string            Vendor ID (format '0x1d6b') (default "0x1d6b")
+
+Global Flags:
+      --host string   The host with the listening P4wnP1 RPC server (default "localhost")
+      --json          Output results as JSON if applicable
+      --port string   The port on which the P4wnP1 RPC server is listening (default "50051")
+``` 
+
+A ton of options, deploying our defined USB setup could be done like this:
+
+```
+root@kali:~# P4wnP1_cli usb set \
+> --sn 123456789 \
+> --product "Auto Writer" \
+> --manufacturer "The Creator" \
+> --pid "0x9876" \
+> --vid "0x1d6b" \
+> --hid-keyboard \
+> --hid-mouse
+Successfully deployed USB gadget settings
+Enabled:      true
+Product:      Auto Writer
+Manufacturer: The Creator
+Serialnumber: 123456789
+PID:          0x9876
+VID:          0x1d6b
+
+Functions:
+    RNDIS:        false
+    CDC ECM:      false
+    Serial:       false
+    HID Mouse:    true
+    HID Keyboard: true
+    HID Generic:  false
+    Mass Storage: false
+```
+
+The result output of the (long) command shows the intended settings. Let us check the "USB settings" tab of the 
+webclient to confirm. All changes should be reflected, if nothing went wrong.
+
+Although it is perfectly possible to deploy a USB setup via CLI, there are several benefits using the webclient in favor
+of the CLI in this case:
+- changing the settings from the webclient is easier and more convenient
+- the webclient has a local state, thus settings could be changed (one by one), without deploying them 
+- the webclient could store its current settings (which don't have to be deployed necessarily) to persistent templates
+- the CLI client, (currently) isn't able to store USB settings
+
+So it would have been a better choice to use the webclient to change the USB settings to our needs. The good thing
+about the CLI approach used here: If the settings have already been deployed, we know that they work (before storing
+them to a template).
+
+Again we hit the "store" button, this time in the "USB settings" tab. Once more we call the template `tutorial1` (there
+is no conflict with the TriggerAction template stored under the same name, because a different namespace is used for 
+USB settings).
+
+
+We have to stored templates now:
+- one for the TriggerAction set, named `tutorial1`
+- one for the USB settings, also name `tutorial1`
+
+Assuming the state (of current USB settings, TriggerActions or both) changed somehow, we could reload the settings with 
+a single CLI command:
+
+```
+P4wnP1_cli template deploy --usb tutorial1 --trigger-actions tutorial1
+```
+
+But even if we define a new TriggerAction doing this for the on "service start" trigger, for example with an action 
+executing a bash script, we run into a chicken-egg problem.
+
+We can't deploy settings 
