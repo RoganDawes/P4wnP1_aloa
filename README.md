@@ -1409,7 +1409,7 @@ Work in progress, missing sections:
 - HIDScript Trigger variables (variables handed in to HIDScripts fired from TriggerActions)
 - HIDScript helpers (powershell functions)
 - HIDScript demo snake (mouse)
-- USB Mass storage
+- USB Mass storage (genimg helper)
 
 ## 4. Rescue: Help, I can't reach P4wnP1 A.L.O.A. as i messed up the configuration
  

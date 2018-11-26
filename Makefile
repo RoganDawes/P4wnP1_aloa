@@ -82,6 +82,7 @@ installkali:
 	cp -R dist/db /usr/local/P4wnP1/
 	cp -R dist/helper /usr/local/P4wnP1/
 	cp -R dist/ums /usr/local/P4wnP1/
+	cp -R dist/legacy /usr/local/P4wnP1/
 	cp build/webapp.js /usr/local/P4wnP1/www
 	cp build/webapp.js.map /usr/local/P4wnP1/www
 
