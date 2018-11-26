@@ -1208,13 +1208,208 @@ You have learned about the very basic workflow concepts of P4wnP1 A.L.O.A.
 
 ## 3. Where to go from here
 
-Under construction
+It is currently not possible to provide a full documentations. So here are some comments on topics which haven't been 
+touched, yet, but are worth investigating.
 
-- bash scripts
-- GPIO
-- nexmon (karma)
-- WiFi covert channel example
-- bluetooth NAP
+### BashScripts
+
+P4wnP1 allows running BashScripts from TriggerActions. The scripts which are usable from TriggerActions are homed at
+`/usr/local/P4wnP1/scripts`. If a script is called from a TriggerAction, several arguments (like the actual trigger) are
+handed in via bash variables. The file `/usr/local/P4wnP1/scripts/trigger-aware.sh` provides a nice example of a bash
+script which acts differently, depending on the calling trigger. It is worth having a look onto this script, as it uses
+all "TriggerAction variables" currently available.
+
+### GPIO
+
+The community of the old P4wnP1 version occasionally came up with hardware mods or extensions of the Rapsberry PI and
+the question how to integrate them. It isn't possible for me to provide a generic solution to this problem. Neither
+is it a good idea, to provide support for a very specific hardware extension, which is only used by a few people. With
+the introduction of TriggerAction the idea came up, to support GPIO as both, Triggers via GPIO input and Actions issuing
+GPIO output. Although not planned for the first release, this feature has already been implemented. I still haven't
+had the time to document it and it could easily happen that some things change. The functionality uses the "periph.io"
+library with some minor extension (customized edge detection with custom de-bounce for GPIO, thanks to @marcaruel for 
+exchange on this) 
+
+### nexmon KARMA 
+
+The WiFi firmware included with P4wnP1 A.L.O.A. has been modified (utilizing nexmon framework) to support KARMA.
+This feature hasn't made it into the core so far (needs some rework firmware-wise) and thus isn't available from 
+webclient or CLI. If you want to play around with the karma features, there is a legacy python CLI, which allows setting
+the KARMA options on the fly. The python script could be found here:
+`/usr/local/P4wnP1/legacy/karmatool.py`
+
+Tip: To get most out of the KARMA functionality, you should setup P4wnP1 A.L.O.A. to provide a WiFi Access Point without
+authentication, otherwise it wouldn't make to much sense. For poor beacon flooding this isn't needed, but (static) 
+custom SSIDs for beaconing are limited in their number (saving resources on the WiFi chip) 
+
+### WiFi covert channel
+
+The WiFi covert channel hasn't been ported to Go and isn't part of the P4wnP1 core. Anyways, the legacy functionality
+is provided. In order to make the covert channel run, several conditions have to be met:
+- a keystroke injection has to be applied to the target client to inject stage1
+- stage1 loads stage2 over a (simplified version) of the HID covert channel, thus a special USB HID device has to be 
+provided and a special HID covert channel server has to be started on P4wnP1, in order to provide stage2
+- a second server has to be started and interface the modified WiFi firmware, in order to manage client connecting
+in via the WiFi covert channel and provide interactive shell access to those clients (the server is a console 
+application which is meant to run in a terminal multiplexer, like `screen`)
+
+All of the aforementioned conditions could be fulfilled using P4wnP1 A.L.O.A.'s feature set, if the needed components 
+(HID stager, WiFi cover channel server, client agent to deliver) are provided.
+
+To carry out such a task with P4wnP1 A.L.O.A. is a great example for its capabilities. Additionally it helps to
+distinguish what P4wnP1 A.L.O.A. is meant to be and what is not meant to be.
+
+P4wnP1 A.L.O.A. is not meant to:
+- be a "weaponized" tool
+- provide RTR payloads, which could be carried out by everybody, without understanding what's going on or which risks
+are involved
+
+P4wnP1 A.L.O.A. is meant to:
+- be a flexible, low-cost, pocket sized platform
+- serve as enabler for tasks like the one described here
+- support prototyping, testing and carrying out all kinds of USB related tasks, commonly used during pentest or
+redteam engagements, without providing a finalized static solution
+
+In set sense, the `/usr/local/P4wnP1/legacy` folder homes the needed external tools to run the WiFi covert channel
+(namely the WiFi server, the HID covert channel stager server and the WiFi covert channel client agent). Those 
+components could be considered as external parts (don't belong to P4wnP1 A.L.O.A. core).
+
+Additionally P4wnP1 A.L.O.A. provides a configuration, which utilizes the given components to do the following things:
+- drive-by against Windows hosts in order to deliver in-memory client code to download stage2 via HID covert channel, 
+based on keystroke injection (HIDScript)
+- starting the keystroke injection, as soon as P4wnP1 is connected to a USB host (TriggerAction issuing HIDScript)
+- bring up the stager, which delivers the WiFi covert channel client agent via HID covert channel, as soon as the
+keystroke injection starts (TriggerAction running a bash script, which again starts the external server)
+- bring up the WiFi covert channel server, when needed (same TriggerAction and BashScript)
+- deploy a USB setup which provides a USB keyboard (to allow keystroke injection) and an additional raw HID device 
+(serves as covert channel for stage2 delivery) - the USB settings are stored in a settings template
+- deploy a WiFi setup, which allows remote access to P4wnP1, in order to allow interaction with the CLI frontend of
+the WiFi covert channel server - the WiFi settings are stored in a settings template
+- provide a single point of entry, to deploy all the needed configurations at once (done by a Master Template, which
+consists of proper WiFi settings, proper USB settings and the TriggerActions needed to start the HIDScript)
+
+The Master Template is called "wifi covert channel". By deploying it from the "generic settings" tap of the webclient
+("DEPLOY STORED" from the Master Template Editor) P4wnP1 A.L.O.A. is ready configured to execute all the describe steps.
+
+As soon as it is re-attached to a USB host, it should start typing out stage1 and the according servers are started 
+internally.
+From a SSH session (for example over WiFi) the WiFi covert channel server could be accessed using `screen -d -r wifi_c2`
+to interact with clients, which connected back over the WiFi covert channel.
+As the keystroke injection depends on the USB hosts language layout, the according HIDScript called 
+`wifi_covert_channel.js` has a variable `language` which could be used to adjust the keyboard layout in use. 
+Additionally there is a variable called `hide` (false by default). If `hide` is set to true, the console Window on
+the client gets hidden while stage1 is typed. This, again, pinpoints how complex tasks could be reduced to a simple bool
+variable, thanks to HIDScript and the backing JavaScript engine. 
+
+The "wifi covert channel" demo provided with P4wnP1's Master Templates could be used as Startup Master Template, too, as
+WiFi access is still possible and thus the setup could be changed again, remotely at any time. 
+
+The involved BashScript, which is called from a TriggerAction is a good example how flexible the CLI client could get.
+As the HID stager needs to know on which device file to listen (the one which represents the generic HID device), but
+this information is only available at runtime (depends on enabled USB gadget functions), the script requests the CLI
+to report the correct HID device by running `hidraw=$(P4wnP1_cli usb get device raw)`.
+
+The full BashScript is hosted in the folder `/usr/local/P4wnP1/scripts`, as all bash scripts which should be accessible
+from TriggerActions. 
+
+### Bluetooth NAP
+
+P4wnP1 provides Bluetooth based network functionality over the Bluetooth Network Encapsulation Protocol (BNEP).
+The currently most interesting feature is the Bluetooth Network Access Point (NAP), which allows IP based Bluetooth 
+remote access to P4wnP1, for example from mobiles.
+
+In order to use this feature some things should be known:
+- The bluetooth network interface, called `bteth` could be configured and templated like the other network interfaces 
+(webclient or CLI)
+- In order to allow NAP access from an Android mobile (iPhone untested), the mobile not only needs to connect, but 
+additionally P4wnP1 has to hand out a proper IP for the default gateway on the `bteth` interface via DHCP. This is, 
+because the mobile wants to use the NAP as gateway to the Internet (which would be the intended use). If the NAP itself
+wouldn't provide a gateway, the Android Mobile would do no further requests after the DHCP D.O.R.A. The easiest way to
+overcome this, is to instruct the DHCP server to provide the IP of the `bteth` interface itself as default gateway 
+(DHCP option 3). Even if there is no real upstream connection, this worked during my tests - as the mobile has to access
+the gateway with layer3 communication in order to "phone home". Even if successive connectivity tests fail, the working
+layer 3 connection persists. This allows, for example, SSH access via Bluetooth. With "High Speed" enabled, the 
+webclient works pretty nice, too.
+- In order to allow PIN based pairing Simple Secure Pairing (SSP) has to be disabled. If SSP is enabled, the running
+Pairing agent confirms every passkey (which means even less security than with legacy PIN pairing, as every device is 
+able to connect). Maybe a confirmation dialog for SSP based passkey pairing will be implemented for the CLI/webclient
+in future, but currently this is out of scope. I highly suggest to disable "discoverable" and "bondable" if SSP is in
+use, as soon as the intended device has paired.
+- Another shortcoming of having SSP disabled, is that "High Speed" wouldn't be usable for bluetooth conections (or
+to enable High Speed, pairing has to be done with SSP). Without "High Speed" enabled (uses 802.11 frames for 
+communication) it would take about 10 minutes to request the webclient, with high speed enabled it takes some seconds.
+Using SSH and the CLI client over a NAP without "High Speed" should be fine, though.
+- The default Bluetooth network interface settings (`bteth_startup`) and the default Bluetooth settings (`startup`) 
+should allow "Low Speed" access over SSH with legacy PIN pairing. The PIN is `1337` and could be changed from the 
+webclient. 
+
+### TriggerAction Groups
+
+The TriggerActions come with a nice rooting capability called "Groups". I didn't managed to come up with a feature demo
+in time, but I'm planning to include an example for an LED based 4 bit binary counter (using GPIOs, a toggle switch
+and 4 LEDs).
+
+The idea of groups is the following:
+
+Consider you want to have 4 TriggerActions (TAs) firing on the exact same Trigger (for example "on attached to USB host").
+You could achieve this by creating 4 TAs, each with the Trigger "on attached to USB host".
+
+Alternatively, you could bring up a TriggerAction which sends the value `1` to a group named `"connected"` when the 
+"on attached to USB host" occurs. Now you define your other 4 TriggerActions to fire when the value `1` is received on
+a group named `"connected"`. The result would be the same and not make too much sense for now (in fact it needs one 
+more TriggerAction). The only positive effect, for now, is that the TriggerActions are slightly more readable, thanks
+to the group name, which could be chosen freely.
+
+Now the first advanced thing you could do, is to run the following CLI command:
+
+```
+P4wnP1_cli trigger send --group-name=connected --group-value=1
+```
+
+This command would have the exatc same effect as the "on attached to USB host" host TriggerAction and all 4 other
+TAs, which are waiting for the value `1` to arrive on the group `connected` would fire. As you maybe remember, the
+CLI client could run remotely (from different platforms), so it could be used to Trigger command remotely.
+
+The Trigger which reacts on "Group channels" is called "value on group channel". The more interesting trigger is called
+"multiple values on group channel". This "multiple values" trigger allows to listen for ordered sequences of values, or 
+one of multiple values or all values in an unordered sequence, before it fires.
+
+Let's say you qant to fire a BashScript, when these conditions are met:
+- The WiFi AP is up
+- P4wnP1 has been connected to a USB host
+
+You could create TAs for both events like this:
+1) On "WiFi AP up" --> send value 1 to group "conditions"
+2) On "attached to USB host" --> send value 2 to group "conditions"
+
+Now you could deploy a third TriggerAction like this
+- On "multiple values on group channel"; values (1,2); type "All (logical AND)" --> start bash script
+
+In this configuration, the bash script would only start if both "condition" Trigger have fired.
+
+If "exact ordered sequence" would have been used, instead of "All (logical AND)" for the type, the bash script would
+only start if the WiFi AP come up before the USB connected Trigger (not the otherway around). In combination with GPIO
+triggers, this could for example be used, to trigger actions based on the input of a simple PIN pad.
+
+I'm sure you have some nice usage ideas for "group" channels.
+
+Worth mentioning:
+
+The CLI client is able to do a blocking wait, till a dedicated value arrives on a "group channel", using a command like
+this:
+
+```
+P4wnP1_cli trigger wait --group-name=waitgroup --group-value=1
+```
+
+This could be used, to drive scripts from TriggerActions, utilizing the CLI (with their full power like GPIO).
+
+
+Work in progress, missing sections:
+- HIDScript Trigger variables (variables handed in to HIDScripts fired from TriggerActions)
+- HIDScript helpers (powershell functions)
+- HIDScript demo snake (mouse)
+- USB Mass storage
 
 ## 4. Rescue: Help, I can't reach P4wnP1 A.L.O.A. as i messed up the configuration
  
@@ -1277,7 +1472,68 @@ Sorry, seems you have to recreate your P4wnP1 A.L.O.A. SD crad from a clean imag
 
 ## 5. Credits
 
-Under construction
+Under construction, random order
 
-## 6. Licencing (3rd party under construction)
+- @JohanBrandhorst (close exchange on gRPC-web via gopherjs, ridiculous fast implementation of 
+"websocket for server streaming", feature request)
+- @steevdave, @_binkybear (kali build scripts, discussion ongoing exchange)
+- @Re4sonKernel (Support on moving P4wnP1 kernel changes to a well maintained and popular repo, collaboration on Bluez
+fixes)
+- @SymbianSyMoh (Inspiration for HID attack re-trigger without reboot)
+- @quasarframework (could list this under 3rd party libs, but the work done here is insane; the look&feel of the 
+P4wnP1 webclient is more or lees based on default components of this beautiful library)
+- @CyberArms (one of the most early P4wnP1 supporters, writer of the best tutorial and even books on such topics)
+- @LucaBongiorni (not only one of the earliest supporters, he does in hardware, what I'm only to do in software; he
+gives talks on the USB topic and honors Open Source solutions, all in all a great guy and an inspiration)
+- @evilsocket (his block pushed me towards Go, a great OSS developer, read his code and you know what I mean)
+- @RoganDawes and @Singe from @SensePost (inspiring guys)
+- @Swiftb0y (Early supporter, creator of the "old" P4wnP1 WiKi, early tester for ideas on P4wnP1 A.L.O.A.)
+- @marcaruel (discussion on GPIO edge detection using periph.io) 
 
+## 6. ToDos and support
+
+This isn't a full fledged ToDo list, but some milestones are left and I'd be happy to receive som community support on
+this
+- Porting the full HID covert channel functionality to Go core (I'm on my own with that)
+- **add Bluetooth configuration command for CLI**
+- **Create missing keyboard layouts** (currently only "us" and "de" are supported, as this has been a low priority task 
+during development of core features)
+- extend Bluetooth functionality to allow connection to other discoverable devices (authentication and trust)
+- move WiFi KARMA functionality from dedicated python tool to P4wnP1 core (with webclient support))
+- Create full documentation for HIDScript (basically only the mouse part is missing)
+- Create full documentation for P4wnP1 (hoping for community)
+- Get rid of a remaining dependency on the docker netlink (see README of the `netlink` folder)
+
+Note on Bluetooth: 
+
+P4wnP1 works with custom bindings to the Bluez API. Although the Bluez API supports Low Energy (GATT,
+emulating peripherals etc.) it isn't planned to integrate this functionality into P4wnP1 A.L.O.A. 
+
+Note on Nexmon: 
+
+P4wnP1 utilizes nexmon. Most people know nexmon as a firmware modification which allows enabling monitor
+mode and package injection for broadcom WiFi chips (including the BCM43430a1, which is used by the Raspberry Pi Zero W).
+But nexmon is more, it is a framework which allows modifying ARM firmware blobs (after a bit of reversing), with patches
+written in high level C code. P4wnP1 uses this framework, to apply custom patches to the WiFi firmware, which enable
+hardware based KARMA support and firmware (as well as driver) support for the WiFi covert channel. It isn't the aim
+of this modifications to provide proper monitor mode or injection support for the built-in WiFi interface. Although, 
+the legacy nexmon monitor mode functionality is included in the current WiFi firmware, it is considered "erroneous", as
+it interferes with standard WiFi functionality used by P4wnP1 (crashes if the interface is used in station mode etc.). 
+
+## 7. Copyright
+
+    P4wnP1 A.L.O.A.
+    Copyright (C) 2018 Marcus Mengs
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.

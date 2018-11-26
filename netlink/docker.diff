@@ -1,0 +1,513 @@
+--- ../../docker/libcontainer/netlink/netlink_linux.go	2018-05-03 13:34:22.615800101 +0200
++++ netlink/netlink_linux.go	2018-11-13 12:42:55.325253104 +0100
+@@ -11,6 +11,7 @@
+ 	"syscall"
+ 	"time"
+ 	"unsafe"
++	"errors"
+ )
+
+ const (
+@@ -31,12 +32,24 @@
+ )
+
+ const (
+-	MACVLAN_MODE_PRIVATE = 1 << iota
++	MACVLAN_MODE_PRIVATE  = 1 << iota
+ 	MACVLAN_MODE_VEPA
+ 	MACVLAN_MODE_BRIDGE
+ 	MACVLAN_MODE_PASSTHRU
+ )
+
++const (
++	// See linux/if_arp.h.
++	// Note that Linux doesn't support IPv4 over IPv6 tunneling.
++	sysARPHardwareIPv4IPv4 = 768 // IPv4 over IPv4 tunneling
++	sysARPHardwareIPv6IPv6 = 769 // IPv6 over IPv6 tunneling
++	sysARPHardwareIPv6IPv4 = 776 // IPv6 over IPv4 tunneling
++	sysARPHardwareGREIPv4  = 778 // any over GRE over IPv4 tunneling
++	sysARPHardwareGREIPv6  = 823 // any over GRE over IPv6 tunneling
++)
++
++var errNoSuchInterface = errors.New("no such network interface")
++
+ var nextSeqNr uint32
+
+ type ifreqHwaddr struct {
+@@ -143,6 +156,29 @@
+ 	return syscall.SizeofIfAddrmsg
+ }
+
++type RtGenmsg struct {
++	syscall.RtGenmsg
++}
++
++func newRtGenMsg(family int) *RtGenmsg {
++	return &RtGenmsg{
++		RtGenmsg: syscall.RtGenmsg{
++			Family: uint8(family),
++		},
++	}
++}
++
++func (msg *RtGenmsg) ToWireFormat() []byte {
++	length := syscall.SizeofRtGenmsg
++	b := make([]byte, length)
++	b[0] = msg.Family
++	return b
++}
++
++func (msg *RtGenmsg) Len() int {
++	return syscall.SizeofRtGenmsg
++}
++
+ type RtMsg struct {
+ 	syscall.RtMsg
+ }
+@@ -462,6 +498,78 @@
+ 	return s.HandleAck(wb.Seq)
+ }
+
++// see https://www.infradead.org/~tgr/libnl/doc/route.html
++
++// Returns an array of IPNet for all the currently routed subnets on ipv4
++// This is similar to the first column of "ip route" output
++func NetworkLinkGetStateUp(iface *net.Interface) (res bool,err error) {
++	//fmt.Println("Needed if idx", iface.Index)
++
++	s, err := getNetlinkSocket()
++	if err != nil {
++		return false,err
++	}
++	defer s.Close()
++
++	wb := newNetlinkRequest(syscall.RTM_GETLINK, syscall.NLM_F_DUMP)
++
++	msg := newIfInfomsg(syscall.AF_UNSPEC)
++	msg.Index = int32(iface.Index)
++
++	wb.AddData(msg)
++
++	if err := s.Send(wb); err != nil {
++		return false, err
++	}
++
++	// retrieve PID
++	pid, err := s.GetPid()
++	if err != nil {
++		return false, err
++	}
++
++outer:
++// Receive loop
++	for {
++		msgs, err := s.Receive()
++		if err != nil {
++			return false, err
++		}
++		// loop over incoming NL messages
++		for _, m := range msgs {
++			//			fmt.Printf("Message %+v\n", m)
++
++			// check if seq number and receiver PID are correct, abort receive loop on Type == NLMSG_DONE (translated to EOF)
++			if err := s.CheckMessage(m, wb.Seq, pid); err != nil {
++				if err == io.EOF {
++					break outer // abort receive loop if multipart messages reached eof
++				}
++				return false, err
++			}
++
++			// the result we want to fetch
++			if m.Header.Type != syscall.RTM_NEWLINK {
++				continue
++			}
++
++			//Cast first part to IfInfoMsg
++			msg := (*IfInfomsg)(unsafe.Pointer(&m.Data[0:syscall.SizeofIfInfomsg][0]))
++
++			// Ignore message for different interface
++			if msg.Index != int32(iface.Index) {
++				continue
++			}
++
++			if_up := msg.Flags&syscall.IFF_UP != 0
++			//fmt.Printf("Message: %+v\n", msg)
++			//fmt.Printf("Flag IFF_UP: %+v\n", if_up)
++			return if_up, nil
++		}
++	}
++
++	return false, errors.New("Couldn't retreive link state")
++}
++
+ // Bring up a particular network interface.
+ // This is identical to running: ip link set dev $name up
+ func NetworkLinkUp(iface *net.Interface) error {
+@@ -550,6 +658,38 @@
+ 	return s.HandleAck(wb.Seq)
+ }
+
++//Added by MaMe82
++// Bring down a particular network interface.
++// This is identical to running: ip link set $name down
++func NetworkSetMulticast(iface *net.Interface, enable bool) error {
++	s, err := getNetlinkSocket()
++	if err != nil {
++		return err
++	}
++	defer s.Close()
++
++	wb := newNetlinkRequest(syscall.RTM_SETLINK, syscall.NLM_F_ACK)
++
++	msg := newIfInfomsg(syscall.AF_UNSPEC)
++	msg.Index = int32(iface.Index)
++	msg.Flags = syscall.NLM_F_REQUEST
++	msg.Change = DEFAULT_CHANGE
++	msg.IfInfomsg.Change |= syscall.IFF_MULTICAST
++	if enable {
++		msg.IfInfomsg.Flags |= syscall.IFF_MULTICAST
++	} else {
++		msg.IfInfomsg.Flags = uint32(int(msg.IfInfomsg.Flags) & ^syscall.IFF_MULTICAST)
++	}
++
++	wb.AddData(msg)
++
++	if err := s.Send(wb); err != nil {
++		return err
++	}
++
++	return s.HandleAck(wb.Seq)
++}
++
+ // Set link Maximum Transmission Unit
+ // This is identical to running: ip link set dev $name mtu $MTU
+ // bridge is a bitch here https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=292088
+@@ -907,6 +1047,45 @@
+ 	return s.HandleAck(wb.Seq)
+ }
+
++func networkLinkIpAction4(action, flags int, ifa IfAddr, ifa_broadcast IfAddr) error {
++	s, err := getNetlinkSocket()
++	if err != nil {
++		return err
++	}
++	defer s.Close()
++
++	family := getIpFamily(ifa.IP)
++	if family != syscall.AF_INET {
++		return errors.New("Address family has to be AF_INET (IPv4)")
++	}
++
++	wb := newNetlinkRequest(action, flags)
++
++	msg := newIfAddrmsg(family)
++	msg.Index = uint32(ifa.Iface.Index)
++	prefixLen, _ := ifa.IPNet.Mask.Size()
++	msg.Prefixlen = uint8(prefixLen)
++	wb.AddData(msg)
++
++	ipData := ifa.IP.To4()
++
++	localData := newRtAttr(syscall.IFA_LOCAL, ipData)
++	wb.AddData(localData)
++
++	addrData := newRtAttr(syscall.IFA_ADDRESS, ipData)
++	wb.AddData(addrData)
++
++	ipBcData := ifa_broadcast.IP.To4()
++	brAddrData := newRtAttr(syscall.IFA_BROADCAST, ipBcData)
++	wb.AddData(brAddrData)
++
++	if err := s.Send(wb); err != nil {
++		return err
++	}
++
++	return s.HandleAck(wb.Seq)
++}
++
+ // Delete an IP address from an interface. This is identical to:
+ // ip addr del $ip/$ipNet dev $iface
+ func NetworkLinkDelIp(iface *net.Interface, ip net.IP, ipNet *net.IPNet) error {
+@@ -917,12 +1096,273 @@
+ 	)
+ }
+
++func IpBroadcast4(n *net.IPNet) (net.IP, error) {
++	ipv4 := n.IP.To4()
++	if ipv4 == nil {
++		return nil, errors.New("No IPv4 net")
++	}
++	maskv4 := n.Mask
++	if len(maskv4) == net.IPv6len {
++		maskv4 = maskv4[12:]
++	}
++
++	res := net.IPv4(0xff, 0xff, 0xff, 0xff).To4()
++	for i := 0; i < net.IPv4len; i++ {
++		res[i] = (res[i] ^ maskv4[i]) + ipv4[i]
++	}
++	//log.Printf("Calculated broadcast %s", res)
++	return res, nil
++}
++
+ // Add an Ip address to an interface. This is identical to:
+ // ip addr add $ip/$ipNet dev $iface
+ func NetworkLinkAddIp(iface *net.Interface, ip net.IP, ipNet *net.IPNet) error {
++	family := getIpFamily(ip)
++	ifa := IfAddr{iface, ip, ipNet}
++	if family == syscall.AF_INET6 {
++		return networkLinkIpAction(
++			syscall.RTM_NEWADDR,
++			syscall.NLM_F_CREATE|syscall.NLM_F_EXCL|syscall.NLM_F_ACK,
++			ifa,
++		)
++	} else {
++		//For IPv4 calculate broadcast
++		ipBc, err := IpBroadcast4(ipNet)
++		//log.Printf("Adding with broadcast ip %v", ipBc)
++		if err != nil {
++			return errors.New(fmt.Sprintf("Errof calculating braodcast IP: %v", err))
++		}
++		return networkLinkIpAction4(
++			syscall.RTM_NEWADDR,
++			syscall.NLM_F_CREATE|syscall.NLM_F_EXCL|syscall.NLM_F_ACK,
++			ifa,
++			IfAddr{iface, ipBc, ipNet},
++		)
++	}
++
++}
++
++// Add an Ip address to an interface. This is identical to:
++// ip addr change $ip/$ipNet dev $iface
++func NetworkLinkChangeIp(iface *net.Interface, ip net.IP, ipNet *net.IPNet) error {
++	return networkLinkIpAction(
++		syscall.RTM_NEWADDR,
++		syscall.NLM_F_REPLACE|syscall.NLM_F_ACK,
++		IfAddr{iface, ip, ipNet},
++	)
++}
++
++func linkFlags(rawFlags uint32) net.Flags {
++	var f net.Flags
++	if rawFlags&syscall.IFF_UP != 0 {
++		f |= net.FlagUp
++	}
++	if rawFlags&syscall.IFF_BROADCAST != 0 {
++		f |= net.FlagBroadcast
++	}
++	if rawFlags&syscall.IFF_LOOPBACK != 0 {
++		f |= net.FlagLoopback
++	}
++	if rawFlags&syscall.IFF_POINTOPOINT != 0 {
++		f |= net.FlagPointToPoint
++	}
++	if rawFlags&syscall.IFF_MULTICAST != 0 {
++		f |= net.FlagMulticast
++	}
++	return f
++}
++
++func newAddr(ifam *syscall.IfAddrmsg, attrs []syscall.NetlinkRouteAttr) net.Addr {
++	var ipPointToPoint bool
++	// Seems like we need to make sure whether the IP interface
++	// stack consists of IP point-to-point numbered or unnumbered
++	// addressing.
++	for _, a := range attrs {
++		if a.Attr.Type == syscall.IFA_LOCAL {
++			ipPointToPoint = true
++			break
++		}
++	}
++	for _, a := range attrs {
++		if ipPointToPoint && a.Attr.Type == syscall.IFA_ADDRESS {
++			continue
++		}
++		switch ifam.Family {
++		case syscall.AF_INET:
++			return &net.IPNet{IP: net.IPv4(a.Value[0], a.Value[1], a.Value[2], a.Value[3]), Mask: net.CIDRMask(int(ifam.Prefixlen), 8*net.IPv4len)}
++		case syscall.AF_INET6:
++			ifa := &net.IPNet{IP: make(net.IP, net.IPv6len), Mask: net.CIDRMask(int(ifam.Prefixlen), 8*net.IPv6len)}
++			copy(ifa.IP, a.Value[:])
++			return ifa
++		}
++	}
++	return nil
++}
++
++func newLink(ifim *syscall.IfInfomsg, attrs []syscall.NetlinkRouteAttr) *net.Interface {
++	ifi := &net.Interface{Index: int(ifim.Index), Flags: linkFlags(ifim.Flags)}
++	for _, a := range attrs {
++		switch a.Attr.Type {
++		case syscall.IFLA_ADDRESS:
++			// We never return any /32 or /128 IP address
++			// prefix on any IP tunnel interface as the
++			// hardware address.
++			switch len(a.Value) {
++			case net.IPv4len:
++				switch ifim.Type {
++				case sysARPHardwareIPv4IPv4, sysARPHardwareGREIPv4, sysARPHardwareIPv6IPv4:
++					continue
++				}
++			case net.IPv6len:
++				switch ifim.Type {
++				case sysARPHardwareIPv6IPv6, sysARPHardwareGREIPv6:
++					continue
++				}
++			}
++			var nonzero bool
++			for _, b := range a.Value {
++				if b != 0 {
++					nonzero = true
++					break
++				}
++			}
++			if nonzero {
++				ifi.HardwareAddr = a.Value[:]
++			}
++		case syscall.IFLA_IFNAME:
++			ifi.Name = string(a.Value[:len(a.Value)-1])
++		case syscall.IFLA_MTU:
++			ifi.MTU = int(*(*uint32)(unsafe.Pointer(&a.Value[:4][0])))
++		}
++	}
++	return ifi
++}
++
++func interfaceTable(ifindex int) ([]net.Interface, error) {
++	tab, err := syscall.NetlinkRIB(syscall.RTM_GETLINK, syscall.AF_UNSPEC)
++	if err != nil {
++		return nil, os.NewSyscallError("netlinkrib", err)
++	}
++	msgs, err := syscall.ParseNetlinkMessage(tab)
++	if err != nil {
++		return nil, os.NewSyscallError("parsenetlinkmessage", err)
++	}
++	var ift []net.Interface
++loop:
++	for _, m := range msgs {
++		switch m.Header.Type {
++		case syscall.NLMSG_DONE:
++			break loop
++		case syscall.RTM_NEWLINK:
++			ifim := (*syscall.IfInfomsg)(unsafe.Pointer(&m.Data[0]))
++			if ifindex == 0 || ifindex == int(ifim.Index) {
++				attrs, err := syscall.ParseNetlinkRouteAttr(&m)
++				if err != nil {
++					return nil, os.NewSyscallError("parsenetlinkrouteattr", err)
++				}
++				ift = append(ift, *newLink(ifim, attrs))
++				if ifindex == int(ifim.Index) {
++					break loop
++				}
++			}
++		}
++	}
++	return ift, nil
++}
++
++func interfaceByIndex(ift []net.Interface, index int) (*net.Interface, error) {
++	for _, ifi := range ift {
++		if index == ifi.Index {
++			return &ifi, nil
++		}
++	}
++	return nil, errNoSuchInterface
++}
++
++func addrTable(ift []net.Interface, ifi *net.Interface, msgs []syscall.NetlinkMessage) ([]net.Addr, error) {
++	var ifat []net.Addr
++loop:
++	for _, m := range msgs {
++		switch m.Header.Type {
++		case syscall.NLMSG_DONE:
++			break loop
++		case syscall.RTM_NEWADDR:
++			ifam := (*syscall.IfAddrmsg)(unsafe.Pointer(&m.Data[0]))
++			if len(ift) != 0 || ifi.Index == int(ifam.Index) {
++				if len(ift) != 0 {
++					var err error
++					ifi, err = interfaceByIndex(ift, int(ifam.Index))
++
++					if err != nil {
++						return nil, err
++					}
++				}
++				attrs, err := syscall.ParseNetlinkRouteAttr(&m)
++				if err != nil {
++					return nil, os.NewSyscallError("parsenetlinkrouteattr", err)
++				}
++				ifa := newAddr(ifam, attrs)
++				if ifa != nil {
++					ifat = append(ifat, ifa)
++				}
++			}
++		}
++	}
++	return ifat, nil
++}
++
++func interfaceAddrTable(ifi *net.Interface) ([]net.Addr, error) {
++	tab, err := syscall.NetlinkRIB(syscall.RTM_GETADDR, syscall.AF_UNSPEC)
++	if err != nil {
++		return nil, os.NewSyscallError("netlinkrib", err)
++	}
++	msgs, err := syscall.ParseNetlinkMessage(tab)
++	if err != nil {
++		return nil, os.NewSyscallError("parsenetlinkmessage", err)
++	}
++	var ift []net.Interface
++	if ifi == nil {
++		var err error
++		ift, err = interfaceTable(0)
++		if err != nil {
++			return nil, err
++		}
++	}
++	ifat, err := addrTable(ift, ifi, msgs)
++	if err != nil {
++		return nil, err
++	}
++	return ifat, nil
++}
++
++func NetworkLinkList(iface *net.Interface) ([]net.Addr, error) {
++	return interfaceAddrTable(iface)
++}
++
++func NetworkLinkFlush(iface *net.Interface) (error) {
++	at, err := NetworkLinkList(iface)
++	if err != nil {
++		return err
++	}
++	for _, a := range at {
++		ip, ipnet, err := net.ParseCIDR(a.String())
++		if err != nil {
++			return err
++		}
++		err = NetworkLinkDelIp(iface, ip, ipnet)
++		if err != nil {
++			return err
++		}
++	}
++	return nil
++}
++
++// Add an Ip address to an interface. This is identical to:
++// ip addr replace $ip/$ipNet dev $iface
++func NetworkLinkReplaceIp(iface *net.Interface, ip net.IP, ipNet *net.IPNet) error {
+ 	return networkLinkIpAction(
+ 		syscall.RTM_NEWADDR,
+-		syscall.NLM_F_CREATE|syscall.NLM_F_EXCL|syscall.NLM_F_ACK,
++		syscall.NLM_F_CREATE|syscall.NLM_F_REPLACE|syscall.NLM_F_ACK,
+ 		IfAddr{iface, ip, ipNet},
+ 	)
+ }
+@@ -1108,6 +1548,7 @@
+ 	}
+ 	wb.AddData(uint32Attr(syscall.RTA_OIF, uint32(iface.Index)))
+
++	//Send the message
+ 	if err := s.Send(wb); err != nil {
+ 		return err
+ 	}
