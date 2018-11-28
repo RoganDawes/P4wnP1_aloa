@@ -1,6 +1,6 @@
 {
-	"Name": "COMMON",
-	"Description": "Contains common key mappings which are the same in most languages",
+	"Name": "BR",
+	"Description": "Portuguese (Brazil) USB Keyboard report mapping",
 	"Mapping": {
 
             "CTRL": [{"Modifiers": ["MOD_LEFT_CONTROL"], "Keys": []}],
@@ -44,7 +44,7 @@
             "BRK": [{"Modifiers": [], "Keys": ["KEY_PAUSE"]}],
 
 
-            "`": [{"Modifiers": [], "Keys": ["KEY_GRAVE"]}],
+            "'": [{"Modifiers": [], "Keys": ["KEY_GRAVE"]}],
             "1": [{"Modifiers": [],	"Keys": ["KEY_1"]}],
             "2": [{"Modifiers": [],	"Keys": ["KEY_2"]}],
             "3": [{"Modifiers": [],	"Keys": ["KEY_3"]}],
@@ -58,19 +58,33 @@
             "-": [{"Modifiers": [],	"Keys": ["KEY_MINUS"]}],
             "=": [{"Modifiers": [], "Keys": ["KEY_EQUAL"]}],
 
-            "~": [{"Modifiers": ["MOD_LEFT_SHIFT"], "Keys": ["KEY_GRAVE"]}],
+            "\"": [{"Modifiers": ["MOD_LEFT_SHIFT"], "Keys": ["KEY_GRAVE"]}],
             "!": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_1"]}],
             "@": [{"Modifiers": ["MOD_LEFT_SHIFT"], "Keys": ["KEY_2"]}],
             "#": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_3"]}],
             "$": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_4"]}],
             "%": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_5"]}],
-            "^": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_6"]}],
+
             "&": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_7"]}],
             "*": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_8"]}],
             "(": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_9"]}],
             ")": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_0"]}],
             "_": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_MINUS"]}],
             "+": [{"Modifiers": ["MOD_LEFT_SHIFT"], "Keys": ["KEY_EQUAL"]}],
+
+            "¬": [{"Modifiers": ["MOD_RIGHT_ALT"], "Keys": ["KEY_GRAVE"]}],
+            "¹": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_1"]}],
+            "²": [{"Modifiers": ["MOD_RIGHT_ALT"], "Keys": ["KEY_2"]}],
+            "³": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_3"]}],
+            "£": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_4"]}],
+            "¢": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_5"]}],
+            "¬": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_6"]}],
+            "{": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_7"]}],
+            "[": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_8"]}],
+            "]": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_9"]}],
+            "}": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_0"]}],
+            "}": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_MINUS"]}],
+            "§": [{"Modifiers": ["MOD_RIGHT_ALT"], "Keys": ["KEY_EQUAL"]}],
             "BACKSPACE": [{"Modifiers": [], "Keys": ["KEY_BACKSPACE"]}],
 
 
@@ -87,8 +101,8 @@
             "i": [{"Modifiers": [],	"Keys": ["KEY_I"]}],
             "o": [{"Modifiers": [],	"Keys": ["KEY_O"]}],
             "p": [{"Modifiers": [],	"Keys": ["KEY_P"]}],
-            "[": [{"Modifiers": [],	"Keys": ["KEY_LEFTBRACE"]}],
-            "]": [{"Modifiers": [],	"Keys": ["KEY_RIGHTBRACE"]}],
+
+            "[": [{"Modifiers": [],	"Keys": ["KEY_RIGHTBRACE"]}],
 
 
             "Q": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_Q"]}],
@@ -101,8 +115,22 @@
             "I": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_I"]}],
             "O": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_O"]}],
             "P": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_P"]}],
-            "{": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_LEFTBRACE"]}],
-            "}": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_RIGHTBRACE"]}],
+            "`": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_LEFTBRACE"]}, {"Modifiers": [],	"Keys": ["KEY_SPACE"]}],
+            "{": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_RIGHTBRACE"]}],
+
+            "/": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_Q"]}],
+            "?": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_W"]}],
+            "€": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_E"]}],
+            "®": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_R"]}],
+            "ŧ": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_T"]}],
+            "←": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_Y"]}],
+            "↓": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_U"]}],
+            "→": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_I"]}],
+            "ø": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_O"]}],
+            "þ": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_P"]}],
+            "´": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_LEFTBRACE"]}],
+            "ª": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_RIGHTBRACE"]}],
+
             "ENTER": [{"Modifiers": [], "Keys": ["KEY_ENTER"]}],
             "RETURN": [{"Modifiers": [], "Keys": ["KEY_ENTER"]}],
             "\n": [{"Modifiers": [], "Keys": ["KEY_ENTER"]}],
@@ -119,9 +147,9 @@
             "j": [{"Modifiers": [],	"Keys": ["KEY_J"]}],
             "k": [{"Modifiers": [],	"Keys": ["KEY_K"]}],
             "l": [{"Modifiers": [],	"Keys": ["KEY_L"]}],
-            ";": [{"Modifiers": [],	"Keys": ["KEY_SEMICOLON"]}],
-            "'": [{"Modifiers": [],	"Keys": ["KEY_APOSTROPHE"]}],
-            "\\": [{"Modifiers": [],	"Keys": ["KEY_BACKSLASH"]}],
+            "ç": [{"Modifiers": [],	"Keys": ["KEY_SEMICOLON"]}],
+            "~": [{"Modifiers": [],	"Keys": ["KEY_APOSTROPHE"]}, {"Modifiers": [],	"Keys": ["KEY_SPACE"]}],
+            "]": [{"Modifiers": [],	"Keys": ["KEY_BACKSLASH"]}],
 
             "A": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_A"]}],
             "S": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_S"]}],
@@ -132,13 +160,16 @@
             "J": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_J"]}],
             "K": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_K"]}],
             "L": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_L"]}],
-            ":": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_SEMICOLON"]}],
-            "\"": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_APOSTROPHE"]}],
-            "|": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_BACKSLASH"]}],
+            "Ç": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_SEMICOLON"]}],
+            "^": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_APOSTROPHE"]}, {"Modifiers": [],	"Keys": ["KEY_SPACE"]}],
+            "}": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_BACKSLASH"]}],
 
 
 
-            "102ND": [{"Modifiers": [], "Keys": ["KEY_102ND"]}],
+            "\\": [{"Modifiers": [], "Keys": ["KEY_102ND"]}],
+            "|": [{"Modifiers": ["MOD_LEFT_SHIFT"], "Keys": ["KEY_102ND"]}],
+            "º": [{"Modifiers": ["MOD_RIGHT_ALT"], "Keys": ["KEY_102ND"]}],
+
             "z": [{"Modifiers": [],	"Keys": ["KEY_Z"]}],
             "x": [{"Modifiers": [],	"Keys": ["KEY_X"]}],
             "c": [{"Modifiers": [],	"Keys": ["KEY_C"]}],
@@ -148,7 +179,7 @@
             "m": [{"Modifiers": [],	"Keys": ["KEY_M"]}],
             ",": [{"Modifiers": [],	"Keys": ["KEY_COMMA"]}],
             ".": [{"Modifiers": [],	"Keys": ["KEY_DOT"]}],
-            "/": [{"Modifiers": [],	"Keys": ["KEY_SLASH"]}],
+            ";": [{"Modifiers": [],	"Keys": ["KEY_SLASH"]}],
 
 
             "Z": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_Z"]}],
@@ -160,7 +191,7 @@
             "M": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_M"]}],
             "<": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_COMMA"]}],
             ">": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_DOT"]}],
-            "?": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_SLASH"]}],
+            ":": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_SLASH"]}],
 
 
             " ": [{"Modifiers": [], "Keys": ["KEY_SPACE"]}],
@@ -211,4 +242,3 @@
             "F24": [{"Modifiers": [], "Keys": ["KEY_F24"]}]
     }
 }
-
