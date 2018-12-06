@@ -3,7 +3,7 @@ package cli_client
 import (
 	"encoding/json"
 	"fmt"
-	pb "github.com/mame82/P4wnP1_go/proto"
+	pb "github.com/mame82/P4wnP1_aloa/proto"
 	"github.com/spf13/cobra"
 	"log"
 	"os"

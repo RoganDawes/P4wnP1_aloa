@@ -46,13 +46,13 @@ dep:
 	#go get -u github.com/gorilla/websocket
 
 compile:
-	go get -u github.com/mame82/P4wnP1_go/... # partially downloads again, but we need the library packages in go path to build
+	go get -u github.com/mame82/P4wnP1_aloa/... # partially downloads again, but we need the library packages in go path to build
 	# <--- second compilation, maybe -d flag on go get above is better
 	env GOBIN=$(CURDIR)/build go install ./cmd/... # compile all main packages to the build folder
 
 	# compile the web app
 	# ToDo: (check if dependencies have been fetched by 'go get', even with the build js tags)
-	$(HOME)/go/bin/gopherjs get github.com/mame82/P4wnP1_go/web_client/...
+	$(HOME)/go/bin/gopherjs get github.com/mame82/P4wnP1_aloa/web_client/...
 	$(HOME)/go/bin/gopherjs build -m -o build/webapp.js web_client/*.go
 
 installkali:

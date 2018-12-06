@@ -5,7 +5,7 @@ package main
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/mame82/hvue"
-	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
+	pb "github.com/mame82/P4wnP1_aloa/proto/gopherjs"
 )
 
 type jsBluetoothRequestSettingsStorage struct {

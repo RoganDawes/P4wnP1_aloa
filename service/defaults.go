@@ -1,7 +1,7 @@
 package service
 
 import (
-	pb "github.com/mame82/P4wnP1_go/proto"
+	pb "github.com/mame82/P4wnP1_aloa/proto"
 )
 
 const (

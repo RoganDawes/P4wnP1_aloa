@@ -9,12 +9,12 @@ import (
 	"sync"
 	"time"
 
-	//"github.com/mame82/P4wnP1_go/service"
+	//"github.com/mame82/P4wnP1_aloa/service"
 	"github.com/mame82/mblue-toolz/btmgmt"
 	"github.com/mame82/mblue-toolz/dbusHelper"
 	"github.com/mame82/mblue-toolz/toolz"
 	"errors"
-	pb "github.com/mame82/P4wnP1_go/proto"
+	pb "github.com/mame82/P4wnP1_aloa/proto"
 
 )
 

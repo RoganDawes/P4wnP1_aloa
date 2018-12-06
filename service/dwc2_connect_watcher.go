@@ -5,10 +5,10 @@ package service
 import (
 	"fmt"
 	"errors"
-	"github.com/mame82/P4wnP1_go/common_web"
+	"github.com/mame82/P4wnP1_aloa/common_web"
 
-	genl "github.com/mame82/P4wnP1_go/mgenetlink"
-	nl "github.com/mame82/P4wnP1_go/mnetlink"
+	genl "github.com/mame82/P4wnP1_aloa/mgenetlink"
+	nl "github.com/mame82/P4wnP1_aloa/mnetlink"
 )
 
 /*

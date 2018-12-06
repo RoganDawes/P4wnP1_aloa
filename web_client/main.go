@@ -5,7 +5,7 @@ package main
 import (
 	//	"honnef.co/go/js/dom"
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/mame82/P4wnP1_go/common_web"
+	"github.com/mame82/P4wnP1_aloa/common_web"
 	"github.com/mame82/hvue"
 	"github.com/mame82/mvuex"
 )
@@ -126,7 +126,7 @@ const templateMainApp = `
         <q-layout-footer class="desktop-only">
             <q-toolbar>
                 <q-toolbar-title>
-                    <div slot="subtitle">by MaMe82  ` + common_web.VERSION + ` by MaMe82</div>
+                    <div slot="subtitle">` + common_web.VERSION + ` by MaMe82</div>
                 </q-toolbar-title>
             </q-toolbar>
         </q-layout-footer>

@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/mame82/P4wnP1_go/common_web"
-	"github.com/mame82/P4wnP1_go/hid"
-	pb "github.com/mame82/P4wnP1_go/proto"
+	"github.com/mame82/P4wnP1_aloa/common_web"
+	"github.com/mame82/P4wnP1_aloa/hid"
+	pb "github.com/mame82/P4wnP1_aloa/proto"
 	"log"
 	"sync"
 	"time"

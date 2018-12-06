@@ -3,7 +3,7 @@
 package main
 
 import(
-	"github.com/mame82/P4wnP1_go/hid"
+	"github.com/mame82/P4wnP1_aloa/hid"
 
 	"log"
 	"fmt"

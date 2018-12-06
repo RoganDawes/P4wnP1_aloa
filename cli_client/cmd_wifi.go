@@ -2,7 +2,7 @@ package cli_client
 
 import (
 	"github.com/spf13/cobra"
-	pb "github.com/mame82/P4wnP1_go/proto"
+	pb "github.com/mame82/P4wnP1_aloa/proto"
 	"fmt"
 	"google.golang.org/grpc/status"
 	"os"

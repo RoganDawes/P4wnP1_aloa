@@ -2,7 +2,7 @@ package cli_client
 
 import (
 	"fmt"
-	pb "github.com/mame82/P4wnP1_go/proto"
+	pb "github.com/mame82/P4wnP1_aloa/proto"
 	"errors"
 	"context"
 	"google.golang.org/grpc"

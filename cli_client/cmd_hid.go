@@ -2,7 +2,7 @@ package cli_client
 
 import (
 	"context"
-	"github.com/mame82/P4wnP1_go/common"
+	"github.com/mame82/P4wnP1_aloa/common"
 	"github.com/spf13/cobra"
 	"fmt"
 	"path/filepath"
@@ -13,7 +13,7 @@ import (
 	"errors"
 	"log"
 	"strconv"
-	pb "github.com/mame82/P4wnP1_go/proto"
+	pb "github.com/mame82/P4wnP1_aloa/proto"
 )
 
 var (

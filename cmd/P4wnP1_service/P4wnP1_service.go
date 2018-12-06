@@ -4,8 +4,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/mame82/P4wnP1_go/common_web"
-	"github.com/mame82/P4wnP1_go/service"
+	"github.com/mame82/P4wnP1_aloa/common_web"
+	"github.com/mame82/P4wnP1_aloa/service"
 	"log"
 	"os"
 	"os/signal"

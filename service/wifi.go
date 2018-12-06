@@ -3,12 +3,12 @@
 package service
 
 import (
-	"github.com/mame82/P4wnP1_go/common_web"
-	"github.com/mame82/P4wnP1_go/netlink"
-	pb "github.com/mame82/P4wnP1_go/proto"
+	"github.com/mame82/P4wnP1_aloa/common_web"
+	"github.com/mame82/P4wnP1_aloa/netlink"
+	pb "github.com/mame82/P4wnP1_aloa/proto"
 	"sync"
 	"os/exec"
-	"github.com/mame82/P4wnP1_go/service/util"
+	"github.com/mame82/P4wnP1_aloa/service/util"
 	"errors"
 	"fmt"
 	"strings"

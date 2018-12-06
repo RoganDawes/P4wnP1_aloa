@@ -1,7 +1,7 @@
 package mgenetlink
 
 import (
-	nl "github.com/mame82/P4wnP1_go/mnetlink"
+	nl "github.com/mame82/P4wnP1_aloa/mnetlink"
 	"errors"
 	"golang.org/x/sys/unix"
 	"log"

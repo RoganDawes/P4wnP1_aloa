@@ -5,10 +5,12 @@ package service
 import (
 	"errors"
 	"fmt"
-	pb "github.com/mame82/P4wnP1_go/proto"
-	"github.com/mame82/P4wnP1_go/service/bluetooth"
+	pb "github.com/mame82/P4wnP1_aloa/proto"
+	"github.com/mame82/P4wnP1_aloa/service/bluetooth"
 	"github.com/mame82/mblue-toolz/toolz"
+	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -493,6 +495,10 @@ func (bt *BtService) EnableBridge() (err error) {
 	log.Println("... reconfigure ethernet settings for interface", bt.BrName)
 	if mi, err := bt.RootSvc.SubSysNetwork.GetManagedInterface(bt.BrName); err == nil {
 		mi.ReDeploy()
+		// disable IPv6 for bridge interface
+		//ioutil.WriteFile("/proc/sys/net/ipv6/conf/" + bt.BrName + "/disable_ipv6", []byte("1"), os.ModePerm)
+		// disable IPv6 for all interfaces
+		ioutil.WriteFile("/proc/sys/net/ipv6/conf/all/disable_ipv6", []byte("1"), os.ModePerm)
 	}
 
 

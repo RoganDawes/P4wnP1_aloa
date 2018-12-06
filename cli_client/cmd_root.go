@@ -2,7 +2,7 @@ package cli_client
 
 import (
 	"fmt"
-	"github.com/mame82/P4wnP1_go/common_web"
+	"github.com/mame82/P4wnP1_aloa/common_web"
 	"os"
 
 	"github.com/spf13/cobra"

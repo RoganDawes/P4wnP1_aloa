@@ -5,8 +5,8 @@ package main
 import (
 	"errors"
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/mame82/P4wnP1_go/common_web"
-	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
+	"github.com/mame82/P4wnP1_aloa/common_web"
+	pb "github.com/mame82/P4wnP1_aloa/proto/gopherjs"
 	"github.com/mame82/hvue"
 	"strconv"
 )

@@ -6,8 +6,8 @@ import (
 	"context"
 	"errors"
 	"github.com/johanbrandhorst/protobuf/grpcweb"
-	"github.com/mame82/P4wnP1_go/common_web"
-	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
+	"github.com/mame82/P4wnP1_aloa/common_web"
+	pb "github.com/mame82/P4wnP1_aloa/proto/gopherjs"
 	"sync"
 	"time"
 )

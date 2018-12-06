@@ -5,7 +5,7 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/mame82/P4wnP1_go/service/pgpio"
+	"github.com/mame82/P4wnP1_aloa/service/pgpio"
 	"periph.io/x/periph"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/conn/gpio/gpioreg"
@@ -15,7 +15,7 @@ import (
 	"sync"
 	"time"
 	"errors"
-	pb "github.com/mame82/P4wnP1_go/proto"
+	pb "github.com/mame82/P4wnP1_aloa/proto"
 )
 
 var (

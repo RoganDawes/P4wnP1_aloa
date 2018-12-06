@@ -2,15 +2,15 @@ package cli_client
 
 import (
 	"github.com/spf13/cobra"
-	pb "github.com/mame82/P4wnP1_go/proto"
+	pb "github.com/mame82/P4wnP1_aloa/proto"
 	"net"
 	"errors"
 	"fmt"
 	"google.golang.org/grpc/status"
-	//"github.com/mame82/P4wnP1_go/service"
+	//"github.com/mame82/P4wnP1_aloa/service"
 	"strings"
 	"strconv"
-	"github.com/mame82/P4wnP1_go/common_web"
+	"github.com/mame82/P4wnP1_aloa/common_web"
 )
 
 //Empty settings used to store cobra flags

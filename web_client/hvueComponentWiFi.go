@@ -4,7 +4,7 @@ package main
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	pb "github.com/mame82/P4wnP1_go/proto/gopherjs"
+	pb "github.com/mame82/P4wnP1_aloa/proto/gopherjs"
 	"github.com/mame82/hvue"
 )
 
