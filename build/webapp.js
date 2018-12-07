@@ -22578,9 +22578,9 @@ $packages["github.com/johanbrandhorst/protobuf/grpcweb"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
-$packages["github.com/mame82/P4wnP1_go/common_web"] = (function() {
+$packages["github.com/mame82/P4wnP1_aloa/common_web"] = (function() {
 	var $pkg = {}, $init, EvtStateChangeType, NameLeaseFileDHCPSrv;
-	EvtStateChangeType = $pkg.EvtStateChangeType = $newType(8, $kindInt64, "common_web.EvtStateChangeType", true, "github.com/mame82/P4wnP1_go/common_web", true, null);
+	EvtStateChangeType = $pkg.EvtStateChangeType = $newType(8, $kindInt64, "common_web.EvtStateChangeType", true, "github.com/mame82/P4wnP1_aloa/common_web", true, null);
 	NameLeaseFileDHCPSrv = function(nameIface) {
 		var lf, nameIface;
 		lf = "";
@@ -22599,23 +22599,23 @@ $packages["github.com/mame82/P4wnP1_go/common_web"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
-$packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
+$packages["github.com/mame82/P4wnP1_aloa/proto/gopherjs"] = (function() {
 	var $pkg = {}, $init, context, grpcweb, jspb, BluetoothNetworkServiceType, GroupReceiveMultiType, GPIOInPullUpDown, GPIOInEdge, GPIOOutValue, WiFiWorkingMode, WiFiStateMode, WiFiAuthMode, AccessibleFolder, ActionDeploySettingsTemplate_TemplateType, EthernetInterfaceSettings_Mode, MasterTemplate, RequestMasterTemplateStorage, BluetoothRequestSettingsStorage, BluetoothSettings, BluetoothAgentSettings, BluetoothNetworkService, BluetoothControllerSettings, BluetoothControllerInformation, TriggerActionSet, TriggerAction, isTriggerAction_Trigger, isTriggerAction_Action, TriggerAction_ServiceStarted, TriggerAction_UsbGadgetConnected, TriggerAction_UsbGadgetDisconnected, TriggerAction_WifiAPStarted, TriggerAction_WifiConnectedAsSta, TriggerAction_SshLogin, TriggerAction_DhcpLeaseGranted, TriggerAction_GroupReceive, TriggerAction_GroupReceiveMulti, TriggerAction_GpioIn, TriggerAction_BashScript, TriggerAction_HidScript, TriggerAction_DeploySettingsTemplate, TriggerAction_Log, TriggerAction_GpioOut, TriggerAction_GroupSend, TriggerServiceStarted, TriggerUSBGadgetConnected, TriggerUSBGadgetDisconnected, TriggerWifiAPStarted, TriggerWifiConnectedAsSta, TriggerSSHLogin, TriggerDHCPLeaseGranted, TriggerGroupReceive, TriggerGroupReceiveMulti, TriggerGPIOIn, ActionStartBashScript, ActionStartHIDScript, ActionDeploySettingsTemplate, ActionLog, ActionGPIOOut, ActionGroupSend, WifiRequestSettingsStorage, WiFiSettings, WiFiState, WiFiBSSCfg, StringMessage, StringMessageArray, EventRequest, EventValue, isEventValue_Val, EventValue_Tstring, EventValue_Tbool, EventValue_Tint64, Event, TempDirOrFileRequest, TempDirOrFileResponse, ReadFileRequest, ReadFileResponse, WriteFileRequest, FileInfoRequest, FileInfoResponse, HIDScriptRequest, HIDScriptJob, HIDScriptJobList, HIDRunningJobStateResult, HIDScriptResult, LEDSettings, USBRequestSettingsStorage, GadgetSettings, GadgetSettingsEthernet, GadgetSettingsUMS, EthernetRequestSettingsStorage, DeployedEthernetInterfaceSettings, EthernetInterfaceSettings, DHCPServerSettings, DHCPServerRange, DHCPServerStaticHost, Empty, P4WNP1Client, p4WNP1Client, P4WNP1_EventListenClient, p4WNP1EventListenClient, ptrType, sliceType, ptrType$1, ptrType$2, ptrType$3, ptrType$4, ptrType$5, ptrType$6, ptrType$7, sliceType$1, ptrType$8, sliceType$2, ptrType$9, ptrType$10, ptrType$11, ptrType$12, ptrType$13, ptrType$14, ptrType$15, ptrType$16, ptrType$17, ptrType$18, ptrType$19, ptrType$20, ptrType$21, ptrType$22, ptrType$23, ptrType$24, ptrType$25, ptrType$26, ptrType$27, ptrType$28, ptrType$29, ptrType$30, ptrType$31, ptrType$32, ptrType$33, ptrType$34, ptrType$35, ptrType$36, ptrType$37, ptrType$38, ptrType$39, ptrType$40, ptrType$41, sliceType$3, ptrType$42, ptrType$43, ptrType$44, sliceType$4, ptrType$45, ptrType$46, ptrType$47, ptrType$48, ptrType$49, ptrType$50, ptrType$51, ptrType$52, ptrType$53, sliceType$5, ptrType$54, ptrType$55, ptrType$56, ptrType$57, ptrType$58, ptrType$59, ptrType$60, ptrType$61, ptrType$62, sliceType$6, ptrType$63, ptrType$64, ptrType$65, ptrType$66, ptrType$67, ptrType$68, ptrType$69, ptrType$70, ptrType$71, ptrType$72, sliceType$7, ptrType$73, ptrType$74, ptrType$75, sliceType$8, ptrType$76, sliceType$9, ptrType$77, ptrType$78, mapType, sliceType$10, ptrType$79, ptrType$80, NewP4WNP1Client;
 	context = $packages["context"];
 	grpcweb = $packages["github.com/johanbrandhorst/protobuf/grpcweb"];
 	jspb = $packages["github.com/johanbrandhorst/protobuf/jspb"];
-	BluetoothNetworkServiceType = $pkg.BluetoothNetworkServiceType = $newType(4, $kindInt, "P4wnP1_grpc.BluetoothNetworkServiceType", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	GroupReceiveMultiType = $pkg.GroupReceiveMultiType = $newType(4, $kindInt, "P4wnP1_grpc.GroupReceiveMultiType", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	GPIOInPullUpDown = $pkg.GPIOInPullUpDown = $newType(4, $kindInt, "P4wnP1_grpc.GPIOInPullUpDown", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	GPIOInEdge = $pkg.GPIOInEdge = $newType(4, $kindInt, "P4wnP1_grpc.GPIOInEdge", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	GPIOOutValue = $pkg.GPIOOutValue = $newType(4, $kindInt, "P4wnP1_grpc.GPIOOutValue", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	WiFiWorkingMode = $pkg.WiFiWorkingMode = $newType(4, $kindInt, "P4wnP1_grpc.WiFiWorkingMode", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	WiFiStateMode = $pkg.WiFiStateMode = $newType(4, $kindInt, "P4wnP1_grpc.WiFiStateMode", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	WiFiAuthMode = $pkg.WiFiAuthMode = $newType(4, $kindInt, "P4wnP1_grpc.WiFiAuthMode", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	AccessibleFolder = $pkg.AccessibleFolder = $newType(4, $kindInt, "P4wnP1_grpc.AccessibleFolder", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	ActionDeploySettingsTemplate_TemplateType = $pkg.ActionDeploySettingsTemplate_TemplateType = $newType(4, $kindInt, "P4wnP1_grpc.ActionDeploySettingsTemplate_TemplateType", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	EthernetInterfaceSettings_Mode = $pkg.EthernetInterfaceSettings_Mode = $newType(4, $kindInt, "P4wnP1_grpc.EthernetInterfaceSettings_Mode", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	MasterTemplate = $pkg.MasterTemplate = $newType(0, $kindStruct, "P4wnP1_grpc.MasterTemplate", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(TemplateNameBluetooth_, TemplateNameUsb_, TemplateNameWifi_, TemplateNameTriggerActions_, TemplateNamesNetwork_) {
+	BluetoothNetworkServiceType = $pkg.BluetoothNetworkServiceType = $newType(4, $kindInt, "P4wnP1_grpc.BluetoothNetworkServiceType", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	GroupReceiveMultiType = $pkg.GroupReceiveMultiType = $newType(4, $kindInt, "P4wnP1_grpc.GroupReceiveMultiType", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	GPIOInPullUpDown = $pkg.GPIOInPullUpDown = $newType(4, $kindInt, "P4wnP1_grpc.GPIOInPullUpDown", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	GPIOInEdge = $pkg.GPIOInEdge = $newType(4, $kindInt, "P4wnP1_grpc.GPIOInEdge", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	GPIOOutValue = $pkg.GPIOOutValue = $newType(4, $kindInt, "P4wnP1_grpc.GPIOOutValue", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	WiFiWorkingMode = $pkg.WiFiWorkingMode = $newType(4, $kindInt, "P4wnP1_grpc.WiFiWorkingMode", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	WiFiStateMode = $pkg.WiFiStateMode = $newType(4, $kindInt, "P4wnP1_grpc.WiFiStateMode", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	WiFiAuthMode = $pkg.WiFiAuthMode = $newType(4, $kindInt, "P4wnP1_grpc.WiFiAuthMode", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	AccessibleFolder = $pkg.AccessibleFolder = $newType(4, $kindInt, "P4wnP1_grpc.AccessibleFolder", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	ActionDeploySettingsTemplate_TemplateType = $pkg.ActionDeploySettingsTemplate_TemplateType = $newType(4, $kindInt, "P4wnP1_grpc.ActionDeploySettingsTemplate_TemplateType", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	EthernetInterfaceSettings_Mode = $pkg.EthernetInterfaceSettings_Mode = $newType(4, $kindInt, "P4wnP1_grpc.EthernetInterfaceSettings_Mode", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	MasterTemplate = $pkg.MasterTemplate = $newType(0, $kindStruct, "P4wnP1_grpc.MasterTemplate", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(TemplateNameBluetooth_, TemplateNameUsb_, TemplateNameWifi_, TemplateNameTriggerActions_, TemplateNamesNetwork_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.TemplateNameBluetooth = "";
@@ -22631,7 +22631,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.TemplateNameTriggerActions = TemplateNameTriggerActions_;
 		this.TemplateNamesNetwork = TemplateNamesNetwork_;
 	});
-	RequestMasterTemplateStorage = $pkg.RequestMasterTemplateStorage = $newType(0, $kindStruct, "P4wnP1_grpc.RequestMasterTemplateStorage", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(TemplateName_, Template_) {
+	RequestMasterTemplateStorage = $pkg.RequestMasterTemplateStorage = $newType(0, $kindStruct, "P4wnP1_grpc.RequestMasterTemplateStorage", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(TemplateName_, Template_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.TemplateName = "";
@@ -22641,7 +22641,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Template = Template_;
 	});
-	BluetoothRequestSettingsStorage = $pkg.BluetoothRequestSettingsStorage = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothRequestSettingsStorage", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(TemplateName_, Settings_) {
+	BluetoothRequestSettingsStorage = $pkg.BluetoothRequestSettingsStorage = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.TemplateName = "";
@@ -22651,7 +22651,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	BluetoothSettings = $pkg.BluetoothSettings = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothSettings", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Ci_, As_) {
+	BluetoothSettings = $pkg.BluetoothSettings = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothSettings", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Ci_, As_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Ci = ptrType$4.nil;
@@ -22661,7 +22661,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.Ci = Ci_;
 		this.As = As_;
 	});
-	BluetoothAgentSettings = $pkg.BluetoothAgentSettings = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothAgentSettings", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Pin_) {
+	BluetoothAgentSettings = $pkg.BluetoothAgentSettings = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothAgentSettings", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Pin_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pin = "";
@@ -22669,7 +22669,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.Pin = Pin_;
 	});
-	BluetoothNetworkService = $pkg.BluetoothNetworkService = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothNetworkService", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(RegisterOrUnregister_, ServerOrConnect_, Type_, MacOrName_, BridgeName_) {
+	BluetoothNetworkService = $pkg.BluetoothNetworkService = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothNetworkService", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(RegisterOrUnregister_, ServerOrConnect_, Type_, MacOrName_, BridgeName_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.RegisterOrUnregister = false;
@@ -22685,7 +22685,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.MacOrName = MacOrName_;
 		this.BridgeName = BridgeName_;
 	});
-	BluetoothControllerSettings = $pkg.BluetoothControllerSettings = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothControllerSettings", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Powered_, Connectable_, FastConnectable_, Discoverable_, Bondable_, LinkLevelSecurity_, SecureSimplePairing_, BrEdr_, HighSpeed_, LowEnergy_, Advertising_, SecureConnections_, DebugKeys_, Privacy_, ControllerConfiguration_, StaticAddress_) {
+	BluetoothControllerSettings = $pkg.BluetoothControllerSettings = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothControllerSettings", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Powered_, Connectable_, FastConnectable_, Discoverable_, Bondable_, LinkLevelSecurity_, SecureSimplePairing_, BrEdr_, HighSpeed_, LowEnergy_, Advertising_, SecureConnections_, DebugKeys_, Privacy_, ControllerConfiguration_, StaticAddress_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Powered = false;
@@ -22723,7 +22723,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.ControllerConfiguration = ControllerConfiguration_;
 		this.StaticAddress = StaticAddress_;
 	});
-	BluetoothControllerInformation = $pkg.BluetoothControllerInformation = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothControllerInformation", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Address_, BluetoothVersion_, Manufacturer_, SupportedSettings_, CurrentSettings_, ClassOfDevice_, Name_, ShortName_, IsAvailable_, ServiceNetworkServerNap_, ServiceNetworkServerPanu_, ServiceNetworkServerGn_) {
+	BluetoothControllerInformation = $pkg.BluetoothControllerInformation = $newType(0, $kindStruct, "P4wnP1_grpc.BluetoothControllerInformation", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Address_, BluetoothVersion_, Manufacturer_, SupportedSettings_, CurrentSettings_, ClassOfDevice_, Name_, ShortName_, IsAvailable_, ServiceNetworkServerNap_, ServiceNetworkServerPanu_, ServiceNetworkServerGn_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Address = sliceType$1.nil;
@@ -22753,7 +22753,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.ServiceNetworkServerPanu = ServiceNetworkServerPanu_;
 		this.ServiceNetworkServerGn = ServiceNetworkServerGn_;
 	});
-	TriggerActionSet = $pkg.TriggerActionSet = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerActionSet", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(TriggerActions_, Name_) {
+	TriggerActionSet = $pkg.TriggerActionSet = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerActionSet", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(TriggerActions_, Name_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.TriggerActions = sliceType$2.nil;
@@ -22763,7 +22763,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.TriggerActions = TriggerActions_;
 		this.Name = Name_;
 	});
-	TriggerAction = $pkg.TriggerAction = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Id_, OneShot_, IsActive_, Immutable_, Trigger_, Action_) {
+	TriggerAction = $pkg.TriggerAction = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Id_, OneShot_, IsActive_, Immutable_, Trigger_, Action_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Id = 0;
@@ -22781,9 +22781,9 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.Trigger = Trigger_;
 		this.Action = Action_;
 	});
-	isTriggerAction_Trigger = $pkg.isTriggerAction_Trigger = $newType(8, $kindInterface, "P4wnP1_grpc.isTriggerAction_Trigger", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", false, null);
-	isTriggerAction_Action = $pkg.isTriggerAction_Action = $newType(8, $kindInterface, "P4wnP1_grpc.isTriggerAction_Action", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", false, null);
-	TriggerAction_ServiceStarted = $pkg.TriggerAction_ServiceStarted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_ServiceStarted", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(ServiceStarted_) {
+	isTriggerAction_Trigger = $pkg.isTriggerAction_Trigger = $newType(8, $kindInterface, "P4wnP1_grpc.isTriggerAction_Trigger", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", false, null);
+	isTriggerAction_Action = $pkg.isTriggerAction_Action = $newType(8, $kindInterface, "P4wnP1_grpc.isTriggerAction_Action", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", false, null);
+	TriggerAction_ServiceStarted = $pkg.TriggerAction_ServiceStarted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_ServiceStarted", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(ServiceStarted_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.ServiceStarted = ptrType$10.nil;
@@ -22791,7 +22791,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.ServiceStarted = ServiceStarted_;
 	});
-	TriggerAction_UsbGadgetConnected = $pkg.TriggerAction_UsbGadgetConnected = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_UsbGadgetConnected", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(UsbGadgetConnected_) {
+	TriggerAction_UsbGadgetConnected = $pkg.TriggerAction_UsbGadgetConnected = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_UsbGadgetConnected", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(UsbGadgetConnected_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.UsbGadgetConnected = ptrType$12.nil;
@@ -22799,7 +22799,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.UsbGadgetConnected = UsbGadgetConnected_;
 	});
-	TriggerAction_UsbGadgetDisconnected = $pkg.TriggerAction_UsbGadgetDisconnected = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_UsbGadgetDisconnected", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(UsbGadgetDisconnected_) {
+	TriggerAction_UsbGadgetDisconnected = $pkg.TriggerAction_UsbGadgetDisconnected = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_UsbGadgetDisconnected", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(UsbGadgetDisconnected_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.UsbGadgetDisconnected = ptrType$14.nil;
@@ -22807,7 +22807,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.UsbGadgetDisconnected = UsbGadgetDisconnected_;
 	});
-	TriggerAction_WifiAPStarted = $pkg.TriggerAction_WifiAPStarted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_WifiAPStarted", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(WifiAPStarted_) {
+	TriggerAction_WifiAPStarted = $pkg.TriggerAction_WifiAPStarted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_WifiAPStarted", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(WifiAPStarted_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.WifiAPStarted = ptrType$16.nil;
@@ -22815,7 +22815,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.WifiAPStarted = WifiAPStarted_;
 	});
-	TriggerAction_WifiConnectedAsSta = $pkg.TriggerAction_WifiConnectedAsSta = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_WifiConnectedAsSta", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(WifiConnectedAsSta_) {
+	TriggerAction_WifiConnectedAsSta = $pkg.TriggerAction_WifiConnectedAsSta = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_WifiConnectedAsSta", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(WifiConnectedAsSta_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.WifiConnectedAsSta = ptrType$18.nil;
@@ -22823,7 +22823,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.WifiConnectedAsSta = WifiConnectedAsSta_;
 	});
-	TriggerAction_SshLogin = $pkg.TriggerAction_SshLogin = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_SshLogin", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(SshLogin_) {
+	TriggerAction_SshLogin = $pkg.TriggerAction_SshLogin = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_SshLogin", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(SshLogin_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.SshLogin = ptrType$20.nil;
@@ -22831,7 +22831,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.SshLogin = SshLogin_;
 	});
-	TriggerAction_DhcpLeaseGranted = $pkg.TriggerAction_DhcpLeaseGranted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_DhcpLeaseGranted", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(DhcpLeaseGranted_) {
+	TriggerAction_DhcpLeaseGranted = $pkg.TriggerAction_DhcpLeaseGranted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_DhcpLeaseGranted", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(DhcpLeaseGranted_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.DhcpLeaseGranted = ptrType$22.nil;
@@ -22839,7 +22839,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.DhcpLeaseGranted = DhcpLeaseGranted_;
 	});
-	TriggerAction_GroupReceive = $pkg.TriggerAction_GroupReceive = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_GroupReceive", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(GroupReceive_) {
+	TriggerAction_GroupReceive = $pkg.TriggerAction_GroupReceive = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_GroupReceive", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(GroupReceive_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.GroupReceive = ptrType$24.nil;
@@ -22847,7 +22847,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.GroupReceive = GroupReceive_;
 	});
-	TriggerAction_GroupReceiveMulti = $pkg.TriggerAction_GroupReceiveMulti = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_GroupReceiveMulti", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(GroupReceiveMulti_) {
+	TriggerAction_GroupReceiveMulti = $pkg.TriggerAction_GroupReceiveMulti = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_GroupReceiveMulti", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(GroupReceiveMulti_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.GroupReceiveMulti = ptrType$26.nil;
@@ -22855,7 +22855,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.GroupReceiveMulti = GroupReceiveMulti_;
 	});
-	TriggerAction_GpioIn = $pkg.TriggerAction_GpioIn = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_GpioIn", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(GpioIn_) {
+	TriggerAction_GpioIn = $pkg.TriggerAction_GpioIn = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_GpioIn", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(GpioIn_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.GpioIn = ptrType$28.nil;
@@ -22863,7 +22863,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.GpioIn = GpioIn_;
 	});
-	TriggerAction_BashScript = $pkg.TriggerAction_BashScript = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_BashScript", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(BashScript_) {
+	TriggerAction_BashScript = $pkg.TriggerAction_BashScript = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_BashScript", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(BashScript_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.BashScript = ptrType$30.nil;
@@ -22871,7 +22871,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.BashScript = BashScript_;
 	});
-	TriggerAction_HidScript = $pkg.TriggerAction_HidScript = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_HidScript", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(HidScript_) {
+	TriggerAction_HidScript = $pkg.TriggerAction_HidScript = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_HidScript", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(HidScript_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.HidScript = ptrType$32.nil;
@@ -22879,7 +22879,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.HidScript = HidScript_;
 	});
-	TriggerAction_DeploySettingsTemplate = $pkg.TriggerAction_DeploySettingsTemplate = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_DeploySettingsTemplate", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(DeploySettingsTemplate_) {
+	TriggerAction_DeploySettingsTemplate = $pkg.TriggerAction_DeploySettingsTemplate = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_DeploySettingsTemplate", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(DeploySettingsTemplate_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.DeploySettingsTemplate = ptrType$34.nil;
@@ -22887,7 +22887,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.DeploySettingsTemplate = DeploySettingsTemplate_;
 	});
-	TriggerAction_Log = $pkg.TriggerAction_Log = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_Log", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Log_) {
+	TriggerAction_Log = $pkg.TriggerAction_Log = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_Log", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Log_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Log = ptrType$36.nil;
@@ -22895,7 +22895,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.Log = Log_;
 	});
-	TriggerAction_GpioOut = $pkg.TriggerAction_GpioOut = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_GpioOut", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(GpioOut_) {
+	TriggerAction_GpioOut = $pkg.TriggerAction_GpioOut = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_GpioOut", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(GpioOut_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.GpioOut = ptrType$38.nil;
@@ -22903,7 +22903,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.GpioOut = GpioOut_;
 	});
-	TriggerAction_GroupSend = $pkg.TriggerAction_GroupSend = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_GroupSend", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(GroupSend_) {
+	TriggerAction_GroupSend = $pkg.TriggerAction_GroupSend = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerAction_GroupSend", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(GroupSend_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.GroupSend = ptrType$40.nil;
@@ -22911,37 +22911,37 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.GroupSend = GroupSend_;
 	});
-	TriggerServiceStarted = $pkg.TriggerServiceStarted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerServiceStarted", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function() {
+	TriggerServiceStarted = $pkg.TriggerServiceStarted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerServiceStarted", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			return;
 		}
 	});
-	TriggerUSBGadgetConnected = $pkg.TriggerUSBGadgetConnected = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerUSBGadgetConnected", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function() {
+	TriggerUSBGadgetConnected = $pkg.TriggerUSBGadgetConnected = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerUSBGadgetConnected", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			return;
 		}
 	});
-	TriggerUSBGadgetDisconnected = $pkg.TriggerUSBGadgetDisconnected = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerUSBGadgetDisconnected", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function() {
+	TriggerUSBGadgetDisconnected = $pkg.TriggerUSBGadgetDisconnected = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerUSBGadgetDisconnected", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			return;
 		}
 	});
-	TriggerWifiAPStarted = $pkg.TriggerWifiAPStarted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerWifiAPStarted", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function() {
+	TriggerWifiAPStarted = $pkg.TriggerWifiAPStarted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerWifiAPStarted", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			return;
 		}
 	});
-	TriggerWifiConnectedAsSta = $pkg.TriggerWifiConnectedAsSta = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerWifiConnectedAsSta", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function() {
+	TriggerWifiConnectedAsSta = $pkg.TriggerWifiConnectedAsSta = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerWifiConnectedAsSta", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			return;
 		}
 	});
-	TriggerSSHLogin = $pkg.TriggerSSHLogin = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerSSHLogin", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(LoginUser_) {
+	TriggerSSHLogin = $pkg.TriggerSSHLogin = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerSSHLogin", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(LoginUser_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.LoginUser = "";
@@ -22949,13 +22949,13 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.LoginUser = LoginUser_;
 	});
-	TriggerDHCPLeaseGranted = $pkg.TriggerDHCPLeaseGranted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerDHCPLeaseGranted", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function() {
+	TriggerDHCPLeaseGranted = $pkg.TriggerDHCPLeaseGranted = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerDHCPLeaseGranted", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			return;
 		}
 	});
-	TriggerGroupReceive = $pkg.TriggerGroupReceive = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerGroupReceive", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(GroupName_, Value_) {
+	TriggerGroupReceive = $pkg.TriggerGroupReceive = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerGroupReceive", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(GroupName_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.GroupName = "";
@@ -22965,7 +22965,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.GroupName = GroupName_;
 		this.Value = Value_;
 	});
-	TriggerGroupReceiveMulti = $pkg.TriggerGroupReceiveMulti = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerGroupReceiveMulti", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(GroupName_, Values_, Type_) {
+	TriggerGroupReceiveMulti = $pkg.TriggerGroupReceiveMulti = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerGroupReceiveMulti", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(GroupName_, Values_, Type_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.GroupName = "";
@@ -22977,7 +22977,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.Values = Values_;
 		this.Type = Type_;
 	});
-	TriggerGPIOIn = $pkg.TriggerGPIOIn = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerGPIOIn", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(GpioName_, PullUpDown_, GpioInEdge_, DebounceMillis_) {
+	TriggerGPIOIn = $pkg.TriggerGPIOIn = $newType(0, $kindStruct, "P4wnP1_grpc.TriggerGPIOIn", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(GpioName_, PullUpDown_, GpioInEdge_, DebounceMillis_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.GpioName = "";
@@ -22991,7 +22991,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.GpioInEdge = GpioInEdge_;
 		this.DebounceMillis = DebounceMillis_;
 	});
-	ActionStartBashScript = $pkg.ActionStartBashScript = $newType(0, $kindStruct, "P4wnP1_grpc.ActionStartBashScript", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(ScriptName_) {
+	ActionStartBashScript = $pkg.ActionStartBashScript = $newType(0, $kindStruct, "P4wnP1_grpc.ActionStartBashScript", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(ScriptName_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.ScriptName = "";
@@ -22999,7 +22999,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.ScriptName = ScriptName_;
 	});
-	ActionStartHIDScript = $pkg.ActionStartHIDScript = $newType(0, $kindStruct, "P4wnP1_grpc.ActionStartHIDScript", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(ScriptName_) {
+	ActionStartHIDScript = $pkg.ActionStartHIDScript = $newType(0, $kindStruct, "P4wnP1_grpc.ActionStartHIDScript", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(ScriptName_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.ScriptName = "";
@@ -23007,7 +23007,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.ScriptName = ScriptName_;
 	});
-	ActionDeploySettingsTemplate = $pkg.ActionDeploySettingsTemplate = $newType(0, $kindStruct, "P4wnP1_grpc.ActionDeploySettingsTemplate", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(TemplateName_, Type_) {
+	ActionDeploySettingsTemplate = $pkg.ActionDeploySettingsTemplate = $newType(0, $kindStruct, "P4wnP1_grpc.ActionDeploySettingsTemplate", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(TemplateName_, Type_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.TemplateName = "";
@@ -23017,13 +23017,13 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Type = Type_;
 	});
-	ActionLog = $pkg.ActionLog = $newType(0, $kindStruct, "P4wnP1_grpc.ActionLog", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function() {
+	ActionLog = $pkg.ActionLog = $newType(0, $kindStruct, "P4wnP1_grpc.ActionLog", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			return;
 		}
 	});
-	ActionGPIOOut = $pkg.ActionGPIOOut = $newType(0, $kindStruct, "P4wnP1_grpc.ActionGPIOOut", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(GpioName_, Value_) {
+	ActionGPIOOut = $pkg.ActionGPIOOut = $newType(0, $kindStruct, "P4wnP1_grpc.ActionGPIOOut", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(GpioName_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.GpioName = "";
@@ -23033,7 +23033,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.GpioName = GpioName_;
 		this.Value = Value_;
 	});
-	ActionGroupSend = $pkg.ActionGroupSend = $newType(0, $kindStruct, "P4wnP1_grpc.ActionGroupSend", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(GroupName_, Value_) {
+	ActionGroupSend = $pkg.ActionGroupSend = $newType(0, $kindStruct, "P4wnP1_grpc.ActionGroupSend", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(GroupName_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.GroupName = "";
@@ -23043,7 +23043,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.GroupName = GroupName_;
 		this.Value = Value_;
 	});
-	WifiRequestSettingsStorage = $pkg.WifiRequestSettingsStorage = $newType(0, $kindStruct, "P4wnP1_grpc.WifiRequestSettingsStorage", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(TemplateName_, Settings_) {
+	WifiRequestSettingsStorage = $pkg.WifiRequestSettingsStorage = $newType(0, $kindStruct, "P4wnP1_grpc.WifiRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.TemplateName = "";
@@ -23053,7 +23053,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	WiFiSettings = $pkg.WiFiSettings = $newType(0, $kindStruct, "P4wnP1_grpc.WiFiSettings", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Name_, Disabled_, Regulatory_, WorkingMode_, AuthMode_, Channel_, Ap_BSS_, Client_BSSList_, HideSsid_, Nexmon_) {
+	WiFiSettings = $pkg.WiFiSettings = $newType(0, $kindStruct, "P4wnP1_grpc.WiFiSettings", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Name_, Disabled_, Regulatory_, WorkingMode_, AuthMode_, Channel_, Ap_BSS_, Client_BSSList_, HideSsid_, Nexmon_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Name = "";
@@ -23079,7 +23079,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.HideSsid = HideSsid_;
 		this.Nexmon = Nexmon_;
 	});
-	WiFiState = $pkg.WiFiState = $newType(0, $kindStruct, "P4wnP1_grpc.WiFiState", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Mode_, Channel_, Ssid_, CurrentSettings_) {
+	WiFiState = $pkg.WiFiState = $newType(0, $kindStruct, "P4wnP1_grpc.WiFiState", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Mode_, Channel_, Ssid_, CurrentSettings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Mode = 0;
@@ -23093,7 +23093,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.Ssid = Ssid_;
 		this.CurrentSettings = CurrentSettings_;
 	});
-	WiFiBSSCfg = $pkg.WiFiBSSCfg = $newType(0, $kindStruct, "P4wnP1_grpc.WiFiBSSCfg", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(SSID_, PSK_) {
+	WiFiBSSCfg = $pkg.WiFiBSSCfg = $newType(0, $kindStruct, "P4wnP1_grpc.WiFiBSSCfg", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(SSID_, PSK_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.SSID = "";
@@ -23103,7 +23103,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.SSID = SSID_;
 		this.PSK = PSK_;
 	});
-	StringMessage = $pkg.StringMessage = $newType(0, $kindStruct, "P4wnP1_grpc.StringMessage", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Msg_) {
+	StringMessage = $pkg.StringMessage = $newType(0, $kindStruct, "P4wnP1_grpc.StringMessage", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Msg_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Msg = "";
@@ -23111,7 +23111,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.Msg = Msg_;
 	});
-	StringMessageArray = $pkg.StringMessageArray = $newType(0, $kindStruct, "P4wnP1_grpc.StringMessageArray", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(MsgArray_) {
+	StringMessageArray = $pkg.StringMessageArray = $newType(0, $kindStruct, "P4wnP1_grpc.StringMessageArray", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(MsgArray_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.MsgArray = sliceType.nil;
@@ -23119,7 +23119,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.MsgArray = MsgArray_;
 	});
-	EventRequest = $pkg.EventRequest = $newType(0, $kindStruct, "P4wnP1_grpc.EventRequest", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(ListenType_) {
+	EventRequest = $pkg.EventRequest = $newType(0, $kindStruct, "P4wnP1_grpc.EventRequest", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(ListenType_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.ListenType = new $Int64(0, 0);
@@ -23127,7 +23127,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.ListenType = ListenType_;
 	});
-	EventValue = $pkg.EventValue = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Val_) {
+	EventValue = $pkg.EventValue = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Val_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Val = $ifaceNil;
@@ -23135,8 +23135,8 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.Val = Val_;
 	});
-	isEventValue_Val = $pkg.isEventValue_Val = $newType(8, $kindInterface, "P4wnP1_grpc.isEventValue_Val", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", false, null);
-	EventValue_Tstring = $pkg.EventValue_Tstring = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue_Tstring", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Tstring_) {
+	isEventValue_Val = $pkg.isEventValue_Val = $newType(8, $kindInterface, "P4wnP1_grpc.isEventValue_Val", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", false, null);
+	EventValue_Tstring = $pkg.EventValue_Tstring = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue_Tstring", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Tstring_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Tstring = "";
@@ -23144,7 +23144,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.Tstring = Tstring_;
 	});
-	EventValue_Tbool = $pkg.EventValue_Tbool = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue_Tbool", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Tbool_) {
+	EventValue_Tbool = $pkg.EventValue_Tbool = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue_Tbool", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Tbool_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Tbool = false;
@@ -23152,7 +23152,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.Tbool = Tbool_;
 	});
-	EventValue_Tint64 = $pkg.EventValue_Tint64 = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue_Tint64", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Tint64_) {
+	EventValue_Tint64 = $pkg.EventValue_Tint64 = $newType(0, $kindStruct, "P4wnP1_grpc.EventValue_Tint64", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Tint64_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Tint64 = new $Int64(0, 0);
@@ -23160,7 +23160,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.Tint64 = Tint64_;
 	});
-	Event = $pkg.Event = $newType(0, $kindStruct, "P4wnP1_grpc.Event", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Type_, Values_) {
+	Event = $pkg.Event = $newType(0, $kindStruct, "P4wnP1_grpc.Event", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Type_, Values_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Type = new $Int64(0, 0);
@@ -23170,7 +23170,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.Type = Type_;
 		this.Values = Values_;
 	});
-	TempDirOrFileRequest = $pkg.TempDirOrFileRequest = $newType(0, $kindStruct, "P4wnP1_grpc.TempDirOrFileRequest", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Dir_, Prefix_, OnlyFolder_) {
+	TempDirOrFileRequest = $pkg.TempDirOrFileRequest = $newType(0, $kindStruct, "P4wnP1_grpc.TempDirOrFileRequest", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Dir_, Prefix_, OnlyFolder_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Dir = "";
@@ -23182,7 +23182,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.Prefix = Prefix_;
 		this.OnlyFolder = OnlyFolder_;
 	});
-	TempDirOrFileResponse = $pkg.TempDirOrFileResponse = $newType(0, $kindStruct, "P4wnP1_grpc.TempDirOrFileResponse", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(ResultPath_) {
+	TempDirOrFileResponse = $pkg.TempDirOrFileResponse = $newType(0, $kindStruct, "P4wnP1_grpc.TempDirOrFileResponse", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(ResultPath_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.ResultPath = "";
@@ -23190,7 +23190,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.ResultPath = ResultPath_;
 	});
-	ReadFileRequest = $pkg.ReadFileRequest = $newType(0, $kindStruct, "P4wnP1_grpc.ReadFileRequest", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Folder_, Filename_, Start_, Len_) {
+	ReadFileRequest = $pkg.ReadFileRequest = $newType(0, $kindStruct, "P4wnP1_grpc.ReadFileRequest", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Folder_, Filename_, Start_, Len_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Folder = 0;
@@ -23204,7 +23204,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.Start = Start_;
 		this.Len = Len_;
 	});
-	ReadFileResponse = $pkg.ReadFileResponse = $newType(0, $kindStruct, "P4wnP1_grpc.ReadFileResponse", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(ReadCount_, Data_) {
+	ReadFileResponse = $pkg.ReadFileResponse = $newType(0, $kindStruct, "P4wnP1_grpc.ReadFileResponse", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(ReadCount_, Data_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.ReadCount = new $Int64(0, 0);
@@ -23214,7 +23214,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.ReadCount = ReadCount_;
 		this.Data = Data_;
 	});
-	WriteFileRequest = $pkg.WriteFileRequest = $newType(0, $kindStruct, "P4wnP1_grpc.WriteFileRequest", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Folder_, Filename_, Append_, MustNotExist_, Data_) {
+	WriteFileRequest = $pkg.WriteFileRequest = $newType(0, $kindStruct, "P4wnP1_grpc.WriteFileRequest", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Folder_, Filename_, Append_, MustNotExist_, Data_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Folder = 0;
@@ -23230,7 +23230,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.MustNotExist = MustNotExist_;
 		this.Data = Data_;
 	});
-	FileInfoRequest = $pkg.FileInfoRequest = $newType(0, $kindStruct, "P4wnP1_grpc.FileInfoRequest", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Path_) {
+	FileInfoRequest = $pkg.FileInfoRequest = $newType(0, $kindStruct, "P4wnP1_grpc.FileInfoRequest", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Path_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Path = "";
@@ -23238,7 +23238,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.Path = Path_;
 	});
-	FileInfoResponse = $pkg.FileInfoResponse = $newType(0, $kindStruct, "P4wnP1_grpc.FileInfoResponse", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Name_, Size_, Mode_, ModTime_, IsDir_) {
+	FileInfoResponse = $pkg.FileInfoResponse = $newType(0, $kindStruct, "P4wnP1_grpc.FileInfoResponse", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Name_, Size_, Mode_, ModTime_, IsDir_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Name = "";
@@ -23254,7 +23254,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.ModTime = ModTime_;
 		this.IsDir = IsDir_;
 	});
-	HIDScriptRequest = $pkg.HIDScriptRequest = $newType(0, $kindStruct, "P4wnP1_grpc.HIDScriptRequest", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(ScriptPath_, TimeoutSeconds_) {
+	HIDScriptRequest = $pkg.HIDScriptRequest = $newType(0, $kindStruct, "P4wnP1_grpc.HIDScriptRequest", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(ScriptPath_, TimeoutSeconds_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.ScriptPath = "";
@@ -23264,7 +23264,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.ScriptPath = ScriptPath_;
 		this.TimeoutSeconds = TimeoutSeconds_;
 	});
-	HIDScriptJob = $pkg.HIDScriptJob = $newType(0, $kindStruct, "P4wnP1_grpc.HIDScriptJob", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Id_) {
+	HIDScriptJob = $pkg.HIDScriptJob = $newType(0, $kindStruct, "P4wnP1_grpc.HIDScriptJob", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Id_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Id = 0;
@@ -23272,7 +23272,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.Id = Id_;
 	});
-	HIDScriptJobList = $pkg.HIDScriptJobList = $newType(0, $kindStruct, "P4wnP1_grpc.HIDScriptJobList", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Ids_) {
+	HIDScriptJobList = $pkg.HIDScriptJobList = $newType(0, $kindStruct, "P4wnP1_grpc.HIDScriptJobList", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Ids_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Ids = sliceType$6.nil;
@@ -23280,7 +23280,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.Ids = Ids_;
 	});
-	HIDRunningJobStateResult = $pkg.HIDRunningJobStateResult = $newType(0, $kindStruct, "P4wnP1_grpc.HIDRunningJobStateResult", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Id_, VmId_, Source_) {
+	HIDRunningJobStateResult = $pkg.HIDRunningJobStateResult = $newType(0, $kindStruct, "P4wnP1_grpc.HIDRunningJobStateResult", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Id_, VmId_, Source_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Id = new $Int64(0, 0);
@@ -23292,7 +23292,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.VmId = VmId_;
 		this.Source = Source_;
 	});
-	HIDScriptResult = $pkg.HIDScriptResult = $newType(0, $kindStruct, "P4wnP1_grpc.HIDScriptResult", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Job_, IsFinished_, ResultJson_) {
+	HIDScriptResult = $pkg.HIDScriptResult = $newType(0, $kindStruct, "P4wnP1_grpc.HIDScriptResult", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Job_, IsFinished_, ResultJson_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Job = ptrType$62.nil;
@@ -23304,7 +23304,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.IsFinished = IsFinished_;
 		this.ResultJson = ResultJson_;
 	});
-	LEDSettings = $pkg.LEDSettings = $newType(0, $kindStruct, "P4wnP1_grpc.LEDSettings", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(BlinkCount_) {
+	LEDSettings = $pkg.LEDSettings = $newType(0, $kindStruct, "P4wnP1_grpc.LEDSettings", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(BlinkCount_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.BlinkCount = 0;
@@ -23312,7 +23312,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.BlinkCount = BlinkCount_;
 	});
-	USBRequestSettingsStorage = $pkg.USBRequestSettingsStorage = $newType(0, $kindStruct, "P4wnP1_grpc.USBRequestSettingsStorage", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(TemplateName_, Settings_) {
+	USBRequestSettingsStorage = $pkg.USBRequestSettingsStorage = $newType(0, $kindStruct, "P4wnP1_grpc.USBRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.TemplateName = "";
@@ -23322,7 +23322,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	GadgetSettings = $pkg.GadgetSettings = $newType(0, $kindStruct, "P4wnP1_grpc.GadgetSettings", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Enabled_, Vid_, Pid_, Manufacturer_, Product_, Serial_, Use_CDC_ECM_, Use_RNDIS_, Use_HID_KEYBOARD_, Use_HID_MOUSE_, Use_HID_RAW_, Use_UMS_, Use_SERIAL_, RndisSettings_, CdcEcmSettings_, UmsSettings_, DevPathHidKeyboard_, DevPathHidMouse_, DevPathHidRaw_) {
+	GadgetSettings = $pkg.GadgetSettings = $newType(0, $kindStruct, "P4wnP1_grpc.GadgetSettings", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Enabled_, Vid_, Pid_, Manufacturer_, Product_, Serial_, Use_CDC_ECM_, Use_RNDIS_, Use_HID_KEYBOARD_, Use_HID_MOUSE_, Use_HID_RAW_, Use_UMS_, Use_SERIAL_, RndisSettings_, CdcEcmSettings_, UmsSettings_, DevPathHidKeyboard_, DevPathHidMouse_, DevPathHidRaw_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Enabled = false;
@@ -23366,7 +23366,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.DevPathHidMouse = DevPathHidMouse_;
 		this.DevPathHidRaw = DevPathHidRaw_;
 	});
-	GadgetSettingsEthernet = $pkg.GadgetSettingsEthernet = $newType(0, $kindStruct, "P4wnP1_grpc.GadgetSettingsEthernet", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(HostAddr_, DevAddr_) {
+	GadgetSettingsEthernet = $pkg.GadgetSettingsEthernet = $newType(0, $kindStruct, "P4wnP1_grpc.GadgetSettingsEthernet", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(HostAddr_, DevAddr_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.HostAddr = "";
@@ -23376,7 +23376,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.HostAddr = HostAddr_;
 		this.DevAddr = DevAddr_;
 	});
-	GadgetSettingsUMS = $pkg.GadgetSettingsUMS = $newType(0, $kindStruct, "P4wnP1_grpc.GadgetSettingsUMS", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Cdrom_, File_) {
+	GadgetSettingsUMS = $pkg.GadgetSettingsUMS = $newType(0, $kindStruct, "P4wnP1_grpc.GadgetSettingsUMS", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Cdrom_, File_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Cdrom = false;
@@ -23386,7 +23386,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.Cdrom = Cdrom_;
 		this.File = File_;
 	});
-	EthernetRequestSettingsStorage = $pkg.EthernetRequestSettingsStorage = $newType(0, $kindStruct, "P4wnP1_grpc.EthernetRequestSettingsStorage", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(TemplateName_, Settings_) {
+	EthernetRequestSettingsStorage = $pkg.EthernetRequestSettingsStorage = $newType(0, $kindStruct, "P4wnP1_grpc.EthernetRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.TemplateName = "";
@@ -23396,7 +23396,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	DeployedEthernetInterfaceSettings = $pkg.DeployedEthernetInterfaceSettings = $newType(0, $kindStruct, "P4wnP1_grpc.DeployedEthernetInterfaceSettings", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(List_) {
+	DeployedEthernetInterfaceSettings = $pkg.DeployedEthernetInterfaceSettings = $newType(0, $kindStruct, "P4wnP1_grpc.DeployedEthernetInterfaceSettings", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(List_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.List = sliceType$7.nil;
@@ -23404,7 +23404,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.List = List_;
 	});
-	EthernetInterfaceSettings = $pkg.EthernetInterfaceSettings = $newType(0, $kindStruct, "P4wnP1_grpc.EthernetInterfaceSettings", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Name_, Mode_, IpAddress4_, Netmask4_, Enabled_, DhcpServerSettings_, SettingsInUse_) {
+	EthernetInterfaceSettings = $pkg.EthernetInterfaceSettings = $newType(0, $kindStruct, "P4wnP1_grpc.EthernetInterfaceSettings", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Name_, Mode_, IpAddress4_, Netmask4_, Enabled_, DhcpServerSettings_, SettingsInUse_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Name = "";
@@ -23424,7 +23424,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.DhcpServerSettings = DhcpServerSettings_;
 		this.SettingsInUse = SettingsInUse_;
 	});
-	DHCPServerSettings = $pkg.DHCPServerSettings = $newType(0, $kindStruct, "P4wnP1_grpc.DHCPServerSettings", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(ListenPort_, ListenInterface_, LeaseFile_, NotAuthoritative_, DoNotBindInterface_, CallbackScript_, Ranges_, Options_, StaticHosts_) {
+	DHCPServerSettings = $pkg.DHCPServerSettings = $newType(0, $kindStruct, "P4wnP1_grpc.DHCPServerSettings", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(ListenPort_, ListenInterface_, LeaseFile_, NotAuthoritative_, DoNotBindInterface_, CallbackScript_, Ranges_, Options_, StaticHosts_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.ListenPort = 0;
@@ -23448,7 +23448,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.Options = Options_;
 		this.StaticHosts = StaticHosts_;
 	});
-	DHCPServerRange = $pkg.DHCPServerRange = $newType(0, $kindStruct, "P4wnP1_grpc.DHCPServerRange", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(RangeLower_, RangeUpper_, LeaseTime_) {
+	DHCPServerRange = $pkg.DHCPServerRange = $newType(0, $kindStruct, "P4wnP1_grpc.DHCPServerRange", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(RangeLower_, RangeUpper_, LeaseTime_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.RangeLower = "";
@@ -23460,7 +23460,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.RangeUpper = RangeUpper_;
 		this.LeaseTime = LeaseTime_;
 	});
-	DHCPServerStaticHost = $pkg.DHCPServerStaticHost = $newType(0, $kindStruct, "P4wnP1_grpc.DHCPServerStaticHost", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function(Mac_, Ip_) {
+	DHCPServerStaticHost = $pkg.DHCPServerStaticHost = $newType(0, $kindStruct, "P4wnP1_grpc.DHCPServerStaticHost", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function(Mac_, Ip_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Mac = "";
@@ -23470,14 +23470,14 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		this.Mac = Mac_;
 		this.Ip = Ip_;
 	});
-	Empty = $pkg.Empty = $newType(0, $kindStruct, "P4wnP1_grpc.Empty", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, function() {
+	Empty = $pkg.Empty = $newType(0, $kindStruct, "P4wnP1_grpc.Empty", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, function() {
 		this.$val = this;
 		if (arguments.length === 0) {
 			return;
 		}
 	});
-	P4WNP1Client = $pkg.P4WNP1Client = $newType(8, $kindInterface, "P4wnP1_grpc.P4WNP1Client", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	p4WNP1Client = $pkg.p4WNP1Client = $newType(0, $kindStruct, "P4wnP1_grpc.p4WNP1Client", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", false, function(client_) {
+	P4WNP1Client = $pkg.P4WNP1Client = $newType(8, $kindInterface, "P4wnP1_grpc.P4WNP1Client", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	p4WNP1Client = $pkg.p4WNP1Client = $newType(0, $kindStruct, "P4wnP1_grpc.p4WNP1Client", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", false, function(client_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.client = ptrType$78.nil;
@@ -23485,8 +23485,8 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		}
 		this.client = client_;
 	});
-	P4WNP1_EventListenClient = $pkg.P4WNP1_EventListenClient = $newType(8, $kindInterface, "P4wnP1_grpc.P4WNP1_EventListenClient", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", true, null);
-	p4WNP1EventListenClient = $pkg.p4WNP1EventListenClient = $newType(0, $kindStruct, "P4wnP1_grpc.p4WNP1EventListenClient", true, "github.com/mame82/P4wnP1_go/proto/gopherjs", false, function(ClientStream_) {
+	P4WNP1_EventListenClient = $pkg.P4WNP1_EventListenClient = $newType(8, $kindInterface, "P4wnP1_grpc.P4WNP1_EventListenClient", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", true, null);
+	p4WNP1EventListenClient = $pkg.p4WNP1EventListenClient = $newType(0, $kindStruct, "P4wnP1_grpc.p4WNP1EventListenClient", true, "github.com/mame82/P4wnP1_aloa/proto/gopherjs", false, function(ClientStream_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.ClientStream = $ifaceNil;
@@ -25686,116 +25686,116 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		/* */ if ($assertType(_ref, ptrType$29, true)[1]) { $s = 10; continue; }
 		/* */ $s = 11; continue;
 		/* if ($assertType(_ref, ptrType$11, true)[1]) { */ case 1:
-			t$9[0] = _ref.$val;
-			/* */ if (!(t$9[0].ServiceStarted === ptrType$10.nil)) { $s = 12; continue; }
+			t$6[0] = _ref.$val;
+			/* */ if (!(t$6[0].ServiceStarted === ptrType$10.nil)) { $s = 12; continue; }
 			/* */ $s = 13; continue;
-			/* if (!(t$9[0].ServiceStarted === ptrType$10.nil)) { */ case 12:
+			/* if (!(t$6[0].ServiceStarted === ptrType$10.nil)) { */ case 12:
 				$r = writer[0].WriteMessage(5, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t$9[0].ServiceStarted.MarshalToWriter(writer[0]);
+					t$6[0].ServiceStarted.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 13:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$13, true)[1]) { */ case 2:
-			t$2[0] = _ref.$val;
-			/* */ if (!(t$2[0].UsbGadgetConnected === ptrType$12.nil)) { $s = 15; continue; }
+			t$1[0] = _ref.$val;
+			/* */ if (!(t$1[0].UsbGadgetConnected === ptrType$12.nil)) { $s = 15; continue; }
 			/* */ $s = 16; continue;
-			/* if (!(t$2[0].UsbGadgetConnected === ptrType$12.nil)) { */ case 15:
+			/* if (!(t$1[0].UsbGadgetConnected === ptrType$12.nil)) { */ case 15:
 				$r = writer[0].WriteMessage(6, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t$2[0].UsbGadgetConnected.MarshalToWriter(writer[0]);
+					t$1[0].UsbGadgetConnected.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 17; case 17: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 16:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$15, true)[1]) { */ case 3:
-			t$1[0] = _ref.$val;
-			/* */ if (!(t$1[0].UsbGadgetDisconnected === ptrType$14.nil)) { $s = 18; continue; }
+			t$7[0] = _ref.$val;
+			/* */ if (!(t$7[0].UsbGadgetDisconnected === ptrType$14.nil)) { $s = 18; continue; }
 			/* */ $s = 19; continue;
-			/* if (!(t$1[0].UsbGadgetDisconnected === ptrType$14.nil)) { */ case 18:
+			/* if (!(t$7[0].UsbGadgetDisconnected === ptrType$14.nil)) { */ case 18:
 				$r = writer[0].WriteMessage(7, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t$1[0].UsbGadgetDisconnected.MarshalToWriter(writer[0]);
+					t$7[0].UsbGadgetDisconnected.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 20; case 20: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 19:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$17, true)[1]) { */ case 4:
-			t$6[0] = _ref.$val;
-			/* */ if (!(t$6[0].WifiAPStarted === ptrType$16.nil)) { $s = 21; continue; }
+			t[0] = _ref.$val;
+			/* */ if (!(t[0].WifiAPStarted === ptrType$16.nil)) { $s = 21; continue; }
 			/* */ $s = 22; continue;
-			/* if (!(t$6[0].WifiAPStarted === ptrType$16.nil)) { */ case 21:
+			/* if (!(t[0].WifiAPStarted === ptrType$16.nil)) { */ case 21:
 				$r = writer[0].WriteMessage(8, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t$6[0].WifiAPStarted.MarshalToWriter(writer[0]);
+					t[0].WifiAPStarted.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 23; case 23: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 22:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$19, true)[1]) { */ case 5:
-			t$7[0] = _ref.$val;
-			/* */ if (!(t$7[0].WifiConnectedAsSta === ptrType$18.nil)) { $s = 24; continue; }
+			t$9[0] = _ref.$val;
+			/* */ if (!(t$9[0].WifiConnectedAsSta === ptrType$18.nil)) { $s = 24; continue; }
 			/* */ $s = 25; continue;
-			/* if (!(t$7[0].WifiConnectedAsSta === ptrType$18.nil)) { */ case 24:
+			/* if (!(t$9[0].WifiConnectedAsSta === ptrType$18.nil)) { */ case 24:
 				$r = writer[0].WriteMessage(9, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t$7[0].WifiConnectedAsSta.MarshalToWriter(writer[0]);
+					t$9[0].WifiConnectedAsSta.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 26; case 26: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 25:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$21, true)[1]) { */ case 6:
-			t$8[0] = _ref.$val;
-			/* */ if (!(t$8[0].SshLogin === ptrType$20.nil)) { $s = 27; continue; }
+			t$2[0] = _ref.$val;
+			/* */ if (!(t$2[0].SshLogin === ptrType$20.nil)) { $s = 27; continue; }
 			/* */ $s = 28; continue;
-			/* if (!(t$8[0].SshLogin === ptrType$20.nil)) { */ case 27:
+			/* if (!(t$2[0].SshLogin === ptrType$20.nil)) { */ case 27:
 				$r = writer[0].WriteMessage(10, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$8[0].SshLogin.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$2[0].SshLogin.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 29; case 29: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 28:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$23, true)[1]) { */ case 7:
-			t[0] = _ref.$val;
-			/* */ if (!(t[0].DhcpLeaseGranted === ptrType$22.nil)) { $s = 30; continue; }
+			t$3[0] = _ref.$val;
+			/* */ if (!(t$3[0].DhcpLeaseGranted === ptrType$22.nil)) { $s = 30; continue; }
 			/* */ $s = 31; continue;
-			/* if (!(t[0].DhcpLeaseGranted === ptrType$22.nil)) { */ case 30:
+			/* if (!(t$3[0].DhcpLeaseGranted === ptrType$22.nil)) { */ case 30:
 				$r = writer[0].WriteMessage(11, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t[0].DhcpLeaseGranted.MarshalToWriter(writer[0]);
+					t$3[0].DhcpLeaseGranted.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 32; case 32: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 31:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$25, true)[1]) { */ case 8:
-			t$5[0] = _ref.$val;
-			/* */ if (!(t$5[0].GroupReceive === ptrType$24.nil)) { $s = 33; continue; }
+			t$4[0] = _ref.$val;
+			/* */ if (!(t$4[0].GroupReceive === ptrType$24.nil)) { $s = 33; continue; }
 			/* */ $s = 34; continue;
-			/* if (!(t$5[0].GroupReceive === ptrType$24.nil)) { */ case 33:
+			/* if (!(t$4[0].GroupReceive === ptrType$24.nil)) { */ case 33:
 				$r = writer[0].WriteMessage(12, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$5[0].GroupReceive.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$4[0].GroupReceive.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 35; case 35: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 34:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$27, true)[1]) { */ case 9:
-			t$3[0] = _ref.$val;
-			/* */ if (!(t$3[0].GroupReceiveMulti === ptrType$26.nil)) { $s = 36; continue; }
+			t$8[0] = _ref.$val;
+			/* */ if (!(t$8[0].GroupReceiveMulti === ptrType$26.nil)) { $s = 36; continue; }
 			/* */ $s = 37; continue;
-			/* if (!(t$3[0].GroupReceiveMulti === ptrType$26.nil)) { */ case 36:
+			/* if (!(t$8[0].GroupReceiveMulti === ptrType$26.nil)) { */ case 36:
 				$r = writer[0].WriteMessage(13, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$3[0].GroupReceiveMulti.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$8[0].GroupReceiveMulti.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 38; case 38: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 37:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$29, true)[1]) { */ case 10:
-			t$4[0] = _ref.$val;
-			/* */ if (!(t$4[0].GpioIn === ptrType$28.nil)) { $s = 39; continue; }
+			t$5[0] = _ref.$val;
+			/* */ if (!(t$5[0].GpioIn === ptrType$28.nil)) { $s = 39; continue; }
 			/* */ $s = 40; continue;
-			/* if (!(t$4[0].GpioIn === ptrType$28.nil)) { */ case 39:
+			/* if (!(t$5[0].GpioIn === ptrType$28.nil)) { */ case 39:
 				$r = writer[0].WriteMessage(14, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$4[0].GpioIn.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$5[0].GpioIn.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 41; case 41: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
@@ -25810,14 +25810,14 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 		/* */ if ($assertType(_ref$1, ptrType$41, true)[1]) { $s = 47; continue; }
 		/* */ $s = 48; continue;
 		/* if ($assertType(_ref$1, ptrType$31, true)[1]) { */ case 42:
-			t$10[0] = _ref$1.$val;
-			/* */ if (!(t$10[0].BashScript === ptrType$30.nil)) { $s = 49; continue; }
+			t$12[0] = _ref$1.$val;
+			/* */ if (!(t$12[0].BashScript === ptrType$30.nil)) { $s = 49; continue; }
 			/* */ $s = 50; continue;
-			/* if (!(t$10[0].BashScript === ptrType$30.nil)) { */ case 49:
+			/* if (!(t$12[0].BashScript === ptrType$30.nil)) { */ case 49:
 				$r = writer[0].WriteMessage(15, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$10[0].BashScript.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$12[0].BashScript.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 51; case 51: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
@@ -25838,26 +25838,26 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 			/* } */ case 53:
 			$s = 48; continue;
 		/* } else if ($assertType(_ref$1, ptrType$35, true)[1]) { */ case 44:
-			t$12[0] = _ref$1.$val;
-			/* */ if (!(t$12[0].DeploySettingsTemplate === ptrType$34.nil)) { $s = 55; continue; }
+			t$13[0] = _ref$1.$val;
+			/* */ if (!(t$13[0].DeploySettingsTemplate === ptrType$34.nil)) { $s = 55; continue; }
 			/* */ $s = 56; continue;
-			/* if (!(t$12[0].DeploySettingsTemplate === ptrType$34.nil)) { */ case 55:
+			/* if (!(t$13[0].DeploySettingsTemplate === ptrType$34.nil)) { */ case 55:
 				$r = writer[0].WriteMessage(17, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$12[0].DeploySettingsTemplate.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$13[0].DeploySettingsTemplate.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 57; case 57: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 56:
 			$s = 48; continue;
 		/* } else if ($assertType(_ref$1, ptrType$37, true)[1]) { */ case 45:
-			t$13[0] = _ref$1.$val;
-			/* */ if (!(t$13[0].Log === ptrType$36.nil)) { $s = 58; continue; }
+			t$10[0] = _ref$1.$val;
+			/* */ if (!(t$10[0].Log === ptrType$36.nil)) { $s = 58; continue; }
 			/* */ $s = 59; continue;
-			/* if (!(t$13[0].Log === ptrType$36.nil)) { */ case 58:
+			/* if (!(t$10[0].Log === ptrType$36.nil)) { */ case 58:
 				$r = writer[0].WriteMessage(18, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t$13[0].Log.MarshalToWriter(writer[0]);
+					t$10[0].Log.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 60; case 60: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 59:
 			$s = 48; continue;
@@ -33846,22 +33846,22 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 	ptrType$4.methods = [{prop: "GetAddress", name: "GetAddress", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "GetBluetoothVersion", name: "GetBluetoothVersion", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "GetManufacturer", name: "GetManufacturer", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "GetSupportedSettings", name: "GetSupportedSettings", pkg: "", typ: $funcType([], [ptrType$7], false)}, {prop: "GetCurrentSettings", name: "GetCurrentSettings", pkg: "", typ: $funcType([], [ptrType$7], false)}, {prop: "GetClassOfDevice", name: "GetClassOfDevice", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "GetName", name: "GetName", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetShortName", name: "GetShortName", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetIsAvailable", name: "GetIsAvailable", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetServiceNetworkServerNap", name: "GetServiceNetworkServerNap", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetServiceNetworkServerPanu", name: "GetServiceNetworkServerPanu", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetServiceNetworkServerGn", name: "GetServiceNetworkServerGn", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$4], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$4, $error], false)}];
 	ptrType$9.methods = [{prop: "GetTriggerActions", name: "GetTriggerActions", pkg: "", typ: $funcType([], [sliceType$2], false)}, {prop: "GetName", name: "GetName", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$9], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$9, $error], false)}];
 	ptrType$8.methods = [{prop: "GetTrigger", name: "GetTrigger", pkg: "", typ: $funcType([], [isTriggerAction_Trigger], false)}, {prop: "GetAction", name: "GetAction", pkg: "", typ: $funcType([], [isTriggerAction_Action], false)}, {prop: "GetId", name: "GetId", pkg: "", typ: $funcType([], [$Uint32], false)}, {prop: "GetOneShot", name: "GetOneShot", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetIsActive", name: "GetIsActive", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetImmutable", name: "GetImmutable", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetServiceStarted", name: "GetServiceStarted", pkg: "", typ: $funcType([], [ptrType$10], false)}, {prop: "GetUsbGadgetConnected", name: "GetUsbGadgetConnected", pkg: "", typ: $funcType([], [ptrType$12], false)}, {prop: "GetUsbGadgetDisconnected", name: "GetUsbGadgetDisconnected", pkg: "", typ: $funcType([], [ptrType$14], false)}, {prop: "GetWifiAPStarted", name: "GetWifiAPStarted", pkg: "", typ: $funcType([], [ptrType$16], false)}, {prop: "GetWifiConnectedAsSta", name: "GetWifiConnectedAsSta", pkg: "", typ: $funcType([], [ptrType$18], false)}, {prop: "GetSshLogin", name: "GetSshLogin", pkg: "", typ: $funcType([], [ptrType$20], false)}, {prop: "GetDhcpLeaseGranted", name: "GetDhcpLeaseGranted", pkg: "", typ: $funcType([], [ptrType$22], false)}, {prop: "GetGroupReceive", name: "GetGroupReceive", pkg: "", typ: $funcType([], [ptrType$24], false)}, {prop: "GetGroupReceiveMulti", name: "GetGroupReceiveMulti", pkg: "", typ: $funcType([], [ptrType$26], false)}, {prop: "GetGpioIn", name: "GetGpioIn", pkg: "", typ: $funcType([], [ptrType$28], false)}, {prop: "GetBashScript", name: "GetBashScript", pkg: "", typ: $funcType([], [ptrType$30], false)}, {prop: "GetHidScript", name: "GetHidScript", pkg: "", typ: $funcType([], [ptrType$32], false)}, {prop: "GetDeploySettingsTemplate", name: "GetDeploySettingsTemplate", pkg: "", typ: $funcType([], [ptrType$34], false)}, {prop: "GetLog", name: "GetLog", pkg: "", typ: $funcType([], [ptrType$36], false)}, {prop: "GetGpioOut", name: "GetGpioOut", pkg: "", typ: $funcType([], [ptrType$38], false)}, {prop: "GetGroupSend", name: "GetGroupSend", pkg: "", typ: $funcType([], [ptrType$40], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$8], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$8, $error], false)}];
-	ptrType$11.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$13.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$15.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$17.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$19.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$21.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$23.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$25.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$27.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$29.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$31.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$33.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$35.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$37.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$39.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$41.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$11.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$13.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$15.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$17.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$19.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$21.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$23.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$25.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$27.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$29.methods = [{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$31.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$33.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$35.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$37.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$39.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$41.methods = [{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
 	ptrType$10.methods = [{prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$10], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$10, $error], false)}];
 	ptrType$12.methods = [{prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$12], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$12, $error], false)}];
 	ptrType$14.methods = [{prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$14], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$14, $error], false)}];
@@ -33886,9 +33886,9 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 	ptrType$47.methods = [{prop: "GetMsgArray", name: "GetMsgArray", pkg: "", typ: $funcType([], [sliceType], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$47], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$47, $error], false)}];
 	ptrType$48.methods = [{prop: "GetListenType", name: "GetListenType", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$48], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$48, $error], false)}];
 	ptrType$49.methods = [{prop: "GetVal", name: "GetVal", pkg: "", typ: $funcType([], [isEventValue_Val], false)}, {prop: "GetTstring", name: "GetTstring", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetTbool", name: "GetTbool", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "GetTint64", name: "GetTint64", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$49], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$49, $error], false)}];
-	ptrType$50.methods = [{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$51.methods = [{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
-	ptrType$52.methods = [{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$50.methods = [{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$51.methods = [{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
+	ptrType$52.methods = [{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}];
 	ptrType$53.methods = [{prop: "GetType", name: "GetType", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "GetValues", name: "GetValues", pkg: "", typ: $funcType([], [sliceType$5], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$53], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$53, $error], false)}];
 	ptrType$54.methods = [{prop: "GetDir", name: "GetDir", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetPrefix", name: "GetPrefix", pkg: "", typ: $funcType([], [$String], false)}, {prop: "GetOnlyFolder", name: "GetOnlyFolder", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$54], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$54, $error], false)}];
 	ptrType$55.methods = [{prop: "GetResultPath", name: "GetResultPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "MarshalToWriter", name: "MarshalToWriter", pkg: "", typ: $funcType([jspb.Writer], [], false)}, {prop: "Marshal", name: "Marshal", pkg: "", typ: $funcType([], [sliceType$1], false)}, {prop: "UnmarshalFromReader", name: "UnmarshalFromReader", pkg: "", typ: $funcType([jspb.Reader], [ptrType$55], false)}, {prop: "Unmarshal", name: "Unmarshal", pkg: "", typ: $funcType([sliceType$1], [ptrType$55, $error], false)}];
@@ -33926,8 +33926,8 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 	BluetoothControllerInformation.init("", [{prop: "Address", name: "Address", embedded: false, exported: true, typ: sliceType$1, tag: ""}, {prop: "BluetoothVersion", name: "BluetoothVersion", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "Manufacturer", name: "Manufacturer", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "SupportedSettings", name: "SupportedSettings", embedded: false, exported: true, typ: ptrType$7, tag: ""}, {prop: "CurrentSettings", name: "CurrentSettings", embedded: false, exported: true, typ: ptrType$7, tag: ""}, {prop: "ClassOfDevice", name: "ClassOfDevice", embedded: false, exported: true, typ: sliceType$1, tag: ""}, {prop: "Name", name: "Name", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "ShortName", name: "ShortName", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "IsAvailable", name: "IsAvailable", embedded: false, exported: true, typ: $Bool, tag: ""}, {prop: "ServiceNetworkServerNap", name: "ServiceNetworkServerNap", embedded: false, exported: true, typ: $Bool, tag: ""}, {prop: "ServiceNetworkServerPanu", name: "ServiceNetworkServerPanu", embedded: false, exported: true, typ: $Bool, tag: ""}, {prop: "ServiceNetworkServerGn", name: "ServiceNetworkServerGn", embedded: false, exported: true, typ: $Bool, tag: ""}]);
 	TriggerActionSet.init("", [{prop: "TriggerActions", name: "TriggerActions", embedded: false, exported: true, typ: sliceType$2, tag: ""}, {prop: "Name", name: "Name", embedded: false, exported: true, typ: $String, tag: ""}]);
 	TriggerAction.init("", [{prop: "Id", name: "Id", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "OneShot", name: "OneShot", embedded: false, exported: true, typ: $Bool, tag: ""}, {prop: "IsActive", name: "IsActive", embedded: false, exported: true, typ: $Bool, tag: ""}, {prop: "Immutable", name: "Immutable", embedded: false, exported: true, typ: $Bool, tag: ""}, {prop: "Trigger", name: "Trigger", embedded: false, exported: true, typ: isTriggerAction_Trigger, tag: ""}, {prop: "Action", name: "Action", embedded: false, exported: true, typ: isTriggerAction_Action, tag: ""}]);
-	isTriggerAction_Trigger.init([{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}]);
-	isTriggerAction_Action.init([{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}]);
+	isTriggerAction_Trigger.init([{prop: "isTriggerAction_Trigger", name: "isTriggerAction_Trigger", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}]);
+	isTriggerAction_Action.init([{prop: "isTriggerAction_Action", name: "isTriggerAction_Action", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}]);
 	TriggerAction_ServiceStarted.init("", [{prop: "ServiceStarted", name: "ServiceStarted", embedded: false, exported: true, typ: ptrType$10, tag: ""}]);
 	TriggerAction_UsbGadgetConnected.init("", [{prop: "UsbGadgetConnected", name: "UsbGadgetConnected", embedded: false, exported: true, typ: ptrType$12, tag: ""}]);
 	TriggerAction_UsbGadgetDisconnected.init("", [{prop: "UsbGadgetDisconnected", name: "UsbGadgetDisconnected", embedded: false, exported: true, typ: ptrType$14, tag: ""}]);
@@ -33968,7 +33968,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 	StringMessageArray.init("", [{prop: "MsgArray", name: "MsgArray", embedded: false, exported: true, typ: sliceType, tag: ""}]);
 	EventRequest.init("", [{prop: "ListenType", name: "ListenType", embedded: false, exported: true, typ: $Int64, tag: ""}]);
 	EventValue.init("", [{prop: "Val", name: "Val", embedded: false, exported: true, typ: isEventValue_Val, tag: ""}]);
-	isEventValue_Val.init([{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "github.com/mame82/P4wnP1_go/proto/gopherjs", typ: $funcType([], [], false)}]);
+	isEventValue_Val.init([{prop: "isEventValue_Val", name: "isEventValue_Val", pkg: "github.com/mame82/P4wnP1_aloa/proto/gopherjs", typ: $funcType([], [], false)}]);
 	EventValue_Tstring.init("", [{prop: "Tstring", name: "Tstring", embedded: false, exported: true, typ: $String, tag: ""}]);
 	EventValue_Tbool.init("", [{prop: "Tbool", name: "Tbool", embedded: false, exported: true, typ: $Bool, tag: ""}]);
 	EventValue_Tint64.init("", [{prop: "Tint64", name: "Tint64", embedded: false, exported: true, typ: $Int64, tag: ""}]);
@@ -33998,7 +33998,7 @@ $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"] = (function() {
 	DHCPServerStaticHost.init("", [{prop: "Mac", name: "Mac", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "Ip", name: "Ip", embedded: false, exported: true, typ: $String, tag: ""}]);
 	Empty.init("", []);
 	P4WNP1Client.init([{prop: "DBBackup", name: "DBBackup", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "DBRestore", name: "DBRestore", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "DeleteStoredBluetoothSettings", name: "DeleteStoredBluetoothSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "DeleteStoredEthernetInterfaceSettings", name: "DeleteStoredEthernetInterfaceSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "DeleteStoredMasterTemplate", name: "DeleteStoredMasterTemplate", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "DeleteStoredTriggerActionSet", name: "DeleteStoredTriggerActionSet", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "DeleteStoredUSBSettings", name: "DeleteStoredUSBSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "DeleteStoredWifiSettings", name: "DeleteStoredWifiSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "DeployBluetoothAgentSettings", name: "DeployBluetoothAgentSettings", pkg: "", typ: $funcType([context.Context, ptrType$5, sliceType$10], [ptrType$5, $error], true)}, {prop: "DeployBluetoothControllerInformation", name: "DeployBluetoothControllerInformation", pkg: "", typ: $funcType([context.Context, ptrType$4, sliceType$10], [ptrType$4, $error], true)}, {prop: "DeployBluetoothSettings", name: "DeployBluetoothSettings", pkg: "", typ: $funcType([context.Context, ptrType$3, sliceType$10], [ptrType$3, $error], true)}, {prop: "DeployEthernetInterfaceSettings", name: "DeployEthernetInterfaceSettings", pkg: "", typ: $funcType([context.Context, ptrType$72, sliceType$10], [ptrType$77, $error], true)}, {prop: "DeployGadgetSetting", name: "DeployGadgetSetting", pkg: "", typ: $funcType([context.Context, ptrType$68, sliceType$10], [ptrType$68, $error], true)}, {prop: "DeployMasterTemplate", name: "DeployMasterTemplate", pkg: "", typ: $funcType([context.Context, ptrType, sliceType$10], [ptrType$77, $error], true)}, {prop: "DeployStoredBluetoothSettings", name: "DeployStoredBluetoothSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$3, $error], true)}, {prop: "DeployStoredEthernetInterfaceSettings", name: "DeployStoredEthernetInterfaceSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "DeployStoredMasterTemplate", name: "DeployStoredMasterTemplate", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType, $error], true)}, {prop: "DeployStoredTriggerActionSetAdd", name: "DeployStoredTriggerActionSetAdd", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$9, $error], true)}, {prop: "DeployStoredTriggerActionSetReplace", name: "DeployStoredTriggerActionSetReplace", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$9, $error], true)}, {prop: "DeployStoredUSBSettings", name: "DeployStoredUSBSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$68, $error], true)}, {prop: "DeployStoredWifiSettings", name: "DeployStoredWifiSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$45, $error], true)}, {prop: "DeployTriggerActionSetAdd", name: "DeployTriggerActionSetAdd", pkg: "", typ: $funcType([context.Context, ptrType$9, sliceType$10], [ptrType$9, $error], true)}, {prop: "DeployTriggerActionSetRemove", name: "DeployTriggerActionSetRemove", pkg: "", typ: $funcType([context.Context, ptrType$9, sliceType$10], [ptrType$9, $error], true)}, {prop: "DeployTriggerActionSetReplace", name: "DeployTriggerActionSetReplace", pkg: "", typ: $funcType([context.Context, ptrType$9, sliceType$10], [ptrType$9, $error], true)}, {prop: "DeployTriggerActionSetUpdate", name: "DeployTriggerActionSetUpdate", pkg: "", typ: $funcType([context.Context, ptrType$9, sliceType$10], [ptrType$9, $error], true)}, {prop: "DeployWiFiSettings", name: "DeployWiFiSettings", pkg: "", typ: $funcType([context.Context, ptrType$43, sliceType$10], [ptrType$45, $error], true)}, {prop: "EchoRequest", name: "EchoRequest", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$46, $error], true)}, {prop: "EventListen", name: "EventListen", pkg: "", typ: $funcType([context.Context, ptrType$48, sliceType$10], [P4WNP1_EventListenClient, $error], true)}, {prop: "FSCreateTempDirOrFile", name: "FSCreateTempDirOrFile", pkg: "", typ: $funcType([context.Context, ptrType$54, sliceType$10], [ptrType$55, $error], true)}, {prop: "FSGetFileInfo", name: "FSGetFileInfo", pkg: "", typ: $funcType([context.Context, ptrType$59, sliceType$10], [ptrType$60, $error], true)}, {prop: "FSReadFile", name: "FSReadFile", pkg: "", typ: $funcType([context.Context, ptrType$56, sliceType$10], [ptrType$57, $error], true)}, {prop: "FSWriteFile", name: "FSWriteFile", pkg: "", typ: $funcType([context.Context, ptrType$58, sliceType$10], [ptrType$77, $error], true)}, {prop: "FireActionGroupSend", name: "FireActionGroupSend", pkg: "", typ: $funcType([context.Context, ptrType$40, sliceType$10], [ptrType$77, $error], true)}, {prop: "GetAllDeployedEthernetInterfaceSettings", name: "GetAllDeployedEthernetInterfaceSettings", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$73, $error], true)}, {prop: "GetAvailableGpios", name: "GetAvailableGpios", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "GetBluetoothAgentSettings", name: "GetBluetoothAgentSettings", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$5, $error], true)}, {prop: "GetBluetoothControllerInformation", name: "GetBluetoothControllerInformation", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$4, $error], true)}, {prop: "GetDeployedEthernetInterfaceSettings", name: "GetDeployedEthernetInterfaceSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$72, $error], true)}, {prop: "GetDeployedGadgetSetting", name: "GetDeployedGadgetSetting", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$68, $error], true)}, {prop: "GetDeployedTriggerActionSet", name: "GetDeployedTriggerActionSet", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$9, $error], true)}, {prop: "GetLEDSettings", name: "GetLEDSettings", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$66, $error], true)}, {prop: "GetStartupMasterTemplate", name: "GetStartupMasterTemplate", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$46, $error], true)}, {prop: "GetStoredBluetoothSettings", name: "GetStoredBluetoothSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$3, $error], true)}, {prop: "GetStoredEthernetInterfaceSettings", name: "GetStoredEthernetInterfaceSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$72, $error], true)}, {prop: "GetStoredMasterTemplate", name: "GetStoredMasterTemplate", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType, $error], true)}, {prop: "GetStoredUSBSettings", name: "GetStoredUSBSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$68, $error], true)}, {prop: "GetStoredWifiSettings", name: "GetStoredWifiSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$43, $error], true)}, {prop: "GetWiFiState", name: "GetWiFiState", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$45, $error], true)}, {prop: "HIDCancelAllScriptJobs", name: "HIDCancelAllScriptJobs", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$77, $error], true)}, {prop: "HIDCancelScriptJob", name: "HIDCancelScriptJob", pkg: "", typ: $funcType([context.Context, ptrType$62, sliceType$10], [ptrType$77, $error], true)}, {prop: "HIDGetRunningJobState", name: "HIDGetRunningJobState", pkg: "", typ: $funcType([context.Context, ptrType$62, sliceType$10], [ptrType$64, $error], true)}, {prop: "HIDGetRunningScriptJobs", name: "HIDGetRunningScriptJobs", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$63, $error], true)}, {prop: "HIDGetScriptJobResult", name: "HIDGetScriptJobResult", pkg: "", typ: $funcType([context.Context, ptrType$62, sliceType$10], [ptrType$65, $error], true)}, {prop: "HIDRunScript", name: "HIDRunScript", pkg: "", typ: $funcType([context.Context, ptrType$61, sliceType$10], [ptrType$65, $error], true)}, {prop: "HIDRunScriptJob", name: "HIDRunScriptJob", pkg: "", typ: $funcType([context.Context, ptrType$61, sliceType$10], [ptrType$62, $error], true)}, {prop: "ListStoredBashScripts", name: "ListStoredBashScripts", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "ListStoredBluetoothSettings", name: "ListStoredBluetoothSettings", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "ListStoredDBBackups", name: "ListStoredDBBackups", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "ListStoredEthernetInterfaceSettings", name: "ListStoredEthernetInterfaceSettings", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "ListStoredHIDScripts", name: "ListStoredHIDScripts", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "ListStoredMasterTemplate", name: "ListStoredMasterTemplate", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "ListStoredTriggerActionSets", name: "ListStoredTriggerActionSets", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "ListStoredUSBSettings", name: "ListStoredUSBSettings", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "ListStoredWifiSettings", name: "ListStoredWifiSettings", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "ListUmsImageCdrom", name: "ListUmsImageCdrom", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "ListUmsImageFlashdrive", name: "ListUmsImageFlashdrive", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$47, $error], true)}, {prop: "ListenWiFiStateChanges", name: "ListenWiFiStateChanges", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$45, $error], true)}, {prop: "MountUMSFile", name: "MountUMSFile", pkg: "", typ: $funcType([context.Context, ptrType$70, sliceType$10], [ptrType$77, $error], true)}, {prop: "Reboot", name: "Reboot", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$77, $error], true)}, {prop: "SetBluetoothNetworkService", name: "SetBluetoothNetworkService", pkg: "", typ: $funcType([context.Context, ptrType$6, sliceType$10], [ptrType$77, $error], true)}, {prop: "SetLEDSettings", name: "SetLEDSettings", pkg: "", typ: $funcType([context.Context, ptrType$66, sliceType$10], [ptrType$77, $error], true)}, {prop: "SetStartupMasterTemplate", name: "SetStartupMasterTemplate", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "Shutdown", name: "Shutdown", pkg: "", typ: $funcType([context.Context, ptrType$77, sliceType$10], [ptrType$77, $error], true)}, {prop: "StoreBluetoothSettings", name: "StoreBluetoothSettings", pkg: "", typ: $funcType([context.Context, ptrType$2, sliceType$10], [ptrType$77, $error], true)}, {prop: "StoreDeployedBluetoothSettings", name: "StoreDeployedBluetoothSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "StoreDeployedUSBSettings", name: "StoreDeployedUSBSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "StoreDeployedWifiSettings", name: "StoreDeployedWifiSettings", pkg: "", typ: $funcType([context.Context, ptrType$46, sliceType$10], [ptrType$77, $error], true)}, {prop: "StoreEthernetInterfaceSettings", name: "StoreEthernetInterfaceSettings", pkg: "", typ: $funcType([context.Context, ptrType$71, sliceType$10], [ptrType$77, $error], true)}, {prop: "StoreMasterTemplate", name: "StoreMasterTemplate", pkg: "", typ: $funcType([context.Context, ptrType$1, sliceType$10], [ptrType$77, $error], true)}, {prop: "StoreTriggerActionSet", name: "StoreTriggerActionSet", pkg: "", typ: $funcType([context.Context, ptrType$9, sliceType$10], [ptrType$77, $error], true)}, {prop: "StoreUSBSettings", name: "StoreUSBSettings", pkg: "", typ: $funcType([context.Context, ptrType$67, sliceType$10], [ptrType$77, $error], true)}, {prop: "StoreWifiSettings", name: "StoreWifiSettings", pkg: "", typ: $funcType([context.Context, ptrType$42, sliceType$10], [ptrType$77, $error], true)}, {prop: "WaitTriggerGroupReceive", name: "WaitTriggerGroupReceive", pkg: "", typ: $funcType([context.Context, ptrType$24, sliceType$10], [ptrType$77, $error], true)}]);
-	p4WNP1Client.init("github.com/mame82/P4wnP1_go/proto/gopherjs", [{prop: "client", name: "client", embedded: false, exported: false, typ: ptrType$78, tag: ""}]);
+	p4WNP1Client.init("github.com/mame82/P4wnP1_aloa/proto/gopherjs", [{prop: "client", name: "client", embedded: false, exported: false, typ: ptrType$78, tag: ""}]);
 	P4WNP1_EventListenClient.init([{prop: "CloseSend", name: "CloseSend", pkg: "", typ: $funcType([], [$error], false)}, {prop: "Context", name: "Context", pkg: "", typ: $funcType([], [context.Context], false)}, {prop: "Header", name: "Header", pkg: "", typ: $funcType([], [$packages["github.com/johanbrandhorst/protobuf/vendor/google.golang.org/grpc/metadata"].MD], false)}, {prop: "Recv", name: "Recv", pkg: "", typ: $funcType([], [ptrType$53, $error], false)}, {prop: "RecvMsg", name: "RecvMsg", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}, {prop: "SendMsg", name: "SendMsg", pkg: "", typ: $funcType([sliceType$1], [$error], false)}, {prop: "Trailer", name: "Trailer", pkg: "", typ: $funcType([], [$packages["github.com/johanbrandhorst/protobuf/vendor/google.golang.org/grpc/metadata"].MD], false)}]);
 	p4WNP1EventListenClient.init("", [{prop: "ClientStream", name: "ClientStream", embedded: true, exported: true, typ: grpcweb.ClientStream, tag: ""}]);
 	$init = function() {
@@ -35515,7 +35515,7 @@ $packages["path/filepath"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
-$packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
+$packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	var $pkg = {}, $init, context, md5, hex, errors, js, grpcweb, common_web, P4wnP1_grpc, hvue, mvuex, io, filepath, strconv, strings, sync, time, CompEthernetAddressesData2, CompHIDEventsData, CompHIDJobsData, CompHIDScriptCodeEditorData, CodeMirrorMode, CodeMirrorExtraKeys, CodeMirrorOptionsType, CompToggleSwitchData, CompUSBSettingsData, jsBluetoothRequestSettingsStorage, jsBluetoothSettings, jsBluetoothAgentSettings, jsBluetoothControllerSettings, jsBluetoothControllerInformation, jsDataTablePagination, jsMasterTemplate, jsRequestMasterTemplateStorage, jsLoadHidScriptSourceMode, jsLoadHidScriptSourceReq, jsWifiRequestSettingsStorage, jsUSBRequestSettingsStorage, jsGadgetSettings, jsGadgetSettingsEthernet, jsGadgetSettingsUMS, jsEvent, jsLogEvent, jsHidEvent, jsHidJobState, jsHidJobStateList, jsWiFiState, jsWiFiBSSCfg, jsWiFiSettings, jsEthernetRequestSettingsStorage, jsEthernetSettingsArray, jsEthernetInterfaceSettings, jsDHCPServerSettings, jsDHCPServerRange, jsDHCPServerOption, jsDHCPServerStaticHost, jsEventProcessor, triggerType, actionType, jsTriggerAction, jsTriggerServiceStarted, jsTriggerUSBGadgetConnected, jsTriggerUSBGadgetDisconnected, jsTriggerWifiAPStarted, jsTriggerWifiConnectedAsSta, jsTriggerSSHLogin, jsTriggerDHCPLeaseGranted, jsTriggerGroupReceive, jsTriggerGroupReceiveMulti, GroupReceiveMultiType, jsTriggerGPIOIn, GPIOInPullUpDown, GPIOInEdge, jsActionStartBashScript, jsActionStartHIDScript, jsActionDeploySettingsTemplate, jsActionGPIOOut, GPIOOutValue, jsActionGroupSend, jsActionLog, TemplateType, jsTriggerActionSet, GlobalState, Promise, Quasar, QuasarNotification, Rpc, VueRouterConfig, VueRouterOption, option, option$1, option$2, option$3, option$4, option$5, option$6, option$7, ptrType, sliceType, sliceType$1, sliceType$2, sliceType$3, sliceType$4, sliceType$5, sliceType$6, sliceType$7, arrayType, sliceType$8, sliceType$9, sliceType$10, ptrType$1, ptrType$2, ptrType$3, funcType, funcType$1, structType, funcType$2, ptrType$4, ptrType$5, ptrType$6, structType$1, funcType$3, ptrType$7, funcType$4, structType$2, funcType$5, ptrType$8, ptrType$9, ptrType$10, ptrType$11, structType$3, structType$4, structType$5, ptrType$12, funcType$6, ptrType$13, ptrType$14, ptrType$15, ptrType$16, ptrType$17, ptrType$18, ptrType$19, ptrType$20, ptrType$21, ptrType$22, ptrType$23, structType$6, structType$7, structType$8, structType$9, funcType$7, structType$10, sliceType$11, ptrType$24, funcType$8, sliceType$12, ptrType$25, structType$11, structType$12, structType$13, structType$14, ptrType$26, ptrType$27, funcType$9, ptrType$28, funcType$10, structType$15, ptrType$29, funcType$11, ptrType$30, funcType$12, ptrType$31, funcType$13, structType$16, funcType$14, ptrType$32, structType$17, funcType$15, sliceType$13, structType$18, funcType$16, ptrType$33, ptrType$34, ptrType$35, ptrType$36, ptrType$37, ptrType$38, ptrType$39, ptrType$40, ptrType$41, ptrType$42, ptrType$43, ptrType$44, ptrType$45, ptrType$46, sliceType$14, ptrType$47, funcType$17, ptrType$48, ptrType$49, ptrType$50, sliceType$15, ptrType$51, sliceType$16, ptrType$52, ptrType$53, ptrType$54, ptrType$55, ptrType$56, ptrType$57, ptrType$58, ptrType$59, ptrType$60, ptrType$61, ptrType$62, ptrType$63, ptrType$64, ptrType$65, ptrType$66, ptrType$67, ptrType$68, ptrType$69, ptrType$70, ptrType$71, ptrType$72, ptrType$73, ptrType$74, ptrType$75, ptrType$76, ptrType$77, ptrType$78, ptrType$79, ptrType$80, ptrType$81, ptrType$82, ptrType$83, ptrType$84, ptrType$85, ptrType$86, ptrType$87, sliceType$17, ptrType$88, sliceType$18, ptrType$89, ptrType$90, funcType$18, funcType$19, funcType$20, funcType$21, funcType$22, funcType$23, funcType$24, funcType$25, funcType$26, funcType$27, funcType$28, funcType$29, funcType$30, funcType$31, ptrType$91, funcType$32, funcType$33, funcType$34, funcType$35, funcType$36, funcType$37, funcType$38, funcType$39, funcType$40, funcType$41, funcType$42, funcType$43, funcType$44, funcType$45, funcType$46, funcType$47, sliceType$19, ptrType$92, structType$19, funcType$48, mapType, ptrType$93, ptrType$95, ptrType$96, sliceType$20, sliceType$21, ptrType$97, ptrType$98, sliceType$22, ptrType$99, structType$20, ptrType$100, ptrType$101, ptrType$102, ptrType$103, ptrType$104, ptrType$105, ptrType$106, ptrType$107, ptrType$108, ptrType$109, ptrType$110, ptrType$111, eNoLogEvent, eNoHidEvent, triggerNames, actionNames, availableTriggers, availableActions, groupReceiveMultiNames, availableGroupReceiveMulti, gpioInPullUpDownNames, availableGPIOInPullUpDowns, gpioInEdgeNames, availableGPIOInEdges, gpioOutValueNames, availableGPIOOutValues, templateTypeNames, availableTemplateTypes, serverAddr, globalState, _r, O, Alert, BytesToMD5, newCompEthernetAddressesData2, InitCompEthernetAddresses2, newCompHIDEventsData, InitCompHIDEvents, newCompHIDJobsData, InitCompHIDJobs, newCompHIDScriptCodeEditorData, InitComponentsHIDScript, LogLevelClass, InitCompLogger, InitCompModal, newCompStateData, InitCompState, newCompToggleSwitchData, InitCompToggleSwitch, InitCompUSBSettings, newCompUSBSettingsData, InitComponentsWiFi, NewBluetoothRequestSettingsStorageFromArgs, NewBluetoothSettings, NewBluetoothAgentSettings, NewBluetoothControllerSettings, NewBluetoothControllerInformation, InitComponentsBluetooth, InitComponentsDialog, InitComponentsGeneric, newPagination, InitComponentsNetwork, generateSelectOptionsTrigger, generateSelectOptionsAction, generateSelectOptionsGroupReceiveMultiType, generateSelectOptionsGPIOOutValue, generateSelectOptionsGPIONames, generateSelectOptionsGPIOInPullUpDown, generateSelectOptionsGPIOInEdges, generateSelectOptionsTemplateTypes, InitComponentsTriggerActions, NewMasterTemplate, NewRequestMasterTemplateStorage, NewWifiRequestSettingsStorage, NewUSBRequestSettingsStorage, NewUSBGadgetSettings, NewJsEventFromNative, NewHIDJobStateList, NewWiFiState, NewWifiSettings, NewEthernetRequestSettingsStorage, NewEthernetSettingsList, NewEventProcessor, NewTriggerAction, NewTriggerActionSet, GetBaseURL, Store, Router, main, createGlobalStateStruct, processEvent, actionUpdateAllStates, actionUpdateUmsImageCdromList, actionUpdateUmsImageFlashdriveList, actionUpdateStoredDBBackupList, actionGetStartupMasterTemplateName, actionSetStartupMasterTemplateName, actionBackupDB, actionRestoreDB, actionReboot, actionShutdown, actionUpdateGpioNamesList, actionDeployMasterTemplate, actionUpdateStoredMasterTemplateList, actionStoreMasterTemplate, actionLoadMasterTemplate, actionDeployStoredMasterTemplate, actionDeleteStoredMasterTemplate, actionSendAndRunHIDScript, actionCancelHidJob, actionCancelAllHidJobs, actionRemoveSucceededHidJobs, actionRemoveFailedHidJobs, actionStartEventListen, actionStopEventListen, actionUpdateStoredBluetoothSettingsList, actionDeployStoredBluetoothSettings, actionDeleteStoredBluetoothSettings, actionStoreBluetoothSettings, actionDeleteStoredUSBSettings, actionDeleteStoredTriggerActionSet, actionDeleteStoredWifiSettings, actionDeleteStoredEthernetInterfaceSettings, actionUpdateCurrentBluetoothControllerInformation, actionDeployCurrentBluetoothControllerInformation, actionUpdateCurrentBluetoothAgentSettings, actionDeployCurrentBluetoothAgentSettings, actionUpdateStoredUSBSettingsList, actionStoreUSBSettings, actionLoadUSBSettings, actionDeployStoredUSBSettings, actionUpdateAllEthernetInterfaceSettings, actionStoreEthernetInterfaceSettings, actionLoadEthernetInterfaceSettings, actionDeployStoredEthernetInterfaceSettings, actionUpdateStoredEthernetInterfaceSettingsList, actionUpdateCurrentHidScriptSourceFromRemoteFile, actionStoreCurrentHidScriptSourceToRemoteFile, actionUpdateStoredBashScriptsList, actionUpdateStoredHIDScriptsList, actionUpdateGadgetSettingsFromDeployed, actionUpdateWifiState, actionUpdateStoredWifiSettingsList, actionStoreWifiSettings, actionLoadWifiSettings, actionDeployStoredWifiSettings, actionDeployWifiSettings, actionUpdateRunningHidJobs, actionUpdateStoredTriggerActionSetsList, actionUpdateCurrentTriggerActionsFromServer, actionAddNewTriggerAction, actionUpdateTriggerActions, actionRemoveTriggerActions, actionStoreTriggerActionSet, actionDeployTriggerActionSetReplace, actionDeployTriggerActionSetAdd, actionDeployStoredTriggerActionSetReplace, actionDeployStoredTriggerActionSetAdd, actionDeployCurrentGadgetSettings, actionDeployEthernetInterfaceSettings, initMVuex, InitGlobalState, NewPromise, QuasarGetQuasar, QuasarNotify, QuasarNotifyError, QuasarNotifySuccess, NewRpcClient, VueRouterRoute, NewVueRouter;
 	context = $packages["context"];
 	md5 = $packages["crypto/md5"];
@@ -35523,8 +35523,8 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 	errors = $packages["errors"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	grpcweb = $packages["github.com/johanbrandhorst/protobuf/grpcweb"];
-	common_web = $packages["github.com/mame82/P4wnP1_go/common_web"];
-	P4wnP1_grpc = $packages["github.com/mame82/P4wnP1_go/proto/gopherjs"];
+	common_web = $packages["github.com/mame82/P4wnP1_aloa/common_web"];
+	P4wnP1_grpc = $packages["github.com/mame82/P4wnP1_aloa/proto/gopherjs"];
 	hvue = $packages["github.com/mame82/hvue"];
 	mvuex = $packages["github.com/mame82/mvuex"];
 	io = $packages["io"];
@@ -35533,7 +35533,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 	strings = $packages["strings"];
 	sync = $packages["sync"];
 	time = $packages["time"];
-	CompEthernetAddressesData2 = $pkg.CompEthernetAddressesData2 = $newType(0, $kindStruct, "main.CompEthernetAddressesData2", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_) {
+	CompEthernetAddressesData2 = $pkg.CompEthernetAddressesData2 = $newType(0, $kindStruct, "main.CompEthernetAddressesData2", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35541,7 +35541,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	CompHIDEventsData = $pkg.CompHIDEventsData = $newType(0, $kindStruct, "main.CompHIDEventsData", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_, Pagination_) {
+	CompHIDEventsData = $pkg.CompHIDEventsData = $newType(0, $kindStruct, "main.CompHIDEventsData", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Pagination_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35551,7 +35551,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Object = Object_;
 		this.Pagination = Pagination_;
 	});
-	CompHIDJobsData = $pkg.CompHIDJobsData = $newType(0, $kindStruct, "main.CompHIDJobsData", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_) {
+	CompHIDJobsData = $pkg.CompHIDJobsData = $newType(0, $kindStruct, "main.CompHIDJobsData", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35559,7 +35559,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	CompHIDScriptCodeEditorData = $pkg.CompHIDScriptCodeEditorData = $newType(0, $kindStruct, "main.CompHIDScriptCodeEditorData", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_, CodeMirrorOptions_) {
+	CompHIDScriptCodeEditorData = $pkg.CompHIDScriptCodeEditorData = $newType(0, $kindStruct, "main.CompHIDScriptCodeEditorData", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, CodeMirrorOptions_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35569,7 +35569,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Object = Object_;
 		this.CodeMirrorOptions = CodeMirrorOptions_;
 	});
-	CodeMirrorMode = $pkg.CodeMirrorMode = $newType(0, $kindStruct, "main.CodeMirrorMode", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_, Name_, GlobalVars_) {
+	CodeMirrorMode = $pkg.CodeMirrorMode = $newType(0, $kindStruct, "main.CodeMirrorMode", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Name_, GlobalVars_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35581,7 +35581,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Name = Name_;
 		this.GlobalVars = GlobalVars_;
 	});
-	CodeMirrorExtraKeys = $pkg.CodeMirrorExtraKeys = $newType(0, $kindStruct, "main.CodeMirrorExtraKeys", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_, CtrlSpace_) {
+	CodeMirrorExtraKeys = $pkg.CodeMirrorExtraKeys = $newType(0, $kindStruct, "main.CodeMirrorExtraKeys", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, CtrlSpace_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35591,7 +35591,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Object = Object_;
 		this.CtrlSpace = CtrlSpace_;
 	});
-	CodeMirrorOptionsType = $pkg.CodeMirrorOptionsType = $newType(0, $kindStruct, "main.CodeMirrorOptionsType", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_, Mode_, LineNumbers_, LineWrapping_, AutoCloseBrackets_, ExtraKeys_) {
+	CodeMirrorOptionsType = $pkg.CodeMirrorOptionsType = $newType(0, $kindStruct, "main.CodeMirrorOptionsType", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Mode_, LineNumbers_, LineWrapping_, AutoCloseBrackets_, ExtraKeys_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35609,7 +35609,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.AutoCloseBrackets = AutoCloseBrackets_;
 		this.ExtraKeys = ExtraKeys_;
 	});
-	CompToggleSwitchData = $pkg.CompToggleSwitchData = $newType(0, $kindStruct, "main.CompToggleSwitchData", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_) {
+	CompToggleSwitchData = $pkg.CompToggleSwitchData = $newType(0, $kindStruct, "main.CompToggleSwitchData", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35617,7 +35617,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	CompUSBSettingsData = $pkg.CompUSBSettingsData = $newType(0, $kindStruct, "main.CompUSBSettingsData", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_, GadgetSettings_, DeployPending_, CdcEcmDetails_, RndisDetails_, ShowStoreModal_, ShowLoadModal_, ShowDeployStoredModal_, ShowUmsModal_) {
+	CompUSBSettingsData = $pkg.CompUSBSettingsData = $newType(0, $kindStruct, "main.CompUSBSettingsData", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, GadgetSettings_, DeployPending_, CdcEcmDetails_, RndisDetails_, ShowStoreModal_, ShowLoadModal_, ShowDeployStoredModal_, ShowUmsModal_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35641,7 +35641,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.ShowDeployStoredModal = ShowDeployStoredModal_;
 		this.ShowUmsModal = ShowUmsModal_;
 	});
-	jsBluetoothRequestSettingsStorage = $pkg.jsBluetoothRequestSettingsStorage = $newType(0, $kindStruct, "main.jsBluetoothRequestSettingsStorage", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, TemplateName_, Settings_) {
+	jsBluetoothRequestSettingsStorage = $pkg.jsBluetoothRequestSettingsStorage = $newType(0, $kindStruct, "main.jsBluetoothRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35653,7 +35653,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	jsBluetoothSettings = $pkg.jsBluetoothSettings = $newType(0, $kindStruct, "main.jsBluetoothSettings", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Ci_, As_) {
+	jsBluetoothSettings = $pkg.jsBluetoothSettings = $newType(0, $kindStruct, "main.jsBluetoothSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Ci_, As_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35665,7 +35665,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Ci = Ci_;
 		this.As = As_;
 	});
-	jsBluetoothAgentSettings = $pkg.jsBluetoothAgentSettings = $newType(0, $kindStruct, "main.jsBluetoothAgentSettings", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Pin_) {
+	jsBluetoothAgentSettings = $pkg.jsBluetoothAgentSettings = $newType(0, $kindStruct, "main.jsBluetoothAgentSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Pin_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35675,7 +35675,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Object = Object_;
 		this.Pin = Pin_;
 	});
-	jsBluetoothControllerSettings = $pkg.jsBluetoothControllerSettings = $newType(0, $kindStruct, "main.jsBluetoothControllerSettings", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Powered_, Connectable_, FastConnectable_, Discoverable_, Bondable_, LinkLevelSecurity_, SecureSimplePairing_, BrEdr_, HighSpeed_, LowEnergy_, Advertising_, SecureConnections_, DebugKeys_, Privacy_, ControllerConfiguration_, StaticAddress_) {
+	jsBluetoothControllerSettings = $pkg.jsBluetoothControllerSettings = $newType(0, $kindStruct, "main.jsBluetoothControllerSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Powered_, Connectable_, FastConnectable_, Discoverable_, Bondable_, LinkLevelSecurity_, SecureSimplePairing_, BrEdr_, HighSpeed_, LowEnergy_, Advertising_, SecureConnections_, DebugKeys_, Privacy_, ControllerConfiguration_, StaticAddress_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35715,7 +35715,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.ControllerConfiguration = ControllerConfiguration_;
 		this.StaticAddress = StaticAddress_;
 	});
-	jsBluetoothControllerInformation = $pkg.jsBluetoothControllerInformation = $newType(0, $kindStruct, "main.jsBluetoothControllerInformation", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, IsAvailable_, Address_, BluetoothVersion_, Manufacturer_, SupportedSettings_, CurrentSettings_, ClassOfDevice_, Name_, ShortName_, ServiceNetworkServerNAP_, ServiceNetworkServerPANU_, ServiceNetworkServerGN_) {
+	jsBluetoothControllerInformation = $pkg.jsBluetoothControllerInformation = $newType(0, $kindStruct, "main.jsBluetoothControllerInformation", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, IsAvailable_, Address_, BluetoothVersion_, Manufacturer_, SupportedSettings_, CurrentSettings_, ClassOfDevice_, Name_, ShortName_, ServiceNetworkServerNAP_, ServiceNetworkServerPANU_, ServiceNetworkServerGN_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35747,7 +35747,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.ServiceNetworkServerPANU = ServiceNetworkServerPANU_;
 		this.ServiceNetworkServerGN = ServiceNetworkServerGN_;
 	});
-	jsDataTablePagination = $pkg.jsDataTablePagination = $newType(0, $kindStruct, "main.jsDataTablePagination", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, RowsPerPage_, Descending_, Page_) {
+	jsDataTablePagination = $pkg.jsDataTablePagination = $newType(0, $kindStruct, "main.jsDataTablePagination", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, RowsPerPage_, Descending_, Page_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35761,7 +35761,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Descending = Descending_;
 		this.Page = Page_;
 	});
-	jsMasterTemplate = $pkg.jsMasterTemplate = $newType(0, $kindStruct, "main.jsMasterTemplate", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, TemplateNameBluetooth_, TemplateNameUSB_, TemplateNameWiFi_, TemplateNameTriggerActions_, TemplateNamesNetwork_) {
+	jsMasterTemplate = $pkg.jsMasterTemplate = $newType(0, $kindStruct, "main.jsMasterTemplate", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateNameBluetooth_, TemplateNameUSB_, TemplateNameWiFi_, TemplateNameTriggerActions_, TemplateNamesNetwork_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35779,7 +35779,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.TemplateNameTriggerActions = TemplateNameTriggerActions_;
 		this.TemplateNamesNetwork = TemplateNamesNetwork_;
 	});
-	jsRequestMasterTemplateStorage = $pkg.jsRequestMasterTemplateStorage = $newType(0, $kindStruct, "main.jsRequestMasterTemplateStorage", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, TemplateName_, Template_) {
+	jsRequestMasterTemplateStorage = $pkg.jsRequestMasterTemplateStorage = $newType(0, $kindStruct, "main.jsRequestMasterTemplateStorage", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Template_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35791,8 +35791,8 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Template = Template_;
 	});
-	jsLoadHidScriptSourceMode = $pkg.jsLoadHidScriptSourceMode = $newType(4, $kindInt, "main.jsLoadHidScriptSourceMode", true, "github.com/mame82/P4wnP1_go/web_client", false, null);
-	jsLoadHidScriptSourceReq = $pkg.jsLoadHidScriptSourceReq = $newType(0, $kindStruct, "main.jsLoadHidScriptSourceReq", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, FileName_, Mode_) {
+	jsLoadHidScriptSourceMode = $pkg.jsLoadHidScriptSourceMode = $newType(4, $kindInt, "main.jsLoadHidScriptSourceMode", true, "github.com/mame82/P4wnP1_aloa/web_client", false, null);
+	jsLoadHidScriptSourceReq = $pkg.jsLoadHidScriptSourceReq = $newType(0, $kindStruct, "main.jsLoadHidScriptSourceReq", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, FileName_, Mode_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35804,7 +35804,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.FileName = FileName_;
 		this.Mode = Mode_;
 	});
-	jsWifiRequestSettingsStorage = $pkg.jsWifiRequestSettingsStorage = $newType(0, $kindStruct, "main.jsWifiRequestSettingsStorage", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, TemplateName_, Settings_) {
+	jsWifiRequestSettingsStorage = $pkg.jsWifiRequestSettingsStorage = $newType(0, $kindStruct, "main.jsWifiRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35816,7 +35816,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	jsUSBRequestSettingsStorage = $pkg.jsUSBRequestSettingsStorage = $newType(0, $kindStruct, "main.jsUSBRequestSettingsStorage", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, TemplateName_, Settings_) {
+	jsUSBRequestSettingsStorage = $pkg.jsUSBRequestSettingsStorage = $newType(0, $kindStruct, "main.jsUSBRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35828,7 +35828,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	jsGadgetSettings = $pkg.jsGadgetSettings = $newType(0, $kindStruct, "main.jsGadgetSettings", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Enabled_, Vid_, Pid_, Manufacturer_, Product_, Serial_, Use_CDC_ECM_, Use_RNDIS_, Use_HID_KEYBOARD_, Use_HID_MOUSE_, Use_HID_RAW_, Use_UMS_, Use_SERIAL_, RndisSettings_, CdcEcmSettings_, UmsSettings_) {
+	jsGadgetSettings = $pkg.jsGadgetSettings = $newType(0, $kindStruct, "main.jsGadgetSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Enabled_, Vid_, Pid_, Manufacturer_, Product_, Serial_, Use_CDC_ECM_, Use_RNDIS_, Use_HID_KEYBOARD_, Use_HID_MOUSE_, Use_HID_RAW_, Use_UMS_, Use_SERIAL_, RndisSettings_, CdcEcmSettings_, UmsSettings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35868,7 +35868,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.CdcEcmSettings = CdcEcmSettings_;
 		this.UmsSettings = UmsSettings_;
 	});
-	jsGadgetSettingsEthernet = $pkg.jsGadgetSettingsEthernet = $newType(0, $kindStruct, "main.jsGadgetSettingsEthernet", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, HostAddr_, DevAddr_) {
+	jsGadgetSettingsEthernet = $pkg.jsGadgetSettingsEthernet = $newType(0, $kindStruct, "main.jsGadgetSettingsEthernet", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, HostAddr_, DevAddr_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35880,7 +35880,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.HostAddr = HostAddr_;
 		this.DevAddr = DevAddr_;
 	});
-	jsGadgetSettingsUMS = $pkg.jsGadgetSettingsUMS = $newType(0, $kindStruct, "main.jsGadgetSettingsUMS", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Cdrom_, File_) {
+	jsGadgetSettingsUMS = $pkg.jsGadgetSettingsUMS = $newType(0, $kindStruct, "main.jsGadgetSettingsUMS", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Cdrom_, File_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35892,7 +35892,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Cdrom = Cdrom_;
 		this.File = File_;
 	});
-	jsEvent = $pkg.jsEvent = $newType(0, $kindStruct, "main.jsEvent", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Type_, Values_, JSValues_) {
+	jsEvent = $pkg.jsEvent = $newType(0, $kindStruct, "main.jsEvent", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Type_, Values_, JSValues_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35906,7 +35906,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Values = Values_;
 		this.JSValues = JSValues_;
 	});
-	jsLogEvent = $pkg.jsLogEvent = $newType(0, $kindStruct, "main.jsLogEvent", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, EvLogSource_, EvLogLevel_, EvLogMessage_, EvLogTime_) {
+	jsLogEvent = $pkg.jsLogEvent = $newType(0, $kindStruct, "main.jsLogEvent", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, EvLogSource_, EvLogLevel_, EvLogMessage_, EvLogTime_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35922,7 +35922,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.EvLogMessage = EvLogMessage_;
 		this.EvLogTime = EvLogTime_;
 	});
-	jsHidEvent = $pkg.jsHidEvent = $newType(0, $kindStruct, "main.jsHidEvent", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, EvType_, VMId_, JobId_, HasError_, Result_, Error_, Message_, EvLogTime_) {
+	jsHidEvent = $pkg.jsHidEvent = $newType(0, $kindStruct, "main.jsHidEvent", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, EvType_, VMId_, JobId_, HasError_, Result_, Error_, Message_, EvLogTime_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35946,7 +35946,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Message = Message_;
 		this.EvLogTime = EvLogTime_;
 	});
-	jsHidJobState = $pkg.jsHidJobState = $newType(0, $kindStruct, "main.jsHidJobState", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Id_, VmId_, HasFailed_, HasSucceeded_, LastMessage_, TextResult_, LastUpdateTime_, ScriptSource_) {
+	jsHidJobState = $pkg.jsHidJobState = $newType(0, $kindStruct, "main.jsHidJobState", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Id_, VmId_, HasFailed_, HasSucceeded_, LastMessage_, TextResult_, LastUpdateTime_, ScriptSource_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35970,7 +35970,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.LastUpdateTime = LastUpdateTime_;
 		this.ScriptSource = ScriptSource_;
 	});
-	jsHidJobStateList = $pkg.jsHidJobStateList = $newType(0, $kindStruct, "main.jsHidJobStateList", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Jobs_) {
+	jsHidJobStateList = $pkg.jsHidJobStateList = $newType(0, $kindStruct, "main.jsHidJobStateList", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Jobs_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35980,7 +35980,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Object = Object_;
 		this.Jobs = Jobs_;
 	});
-	jsWiFiState = $pkg.jsWiFiState = $newType(0, $kindStruct, "main.jsWiFiState", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Mode_, Channel_, Ssid_, CurrentSettings_) {
+	jsWiFiState = $pkg.jsWiFiState = $newType(0, $kindStruct, "main.jsWiFiState", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Mode_, Channel_, Ssid_, CurrentSettings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35996,7 +35996,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Ssid = Ssid_;
 		this.CurrentSettings = CurrentSettings_;
 	});
-	jsWiFiBSSCfg = $pkg.jsWiFiBSSCfg = $newType(0, $kindStruct, "main.jsWiFiBSSCfg", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, SSID_, PSK_) {
+	jsWiFiBSSCfg = $pkg.jsWiFiBSSCfg = $newType(0, $kindStruct, "main.jsWiFiBSSCfg", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, SSID_, PSK_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36008,7 +36008,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.SSID = SSID_;
 		this.PSK = PSK_;
 	});
-	jsWiFiSettings = $pkg.jsWiFiSettings = $newType(0, $kindStruct, "main.jsWiFiSettings", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Name_, Disabled_, Reg_, Mode_, AuthMode_, Channel_, HideSsid_, Nexmon_, Ap_BSS_, Client_BSSList_) {
+	jsWiFiSettings = $pkg.jsWiFiSettings = $newType(0, $kindStruct, "main.jsWiFiSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Name_, Disabled_, Reg_, Mode_, AuthMode_, Channel_, HideSsid_, Nexmon_, Ap_BSS_, Client_BSSList_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36036,7 +36036,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Ap_BSS = Ap_BSS_;
 		this.Client_BSSList = Client_BSSList_;
 	});
-	jsEthernetRequestSettingsStorage = $pkg.jsEthernetRequestSettingsStorage = $newType(0, $kindStruct, "main.jsEthernetRequestSettingsStorage", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, TemplateName_, Settings_) {
+	jsEthernetRequestSettingsStorage = $pkg.jsEthernetRequestSettingsStorage = $newType(0, $kindStruct, "main.jsEthernetRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36048,7 +36048,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	jsEthernetSettingsArray = $pkg.jsEthernetSettingsArray = $newType(0, $kindStruct, "main.jsEthernetSettingsArray", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Interfaces_) {
+	jsEthernetSettingsArray = $pkg.jsEthernetSettingsArray = $newType(0, $kindStruct, "main.jsEthernetSettingsArray", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Interfaces_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36058,7 +36058,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Object = Object_;
 		this.Interfaces = Interfaces_;
 	});
-	jsEthernetInterfaceSettings = $pkg.jsEthernetInterfaceSettings = $newType(0, $kindStruct, "main.jsEthernetInterfaceSettings", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Name_, Mode_, IpAddress4_, Netmask4_, Enabled_, DhcpServerSettings_, SettingsInUse_) {
+	jsEthernetInterfaceSettings = $pkg.jsEthernetInterfaceSettings = $newType(0, $kindStruct, "main.jsEthernetInterfaceSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Name_, Mode_, IpAddress4_, Netmask4_, Enabled_, DhcpServerSettings_, SettingsInUse_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36080,7 +36080,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.DhcpServerSettings = DhcpServerSettings_;
 		this.SettingsInUse = SettingsInUse_;
 	});
-	jsDHCPServerSettings = $pkg.jsDHCPServerSettings = $newType(0, $kindStruct, "main.jsDHCPServerSettings", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, ListenPort_, ListenInterface_, LeaseFile_, NotAuthoritative_, DoNotBindInterface_, CallbackScript_, Ranges_, Options_, StaticHosts_) {
+	jsDHCPServerSettings = $pkg.jsDHCPServerSettings = $newType(0, $kindStruct, "main.jsDHCPServerSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, ListenPort_, ListenInterface_, LeaseFile_, NotAuthoritative_, DoNotBindInterface_, CallbackScript_, Ranges_, Options_, StaticHosts_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36106,7 +36106,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Options = Options_;
 		this.StaticHosts = StaticHosts_;
 	});
-	jsDHCPServerRange = $pkg.jsDHCPServerRange = $newType(0, $kindStruct, "main.jsDHCPServerRange", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, RangeLower_, RangeUpper_, LeaseTime_) {
+	jsDHCPServerRange = $pkg.jsDHCPServerRange = $newType(0, $kindStruct, "main.jsDHCPServerRange", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, RangeLower_, RangeUpper_, LeaseTime_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36120,7 +36120,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.RangeUpper = RangeUpper_;
 		this.LeaseTime = LeaseTime_;
 	});
-	jsDHCPServerOption = $pkg.jsDHCPServerOption = $newType(0, $kindStruct, "main.jsDHCPServerOption", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Option_, Value_) {
+	jsDHCPServerOption = $pkg.jsDHCPServerOption = $newType(0, $kindStruct, "main.jsDHCPServerOption", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Option_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36132,7 +36132,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Option = Option_;
 		this.Value = Value_;
 	});
-	jsDHCPServerStaticHost = $pkg.jsDHCPServerStaticHost = $newType(0, $kindStruct, "main.jsDHCPServerStaticHost", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Mac_, Ip_) {
+	jsDHCPServerStaticHost = $pkg.jsDHCPServerStaticHost = $newType(0, $kindStruct, "main.jsDHCPServerStaticHost", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Mac_, Ip_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36144,7 +36144,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Mac = Mac_;
 		this.Ip = Ip_;
 	});
-	jsEventProcessor = $pkg.jsEventProcessor = $newType(0, $kindStruct, "main.jsEventProcessor", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, LogArray_, HidEventArray_, MaxEntries_, JobList_) {
+	jsEventProcessor = $pkg.jsEventProcessor = $newType(0, $kindStruct, "main.jsEventProcessor", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, LogArray_, HidEventArray_, MaxEntries_, JobList_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36160,9 +36160,9 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.MaxEntries = MaxEntries_;
 		this.JobList = JobList_;
 	});
-	triggerType = $pkg.triggerType = $newType(4, $kindInt, "main.triggerType", true, "github.com/mame82/P4wnP1_go/web_client", false, null);
-	actionType = $pkg.actionType = $newType(4, $kindInt, "main.actionType", true, "github.com/mame82/P4wnP1_go/web_client", false, null);
-	jsTriggerAction = $pkg.jsTriggerAction = $newType(0, $kindStruct, "main.jsTriggerAction", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Id_, OneShot_, IsActive_, Immutable_, TriggerType_, ActionType_, TriggerData_, ActionData_) {
+	triggerType = $pkg.triggerType = $newType(4, $kindInt, "main.triggerType", true, "github.com/mame82/P4wnP1_aloa/web_client", false, null);
+	actionType = $pkg.actionType = $newType(4, $kindInt, "main.actionType", true, "github.com/mame82/P4wnP1_aloa/web_client", false, null);
+	jsTriggerAction = $pkg.jsTriggerAction = $newType(0, $kindStruct, "main.jsTriggerAction", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Id_, OneShot_, IsActive_, Immutable_, TriggerType_, ActionType_, TriggerData_, ActionData_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36186,7 +36186,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.TriggerData = TriggerData_;
 		this.ActionData = ActionData_;
 	});
-	jsTriggerServiceStarted = $pkg.jsTriggerServiceStarted = $newType(0, $kindStruct, "main.jsTriggerServiceStarted", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_) {
+	jsTriggerServiceStarted = $pkg.jsTriggerServiceStarted = $newType(0, $kindStruct, "main.jsTriggerServiceStarted", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36194,7 +36194,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerUSBGadgetConnected = $pkg.jsTriggerUSBGadgetConnected = $newType(0, $kindStruct, "main.jsTriggerUSBGadgetConnected", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_) {
+	jsTriggerUSBGadgetConnected = $pkg.jsTriggerUSBGadgetConnected = $newType(0, $kindStruct, "main.jsTriggerUSBGadgetConnected", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36202,7 +36202,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerUSBGadgetDisconnected = $pkg.jsTriggerUSBGadgetDisconnected = $newType(0, $kindStruct, "main.jsTriggerUSBGadgetDisconnected", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_) {
+	jsTriggerUSBGadgetDisconnected = $pkg.jsTriggerUSBGadgetDisconnected = $newType(0, $kindStruct, "main.jsTriggerUSBGadgetDisconnected", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36210,7 +36210,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerWifiAPStarted = $pkg.jsTriggerWifiAPStarted = $newType(0, $kindStruct, "main.jsTriggerWifiAPStarted", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_) {
+	jsTriggerWifiAPStarted = $pkg.jsTriggerWifiAPStarted = $newType(0, $kindStruct, "main.jsTriggerWifiAPStarted", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36218,7 +36218,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerWifiConnectedAsSta = $pkg.jsTriggerWifiConnectedAsSta = $newType(0, $kindStruct, "main.jsTriggerWifiConnectedAsSta", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_) {
+	jsTriggerWifiConnectedAsSta = $pkg.jsTriggerWifiConnectedAsSta = $newType(0, $kindStruct, "main.jsTriggerWifiConnectedAsSta", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36226,7 +36226,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerSSHLogin = $pkg.jsTriggerSSHLogin = $newType(0, $kindStruct, "main.jsTriggerSSHLogin", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, LoginUser_) {
+	jsTriggerSSHLogin = $pkg.jsTriggerSSHLogin = $newType(0, $kindStruct, "main.jsTriggerSSHLogin", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, LoginUser_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36236,7 +36236,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Object = Object_;
 		this.LoginUser = LoginUser_;
 	});
-	jsTriggerDHCPLeaseGranted = $pkg.jsTriggerDHCPLeaseGranted = $newType(0, $kindStruct, "main.jsTriggerDHCPLeaseGranted", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_) {
+	jsTriggerDHCPLeaseGranted = $pkg.jsTriggerDHCPLeaseGranted = $newType(0, $kindStruct, "main.jsTriggerDHCPLeaseGranted", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36244,7 +36244,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerGroupReceive = $pkg.jsTriggerGroupReceive = $newType(0, $kindStruct, "main.jsTriggerGroupReceive", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, GroupName_, Value_) {
+	jsTriggerGroupReceive = $pkg.jsTriggerGroupReceive = $newType(0, $kindStruct, "main.jsTriggerGroupReceive", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, GroupName_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36256,7 +36256,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.GroupName = GroupName_;
 		this.Value = Value_;
 	});
-	jsTriggerGroupReceiveMulti = $pkg.jsTriggerGroupReceiveMulti = $newType(0, $kindStruct, "main.jsTriggerGroupReceiveMulti", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, GroupName_, Type_, Values_) {
+	jsTriggerGroupReceiveMulti = $pkg.jsTriggerGroupReceiveMulti = $newType(0, $kindStruct, "main.jsTriggerGroupReceiveMulti", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, GroupName_, Type_, Values_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36270,8 +36270,8 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Type = Type_;
 		this.Values = Values_;
 	});
-	GroupReceiveMultiType = $pkg.GroupReceiveMultiType = $newType(4, $kindInt, "main.GroupReceiveMultiType", true, "github.com/mame82/P4wnP1_go/web_client", true, null);
-	jsTriggerGPIOIn = $pkg.jsTriggerGPIOIn = $newType(0, $kindStruct, "main.jsTriggerGPIOIn", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, GpioName_, PullUpDown_, Edge_, DebounceMillis_) {
+	GroupReceiveMultiType = $pkg.GroupReceiveMultiType = $newType(4, $kindInt, "main.GroupReceiveMultiType", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
+	jsTriggerGPIOIn = $pkg.jsTriggerGPIOIn = $newType(0, $kindStruct, "main.jsTriggerGPIOIn", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, GpioName_, PullUpDown_, Edge_, DebounceMillis_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36287,9 +36287,9 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Edge = Edge_;
 		this.DebounceMillis = DebounceMillis_;
 	});
-	GPIOInPullUpDown = $pkg.GPIOInPullUpDown = $newType(4, $kindInt, "main.GPIOInPullUpDown", true, "github.com/mame82/P4wnP1_go/web_client", true, null);
-	GPIOInEdge = $pkg.GPIOInEdge = $newType(4, $kindInt, "main.GPIOInEdge", true, "github.com/mame82/P4wnP1_go/web_client", true, null);
-	jsActionStartBashScript = $pkg.jsActionStartBashScript = $newType(0, $kindStruct, "main.jsActionStartBashScript", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, ScriptName_) {
+	GPIOInPullUpDown = $pkg.GPIOInPullUpDown = $newType(4, $kindInt, "main.GPIOInPullUpDown", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
+	GPIOInEdge = $pkg.GPIOInEdge = $newType(4, $kindInt, "main.GPIOInEdge", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
+	jsActionStartBashScript = $pkg.jsActionStartBashScript = $newType(0, $kindStruct, "main.jsActionStartBashScript", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, ScriptName_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36299,7 +36299,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Object = Object_;
 		this.ScriptName = ScriptName_;
 	});
-	jsActionStartHIDScript = $pkg.jsActionStartHIDScript = $newType(0, $kindStruct, "main.jsActionStartHIDScript", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, ScriptName_) {
+	jsActionStartHIDScript = $pkg.jsActionStartHIDScript = $newType(0, $kindStruct, "main.jsActionStartHIDScript", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, ScriptName_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36309,7 +36309,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Object = Object_;
 		this.ScriptName = ScriptName_;
 	});
-	jsActionDeploySettingsTemplate = $pkg.jsActionDeploySettingsTemplate = $newType(0, $kindStruct, "main.jsActionDeploySettingsTemplate", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, TemplateName_, Type_) {
+	jsActionDeploySettingsTemplate = $pkg.jsActionDeploySettingsTemplate = $newType(0, $kindStruct, "main.jsActionDeploySettingsTemplate", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Type_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36321,7 +36321,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Type = Type_;
 	});
-	jsActionGPIOOut = $pkg.jsActionGPIOOut = $newType(0, $kindStruct, "main.jsActionGPIOOut", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, GpioName_, Value_) {
+	jsActionGPIOOut = $pkg.jsActionGPIOOut = $newType(0, $kindStruct, "main.jsActionGPIOOut", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, GpioName_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36333,8 +36333,8 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.GpioName = GpioName_;
 		this.Value = Value_;
 	});
-	GPIOOutValue = $pkg.GPIOOutValue = $newType(4, $kindInt, "main.GPIOOutValue", true, "github.com/mame82/P4wnP1_go/web_client", true, null);
-	jsActionGroupSend = $pkg.jsActionGroupSend = $newType(0, $kindStruct, "main.jsActionGroupSend", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, GroupName_, Value_) {
+	GPIOOutValue = $pkg.GPIOOutValue = $newType(4, $kindInt, "main.GPIOOutValue", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
+	jsActionGroupSend = $pkg.jsActionGroupSend = $newType(0, $kindStruct, "main.jsActionGroupSend", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, GroupName_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36346,7 +36346,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.GroupName = GroupName_;
 		this.Value = Value_;
 	});
-	jsActionLog = $pkg.jsActionLog = $newType(0, $kindStruct, "main.jsActionLog", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_) {
+	jsActionLog = $pkg.jsActionLog = $newType(0, $kindStruct, "main.jsActionLog", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36354,8 +36354,8 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	TemplateType = $pkg.TemplateType = $newType(4, $kindInt, "main.TemplateType", true, "github.com/mame82/P4wnP1_go/web_client", true, null);
-	jsTriggerActionSet = $pkg.jsTriggerActionSet = $newType(0, $kindStruct, "main.jsTriggerActionSet", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Name_, TriggerActions_) {
+	TemplateType = $pkg.TemplateType = $newType(4, $kindInt, "main.TemplateType", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
+	jsTriggerActionSet = $pkg.jsTriggerActionSet = $newType(0, $kindStruct, "main.jsTriggerActionSet", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Name_, TriggerActions_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36367,7 +36367,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Name = Name_;
 		this.TriggerActions = TriggerActions_;
 	});
-	GlobalState = $pkg.GlobalState = $newType(0, $kindStruct, "main.GlobalState", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_, Title_, CurrentHIDScriptSource_, CurrentGadgetSettings_, CurrentlyDeployingGadgetSettings_, CurrentlyDeployingWifiSettings_, EventProcessor_, HidJobList_, TriggerActionList_, IsModalEnabled_, IsConnected_, FailedConnectionAttempts_, InterfaceSettings_, WiFiState_, CurrentBluetoothControllerInformation_, CurrentBluetoothAgentSettings_, CurrentMasterTemplate_, CurrentStartupMasterTemplateName_, StoredWifiSettingsList_, StoredEthernetInterfaceSettingsList_, StoredTriggerActionSetsList_, StoredBashScriptsList_, StoredHIDScriptsList_, StoredUSBSettingsList_, StoredBluetoothSettingsList_, StoredMasterTemplateList_, DBBackupList_, GpioNamesList_, UmsImageListCdrom_, UmsImageListFlashdrive_, ConnectRetryCount_, EventListenerRunning_, EventListenerShouldBeRunning_, EventListenerCancelFunc_) {
+	GlobalState = $pkg.GlobalState = $newType(0, $kindStruct, "main.GlobalState", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Title_, CurrentHIDScriptSource_, CurrentGadgetSettings_, CurrentlyDeployingGadgetSettings_, CurrentlyDeployingWifiSettings_, EventProcessor_, HidJobList_, TriggerActionList_, IsModalEnabled_, IsConnected_, FailedConnectionAttempts_, InterfaceSettings_, WiFiState_, CurrentBluetoothControllerInformation_, CurrentBluetoothAgentSettings_, CurrentMasterTemplate_, CurrentStartupMasterTemplateName_, StoredWifiSettingsList_, StoredEthernetInterfaceSettingsList_, StoredTriggerActionSetsList_, StoredBashScriptsList_, StoredHIDScriptsList_, StoredUSBSettingsList_, StoredBluetoothSettingsList_, StoredMasterTemplateList_, DBBackupList_, GpioNamesList_, UmsImageListCdrom_, UmsImageListFlashdrive_, ConnectRetryCount_, EventListenerRunning_, EventListenerShouldBeRunning_, EventListenerCancelFunc_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36441,7 +36441,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.EventListenerShouldBeRunning = EventListenerShouldBeRunning_;
 		this.EventListenerCancelFunc = EventListenerCancelFunc_;
 	});
-	Promise = $pkg.Promise = $newType(0, $kindStruct, "main.Promise", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_, State_) {
+	Promise = $pkg.Promise = $newType(0, $kindStruct, "main.Promise", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, State_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36451,7 +36451,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Object = Object_;
 		this.State = State_;
 	});
-	Quasar = $pkg.Quasar = $newType(0, $kindStruct, "main.Quasar", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_, Version_, Theme_, Plugins_) {
+	Quasar = $pkg.Quasar = $newType(0, $kindStruct, "main.Quasar", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Version_, Theme_, Plugins_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36465,7 +36465,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Theme = Theme_;
 		this.Plugins = Plugins_;
 	});
-	QuasarNotification = $pkg.QuasarNotification = $newType(0, $kindStruct, "main.QuasarNotification", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_, Message_, Detail_, Type_, Color_, TextColor_, Icon_, Position_, Timeout_) {
+	QuasarNotification = $pkg.QuasarNotification = $newType(0, $kindStruct, "main.QuasarNotification", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Message_, Detail_, Type_, Color_, TextColor_, Icon_, Position_, Timeout_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36489,7 +36489,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Position = Position_;
 		this.Timeout = Timeout_;
 	});
-	Rpc = $pkg.Rpc = $newType(0, $kindStruct, "main.Rpc", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Mutex_, Client_, eventListeningOn_, eventListeningCtx_, eventListeningCancel_) {
+	Rpc = $pkg.Rpc = $newType(0, $kindStruct, "main.Rpc", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Mutex_, Client_, eventListeningOn_, eventListeningCtx_, eventListeningCancel_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Mutex = ptrType$95.nil;
@@ -36505,7 +36505,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.eventListeningCtx = eventListeningCtx_;
 		this.eventListeningCancel = eventListeningCancel_;
 	});
-	VueRouterConfig = $pkg.VueRouterConfig = $newType(0, $kindStruct, "main.VueRouterConfig", true, "github.com/mame82/P4wnP1_go/web_client", true, function(Object_, Routes_) {
+	VueRouterConfig = $pkg.VueRouterConfig = $newType(0, $kindStruct, "main.VueRouterConfig", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Routes_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36515,8 +36515,8 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Object = Object_;
 		this.Routes = Routes_;
 	});
-	VueRouterOption = $pkg.VueRouterOption = $newType(4, $kindFunc, "main.VueRouterOption", true, "github.com/mame82/P4wnP1_go/web_client", true, null);
-	option = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Label_, Value_) {
+	VueRouterOption = $pkg.VueRouterOption = $newType(4, $kindFunc, "main.VueRouterOption", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
+	option = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36528,7 +36528,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$1 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Label_, Value_) {
+	option$1 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36540,7 +36540,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$2 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Label_, Value_) {
+	option$2 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36552,7 +36552,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$3 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Label_, Value_) {
+	option$3 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36564,7 +36564,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$4 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Label_, Value_) {
+	option$4 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36576,7 +36576,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$5 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Label_, Value_) {
+	option$5 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36588,7 +36588,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$6 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Label_, Value_) {
+	option$6 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36600,7 +36600,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$7 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_go/web_client", false, function(Object_, Label_, Value_) {
+	option$7 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -40207,7 +40207,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 		$r = InitComponentsTriggerActions(); /* */ $s = 24; case 24: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = InitComponentsBluetooth(); /* */ $s = 25; case 25: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = InitComponentsGeneric(); /* */ $s = 26; case 26: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_r$12 = hvue.NewVM(new sliceType$10([hvue.El("#app"), hvue.Template("\n    <q-layout view=\"lHh Lpr fFf\">\n        <q-layout-header :reveal=\"!$q.platform.is.desktop\">\n            <q-toolbar>\n                <q-toolbar-title>\n                    P4wnP1 A.L.O.A.\n\t\t\t\t\t<span slot=\"subtitle\" class=\"mobile-only\">v0.1.0-alpha1 by MaMe82</span>\n                </q-toolbar-title>\n            </q-toolbar>\n            <q-tabs>\n                <q-route-tab default slot=\"title\" to=\"usb\" name=\"tab-usb\" icon=\"usb\" label=\"USB Settings\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"wifi\" name=\"tab-wifi\" icon=\"wifi\" label=\"WiFi settings\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"bluetooth\" name=\"tab-bluetooth\" icon=\"bluetooth\" label=\"Bluetooth\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"network\" name=\"tab-network\" icon=\"settings_ethernet\" label=\"Network settings\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"triggeractions\" name=\"tab-triggeraction\" icon=\"whatshot\" label=\"Trigger Actions\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"hid\" name=\"tab-hid-script\" icon=\"keyboard\" label=\"HIDScript\"></q-route-tab>\n <!--               <q-route-tab slot=\"title\" to=\"hidjobs\" name=\"tab-hid-jobs\" icon=\"schedule\" label=\"HID Events\"></q-route-tab> -->\n                <q-route-tab slot=\"title\" to=\"logger\" name=\"tab-logger\" icon=\"message\" label=\"Event Log\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"generic\" name=\"tab-generic\" icon=\"settings\" label=\"Generic settings\"></q-route-tab>\n            </q-tabs>\n        </q-layout-header>\n\n\n        <q-layout-footer class=\"desktop-only\">\n            <q-toolbar>\n                <q-toolbar-title>\n                    <div slot=\"subtitle\">by MaMe82  v0.1.0-alpha1 by MaMe82</div>\n                </q-toolbar-title>\n            </q-toolbar>\n        </q-layout-footer>\n\n        <q-page-container>\n            <router-view></router-view>\n\n\t\t\t<disconnect-modal :value=\"!$store.getters.isConnected\"></disconnect-modal>\n        </q-page-container>\n\n\n    </q-layout>\n"), hvue.Computed("state", (function(vm) {
+		_r$12 = hvue.NewVM(new sliceType$10([hvue.El("#app"), hvue.Template("\n    <q-layout view=\"lHh Lpr fFf\">\n        <q-layout-header :reveal=\"!$q.platform.is.desktop\">\n            <q-toolbar>\n                <q-toolbar-title>\n                    P4wnP1 A.L.O.A.\n\t\t\t\t\t<span slot=\"subtitle\" class=\"mobile-only\">v0.1.0-alpha2 by MaMe82</span>\n                </q-toolbar-title>\n            </q-toolbar>\n            <q-tabs>\n                <q-route-tab default slot=\"title\" to=\"usb\" name=\"tab-usb\" icon=\"usb\" label=\"USB Settings\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"wifi\" name=\"tab-wifi\" icon=\"wifi\" label=\"WiFi settings\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"bluetooth\" name=\"tab-bluetooth\" icon=\"bluetooth\" label=\"Bluetooth\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"network\" name=\"tab-network\" icon=\"settings_ethernet\" label=\"Network settings\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"triggeractions\" name=\"tab-triggeraction\" icon=\"whatshot\" label=\"Trigger Actions\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"hid\" name=\"tab-hid-script\" icon=\"keyboard\" label=\"HIDScript\"></q-route-tab>\n <!--               <q-route-tab slot=\"title\" to=\"hidjobs\" name=\"tab-hid-jobs\" icon=\"schedule\" label=\"HID Events\"></q-route-tab> -->\n                <q-route-tab slot=\"title\" to=\"logger\" name=\"tab-logger\" icon=\"message\" label=\"Event Log\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"generic\" name=\"tab-generic\" icon=\"settings\" label=\"Generic settings\"></q-route-tab>\n            </q-tabs>\n        </q-layout-header>\n\n\n        <q-layout-footer class=\"desktop-only\">\n            <q-toolbar>\n                <q-toolbar-title>\n                    <div slot=\"subtitle\">v0.1.0-alpha2 by MaMe82</div>\n                </q-toolbar-title>\n            </q-toolbar>\n        </q-layout-footer>\n\n        <q-page-container>\n            <router-view></router-view>\n\n\t\t\t<disconnect-modal :value=\"!$store.getters.isConnected\"></disconnect-modal>\n        </q-page-container>\n\n\n    </q-layout>\n"), hvue.Computed("state", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.$store.state);
 		})), hvue.BeforeMount((function(vm) {
@@ -43885,32 +43885,32 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 	};
 	$pkg.NewVueRouter = NewVueRouter;
 	ptrType$102.methods = [{prop: "UpdateFromDeployedGadgetSettings", name: "UpdateFromDeployedGadgetSettings", pkg: "", typ: $funcType([ptrType$2], [], false)}, {prop: "ApplyGadgetSettings", name: "ApplyGadgetSettings", pkg: "", typ: $funcType([ptrType$2], [], false)}];
-	ptrType$17.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$103], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$103], [], false)}];
-	ptrType$16.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$15], [], false)}, {prop: "fromASandCI", name: "fromASandCI", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$18, ptrType$19], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$15], false)}];
-	ptrType$18.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$21], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$21], false)}];
-	ptrType$23.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$22], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$22], false)}];
-	ptrType$19.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$20], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$20], [], false)}];
-	ptrType$24.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$33], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$33], false)}];
-	ptrType$25.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$104], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$104], [], false)}];
-	ptrType$14.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$105], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$105], [], false)}];
-	ptrType$11.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$106], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$106], [], false)}];
-	jsGadgetSettings.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$35], false)}];
-	ptrType$8.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$35], [], false)}];
-	ptrType$38.methods = [{prop: "toLogEvent", name: "toLogEvent", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$42, $error], false)}, {prop: "toHidEvent", name: "toHidEvent", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$43, $error], false)}];
+	ptrType$17.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$103], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$103], [], false)}];
+	ptrType$16.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$15], [], false)}, {prop: "fromASandCI", name: "fromASandCI", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$18, ptrType$19], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$15], false)}];
+	ptrType$18.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$21], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$21], false)}];
+	ptrType$23.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$22], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$22], false)}];
+	ptrType$19.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$20], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$20], [], false)}];
+	ptrType$24.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$33], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$33], false)}];
+	ptrType$25.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$104], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$104], [], false)}];
+	ptrType$14.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$105], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$105], [], false)}];
+	ptrType$11.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$106], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$106], [], false)}];
+	jsGadgetSettings.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$35], false)}];
+	ptrType$8.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$35], [], false)}];
+	ptrType$38.methods = [{prop: "toLogEvent", name: "toLogEvent", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$42, $error], false)}, {prop: "toHidEvent", name: "toHidEvent", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$43, $error], false)}];
 	ptrType$52.methods = [{prop: "UpdateEntry", name: "UpdateEntry", pkg: "", typ: $funcType([$Int64, $Int64, $Bool, $Bool, $String, $String, $Int64, $String], [], false)}, {prop: "Clear", name: "Clear", pkg: "", typ: $funcType([], [], false)}, {prop: "DeleteEntry", name: "DeleteEntry", pkg: "", typ: $funcType([$Int64], [], false)}];
 	jsWiFiState.methods = [{prop: "ModeString", name: "ModeString", pkg: "", typ: $funcType([], [$String], false)}];
-	ptrType$90.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$45], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$45], false)}];
-	ptrType$12.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$34], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$34], [], false)}];
-	ptrType$28.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$107], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$107], [], false)}];
-	ptrType$48.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$108], [], false)}, {prop: "updateSingleInterface", name: "updateSingleInterface", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$27], [], false)}];
-	ptrType$27.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$47], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$47], false)}, {prop: "CreateDhcpSettingsForInterface", name: "CreateDhcpSettingsForInterface", pkg: "", typ: $funcType([], [], false)}];
-	ptrType$26.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$49], false)}, {prop: "AddRange", name: "AddRange", pkg: "", typ: $funcType([ptrType$29], [], false)}, {prop: "RemoveRange", name: "RemoveRange", pkg: "", typ: $funcType([ptrType$29], [], false)}, {prop: "AddOption", name: "AddOption", pkg: "", typ: $funcType([ptrType$30], [], false)}, {prop: "RemoveOption", name: "RemoveOption", pkg: "", typ: $funcType([ptrType$30], [], false)}, {prop: "AddStaticHost", name: "AddStaticHost", pkg: "", typ: $funcType([ptrType$31], [], false)}, {prop: "RemoveStaticHost", name: "RemoveStaticHost", pkg: "", typ: $funcType([ptrType$31], [], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$49], [], false)}];
-	ptrType$29.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$50], [], false)}];
-	ptrType$30.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([$Uint32, $String], [], false)}];
-	ptrType$31.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$51], [], false)}];
-	ptrType$89.methods = [{prop: "handleHidEvent", name: "handleHidEvent", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$43], [], false)}, {prop: "HandleEvent", name: "HandleEvent", pkg: "", typ: $funcType([ptrType$109], [], false)}];
-	ptrType$86.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([ptrType$69], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$69], false)}, {prop: "ChangeActionType", name: "ChangeActionType", pkg: "", typ: $funcType([actionType], [], false)}, {prop: "IsActionLog", name: "IsActionLog", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionBashScript", name: "IsActionBashScript", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionHidScript", name: "IsActionHidScript", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionDeploySettingsTemplate", name: "IsActionDeploySettingsTemplate", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionGroupSend", name: "IsActionGroupSend", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionGPIOOut", name: "IsActionGPIOOut", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "ChangeTriggerType", name: "ChangeTriggerType", pkg: "", typ: $funcType([triggerType], [], false)}, {prop: "IsTriggerServiceStarted", name: "IsTriggerServiceStarted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerSshLogin", name: "IsTriggerSshLogin", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerDhcpLeaseGranted", name: "IsTriggerDhcpLeaseGranted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerWifiAPStarted", name: "IsTriggerWifiAPStarted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerWifiConnectedAsSta", name: "IsTriggerWifiConnectedAsSta", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerUsbGadgetConnected", name: "IsTriggerUsbGadgetConnected", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerUsbGadgetDisconnected", name: "IsTriggerUsbGadgetDisconnected", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGPIOIn", name: "IsTriggerGPIOIn", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGroupReceive", name: "IsTriggerGroupReceive", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGroupReceiveMulti", name: "IsTriggerGroupReceiveMulti", pkg: "", typ: $funcType([], [$Bool], false)}];
-	jsTriggerActionSet.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_go/web_client", typ: $funcType([], [ptrType$87], false)}];
+	ptrType$90.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$45], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$45], false)}];
+	ptrType$12.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$34], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$34], [], false)}];
+	ptrType$28.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$107], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$107], [], false)}];
+	ptrType$48.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$108], [], false)}, {prop: "updateSingleInterface", name: "updateSingleInterface", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$27], [], false)}];
+	ptrType$27.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$47], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$47], false)}, {prop: "CreateDhcpSettingsForInterface", name: "CreateDhcpSettingsForInterface", pkg: "", typ: $funcType([], [], false)}];
+	ptrType$26.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$49], false)}, {prop: "AddRange", name: "AddRange", pkg: "", typ: $funcType([ptrType$29], [], false)}, {prop: "RemoveRange", name: "RemoveRange", pkg: "", typ: $funcType([ptrType$29], [], false)}, {prop: "AddOption", name: "AddOption", pkg: "", typ: $funcType([ptrType$30], [], false)}, {prop: "RemoveOption", name: "RemoveOption", pkg: "", typ: $funcType([ptrType$30], [], false)}, {prop: "AddStaticHost", name: "AddStaticHost", pkg: "", typ: $funcType([ptrType$31], [], false)}, {prop: "RemoveStaticHost", name: "RemoveStaticHost", pkg: "", typ: $funcType([ptrType$31], [], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$49], [], false)}];
+	ptrType$29.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$50], [], false)}];
+	ptrType$30.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([$Uint32, $String], [], false)}];
+	ptrType$31.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$51], [], false)}];
+	ptrType$89.methods = [{prop: "handleHidEvent", name: "handleHidEvent", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$43], [], false)}, {prop: "HandleEvent", name: "HandleEvent", pkg: "", typ: $funcType([ptrType$109], [], false)}];
+	ptrType$86.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$69], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$69], false)}, {prop: "ChangeActionType", name: "ChangeActionType", pkg: "", typ: $funcType([actionType], [], false)}, {prop: "IsActionLog", name: "IsActionLog", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionBashScript", name: "IsActionBashScript", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionHidScript", name: "IsActionHidScript", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionDeploySettingsTemplate", name: "IsActionDeploySettingsTemplate", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionGroupSend", name: "IsActionGroupSend", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionGPIOOut", name: "IsActionGPIOOut", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "ChangeTriggerType", name: "ChangeTriggerType", pkg: "", typ: $funcType([triggerType], [], false)}, {prop: "IsTriggerServiceStarted", name: "IsTriggerServiceStarted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerSshLogin", name: "IsTriggerSshLogin", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerDhcpLeaseGranted", name: "IsTriggerDhcpLeaseGranted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerWifiAPStarted", name: "IsTriggerWifiAPStarted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerWifiConnectedAsSta", name: "IsTriggerWifiConnectedAsSta", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerUsbGadgetConnected", name: "IsTriggerUsbGadgetConnected", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerUsbGadgetDisconnected", name: "IsTriggerUsbGadgetDisconnected", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGPIOIn", name: "IsTriggerGPIOIn", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGroupReceive", name: "IsTriggerGroupReceive", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGroupReceiveMulti", name: "IsTriggerGroupReceiveMulti", pkg: "", typ: $funcType([], [$Bool], false)}];
+	jsTriggerActionSet.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$87], false)}];
 	ptrType$32.methods = [{prop: "UpdateEntry", name: "UpdateEntry", pkg: "", typ: $funcType([ptrType$86], [], false)}, {prop: "DeleteEntry", name: "DeleteEntry", pkg: "", typ: $funcType([$Uint32], [], false)}, {prop: "Flush", name: "Flush", pkg: "", typ: $funcType([], [], false)}];
 	ptrType$111.methods = [{prop: "GetUmsImageFlashdriveList", name: "GetUmsImageFlashdriveList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "GetUmsImageCdromList", name: "GetUmsImageCdromList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "GetStoredDBBackupList", name: "GetStoredDBBackupList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "DBBackup", name: "DBBackup", pkg: "", typ: $funcType([time.Duration, $String], [$error], false)}, {prop: "DBRestore", name: "DBRestore", pkg: "", typ: $funcType([time.Duration, $String], [$error], false)}, {prop: "GetStartupMasterTemplate", name: "GetStartupMasterTemplate", pkg: "", typ: $funcType([time.Duration], [$String, $error], false)}, {prop: "SetStartupMasterTemplate", name: "SetStartupMasterTemplate", pkg: "", typ: $funcType([time.Duration, $String], [$error], false)}, {prop: "Shutdown", name: "Shutdown", pkg: "", typ: $funcType([time.Duration], [$error], false)}, {prop: "Reboot", name: "Reboot", pkg: "", typ: $funcType([time.Duration], [$error], false)}, {prop: "GetGpioNamesList", name: "GetGpioNamesList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "DeployMasterTemplate", name: "DeployMasterTemplate", pkg: "", typ: $funcType([time.Duration, ptrType$33], [$error], false)}, {prop: "GetStoredMasterTemplateList", name: "GetStoredMasterTemplateList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "StoreMasterTemplate", name: "StoreMasterTemplate", pkg: "", typ: $funcType([time.Duration, ptrType$104], [$error], false)}, {prop: "GetStoredMasterTemplate", name: "GetStoredMasterTemplate", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$33, $error], false)}, {prop: "DeployStoredMasterTemplate", name: "DeployStoredMasterTemplate", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$33, $error], false)}, {prop: "DeleteStoredMasterTemplate", name: "DeleteStoredMasterTemplate", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "UploadContentToTempFile", name: "UploadContentToTempFile", pkg: "", typ: $funcType([time.Duration, sliceType$7], [$String, $error], false)}, {prop: "RunHIDScriptJob", name: "RunHIDScriptJob", pkg: "", typ: $funcType([time.Duration, $String], [ptrType$97, $error], false)}, {prop: "CancelHIDScriptJob", name: "CancelHIDScriptJob", pkg: "", typ: $funcType([time.Duration, $Uint32], [$error], false)}, {prop: "CancelAllHIDScriptJobs", name: "CancelAllHIDScriptJobs", pkg: "", typ: $funcType([time.Duration], [$error], false)}, {prop: "GetStoredBluetoothSettingsList", name: "GetStoredBluetoothSettingsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "StoreBluetoothSettings", name: "StoreBluetoothSettings", pkg: "", typ: $funcType([time.Duration, ptrType$103], [$error], false)}, {prop: "GetStoredBluetoothSettings", name: "GetStoredBluetoothSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$15, $error], false)}, {prop: "DeployStoredBluetoothSettings", name: "DeployStoredBluetoothSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$15, $error], false)}, {prop: "DeleteStoredBluetoothSettings", name: "DeleteStoredBluetoothSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "DeleteStoredUSBSettings", name: "DeleteStoredUSBSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "DeleteStoredWifiSettings", name: "DeleteStoredWifiSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "DeleteStoredEthernetInterfaceSettings", name: "DeleteStoredEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "DeleteStoredTriggerActionsSet", name: "DeleteStoredTriggerActionsSet", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "GetBluetoothAgentSettings", name: "GetBluetoothAgentSettings", pkg: "", typ: $funcType([time.Duration], [ptrType$18, $error], false)}, {prop: "DeployBluetoothAgentSettings", name: "DeployBluetoothAgentSettings", pkg: "", typ: $funcType([time.Duration, ptrType$18], [ptrType$18, $error], false)}, {prop: "GetBluetoothControllerInformation", name: "GetBluetoothControllerInformation", pkg: "", typ: $funcType([time.Duration], [ptrType$19, $error], false)}, {prop: "DeployBluetoothControllerInformation", name: "DeployBluetoothControllerInformation", pkg: "", typ: $funcType([time.Duration, ptrType$19], [ptrType$19, $error], false)}, {prop: "GetStoredUSBSettingsList", name: "GetStoredUSBSettingsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "StoreUSBSettings", name: "StoreUSBSettings", pkg: "", typ: $funcType([time.Duration, ptrType$106], [$error], false)}, {prop: "GetStoredUSBSettings", name: "GetStoredUSBSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$35, $error], false)}, {prop: "DeployStoredUSBSettings", name: "DeployStoredUSBSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$35, $error], false)}, {prop: "UploadBytesToFile", name: "UploadBytesToFile", pkg: "", typ: $funcType([time.Duration, $String, P4wnP1_grpc.AccessibleFolder, sliceType$7, $Bool], [$error], false)}, {prop: "DownloadFileToBytes", name: "DownloadFileToBytes", pkg: "", typ: $funcType([time.Duration, $String, P4wnP1_grpc.AccessibleFolder], [sliceType$7, $error], false)}, {prop: "GetStoredEthernetInterfaceSettingsList", name: "GetStoredEthernetInterfaceSettingsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "GetStoredBashScriptsList", name: "GetStoredBashScriptsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "GetStoredHIDScriptsList", name: "GetStoredHIDScriptsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "DeployedEthernetInterfaceSettings", name: "DeployedEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration, ptrType$47], [$error], false)}, {prop: "GetStoredWifiSettingsList", name: "GetStoredWifiSettingsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "DeployWifiSettings", name: "DeployWifiSettings", pkg: "", typ: $funcType([time.Duration, ptrType$34], [ptrType$45, $error], false)}, {prop: "StoreWifiSettings", name: "StoreWifiSettings", pkg: "", typ: $funcType([time.Duration, ptrType$105], [$error], false)}, {prop: "GetStoredWifiSettings", name: "GetStoredWifiSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$34, $error], false)}, {prop: "DeployStoredWifiSettings", name: "DeployStoredWifiSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$45, $error], false)}, {prop: "GetWifiState", name: "GetWifiState", pkg: "", typ: $funcType([time.Duration], [ptrType$90, $error], false)}, {prop: "GetAllDeployedEthernetInterfaceSettings", name: "GetAllDeployedEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration], [ptrType$48, $error], false)}, {prop: "StoreEthernetInterfaceSettings", name: "StoreEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration, ptrType$107], [$error], false)}, {prop: "GetStoredEthernetInterfaceSettings", name: "GetStoredEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$47, $error], false)}, {prop: "DeployStoredEthernetInterfaceSettings", name: "DeployStoredEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "GetRunningHidJobStates", name: "GetRunningHidJobStates", pkg: "", typ: $funcType([time.Duration], [sliceType$22, $error], false)}, {prop: "ListStoredTriggerActionSets", name: "ListStoredTriggerActionSets", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "StoreTriggerActionSet", name: "StoreTriggerActionSet", pkg: "", typ: $funcType([time.Duration, ptrType$87], [$error], false)}, {prop: "GetDeployedTriggerActionSet", name: "GetDeployedTriggerActionSet", pkg: "", typ: $funcType([time.Duration], [ptrType$87, $error], false)}, {prop: "DeployTriggerActionsSetReplace", name: "DeployTriggerActionsSetReplace", pkg: "", typ: $funcType([time.Duration, ptrType$87], [ptrType$87, $error], false)}, {prop: "DeployTriggerActionsSetRemove", name: "DeployTriggerActionsSetRemove", pkg: "", typ: $funcType([time.Duration, ptrType$87], [ptrType$87, $error], false)}, {prop: "DeployTriggerActionsSetUpdate", name: "DeployTriggerActionsSetUpdate", pkg: "", typ: $funcType([time.Duration, ptrType$87], [ptrType$87, $error], false)}, {prop: "DeployTriggerActionsSetAdd", name: "DeployTriggerActionsSetAdd", pkg: "", typ: $funcType([time.Duration, ptrType$87], [ptrType$87, $error], false)}, {prop: "DeployStoredTriggerActionsSetReplace", name: "DeployStoredTriggerActionsSetReplace", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$87, $error], false)}, {prop: "DeployStoredTriggerActionsSetAdd", name: "DeployStoredTriggerActionsSetAdd", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$87, $error], false)}, {prop: "GetDeployedGadgetSettings", name: "GetDeployedGadgetSettings", pkg: "", typ: $funcType([time.Duration], [ptrType$35, $error], false)}, {prop: "DeployRemoteGadgetSettings", name: "DeployRemoteGadgetSettings", pkg: "", typ: $funcType([time.Duration, ptrType$35], [ptrType$35, $error], false)}, {prop: "ConnectionTest", name: "ConnectionTest", pkg: "", typ: $funcType([time.Duration], [$error], false)}, {prop: "StartEventListening", name: "StartEventListening", pkg: "", typ: $funcType([time.Duration], [P4wnP1_grpc.P4WNP1_EventListenClient, context.CancelFunc, $error], false)}];
 	CompEthernetAddressesData2.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}]);
@@ -43974,7 +43974,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 	Promise.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "State", name: "State", embedded: false, exported: true, typ: $String, tag: "js:\"state\""}]);
 	Quasar.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Version", name: "Version", embedded: false, exported: true, typ: $String, tag: "js:\"version\""}, {prop: "Theme", name: "Theme", embedded: false, exported: true, typ: $String, tag: "js:\"theme\""}, {prop: "Plugins", name: "Plugins", embedded: false, exported: true, typ: mapType, tag: "js:\"plugins\""}]);
 	QuasarNotification.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Message", name: "Message", embedded: false, exported: true, typ: $String, tag: "js:\"message\""}, {prop: "Detail", name: "Detail", embedded: false, exported: true, typ: $String, tag: "js:\"detail\""}, {prop: "Type", name: "Type", embedded: false, exported: true, typ: $String, tag: "js:\"type\""}, {prop: "Color", name: "Color", embedded: false, exported: true, typ: $String, tag: "js:\"color\""}, {prop: "TextColor", name: "TextColor", embedded: false, exported: true, typ: $String, tag: "js:\"textColor\""}, {prop: "Icon", name: "Icon", embedded: false, exported: true, typ: $String, tag: "js:\"icon\""}, {prop: "Position", name: "Position", embedded: false, exported: true, typ: $String, tag: "js:\"position\""}, {prop: "Timeout", name: "Timeout", embedded: false, exported: true, typ: $Uint, tag: "js:\"timeout\""}]);
-	Rpc.init("github.com/mame82/P4wnP1_go/web_client", [{prop: "Mutex", name: "Mutex", embedded: true, exported: true, typ: ptrType$95, tag: ""}, {prop: "Client", name: "Client", embedded: false, exported: true, typ: P4wnP1_grpc.P4WNP1Client, tag: ""}, {prop: "eventListeningOn", name: "eventListeningOn", embedded: false, exported: false, typ: $Bool, tag: ""}, {prop: "eventListeningCtx", name: "eventListeningCtx", embedded: false, exported: false, typ: ptrType$96, tag: ""}, {prop: "eventListeningCancel", name: "eventListeningCancel", embedded: false, exported: false, typ: context.CancelFunc, tag: ""}]);
+	Rpc.init("github.com/mame82/P4wnP1_aloa/web_client", [{prop: "Mutex", name: "Mutex", embedded: true, exported: true, typ: ptrType$95, tag: ""}, {prop: "Client", name: "Client", embedded: false, exported: true, typ: P4wnP1_grpc.P4WNP1Client, tag: ""}, {prop: "eventListeningOn", name: "eventListeningOn", embedded: false, exported: false, typ: $Bool, tag: ""}, {prop: "eventListeningCtx", name: "eventListeningCtx", embedded: false, exported: false, typ: ptrType$96, tag: ""}, {prop: "eventListeningCancel", name: "eventListeningCancel", embedded: false, exported: false, typ: context.CancelFunc, tag: ""}]);
 	VueRouterConfig.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Routes", name: "Routes", embedded: false, exported: true, typ: ptrType$3, tag: "js:\"routes\""}]);
 	VueRouterOption.init([ptrType$101], [], false);
 	option.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Label", name: "Label", embedded: false, exported: true, typ: $String, tag: "js:\"label\""}, {prop: "Value", name: "Value", embedded: false, exported: true, typ: triggerType, tag: "js:\"value\""}]);
@@ -44037,7 +44037,7 @@ $packages["github.com/mame82/P4wnP1_go/web_client"] = (function() {
 	return $pkg;
 })();
 $synthesizeMethods();
-var $mainPkg = $packages["github.com/mame82/P4wnP1_go/web_client"];
+var $mainPkg = $packages["github.com/mame82/P4wnP1_aloa/web_client"];
 $packages["runtime"].$init();
 $go($mainPkg.$init, []);
 $flushConsole();
