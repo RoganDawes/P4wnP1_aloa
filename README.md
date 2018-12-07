@@ -5,8 +5,10 @@ pentesting, red teaming and physical engagements ... or into "A Little Offensive
 
 ## 0. How to install
 
-Currently the closed alpha is running. As soon as the alpha has finished, a pre-built image will be uploaded and 
-be reachable under release tab.
+The latest image could be found under release tab.
+
+The easiest way to access a fresh P4wnP1 A.L.O.A. installation is to use the web client via the spawned WiFi (the PSK
+is `MaMe82-P4wnP1`, the URL `http://172.24.0.1:8000`) or SSH (default password `toor`).
 
 ## 1. Features
 
@@ -41,6 +43,7 @@ using `Math` for mouse calculations etc.)
   - **absolute positioning** on Windows (pixel perfect if target's screen dimensions are known)
 - Keyboard and mouse are not only controlled by the same scripting language, both could be used in the same script. This
 allows combining them in order to achieve goals, which couldn't be achieved using only keyboard or mouse.
+- current language layouts: br, de, es, fr, gb, it, ru and us 
   
 ### Bluetooth
 - full interface to Bluez stack (currently no support for remote device discovery/connect)
@@ -1245,7 +1248,60 @@ the KARMA options on the fly. The python script could be found here:
 
 Tip: To get most out of the KARMA functionality, you should setup P4wnP1 A.L.O.A. to provide a WiFi Access Point without
 authentication, otherwise it wouldn't make to much sense. For poor beacon flooding this isn't needed, but (static) 
-custom SSIDs for beaconing are limited in their number (saving resources on the WiFi chip) 
+custom SSIDs for beaconing are limited in their number (saving resources on the WiFi chip)
+
+Help screen of karmatool.py:
+
+```
+root@kali:/usr/local/P4wnP1/legacy# ./karmatool.py 
+Firmware in use seems to be KARMA capable
+Firmware configuration tool for KARMA modified nexmon WiFi firmware on Pi0W/Pi3 by MaMe82
+=========================================================================================
+
+RePo:       https://github.com/mame82/P4wnP1_nexmon_additions
+Creds to:   seemoo-lab for "NEXMON" project
+
+A hostapd based Access Point should be up and running, when using this tool
+(see the README for details).
+            
+Usage:      python karmatool.py [Arguments]
+
+Arguments:
+   -h                   Print this help screen
+   -i                   Interactive mode
+   -d                   Load default configuration (KARMA on, KARMA beaconing off, 
+                        beaconing for 13 common SSIDs on, custom SSIDs never expire)
+   -c                   Print current KARMA firmware configuration
+   -p 0/1               Disable/Enable KARMA probe responses
+   -a 0/1               Disable/Enable KARMA association responses
+   -k 0/1               Disable/Enable KARMA association responses and probe responses
+                        (overrides -p and -a)
+   -b 0/1               Disable/Enable KARMA beaconing (broadcasts up to 20 SSIDs
+                        spotted in probe requests as beacon)
+   -s 0/1               Disable/Enable custom SSID beaconing (broadcasts up to 20 SSIDs
+                        which have been added by the user with '--addssid=' when enabled)
+   --addssid="test"     Add SSID "test" to custom SSID list (max 20 SSIDs)
+   --remssid="test"     Remove SSID "test" from custom SSID list
+   --clearssids         Clear list of custom SSIDs
+   --clearkarma         Clear list of karma SSIDs (only influences beaconing, not probes)
+   --autoremkarma=600   Auto remove KARMA SSIDs from beaconing list after sending 600 beacons
+                        without receiving an association (about 60 seconds, 0 = beacon forever)
+   --autoremcustom=3000    Auto remove custom SSIDs from beaconing list after sending 3000
+                        beacons without receiving an association (about 5 minutes, 0 = beacon
+                        forever)
+   
+Example:
+   python karmatool.py -k 1 -b 0    Enables KARMA (probe and association responses)
+                                    But sends no beacons for SSIDs from received probes
+   python karmatool.py -k 1 -b 0    Enables KARMA (probe and association responses)
+                                    and sends beacons for SSIDs from received probes
+                                    (max 20 SSIDs, if autoremove isn't enabled)
+   
+   python karmatool.py --addssid="test 1" --addssid="test 2" -s 1
+                                    Add SSID "test 1" and "test 2" and enable beaconing for
+                                    custom SSIDs
+```
+ 
 
 ### WiFi covert channel
 
@@ -1501,8 +1557,7 @@ This isn't a full fledged ToDo list, but some milestones are left and I'd be hap
 this
 - Porting the full HID covert channel functionality to Go core (I'm on my own with that)
 - **add Bluetooth configuration command for CLI**
-- **Create missing keyboard layouts** (currently only "us" and "de" are supported, as this has been a low priority task 
-during development of core features)
+- Create additional keyboard layouts (currently br, de, es, fr, gb, it, ru and us are supported) 
 - extend Bluetooth functionality to allow connection to other discoverable devices (authentication and trust)
 - move WiFi KARMA functionality from dedicated python tool to P4wnP1 core (with webclient support))
 - Create full documentation for HIDScript (basically only the mouse part is missing)
