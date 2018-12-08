@@ -241,7 +241,7 @@ const templateDisconnectModal = `
 			</q-toolbar>
 
 			<div  class="layout-padding">
-      			<p>No connection to server</p>
+      			<p>未连接到服务器</p>
 				<p>正在尝试重新连接 ... 重试次数: {{ $store.state.ConnectRetryCount }}</p>
 			</div>
 		</q-modal-layout>
