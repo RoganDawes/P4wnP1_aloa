@@ -288,28 +288,28 @@ func InitComponentsNetwork() {
 
 const templateNetwork = `
 <q-page padding>
-	<select-string-from-array :values="$store.state.StoredEthernetInterfaceSettingsList" v-model="showLoadModal" title="Load ethernet interface settings" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
-	<select-string-from-array :values="$store.state.StoredEthernetInterfaceSettingsList" v-model="showDeployStoredModal" title="Deploy stored ethernet interface settings" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
-	<modal-string-input v-model="showStoreModal" title="Store current ethernet interface Settings" @save="store($event)"></modal-string-input>
+	<select-string-from-array :values="$store.state.StoredEthernetInterfaceSettingsList" v-model="showLoadModal" title="加载以太网接口设置" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredEthernetInterfaceSettingsList" v-model="showDeployStoredModal" title="应用已保存的以太网接口设置" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+	<modal-string-input v-model="showStoreModal" title="保存当前的以太网接口设置" @save="store($event)"></modal-string-input>
 
 	<div class="row gutter-sm">
 
 		<div class="col-12">
 			<q-card>
 				<q-card-title>
-					Network Interface Settings
+					网络接口设置
 				</q-card-title>
 
 				<q-card-main>
 					<div class="row gutter-sm">
 
-						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="deploy(current)" label="deploy" icon="launch"></q-btn></div>
-						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="deploy(current)" label="应用" icon="launch"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="应用已保存" icon="settings_backup_restore"></q-btn></div>
 <!--
-						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="UpdateFromDeployedGadgetSettings" label="reset" icon="autorenew"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="UpdateFromDeployedGadgetSettings" label="重置" icon="autorenew"></q-btn></div>
 -->
-						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>
-						<div class="col-6 col-sm"><q-btn class="fit" color="warning" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored" icon="cloud_download"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="保存" icon="cloud_upload"></q-btn></div>
+						<div class="col-6 col-sm"><q-btn class="fit" color="warning" @click="updateStoredSettingsList(); showLoadModal=true" label="加载已保存" icon="cloud_download"></q-btn></div>
 
 					</div>
   				</q-card-main>
@@ -322,15 +322,15 @@ const templateNetwork = `
 		<div class="col-12 col-xl-3">
 		<q-card class="full-height">
 			<q-card-title>
-		    	Generic
+		    	通用设置
 			</q-card-title>
 
 			<q-list link>
 				<q-item-separator />
 				<q-item tag="label">
 					<q-item-main>
-						<q-item-tile label>Interface</q-item-tile>
-						<q-item-tile sublabel>Select which interface to configure</q-item-tile>
+						<q-item-tile label>接口</q-item-tile>
+						<q-item-tile sublabel>选择一个接口以配置</q-item-tile>
 						<q-item-tile>
 							<q-select v-model="currentIdx" :options="selectOptionsInterface" color="secondary" inverted></q-select>
 						</q-item-tile>
@@ -353,7 +353,7 @@ const templateNetwork = `
 const templateDHCPConfig = `
 <q-card>
 	<q-card-title>
-    	DHCP Server settings for {{ interface.name }}
+    	为 {{ interface.name }} 设置DHCP服务器
 	</q-card-title>
 
 
@@ -364,24 +364,24 @@ const templateDHCPConfig = `
 				<q-toggle v-model="authoritative"></q-toggle>
 			</q-item-side>
 			<q-item-main>
-				<q-item-tile label>Authoritative</q-item-tile>
-				<q-item-tile sublabel>If disabled, the DHCP Server isn't authoritative</q-item-tile>
+				<q-item-tile label>可信的</q-item-tile>
+				<q-item-tile sublabel>如果禁用，则DHCP服务器不具有权威性</q-item-tile>
 			</q-item-main>
 		</q-item>
 		<q-item tag="label" disabled link>
 			<q-item-main>
-				<q-item-tile label>Path to lease file</q-item-tile>
+				<q-item-tile label>凭据文件的路径</q-item-tile>
 				<q-item-tile sublabel>{{ config.leaseFile }}</q-item-tile>
 			</q-item-main>
 		</q-item>
 
-		<q-list-header>DHCP ranges</q-list-header>
+		<q-list-header>DHCP范围</q-list-header>
 		<dhcp-ranges :config="config"></dhcp-ranges>
 
-		<q-list-header>DHCP options</q-list-header>
+		<q-list-header>DHCP选项</q-list-header>
 		<dhcp-options :config="config"></dhcp-options>
 
-		<q-list-header>DHCP static hosts</q-list-header>
+		<q-list-header>DHCP静态主机</q-list-header>
 		<dhcp-static-hosts :config="config"></dhcp-static-hosts>
 	</q-list>
 </q-card>
@@ -393,7 +393,7 @@ const templateDHCPRanges = `
 		<q-item-tile>
 			<q-table
 				:data="config.ranges"
-				:columns="[{name:'lower', field: 'rangeLower', label: 'Lower IP', align: 'left'}, {name:'upper', field: 'rangeUpper', label: 'Upper IP', align: 'left'}, {name:'lease', field: 'leaseTime', label: 'Lease Time', align: 'left'}, {name:'remove', label: 'Delete range', align: 'left'}]"
+				:columns="[{name:'lower', field: 'rangeLower', label: '起始IP', align: 'left'}, {name:'upper', field: 'rangeUpper', label: '结束IP', align: 'left'}, {name:'lease', field: 'leaseTime', label: '租期', align: 'left'}, {name:'remove', label: '删除范围', align: 'left'}]"
 				row-key="name"
 				:pagination.sync="pagination"
 				v-if="$q.platform.is.desktop"
@@ -403,7 +403,7 @@ const templateDHCPRanges = `
 					<q-th :key="props.cols[1].name" :props="props"> {{ props.cols[1].label }} </q-th>
 					<q-th :key="props.cols[2].name" :props="props"> {{ props.cols[2].label }} </q-th>
 					<q-th :key="props.cols[3].name" :props="props">
-					<q-btn @click="addRange()">add</q-btn>
+					<q-btn @click="addRange()">添加</q-btn>
 					</q-th>
 				</q-tr>
 				
@@ -471,14 +471,14 @@ const templateDHCPRanges = `
 				<q-card-main>
 					<q-table
 						:data="config.ranges"
-						:columns="[{name:'lower', field: 'rangeLower', label: 'Lower IP', align: 'left'}, {name:'upper', field: 'rangeUpper', label: 'Upper IP', align: 'left'}, {name:'lease', field: 'leaseTime', label: 'Lease Time', align: 'left'}, {name:'remove', label: 'Delete range', align: 'left'}]"
+						:columns="[{name:'lower', field: 'rangeLower', label: '起始IP', align: 'left'}, {name:'upper', field: 'rangeUpper', label: '结束IP', align: 'left'}, {name:'lease', field: 'leaseTime', label: '租期', align: 'left'}, {name:'remove', label: '删除范围', align: 'left'}]"
 						row-key="name"
 						hide-header
 						:pagination.sync="pagination"
 						grid
 					>
 						<template slot="top-right" slot-scope="props" class="q-mr-sm">
-							<q-btn @click="addRange()" color="primary">add range</q-btn>
+							<q-btn @click="addRange()" color="primary">添加范围</q-btn>
 						</template>
 						<div
 							slot="item"
@@ -489,7 +489,7 @@ const templateDHCPRanges = `
 							<q-list link no-border>
 								<q-item tag="label" :key="remove">
 									<q-item-main>
-										<q-btn @click="removeRange(props.row)" color="secondary">delete range {{ props.row.__index + 1 }}</q-btn>
+										<q-btn @click="removeRange(props.row)" color="secondary">删除范围 {{ props.row.__index + 1 }}</q-btn>
 									</q-item-main>
 								</q-item>
 								<q-item tag="label" :key="props.colsMap.lower.name">

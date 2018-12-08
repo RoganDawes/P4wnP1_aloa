@@ -120,11 +120,11 @@ const (
 
 	compHIDScriptTemplate = `
 <q-page padding>
-	<ransom-note v-model="ShowRansom"></ransom-note>
+	<ransom-note v-model="显示已劫持的设备"></ransom-note>
 
-	<modal-string-input v-model="ShowStoreHIDScriptModal" title="Store HIDScript" @save="storeHIDScript($event)"></modal-string-input>
-	<select-string-from-array :values="$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptModal" title="Load HIDScript to editor" @load="loadHIDScript($event)"></select-string-from-array>
-	<select-string-from-array :values="$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptPrependModal" title="Load HIDScript to editor" @load="loadHIDScriptPrepend($event)"></select-string-from-array>
+	<modal-string-input v-model="ShowStoreHIDScriptModal" title="保存HID脚本" @save="storeHIDScript($event)"></modal-string-input>
+	<select-string-from-array :values="$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptModal" title="加载HID脚本到编辑器" @load="loadHIDScript($event)"></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredHIDScriptsList" v-model="ShowLoadHIDScriptPrependModal" title="加载HID脚本到编辑器" @load="loadHIDScriptPrepend($event)"></select-string-from-array>
 
 
 	<div class="row gutter-sm">
@@ -137,11 +137,11 @@ const (
 
 				<q-card-main>
 					<div class="row gutter-sm">
-	    				<div class="col-6 col-sm"><q-btn class="fit" color="primary" label="run" @click="SendAndRun()" icon="play_circle_filled" /></div>
-    					<div class="col-6 col-sm"><q-btn class="fit" color="secondary" label="store" icon="cloud_upload" @click="ShowStoreHIDScriptModal=true" /></div>
-    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="load & replace" icon="cloud_download" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptModal=true"/></div>
-    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="load & prepend" icon="add_to_photos" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptPrependModal=true"/></div>
-    					<div class="col-12 col-sm lg"><q-btn class="fit" color="negative" label="import DuckyScript" icon="accessible" @click="ShowRansom=true"/></div>
+	    				<div class="col-6 col-sm"><q-btn class="fit" color="primary" label="运行" @click="SendAndRun()" icon="play_circle_filled" /></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="secondary" label="保存" icon="cloud_upload" @click="ShowStoreHIDScriptModal=true" /></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="加载并替换" icon="cloud_download" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptModal=true"/></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="加载并添加到任务列表当中" icon="add_to_photos" @click="updateStoredHIDScriptsList(); ShowLoadHIDScriptPrependModal=true"/></div>
+    					<div class="col-12 col-sm lg"><q-btn class="fit" color="negative" label="导入Ducky脚本" icon="accessible" @click="ShowRansom=true"/></div>
 					</div>
   				</q-card-main>
 
@@ -165,7 +165,7 @@ const (
 	<q-card class="full-height">
 <!--
   		<q-card-title>
-    		HIDScript editor
+    		HID脚本编辑器
   		</q-card-title>
 -->
 		<q-card-main>

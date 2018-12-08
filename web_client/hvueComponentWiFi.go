@@ -183,25 +183,25 @@ func InitComponentsWiFi() {
 
 const templateWiFi = `
 <q-page padding>
-	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showLoadModal" title="Load WiFi settings" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
-	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showDeployStoredModal" title="Deploy stored WiFi settings" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
-	<modal-string-input v-model="showStoreModal" title="Store current WiFi Settings" @save="store($event)"></modal-string-input>
+	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showLoadModal" title="加载WiFi设置" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredWifiSettingsList" v-model="showDeployStoredModal" title="应用已保存的WiFi设置" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+	<modal-string-input v-model="showStoreModal" title="保存当前WiFi设置" @save="store($event)"></modal-string-input>
 
 <div class="row gutter-sm">
 		<div class="col-12">
 			<q-card>
 				<q-card-title>
-					WiFi settings
+					WiFi设置
 				</q-card-title>
 
 				<q-card-main>
 					<div class="row gutter-sm">
 
-						<div class="col-6 col-sm""><q-btn :loading="deploying" class="fit" color="primary" @click="deploy(settings)" label="deploy" icon="launch"></q-btn></div>
-						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
-						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="reset" label="reset" icon="autorenew"></q-btn></div>
-						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>
-						<div class="col-12 col-sm"><q-btn class="fit" color="warning" @click="updateStoredSettingsList(); showLoadModal=true" label="load stored" icon="cloud_download"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn :loading="deploying" class="fit" color="primary" @click="deploy(settings)" label="应用" icon="launch"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="应用已保存" icon="settings_backup_restore"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="reset" label="重置" icon="autorenew"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="保存" icon="cloud_upload"></q-btn></div>
+						<div class="col-12 col-sm"><q-btn class="fit" color="warning" @click="updateStoredSettingsList(); showLoadModal=true" label="加载已保存" icon="cloud_download"></q-btn></div>
 
 					</div>
   				</q-card-main>
@@ -214,7 +214,7 @@ const templateWiFi = `
 	<div class="col-12 col-lg">
 	<q-card class="full-height">
 		<q-card-title>
-			Generic
+			通用
 		</q-card-title>
 
 	
@@ -234,8 +234,8 @@ const templateWiFi = `
 					<q-toggle v-model="enabled"></q-toggle>
 				</q-item-side>
 				<q-item-main>
-					<q-item-tile label>Enabled</q-item-tile>
-					<q-item-tile sublabel>Enable/Disable WiFi</q-item-tile>
+					<q-item-tile label>已启用</q-item-tile>
+					<q-item-tile sublabel>开启/关闭WiFi</q-item-tile>
 				</q-item-main>
 			</q-item>
 <!--
@@ -245,7 +245,7 @@ const templateWiFi = `
 				</q-item-side>
 				<q-item-main>
 					<q-item-tile label>Nexmon</q-item-tile>
-					<q-item-tile sublabel>Enable/Disable modified nexmon firmware (needed for WiFi covert channel and KARMA)</q-item-tile>
+					<q-item-tile sublabel>启用/禁用已修改的nexmon固件(WiFi隐蔽通道和KARMA所需)</q-item-tile>
 				</q-item-main>
 			</q-item>
 -->
@@ -255,13 +255,13 @@ const templateWiFi = `
 				</q-item-side>
 				<q-item-main>
 					<q-item-tile label>Nexmon</q-item-tile>
-					<q-item-tile sublabel>Enable/Disable modified nexmon firmware (needed for WiFi covert channel and KARMA)</q-item-tile>
+					<q-item-tile sublabel>启用/禁用已修改的nexmon固件(WiFi隐蔽通道和KARMA所需)</q-item-tile>
 				</q-item-main>
 			</q-item>
 			<q-item tag="label">
 				<q-item-main>
-					<q-item-tile label>Regulatory domain</q-item-tile>
-					<q-item-tile sublabel>Regulatory domain according to ISO/IEC 3166-1 alpha2 (example "US")</q-item-tile>
+					<q-item-tile label>域名监管</q-item-tile>
+					<q-item-tile sublabel>法规域根据ISO/IEC 3166-1 alpha2(示例"us")</q-item-tile>
 					<q-item-tile>
 						<q-input v-model="settings.reg" inverted></q-input>
 					</q-item-tile>
@@ -269,8 +269,8 @@ const templateWiFi = `
 			</q-item>
 			<q-item tag="label">
 				<q-item-main>
-					<q-item-tile label>Working Mode</q-item-tile>
-					<q-item-tile sublabel>Work as Access Point or Client</q-item-tile>
+					<q-item-tile label>工作模式</q-item-tile>
+					<q-item-tile sublabel>以热点或客户端方式工作</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="settings.mode" :options="wifiModes" color="secondary" inverted></q-select>
 					</q-item-tile>
@@ -284,7 +284,7 @@ const templateWiFi = `
 	<div class="col-12 col-lg" v-if="settings.mode == mode_sta || settings.mode == mode_failover">
 	<q-card class="full-height">
 		<q-card-title>
-			WiFi client settings
+			WiFi客户端设置
 		</q-card-title>
 
 		<q-list link>
@@ -292,7 +292,7 @@ const templateWiFi = `
 				<q-item tag="label">
 					<q-item-main>
 						<q-item-tile label>SSID</q-item-tile>
-						<q-item-tile sublabel>Network name to connect</q-item-tile>
+						<q-item-tile sublabel>要连接的网络名称</q-item-tile>
 						<q-item-tile>
 							<q-input v-model="settings.staBssList[0].ssid" color="primary" inverted></q-input>
 						</q-item-tile>
@@ -300,8 +300,8 @@ const templateWiFi = `
 				</q-item>
 				<q-item tag="label">
 					<q-item-main>
-						<q-item-tile label>Pre shared key</q-item-tile>
-						<q-item-tile sublabel>If empty, a network with Open Authentication is assumed (Warning: PLAIN TRANSMISSION)</q-item-tile>
+						<q-item-tile label>预共享密钥</q-item-tile>
+						<q-item-tile sublabel>如果为空，则假定具有开放式身份验证的网络(警告：明文传输)</q-item-tile>
 						<q-item-tile>
 							<q-input v-model="settings.staBssList[0].psk" type="password" color="primary" inverted></q-input>
 						</q-item-tile>
@@ -312,7 +312,7 @@ const templateWiFi = `
 				<q-item>
 					<q-item-main>
 	  				<q-alert type="warning">
-						If the SSID provided for client mode couldn't be connected, an attempt is started to fail over to Access Point mode with the respective settings.
+						如果无法连接为客户端模式提供的SSID，则会尝试使用相应设置故障转移到接入点模式
 					</q-alert>
 					</q-item-main>
 				</q-item>
@@ -324,7 +324,7 @@ const templateWiFi = `
 	<div class="col-12 col-lg" v-if="settings.mode == mode_ap || settings.mode == mode_failover">
 	<q-card class="full-height">
 		<q-card-title>
-			WiFi Access Point settings
+			WiFi热点设置
 		</q-card-title>
 
 		<q-list link>
@@ -334,8 +334,8 @@ const templateWiFi = `
 				<q-item-separator />
 				<q-item tag="label">
 					<q-item-main>
-						<q-item-tile label>Channel</q-item-tile>
-						<q-item-tile sublabel>Must exist in regulatory domain (example 13)</q-item-tile>
+						<q-item-tile label>信道</q-item-tile>
+						<q-item-tile sublabel>必须存在于监管领域（例13）</q-item-tile>
 						<q-item-tile>
 							<q-input v-model="settings.channel" type="number" inverted></q-input>
 						</q-item-tile>
@@ -344,8 +344,8 @@ const templateWiFi = `
 
 				<q-item tag="label">
 					<q-item-main>
-						<q-item-tile label>Authentication Mode</q-item-tile>
-						<q-item-tile sublabel>Authentication Mode for Access Point (ignored for client mode)</q-item-tile>
+						<q-item-tile label>认证模式</q-item-tile>
+						<q-item-tile sublabel>接入点的验证模式(客户端模式忽略)</q-item-tile>
 						<q-item-tile>
 							<q-select v-model="settings.authMode" :options="wifiAuthModes" color="primary" inverted></q-select>
 						</q-item-tile>
@@ -354,7 +354,7 @@ const templateWiFi = `
 				<q-item tag="label">
 					<q-item-main>
 						<q-item-tile label>SSID</q-item-tile>
-						<q-item-tile sublabel>Network name (Service Set Identifier)</q-item-tile>
+						<q-item-tile sublabel>网络名称(服务集标识符)</q-item-tile>
 						<q-item-tile>
 							<q-input v-model="settings.apBss.ssid" color="primary" inverted></q-input>
 						</q-item-tile>
@@ -365,14 +365,14 @@ const templateWiFi = `
 						<q-toggle v-model="settings.hideSsid"></q-toggle>
 					</q-item-side>
 					<q-item-main>
-						<q-item-tile label>Hide SSID</q-item-tile>
-						<q-item-tile sublabel>Access Point doesn't send beacons with its SSID</q-item-tile>
+						<q-item-tile label>隐藏SSID</q-item-tile>
+						<q-item-tile sublabel>接入点不会发送带有SSID的信标</q-item-tile>
 					</q-item-main>
 				</q-item>
 				<q-item tag="label">
 					<q-item-main>
-						<q-item-tile label>Pre shared key</q-item-tile>
-						<q-item-tile sublabel>Warning: PLAIN TRANSMISSION</q-item-tile>
+						<q-item-tile label>预共享密钥</q-item-tile>
+						<q-item-tile sublabel>警告：明文传输</q-item-tile>
 						<q-item-tile>
 							<q-input v-model="settings.apBss.psk" type="password" color="primary" inverted></q-input>
 						</q-item-tile>

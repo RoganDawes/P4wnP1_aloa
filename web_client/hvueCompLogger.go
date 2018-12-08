@@ -66,7 +66,7 @@ const (
 		<div>
 			<q-table
 				:data="logArray"
-				:columns="[{name:'logTime', field: 'time', label: 'Time', align: 'left'}, {name:'logSource', field: 'source', label: 'Source', align: 'left'}, {name:'logLevel', field: 'level', label: 'Level', align: 'left'}, {name:'logMessage', field: 'message', label: 'Message', align: 'left'}]"
+				:columns="[{name:'logTime', field: 'time', label: '时间', align: 'left'}, {name:'logSource', field: 'source', label: '事件源', align: 'left'}, {name:'logLevel', field: 'level', label: '级别', align: 'left'}, {name:'logMessage', field: 'message', label: '消息', align: 'left'}]"
 				row-key="name"
 				:pagination="pagination"
 				hide-bottom
@@ -82,10 +82,10 @@ const (
 	<div class="logger">
 	<table class="log-entries">
 		<tr>
-			<th>time</th>
-			<th>source</th>
-			<th>level</th>
-			<th>message</th>
+			<th>时间</th>
+			<th>事件源</th>
+			<th>级别</th>
+			<th>消息</th>
 		</tr>
         <tr v-for="(logEntry,idx) in logArray" :key="idx" :class="logLevelClass(logEntry.level)">
 			<td class="log-entry-time">{{ logEntry.time }}</td>

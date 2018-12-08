@@ -48,7 +48,7 @@ const (
 		<div>
 			<q-table
 				:data="events"
-				:columns="[{name:'timestamp', field: 'time', label: 'Time', align: 'left'}, {name:'type', field: 'evtype', label: 'Event Type', align: 'left'}, {name:'vmid', field: 'vmId', label: 'VM ID', align: 'left'}, {name:'jobid', field: 'jobId', label: 'Job ID', align: 'left'}, {name:'haserror', field: 'hasError', label: 'Has error', align: 'left'}, {name:'res', field: 'result', label: 'Result', align: 'left'}, {name:'errormsg', field: 'error', label: 'Error', align: 'left'}, {name:'msg', field: 'message', label: 'Message', align: 'left'}]"
+				:columns="[{name:'timestamp', field: 'time', label: '时间', align: 'left'}, {name:'type', field: 'evtype', label: '事件类型', align: 'left'}, {name:'vmid', field: 'vmId', label: 'VM ID', align: 'left'}, {name:'jobid', field: 'jobId', label: '任务ID', align: 'left'}, {name:'haserror', field: 'hasError', label: '执行错误', align: 'left'}, {name:'res', field: 'result', label: '结果', align: 'left'}, {name:'errormsg', field: 'error', label: '错误', align: 'left'}, {name:'msg', field: 'message', label: '消息', align: 'left'}]"
 				row-key="name"
 				:pagination="pagination"
 				hide-bottom

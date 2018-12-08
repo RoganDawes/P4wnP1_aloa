@@ -110,15 +110,15 @@ const templateMainApp = `
                 </q-toolbar-title>
             </q-toolbar>
             <q-tabs>
-                <q-route-tab default slot="title" to="usb" name="tab-usb" icon="usb" label="USB Settings"></q-route-tab>
-                <q-route-tab slot="title" to="wifi" name="tab-wifi" icon="wifi" label="WiFi settings"></q-route-tab>
-                <q-route-tab slot="title" to="bluetooth" name="tab-bluetooth" icon="bluetooth" label="Bluetooth"></q-route-tab>
-                <q-route-tab slot="title" to="network" name="tab-network" icon="settings_ethernet" label="Network settings"></q-route-tab>
-                <q-route-tab slot="title" to="triggeractions" name="tab-triggeraction" icon="whatshot" label="Trigger Actions"></q-route-tab>
-                <q-route-tab slot="title" to="hid" name="tab-hid-script" icon="keyboard" label="HIDScript"></q-route-tab>
- <!--               <q-route-tab slot="title" to="hidjobs" name="tab-hid-jobs" icon="schedule" label="HID Events"></q-route-tab> -->
-                <q-route-tab slot="title" to="logger" name="tab-logger" icon="message" label="Event Log"></q-route-tab>
-                <q-route-tab slot="title" to="generic" name="tab-generic" icon="settings" label="Generic settings"></q-route-tab>
+                <q-route-tab default slot="title" to="usb" name="tab-usb" icon="usb" label="USB设置"></q-route-tab>
+                <q-route-tab slot="title" to="wifi" name="tab-wifi" icon="wifi" label="WiFi设置"></q-route-tab>
+                <q-route-tab slot="title" to="bluetooth" name="tab-bluetooth" icon="bluetooth" label="蓝牙"></q-route-tab>
+                <q-route-tab slot="title" to="network" name="tab-network" icon="settings_ethernet" label="网络设置"></q-route-tab>
+                <q-route-tab slot="title" to="triggeractions" name="tab-triggeraction" icon="whatshot" label="触发器设置"></q-route-tab>
+                <q-route-tab slot="title" to="hid" name="tab-hid-script" icon="keyboard" label="HID脚本"></q-route-tab>
+ <!--               <q-route-tab slot="title" to="hidjobs" name="tab-hid-jobs" icon="schedule" label="HID事件"></q-route-tab> -->
+                <q-route-tab slot="title" to="logger" name="tab-logger" icon="message" label="事件日志"></q-route-tab>
+                <q-route-tab slot="title" to="generic" name="tab-generic" icon="settings" label="通用设置"></q-route-tab>
             </q-tabs>
         </q-layout-header>
 

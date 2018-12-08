@@ -338,7 +338,7 @@ func InitComponentsBluetooth() {
 const templateBluetoothPage = `
 <q-page padding>
 
-	<select-string-from-array :values="$store.state.StoredBluetoothSettingsList" v-model="showDeployStoredModal" title="Deploy stored bluetooth settings" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+	<select-string-from-array :values="$store.state.StoredBluetoothSettingsList" v-model="showDeployStoredModal" title="应用已保存的蓝牙设置" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
 	<modal-string-input v-model="showStoreModal" title="Store bluetooth settings" @save="store($event)"></modal-string-input>
 
 
@@ -347,13 +347,13 @@ const templateBluetoothPage = `
 		<div class="col-12">
 			<q-card>
 				<q-card-title>
-					Bluetooth Settings
+					蓝牙设置
 				</q-card-title>
 
 				<q-card-main>
 					<div class="row gutter-sm">
-						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
-						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="primary" @click="updateStoredSettingsList(); showDeployStoredModal=true" label="设置已保存" icon="settings_backup_restore"></q-btn></div>
+						<div class="col-6 col-sm""><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="保存" icon="cloud_upload"></q-btn></div>
 					</div>
   				</q-card-main>
 			</q-card>
@@ -383,7 +383,7 @@ const templateBluetoothPage = `
 const templateBluetoothController = `
 <q-card>
 	<q-card-title>
-		Generic Bluetooth Controller settings
+		通用蓝牙控制器设置
 	</q-card-title>
 
 	<q-list link>
@@ -392,15 +392,15 @@ const templateBluetoothController = `
 				<q-toggle v-model="controllerInfo.CurrentSettings.Powered" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
 			</q-item-side>
 			<q-item-main>
-				<q-item-tile label>Enabled</q-item-tile>
-				<q-item-tile sublabel>Power on/off Bluetooth controller</q-item-tile>
+				<q-item-tile label>已启用</q-item-tile>
+				<q-item-tile sublabel>打开/关闭蓝牙控制器</q-item-tile>
 			</q-item-main>
 		</q-item>
 
 		<q-item tag="label">
 			<q-item-main>
-				<q-item-tile label>Name</q-item-tile>
-				<q-item-tile sublabel>Visible name of the bluetooth device</q-item-tile>
+				<q-item-tile label>名称</q-item-tile>
+				<q-item-tile sublabel>可见的蓝牙设备名</q-item-tile>
 				<q-item-tile>
 					<q-input :value="controllerInfo.Name" @change="controllerInfo.Name = $event; $store.dispatch('deployCurrentBluetoothControllerInformation')" inverted></q-input>
 				</q-item-tile>
@@ -413,7 +413,7 @@ const templateBluetoothController = `
 			</q-item-side>
 			<q-item-main>
 				<q-item-tile label>Connectable</q-item-tile>
-				<q-item-tile sublabel>Allow incoming connections</q-item-tile>
+				<q-item-tile sublabel>允许的传入连接</q-item-tile>
 			</q-item-main>
 		</q-item>
 
@@ -422,8 +422,8 @@ const templateBluetoothController = `
 				<q-toggle v-model="controllerInfo.CurrentSettings.Discoverable" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
 			</q-item-side>
 			<q-item-main>
-				<q-item-tile label>Discoverable</q-item-tile>
-				<q-item-tile sublabel>P4wnP1 could be discovered by other devices if enabled (only if Connectable)</q-item-tile>
+				<q-item-tile label>可见的</q-item-tile>
+				<q-item-tile sublabel>如果启用了该选项，则可以通过其他设备发现P4wnP1（仅当可连接时）</q-item-tile>
 			</q-item-main>
 		</q-item>
 
@@ -432,8 +432,8 @@ const templateBluetoothController = `
 				<q-toggle v-model="controllerInfo.CurrentSettings.Bondable" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
 			</q-item-side>
 			<q-item-main>
-				<q-item-tile label>Bondable</q-item-tile>
-				<q-item-tile sublabel>Other devices could pair with P4wnP1</q-item-tile>
+				<q-item-tile label>允许配对</q-item-tile>
+				<q-item-tile sublabel>其他设备可以与P4wnP1配对</q-item-tile>
 			</q-item-main>
 		</q-item>
 
@@ -442,8 +442,8 @@ const templateBluetoothController = `
 				<q-toggle v-model="controllerInfo.CurrentSettings.HighSpeed" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
 			</q-item-side>
 			<q-item-main>
-				<q-item-tile label>High Speed</q-item-tile>
-				<q-item-tile sublabel>Use alternate data channel (802.11)</q-item-tile>
+				<q-item-tile label>高速传输</q-item-tile>
+				<q-item-tile sublabel>使用备用数据通道(802.11)</q-item-tile>
 			</q-item-main>
 		</q-item>
 
@@ -452,8 +452,8 @@ const templateBluetoothController = `
 				<q-toggle v-model="controllerInfo.CurrentSettings.LowEnergy" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
 			</q-item-side>
 			<q-item-main>
-				<q-item-tile label>Low Energy</q-item-tile>
-				<q-item-tile sublabel>Enable Bluetooth LE (Bluetooth Smart)</q-item-tile>
+				<q-item-tile label>低功耗</q-item-tile>
+				<q-item-tile sublabel>启用蓝牙LE(智能蓝牙)</q-item-tile>
 			</q-item-main>
 		</q-item>
 
@@ -462,8 +462,8 @@ const templateBluetoothController = `
 				<q-toggle v-model="controllerInfo.CurrentSettings.SecureSimplePairing" @input="$store.dispatch('deployCurrentBluetoothControllerInformation')"></q-toggle>
 			</q-item-side>
 			<q-item-main>
-				<q-item-tile label>Secure Simple Pairing</q-item-tile>
-				<q-item-tile sublabel>If disabled, insecure PIN based pairing is used and HighSpeed isn't available</q-item-tile>
+				<q-item-tile label>安全简单方式配对</q-item-tile>
+				<q-item-tile sublabel>如果禁用，则使用不安全的PIN配对，并且无法使用高速数据传输</q-item-tile>
 			</q-item-main>
 		</q-item>
 
@@ -477,8 +477,8 @@ const templateBluetoothController = `
 const templateBluetoothControllerNetworkServices = `
 <q-card>
 	<q-card-title>
-		BNEP server services
-		<span slot="subtitle">Bluetooth Network Encapsulation Protocol services provided by the controller</span>
+		BNEP服务器服务
+		<span slot="subtitle">控制器提供的蓝牙网络封装协议服务</span>
 	</q-card-title>
 
 
@@ -489,7 +489,7 @@ const templateBluetoothControllerNetworkServices = `
 			</q-item-side>
 			<q-item-main>
 				<q-item-tile label>NAP</q-item-tile>
-				<q-item-tile sublabel>Provide Network Access Point</q-item-tile>
+				<q-item-tile sublabel>提供网络接入点</q-item-tile>
 			</q-item-main>
 		</q-item>
 
@@ -499,7 +499,7 @@ const templateBluetoothControllerNetworkServices = `
 			</q-item-side>
 			<q-item-main>
 				<q-item-tile label>PANU</q-item-tile>
-				<q-item-tile sublabel>Provide Protable Area Network Unit</q-item-tile>
+				<q-item-tile sublabel>提供便携式区域网络单元</q-item-tile>
 			</q-item-main>
 		</q-item>
 
@@ -509,7 +509,7 @@ const templateBluetoothControllerNetworkServices = `
 			</q-item-side>
 			<q-item-main>
 				<q-item-tile label>GN</q-item-tile>
-				<q-item-tile sublabel>Provide Group Ad-hoc Network</q-item-tile>
+				<q-item-tile sublabel>提供组Ad-hoc网络</q-item-tile>
 			</q-item-main>
 		</q-item>
 
@@ -522,7 +522,7 @@ const templateBluetoothControllerNetworkServices = `
 const templateBluetoothAgent = `
 <q-card>
 	<q-card-title>
-		Authentication Agent
+		代理认证
 	</q-card-title>
 
 
@@ -530,7 +530,7 @@ const templateBluetoothAgent = `
 		<q-item tag="label">
 			<q-item-main>
 				<q-item-tile label>Pin</q-item-tile>
-				<q-item-tile sublabel>PIN requested from remote devices on bonding (only if SSP is off)</q-item-tile>
+				<q-item-tile sublabel>在绑定时从远程设备请求PIN(仅当SSP关闭时)</q-item-tile>
 				<q-item-tile>
 					<q-input :value="bluetoothAgent.Pin" @change="bluetoothAgent.Pin = $event; $store.dispatch('deployCurrentBluetoothAgentSettings')" type="password" inverted></q-input>
 				</q-item-tile>

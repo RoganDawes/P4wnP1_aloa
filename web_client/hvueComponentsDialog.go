@@ -236,13 +236,13 @@ const templateDisconnectModal = `
 		<q-modal-layout>
 			<q-toolbar slot="header">
 				<q-toolbar-title>
-					Not connection to server
+					未连接到服务器
 				</q-toolbar-title>
 			</q-toolbar>
 
 			<div  class="layout-padding">
       			<p>No connection to server</p>
-				<p>Trying to reconnect ... Attempt: {{ $store.state.ConnectRetryCount }}</p>
+				<p>正在尝试重新连接 ... 重试次数: {{ $store.state.ConnectRetryCount }}</p>
 			</div>
 		</q-modal-layout>
 	</q-modal>
@@ -254,7 +254,7 @@ const templateRansomModal = `
 	<q-modal v-model="visible" content-css="background: red;" no-esc-dismiss no-route-dismiss no-backdrop-dismiss>
 			<div style="color: white; font-size: 1.5em; font-family: monospace; padding: 10%">
 				
-You became victim of a VERY SILLY IDEA</br>
+你成了一个非常愚蠢的想法的受害者</br>
 ███████████████████████████████████████████████████████████████████████████████</br>
 </br>
 The web page you've been viewing, provided a sophisticated experience</br>

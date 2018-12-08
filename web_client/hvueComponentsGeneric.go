@@ -325,7 +325,7 @@ const compGeneric = `
 const compStartupSettings = `
 <q-card>
 	<q-card-title>
-		Startup Settings
+		启动设置
 	</q-card-title>
 
 	<q-card-main>
@@ -334,8 +334,8 @@ const compStartupSettings = `
 				<select-string-from-array :values="$store.state.StoredMasterTemplateList" v-model="ShowTemplateSelect" title="Select Master Template used on startup" @load="selectMasterTemplate($event)"></select-string-from-array>
 				<q-item-side icon="whatshot" color primary />
 				<q-item-main>
-					<q-item-tile label>Startup Master Template</q-item-tile>
-					<q-item-tile sublabel>The template which is loaded on service start</q-item-tile>
+					<q-item-tile label>启动主模板</q-item-tile>
+					<q-item-tile sublabel>服务启动时加载的模板</q-item-tile>
 					<q-item-tile>
 						<div class="row no-wrap">
 							<div class="fit">
@@ -355,25 +355,25 @@ const compStartupSettings = `
 const compMasterTemplate = `
 <q-card>
 	<q-card-title>
-		Master Template Editor
+		主模板编辑器
 	</q-card-title>
 
 <!--	{{ $data }} -->
 
 	<q-card-main>
-		<select-string-from-array :values="$store.state.StoredMasterTemplateList" v-model="showLoadModal" title="Load stored Master Template" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
-		<select-string-from-array :values="$store.state.StoredMasterTemplateList" v-model="showDeployStoredModal" title="Deploy stored Master Template" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
-		<modal-string-input v-model="showStoreModal" title="Store current Master Template" @save="store($event)"></modal-string-input>
+		<select-string-from-array :values="$store.state.StoredMasterTemplateList" v-model="showLoadModal" title="加载已保存的主模板" @load="load($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+		<select-string-from-array :values="$store.state.StoredMasterTemplateList" v-model="showDeployStoredModal" title="应用已保存的主模板" @load="deployStored($event)" @delete="deleteStored($event)" with-delete></select-string-from-array>
+		<modal-string-input v-model="showStoreModal" title="保存当前主模板" @save="store($event)"></modal-string-input>
 
 
 		<div class="row gutter-sm">
 
 			<div class="col-12">
 				<div class="row gutter-sm">
-					<div class="col-6 col-sm"><q-btn class="fit" color="primary" @click="deploy(MasterTemplate)" label="deploy" icon="launch"></q-btn></div>
-					<div class="col-6 col-sm"><q-btn class="fit" color="primary" @click="showDeployStoredModal=true" label="deploy stored" icon="settings_backup_restore"></q-btn></div>
-					<div class="col-6 col-sm"><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="store" icon="cloud_upload"></q-btn></div>
-					<div class="col-6 col-sm"><q-btn class="fit" color="warning" @click="showLoadModal=true" label="load stored" icon="cloud_download"></q-btn></div>
+					<div class="col-6 col-sm"><q-btn class="fit" color="primary" @click="deploy(MasterTemplate)" label="应用" icon="launch"></q-btn></div>
+					<div class="col-6 col-sm"><q-btn class="fit" color="primary" @click="showDeployStoredModal=true" label="应用已保存" icon="settings_backup_restore"></q-btn></div>
+					<div class="col-6 col-sm"><q-btn class="fit" color="secondary" @click="showStoreModal=true" label="保存" icon="cloud_upload"></q-btn></div>
+					<div class="col-6 col-sm"><q-btn class="fit" color="warning" @click="showLoadModal=true" label="load 加载已保存" icon="cloud_download"></q-btn></div>
 
 				</div>
 			</div>
@@ -382,12 +382,12 @@ const compMasterTemplate = `
 			<!-- TriggerActions template -->
 			
 			<q-item tag="div" class="col-12">
-				<select-string-from-array :values="$store.state.StoredTriggerActionSetsList"  v-model="ShowTemplateSelectTriggerAction" title="Select TriggerActions template" @load="MasterTemplate.TemplateNameTriggerActions=$event"></select-string-from-array>
+				<select-string-from-array :values="$store.state.StoredTriggerActionSetsList"  v-model="ShowTemplateSelectTriggerAction" title="选择触发器动作模板" @load="MasterTemplate.TemplateNameTriggerActions=$event"></select-string-from-array>
 				<q-item-side icon="whatshot" color primary />
 				<q-item-main>
-					<q-item-tile label>TriggerActions Template</q-item-tile>
+					<q-item-tile label>触发器动作模板</q-item-tile>
 <!--
-					<q-item-tile sublabel>If not empty, the selected TriggerActions are deployed along with the master template</q-item-tile>
+					<q-item-tile sublabel>如果不为空，则选定的触发器动作与主模板一起部署</q-item-tile>
 -->
 					<q-item-tile>
 						<div class="row no-wrap">
@@ -404,12 +404,12 @@ const compMasterTemplate = `
 
 			<!-- USB template -->
 			<q-item tag="div" class="col-12">
-				<select-string-from-array :values="$store.state.StoredUSBSettingsList"  v-model="ShowTemplateSelectUSB" title="Select USB template" @load="MasterTemplate.TemplateNameUSB=$event"></select-string-from-array>
+				<select-string-from-array :values="$store.state.StoredUSBSettingsList"  v-model="ShowTemplateSelectUSB" title="选择USB模板" @load="MasterTemplate.TemplateNameUSB=$event"></select-string-from-array>
 				<q-item-side icon="usb" color primary />
 				<q-item-main>
-					<q-item-tile label>USB Template</q-item-tile>
+					<q-item-tile label>USB模板</q-item-tile>
 <!--
-					<q-item-tile sublabel>If not empty, the selected USB settings are deployed along with the master template</q-item-tile>
+					<q-item-tile sublabel>如果不为空，则会将所选USB设置与主模板一起部署</q-item-tile>
 -->
 					<q-item-tile>
 						<div class="row no-wrap">
@@ -426,12 +426,12 @@ const compMasterTemplate = `
 
 			<!-- WiFi template -->
 			<q-item tag="div" class="col-12">
-				<select-string-from-array :values="$store.state.StoredWifiSettingsList"  v-model="ShowTemplateSelectWiFi" title="Select WiFi template" @load="MasterTemplate.TemplateNameWiFi=$event"></select-string-from-array>
+				<select-string-from-array :values="$store.state.StoredWifiSettingsList"  v-model="ShowTemplateSelectWiFi" title="选择WiFi模板" @load="MasterTemplate.TemplateNameWiFi=$event"></select-string-from-array>
 				<q-item-side icon="wifi" color primary />
 				<q-item-main>
-					<q-item-tile label>WiFi Template</q-item-tile>
+					<q-item-tile label>WiFi模板</q-item-tile>
 <!--
-					<q-item-tile sublabel>If not empty, the selected WiFi settings are deployed along with the master template</q-item-tile>
+					<q-item-tile sublabel>如果不为空，则将选择的WiFi设置与主模板一起部署</q-item-tile>
 -->
 					<q-item-tile>
 						<div class="row no-wrap">
@@ -447,12 +447,12 @@ const compMasterTemplate = `
 
 			<!-- Bluetooth template -->
 			<q-item tag="div" class="col-12">
-				<select-string-from-array :values="$store.state.StoredBluetoothSettingsList"  v-model="ShowTemplateSelectBluetooth" title="Select Bluetooth template" @load="MasterTemplate.TemplateNameBluetooth=$event"></select-string-from-array>
+				<select-string-from-array :values="$store.state.StoredBluetoothSettingsList"  v-model="ShowTemplateSelectBluetooth" title="选择蓝牙模板" @load="MasterTemplate.TemplateNameBluetooth=$event"></select-string-from-array>
 				<q-item-side icon="bluetooth" color primary />
 				<q-item-main>
-					<q-item-tile label>Bluetooth Template</q-item-tile>
+					<q-item-tile label>蓝牙模板</q-item-tile>
 <!--
-					<q-item-tile sublabel>If not empty, the selected Bluetooth settings are deployed along with the master template</q-item-tile>
+					<q-item-tile sublabel>如果不为空，则会将选定的蓝牙设置与主模板一起部署</q-item-tile>
 -->
 					<q-item-tile>
 						<div class="row no-wrap">
@@ -471,13 +471,13 @@ const compMasterTemplate = `
 					:values="$store.state.StoredEthernetInterfaceSettingsList" 
 					:show="ShowTemplateSelectNetwork" 
 					@show="ShowTemplateSelectNetwork=$event"
-					title="Select Network templates" 
+					title="选择网络模板" 
 					v-model="MasterTemplate.TemplateNamesNetwork" 
 				/>
 				<q-item-side icon="settings_ethernet" color primary />
 				<q-item-main>
-					<q-item-tile label>Networks templates</q-item-tile>
-					<q-item-tile sublabel>Only one template could be selected per interface.</q-item-tile>
+					<q-item-tile label>网络模板</q-item-tile>
+					<q-item-tile sublabel>每个接口只能选择一个模板</q-item-tile>
 <!--
 					<q-item-tile sublabel>If not empty, the selected network templates are deployed along with the master template. Only one template could be selected per interface.</q-item-tile>
 -->
@@ -505,13 +505,13 @@ const compMasterTemplate = `
 const compSystem = `
 <q-card>
 	<q-card-title>
-		System
+		系统
 	</q-card-title>
 
 	<q-card-main>
 		<div class="row gutter-sm">
-			<div class="col"> <q-btn class="fit" color="warning" label="reboot" icon="refresh" @click="reboot" /> </div>
-			<div class="col"> <q-btn class="fit" color="negative" label="shutdown" icon="power_settings_new" @click="shutdown"/> </div>
+			<div class="col"> <q-btn class="fit" color="warning" label="重启" icon="refresh" @click="reboot" /> </div>
+			<div class="col"> <q-btn class="fit" color="negative" label="关机" icon="power_settings_new" @click="shutdown"/> </div>
 		</div>
 	</q-card-main>
 </q-card>
@@ -520,17 +520,17 @@ const compSystem = `
 const compDatabase = `
 <q-card>
 
-	<select-string-from-array v-model="ShowLoad" :values="$store.state.DBBackupList" title="Select DB backup" @load="load($event)"></select-string-from-array>
-	<modal-string-input v-model="ShowStore" title="Store current Master Template" @save="store($event)"></modal-string-input>
+	<select-string-from-array v-model="ShowLoad" :values="$store.state.DBBackupList" title="选择数据库备份" @load="load($event)"></select-string-from-array>
+	<modal-string-input v-model="ShowStore" title="保存当前主模板" @save="store($event)"></modal-string-input>
 
 	<q-card-title>
-		Database
+		数据库
 	</q-card-title>
 
 	<q-card-main>
 		<div class="row gutter-sm">
-			<div class="col"> <q-btn class="fit" color="primary" label="backup" icon="cloud_upload" @click="ShowStore=true" /> </div>
-			<div class="col"> <q-btn class="fit" color="negative" label="restore" icon="cloud_download" @click="updateList();ShowLoad=true" /> </div>
+			<div class="col"> <q-btn class="fit" color="primary" label="备份" icon="cloud_upload" @click="ShowStore=true" /> </div>
+			<div class="col"> <q-btn class="fit" color="negative" label="还原" icon="cloud_download" @click="updateList();ShowLoad=true" /> </div>
 		</div>
 	</q-card-main>
 </q-card>
@@ -543,7 +543,7 @@ const templateSelectNetworkTemplatesModal = `
 				<q-toolbar-title>
 					{{ title }}
     				<span slot="subtitle">
-      					Only one template could be selected per interface
+      					每个接口只能选择一个模板
     				</span>
 				</q-toolbar-title>
 			</q-toolbar>

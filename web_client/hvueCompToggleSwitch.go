@@ -33,7 +33,7 @@ const (
 	compToggleSwitchTemplate = `
 <label class="toggle-switch">
    	<input type="checkbox" v-bind:checked="value" v-on:change="$emit('input', $event.target.checked)">
-   	<div><span class="on">On</span><span class="off">Off</span></div>
+   	<div><span class="on">开</span><span class="off">关</span></div>
 	<span class="toggle-switch-slider"></span>
 </label>
 `

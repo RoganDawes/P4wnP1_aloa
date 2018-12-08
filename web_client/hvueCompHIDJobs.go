@@ -177,7 +177,7 @@ ScriptSource   string `js:"textSource"`
 	<q-modal-layout>
 		<q-toolbar slot="header">
 			<q-toolbar-title>
-				HIDScript job details
+				HID脚本任务详情
 			</q-toolbar-title>
 		</q-toolbar>
 
@@ -185,7 +185,7 @@ ScriptSource   string `js:"textSource"`
 			<div class="col-3">
 				<q-item tag="label">
 					<q-item-main>
-						<q-item-tile label>Job ID</q-item-tile>
+						<q-item-tile label>任务ID</q-item-tile>
 						<q-item-tile>
 							<q-input readonly v-model="job.id" inverted></q-input>
 						</q-item-tile>
@@ -205,7 +205,7 @@ ScriptSource   string `js:"textSource"`
 			<div class="col-6">
 				<q-item tag="label">
 					<q-item-main>
-						<q-item-tile label>Sate</q-item-tile>
+						<q-item-tile label>状态</q-item-tile>
 						<q-item-tile>
 							<q-input readonly :color="jobcolor" v-model="jobstate" inverted></q-input>
 						</q-item-tile>
@@ -216,7 +216,7 @@ ScriptSource   string `js:"textSource"`
 			<div class="col-12">
 				<q-item tag="label">
 					<q-item-main>
-						<q-item-tile label>HIDScript result</q-item-tile>
+						<q-item-tile label>HID脚本执行结果</q-item-tile>
 						<q-item-tile>
 							<q-input readonly :color="jobcolor" v-model="job.textResult" inverted></q-input>
 						</q-item-tile>
@@ -227,7 +227,7 @@ ScriptSource   string `js:"textSource"`
 			<div class="col-12">
 				<q-item tag="label">
 					<q-item-main>
-						<q-item-tile label>HIDScript source</q-item-tile>
+						<q-item-tile label>HID脚本源文件</q-item-tile>
 						<q-item-tile>
 							<q-input readonly type="textarea" v-model="job.textSource" inverted></q-input>
 						</q-item-tile>
@@ -267,14 +267,14 @@ ScriptSource   string `js:"textSource"`
 			<div v-if="!job.hasSucceeded && !job.hasFailed">
 				<q-btn flat round dense color="negative" icon="cancel" @click="cancel">
 					<q-tooltip>
-						cancel HIDScript job {{ job.id }}
+						取消HID脚本执行任务 {{ job.id }}
 					</q-tooltip>
 				</q-btn>
 			</div>
 			<div>
 				<q-btn flat round dense icon="info" @click="ShowDetails=true">
 					<q-tooltip>
-						show HIDScript job details
+						显示HID脚本任务详情
 					</q-tooltip>
 				</q-btn>
 			</div>
@@ -292,11 +292,11 @@ compHIDJobOverviewTemplate = `
 		<q-list>
 			<q-collapsible opened icon-toggle>
 				<template slot="header">
-					<q-item-main label="Running jobs" :sublabel="'(' + $store.getters.hidjobsRunning.length + ' running jobs)'"/>
+					<q-item-main label="正在执行的任务" :sublabel="'(' + $store.getters.hidjobsRunning.length + ' running jobs)'"/>
 					<q-item-side v-if="$store.getters.hidjobsRunning.length > 0" right>
 						<q-btn icon="cancel" color="red" @click="$store.dispatch('cancelAllHIDJobs')" round inverted flat>
 							<q-tooltip>
-								cancel all running HIDScript jobs
+								终止所有正在执行的HID脚本任务
 							</q-tooltip>
 						</q-btn>
 					</q-item-side>
@@ -308,11 +308,11 @@ compHIDJobOverviewTemplate = `
 		<q-list>
 			<q-collapsible opened icon-toggle>
 				<template slot="header">
-					<q-item-main label="Succeeded" :sublabel="'(' + $store.getters.hidjobsSucceeded.length + ' successful jobs)'"/>
+					<q-item-main label="执行成功" :sublabel="'(' + $store.getters.hidjobsSucceeded.length + ' successful jobs)'"/>
 					<q-item-side v-if="$store.getters.hidjobsSucceeded.length > 0" right>
 						<q-btn icon="delete" color="red" @click="$store.dispatch('removeSucceededHidJobs')" round inverted flat>
 							<q-tooltip>
-								delete succeeded HID jobs from list
+								从列表中删除成功执行的HID脚本任务
 							</q-tooltip>
 						</q-btn>
 					</q-item-side>
@@ -323,11 +323,11 @@ compHIDJobOverviewTemplate = `
 		<q-list>
 			<q-collapsible  opened icon-toggle>
 				<template slot="header">
-					<q-item-main label="Failed" :sublabel="'(' + $store.getters.hidjobsFailed.length + ' failed jobs)'"/>
+					<q-item-main label="执行失败" :sublabel="'(' + $store.getters.hidjobsFailed.length + ' failed jobs)'"/>
 					<q-item-side v-if="$store.getters.hidjobsFailed.length > 0" right>
 						<q-btn icon="delete" color="red" @click="$store.dispatch('removeFailedHidJobs')" round inverted flat>
 							<q-tooltip>
-								delete failed HID jobs from list
+								从列表中删除执行失败的HID脚本任务
 							</q-tooltip>
 						</q-btn>
 

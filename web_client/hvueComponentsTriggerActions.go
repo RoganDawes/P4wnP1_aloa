@@ -665,8 +665,8 @@ const templateTriggerActionOverview = `
 <q-modal v-model="EditMode" no-route-dismiss no-esc-dismiss no-backdrop-dismiss>
 	<TriggerActionEdit :ta="ta">
 		<span slot="actions">
-			<q-btn color="primary" @click="updateTA(); EditMode=false" label="update" />
-			<q-btn color="secondary" @click="cancelUpdateTA(); EditMode=false" label="cancel" />
+			<q-btn color="primary" @click="updateTA(); EditMode=false" label="更新" />
+			<q-btn color="secondary" @click="cancelUpdateTA(); EditMode=false" label="取消" />
 		</span>
 	</TriggerActionEdit>
 	
@@ -676,13 +676,13 @@ const templateTriggerActionOverview = `
 	<q-card-title>
 		{{ ta.Immutable ? "immutable, " : "" }}
 		{{ ta.IsActive ? "enabled" : "disabled" }}
-		TriggerAction (ID {{ ta.Id }})
+		触发器动作 (ID {{ ta.Id }})
 	
 		<span slot="subtitle">
 			<q-icon name="input"></q-icon> 
 			{{ strTrigger }}
 			<br><q-icon name="launch"></q-icon>
-			{{ strAction }}{{ta.OneShot ? " only once" : "" }}	
+			{{ strAction }}{{ta.OneShot ? " 仅运行一次" : "" }}	
 		</span>
 
 		<div slot="right" v-if="!ta.Immutable">
@@ -697,7 +697,7 @@ const templateTriggerActionOverview = `
 const templateTriggerActionEdit = `
 <q-card class="fit">
 	<q-card-title>
-		TriggerAction
+		触发器动作
 		<span slot="subtitle">ID {{ ta.Id }}</span>
 		<!-- <q-btn slot="right" icon="more_vert" flat></q-btn> -->
 	</q-card-title>
@@ -707,8 +707,8 @@ const templateTriggerActionEdit = `
 					<q-toggle v-model="ta.IsActive"></q-toggle>
 				</q-item-side>
 				<q-item-main>
-					<q-item-tile label>Enabled</q-item-tile>
-					<q-item-tile sublabel>If not enabled, the triggered action is ignored</q-item-tile>
+					<q-item-tile label>已启用</q-item-tile>
+					<q-item-tile sublabel>如果未启用, 则忽略触发器动作</q-item-tile>
 				</q-item-main>
 			</q-item>
 
@@ -717,8 +717,8 @@ const templateTriggerActionEdit = `
 					<q-toggle v-model="ta.OneShot" :disable="!ta.IsActive"></q-toggle>
 				</q-item-side>
 				<q-item-main>
-					<q-item-tile label>One shot</q-item-tile>
-					<q-item-tile sublabel>The trigger fires every time the respective event occurs. If "one shot" is enabled it fires only once.</q-item-tile>
+					<q-item-tile label>仅执行一次</q-item-tile>
+					<q-item-tile sublabel>每次发生相应事件时触发器都会触发， 如果启用"一次性"，则仅触发一次</q-item-tile>
 				</q-item-main>
 			</q-item>
 	</q-list>
@@ -742,8 +742,8 @@ const templateTrigger = `
 		<q-list class="fit" no-border link :disabled="!ta.IsActive">
 			<q-item tag="label">
 				<q-item-main>
-					<q-item-tile label>Trigger</q-item-tile>
-					<q-item-tile sublabel>Chose the event which has to occur to start the selected action</q-item-tile>
+					<q-item-tile label>触发器</q-item-tile>
+					<q-item-tile sublabel>选择必须发生的事件以启动所选操作</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="triggerType" :options="triggertypes" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
@@ -752,8 +752,8 @@ const templateTrigger = `
 
 			<q-item tag="label" v-if="isTriggerGroupReceive || isTriggerGroupReceiveMulti">
 				<q-item-main>
-					<q-item-tile label>Group name</q-item-tile>
-					<q-item-tile sublabel>Only values send for this group name are regarded</q-item-tile>
+					<q-item-tile label>触发器组名称</q-item-tile>
+					<q-item-tile sublabel>仅考虑为此组名发送的值</q-item-tile>
 					<q-item-tile>
 						<q-input v-model="ta.TriggerData.GroupName" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
@@ -761,8 +761,8 @@ const templateTrigger = `
 			</q-item>
 			<q-item tag="label" v-if="isTriggerGroupReceive">
 				<q-item-main>
-					<q-item-tile label>Value</q-item-tile>
-					<q-item-tile sublabel>The numeric value which has to be received to activate the trigger</q-item-tile>
+					<q-item-tile label>触发值</q-item-tile>
+					<q-item-tile sublabel>必须接收以激活触发器的数值</q-item-tile>
 					<q-item-tile>
 						<q-input v-model="ta.TriggerData.Value" type="number" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
@@ -770,8 +770,8 @@ const templateTrigger = `
 			</q-item>
 			<q-item tag="label" v-if="isTriggerGroupReceiveMulti">
 				<q-item-main>
-					<q-item-tile label>Values</q-item-tile>
-					<q-item-tile sublabel>The numeric values which has to be received to activate the trigger</q-item-tile>
+					<q-item-tile label>触发值</q-item-tile>
+					<q-item-tile sublabel>必须接收的数值才能激活触发器</q-item-tile>
 					<q-item-tile>
 						<q-chips-input v-model="TriggerGroupReceiveMultiValues" @duplicate="TriggerGroupReceiveMultiAddValue($event)" type="number" decimals="0" inverted :disable="!ta.IsActive"></q-chips-input>
 					</q-item-tile>
@@ -783,15 +783,15 @@ const templateTrigger = `
 					<q-toggle v-model="ta.TriggerData.IgnoreOutOfOrder" :disable="!ta.IsActive"></q-toggle>
 				</q-item-side>
 				<q-item-main>
-					<q-item-tile label>Ignore out-of-order values</q-item-tile>
-					<q-item-tile sublabel>If enabled the sequence may be interrupted by other values. If disabled they have to arrive in exact order.</q-item-tile>
+					<q-item-tile label>忽略无序值</q-item-tile>
+					<q-item-tile sublabel>如果启用，序列可能会被其他值中断，如果禁用，他们必须准确到达</q-item-tile>
 				</q-item-main>
 			</q-item>
 -->
 			<q-item tag="label" v-if="isTriggerGroupReceiveMulti">
 				<q-item-main>
-					<q-item-tile label>Type</q-item-tile>
-					<q-item-tile sublabel>Chose how values should be checked (logical OR, logical AND, sequence or exact sequence</q-item-tile>
+					<q-item-tile label>类型</q-item-tile>
+					<q-item-tile sublabel>选择应如何检查值(逻辑OR，逻辑AND，序列或精确序列)</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="ta.TriggerData.Type" :options="groupReceiveMultiSelect" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
@@ -802,8 +802,8 @@ const templateTrigger = `
 
 			<q-item tag="label" v-if="isTriggerGPIOIn">
 				<q-item-main>
-					<q-item-tile label>GPIO Number</q-item-tile>
-					<q-item-tile sublabel>The number of the GPIO to monitor</q-item-tile>
+					<q-item-tile label>GPIO编号</q-item-tile>
+					<q-item-tile sublabel>要监听的GPIO的编号</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="ta.TriggerData.GpioName" :options="gpioname" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
@@ -811,8 +811,8 @@ const templateTrigger = `
 			</q-item>
 			<q-item tag="label" v-if="isTriggerGPIOIn">
 				<q-item-main>
-					<q-item-tile label>Pull resistor</q-item-tile>
-					<q-item-tile sublabel>Chose if internal Pull-up/down resistor should be used</q-item-tile>
+					<q-item-tile label>电阻</q-item-tile>
+					<q-item-tile sublabel>选择是否应使用内部上拉/下拉电阻</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="ta.TriggerData.PullUpDown" :options="pullupdown" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
@@ -820,8 +820,8 @@ const templateTrigger = `
 			</q-item>
 			<q-item tag="label" v-if="isTriggerGPIOIn">
 				<q-item-main>
-					<q-item-tile label>Edge</q-item-tile>
-					<q-item-tile sublabel>What edge (level change) has to occur to fire the trigger</q-item-tile>
+					<q-item-tile label>阈值</q-item-tile>
+					<q-item-tile sublabel>触发触发器必须发生什么电平变化</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="ta.TriggerData.Edge" :options="edge" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
@@ -829,8 +829,8 @@ const templateTrigger = `
 			</q-item>
 			<q-item tag="label" v-if="isTriggerGPIOIn">
 				<q-item-main>
-					<q-item-tile label>Debounce duration</q-item-tile>
-					<q-item-tile sublabel>Successive edge events in this duration are ignored</q-item-tile>
+					<q-item-tile label>去抖持续时间</q-item-tile>
+					<q-item-tile sublabel>此持续时间中的连续边缘事件将被忽略</q-item-tile>
 					<q-item-tile>
 						<q-input v-model="ta.TriggerData.DebounceMillis" type="number" suffix="ms" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
@@ -844,8 +844,8 @@ const templateAction = `
 		<q-list class="fit" no-border link :disabled="!ta.IsActive">
 			<q-item tag="label">
 				<q-item-main>
-					<q-item-tile label>Action</q-item-tile>
-					<q-item-tile sublabel>Chose the action which should be started when the trigger fired</q-item-tile>
+					<q-item-tile label>动作</q-item-tile>
+					<q-item-tile sublabel>选择触发器触发时应该启动的动作</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="actionType" :options="actiontypes" color="secondary" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
@@ -855,8 +855,8 @@ const templateAction = `
 			<q-item tag="label" v-if="isActionBashScript">
 <select-string-from-array :values="$store.state.StoredBashScriptsList" v-model="ShowSelectBashScriptModal" title="Select BASH script" @load="ta.ActionData.ScriptName=$event"></select-string-from-array>
 				<q-item-main>
-					<q-item-tile label>Script path</q-item-tile>
-					<q-item-tile sublabel>Path to the BashScript which should be issued</q-item-tile>
+					<q-item-tile label>脚本路径</q-item-tile>
+					<q-item-tile sublabel>应该发布的Bash脚本的路径</q-item-tile>
 					<q-item-tile>
 <q-input @click="updateStoredBashScriptsList();ShowSelectBashScriptModal=true" v-model="ta.ActionData.ScriptName" color="secondary" inverted readonly :after="[{icon: 'more_horiz', handler(){}}]" :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
@@ -867,8 +867,8 @@ const templateAction = `
 <select-string-from-array :values="$store.state.StoredHIDScriptsList" v-model="ShowSelectHIDScriptModal" title="Select HIDScript" @load="ta.ActionData.ScriptName=$event"></select-string-from-array>
 
 				<q-item-main>
-					<q-item-tile label>Script name</q-item-tile>
-					<q-item-tile sublabel>Name of a stored HIDScript</q-item-tile>
+					<q-item-tile label>脚本名称</q-item-tile>
+					<q-item-tile sublabel>存储的HID脚本的名称</q-item-tile>
 					<q-item-tile>
 <q-input @click="updateStoredHIDScriptsList();ShowSelectHIDScriptModal=true" v-model="ta.ActionData.ScriptName" color="secondary" inverted readonly :after="[{icon: 'more_horiz', handler(){}}]" :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
@@ -879,8 +879,8 @@ const templateAction = `
 
 			<q-item tag="label" v-if="isActionGPIOOut">
 				<q-item-main>
-					<q-item-tile label>GPIO Number</q-item-tile>
-					<q-item-tile sublabel>The number of the GPIO to output on</q-item-tile>
+					<q-item-tile label>GPIO编号</q-item-tile>
+					<q-item-tile sublabel>要输出的GPIO的编号</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="ta.ActionData.GpioName" :options="gpioname" color="secondary" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
@@ -888,8 +888,8 @@ const templateAction = `
 			</q-item>
 			<q-item tag="label" v-if="isActionGPIOOut">
 				<q-item-main>
-					<q-item-tile label>Output</q-item-tile>
-					<q-item-tile sublabel>Output low/high on the given GPIO or toggle the output</q-item-tile>
+					<q-item-tile label>输出</q-item-tile>
+					<q-item-tile sublabel>在给定的GPIO上输出低/高或切换输出</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="ta.ActionData.Value" :options="gpiooutvalues" color="secondary" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
@@ -899,8 +899,8 @@ const templateAction = `
 
 			<q-item tag="label" v-if="isActionGroupSend">
 				<q-item-main>
-					<q-item-tile label>Group name</q-item-tile>
-					<q-item-tile sublabel>The name of the group to send to (has to match respective listeners)</q-item-tile>
+					<q-item-tile label>组名</q-item-tile>
+					<q-item-tile sublabel>要发送到的组的名称(必须匹配相应的侦听器)</q-item-tile>
 					<q-item-tile>
 						<q-input v-model="ta.ActionData.GroupName" color="secondary" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
@@ -908,8 +908,8 @@ const templateAction = `
 			</q-item>
 			<q-item tag="label" v-if="isActionGroupSend">
 				<q-item-main>
-					<q-item-tile label>Value</q-item-tile>
-					<q-item-tile sublabel>The numeric value which is sent to the group channel</q-item-tile>
+					<q-item-tile label>通道值</q-item-tile>
+					<q-item-tile sublabel>发送到组通道的数值</q-item-tile>
 					<q-item-tile>
 						<q-input v-model="ta.ActionData.Value" color="secondary"  type="number" inverted :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
@@ -921,8 +921,8 @@ const templateAction = `
 
 			<q-item tag="label" v-if="isActionDeploySettingsTemplate">
 				<q-item-main>
-					<q-item-tile label>Type</q-item-tile>
-					<q-item-tile sublabel>Select the type of the template to load</q-item-tile>
+					<q-item-tile label>模板类型</q-item-tile>
+					<q-item-tile sublabel>选择要加载的模板类型</q-item-tile>
 					<q-item-tile>
 						<q-select v-model="ta.ActionData.Type" :options="templatetypes" color="secondary" @input="ta.ActionData.TemplateName=''" inverted :disable="!ta.IsActive"></q-select>
 					</q-item-tile>
@@ -932,8 +932,8 @@ const templateAction = `
 			<q-item tag="label" v-if="isActionDeploySettingsTemplate">
 <select-string-from-array :values="typedTemplateList" v-model="ShowSelectTemplateModal" title="Select template" @load="ta.ActionData.TemplateName=$event"></select-string-from-array>
 				<q-item-main>
-					<q-item-tile label>Template name</q-item-tile>
-					<q-item-tile sublabel>Name of the stored settings template to load</q-item-tile>
+					<q-item-tile label>模板名</q-item-tile>
+					<q-item-tile sublabel>要加载的存储设置模板的名称</q-item-tile>
 					<q-item-tile>
 <q-input @click="actionTemplateTypeUpdate(); ShowSelectTemplateModal=true" v-model="ta.ActionData.TemplateName" color="secondary" inverted readonly :after="[{icon: 'more_horiz', handler(){}}]" :disable="!ta.IsActive"></q-input>
 					</q-item-tile>
@@ -956,15 +956,15 @@ const templateTriggerActionManager = `
 		<div class="col-12">
 			<q-card>
 				<q-card-title>
-					TriggerAction Manager
+					触发器动作管理器
 				</q-card-title>
 
 				<q-card-main>
 					<div class="row gutter-sm">
-	    				<div class="col-6 col-sm"><q-btn class="fit" color="primary" label="add one" @click="addTA" icon="add_box" /></div>
-    					<div class="col-6 col-sm"><q-btn class="fit" color="secondary" label="store" @click="showStoreTASModal=true" icon="cloud_upload" /></div>
-    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="load & replace" @click="updateStoredTriggerActionSetsList(); showReplaceTASModal=true" icon="cloud_download" /></div>
-    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="load & add" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" /></div>
+	    				<div class="col-6 col-sm"><q-btn class="fit" color="primary" label="添加一个" @click="addTA" icon="add_box" /></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="secondary" label="保存" @click="showStoreTASModal=true" icon="cloud_upload" /></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="加载并替换" @click="updateStoredTriggerActionSetsList(); showReplaceTASModal=true" icon="cloud_download" /></div>
+    					<div class="col-6 col-sm"><q-btn class="fit" color="warning" label="加载并添加" @click="updateStoredTriggerActionSetsList(); showAddTASModal=true" icon="add_to_photos" /></div>
 					</div>
   				</q-card-main>
 

@@ -3164,7 +3164,7 @@ $packages["math"] = (function() {
 	return $pkg;
 })();
 $packages["syscall"] = (function() {
-	var $pkg = {}, $init, js, race, runtime, sync, SockaddrLinklayer, SockaddrNetlink, mmapper, Errno, Sockaddr, SockaddrInet4, SockaddrInet6, SockaddrUnix, Timespec, Stat_t, RawSockaddrInet4, RawSockaddrInet6, RawSockaddrUnix, RawSockaddrLinklayer, RawSockaddrNetlink, RawSockaddr, RawSockaddrAny, _Socklen, Linger, Iovec, IPMreq, IPMreqn, IPv6Mreq, Msghdr, sliceType, sliceType$1, ptrType$2, ptrType$4, arrayType$1, ptrType$8, arrayType$2, ptrType$11, arrayType$4, arrayType$5, arrayType$8, arrayType$9, arrayType$10, arrayType$11, ptrType$18, ptrType$19, structType, ptrType$22, ptrType$24, ptrType$25, mapType, funcType$2, funcType$3, ptrType$26, ptrType$27, ptrType$28, ptrType$29, ptrType$31, warningPrinted, lineBuffer, syscallModule, alreadyTriedToLoad, minusOne, envs, mapper, errEAGAIN, errEINVAL, errENOENT, ioSync, ioSync$24ptr, errors, init, printWarning, printToConsole, indexByte, runtime_envs, syscall, Syscall, Syscall6, BytePtrFromString, readInt, readIntBE, readIntLE, ParseDirent, CloseOnExec, SetNonblock, msanRead, msanWrite, itoa, uitoa, anyToSockaddr, Accept, Accept4, SetsockoptIPMreqn, Recvmsg, SendmsgN, ReadDirent, direntIno, direntReclen, direntNamlen, errnoErr, Read, Write, GetsockoptInt, Recvfrom, Sendto, SetsockoptByte, SetsockoptInt, SetsockoptInet4Addr, SetsockoptIPMreq, SetsockoptIPv6Mreq, SetsockoptLinger, Close, Dup, Fchdir, Fchmod, fcntl, Fsync, Getdents, read, write, munmap, Fchown, Fstat, Ftruncate, Lstat, Pread, Pwrite, Seek, Shutdown, accept, accept4, getsockopt, setsockopt, recvfrom, sendto, recvmsg, sendmsg, mmap;
+	var $pkg = {}, $init, js, race, runtime, sync, SockaddrLinklayer, SockaddrNetlink, mmapper, Errno, Sockaddr, SockaddrInet4, SockaddrInet6, SockaddrUnix, Timespec, Stat_t, RawSockaddrInet4, RawSockaddrInet6, RawSockaddrUnix, RawSockaddrLinklayer, RawSockaddrNetlink, RawSockaddr, RawSockaddrAny, _Socklen, Linger, Iovec, IPMreq, IPMreqn, IPv6Mreq, Msghdr, sliceType, sliceType$1, ptrType$2, ptrType$4, arrayType$1, ptrType$8, arrayType$2, ptrType$11, arrayType$4, arrayType$5, arrayType$8, arrayType$9, arrayType$10, arrayType$11, ptrType$18, ptrType$19, ptrType$21, structType, ptrType$24, ptrType$26, ptrType$27, mapType, funcType$2, funcType$3, ptrType$28, ptrType$29, ptrType$30, ptrType$31, warningPrinted, lineBuffer, syscallModule, alreadyTriedToLoad, minusOne, envs, mapper, errEAGAIN, errEINVAL, errENOENT, ioSync, ioSync$24ptr, errors, init, printWarning, printToConsole, indexByte, runtime_envs, syscall, Syscall, Syscall6, BytePtrFromString, readInt, readIntBE, readIntLE, ParseDirent, CloseOnExec, SetNonblock, msanRead, msanWrite, itoa, uitoa, Open, anyToSockaddr, Accept, Accept4, SetsockoptIPMreqn, Recvmsg, SendmsgN, ReadDirent, direntIno, direntReclen, direntNamlen, Lstat, errnoErr, Read, Write, GetsockoptInt, Recvfrom, Sendto, SetsockoptByte, SetsockoptInt, SetsockoptInet4Addr, SetsockoptIPMreq, SetsockoptIPv6Mreq, SetsockoptLinger, openat, Close, Dup, Fchdir, Fchmod, fcntl, Fsync, Getdents, read, write, munmap, Fchown, Fstat, Fstatat, Ftruncate, Pread, Pwrite, Seek, Shutdown, accept, accept4, getsockopt, setsockopt, recvfrom, sendto, recvmsg, sendmsg, mmap;
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	race = $packages["internal/race"];
 	runtime = $packages["runtime"];
@@ -3267,41 +3267,43 @@ $packages["syscall"] = (function() {
 		this.Sec = Sec_;
 		this.Nsec = Nsec_;
 	});
-	Stat_t = $pkg.Stat_t = $newType(0, $kindStruct, "syscall.Stat_t", true, "syscall", true, function(Dev_, Ino_, Nlink_, Mode_, Uid_, Gid_, X__pad0_, Rdev_, Size_, Blksize_, Blocks_, Atim_, Mtim_, Ctim_, X__unused_) {
+	Stat_t = $pkg.Stat_t = $newType(0, $kindStruct, "syscall.Stat_t", true, "syscall", true, function(Dev_, Ino_, Mode_, Nlink_, Uid_, Gid_, Rdev_, X__pad1_, Size_, Blksize_, X__pad2_, Blocks_, Atim_, Mtim_, Ctim_, X__glibc_reserved_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Dev = new $Uint64(0, 0);
 			this.Ino = new $Uint64(0, 0);
-			this.Nlink = new $Uint64(0, 0);
 			this.Mode = 0;
+			this.Nlink = 0;
 			this.Uid = 0;
 			this.Gid = 0;
-			this.X__pad0 = 0;
 			this.Rdev = new $Uint64(0, 0);
+			this.X__pad1 = new $Uint64(0, 0);
 			this.Size = new $Int64(0, 0);
-			this.Blksize = new $Int64(0, 0);
+			this.Blksize = 0;
+			this.X__pad2 = 0;
 			this.Blocks = new $Int64(0, 0);
 			this.Atim = new Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0));
 			this.Mtim = new Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0));
 			this.Ctim = new Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0));
-			this.X__unused = arrayType$5.zero();
+			this.X__glibc_reserved = arrayType$5.zero();
 			return;
 		}
 		this.Dev = Dev_;
 		this.Ino = Ino_;
-		this.Nlink = Nlink_;
 		this.Mode = Mode_;
+		this.Nlink = Nlink_;
 		this.Uid = Uid_;
 		this.Gid = Gid_;
-		this.X__pad0 = X__pad0_;
 		this.Rdev = Rdev_;
+		this.X__pad1 = X__pad1_;
 		this.Size = Size_;
 		this.Blksize = Blksize_;
+		this.X__pad2 = X__pad2_;
 		this.Blocks = Blocks_;
 		this.Atim = Atim_;
 		this.Mtim = Mtim_;
 		this.Ctim = Ctim_;
-		this.X__unused = X__unused_;
+		this.X__glibc_reserved = X__glibc_reserved_;
 	});
 	RawSockaddrInet4 = $pkg.RawSockaddrInet4 = $newType(0, $kindStruct, "syscall.RawSockaddrInet4", true, "syscall", true, function(Family_, Port_, Addr_, Zero_) {
 		this.$val = this;
@@ -3483,24 +3485,24 @@ $packages["syscall"] = (function() {
 	arrayType$2 = $arrayType($Uint8, 16);
 	ptrType$11 = $ptrType(SockaddrNetlink);
 	arrayType$4 = $arrayType($Uint8, 32);
-	arrayType$5 = $arrayType($Int64, 3);
+	arrayType$5 = $arrayType($Int32, 2);
 	arrayType$8 = $arrayType($Int8, 108);
 	arrayType$9 = $arrayType($Uint8, 4);
 	arrayType$10 = $arrayType($Int8, 14);
 	arrayType$11 = $arrayType($Int8, 96);
 	ptrType$18 = $ptrType(_Socklen);
 	ptrType$19 = $ptrType(Iovec);
+	ptrType$21 = $ptrType(Timespec);
 	structType = $structType("syscall", [{prop: "addr", name: "addr", embedded: false, exported: false, typ: $Uintptr, tag: ""}, {prop: "len", name: "len", embedded: false, exported: false, typ: $Int, tag: ""}, {prop: "cap", name: "cap", embedded: false, exported: false, typ: $Int, tag: ""}]);
-	ptrType$22 = $ptrType($Int64);
-	ptrType$24 = $ptrType(SockaddrLinklayer);
-	ptrType$25 = $ptrType(mmapper);
+	ptrType$24 = $ptrType($Int64);
+	ptrType$26 = $ptrType(SockaddrLinklayer);
+	ptrType$27 = $ptrType(mmapper);
 	mapType = $mapType(ptrType$2, sliceType);
 	funcType$2 = $funcType([$Uintptr, $Uintptr, $Int, $Int, $Int, $Int64], [$Uintptr, $error], false);
 	funcType$3 = $funcType([$Uintptr, $Uintptr], [$error], false);
-	ptrType$26 = $ptrType(SockaddrInet4);
-	ptrType$27 = $ptrType(SockaddrInet6);
-	ptrType$28 = $ptrType(SockaddrUnix);
-	ptrType$29 = $ptrType(Timespec);
+	ptrType$28 = $ptrType(SockaddrInet4);
+	ptrType$29 = $ptrType(SockaddrInet6);
+	ptrType$30 = $ptrType(SockaddrUnix);
 	ptrType$31 = $ptrType(Msghdr);
 	init = function() {
 		$flushConsole = (function() {
@@ -3602,7 +3604,7 @@ $packages["syscall"] = (function() {
 			err = _tmp$2;
 			return [r1, r2, err];
 		}
-		if ((trap === 1) && ((a1 === 1) || (a1 === 2))) {
+		if ((trap === 64) && ((a1 === 1) || (a1 === 2))) {
 			array = a2;
 			slice = $makeSlice(sliceType, $parseInt(array.length));
 			slice.$array = array;
@@ -3615,7 +3617,7 @@ $packages["syscall"] = (function() {
 			err = _tmp$5;
 			return [r1, r2, err];
 		}
-		if (trap === 231) {
+		if (trap === 94) {
 			runtime.Goexit();
 		}
 		printWarning();
@@ -3872,6 +3874,16 @@ $packages["syscall"] = (function() {
 		return (x = $mul64((ts.Sec), new $Int64(0, 1000000000)), x$1 = (ts.Nsec), new $Int64(x.$high + x$1.$high, x.$low + x$1.$low));
 	};
 	Timespec.prototype.Nano = function() { return this.$val.Nano(); };
+	Open = function(path, mode, perm) {
+		var _tuple, err, fd, mode, path, perm;
+		fd = 0;
+		err = $ifaceNil;
+		_tuple = openat(-100, path, mode | 0, perm);
+		fd = _tuple[0];
+		err = _tuple[1];
+		return [fd, err];
+	};
+	$pkg.Open = Open;
 	SockaddrInet4.ptr.prototype.sockaddr = function() {
 		var _array, _struct, _view, i, p, sa, x, x$1, x$2;
 		sa = this;
@@ -4274,6 +4286,13 @@ $packages["syscall"] = (function() {
 		}
 		return [new $Uint64(reclen.$high - 0, reclen.$low - 19), true];
 	};
+	Lstat = function(path, stat) {
+		var err, path, stat;
+		err = $ifaceNil;
+		err = Fstatat(-100, path, stat, 256);
+		return err;
+	};
+	$pkg.Lstat = Lstat;
 	Iovec.ptr.prototype.SetLen = function(length) {
 		var iov, length;
 		iov = this;
@@ -4357,7 +4376,7 @@ $packages["syscall"] = (function() {
 	Errno.prototype.Error = function() {
 		var e, s;
 		e = this.$val;
-		if (0 <= ((e >> 0)) && ((e >> 0)) < 133) {
+		if (0 <= ((e >> 0)) && ((e >> 0)) < 134) {
 			s = ((e < 0 || e >= errors.length) ? ($throwRuntimeError("index out of range"), undefined) : errors[e]);
 			if (!(s === "")) {
 				return s;
@@ -4404,7 +4423,7 @@ $packages["syscall"] = (function() {
 				race.WriteRange(($sliceToArray(p)), n);
 			}
 			if ($interfaceIsEqual(err, $ifaceNil)) {
-				race.Acquire(((ioSync$24ptr || (ioSync$24ptr = new ptrType$22(function() { return ioSync; }, function($v) { ioSync = $v; })))));
+				race.Acquire(((ioSync$24ptr || (ioSync$24ptr = new ptrType$24(function() { return ioSync; }, function($v) { ioSync = $v; })))));
 			}
 		}
 		if (false && n > 0) {
@@ -4418,7 +4437,7 @@ $packages["syscall"] = (function() {
 		n = 0;
 		err = $ifaceNil;
 		if (false) {
-			race.ReleaseMerge(((ioSync$24ptr || (ioSync$24ptr = new ptrType$22(function() { return ioSync; }, function($v) { ioSync = $v; })))));
+			race.ReleaseMerge(((ioSync$24ptr || (ioSync$24ptr = new ptrType$24(function() { return ioSync; }, function($v) { ioSync = $v; })))));
 		}
 		_tuple = write(fd, p);
 		n = _tuple[0];
@@ -4534,10 +4553,30 @@ $packages["syscall"] = (function() {
 		return err;
 	};
 	$pkg.SetsockoptLinger = SetsockoptLinger;
+	openat = function(dirfd, path, flags, mode) {
+		var _p0, _tuple, _tuple$1, dirfd, e1, err, fd, flags, mode, path, r0;
+		fd = 0;
+		err = $ifaceNil;
+		_p0 = ptrType$2.nil;
+		_tuple = BytePtrFromString(path);
+		_p0 = _tuple[0];
+		err = _tuple[1];
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			return [fd, err];
+		}
+		_tuple$1 = Syscall6(56, ((dirfd >>> 0)), ((_p0)), ((flags >>> 0)), ((mode >>> 0)), 0, 0);
+		r0 = _tuple$1[0];
+		e1 = _tuple$1[2];
+		fd = ((r0 >> 0));
+		if (!((e1 === 0))) {
+			err = errnoErr(e1);
+		}
+		return [fd, err];
+	};
 	Close = function(fd) {
 		var _tuple, e1, err, fd;
 		err = $ifaceNil;
-		_tuple = Syscall(3, ((fd >>> 0)), 0, 0);
+		_tuple = Syscall(57, ((fd >>> 0)), 0, 0);
 		e1 = _tuple[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
@@ -4549,7 +4588,7 @@ $packages["syscall"] = (function() {
 		var _tuple, e1, err, fd, oldfd, r0;
 		fd = 0;
 		err = $ifaceNil;
-		_tuple = Syscall(32, ((oldfd >>> 0)), 0, 0);
+		_tuple = Syscall(23, ((oldfd >>> 0)), 0, 0);
 		r0 = _tuple[0];
 		e1 = _tuple[2];
 		fd = ((r0 >> 0));
@@ -4562,7 +4601,7 @@ $packages["syscall"] = (function() {
 	Fchdir = function(fd) {
 		var _tuple, e1, err, fd;
 		err = $ifaceNil;
-		_tuple = Syscall(81, ((fd >>> 0)), 0, 0);
+		_tuple = Syscall(50, ((fd >>> 0)), 0, 0);
 		e1 = _tuple[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
@@ -4573,7 +4612,7 @@ $packages["syscall"] = (function() {
 	Fchmod = function(fd, mode) {
 		var _tuple, e1, err, fd, mode;
 		err = $ifaceNil;
-		_tuple = Syscall(91, ((fd >>> 0)), ((mode >>> 0)), 0);
+		_tuple = Syscall(52, ((fd >>> 0)), ((mode >>> 0)), 0);
 		e1 = _tuple[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
@@ -4585,7 +4624,7 @@ $packages["syscall"] = (function() {
 		var _tuple, arg, cmd, e1, err, fd, r0, val;
 		val = 0;
 		err = $ifaceNil;
-		_tuple = Syscall(72, ((fd >>> 0)), ((cmd >>> 0)), ((arg >>> 0)));
+		_tuple = Syscall(25, ((fd >>> 0)), ((cmd >>> 0)), ((arg >>> 0)));
 		r0 = _tuple[0];
 		e1 = _tuple[2];
 		val = ((r0 >> 0));
@@ -4597,7 +4636,7 @@ $packages["syscall"] = (function() {
 	Fsync = function(fd) {
 		var _tuple, e1, err, fd;
 		err = $ifaceNil;
-		_tuple = Syscall(74, ((fd >>> 0)), 0, 0);
+		_tuple = Syscall(82, ((fd >>> 0)), 0, 0);
 		e1 = _tuple[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
@@ -4615,7 +4654,7 @@ $packages["syscall"] = (function() {
 		} else {
 			_p0 = (new Uint8Array(0));
 		}
-		_tuple = Syscall(217, ((fd >>> 0)), (_p0), ((buf.$length >>> 0)));
+		_tuple = Syscall(61, ((fd >>> 0)), (_p0), ((buf.$length >>> 0)));
 		r0 = _tuple[0];
 		e1 = _tuple[2];
 		n = ((r0 >> 0));
@@ -4635,7 +4674,7 @@ $packages["syscall"] = (function() {
 		} else {
 			_p0 = (new Uint8Array(0));
 		}
-		_tuple = Syscall(0, ((fd >>> 0)), (_p0), ((p.$length >>> 0)));
+		_tuple = Syscall(63, ((fd >>> 0)), (_p0), ((p.$length >>> 0)));
 		r0 = _tuple[0];
 		e1 = _tuple[2];
 		n = ((r0 >> 0));
@@ -4654,7 +4693,7 @@ $packages["syscall"] = (function() {
 		} else {
 			_p0 = (new Uint8Array(0));
 		}
-		_tuple = Syscall(1, ((fd >>> 0)), (_p0), ((p.$length >>> 0)));
+		_tuple = Syscall(64, ((fd >>> 0)), (_p0), ((p.$length >>> 0)));
 		r0 = _tuple[0];
 		e1 = _tuple[2];
 		n = ((r0 >> 0));
@@ -4666,7 +4705,7 @@ $packages["syscall"] = (function() {
 	munmap = function(addr, length) {
 		var _tuple, addr, e1, err, length;
 		err = $ifaceNil;
-		_tuple = Syscall(11, (addr), (length), 0);
+		_tuple = Syscall(215, (addr), (length), 0);
 		e1 = _tuple[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
@@ -4676,7 +4715,7 @@ $packages["syscall"] = (function() {
 	Fchown = function(fd, uid, gid) {
 		var _tuple, e1, err, fd, gid, uid;
 		err = $ifaceNil;
-		_tuple = Syscall(93, ((fd >>> 0)), ((uid >>> 0)), ((gid >>> 0)));
+		_tuple = Syscall(55, ((fd >>> 0)), ((uid >>> 0)), ((gid >>> 0)));
 		e1 = _tuple[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
@@ -4687,9 +4726,9 @@ $packages["syscall"] = (function() {
 	Fstat = function(fd, stat) {
 		var _array, _struct, _tuple, _view, e1, err, fd, stat;
 		err = $ifaceNil;
-		_array = new Uint8Array(144);
-		_tuple = Syscall(5, ((fd >>> 0)), ((_array)), 0);
-		_struct = stat, _view = new DataView(_array.buffer, _array.byteOffset), _struct.Dev = new $Uint64(_view.getUint32(4, true), _view.getUint32(0, true)), _struct.Ino = new $Uint64(_view.getUint32(12, true), _view.getUint32(8, true)), _struct.Nlink = new $Uint64(_view.getUint32(20, true), _view.getUint32(16, true)), _struct.Mode = _view.getUint32(24, true), _struct.Uid = _view.getUint32(28, true), _struct.Gid = _view.getUint32(32, true), _struct.X__pad0 = _view.getInt32(36, true), _struct.Rdev = new $Uint64(_view.getUint32(44, true), _view.getUint32(40, true)), _struct.Size = new $Int64(_view.getUint32(52, true), _view.getUint32(48, true)), _struct.Blksize = new $Int64(_view.getUint32(60, true), _view.getUint32(56, true)), _struct.Blocks = new $Int64(_view.getUint32(68, true), _view.getUint32(64, true)), _struct.Atim.Sec = new $Int64(_view.getUint32(76, true), _view.getUint32(72, true)), _struct.Atim.Nsec = new $Int64(_view.getUint32(84, true), _view.getUint32(80, true)), _struct.Mtim.Sec = new $Int64(_view.getUint32(92, true), _view.getUint32(88, true)), _struct.Mtim.Nsec = new $Int64(_view.getUint32(100, true), _view.getUint32(96, true)), _struct.Ctim.Sec = new $Int64(_view.getUint32(108, true), _view.getUint32(104, true)), _struct.Ctim.Nsec = new $Int64(_view.getUint32(116, true), _view.getUint32(112, true)), _struct.X__unused = new ($nativeArray($kindInt64))(_array.buffer, $min(_array.byteOffset + 120, _array.buffer.byteLength));
+		_array = new Uint8Array(128);
+		_tuple = Syscall(80, ((fd >>> 0)), ((_array)), 0);
+		_struct = stat, _view = new DataView(_array.buffer, _array.byteOffset), _struct.Dev = new $Uint64(_view.getUint32(4, true), _view.getUint32(0, true)), _struct.Ino = new $Uint64(_view.getUint32(12, true), _view.getUint32(8, true)), _struct.Mode = _view.getUint32(16, true), _struct.Nlink = _view.getUint32(20, true), _struct.Uid = _view.getUint32(24, true), _struct.Gid = _view.getUint32(28, true), _struct.Rdev = new $Uint64(_view.getUint32(36, true), _view.getUint32(32, true)), _struct.X__pad1 = new $Uint64(_view.getUint32(44, true), _view.getUint32(40, true)), _struct.Size = new $Int64(_view.getUint32(52, true), _view.getUint32(48, true)), _struct.Blksize = _view.getInt32(56, true), _struct.X__pad2 = _view.getInt32(60, true), _struct.Blocks = new $Int64(_view.getUint32(68, true), _view.getUint32(64, true)), _struct.Atim.Sec = new $Int64(_view.getUint32(76, true), _view.getUint32(72, true)), _struct.Atim.Nsec = new $Int64(_view.getUint32(84, true), _view.getUint32(80, true)), _struct.Mtim.Sec = new $Int64(_view.getUint32(92, true), _view.getUint32(88, true)), _struct.Mtim.Nsec = new $Int64(_view.getUint32(100, true), _view.getUint32(96, true)), _struct.Ctim.Sec = new $Int64(_view.getUint32(108, true), _view.getUint32(104, true)), _struct.Ctim.Nsec = new $Int64(_view.getUint32(116, true), _view.getUint32(112, true)), _struct.X__glibc_reserved = new ($nativeArray($kindInt32))(_array.buffer, $min(_array.byteOffset + 120, _array.buffer.byteLength));
 		e1 = _tuple[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
@@ -4697,19 +4736,8 @@ $packages["syscall"] = (function() {
 		return err;
 	};
 	$pkg.Fstat = Fstat;
-	Ftruncate = function(fd, length) {
-		var _tuple, e1, err, fd, length;
-		err = $ifaceNil;
-		_tuple = Syscall(77, ((fd >>> 0)), ((length.$low >>> 0)), 0);
-		e1 = _tuple[2];
-		if (!((e1 === 0))) {
-			err = errnoErr(e1);
-		}
-		return err;
-	};
-	$pkg.Ftruncate = Ftruncate;
-	Lstat = function(path, stat) {
-		var _array, _p0, _struct, _tuple, _tuple$1, _view, e1, err, path, stat;
+	Fstatat = function(fd, path, stat, flags) {
+		var _array, _p0, _struct, _tuple, _tuple$1, _view, e1, err, fd, flags, path, stat;
 		err = $ifaceNil;
 		_p0 = ptrType$2.nil;
 		_tuple = BytePtrFromString(path);
@@ -4718,16 +4746,27 @@ $packages["syscall"] = (function() {
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
 			return err;
 		}
-		_array = new Uint8Array(144);
-		_tuple$1 = Syscall(6, ((_p0)), ((_array)), 0);
-		_struct = stat, _view = new DataView(_array.buffer, _array.byteOffset), _struct.Dev = new $Uint64(_view.getUint32(4, true), _view.getUint32(0, true)), _struct.Ino = new $Uint64(_view.getUint32(12, true), _view.getUint32(8, true)), _struct.Nlink = new $Uint64(_view.getUint32(20, true), _view.getUint32(16, true)), _struct.Mode = _view.getUint32(24, true), _struct.Uid = _view.getUint32(28, true), _struct.Gid = _view.getUint32(32, true), _struct.X__pad0 = _view.getInt32(36, true), _struct.Rdev = new $Uint64(_view.getUint32(44, true), _view.getUint32(40, true)), _struct.Size = new $Int64(_view.getUint32(52, true), _view.getUint32(48, true)), _struct.Blksize = new $Int64(_view.getUint32(60, true), _view.getUint32(56, true)), _struct.Blocks = new $Int64(_view.getUint32(68, true), _view.getUint32(64, true)), _struct.Atim.Sec = new $Int64(_view.getUint32(76, true), _view.getUint32(72, true)), _struct.Atim.Nsec = new $Int64(_view.getUint32(84, true), _view.getUint32(80, true)), _struct.Mtim.Sec = new $Int64(_view.getUint32(92, true), _view.getUint32(88, true)), _struct.Mtim.Nsec = new $Int64(_view.getUint32(100, true), _view.getUint32(96, true)), _struct.Ctim.Sec = new $Int64(_view.getUint32(108, true), _view.getUint32(104, true)), _struct.Ctim.Nsec = new $Int64(_view.getUint32(116, true), _view.getUint32(112, true)), _struct.X__unused = new ($nativeArray($kindInt64))(_array.buffer, $min(_array.byteOffset + 120, _array.buffer.byteLength));
+		_array = new Uint8Array(128);
+		_tuple$1 = Syscall6(79, ((fd >>> 0)), ((_p0)), ((_array)), ((flags >>> 0)), 0, 0);
+		_struct = stat, _view = new DataView(_array.buffer, _array.byteOffset), _struct.Dev = new $Uint64(_view.getUint32(4, true), _view.getUint32(0, true)), _struct.Ino = new $Uint64(_view.getUint32(12, true), _view.getUint32(8, true)), _struct.Mode = _view.getUint32(16, true), _struct.Nlink = _view.getUint32(20, true), _struct.Uid = _view.getUint32(24, true), _struct.Gid = _view.getUint32(28, true), _struct.Rdev = new $Uint64(_view.getUint32(36, true), _view.getUint32(32, true)), _struct.X__pad1 = new $Uint64(_view.getUint32(44, true), _view.getUint32(40, true)), _struct.Size = new $Int64(_view.getUint32(52, true), _view.getUint32(48, true)), _struct.Blksize = _view.getInt32(56, true), _struct.X__pad2 = _view.getInt32(60, true), _struct.Blocks = new $Int64(_view.getUint32(68, true), _view.getUint32(64, true)), _struct.Atim.Sec = new $Int64(_view.getUint32(76, true), _view.getUint32(72, true)), _struct.Atim.Nsec = new $Int64(_view.getUint32(84, true), _view.getUint32(80, true)), _struct.Mtim.Sec = new $Int64(_view.getUint32(92, true), _view.getUint32(88, true)), _struct.Mtim.Nsec = new $Int64(_view.getUint32(100, true), _view.getUint32(96, true)), _struct.Ctim.Sec = new $Int64(_view.getUint32(108, true), _view.getUint32(104, true)), _struct.Ctim.Nsec = new $Int64(_view.getUint32(116, true), _view.getUint32(112, true)), _struct.X__glibc_reserved = new ($nativeArray($kindInt32))(_array.buffer, $min(_array.byteOffset + 120, _array.buffer.byteLength));
 		e1 = _tuple$1[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
 		}
 		return err;
 	};
-	$pkg.Lstat = Lstat;
+	$pkg.Fstatat = Fstatat;
+	Ftruncate = function(fd, length) {
+		var _tuple, e1, err, fd, length;
+		err = $ifaceNil;
+		_tuple = Syscall(46, ((fd >>> 0)), ((length.$low >>> 0)), 0);
+		e1 = _tuple[2];
+		if (!((e1 === 0))) {
+			err = errnoErr(e1);
+		}
+		return err;
+	};
+	$pkg.Ftruncate = Ftruncate;
 	Pread = function(fd, p, offset) {
 		var _p0, _tuple, e1, err, fd, n, offset, p, r0;
 		n = 0;
@@ -4738,7 +4777,7 @@ $packages["syscall"] = (function() {
 		} else {
 			_p0 = (new Uint8Array(0));
 		}
-		_tuple = Syscall6(17, ((fd >>> 0)), (_p0), ((p.$length >>> 0)), ((offset.$low >>> 0)), 0, 0);
+		_tuple = Syscall6(67, ((fd >>> 0)), (_p0), ((p.$length >>> 0)), ((offset.$low >>> 0)), 0, 0);
 		r0 = _tuple[0];
 		e1 = _tuple[2];
 		n = ((r0 >> 0));
@@ -4758,7 +4797,7 @@ $packages["syscall"] = (function() {
 		} else {
 			_p0 = (new Uint8Array(0));
 		}
-		_tuple = Syscall6(18, ((fd >>> 0)), (_p0), ((p.$length >>> 0)), ((offset.$low >>> 0)), 0, 0);
+		_tuple = Syscall6(68, ((fd >>> 0)), (_p0), ((p.$length >>> 0)), ((offset.$low >>> 0)), 0, 0);
 		r0 = _tuple[0];
 		e1 = _tuple[2];
 		n = ((r0 >> 0));
@@ -4772,7 +4811,7 @@ $packages["syscall"] = (function() {
 		var _tuple, e1, err, fd, off, offset, r0, whence;
 		off = new $Int64(0, 0);
 		err = $ifaceNil;
-		_tuple = Syscall(8, ((fd >>> 0)), ((offset.$low >>> 0)), ((whence >>> 0)));
+		_tuple = Syscall(62, ((fd >>> 0)), ((offset.$low >>> 0)), ((whence >>> 0)));
 		r0 = _tuple[0];
 		e1 = _tuple[2];
 		off = (new $Int64(0, r0.constructor === Number ? r0 : 1));
@@ -4785,7 +4824,7 @@ $packages["syscall"] = (function() {
 	Shutdown = function(fd, how) {
 		var _tuple, e1, err, fd, how;
 		err = $ifaceNil;
-		_tuple = Syscall(48, ((fd >>> 0)), ((how >>> 0)), 0);
+		_tuple = Syscall(210, ((fd >>> 0)), ((how >>> 0)), 0);
 		e1 = _tuple[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
@@ -4798,7 +4837,7 @@ $packages["syscall"] = (function() {
 		fd = 0;
 		err = $ifaceNil;
 		_array = new Uint8Array(112);
-		_tuple = Syscall(43, ((s >>> 0)), ((_array)), ((addrlen)));
+		_tuple = Syscall(202, ((s >>> 0)), ((_array)), ((addrlen)));
 		_struct = rsa, _view = new DataView(_array.buffer, _array.byteOffset), _struct.Addr.Family = _view.getUint16(0, true), _struct.Addr.Data = new ($nativeArray($kindInt8))(_array.buffer, $min(_array.byteOffset + 2, _array.buffer.byteLength)), _struct.Pad = new ($nativeArray($kindInt8))(_array.buffer, $min(_array.byteOffset + 16, _array.buffer.byteLength));
 		r0 = _tuple[0];
 		e1 = _tuple[2];
@@ -4813,7 +4852,7 @@ $packages["syscall"] = (function() {
 		fd = 0;
 		err = $ifaceNil;
 		_array = new Uint8Array(112);
-		_tuple = Syscall6(288, ((s >>> 0)), ((_array)), ((addrlen)), ((flags >>> 0)), 0, 0);
+		_tuple = Syscall6(242, ((s >>> 0)), ((_array)), ((addrlen)), ((flags >>> 0)), 0, 0);
 		_struct = rsa, _view = new DataView(_array.buffer, _array.byteOffset), _struct.Addr.Family = _view.getUint16(0, true), _struct.Addr.Data = new ($nativeArray($kindInt8))(_array.buffer, $min(_array.byteOffset + 2, _array.buffer.byteLength)), _struct.Pad = new ($nativeArray($kindInt8))(_array.buffer, $min(_array.byteOffset + 16, _array.buffer.byteLength));
 		r0 = _tuple[0];
 		e1 = _tuple[2];
@@ -4826,7 +4865,7 @@ $packages["syscall"] = (function() {
 	getsockopt = function(s, level, name, val, vallen) {
 		var _tuple, e1, err, level, name, s, val, vallen;
 		err = $ifaceNil;
-		_tuple = Syscall6(55, ((s >>> 0)), ((level >>> 0)), ((name >>> 0)), (val), ((vallen)), 0);
+		_tuple = Syscall6(209, ((s >>> 0)), ((level >>> 0)), ((name >>> 0)), (val), ((vallen)), 0);
 		e1 = _tuple[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
@@ -4836,7 +4875,7 @@ $packages["syscall"] = (function() {
 	setsockopt = function(s, level, name, val, vallen) {
 		var _tuple, e1, err, level, name, s, val, vallen;
 		err = $ifaceNil;
-		_tuple = Syscall6(54, ((s >>> 0)), ((level >>> 0)), ((name >>> 0)), (val), (vallen), 0);
+		_tuple = Syscall6(208, ((s >>> 0)), ((level >>> 0)), ((name >>> 0)), (val), (vallen), 0);
 		e1 = _tuple[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
@@ -4854,7 +4893,7 @@ $packages["syscall"] = (function() {
 			_p0 = (new Uint8Array(0));
 		}
 		_array = new Uint8Array(112);
-		_tuple = Syscall6(45, ((fd >>> 0)), (_p0), ((p.$length >>> 0)), ((flags >>> 0)), ((_array)), ((fromlen)));
+		_tuple = Syscall6(207, ((fd >>> 0)), (_p0), ((p.$length >>> 0)), ((flags >>> 0)), ((_array)), ((fromlen)));
 		_struct = from, _view = new DataView(_array.buffer, _array.byteOffset), _struct.Addr.Family = _view.getUint16(0, true), _struct.Addr.Data = new ($nativeArray($kindInt8))(_array.buffer, $min(_array.byteOffset + 2, _array.buffer.byteLength)), _struct.Pad = new ($nativeArray($kindInt8))(_array.buffer, $min(_array.byteOffset + 16, _array.buffer.byteLength));
 		r0 = _tuple[0];
 		e1 = _tuple[2];
@@ -4873,7 +4912,7 @@ $packages["syscall"] = (function() {
 		} else {
 			_p0 = (new Uint8Array(0));
 		}
-		_tuple = Syscall6(44, ((s >>> 0)), (_p0), ((buf.$length >>> 0)), ((flags >>> 0)), (to), ((addrlen >>> 0)));
+		_tuple = Syscall6(206, ((s >>> 0)), (_p0), ((buf.$length >>> 0)), ((flags >>> 0)), (to), ((addrlen >>> 0)));
 		e1 = _tuple[2];
 		if (!((e1 === 0))) {
 			err = errnoErr(e1);
@@ -4885,7 +4924,7 @@ $packages["syscall"] = (function() {
 		n = 0;
 		err = $ifaceNil;
 		_array = new Uint8Array(48);
-		_tuple = Syscall(47, ((s >>> 0)), ((_array)), ((flags >>> 0)));
+		_tuple = Syscall(212, ((s >>> 0)), ((_array)), ((flags >>> 0)));
 		_struct = msg, _view = new DataView(_array.buffer, _array.byteOffset), _struct.Namelen = _view.getUint32(4, true), _struct.Pad_cgo_0 = new ($nativeArray($kindUint8))(_array.buffer, $min(_array.byteOffset + 8, _array.buffer.byteLength)), _struct.Iovlen = new $Uint64(_view.getUint32(20, true), _view.getUint32(16, true)), _struct.Controllen = new $Uint64(_view.getUint32(36, true), _view.getUint32(32, true)), _struct.Flags = _view.getInt32(40, true), _struct.Pad_cgo_1 = new ($nativeArray($kindUint8))(_array.buffer, $min(_array.byteOffset + 44, _array.buffer.byteLength));
 		r0 = _tuple[0];
 		e1 = _tuple[2];
@@ -4900,7 +4939,7 @@ $packages["syscall"] = (function() {
 		n = 0;
 		err = $ifaceNil;
 		_array = new Uint8Array(48);
-		_tuple = Syscall(46, ((s >>> 0)), ((_array)), ((flags >>> 0)));
+		_tuple = Syscall(211, ((s >>> 0)), ((_array)), ((flags >>> 0)));
 		_struct = msg, _view = new DataView(_array.buffer, _array.byteOffset), _struct.Namelen = _view.getUint32(4, true), _struct.Pad_cgo_0 = new ($nativeArray($kindUint8))(_array.buffer, $min(_array.byteOffset + 8, _array.buffer.byteLength)), _struct.Iovlen = new $Uint64(_view.getUint32(20, true), _view.getUint32(16, true)), _struct.Controllen = new $Uint64(_view.getUint32(36, true), _view.getUint32(32, true)), _struct.Flags = _view.getInt32(40, true), _struct.Pad_cgo_1 = new ($nativeArray($kindUint8))(_array.buffer, $min(_array.byteOffset + 44, _array.buffer.byteLength));
 		r0 = _tuple[0];
 		e1 = _tuple[2];
@@ -4914,7 +4953,7 @@ $packages["syscall"] = (function() {
 		var _tuple, addr, e1, err, fd, flags, length, offset, prot, r0, xaddr;
 		xaddr = 0;
 		err = $ifaceNil;
-		_tuple = Syscall6(9, (addr), (length), ((prot >>> 0)), ((flags >>> 0)), ((fd >>> 0)), ((offset.$low >>> 0)));
+		_tuple = Syscall6(222, (addr), (length), ((prot >>> 0)), ((flags >>> 0)), ((fd >>> 0)), ((offset.$low >>> 0)));
 		r0 = _tuple[0];
 		e1 = _tuple[2];
 		xaddr = (r0);
@@ -4923,14 +4962,14 @@ $packages["syscall"] = (function() {
 		}
 		return [xaddr, err];
 	};
-	ptrType$24.methods = [{prop: "sockaddr", name: "sockaddr", pkg: "syscall", typ: $funcType([], [$UnsafePointer, _Socklen, $error], false)}];
-	ptrType$11.methods = [{prop: "sockaddr", name: "sockaddr", pkg: "syscall", typ: $funcType([], [$UnsafePointer, _Socklen, $error], false)}];
-	ptrType$25.methods = [{prop: "Mmap", name: "Mmap", pkg: "", typ: $funcType([$Int, $Int64, $Int, $Int, $Int], [sliceType, $error], false)}, {prop: "Munmap", name: "Munmap", pkg: "", typ: $funcType([sliceType], [$error], false)}];
-	Errno.methods = [{prop: "Error", name: "Error", pkg: "", typ: $funcType([], [$String], false)}, {prop: "Temporary", name: "Temporary", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "Timeout", name: "Timeout", pkg: "", typ: $funcType([], [$Bool], false)}];
 	ptrType$26.methods = [{prop: "sockaddr", name: "sockaddr", pkg: "syscall", typ: $funcType([], [$UnsafePointer, _Socklen, $error], false)}];
-	ptrType$27.methods = [{prop: "sockaddr", name: "sockaddr", pkg: "syscall", typ: $funcType([], [$UnsafePointer, _Socklen, $error], false)}];
+	ptrType$11.methods = [{prop: "sockaddr", name: "sockaddr", pkg: "syscall", typ: $funcType([], [$UnsafePointer, _Socklen, $error], false)}];
+	ptrType$27.methods = [{prop: "Mmap", name: "Mmap", pkg: "", typ: $funcType([$Int, $Int64, $Int, $Int, $Int], [sliceType, $error], false)}, {prop: "Munmap", name: "Munmap", pkg: "", typ: $funcType([sliceType], [$error], false)}];
+	Errno.methods = [{prop: "Error", name: "Error", pkg: "", typ: $funcType([], [$String], false)}, {prop: "Temporary", name: "Temporary", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "Timeout", name: "Timeout", pkg: "", typ: $funcType([], [$Bool], false)}];
 	ptrType$28.methods = [{prop: "sockaddr", name: "sockaddr", pkg: "syscall", typ: $funcType([], [$UnsafePointer, _Socklen, $error], false)}];
-	ptrType$29.methods = [{prop: "Unix", name: "Unix", pkg: "", typ: $funcType([], [$Int64, $Int64], false)}, {prop: "Nano", name: "Nano", pkg: "", typ: $funcType([], [$Int64], false)}];
+	ptrType$29.methods = [{prop: "sockaddr", name: "sockaddr", pkg: "syscall", typ: $funcType([], [$UnsafePointer, _Socklen, $error], false)}];
+	ptrType$30.methods = [{prop: "sockaddr", name: "sockaddr", pkg: "syscall", typ: $funcType([], [$UnsafePointer, _Socklen, $error], false)}];
+	ptrType$21.methods = [{prop: "Unix", name: "Unix", pkg: "", typ: $funcType([], [$Int64, $Int64], false)}, {prop: "Nano", name: "Nano", pkg: "", typ: $funcType([], [$Int64], false)}];
 	ptrType$19.methods = [{prop: "SetLen", name: "SetLen", pkg: "", typ: $funcType([$Int], [], false)}];
 	ptrType$31.methods = [{prop: "SetControllen", name: "SetControllen", pkg: "", typ: $funcType([$Int], [], false)}];
 	SockaddrLinklayer.init("syscall", [{prop: "Protocol", name: "Protocol", embedded: false, exported: true, typ: $Uint16, tag: ""}, {prop: "Ifindex", name: "Ifindex", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "Hatype", name: "Hatype", embedded: false, exported: true, typ: $Uint16, tag: ""}, {prop: "Pkttype", name: "Pkttype", embedded: false, exported: true, typ: $Uint8, tag: ""}, {prop: "Halen", name: "Halen", embedded: false, exported: true, typ: $Uint8, tag: ""}, {prop: "Addr", name: "Addr", embedded: false, exported: true, typ: arrayType$1, tag: ""}, {prop: "raw", name: "raw", embedded: false, exported: false, typ: RawSockaddrLinklayer, tag: ""}]);
@@ -4941,7 +4980,7 @@ $packages["syscall"] = (function() {
 	SockaddrInet6.init("syscall", [{prop: "Port", name: "Port", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "ZoneId", name: "ZoneId", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "Addr", name: "Addr", embedded: false, exported: true, typ: arrayType$2, tag: ""}, {prop: "raw", name: "raw", embedded: false, exported: false, typ: RawSockaddrInet6, tag: ""}]);
 	SockaddrUnix.init("syscall", [{prop: "Name", name: "Name", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "raw", name: "raw", embedded: false, exported: false, typ: RawSockaddrUnix, tag: ""}]);
 	Timespec.init("", [{prop: "Sec", name: "Sec", embedded: false, exported: true, typ: $Int64, tag: ""}, {prop: "Nsec", name: "Nsec", embedded: false, exported: true, typ: $Int64, tag: ""}]);
-	Stat_t.init("", [{prop: "Dev", name: "Dev", embedded: false, exported: true, typ: $Uint64, tag: ""}, {prop: "Ino", name: "Ino", embedded: false, exported: true, typ: $Uint64, tag: ""}, {prop: "Nlink", name: "Nlink", embedded: false, exported: true, typ: $Uint64, tag: ""}, {prop: "Mode", name: "Mode", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "Uid", name: "Uid", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "Gid", name: "Gid", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "X__pad0", name: "X__pad0", embedded: false, exported: true, typ: $Int32, tag: ""}, {prop: "Rdev", name: "Rdev", embedded: false, exported: true, typ: $Uint64, tag: ""}, {prop: "Size", name: "Size", embedded: false, exported: true, typ: $Int64, tag: ""}, {prop: "Blksize", name: "Blksize", embedded: false, exported: true, typ: $Int64, tag: ""}, {prop: "Blocks", name: "Blocks", embedded: false, exported: true, typ: $Int64, tag: ""}, {prop: "Atim", name: "Atim", embedded: false, exported: true, typ: Timespec, tag: ""}, {prop: "Mtim", name: "Mtim", embedded: false, exported: true, typ: Timespec, tag: ""}, {prop: "Ctim", name: "Ctim", embedded: false, exported: true, typ: Timespec, tag: ""}, {prop: "X__unused", name: "X__unused", embedded: false, exported: true, typ: arrayType$5, tag: ""}]);
+	Stat_t.init("", [{prop: "Dev", name: "Dev", embedded: false, exported: true, typ: $Uint64, tag: ""}, {prop: "Ino", name: "Ino", embedded: false, exported: true, typ: $Uint64, tag: ""}, {prop: "Mode", name: "Mode", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "Nlink", name: "Nlink", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "Uid", name: "Uid", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "Gid", name: "Gid", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "Rdev", name: "Rdev", embedded: false, exported: true, typ: $Uint64, tag: ""}, {prop: "X__pad1", name: "X__pad1", embedded: false, exported: true, typ: $Uint64, tag: ""}, {prop: "Size", name: "Size", embedded: false, exported: true, typ: $Int64, tag: ""}, {prop: "Blksize", name: "Blksize", embedded: false, exported: true, typ: $Int32, tag: ""}, {prop: "X__pad2", name: "X__pad2", embedded: false, exported: true, typ: $Int32, tag: ""}, {prop: "Blocks", name: "Blocks", embedded: false, exported: true, typ: $Int64, tag: ""}, {prop: "Atim", name: "Atim", embedded: false, exported: true, typ: Timespec, tag: ""}, {prop: "Mtim", name: "Mtim", embedded: false, exported: true, typ: Timespec, tag: ""}, {prop: "Ctim", name: "Ctim", embedded: false, exported: true, typ: Timespec, tag: ""}, {prop: "X__glibc_reserved", name: "X__glibc_reserved", embedded: false, exported: true, typ: arrayType$5, tag: ""}]);
 	RawSockaddrInet4.init("", [{prop: "Family", name: "Family", embedded: false, exported: true, typ: $Uint16, tag: ""}, {prop: "Port", name: "Port", embedded: false, exported: true, typ: $Uint16, tag: ""}, {prop: "Addr", name: "Addr", embedded: false, exported: true, typ: arrayType$9, tag: ""}, {prop: "Zero", name: "Zero", embedded: false, exported: true, typ: arrayType$1, tag: ""}]);
 	RawSockaddrInet6.init("", [{prop: "Family", name: "Family", embedded: false, exported: true, typ: $Uint16, tag: ""}, {prop: "Port", name: "Port", embedded: false, exported: true, typ: $Uint16, tag: ""}, {prop: "Flowinfo", name: "Flowinfo", embedded: false, exported: true, typ: $Uint32, tag: ""}, {prop: "Addr", name: "Addr", embedded: false, exported: true, typ: arrayType$2, tag: ""}, {prop: "Scope_id", name: "Scope_id", embedded: false, exported: true, typ: $Uint32, tag: ""}]);
 	RawSockaddrUnix.init("", [{prop: "Family", name: "Family", embedded: false, exported: true, typ: $Uint16, tag: ""}, {prop: "Path", name: "Path", embedded: false, exported: true, typ: arrayType$8, tag: ""}]);
@@ -4976,7 +5015,7 @@ $packages["syscall"] = (function() {
 		errEAGAIN = new Errno(11);
 		errEINVAL = new Errno(22);
 		errENOENT = new Errno(2);
-		errors = $toNativeArray($kindString, ["", "operation not permitted", "no such file or directory", "no such process", "interrupted system call", "input/output error", "no such device or address", "argument list too long", "exec format error", "bad file descriptor", "no child processes", "resource temporarily unavailable", "cannot allocate memory", "permission denied", "bad address", "block device required", "device or resource busy", "file exists", "invalid cross-device link", "no such device", "not a directory", "is a directory", "invalid argument", "too many open files in system", "too many open files", "inappropriate ioctl for device", "text file busy", "file too large", "no space left on device", "illegal seek", "read-only file system", "too many links", "broken pipe", "numerical argument out of domain", "numerical result out of range", "resource deadlock avoided", "file name too long", "no locks available", "function not implemented", "directory not empty", "too many levels of symbolic links", "", "no message of desired type", "identifier removed", "channel number out of range", "level 2 not synchronized", "level 3 halted", "level 3 reset", "link number out of range", "protocol driver not attached", "no CSI structure available", "level 2 halted", "invalid exchange", "invalid request descriptor", "exchange full", "no anode", "invalid request code", "invalid slot", "", "bad font file format", "device not a stream", "no data available", "timer expired", "out of streams resources", "machine is not on the network", "package not installed", "object is remote", "link has been severed", "advertise error", "srmount error", "communication error on send", "protocol error", "multihop attempted", "RFS specific error", "bad message", "value too large for defined data type", "name not unique on network", "file descriptor in bad state", "remote address changed", "can not access a needed shared library", "accessing a corrupted shared library", ".lib section in a.out corrupted", "attempting to link in too many shared libraries", "cannot exec a shared library directly", "invalid or incomplete multibyte or wide character", "interrupted system call should be restarted", "streams pipe error", "too many users", "socket operation on non-socket", "destination address required", "message too long", "protocol wrong type for socket", "protocol not available", "protocol not supported", "socket type not supported", "operation not supported", "protocol family not supported", "address family not supported by protocol", "address already in use", "cannot assign requested address", "network is down", "network is unreachable", "network dropped connection on reset", "software caused connection abort", "connection reset by peer", "no buffer space available", "transport endpoint is already connected", "transport endpoint is not connected", "cannot send after transport endpoint shutdown", "too many references: cannot splice", "connection timed out", "connection refused", "host is down", "no route to host", "operation already in progress", "operation now in progress", "stale NFS file handle", "structure needs cleaning", "not a XENIX named type file", "no XENIX semaphores available", "is a named type file", "remote I/O error", "disk quota exceeded", "no medium found", "wrong medium type", "operation canceled", "required key not available", "key has expired", "key has been revoked", "key was rejected by service", "owner died", "state not recoverable", "operation not possible due to RF-kill"]);
+		errors = $toNativeArray($kindString, ["", "operation not permitted", "no such file or directory", "no such process", "interrupted system call", "input/output error", "no such device or address", "argument list too long", "exec format error", "bad file descriptor", "no child processes", "resource temporarily unavailable", "cannot allocate memory", "permission denied", "bad address", "block device required", "device or resource busy", "file exists", "invalid cross-device link", "no such device", "not a directory", "is a directory", "invalid argument", "too many open files in system", "too many open files", "inappropriate ioctl for device", "text file busy", "file too large", "no space left on device", "illegal seek", "read-only file system", "too many links", "broken pipe", "numerical argument out of domain", "numerical result out of range", "resource deadlock avoided", "file name too long", "no locks available", "function not implemented", "directory not empty", "too many levels of symbolic links", "", "no message of desired type", "identifier removed", "channel number out of range", "level 2 not synchronized", "level 3 halted", "level 3 reset", "link number out of range", "protocol driver not attached", "no CSI structure available", "level 2 halted", "invalid exchange", "invalid request descriptor", "exchange full", "no anode", "invalid request code", "invalid slot", "", "bad font file format", "device not a stream", "no data available", "timer expired", "out of streams resources", "machine is not on the network", "package not installed", "object is remote", "link has been severed", "advertise error", "srmount error", "communication error on send", "protocol error", "multihop attempted", "RFS specific error", "bad message", "value too large for defined data type", "name not unique on network", "file descriptor in bad state", "remote address changed", "can not access a needed shared library", "accessing a corrupted shared library", ".lib section in a.out corrupted", "attempting to link in too many shared libraries", "cannot exec a shared library directly", "invalid or incomplete multibyte or wide character", "interrupted system call should be restarted", "streams pipe error", "too many users", "socket operation on non-socket", "destination address required", "message too long", "protocol wrong type for socket", "protocol not available", "protocol not supported", "socket type not supported", "operation not supported", "protocol family not supported", "address family not supported by protocol", "address already in use", "cannot assign requested address", "network is down", "network is unreachable", "network dropped connection on reset", "software caused connection abort", "connection reset by peer", "no buffer space available", "transport endpoint is already connected", "transport endpoint is not connected", "cannot send after transport endpoint shutdown", "too many references: cannot splice", "connection timed out", "connection refused", "host is down", "no route to host", "operation already in progress", "operation now in progress", "stale file handle", "structure needs cleaning", "not a XENIX named type file", "no XENIX semaphores available", "is a named type file", "remote I/O error", "disk quota exceeded", "no medium found", "wrong medium type", "operation canceled", "required key not available", "key has expired", "key has been revoked", "key was rejected by service", "owner died", "state not recoverable", "operation not possible due to RF-kill", "memory page has hardware error"]);
 		mapper = new mmapper.ptr(new sync.Mutex.ptr(0, 0), {}, mmap, munmap);
 		init();
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
@@ -5030,7 +5069,7 @@ $packages["github.com/gopherjs/gopherjs/nosync"] = (function() {
 	return $pkg;
 })();
 $packages["time"] = (function() {
-	var $pkg = {}, $init, errors, js, nosync, runtime, syscall, runtimeTimer, ParseError, Timer, Time, Month, Weekday, Duration, Location, zone, zoneTrans, sliceType, sliceType$1, ptrType, sliceType$2, structType, arrayType, sliceType$3, arrayType$1, arrayType$2, ptrType$2, funcType, arrayType$3, funcType$1, ptrType$3, ptrType$4, ptrType$5, chanType$1, ptrType$7, zoneSources, std0x, longDayNames, shortDayNames, shortMonthNames, longMonthNames, atoiError, errBad, errLeadingInt, months, days, daysBefore, utcLoc, utcLoc$24ptr, localLoc, localLoc$24ptr, localOnce, errLocation, badData, init, initLocal, runtimeNano, now, Sleep, startTimer, stopTimer, indexByte, startsWithLowerCase, nextStdChunk, match, lookup, appendInt, atoi, formatNano, quote, isDigit, getnum, cutspace, skip, Parse, parse, parseTimeZone, parseGMT, parseSignedOffset, parseNanoseconds, leadingInt, when, AfterFunc, goFunc, absWeekday, absClock, fmtFrac, fmtInt, lessThanHalf, Until, absDate, daysIn, Now, unixTime, Unix, isLeap, norm, Date, div, FixedZone;
+	var $pkg = {}, $init, errors, js, nosync, runtime, syscall, runtimeTimer, ParseError, Timer, Time, Month, Weekday, Duration, Location, zone, zoneTrans, dataIO, sliceType, sliceType$1, ptrType, sliceType$2, structType, arrayType, sliceType$3, arrayType$1, arrayType$2, ptrType$2, funcType, arrayType$3, funcType$1, ptrType$3, ptrType$4, ptrType$5, chanType$1, ptrType$7, ptrType$8, zoneSources, std0x, longDayNames, shortDayNames, shortMonthNames, longMonthNames, atoiError, errBad, errLeadingInt, months, days, daysBefore, utcLoc, utcLoc$24ptr, localLoc, localLoc$24ptr, localOnce, errLocation, badData, loadTzinfoFromTzdata, init, initLocal, runtimeNano, now, Sleep, startTimer, stopTimer, indexByte, startsWithLowerCase, nextStdChunk, match, lookup, appendInt, atoi, formatNano, quote, isDigit, getnum, cutspace, skip, Parse, parse, parseTimeZone, parseGMT, parseSignedOffset, parseNanoseconds, leadingInt, when, AfterFunc, goFunc, open, closefd, preadn, absWeekday, absClock, fmtFrac, fmtInt, lessThanHalf, Until, absDate, daysIn, Now, unixTime, Unix, isLeap, norm, Date, div, FixedZone, init$1, androidLoadTzinfoFromTzdata;
 	errors = $packages["errors"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	nosync = $packages["github.com/gopherjs/gopherjs/nosync"];
@@ -5141,6 +5180,16 @@ $packages["time"] = (function() {
 		this.isstd = isstd_;
 		this.isutc = isutc_;
 	});
+	dataIO = $pkg.dataIO = $newType(0, $kindStruct, "time.dataIO", true, "time", false, function(p_, error_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.p = sliceType$3.nil;
+			this.error = false;
+			return;
+		}
+		this.p = p_;
+		this.error = error_;
+	});
 	sliceType = $sliceType(zone);
 	sliceType$1 = $sliceType(zoneTrans);
 	ptrType = $ptrType(zone);
@@ -5159,6 +5208,7 @@ $packages["time"] = (function() {
 	ptrType$5 = $ptrType(Timer);
 	chanType$1 = $chanType(Time, false, true);
 	ptrType$7 = $ptrType(Time);
+	ptrType$8 = $ptrType(dataIO);
 	init = function() {
 		$unused(Unix(new $Int64(0, 0), new $Int64(0, 0)));
 	};
@@ -6593,6 +6643,46 @@ $packages["time"] = (function() {
 		var arg, seq;
 		$go($assertType(arg, funcType), []);
 	};
+	open = function(name) {
+		var _tuple, err, fd, name;
+		_tuple = syscall.Open(name, 0, 0);
+		fd = _tuple[0];
+		err = _tuple[1];
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			return [0, err];
+		}
+		return [((fd >>> 0)), $ifaceNil];
+	};
+	closefd = function(fd) {
+		var fd;
+		syscall.Close(((fd >> 0)));
+	};
+	preadn = function(fd, buf, off) {
+		var _tuple, _tuple$1, buf, err, err$1, fd, m, off, whence;
+		whence = 0;
+		if (off < 0) {
+			whence = 2;
+		}
+		_tuple = syscall.Seek(((fd >> 0)), (new $Int64(0, off)), whence);
+		err = _tuple[1];
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			return err;
+		}
+		while (true) {
+			if (!(buf.$length > 0)) { break; }
+			_tuple$1 = syscall.Read(((fd >> 0)), buf);
+			m = _tuple$1[0];
+			err$1 = _tuple$1[1];
+			if (m <= 0) {
+				if ($interfaceIsEqual(err$1, $ifaceNil)) {
+					return errors.New("short read");
+				}
+				return err$1;
+			}
+			buf = $subslice(buf, m);
+		}
+		return $ifaceNil;
+	};
 	Time.ptr.prototype.nsec = function() {
 		var t, x;
 		t = this;
@@ -7905,6 +7995,101 @@ $packages["time"] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: Location.ptr.prototype.lookupName }; } $f._i = _i; $f._i$1 = _i$1; $f._r = _r; $f._r$1 = _r$1; $f._ref = _ref; $f._ref$1 = _ref$1; $f._tmp = _tmp; $f._tmp$1 = _tmp$1; $f._tmp$2 = _tmp$2; $f._tmp$3 = _tmp$3; $f._tuple = _tuple; $f.i = i; $f.i$1 = i$1; $f.l = l; $f.nam = nam; $f.name = name; $f.offset = offset; $f.offset$1 = offset$1; $f.ok = ok; $f.unix = unix; $f.x = x; $f.x$1 = x$1; $f.x$2 = x$2; $f.zone$1 = zone$1; $f.zone$2 = zone$2; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	Location.prototype.lookupName = function(name, unix) { return this.$val.lookupName(name, unix); };
+	init$1 = function() {
+		loadTzinfoFromTzdata = androidLoadTzinfoFromTzdata;
+	};
+	androidLoadTzinfoFromTzdata = function(file, name) {
+		var _q, _tuple, _tuple$1, _tuple$2, _tuple$3, _tuple$4, buf, buf$1, d, d$1, dataOff, entry, entrycount, err, err$1, err$2, err$3, fd, file, i, indexOff, indexSize, magic, name, off, size, $deferred;
+		/* */ var $err = null; try { $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+		if (name.length > 40) {
+			return [sliceType$3.nil, errors.New(name + " is longer than the maximum zone name length (40 bytes)")];
+		}
+		_tuple = open(file);
+		fd = _tuple[0];
+		err = _tuple[1];
+		if (!($interfaceIsEqual(err, $ifaceNil))) {
+			return [sliceType$3.nil, err];
+		}
+		$deferred.push([closefd, [fd]]);
+		buf = $makeSlice(sliceType$3, 24);
+		err$1 = preadn(fd, buf, 0);
+		if (!($interfaceIsEqual(err$1, $ifaceNil))) {
+			return [sliceType$3.nil, errors.New("corrupt tzdata file " + file)];
+		}
+		d = new dataIO.ptr(buf, false);
+		magic = d.read(6);
+		if (!(($bytesToString(magic)) === "tzdata")) {
+			return [sliceType$3.nil, errors.New("corrupt tzdata file " + file)];
+		}
+		dataIO.copy(d, new dataIO.ptr($subslice(buf, 12), false));
+		_tuple$1 = d.big4();
+		indexOff = _tuple$1[0];
+		_tuple$2 = d.big4();
+		dataOff = _tuple$2[0];
+		indexSize = dataOff - indexOff >>> 0;
+		entrycount = (_q = indexSize / 52, (_q === _q && _q !== 1/0 && _q !== -1/0) ? _q >>> 0 : $throwRuntimeError("integer divide by zero"));
+		buf = $makeSlice(sliceType$3, indexSize);
+		err$2 = preadn(fd, buf, ((indexOff >> 0)));
+		if (!($interfaceIsEqual(err$2, $ifaceNil))) {
+			return [sliceType$3.nil, errors.New("corrupt tzdata file " + file)];
+		}
+		i = 0;
+		while (true) {
+			if (!(i < ((entrycount >> 0)))) { break; }
+			entry = $subslice(buf, ($imul(i, 52)), ($imul(((i + 1 >> 0)), 52)));
+			if (!(($bytesToString($subslice(entry, 0, name.length))) === name)) {
+				i = i + (1) >> 0;
+				continue;
+			}
+			d$1 = new dataIO.ptr($subslice(entry, 40), false);
+			_tuple$3 = d$1.big4();
+			off = _tuple$3[0];
+			_tuple$4 = d$1.big4();
+			size = _tuple$4[0];
+			buf$1 = $makeSlice(sliceType$3, size);
+			err$3 = preadn(fd, buf$1, (((off + dataOff >>> 0) >> 0)));
+			if (!($interfaceIsEqual(err$3, $ifaceNil))) {
+				return [sliceType$3.nil, errors.New("corrupt tzdata file " + file)];
+			}
+			return [buf$1, $ifaceNil];
+		}
+		return [sliceType$3.nil, errors.New("cannot find " + name + " in tzdata file " + file)];
+		/* */ } catch(err) { $err = err; return [sliceType$3.nil, $ifaceNil]; } finally { $callDeferred($deferred, $err); }
+	};
+	dataIO.ptr.prototype.read = function(n) {
+		var d, n, p;
+		d = this;
+		if (d.p.$length < n) {
+			d.p = sliceType$3.nil;
+			d.error = true;
+			return sliceType$3.nil;
+		}
+		p = $subslice(d.p, 0, n);
+		d.p = $subslice(d.p, n);
+		return p;
+	};
+	dataIO.prototype.read = function(n) { return this.$val.read(n); };
+	dataIO.ptr.prototype.big4 = function() {
+		var _tmp, _tmp$1, _tmp$2, _tmp$3, d, n, ok, p;
+		n = 0;
+		ok = false;
+		d = this;
+		p = d.read(4);
+		if (p.$length < 4) {
+			d.error = true;
+			_tmp = 0;
+			_tmp$1 = false;
+			n = _tmp;
+			ok = _tmp$1;
+			return [n, ok];
+		}
+		_tmp$2 = (((((((((0 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 0]) >>> 0)) << 24 >>> 0) | ((((1 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 1]) >>> 0)) << 16 >>> 0)) >>> 0) | ((((2 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 2]) >>> 0)) << 8 >>> 0)) >>> 0) | (((3 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 3]) >>> 0))) >>> 0;
+		_tmp$3 = true;
+		n = _tmp$2;
+		ok = _tmp$3;
+		return [n, ok];
+	};
+	dataIO.prototype.big4 = function() { return this.$val.big4(); };
 	ptrType$4.methods = [{prop: "Error", name: "Error", pkg: "", typ: $funcType([], [$String], false)}];
 	ptrType$5.methods = [{prop: "Stop", name: "Stop", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "Reset", name: "Reset", pkg: "", typ: $funcType([Duration], [$Bool], false)}];
 	Time.methods = [{prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}, {prop: "Format", name: "Format", pkg: "", typ: $funcType([$String], [$String], false)}, {prop: "AppendFormat", name: "AppendFormat", pkg: "", typ: $funcType([sliceType$3, $String], [sliceType$3], false)}, {prop: "After", name: "After", pkg: "", typ: $funcType([Time], [$Bool], false)}, {prop: "Before", name: "Before", pkg: "", typ: $funcType([Time], [$Bool], false)}, {prop: "Equal", name: "Equal", pkg: "", typ: $funcType([Time], [$Bool], false)}, {prop: "IsZero", name: "IsZero", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "abs", name: "abs", pkg: "time", typ: $funcType([], [$Uint64], false)}, {prop: "locabs", name: "locabs", pkg: "time", typ: $funcType([], [$String, $Int, $Uint64], false)}, {prop: "Date", name: "Date", pkg: "", typ: $funcType([], [$Int, Month, $Int], false)}, {prop: "Year", name: "Year", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Month", name: "Month", pkg: "", typ: $funcType([], [Month], false)}, {prop: "Day", name: "Day", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Weekday", name: "Weekday", pkg: "", typ: $funcType([], [Weekday], false)}, {prop: "ISOWeek", name: "ISOWeek", pkg: "", typ: $funcType([], [$Int, $Int], false)}, {prop: "Clock", name: "Clock", pkg: "", typ: $funcType([], [$Int, $Int, $Int], false)}, {prop: "Hour", name: "Hour", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Minute", name: "Minute", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Second", name: "Second", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Nanosecond", name: "Nanosecond", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "YearDay", name: "YearDay", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Add", name: "Add", pkg: "", typ: $funcType([Duration], [Time], false)}, {prop: "Sub", name: "Sub", pkg: "", typ: $funcType([Time], [Duration], false)}, {prop: "AddDate", name: "AddDate", pkg: "", typ: $funcType([$Int, $Int, $Int], [Time], false)}, {prop: "date", name: "date", pkg: "time", typ: $funcType([$Bool], [$Int, Month, $Int, $Int], false)}, {prop: "UTC", name: "UTC", pkg: "", typ: $funcType([], [Time], false)}, {prop: "Local", name: "Local", pkg: "", typ: $funcType([], [Time], false)}, {prop: "In", name: "In", pkg: "", typ: $funcType([ptrType$2], [Time], false)}, {prop: "Location", name: "Location", pkg: "", typ: $funcType([], [ptrType$2], false)}, {prop: "Zone", name: "Zone", pkg: "", typ: $funcType([], [$String, $Int], false)}, {prop: "Unix", name: "Unix", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "UnixNano", name: "UnixNano", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "MarshalBinary", name: "MarshalBinary", pkg: "", typ: $funcType([], [sliceType$3, $error], false)}, {prop: "GobEncode", name: "GobEncode", pkg: "", typ: $funcType([], [sliceType$3, $error], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$3, $error], false)}, {prop: "MarshalText", name: "MarshalText", pkg: "", typ: $funcType([], [sliceType$3, $error], false)}, {prop: "Truncate", name: "Truncate", pkg: "", typ: $funcType([Duration], [Time], false)}, {prop: "Round", name: "Round", pkg: "", typ: $funcType([Duration], [Time], false)}];
@@ -7913,6 +8098,7 @@ $packages["time"] = (function() {
 	Weekday.methods = [{prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}];
 	Duration.methods = [{prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}, {prop: "Nanoseconds", name: "Nanoseconds", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "Seconds", name: "Seconds", pkg: "", typ: $funcType([], [$Float64], false)}, {prop: "Minutes", name: "Minutes", pkg: "", typ: $funcType([], [$Float64], false)}, {prop: "Hours", name: "Hours", pkg: "", typ: $funcType([], [$Float64], false)}, {prop: "Truncate", name: "Truncate", pkg: "", typ: $funcType([Duration], [Duration], false)}, {prop: "Round", name: "Round", pkg: "", typ: $funcType([Duration], [Duration], false)}];
 	ptrType$2.methods = [{prop: "get", name: "get", pkg: "time", typ: $funcType([], [ptrType$2], false)}, {prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}, {prop: "lookup", name: "lookup", pkg: "time", typ: $funcType([$Int64], [$String, $Int, $Int64, $Int64], false)}, {prop: "lookupFirstZone", name: "lookupFirstZone", pkg: "time", typ: $funcType([], [$Int], false)}, {prop: "firstZoneUsed", name: "firstZoneUsed", pkg: "time", typ: $funcType([], [$Bool], false)}, {prop: "lookupName", name: "lookupName", pkg: "time", typ: $funcType([$String, $Int64], [$Int, $Bool], false)}];
+	ptrType$8.methods = [{prop: "read", name: "read", pkg: "time", typ: $funcType([$Int], [sliceType$3], false)}, {prop: "big4", name: "big4", pkg: "time", typ: $funcType([], [$Uint32, $Bool], false)}, {prop: "byte$", name: "byte", pkg: "time", typ: $funcType([], [$Uint8, $Bool], false)}];
 	runtimeTimer.init("time", [{prop: "i", name: "i", embedded: false, exported: false, typ: $Int32, tag: ""}, {prop: "when", name: "when", embedded: false, exported: false, typ: $Int64, tag: ""}, {prop: "period", name: "period", embedded: false, exported: false, typ: $Int64, tag: ""}, {prop: "f", name: "f", embedded: false, exported: false, typ: funcType$1, tag: ""}, {prop: "arg", name: "arg", embedded: false, exported: false, typ: $emptyInterface, tag: ""}, {prop: "timeout", name: "timeout", embedded: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "active", name: "active", embedded: false, exported: false, typ: $Bool, tag: ""}]);
 	ParseError.init("", [{prop: "Layout", name: "Layout", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "Value", name: "Value", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "LayoutElem", name: "LayoutElem", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "ValueElem", name: "ValueElem", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "Message", name: "Message", embedded: false, exported: true, typ: $String, tag: ""}]);
 	Timer.init("time", [{prop: "C", name: "C", embedded: false, exported: true, typ: chanType$1, tag: ""}, {prop: "r", name: "r", embedded: false, exported: false, typ: runtimeTimer, tag: ""}]);
@@ -7920,6 +8106,7 @@ $packages["time"] = (function() {
 	Location.init("time", [{prop: "name", name: "name", embedded: false, exported: false, typ: $String, tag: ""}, {prop: "zone", name: "zone", embedded: false, exported: false, typ: sliceType, tag: ""}, {prop: "tx", name: "tx", embedded: false, exported: false, typ: sliceType$1, tag: ""}, {prop: "cacheStart", name: "cacheStart", embedded: false, exported: false, typ: $Int64, tag: ""}, {prop: "cacheEnd", name: "cacheEnd", embedded: false, exported: false, typ: $Int64, tag: ""}, {prop: "cacheZone", name: "cacheZone", embedded: false, exported: false, typ: ptrType, tag: ""}]);
 	zone.init("time", [{prop: "name", name: "name", embedded: false, exported: false, typ: $String, tag: ""}, {prop: "offset", name: "offset", embedded: false, exported: false, typ: $Int, tag: ""}, {prop: "isDST", name: "isDST", embedded: false, exported: false, typ: $Bool, tag: ""}]);
 	zoneTrans.init("time", [{prop: "when", name: "when", embedded: false, exported: false, typ: $Int64, tag: ""}, {prop: "index", name: "index", embedded: false, exported: false, typ: $Uint8, tag: ""}, {prop: "isstd", name: "isstd", embedded: false, exported: false, typ: $Bool, tag: ""}, {prop: "isutc", name: "isutc", embedded: false, exported: false, typ: $Bool, tag: ""}]);
+	dataIO.init("time", [{prop: "p", name: "p", embedded: false, exported: false, typ: sliceType$3, tag: ""}, {prop: "error", name: "error", embedded: false, exported: false, typ: $Bool, tag: ""}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -7930,6 +8117,7 @@ $packages["time"] = (function() {
 		$r = syscall.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		localLoc = new Location.ptr("", sliceType.nil, sliceType$1.nil, new $Int64(0, 0), new $Int64(0, 0), ptrType.nil);
 		localOnce = new nosync.Once.ptr(false, false);
+		loadTzinfoFromTzdata = $throwNilPointerError;
 		zoneSources = new sliceType$2([runtime.GOROOT() + "/lib/time/zoneinfo.zip"]);
 		std0x = $toNativeArray($kindInt, [260, 265, 524, 526, 528, 274]);
 		longDayNames = new sliceType$2(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]);
@@ -7946,9 +8134,10 @@ $packages["time"] = (function() {
 		$pkg.UTC = utcLoc;
 		$pkg.Local = localLoc;
 		errLocation = errors.New("time: invalid location name");
+		$unused(new sliceType$2(["/system/usr/share/zoneinfo/tzdata", "/data/misc/zoneinfo/current/tzdata", runtime.GOROOT() + "/lib/time/zoneinfo.zip"]));
 		badData = errors.New("malformed time zone information");
-		$unused(new sliceType$2(["/usr/share/zoneinfo/", "/usr/share/lib/zoneinfo/", "/usr/lib/locale/TZ/", runtime.GOROOT() + "/lib/time/zoneinfo.zip"]));
 		init();
+		init$1();
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
@@ -8967,7 +9156,7 @@ $packages["internal/poll"] = (function() {
 		var _1, _r, _tuple, e1, fd, r0, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _1 = $f._1; _r = $f._r; _tuple = $f._tuple; e1 = $f.e1; fd = $f.fd; r0 = $f.r0; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		if (atomic.LoadInt32((tryDupCloexec$24ptr || (tryDupCloexec$24ptr = new ptrType$2(function() { return tryDupCloexec; }, function($v) { tryDupCloexec = $v; })))) === 1) {
-			_tuple = syscall.Syscall(72, ((fd >>> 0)), 1030, 0);
+			_tuple = syscall.Syscall(25, ((fd >>> 0)), 1030, 0);
 			r0 = _tuple[0];
 			e1 = _tuple[2];
 			_1 = e1;
@@ -9287,7 +9476,7 @@ $packages["internal/poll"] = (function() {
 				/* break; */ $s = 3; continue;
 			}
 			fd.iovecs = (iovecs.$ptr || (iovecs.$ptr = new ptrType$6(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, iovecs)));
-			_tuple = syscall.Syscall(20, ((fd.Sysfd >>> 0)), (($sliceToArray(iovecs[0]))), ((iovecs[0].$length >>> 0)));
+			_tuple = syscall.Syscall(66, ((fd.Sysfd >>> 0)), (($sliceToArray(iovecs[0]))), ((iovecs[0].$length >>> 0)));
 			wrote = _tuple[0];
 			e0 = _tuple[2];
 			if (wrote === 4294967295) {
@@ -9508,7 +9697,7 @@ $packages["os"] = (function() {
 			this.size = new $Int64(0, 0);
 			this.mode = 0;
 			this.modTime = new time.Time.ptr(new $Uint64(0, 0), new $Int64(0, 0), ptrType$15.nil);
-			this.sys = new syscall.Stat_t.ptr(new $Uint64(0, 0), new $Uint64(0, 0), new $Uint64(0, 0), 0, 0, 0, 0, new $Uint64(0, 0), new $Int64(0, 0), new $Int64(0, 0), new $Int64(0, 0), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), arrayType$1.zero());
+			this.sys = new syscall.Stat_t.ptr(new $Uint64(0, 0), new $Uint64(0, 0), 0, 0, 0, 0, new $Uint64(0, 0), new $Uint64(0, 0), new $Int64(0, 0), 0, 0, new $Int64(0, 0), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), arrayType$1.zero());
 			return;
 		}
 		this.name = name_;
@@ -9527,7 +9716,7 @@ $packages["os"] = (function() {
 	ptrType$4 = $ptrType(SyscallError);
 	sliceType$5 = $sliceType(syscall.Iovec);
 	ptrType$12 = $ptrType(sliceType$5);
-	arrayType$1 = $arrayType($Int64, 3);
+	arrayType$1 = $arrayType($Int32, 2);
 	ptrType$13 = $ptrType(file);
 	funcType$1 = $funcType([ptrType$13], [$error], false);
 	ptrType$15 = $ptrType(time.Location);
@@ -10216,7 +10405,7 @@ $packages["os"] = (function() {
 			pollable = false;
 		}
 		if (false && (kind === 1)) {
-			st = new syscall.Stat_t.ptr(new $Uint64(0, 0), new $Uint64(0, 0), new $Uint64(0, 0), 0, 0, 0, 0, new $Uint64(0, 0), new $Int64(0, 0), new $Int64(0, 0), new $Int64(0, 0), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), arrayType$1.zero());
+			st = new syscall.Stat_t.ptr(new $Uint64(0, 0), new $Uint64(0, 0), 0, 0, 0, 0, new $Uint64(0, 0), new $Uint64(0, 0), new $Int64(0, 0), 0, 0, new $Int64(0, 0), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), arrayType$1.zero());
 			err = syscall.Fstat(fdi, st);
 			if ($interfaceIsEqual(err, $ifaceNil) && (((st.Mode & 61440) >>> 0) === 4096)) {
 				pollable = false;
@@ -10448,7 +10637,7 @@ $packages["os"] = (function() {
 		if (f === ptrType.nil) {
 			$s = -1; return [$ifaceNil, $pkg.ErrInvalid];
 		}
-		fs[0] = new fileStat.ptr("", new $Int64(0, 0), 0, new time.Time.ptr(new $Uint64(0, 0), new $Int64(0, 0), ptrType$15.nil), new syscall.Stat_t.ptr(new $Uint64(0, 0), new $Uint64(0, 0), new $Uint64(0, 0), 0, 0, 0, 0, new $Uint64(0, 0), new $Int64(0, 0), new $Int64(0, 0), new $Int64(0, 0), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), arrayType$1.zero()));
+		fs[0] = new fileStat.ptr("", new $Int64(0, 0), 0, new time.Time.ptr(new $Uint64(0, 0), new $Int64(0, 0), ptrType$15.nil), new syscall.Stat_t.ptr(new $Uint64(0, 0), new $Uint64(0, 0), 0, 0, 0, 0, new $Uint64(0, 0), new $Uint64(0, 0), new $Int64(0, 0), 0, 0, new $Int64(0, 0), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), arrayType$1.zero()));
 		_r = f.file.pfd.Fstat(fs[0].sys); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		err = _r;
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
@@ -10461,7 +10650,7 @@ $packages["os"] = (function() {
 	File.prototype.Stat = function() { return this.$val.Stat(); };
 	lstatNolog = function(name) {
 		var err, fs, name;
-		fs = new fileStat.ptr("", new $Int64(0, 0), 0, new time.Time.ptr(new $Uint64(0, 0), new $Int64(0, 0), ptrType$15.nil), new syscall.Stat_t.ptr(new $Uint64(0, 0), new $Uint64(0, 0), new $Uint64(0, 0), 0, 0, 0, 0, new $Uint64(0, 0), new $Int64(0, 0), new $Int64(0, 0), new $Int64(0, 0), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), arrayType$1.zero()));
+		fs = new fileStat.ptr("", new $Int64(0, 0), 0, new time.Time.ptr(new $Uint64(0, 0), new $Int64(0, 0), ptrType$15.nil), new syscall.Stat_t.ptr(new $Uint64(0, 0), new $Uint64(0, 0), 0, 0, 0, 0, new $Uint64(0, 0), new $Uint64(0, 0), new $Int64(0, 0), 0, 0, new $Int64(0, 0), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), new syscall.Timespec.ptr(new $Int64(0, 0), new $Int64(0, 0)), arrayType$1.zero()));
 		err = syscall.Lstat(name, fs.sys);
 		if (!($interfaceIsEqual(err, $ifaceNil))) {
 			return [$ifaceNil, new PathError.ptr("lstat", name, err)];
@@ -13005,7 +13194,7 @@ $packages["unicode"] = (function() {
 	return $pkg;
 })();
 $packages["reflect"] = (function() {
-	var $pkg = {}, $init, errors, js, math, runtime, strconv, sync, unicode, utf8, uncommonType, funcType, name, nameData, mapIter, Type, Kind, tflag, rtype, typeAlg, method, ChanDir, arrayType, chanType, imethod, interfaceType, mapType, ptrType, sliceType, structField, structType, Method, nameOff, typeOff, textOff, StructField, StructTag, fieldScan, Value, flag, ValueError, sliceType$1, ptrType$1, sliceType$2, sliceType$3, ptrType$2, funcType$1, sliceType$4, ptrType$3, ptrType$4, sliceType$5, sliceType$6, sliceType$7, ptrType$5, ptrType$6, structType$3, sliceType$8, sliceType$9, sliceType$10, sliceType$11, ptrType$7, ptrType$8, sliceType$13, sliceType$14, ptrType$9, sliceType$15, ptrType$15, sliceType$17, ptrType$16, funcType$3, funcType$4, funcType$5, ptrType$17, arrayType$12, ptrType$18, initialized, uncommonTypeMap, nameMap, nameOffList, typeOffList, callHelper, jsObjectPtr, selectHelper, kindNames, uint8Type, init, jsType, reflectType, setKindType, newName, newNameOff, newTypeOff, internalStr, isWrapped, copyStruct, makeValue, MakeSlice, TypeOf, ValueOf, FuncOf, SliceOf, Zero, unsafe_New, makeInt, typedmemmove, keyFor, mapaccess, mapassign, mapdelete, mapiterinit, mapiterkey, mapiternext, maplen, cvtDirect, valueInterface, ifaceE2I, methodName, makeMethodValue, wrapJsObject, unwrapJsObject, getJsTag, chanrecv, chansend, methodReceiver, PtrTo, implements$1, directlyAssignable, haveIdenticalType, haveIdenticalUnderlyingType, toType, ifaceIndir, overflowFloat32, New, convertOp, makeFloat, makeComplex, makeString, makeBytes, makeRunes, cvtInt, cvtUint, cvtFloatInt, cvtFloatUint, cvtIntFloat, cvtUintFloat, cvtFloat, cvtComplex, cvtIntString, cvtUintString, cvtBytesString, cvtStringBytes, cvtRunesString, cvtStringRunes, cvtT2I, cvtI2I;
+	var $pkg = {}, $init, errors, js, math, runtime, strconv, sync, unicode, utf8, uncommonType, funcType, name, nameData, mapIter, Type, Kind, tflag, rtype, typeAlg, method, ChanDir, arrayType, chanType, imethod, interfaceType, mapType, ptrType, sliceType, structField, structType, Method, nameOff, typeOff, textOff, StructField, StructTag, fieldScan, Value, flag, ValueError, sliceType$1, ptrType$1, sliceType$2, sliceType$3, ptrType$2, funcType$1, sliceType$4, ptrType$3, ptrType$4, sliceType$5, sliceType$6, sliceType$7, ptrType$5, ptrType$6, structType$3, sliceType$8, sliceType$9, sliceType$10, sliceType$11, ptrType$7, ptrType$8, ptrType$9, sliceType$13, sliceType$14, ptrType$10, sliceType$15, ptrType$16, sliceType$17, funcType$3, funcType$4, funcType$5, ptrType$17, arrayType$12, ptrType$18, initialized, uncommonTypeMap, nameMap, nameOffList, typeOffList, callHelper, jsObjectPtr, selectHelper, kindNames, uint8Type, init, jsType, reflectType, setKindType, newName, newNameOff, newTypeOff, internalStr, isWrapped, copyStruct, makeValue, MakeSlice, TypeOf, ValueOf, FuncOf, SliceOf, Zero, unsafe_New, makeInt, typedmemmove, keyFor, mapaccess, mapassign, mapdelete, mapiterinit, mapiterkey, mapiternext, maplen, cvtDirect, valueInterface, ifaceE2I, methodName, makeMethodValue, wrapJsObject, unwrapJsObject, getJsTag, chanrecv, chansend, methodReceiver, PtrTo, implements$1, directlyAssignable, haveIdenticalType, haveIdenticalUnderlyingType, toType, ifaceIndir, overflowFloat32, New, convertOp, makeFloat, makeComplex, makeString, makeBytes, makeRunes, cvtInt, cvtUint, cvtFloatInt, cvtFloatUint, cvtIntFloat, cvtUintFloat, cvtFloat, cvtComplex, cvtIntString, cvtUintString, cvtBytesString, cvtStringBytes, cvtRunesString, cvtStringRunes, cvtT2I, cvtI2I;
 	errors = $packages["errors"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	math = $packages["math"];
@@ -13299,7 +13488,7 @@ $packages["reflect"] = (function() {
 	fieldScan = $pkg.fieldScan = $newType(0, $kindStruct, "reflect.fieldScan", true, "reflect", false, function(typ_, index_) {
 		this.$val = this;
 		if (arguments.length === 0) {
-			this.typ = ptrType$9.nil;
+			this.typ = ptrType$10.nil;
 			this.index = sliceType$13.nil;
 			return;
 		}
@@ -13348,15 +13537,15 @@ $packages["reflect"] = (function() {
 	sliceType$9 = $sliceType(Value);
 	sliceType$10 = $sliceType(Type);
 	sliceType$11 = $sliceType(sliceType$8);
-	ptrType$7 = $ptrType(interfaceType);
-	ptrType$8 = $ptrType(imethod);
+	ptrType$7 = $ptrType(funcType);
+	ptrType$8 = $ptrType(interfaceType);
+	ptrType$9 = $ptrType(imethod);
 	sliceType$13 = $sliceType($Int);
 	sliceType$14 = $sliceType(fieldScan);
-	ptrType$9 = $ptrType(structType);
+	ptrType$10 = $ptrType(structType);
 	sliceType$15 = $sliceType($Uint8);
-	ptrType$15 = $ptrType($UnsafePointer);
+	ptrType$16 = $ptrType($UnsafePointer);
 	sliceType$17 = $sliceType($Int32);
-	ptrType$16 = $ptrType(funcType);
 	funcType$3 = $funcType([$String], [$Bool], false);
 	funcType$4 = $funcType([$UnsafePointer, $Uintptr], [$Uintptr], false);
 	funcType$5 = $funcType([$UnsafePointer, $UnsafePointer], [$Bool], false);
@@ -14706,7 +14895,7 @@ $packages["reflect"] = (function() {
 	methodReceiver = function(op, v, i) {
 		var _$38, fn, i, m, m$1, ms, op, prop, rcvr, t, tt, v, x;
 		_$38 = ptrType$1.nil;
-		t = ptrType$1.nil;
+		t = ptrType$7.nil;
 		fn = 0;
 		prop = "";
 		if (v.typ.Kind() === 20) {
@@ -14718,7 +14907,7 @@ $packages["reflect"] = (function() {
 			if (!$clone(tt.rtype.nameOff(m.name), name).isExported()) {
 				$panic(new $String("reflect: " + op + " of unexported method"));
 			}
-			t = tt.rtype.typeOff(m.typ);
+			t = (tt.rtype.typeOff(m.typ).kindType);
 			prop = $clone(tt.rtype.nameOff(m.name), name).name();
 		} else {
 			ms = v.typ.exportedMethods();
@@ -14729,7 +14918,7 @@ $packages["reflect"] = (function() {
 			if (!$clone(v.typ.nameOff(m$1.name), name).isExported()) {
 				$panic(new $String("reflect: " + op + " of unexported method"));
 			}
-			t = v.typ.typeOff(m$1.mtyp);
+			t = (v.typ.typeOff(m$1.mtyp).kindType);
 			prop = $internalize($methodSet(jsType(v.typ))[i].prop, $String);
 		}
 		rcvr = $clone(v, Value).object();
@@ -14743,7 +14932,7 @@ $packages["reflect"] = (function() {
 		var _1, _arg, _arg$1, _arg$2, _arg$3, _i, _i$1, _i$2, _r, _r$1, _r$10, _r$11, _r$12, _r$13, _r$14, _r$15, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, _ref, _ref$1, _ref$2, _tmp, _tmp$1, _tuple, arg, argsArray, elem, fn, i, i$1, i$2, i$3, in$1, isSlice, m, n, nin, nout, op, origIn, rcvr, results, ret, slice, t, targ, v, x, x$1, x$2, xt, xt$1, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _1 = $f._1; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _i = $f._i; _i$1 = $f._i$1; _i$2 = $f._i$2; _r = $f._r; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$15 = $f._r$15; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; _ref = $f._ref; _ref$1 = $f._ref$1; _ref$2 = $f._ref$2; _tmp = $f._tmp; _tmp$1 = $f._tmp$1; _tuple = $f._tuple; arg = $f.arg; argsArray = $f.argsArray; elem = $f.elem; fn = $f.fn; i = $f.i; i$1 = $f.i$1; i$2 = $f.i$2; i$3 = $f.i$3; in$1 = $f.in$1; isSlice = $f.isSlice; m = $f.m; n = $f.n; nin = $f.nin; nout = $f.nout; op = $f.op; origIn = $f.origIn; rcvr = $f.rcvr; results = $f.results; ret = $f.ret; slice = $f.slice; t = $f.t; targ = $f.targ; v = $f.v; x = $f.x; x$1 = $f.x$1; x$2 = $f.x$2; xt = $f.xt; xt$1 = $f.xt$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		v = this;
-		t = ptrType$1.nil;
+		t = ptrType$7.nil;
 		fn = 0;
 		rcvr = null;
 		if (!((((v.flag & 512) >>> 0) === 0))) {
@@ -14755,7 +14944,7 @@ $packages["reflect"] = (function() {
 				rcvr = new (jsType(v.typ))(rcvr);
 			}
 		} else {
-			t = v.typ;
+			t = (v.typ.kindType);
 			fn = ($clone(v, Value).object());
 			rcvr = undefined;
 		}
@@ -14763,9 +14952,9 @@ $packages["reflect"] = (function() {
 			$panic(new $String("reflect.Value.Call: call of nil function"));
 		}
 		isSlice = op === "CallSlice";
-		n = t.NumIn();
+		n = t.rtype.NumIn();
 		if (isSlice) {
-			if (!t.IsVariadic()) {
+			if (!t.rtype.IsVariadic()) {
 				$panic(new $String("reflect: CallSlice of non-variadic function"));
 			}
 			if (in$1.$length < n) {
@@ -14775,13 +14964,13 @@ $packages["reflect"] = (function() {
 				$panic(new $String("reflect: CallSlice with too many input arguments"));
 			}
 		} else {
-			if (t.IsVariadic()) {
+			if (t.rtype.IsVariadic()) {
 				n = n - (1) >> 0;
 			}
 			if (in$1.$length < n) {
 				$panic(new $String("reflect: Call with too few input arguments"));
 			}
-			if (!t.IsVariadic() && in$1.$length > n) {
+			if (!t.rtype.IsVariadic() && in$1.$length > n) {
 				$panic(new $String("reflect: Call with too many input arguments"));
 			}
 		}
@@ -14799,7 +14988,7 @@ $packages["reflect"] = (function() {
 		/* while (true) { */ case 1:
 			/* if (!(i < n)) { break; } */ if(!(i < n)) { $s = 2; continue; }
 			_tmp = $clone(((i < 0 || i >= in$1.$length) ? ($throwRuntimeError("index out of range"), undefined) : in$1.$array[in$1.$offset + i]), Value).Type();
-			_tmp$1 = t.In(i);
+			_tmp$1 = t.rtype.In(i);
 			xt = _tmp;
 			targ = _tmp$1;
 			_r = xt.AssignableTo(targ); /* */ $s = 5; case 5: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
@@ -14812,13 +15001,13 @@ $packages["reflect"] = (function() {
 			/* } */ case 4:
 			i = i + (1) >> 0;
 		/* } */ $s = 1; continue; case 2:
-		/* */ if (!isSlice && t.IsVariadic()) { $s = 8; continue; }
+		/* */ if (!isSlice && t.rtype.IsVariadic()) { $s = 8; continue; }
 		/* */ $s = 9; continue;
-		/* if (!isSlice && t.IsVariadic()) { */ case 8:
+		/* if (!isSlice && t.rtype.IsVariadic()) { */ case 8:
 			m = in$1.$length - n >> 0;
-			_r$3 = MakeSlice(t.In(n), m, m); /* */ $s = 10; case 10: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+			_r$3 = MakeSlice(t.rtype.In(n), m, m); /* */ $s = 10; case 10: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
 			slice = _r$3;
-			_r$4 = t.In(n).Elem(); /* */ $s = 11; case 11: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+			_r$4 = t.rtype.In(n).Elem(); /* */ $s = 11; case 11: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
 			elem = _r$4;
 			i$1 = 0;
 			/* while (true) { */ case 12:
@@ -14843,19 +15032,19 @@ $packages["reflect"] = (function() {
 			((n < 0 || n >= in$1.$length) ? ($throwRuntimeError("index out of range"), undefined) : in$1.$array[in$1.$offset + n] = slice);
 		/* } */ case 9:
 		nin = in$1.$length;
-		if (!((nin === t.NumIn()))) {
+		if (!((nin === t.rtype.NumIn()))) {
 			$panic(new $String("reflect.Value.Call: wrong argument count"));
 		}
-		nout = t.NumOut();
-		argsArray = new ($global.Array)(t.NumIn());
+		nout = t.rtype.NumOut();
+		argsArray = new ($global.Array)(t.rtype.NumIn());
 		_ref$1 = in$1;
 		_i$1 = 0;
 		/* while (true) { */ case 21:
 			/* if (!(_i$1 < _ref$1.$length)) { break; } */ if(!(_i$1 < _ref$1.$length)) { $s = 22; continue; }
 			i$2 = _i$1;
 			arg = ((_i$1 < 0 || _i$1 >= _ref$1.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$1.$array[_ref$1.$offset + _i$1]);
-			_arg = t.In(i$2);
-			_r$9 = t.In(i$2).common(); /* */ $s = 23; case 23: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
+			_arg = t.rtype.In(i$2);
+			_r$9 = t.rtype.In(i$2).common(); /* */ $s = 23; case 23: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
 			_arg$1 = _r$9;
 			_arg$2 = 0;
 			_r$10 = $clone(arg, Value).assignTo("reflect.Value.Call", _arg$1, _arg$2); /* */ $s = 24; case 24: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
@@ -14874,7 +15063,7 @@ $packages["reflect"] = (function() {
 			/* if (_1 === (0)) { */ case 29:
 				$s = -1; return sliceType$9.nil;
 			/* } else if (_1 === (1)) { */ case 30:
-				_r$14 = makeValue(t.Out(0), wrapJsObject(t.Out(0), results), 0); /* */ $s = 33; case 33: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
+				_r$14 = makeValue(t.rtype.Out(0), wrapJsObject(t.rtype.Out(0), results), 0); /* */ $s = 33; case 33: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
 				$s = -1; return new sliceType$9([$clone(_r$14, Value)]);
 			/* } else { */ case 31:
 				ret = $makeSlice(sliceType$9, nout);
@@ -14883,7 +15072,7 @@ $packages["reflect"] = (function() {
 				/* while (true) { */ case 34:
 					/* if (!(_i$2 < _ref$2.$length)) { break; } */ if(!(_i$2 < _ref$2.$length)) { $s = 35; continue; }
 					i$3 = _i$2;
-					_r$15 = makeValue(t.Out(i$3), wrapJsObject(t.Out(i$3), results[i$3]), 0); /* */ $s = 36; case 36: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
+					_r$15 = makeValue(t.rtype.Out(i$3), wrapJsObject(t.rtype.Out(i$3), results[i$3]), 0); /* */ $s = 36; case 36: if($c) { $c = false; _r$15 = _r$15.$blk(); } if (_r$15 && _r$15.$blk !== undefined) { break s; }
 					((i$3 < 0 || i$3 >= ret.$length) ? ($throwRuntimeError("index out of range"), undefined) : ret.$array[ret.$offset + i$3] = _r$15);
 					_i$2++;
 				/* } */ $s = 34; continue; case 35:
@@ -15274,10 +15463,10 @@ $packages["reflect"] = (function() {
 		m = new Method.ptr("", "", $ifaceNil, new Value.ptr(ptrType$1.nil, 0, 0), 0);
 		ok = false;
 		t = this;
-		if (t === ptrType$7.nil) {
+		if (t === ptrType$8.nil) {
 			return [m, ok];
 		}
-		p = ptrType$8.nil;
+		p = ptrType$9.nil;
 		_ref = t.methods;
 		_i = 0;
 		while (true) {
@@ -15433,7 +15622,7 @@ $packages["reflect"] = (function() {
 		current = new sliceType$14([]);
 		next = new sliceType$14([new fieldScan.ptr(t, sliceType$13.nil)]);
 		nextCount = false;
-		visited = $makeMap(ptrType$9.keyFor, []);
+		visited = $makeMap(ptrType$10.keyFor, []);
 		/* while (true) { */ case 1:
 			/* if (!(next.$length > 0)) { break; } */ if(!(next.$length > 0)) { $s = 2; continue; }
 			_tmp = next;
@@ -15448,13 +15637,13 @@ $packages["reflect"] = (function() {
 				/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 4; continue; }
 				scan = $clone(((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]), fieldScan);
 				t$1 = scan.typ;
-				/* */ if ((_entry = visited[ptrType$9.keyFor(t$1)], _entry !== undefined ? _entry.v : false)) { $s = 5; continue; }
+				/* */ if ((_entry = visited[ptrType$10.keyFor(t$1)], _entry !== undefined ? _entry.v : false)) { $s = 5; continue; }
 				/* */ $s = 6; continue;
-				/* if ((_entry = visited[ptrType$9.keyFor(t$1)], _entry !== undefined ? _entry.v : false)) { */ case 5:
+				/* if ((_entry = visited[ptrType$10.keyFor(t$1)], _entry !== undefined ? _entry.v : false)) { */ case 5:
 					_i++;
 					/* continue; */ $s = 3; continue;
 				/* } */ case 6:
-				_key = t$1; (visited || $throwRuntimeError("assignment to entry in nil map"))[ptrType$9.keyFor(_key)] = { k: _key, v: true };
+				_key = t$1; (visited || $throwRuntimeError("assignment to entry in nil map"))[ptrType$10.keyFor(_key)] = { k: _key, v: true };
 				_ref$1 = t$1.fields;
 				_i$1 = 0;
 				/* while (true) { */ case 7:
@@ -15478,7 +15667,7 @@ $packages["reflect"] = (function() {
 					/* */ if (_r$1) { $s = 14; continue; }
 					/* */ $s = 15; continue;
 					/* if (_r$1) { */ case 14:
-						if ((_entry$1 = count[ptrType$9.keyFor(t$1)], _entry$1 !== undefined ? _entry$1.v : 0) > 1 || ok) {
+						if ((_entry$1 = count[ptrType$10.keyFor(t$1)], _entry$1 !== undefined ? _entry$1.v : 0) > 1 || ok) {
 							_tmp$2 = new StructField.ptr("", "", $ifaceNil, "", 0, sliceType$13.nil, false);
 							_tmp$3 = false;
 							StructField.copy(result, _tmp$2);
@@ -15498,17 +15687,17 @@ $packages["reflect"] = (function() {
 						/* continue; */ $s = 7; continue;
 					}
 					styp = (ntyp.kindType);
-					if ((_entry$2 = nextCount[ptrType$9.keyFor(styp)], _entry$2 !== undefined ? _entry$2.v : 0) > 0) {
-						_key$1 = styp; (nextCount || $throwRuntimeError("assignment to entry in nil map"))[ptrType$9.keyFor(_key$1)] = { k: _key$1, v: 2 };
+					if ((_entry$2 = nextCount[ptrType$10.keyFor(styp)], _entry$2 !== undefined ? _entry$2.v : 0) > 0) {
+						_key$1 = styp; (nextCount || $throwRuntimeError("assignment to entry in nil map"))[ptrType$10.keyFor(_key$1)] = { k: _key$1, v: 2 };
 						_i$1++;
 						/* continue; */ $s = 7; continue;
 					}
 					if (nextCount === false) {
-						nextCount = $makeMap(ptrType$9.keyFor, []);
+						nextCount = $makeMap(ptrType$10.keyFor, []);
 					}
-					_key$2 = styp; (nextCount || $throwRuntimeError("assignment to entry in nil map"))[ptrType$9.keyFor(_key$2)] = { k: _key$2, v: 1 };
-					if ((_entry$3 = count[ptrType$9.keyFor(t$1)], _entry$3 !== undefined ? _entry$3.v : 0) > 1) {
-						_key$3 = styp; (nextCount || $throwRuntimeError("assignment to entry in nil map"))[ptrType$9.keyFor(_key$3)] = { k: _key$3, v: 2 };
+					_key$2 = styp; (nextCount || $throwRuntimeError("assignment to entry in nil map"))[ptrType$10.keyFor(_key$2)] = { k: _key$2, v: 1 };
+					if ((_entry$3 = count[ptrType$10.keyFor(t$1)], _entry$3 !== undefined ? _entry$3.v : 0) > 1) {
+						_key$3 = styp; (nextCount || $throwRuntimeError("assignment to entry in nil map"))[ptrType$10.keyFor(_key$3)] = { k: _key$3, v: 2 };
 					}
 					index = sliceType$13.nil;
 					index = $appendSlice(index, scan.index);
@@ -16186,7 +16375,7 @@ $packages["reflect"] = (function() {
 		if (!((((key.flag & 128) >>> 0) === 0))) {
 			k = key.ptr;
 		} else {
-			k = ((key.$ptr_ptr || (key.$ptr_ptr = new ptrType$15(function() { return this.$target.ptr; }, function($v) { this.$target.ptr = $v; }, key))));
+			k = ((key.$ptr_ptr || (key.$ptr_ptr = new ptrType$16(function() { return this.$target.ptr; }, function($v) { this.$target.ptr = $v; }, key))));
 		}
 		e = mapaccess(v.typ, $clone(v, Value).pointer(), k);
 		if (e === 0) {
@@ -16394,7 +16583,7 @@ $packages["reflect"] = (function() {
 			val.ptr = p;
 			val.flag = (val.flag | (128)) >>> 0;
 		} else {
-			p = ((val.$ptr_ptr || (val.$ptr_ptr = new ptrType$15(function() { return this.$target.ptr; }, function($v) { this.$target.ptr = $v; }, val))));
+			p = ((val.$ptr_ptr || (val.$ptr_ptr = new ptrType$16(function() { return this.$target.ptr; }, function($v) { this.$target.ptr = $v; }, val))));
 		}
 		_r = chanrecv($clone(v, Value).pointer(), nb, p); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		_tuple = _r;
@@ -16435,7 +16624,7 @@ $packages["reflect"] = (function() {
 		if (!((((x.flag & 128) >>> 0) === 0))) {
 			p = x.ptr;
 		} else {
-			p = ((x.$ptr_ptr || (x.$ptr_ptr = new ptrType$15(function() { return this.$target.ptr; }, function($v) { this.$target.ptr = $v; }, x))));
+			p = ((x.$ptr_ptr || (x.$ptr_ptr = new ptrType$16(function() { return this.$target.ptr; }, function($v) { this.$target.ptr = $v; }, x))));
 		}
 		_r$1 = chansend($clone(v, Value).pointer(), p, nb); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
 		selected = _r$1;
@@ -16533,7 +16722,7 @@ $packages["reflect"] = (function() {
 		if (!((((key.flag & 128) >>> 0) === 0))) {
 			k = key.ptr;
 		} else {
-			k = ((key.$ptr_ptr || (key.$ptr_ptr = new ptrType$15(function() { return this.$target.ptr; }, function($v) { this.$target.ptr = $v; }, key))));
+			k = ((key.$ptr_ptr || (key.$ptr_ptr = new ptrType$16(function() { return this.$target.ptr; }, function($v) { this.$target.ptr = $v; }, key))));
 		}
 		if (val.typ === ptrType$1.nil) {
 			mapdelete(v.typ, $clone(v, Value).pointer(), k);
@@ -16546,7 +16735,7 @@ $packages["reflect"] = (function() {
 		if (!((((val.flag & 128) >>> 0) === 0))) {
 			e = val.ptr;
 		} else {
-			e = ((val.$ptr_ptr || (val.$ptr_ptr = new ptrType$15(function() { return this.$target.ptr; }, function($v) { this.$target.ptr = $v; }, val))));
+			e = ((val.$ptr_ptr || (val.$ptr_ptr = new ptrType$16(function() { return this.$target.ptr; }, function($v) { this.$target.ptr = $v; }, val))));
 		}
 		$r = mapassign(v.typ, $clone(v, Value).pointer(), k, e); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
@@ -17052,14 +17241,14 @@ $packages["reflect"] = (function() {
 		/* */ } return; } if ($f === undefined) { $f = { $blk: cvtI2I }; } $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f.ret = ret; $f.typ = typ; $f.v = v; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	ptrType$5.methods = [{prop: "methods", name: "methods", pkg: "reflect", typ: $funcType([], [sliceType$5], false)}, {prop: "exportedMethods", name: "exportedMethods", pkg: "reflect", typ: $funcType([], [sliceType$5], false)}];
-	ptrType$16.methods = [{prop: "in$", name: "in", pkg: "reflect", typ: $funcType([], [sliceType$2], false)}, {prop: "out", name: "out", pkg: "reflect", typ: $funcType([], [sliceType$2], false)}];
+	ptrType$7.methods = [{prop: "in$", name: "in", pkg: "reflect", typ: $funcType([], [sliceType$2], false)}, {prop: "out", name: "out", pkg: "reflect", typ: $funcType([], [sliceType$2], false)}];
 	name.methods = [{prop: "name", name: "name", pkg: "reflect", typ: $funcType([], [$String], false)}, {prop: "tag", name: "tag", pkg: "reflect", typ: $funcType([], [$String], false)}, {prop: "pkgPath", name: "pkgPath", pkg: "reflect", typ: $funcType([], [$String], false)}, {prop: "isExported", name: "isExported", pkg: "reflect", typ: $funcType([], [$Bool], false)}, {prop: "data", name: "data", pkg: "reflect", typ: $funcType([$Int, $String], [ptrType$4], false)}, {prop: "nameLen", name: "nameLen", pkg: "reflect", typ: $funcType([], [$Int], false)}, {prop: "tagLen", name: "tagLen", pkg: "reflect", typ: $funcType([], [$Int], false)}];
 	Kind.methods = [{prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}];
 	ptrType$1.methods = [{prop: "uncommon", name: "uncommon", pkg: "reflect", typ: $funcType([], [ptrType$5], false)}, {prop: "nameOff", name: "nameOff", pkg: "reflect", typ: $funcType([nameOff], [name], false)}, {prop: "typeOff", name: "typeOff", pkg: "reflect", typ: $funcType([typeOff], [ptrType$1], false)}, {prop: "ptrTo", name: "ptrTo", pkg: "reflect", typ: $funcType([], [ptrType$1], false)}, {prop: "pointers", name: "pointers", pkg: "reflect", typ: $funcType([], [$Bool], false)}, {prop: "Comparable", name: "Comparable", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "Method", name: "Method", pkg: "", typ: $funcType([$Int], [Method], false)}, {prop: "textOff", name: "textOff", pkg: "reflect", typ: $funcType([textOff], [$UnsafePointer], false)}, {prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}, {prop: "Size", name: "Size", pkg: "", typ: $funcType([], [$Uintptr], false)}, {prop: "Bits", name: "Bits", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Align", name: "Align", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "FieldAlign", name: "FieldAlign", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Kind", name: "Kind", pkg: "", typ: $funcType([], [Kind], false)}, {prop: "common", name: "common", pkg: "reflect", typ: $funcType([], [ptrType$1], false)}, {prop: "exportedMethods", name: "exportedMethods", pkg: "reflect", typ: $funcType([], [sliceType$5], false)}, {prop: "NumMethod", name: "NumMethod", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "MethodByName", name: "MethodByName", pkg: "", typ: $funcType([$String], [Method, $Bool], false)}, {prop: "PkgPath", name: "PkgPath", pkg: "", typ: $funcType([], [$String], false)}, {prop: "Name", name: "Name", pkg: "", typ: $funcType([], [$String], false)}, {prop: "ChanDir", name: "ChanDir", pkg: "", typ: $funcType([], [ChanDir], false)}, {prop: "IsVariadic", name: "IsVariadic", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "Elem", name: "Elem", pkg: "", typ: $funcType([], [Type], false)}, {prop: "Field", name: "Field", pkg: "", typ: $funcType([$Int], [StructField], false)}, {prop: "FieldByIndex", name: "FieldByIndex", pkg: "", typ: $funcType([sliceType$13], [StructField], false)}, {prop: "FieldByName", name: "FieldByName", pkg: "", typ: $funcType([$String], [StructField, $Bool], false)}, {prop: "FieldByNameFunc", name: "FieldByNameFunc", pkg: "", typ: $funcType([funcType$3], [StructField, $Bool], false)}, {prop: "In", name: "In", pkg: "", typ: $funcType([$Int], [Type], false)}, {prop: "Key", name: "Key", pkg: "", typ: $funcType([], [Type], false)}, {prop: "Len", name: "Len", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "NumField", name: "NumField", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "NumIn", name: "NumIn", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "NumOut", name: "NumOut", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Out", name: "Out", pkg: "", typ: $funcType([$Int], [Type], false)}, {prop: "Implements", name: "Implements", pkg: "", typ: $funcType([Type], [$Bool], false)}, {prop: "AssignableTo", name: "AssignableTo", pkg: "", typ: $funcType([Type], [$Bool], false)}, {prop: "ConvertibleTo", name: "ConvertibleTo", pkg: "", typ: $funcType([Type], [$Bool], false)}];
 	ChanDir.methods = [{prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}];
-	ptrType$7.methods = [{prop: "Method", name: "Method", pkg: "", typ: $funcType([$Int], [Method], false)}, {prop: "NumMethod", name: "NumMethod", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "MethodByName", name: "MethodByName", pkg: "", typ: $funcType([$String], [Method, $Bool], false)}];
+	ptrType$8.methods = [{prop: "Method", name: "Method", pkg: "", typ: $funcType([$Int], [Method], false)}, {prop: "NumMethod", name: "NumMethod", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "MethodByName", name: "MethodByName", pkg: "", typ: $funcType([$String], [Method, $Bool], false)}];
 	ptrType$17.methods = [{prop: "offset", name: "offset", pkg: "reflect", typ: $funcType([], [$Uintptr], false)}, {prop: "embedded", name: "embedded", pkg: "reflect", typ: $funcType([], [$Bool], false)}];
-	ptrType$9.methods = [{prop: "Field", name: "Field", pkg: "", typ: $funcType([$Int], [StructField], false)}, {prop: "FieldByIndex", name: "FieldByIndex", pkg: "", typ: $funcType([sliceType$13], [StructField], false)}, {prop: "FieldByNameFunc", name: "FieldByNameFunc", pkg: "", typ: $funcType([funcType$3], [StructField, $Bool], false)}, {prop: "FieldByName", name: "FieldByName", pkg: "", typ: $funcType([$String], [StructField, $Bool], false)}];
+	ptrType$10.methods = [{prop: "Field", name: "Field", pkg: "", typ: $funcType([$Int], [StructField], false)}, {prop: "FieldByIndex", name: "FieldByIndex", pkg: "", typ: $funcType([sliceType$13], [StructField], false)}, {prop: "FieldByNameFunc", name: "FieldByNameFunc", pkg: "", typ: $funcType([funcType$3], [StructField, $Bool], false)}, {prop: "FieldByName", name: "FieldByName", pkg: "", typ: $funcType([$String], [StructField, $Bool], false)}];
 	StructTag.methods = [{prop: "Get", name: "Get", pkg: "", typ: $funcType([$String], [$String], false)}, {prop: "Lookup", name: "Lookup", pkg: "", typ: $funcType([$String], [$String, $Bool], false)}];
 	Value.methods = [{prop: "object", name: "object", pkg: "reflect", typ: $funcType([], [ptrType$2], false)}, {prop: "assignTo", name: "assignTo", pkg: "reflect", typ: $funcType([$String, ptrType$1, $UnsafePointer], [Value], false)}, {prop: "Cap", name: "Cap", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Elem", name: "Elem", pkg: "", typ: $funcType([], [Value], false)}, {prop: "Field", name: "Field", pkg: "", typ: $funcType([$Int], [Value], false)}, {prop: "Index", name: "Index", pkg: "", typ: $funcType([$Int], [Value], false)}, {prop: "InterfaceData", name: "InterfaceData", pkg: "", typ: $funcType([], [arrayType$12], false)}, {prop: "IsNil", name: "IsNil", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "Len", name: "Len", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "Pointer", name: "Pointer", pkg: "", typ: $funcType([], [$Uintptr], false)}, {prop: "Set", name: "Set", pkg: "", typ: $funcType([Value], [], false)}, {prop: "SetBytes", name: "SetBytes", pkg: "", typ: $funcType([sliceType$15], [], false)}, {prop: "SetCap", name: "SetCap", pkg: "", typ: $funcType([$Int], [], false)}, {prop: "SetLen", name: "SetLen", pkg: "", typ: $funcType([$Int], [], false)}, {prop: "Slice", name: "Slice", pkg: "", typ: $funcType([$Int, $Int], [Value], false)}, {prop: "Slice3", name: "Slice3", pkg: "", typ: $funcType([$Int, $Int, $Int], [Value], false)}, {prop: "Close", name: "Close", pkg: "", typ: $funcType([], [], false)}, {prop: "call", name: "call", pkg: "reflect", typ: $funcType([$String, sliceType$9], [sliceType$9], false)}, {prop: "pointer", name: "pointer", pkg: "reflect", typ: $funcType([], [$UnsafePointer], false)}, {prop: "Addr", name: "Addr", pkg: "", typ: $funcType([], [Value], false)}, {prop: "Bool", name: "Bool", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "Bytes", name: "Bytes", pkg: "", typ: $funcType([], [sliceType$15], false)}, {prop: "runes", name: "runes", pkg: "reflect", typ: $funcType([], [sliceType$17], false)}, {prop: "CanAddr", name: "CanAddr", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "CanSet", name: "CanSet", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "Call", name: "Call", pkg: "", typ: $funcType([sliceType$9], [sliceType$9], false)}, {prop: "CallSlice", name: "CallSlice", pkg: "", typ: $funcType([sliceType$9], [sliceType$9], false)}, {prop: "Complex", name: "Complex", pkg: "", typ: $funcType([], [$Complex128], false)}, {prop: "FieldByIndex", name: "FieldByIndex", pkg: "", typ: $funcType([sliceType$13], [Value], false)}, {prop: "FieldByName", name: "FieldByName", pkg: "", typ: $funcType([$String], [Value], false)}, {prop: "FieldByNameFunc", name: "FieldByNameFunc", pkg: "", typ: $funcType([funcType$3], [Value], false)}, {prop: "Float", name: "Float", pkg: "", typ: $funcType([], [$Float64], false)}, {prop: "Int", name: "Int", pkg: "", typ: $funcType([], [$Int64], false)}, {prop: "CanInterface", name: "CanInterface", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "Interface", name: "Interface", pkg: "", typ: $funcType([], [$emptyInterface], false)}, {prop: "IsValid", name: "IsValid", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "Kind", name: "Kind", pkg: "", typ: $funcType([], [Kind], false)}, {prop: "MapIndex", name: "MapIndex", pkg: "", typ: $funcType([Value], [Value], false)}, {prop: "MapKeys", name: "MapKeys", pkg: "", typ: $funcType([], [sliceType$9], false)}, {prop: "Method", name: "Method", pkg: "", typ: $funcType([$Int], [Value], false)}, {prop: "NumMethod", name: "NumMethod", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "MethodByName", name: "MethodByName", pkg: "", typ: $funcType([$String], [Value], false)}, {prop: "NumField", name: "NumField", pkg: "", typ: $funcType([], [$Int], false)}, {prop: "OverflowComplex", name: "OverflowComplex", pkg: "", typ: $funcType([$Complex128], [$Bool], false)}, {prop: "OverflowFloat", name: "OverflowFloat", pkg: "", typ: $funcType([$Float64], [$Bool], false)}, {prop: "OverflowInt", name: "OverflowInt", pkg: "", typ: $funcType([$Int64], [$Bool], false)}, {prop: "OverflowUint", name: "OverflowUint", pkg: "", typ: $funcType([$Uint64], [$Bool], false)}, {prop: "Recv", name: "Recv", pkg: "", typ: $funcType([], [Value, $Bool], false)}, {prop: "recv", name: "recv", pkg: "reflect", typ: $funcType([$Bool], [Value, $Bool], false)}, {prop: "Send", name: "Send", pkg: "", typ: $funcType([Value], [], false)}, {prop: "send", name: "send", pkg: "reflect", typ: $funcType([Value, $Bool], [$Bool], false)}, {prop: "SetBool", name: "SetBool", pkg: "", typ: $funcType([$Bool], [], false)}, {prop: "setRunes", name: "setRunes", pkg: "reflect", typ: $funcType([sliceType$17], [], false)}, {prop: "SetComplex", name: "SetComplex", pkg: "", typ: $funcType([$Complex128], [], false)}, {prop: "SetFloat", name: "SetFloat", pkg: "", typ: $funcType([$Float64], [], false)}, {prop: "SetInt", name: "SetInt", pkg: "", typ: $funcType([$Int64], [], false)}, {prop: "SetMapIndex", name: "SetMapIndex", pkg: "", typ: $funcType([Value, Value], [], false)}, {prop: "SetUint", name: "SetUint", pkg: "", typ: $funcType([$Uint64], [], false)}, {prop: "SetPointer", name: "SetPointer", pkg: "", typ: $funcType([$UnsafePointer], [], false)}, {prop: "SetString", name: "SetString", pkg: "", typ: $funcType([$String], [], false)}, {prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}, {prop: "TryRecv", name: "TryRecv", pkg: "", typ: $funcType([], [Value, $Bool], false)}, {prop: "TrySend", name: "TrySend", pkg: "", typ: $funcType([Value], [$Bool], false)}, {prop: "Type", name: "Type", pkg: "", typ: $funcType([], [Type], false)}, {prop: "Uint", name: "Uint", pkg: "", typ: $funcType([], [$Uint64], false)}, {prop: "UnsafeAddr", name: "UnsafeAddr", pkg: "", typ: $funcType([], [$Uintptr], false)}, {prop: "Convert", name: "Convert", pkg: "", typ: $funcType([Type], [Value], false)}];
 	flag.methods = [{prop: "kind", name: "kind", pkg: "reflect", typ: $funcType([], [Kind], false)}, {prop: "ro", name: "ro", pkg: "reflect", typ: $funcType([], [flag], false)}, {prop: "mustBe", name: "mustBe", pkg: "reflect", typ: $funcType([Kind], [], false)}, {prop: "mustBeExported", name: "mustBeExported", pkg: "reflect", typ: $funcType([], [], false)}, {prop: "mustBeAssignable", name: "mustBeAssignable", pkg: "reflect", typ: $funcType([], [], false)}];
@@ -17084,7 +17273,7 @@ $packages["reflect"] = (function() {
 	structType.init("reflect", [{prop: "rtype", name: "rtype", embedded: true, exported: false, typ: rtype, tag: ""}, {prop: "pkgPath", name: "pkgPath", embedded: false, exported: false, typ: name, tag: ""}, {prop: "fields", name: "fields", embedded: false, exported: false, typ: sliceType$7, tag: ""}]);
 	Method.init("", [{prop: "Name", name: "Name", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "PkgPath", name: "PkgPath", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "Type", name: "Type", embedded: false, exported: true, typ: Type, tag: ""}, {prop: "Func", name: "Func", embedded: false, exported: true, typ: Value, tag: ""}, {prop: "Index", name: "Index", embedded: false, exported: true, typ: $Int, tag: ""}]);
 	StructField.init("", [{prop: "Name", name: "Name", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "PkgPath", name: "PkgPath", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "Type", name: "Type", embedded: false, exported: true, typ: Type, tag: ""}, {prop: "Tag", name: "Tag", embedded: false, exported: true, typ: StructTag, tag: ""}, {prop: "Offset", name: "Offset", embedded: false, exported: true, typ: $Uintptr, tag: ""}, {prop: "Index", name: "Index", embedded: false, exported: true, typ: sliceType$13, tag: ""}, {prop: "Anonymous", name: "Anonymous", embedded: false, exported: true, typ: $Bool, tag: ""}]);
-	fieldScan.init("reflect", [{prop: "typ", name: "typ", embedded: false, exported: false, typ: ptrType$9, tag: ""}, {prop: "index", name: "index", embedded: false, exported: false, typ: sliceType$13, tag: ""}]);
+	fieldScan.init("reflect", [{prop: "typ", name: "typ", embedded: false, exported: false, typ: ptrType$10, tag: ""}, {prop: "index", name: "index", embedded: false, exported: false, typ: sliceType$13, tag: ""}]);
 	Value.init("reflect", [{prop: "typ", name: "typ", embedded: false, exported: false, typ: ptrType$1, tag: ""}, {prop: "ptr", name: "ptr", embedded: false, exported: false, typ: $UnsafePointer, tag: ""}, {prop: "flag", name: "flag", embedded: true, exported: false, typ: flag, tag: ""}]);
 	ValueError.init("", [{prop: "Method", name: "Method", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "Kind", name: "Kind", embedded: false, exported: true, typ: Kind, tag: ""}]);
 	$init = function() {
@@ -25686,42 +25875,42 @@ $packages["github.com/mame82/P4wnP1_aloa/proto/gopherjs"] = (function() {
 		/* */ if ($assertType(_ref, ptrType$29, true)[1]) { $s = 10; continue; }
 		/* */ $s = 11; continue;
 		/* if ($assertType(_ref, ptrType$11, true)[1]) { */ case 1:
-			t$6[0] = _ref.$val;
-			/* */ if (!(t$6[0].ServiceStarted === ptrType$10.nil)) { $s = 12; continue; }
+			t$5[0] = _ref.$val;
+			/* */ if (!(t$5[0].ServiceStarted === ptrType$10.nil)) { $s = 12; continue; }
 			/* */ $s = 13; continue;
-			/* if (!(t$6[0].ServiceStarted === ptrType$10.nil)) { */ case 12:
+			/* if (!(t$5[0].ServiceStarted === ptrType$10.nil)) { */ case 12:
 				$r = writer[0].WriteMessage(5, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t$6[0].ServiceStarted.MarshalToWriter(writer[0]);
+					t$5[0].ServiceStarted.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 13:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$13, true)[1]) { */ case 2:
-			t$1[0] = _ref.$val;
-			/* */ if (!(t$1[0].UsbGadgetConnected === ptrType$12.nil)) { $s = 15; continue; }
+			t[0] = _ref.$val;
+			/* */ if (!(t[0].UsbGadgetConnected === ptrType$12.nil)) { $s = 15; continue; }
 			/* */ $s = 16; continue;
-			/* if (!(t$1[0].UsbGadgetConnected === ptrType$12.nil)) { */ case 15:
+			/* if (!(t[0].UsbGadgetConnected === ptrType$12.nil)) { */ case 15:
 				$r = writer[0].WriteMessage(6, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t$1[0].UsbGadgetConnected.MarshalToWriter(writer[0]);
+					t[0].UsbGadgetConnected.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 17; case 17: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 16:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$15, true)[1]) { */ case 3:
-			t$7[0] = _ref.$val;
-			/* */ if (!(t$7[0].UsbGadgetDisconnected === ptrType$14.nil)) { $s = 18; continue; }
+			t$6[0] = _ref.$val;
+			/* */ if (!(t$6[0].UsbGadgetDisconnected === ptrType$14.nil)) { $s = 18; continue; }
 			/* */ $s = 19; continue;
-			/* if (!(t$7[0].UsbGadgetDisconnected === ptrType$14.nil)) { */ case 18:
+			/* if (!(t$6[0].UsbGadgetDisconnected === ptrType$14.nil)) { */ case 18:
 				$r = writer[0].WriteMessage(7, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t$7[0].UsbGadgetDisconnected.MarshalToWriter(writer[0]);
+					t$6[0].UsbGadgetDisconnected.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 20; case 20: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 19:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$17, true)[1]) { */ case 4:
-			t[0] = _ref.$val;
-			/* */ if (!(t[0].WifiAPStarted === ptrType$16.nil)) { $s = 21; continue; }
+			t$7[0] = _ref.$val;
+			/* */ if (!(t$7[0].WifiAPStarted === ptrType$16.nil)) { $s = 21; continue; }
 			/* */ $s = 22; continue;
-			/* if (!(t[0].WifiAPStarted === ptrType$16.nil)) { */ case 21:
+			/* if (!(t$7[0].WifiAPStarted === ptrType$16.nil)) { */ case 21:
 				$r = writer[0].WriteMessage(8, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t[0].WifiAPStarted.MarshalToWriter(writer[0]);
+					t$7[0].WifiAPStarted.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 23; case 23: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 22:
 			$s = 11; continue;
@@ -25736,38 +25925,38 @@ $packages["github.com/mame82/P4wnP1_aloa/proto/gopherjs"] = (function() {
 			/* } */ case 25:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$21, true)[1]) { */ case 6:
-			t$2[0] = _ref.$val;
-			/* */ if (!(t$2[0].SshLogin === ptrType$20.nil)) { $s = 27; continue; }
+			t$1[0] = _ref.$val;
+			/* */ if (!(t$1[0].SshLogin === ptrType$20.nil)) { $s = 27; continue; }
 			/* */ $s = 28; continue;
-			/* if (!(t$2[0].SshLogin === ptrType$20.nil)) { */ case 27:
+			/* if (!(t$1[0].SshLogin === ptrType$20.nil)) { */ case 27:
 				$r = writer[0].WriteMessage(10, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$2[0].SshLogin.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$1[0].SshLogin.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 29; case 29: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 28:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$23, true)[1]) { */ case 7:
-			t$3[0] = _ref.$val;
-			/* */ if (!(t$3[0].DhcpLeaseGranted === ptrType$22.nil)) { $s = 30; continue; }
+			t$4[0] = _ref.$val;
+			/* */ if (!(t$4[0].DhcpLeaseGranted === ptrType$22.nil)) { $s = 30; continue; }
 			/* */ $s = 31; continue;
-			/* if (!(t$3[0].DhcpLeaseGranted === ptrType$22.nil)) { */ case 30:
+			/* if (!(t$4[0].DhcpLeaseGranted === ptrType$22.nil)) { */ case 30:
 				$r = writer[0].WriteMessage(11, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t$3[0].DhcpLeaseGranted.MarshalToWriter(writer[0]);
+					t$4[0].DhcpLeaseGranted.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 32; case 32: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 31:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$25, true)[1]) { */ case 8:
-			t$4[0] = _ref.$val;
-			/* */ if (!(t$4[0].GroupReceive === ptrType$24.nil)) { $s = 33; continue; }
+			t$2[0] = _ref.$val;
+			/* */ if (!(t$2[0].GroupReceive === ptrType$24.nil)) { $s = 33; continue; }
 			/* */ $s = 34; continue;
-			/* if (!(t$4[0].GroupReceive === ptrType$24.nil)) { */ case 33:
+			/* if (!(t$2[0].GroupReceive === ptrType$24.nil)) { */ case 33:
 				$r = writer[0].WriteMessage(12, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$4[0].GroupReceive.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$2[0].GroupReceive.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 35; case 35: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
@@ -25788,14 +25977,14 @@ $packages["github.com/mame82/P4wnP1_aloa/proto/gopherjs"] = (function() {
 			/* } */ case 37:
 			$s = 11; continue;
 		/* } else if ($assertType(_ref, ptrType$29, true)[1]) { */ case 10:
-			t$5[0] = _ref.$val;
-			/* */ if (!(t$5[0].GpioIn === ptrType$28.nil)) { $s = 39; continue; }
+			t$3[0] = _ref.$val;
+			/* */ if (!(t$3[0].GpioIn === ptrType$28.nil)) { $s = 39; continue; }
 			/* */ $s = 40; continue;
-			/* if (!(t$5[0].GpioIn === ptrType$28.nil)) { */ case 39:
+			/* if (!(t$3[0].GpioIn === ptrType$28.nil)) { */ case 39:
 				$r = writer[0].WriteMessage(14, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$5[0].GpioIn.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$3[0].GpioIn.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 41; case 41: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
@@ -25824,14 +26013,14 @@ $packages["github.com/mame82/P4wnP1_aloa/proto/gopherjs"] = (function() {
 			/* } */ case 50:
 			$s = 48; continue;
 		/* } else if ($assertType(_ref$1, ptrType$33, true)[1]) { */ case 43:
-			t$14[0] = _ref$1.$val;
-			/* */ if (!(t$14[0].HidScript === ptrType$32.nil)) { $s = 52; continue; }
+			t$10[0] = _ref$1.$val;
+			/* */ if (!(t$10[0].HidScript === ptrType$32.nil)) { $s = 52; continue; }
 			/* */ $s = 53; continue;
-			/* if (!(t$14[0].HidScript === ptrType$32.nil)) { */ case 52:
+			/* if (!(t$10[0].HidScript === ptrType$32.nil)) { */ case 52:
 				$r = writer[0].WriteMessage(16, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$14[0].HidScript.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$10[0].HidScript.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 54; case 54: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
@@ -25852,38 +26041,38 @@ $packages["github.com/mame82/P4wnP1_aloa/proto/gopherjs"] = (function() {
 			/* } */ case 56:
 			$s = 48; continue;
 		/* } else if ($assertType(_ref$1, ptrType$37, true)[1]) { */ case 45:
-			t$10[0] = _ref$1.$val;
-			/* */ if (!(t$10[0].Log === ptrType$36.nil)) { $s = 58; continue; }
+			t$11[0] = _ref$1.$val;
+			/* */ if (!(t$11[0].Log === ptrType$36.nil)) { $s = 58; continue; }
 			/* */ $s = 59; continue;
-			/* if (!(t$10[0].Log === ptrType$36.nil)) { */ case 58:
+			/* if (!(t$11[0].Log === ptrType$36.nil)) { */ case 58:
 				$r = writer[0].WriteMessage(18, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function() {
-					t$10[0].Log.MarshalToWriter(writer[0]);
+					t$11[0].Log.MarshalToWriter(writer[0]);
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 60; case 60: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 59:
 			$s = 48; continue;
 		/* } else if ($assertType(_ref$1, ptrType$39, true)[1]) { */ case 46:
-			t$11[0] = _ref$1.$val;
-			/* */ if (!(t$11[0].GpioOut === ptrType$38.nil)) { $s = 61; continue; }
+			t$15[0] = _ref$1.$val;
+			/* */ if (!(t$15[0].GpioOut === ptrType$38.nil)) { $s = 61; continue; }
 			/* */ $s = 62; continue;
-			/* if (!(t$11[0].GpioOut === ptrType$38.nil)) { */ case 61:
+			/* if (!(t$15[0].GpioOut === ptrType$38.nil)) { */ case 61:
 				$r = writer[0].WriteMessage(19, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$11[0].GpioOut.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$15[0].GpioOut.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 63; case 63: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			/* } */ case 62:
 			$s = 48; continue;
 		/* } else if ($assertType(_ref$1, ptrType$41, true)[1]) { */ case 47:
-			t$15[0] = _ref$1.$val;
-			/* */ if (!(t$15[0].GroupSend === ptrType$40.nil)) { $s = 64; continue; }
+			t$14[0] = _ref$1.$val;
+			/* */ if (!(t$14[0].GroupSend === ptrType$40.nil)) { $s = 64; continue; }
 			/* */ $s = 65; continue;
-			/* if (!(t$15[0].GroupSend === ptrType$40.nil)) { */ case 64:
+			/* if (!(t$14[0].GroupSend === ptrType$40.nil)) { */ case 64:
 				$r = writer[0].WriteMessage(20, (function(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer) { return function $b() {
 					var $s, $r;
 					/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-					$r = t$15[0].GroupSend.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+					$r = t$14[0].GroupSend.MarshalToWriter(writer[0]); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 					$s = -1; return;
 					/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.$s = $s; $f.$r = $r; return $f;
 				}; })(t, t$1, t$10, t$11, t$12, t$13, t$14, t$15, t$2, t$3, t$4, t$5, t$6, t$7, t$8, t$9, writer)); /* */ $s = 66; case 66: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
@@ -35515,7 +35704,7 @@ $packages["path/filepath"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
-$packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
+$packages["."] = (function() {
 	var $pkg = {}, $init, context, md5, hex, errors, js, grpcweb, common_web, P4wnP1_grpc, hvue, mvuex, io, filepath, strconv, strings, sync, time, CompEthernetAddressesData2, CompHIDEventsData, CompHIDJobsData, CompHIDScriptCodeEditorData, CodeMirrorMode, CodeMirrorExtraKeys, CodeMirrorOptionsType, CompToggleSwitchData, CompUSBSettingsData, jsBluetoothRequestSettingsStorage, jsBluetoothSettings, jsBluetoothAgentSettings, jsBluetoothControllerSettings, jsBluetoothControllerInformation, jsDataTablePagination, jsMasterTemplate, jsRequestMasterTemplateStorage, jsLoadHidScriptSourceMode, jsLoadHidScriptSourceReq, jsWifiRequestSettingsStorage, jsUSBRequestSettingsStorage, jsGadgetSettings, jsGadgetSettingsEthernet, jsGadgetSettingsUMS, jsEvent, jsLogEvent, jsHidEvent, jsHidJobState, jsHidJobStateList, jsWiFiState, jsWiFiBSSCfg, jsWiFiSettings, jsEthernetRequestSettingsStorage, jsEthernetSettingsArray, jsEthernetInterfaceSettings, jsDHCPServerSettings, jsDHCPServerRange, jsDHCPServerOption, jsDHCPServerStaticHost, jsEventProcessor, triggerType, actionType, jsTriggerAction, jsTriggerServiceStarted, jsTriggerUSBGadgetConnected, jsTriggerUSBGadgetDisconnected, jsTriggerWifiAPStarted, jsTriggerWifiConnectedAsSta, jsTriggerSSHLogin, jsTriggerDHCPLeaseGranted, jsTriggerGroupReceive, jsTriggerGroupReceiveMulti, GroupReceiveMultiType, jsTriggerGPIOIn, GPIOInPullUpDown, GPIOInEdge, jsActionStartBashScript, jsActionStartHIDScript, jsActionDeploySettingsTemplate, jsActionGPIOOut, GPIOOutValue, jsActionGroupSend, jsActionLog, TemplateType, jsTriggerActionSet, GlobalState, Promise, Quasar, QuasarNotification, Rpc, VueRouterConfig, VueRouterOption, option, option$1, option$2, option$3, option$4, option$5, option$6, option$7, ptrType, sliceType, sliceType$1, sliceType$2, sliceType$3, sliceType$4, sliceType$5, sliceType$6, sliceType$7, arrayType, sliceType$8, sliceType$9, sliceType$10, ptrType$1, ptrType$2, ptrType$3, funcType, funcType$1, structType, funcType$2, ptrType$4, ptrType$5, ptrType$6, structType$1, funcType$3, ptrType$7, funcType$4, structType$2, funcType$5, ptrType$8, ptrType$9, ptrType$10, ptrType$11, structType$3, structType$4, structType$5, ptrType$12, funcType$6, ptrType$13, ptrType$14, ptrType$15, ptrType$16, ptrType$17, ptrType$18, ptrType$19, ptrType$20, ptrType$21, ptrType$22, ptrType$23, structType$6, structType$7, structType$8, structType$9, funcType$7, structType$10, sliceType$11, ptrType$24, funcType$8, sliceType$12, ptrType$25, structType$11, structType$12, structType$13, structType$14, ptrType$26, ptrType$27, funcType$9, ptrType$28, funcType$10, structType$15, ptrType$29, funcType$11, ptrType$30, funcType$12, ptrType$31, funcType$13, structType$16, funcType$14, ptrType$32, structType$17, funcType$15, sliceType$13, structType$18, funcType$16, ptrType$33, ptrType$34, ptrType$35, ptrType$36, ptrType$37, ptrType$38, ptrType$39, ptrType$40, ptrType$41, ptrType$42, ptrType$43, ptrType$44, ptrType$45, ptrType$46, sliceType$14, ptrType$47, funcType$17, ptrType$48, ptrType$49, ptrType$50, sliceType$15, ptrType$51, sliceType$16, ptrType$52, ptrType$53, ptrType$54, ptrType$55, ptrType$56, ptrType$57, ptrType$58, ptrType$59, ptrType$60, ptrType$61, ptrType$62, ptrType$63, ptrType$64, ptrType$65, ptrType$66, ptrType$67, ptrType$68, ptrType$69, ptrType$70, ptrType$71, ptrType$72, ptrType$73, ptrType$74, ptrType$75, ptrType$76, ptrType$77, ptrType$78, ptrType$79, ptrType$80, ptrType$81, ptrType$82, ptrType$83, ptrType$84, ptrType$85, ptrType$86, ptrType$87, sliceType$17, ptrType$88, sliceType$18, ptrType$89, ptrType$90, funcType$18, funcType$19, funcType$20, funcType$21, funcType$22, funcType$23, funcType$24, funcType$25, funcType$26, funcType$27, funcType$28, funcType$29, funcType$30, funcType$31, ptrType$91, funcType$32, funcType$33, funcType$34, funcType$35, funcType$36, funcType$37, funcType$38, funcType$39, funcType$40, funcType$41, funcType$42, funcType$43, funcType$44, funcType$45, funcType$46, funcType$47, sliceType$19, ptrType$92, structType$19, funcType$48, mapType, ptrType$93, ptrType$95, ptrType$96, sliceType$20, sliceType$21, ptrType$97, ptrType$98, sliceType$22, ptrType$99, structType$20, ptrType$100, ptrType$101, ptrType$102, ptrType$103, ptrType$104, ptrType$105, ptrType$106, ptrType$107, ptrType$108, ptrType$109, ptrType$110, ptrType$111, eNoLogEvent, eNoHidEvent, triggerNames, actionNames, availableTriggers, availableActions, groupReceiveMultiNames, availableGroupReceiveMulti, gpioInPullUpDownNames, availableGPIOInPullUpDowns, gpioInEdgeNames, availableGPIOInEdges, gpioOutValueNames, availableGPIOOutValues, templateTypeNames, availableTemplateTypes, serverAddr, globalState, _r, O, Alert, BytesToMD5, newCompEthernetAddressesData2, InitCompEthernetAddresses2, newCompHIDEventsData, InitCompHIDEvents, newCompHIDJobsData, InitCompHIDJobs, newCompHIDScriptCodeEditorData, InitComponentsHIDScript, LogLevelClass, InitCompLogger, InitCompModal, newCompStateData, InitCompState, newCompToggleSwitchData, InitCompToggleSwitch, InitCompUSBSettings, newCompUSBSettingsData, InitComponentsWiFi, NewBluetoothRequestSettingsStorageFromArgs, NewBluetoothSettings, NewBluetoothAgentSettings, NewBluetoothControllerSettings, NewBluetoothControllerInformation, InitComponentsBluetooth, InitComponentsDialog, InitComponentsGeneric, newPagination, InitComponentsNetwork, generateSelectOptionsTrigger, generateSelectOptionsAction, generateSelectOptionsGroupReceiveMultiType, generateSelectOptionsGPIOOutValue, generateSelectOptionsGPIONames, generateSelectOptionsGPIOInPullUpDown, generateSelectOptionsGPIOInEdges, generateSelectOptionsTemplateTypes, InitComponentsTriggerActions, NewMasterTemplate, NewRequestMasterTemplateStorage, NewWifiRequestSettingsStorage, NewUSBRequestSettingsStorage, NewUSBGadgetSettings, NewJsEventFromNative, NewHIDJobStateList, NewWiFiState, NewWifiSettings, NewEthernetRequestSettingsStorage, NewEthernetSettingsList, NewEventProcessor, NewTriggerAction, NewTriggerActionSet, GetBaseURL, Store, Router, main, createGlobalStateStruct, processEvent, actionUpdateAllStates, actionUpdateUmsImageCdromList, actionUpdateUmsImageFlashdriveList, actionUpdateStoredDBBackupList, actionGetStartupMasterTemplateName, actionSetStartupMasterTemplateName, actionBackupDB, actionRestoreDB, actionReboot, actionShutdown, actionUpdateGpioNamesList, actionDeployMasterTemplate, actionUpdateStoredMasterTemplateList, actionStoreMasterTemplate, actionLoadMasterTemplate, actionDeployStoredMasterTemplate, actionDeleteStoredMasterTemplate, actionSendAndRunHIDScript, actionCancelHidJob, actionCancelAllHidJobs, actionRemoveSucceededHidJobs, actionRemoveFailedHidJobs, actionStartEventListen, actionStopEventListen, actionUpdateStoredBluetoothSettingsList, actionDeployStoredBluetoothSettings, actionDeleteStoredBluetoothSettings, actionStoreBluetoothSettings, actionDeleteStoredUSBSettings, actionDeleteStoredTriggerActionSet, actionDeleteStoredWifiSettings, actionDeleteStoredEthernetInterfaceSettings, actionUpdateCurrentBluetoothControllerInformation, actionDeployCurrentBluetoothControllerInformation, actionUpdateCurrentBluetoothAgentSettings, actionDeployCurrentBluetoothAgentSettings, actionUpdateStoredUSBSettingsList, actionStoreUSBSettings, actionLoadUSBSettings, actionDeployStoredUSBSettings, actionUpdateAllEthernetInterfaceSettings, actionStoreEthernetInterfaceSettings, actionLoadEthernetInterfaceSettings, actionDeployStoredEthernetInterfaceSettings, actionUpdateStoredEthernetInterfaceSettingsList, actionUpdateCurrentHidScriptSourceFromRemoteFile, actionStoreCurrentHidScriptSourceToRemoteFile, actionUpdateStoredBashScriptsList, actionUpdateStoredHIDScriptsList, actionUpdateGadgetSettingsFromDeployed, actionUpdateWifiState, actionUpdateStoredWifiSettingsList, actionStoreWifiSettings, actionLoadWifiSettings, actionDeployStoredWifiSettings, actionDeployWifiSettings, actionUpdateRunningHidJobs, actionUpdateStoredTriggerActionSetsList, actionUpdateCurrentTriggerActionsFromServer, actionAddNewTriggerAction, actionUpdateTriggerActions, actionRemoveTriggerActions, actionStoreTriggerActionSet, actionDeployTriggerActionSetReplace, actionDeployTriggerActionSetAdd, actionDeployStoredTriggerActionSetReplace, actionDeployStoredTriggerActionSetAdd, actionDeployCurrentGadgetSettings, actionDeployEthernetInterfaceSettings, initMVuex, InitGlobalState, NewPromise, QuasarGetQuasar, QuasarNotify, QuasarNotifyError, QuasarNotifySuccess, NewRpcClient, VueRouterRoute, NewVueRouter;
 	context = $packages["context"];
 	md5 = $packages["crypto/md5"];
@@ -35533,7 +35722,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	strings = $packages["strings"];
 	sync = $packages["sync"];
 	time = $packages["time"];
-	CompEthernetAddressesData2 = $pkg.CompEthernetAddressesData2 = $newType(0, $kindStruct, "main.CompEthernetAddressesData2", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_) {
+	CompEthernetAddressesData2 = $pkg.CompEthernetAddressesData2 = $newType(0, $kindStruct, "main.CompEthernetAddressesData2", true, ".", true, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35541,7 +35730,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	CompHIDEventsData = $pkg.CompHIDEventsData = $newType(0, $kindStruct, "main.CompHIDEventsData", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Pagination_) {
+	CompHIDEventsData = $pkg.CompHIDEventsData = $newType(0, $kindStruct, "main.CompHIDEventsData", true, ".", true, function(Object_, Pagination_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35551,7 +35740,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Object = Object_;
 		this.Pagination = Pagination_;
 	});
-	CompHIDJobsData = $pkg.CompHIDJobsData = $newType(0, $kindStruct, "main.CompHIDJobsData", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_) {
+	CompHIDJobsData = $pkg.CompHIDJobsData = $newType(0, $kindStruct, "main.CompHIDJobsData", true, ".", true, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35559,7 +35748,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	CompHIDScriptCodeEditorData = $pkg.CompHIDScriptCodeEditorData = $newType(0, $kindStruct, "main.CompHIDScriptCodeEditorData", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, CodeMirrorOptions_) {
+	CompHIDScriptCodeEditorData = $pkg.CompHIDScriptCodeEditorData = $newType(0, $kindStruct, "main.CompHIDScriptCodeEditorData", true, ".", true, function(Object_, CodeMirrorOptions_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35569,7 +35758,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Object = Object_;
 		this.CodeMirrorOptions = CodeMirrorOptions_;
 	});
-	CodeMirrorMode = $pkg.CodeMirrorMode = $newType(0, $kindStruct, "main.CodeMirrorMode", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Name_, GlobalVars_) {
+	CodeMirrorMode = $pkg.CodeMirrorMode = $newType(0, $kindStruct, "main.CodeMirrorMode", true, ".", true, function(Object_, Name_, GlobalVars_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35581,7 +35770,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Name = Name_;
 		this.GlobalVars = GlobalVars_;
 	});
-	CodeMirrorExtraKeys = $pkg.CodeMirrorExtraKeys = $newType(0, $kindStruct, "main.CodeMirrorExtraKeys", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, CtrlSpace_) {
+	CodeMirrorExtraKeys = $pkg.CodeMirrorExtraKeys = $newType(0, $kindStruct, "main.CodeMirrorExtraKeys", true, ".", true, function(Object_, CtrlSpace_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35591,7 +35780,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Object = Object_;
 		this.CtrlSpace = CtrlSpace_;
 	});
-	CodeMirrorOptionsType = $pkg.CodeMirrorOptionsType = $newType(0, $kindStruct, "main.CodeMirrorOptionsType", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Mode_, LineNumbers_, LineWrapping_, AutoCloseBrackets_, ExtraKeys_) {
+	CodeMirrorOptionsType = $pkg.CodeMirrorOptionsType = $newType(0, $kindStruct, "main.CodeMirrorOptionsType", true, ".", true, function(Object_, Mode_, LineNumbers_, LineWrapping_, AutoCloseBrackets_, ExtraKeys_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35609,7 +35798,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.AutoCloseBrackets = AutoCloseBrackets_;
 		this.ExtraKeys = ExtraKeys_;
 	});
-	CompToggleSwitchData = $pkg.CompToggleSwitchData = $newType(0, $kindStruct, "main.CompToggleSwitchData", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_) {
+	CompToggleSwitchData = $pkg.CompToggleSwitchData = $newType(0, $kindStruct, "main.CompToggleSwitchData", true, ".", true, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35617,7 +35806,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	CompUSBSettingsData = $pkg.CompUSBSettingsData = $newType(0, $kindStruct, "main.CompUSBSettingsData", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, GadgetSettings_, DeployPending_, CdcEcmDetails_, RndisDetails_, ShowStoreModal_, ShowLoadModal_, ShowDeployStoredModal_, ShowUmsModal_) {
+	CompUSBSettingsData = $pkg.CompUSBSettingsData = $newType(0, $kindStruct, "main.CompUSBSettingsData", true, ".", true, function(Object_, GadgetSettings_, DeployPending_, CdcEcmDetails_, RndisDetails_, ShowStoreModal_, ShowLoadModal_, ShowDeployStoredModal_, ShowUmsModal_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35641,7 +35830,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.ShowDeployStoredModal = ShowDeployStoredModal_;
 		this.ShowUmsModal = ShowUmsModal_;
 	});
-	jsBluetoothRequestSettingsStorage = $pkg.jsBluetoothRequestSettingsStorage = $newType(0, $kindStruct, "main.jsBluetoothRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Settings_) {
+	jsBluetoothRequestSettingsStorage = $pkg.jsBluetoothRequestSettingsStorage = $newType(0, $kindStruct, "main.jsBluetoothRequestSettingsStorage", true, ".", false, function(Object_, TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35653,7 +35842,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	jsBluetoothSettings = $pkg.jsBluetoothSettings = $newType(0, $kindStruct, "main.jsBluetoothSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Ci_, As_) {
+	jsBluetoothSettings = $pkg.jsBluetoothSettings = $newType(0, $kindStruct, "main.jsBluetoothSettings", true, ".", false, function(Object_, Ci_, As_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35665,7 +35854,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Ci = Ci_;
 		this.As = As_;
 	});
-	jsBluetoothAgentSettings = $pkg.jsBluetoothAgentSettings = $newType(0, $kindStruct, "main.jsBluetoothAgentSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Pin_) {
+	jsBluetoothAgentSettings = $pkg.jsBluetoothAgentSettings = $newType(0, $kindStruct, "main.jsBluetoothAgentSettings", true, ".", false, function(Object_, Pin_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35675,7 +35864,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Object = Object_;
 		this.Pin = Pin_;
 	});
-	jsBluetoothControllerSettings = $pkg.jsBluetoothControllerSettings = $newType(0, $kindStruct, "main.jsBluetoothControllerSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Powered_, Connectable_, FastConnectable_, Discoverable_, Bondable_, LinkLevelSecurity_, SecureSimplePairing_, BrEdr_, HighSpeed_, LowEnergy_, Advertising_, SecureConnections_, DebugKeys_, Privacy_, ControllerConfiguration_, StaticAddress_) {
+	jsBluetoothControllerSettings = $pkg.jsBluetoothControllerSettings = $newType(0, $kindStruct, "main.jsBluetoothControllerSettings", true, ".", false, function(Object_, Powered_, Connectable_, FastConnectable_, Discoverable_, Bondable_, LinkLevelSecurity_, SecureSimplePairing_, BrEdr_, HighSpeed_, LowEnergy_, Advertising_, SecureConnections_, DebugKeys_, Privacy_, ControllerConfiguration_, StaticAddress_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35715,7 +35904,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.ControllerConfiguration = ControllerConfiguration_;
 		this.StaticAddress = StaticAddress_;
 	});
-	jsBluetoothControllerInformation = $pkg.jsBluetoothControllerInformation = $newType(0, $kindStruct, "main.jsBluetoothControllerInformation", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, IsAvailable_, Address_, BluetoothVersion_, Manufacturer_, SupportedSettings_, CurrentSettings_, ClassOfDevice_, Name_, ShortName_, ServiceNetworkServerNAP_, ServiceNetworkServerPANU_, ServiceNetworkServerGN_) {
+	jsBluetoothControllerInformation = $pkg.jsBluetoothControllerInformation = $newType(0, $kindStruct, "main.jsBluetoothControllerInformation", true, ".", false, function(Object_, IsAvailable_, Address_, BluetoothVersion_, Manufacturer_, SupportedSettings_, CurrentSettings_, ClassOfDevice_, Name_, ShortName_, ServiceNetworkServerNAP_, ServiceNetworkServerPANU_, ServiceNetworkServerGN_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35747,7 +35936,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.ServiceNetworkServerPANU = ServiceNetworkServerPANU_;
 		this.ServiceNetworkServerGN = ServiceNetworkServerGN_;
 	});
-	jsDataTablePagination = $pkg.jsDataTablePagination = $newType(0, $kindStruct, "main.jsDataTablePagination", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, RowsPerPage_, Descending_, Page_) {
+	jsDataTablePagination = $pkg.jsDataTablePagination = $newType(0, $kindStruct, "main.jsDataTablePagination", true, ".", false, function(Object_, RowsPerPage_, Descending_, Page_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35761,7 +35950,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Descending = Descending_;
 		this.Page = Page_;
 	});
-	jsMasterTemplate = $pkg.jsMasterTemplate = $newType(0, $kindStruct, "main.jsMasterTemplate", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateNameBluetooth_, TemplateNameUSB_, TemplateNameWiFi_, TemplateNameTriggerActions_, TemplateNamesNetwork_) {
+	jsMasterTemplate = $pkg.jsMasterTemplate = $newType(0, $kindStruct, "main.jsMasterTemplate", true, ".", false, function(Object_, TemplateNameBluetooth_, TemplateNameUSB_, TemplateNameWiFi_, TemplateNameTriggerActions_, TemplateNamesNetwork_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35779,7 +35968,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.TemplateNameTriggerActions = TemplateNameTriggerActions_;
 		this.TemplateNamesNetwork = TemplateNamesNetwork_;
 	});
-	jsRequestMasterTemplateStorage = $pkg.jsRequestMasterTemplateStorage = $newType(0, $kindStruct, "main.jsRequestMasterTemplateStorage", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Template_) {
+	jsRequestMasterTemplateStorage = $pkg.jsRequestMasterTemplateStorage = $newType(0, $kindStruct, "main.jsRequestMasterTemplateStorage", true, ".", false, function(Object_, TemplateName_, Template_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35791,8 +35980,8 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Template = Template_;
 	});
-	jsLoadHidScriptSourceMode = $pkg.jsLoadHidScriptSourceMode = $newType(4, $kindInt, "main.jsLoadHidScriptSourceMode", true, "github.com/mame82/P4wnP1_aloa/web_client", false, null);
-	jsLoadHidScriptSourceReq = $pkg.jsLoadHidScriptSourceReq = $newType(0, $kindStruct, "main.jsLoadHidScriptSourceReq", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, FileName_, Mode_) {
+	jsLoadHidScriptSourceMode = $pkg.jsLoadHidScriptSourceMode = $newType(4, $kindInt, "main.jsLoadHidScriptSourceMode", true, ".", false, null);
+	jsLoadHidScriptSourceReq = $pkg.jsLoadHidScriptSourceReq = $newType(0, $kindStruct, "main.jsLoadHidScriptSourceReq", true, ".", false, function(Object_, FileName_, Mode_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35804,7 +35993,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.FileName = FileName_;
 		this.Mode = Mode_;
 	});
-	jsWifiRequestSettingsStorage = $pkg.jsWifiRequestSettingsStorage = $newType(0, $kindStruct, "main.jsWifiRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Settings_) {
+	jsWifiRequestSettingsStorage = $pkg.jsWifiRequestSettingsStorage = $newType(0, $kindStruct, "main.jsWifiRequestSettingsStorage", true, ".", false, function(Object_, TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35816,7 +36005,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	jsUSBRequestSettingsStorage = $pkg.jsUSBRequestSettingsStorage = $newType(0, $kindStruct, "main.jsUSBRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Settings_) {
+	jsUSBRequestSettingsStorage = $pkg.jsUSBRequestSettingsStorage = $newType(0, $kindStruct, "main.jsUSBRequestSettingsStorage", true, ".", false, function(Object_, TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35828,7 +36017,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	jsGadgetSettings = $pkg.jsGadgetSettings = $newType(0, $kindStruct, "main.jsGadgetSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Enabled_, Vid_, Pid_, Manufacturer_, Product_, Serial_, Use_CDC_ECM_, Use_RNDIS_, Use_HID_KEYBOARD_, Use_HID_MOUSE_, Use_HID_RAW_, Use_UMS_, Use_SERIAL_, RndisSettings_, CdcEcmSettings_, UmsSettings_) {
+	jsGadgetSettings = $pkg.jsGadgetSettings = $newType(0, $kindStruct, "main.jsGadgetSettings", true, ".", false, function(Object_, Enabled_, Vid_, Pid_, Manufacturer_, Product_, Serial_, Use_CDC_ECM_, Use_RNDIS_, Use_HID_KEYBOARD_, Use_HID_MOUSE_, Use_HID_RAW_, Use_UMS_, Use_SERIAL_, RndisSettings_, CdcEcmSettings_, UmsSettings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35868,7 +36057,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.CdcEcmSettings = CdcEcmSettings_;
 		this.UmsSettings = UmsSettings_;
 	});
-	jsGadgetSettingsEthernet = $pkg.jsGadgetSettingsEthernet = $newType(0, $kindStruct, "main.jsGadgetSettingsEthernet", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, HostAddr_, DevAddr_) {
+	jsGadgetSettingsEthernet = $pkg.jsGadgetSettingsEthernet = $newType(0, $kindStruct, "main.jsGadgetSettingsEthernet", true, ".", false, function(Object_, HostAddr_, DevAddr_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35880,7 +36069,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.HostAddr = HostAddr_;
 		this.DevAddr = DevAddr_;
 	});
-	jsGadgetSettingsUMS = $pkg.jsGadgetSettingsUMS = $newType(0, $kindStruct, "main.jsGadgetSettingsUMS", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Cdrom_, File_) {
+	jsGadgetSettingsUMS = $pkg.jsGadgetSettingsUMS = $newType(0, $kindStruct, "main.jsGadgetSettingsUMS", true, ".", false, function(Object_, Cdrom_, File_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35892,7 +36081,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Cdrom = Cdrom_;
 		this.File = File_;
 	});
-	jsEvent = $pkg.jsEvent = $newType(0, $kindStruct, "main.jsEvent", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Type_, Values_, JSValues_) {
+	jsEvent = $pkg.jsEvent = $newType(0, $kindStruct, "main.jsEvent", true, ".", false, function(Object_, Type_, Values_, JSValues_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35906,7 +36095,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Values = Values_;
 		this.JSValues = JSValues_;
 	});
-	jsLogEvent = $pkg.jsLogEvent = $newType(0, $kindStruct, "main.jsLogEvent", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, EvLogSource_, EvLogLevel_, EvLogMessage_, EvLogTime_) {
+	jsLogEvent = $pkg.jsLogEvent = $newType(0, $kindStruct, "main.jsLogEvent", true, ".", false, function(Object_, EvLogSource_, EvLogLevel_, EvLogMessage_, EvLogTime_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35922,7 +36111,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.EvLogMessage = EvLogMessage_;
 		this.EvLogTime = EvLogTime_;
 	});
-	jsHidEvent = $pkg.jsHidEvent = $newType(0, $kindStruct, "main.jsHidEvent", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, EvType_, VMId_, JobId_, HasError_, Result_, Error_, Message_, EvLogTime_) {
+	jsHidEvent = $pkg.jsHidEvent = $newType(0, $kindStruct, "main.jsHidEvent", true, ".", false, function(Object_, EvType_, VMId_, JobId_, HasError_, Result_, Error_, Message_, EvLogTime_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35946,7 +36135,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Message = Message_;
 		this.EvLogTime = EvLogTime_;
 	});
-	jsHidJobState = $pkg.jsHidJobState = $newType(0, $kindStruct, "main.jsHidJobState", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Id_, VmId_, HasFailed_, HasSucceeded_, LastMessage_, TextResult_, LastUpdateTime_, ScriptSource_) {
+	jsHidJobState = $pkg.jsHidJobState = $newType(0, $kindStruct, "main.jsHidJobState", true, ".", false, function(Object_, Id_, VmId_, HasFailed_, HasSucceeded_, LastMessage_, TextResult_, LastUpdateTime_, ScriptSource_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35970,7 +36159,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.LastUpdateTime = LastUpdateTime_;
 		this.ScriptSource = ScriptSource_;
 	});
-	jsHidJobStateList = $pkg.jsHidJobStateList = $newType(0, $kindStruct, "main.jsHidJobStateList", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Jobs_) {
+	jsHidJobStateList = $pkg.jsHidJobStateList = $newType(0, $kindStruct, "main.jsHidJobStateList", true, ".", false, function(Object_, Jobs_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35980,7 +36169,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Object = Object_;
 		this.Jobs = Jobs_;
 	});
-	jsWiFiState = $pkg.jsWiFiState = $newType(0, $kindStruct, "main.jsWiFiState", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Mode_, Channel_, Ssid_, CurrentSettings_) {
+	jsWiFiState = $pkg.jsWiFiState = $newType(0, $kindStruct, "main.jsWiFiState", true, ".", false, function(Object_, Mode_, Channel_, Ssid_, CurrentSettings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -35996,7 +36185,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Ssid = Ssid_;
 		this.CurrentSettings = CurrentSettings_;
 	});
-	jsWiFiBSSCfg = $pkg.jsWiFiBSSCfg = $newType(0, $kindStruct, "main.jsWiFiBSSCfg", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, SSID_, PSK_) {
+	jsWiFiBSSCfg = $pkg.jsWiFiBSSCfg = $newType(0, $kindStruct, "main.jsWiFiBSSCfg", true, ".", false, function(Object_, SSID_, PSK_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36008,7 +36197,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.SSID = SSID_;
 		this.PSK = PSK_;
 	});
-	jsWiFiSettings = $pkg.jsWiFiSettings = $newType(0, $kindStruct, "main.jsWiFiSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Name_, Disabled_, Reg_, Mode_, AuthMode_, Channel_, HideSsid_, Nexmon_, Ap_BSS_, Client_BSSList_) {
+	jsWiFiSettings = $pkg.jsWiFiSettings = $newType(0, $kindStruct, "main.jsWiFiSettings", true, ".", false, function(Object_, Name_, Disabled_, Reg_, Mode_, AuthMode_, Channel_, HideSsid_, Nexmon_, Ap_BSS_, Client_BSSList_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36036,7 +36225,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Ap_BSS = Ap_BSS_;
 		this.Client_BSSList = Client_BSSList_;
 	});
-	jsEthernetRequestSettingsStorage = $pkg.jsEthernetRequestSettingsStorage = $newType(0, $kindStruct, "main.jsEthernetRequestSettingsStorage", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Settings_) {
+	jsEthernetRequestSettingsStorage = $pkg.jsEthernetRequestSettingsStorage = $newType(0, $kindStruct, "main.jsEthernetRequestSettingsStorage", true, ".", false, function(Object_, TemplateName_, Settings_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36048,7 +36237,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Settings = Settings_;
 	});
-	jsEthernetSettingsArray = $pkg.jsEthernetSettingsArray = $newType(0, $kindStruct, "main.jsEthernetSettingsArray", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Interfaces_) {
+	jsEthernetSettingsArray = $pkg.jsEthernetSettingsArray = $newType(0, $kindStruct, "main.jsEthernetSettingsArray", true, ".", false, function(Object_, Interfaces_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36058,7 +36247,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Object = Object_;
 		this.Interfaces = Interfaces_;
 	});
-	jsEthernetInterfaceSettings = $pkg.jsEthernetInterfaceSettings = $newType(0, $kindStruct, "main.jsEthernetInterfaceSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Name_, Mode_, IpAddress4_, Netmask4_, Enabled_, DhcpServerSettings_, SettingsInUse_) {
+	jsEthernetInterfaceSettings = $pkg.jsEthernetInterfaceSettings = $newType(0, $kindStruct, "main.jsEthernetInterfaceSettings", true, ".", false, function(Object_, Name_, Mode_, IpAddress4_, Netmask4_, Enabled_, DhcpServerSettings_, SettingsInUse_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36080,7 +36269,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.DhcpServerSettings = DhcpServerSettings_;
 		this.SettingsInUse = SettingsInUse_;
 	});
-	jsDHCPServerSettings = $pkg.jsDHCPServerSettings = $newType(0, $kindStruct, "main.jsDHCPServerSettings", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, ListenPort_, ListenInterface_, LeaseFile_, NotAuthoritative_, DoNotBindInterface_, CallbackScript_, Ranges_, Options_, StaticHosts_) {
+	jsDHCPServerSettings = $pkg.jsDHCPServerSettings = $newType(0, $kindStruct, "main.jsDHCPServerSettings", true, ".", false, function(Object_, ListenPort_, ListenInterface_, LeaseFile_, NotAuthoritative_, DoNotBindInterface_, CallbackScript_, Ranges_, Options_, StaticHosts_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36106,7 +36295,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Options = Options_;
 		this.StaticHosts = StaticHosts_;
 	});
-	jsDHCPServerRange = $pkg.jsDHCPServerRange = $newType(0, $kindStruct, "main.jsDHCPServerRange", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, RangeLower_, RangeUpper_, LeaseTime_) {
+	jsDHCPServerRange = $pkg.jsDHCPServerRange = $newType(0, $kindStruct, "main.jsDHCPServerRange", true, ".", false, function(Object_, RangeLower_, RangeUpper_, LeaseTime_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36120,7 +36309,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.RangeUpper = RangeUpper_;
 		this.LeaseTime = LeaseTime_;
 	});
-	jsDHCPServerOption = $pkg.jsDHCPServerOption = $newType(0, $kindStruct, "main.jsDHCPServerOption", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Option_, Value_) {
+	jsDHCPServerOption = $pkg.jsDHCPServerOption = $newType(0, $kindStruct, "main.jsDHCPServerOption", true, ".", false, function(Object_, Option_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36132,7 +36321,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Option = Option_;
 		this.Value = Value_;
 	});
-	jsDHCPServerStaticHost = $pkg.jsDHCPServerStaticHost = $newType(0, $kindStruct, "main.jsDHCPServerStaticHost", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Mac_, Ip_) {
+	jsDHCPServerStaticHost = $pkg.jsDHCPServerStaticHost = $newType(0, $kindStruct, "main.jsDHCPServerStaticHost", true, ".", false, function(Object_, Mac_, Ip_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36144,7 +36333,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Mac = Mac_;
 		this.Ip = Ip_;
 	});
-	jsEventProcessor = $pkg.jsEventProcessor = $newType(0, $kindStruct, "main.jsEventProcessor", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, LogArray_, HidEventArray_, MaxEntries_, JobList_) {
+	jsEventProcessor = $pkg.jsEventProcessor = $newType(0, $kindStruct, "main.jsEventProcessor", true, ".", false, function(Object_, LogArray_, HidEventArray_, MaxEntries_, JobList_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36160,9 +36349,9 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.MaxEntries = MaxEntries_;
 		this.JobList = JobList_;
 	});
-	triggerType = $pkg.triggerType = $newType(4, $kindInt, "main.triggerType", true, "github.com/mame82/P4wnP1_aloa/web_client", false, null);
-	actionType = $pkg.actionType = $newType(4, $kindInt, "main.actionType", true, "github.com/mame82/P4wnP1_aloa/web_client", false, null);
-	jsTriggerAction = $pkg.jsTriggerAction = $newType(0, $kindStruct, "main.jsTriggerAction", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Id_, OneShot_, IsActive_, Immutable_, TriggerType_, ActionType_, TriggerData_, ActionData_) {
+	triggerType = $pkg.triggerType = $newType(4, $kindInt, "main.triggerType", true, ".", false, null);
+	actionType = $pkg.actionType = $newType(4, $kindInt, "main.actionType", true, ".", false, null);
+	jsTriggerAction = $pkg.jsTriggerAction = $newType(0, $kindStruct, "main.jsTriggerAction", true, ".", false, function(Object_, Id_, OneShot_, IsActive_, Immutable_, TriggerType_, ActionType_, TriggerData_, ActionData_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36186,7 +36375,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.TriggerData = TriggerData_;
 		this.ActionData = ActionData_;
 	});
-	jsTriggerServiceStarted = $pkg.jsTriggerServiceStarted = $newType(0, $kindStruct, "main.jsTriggerServiceStarted", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
+	jsTriggerServiceStarted = $pkg.jsTriggerServiceStarted = $newType(0, $kindStruct, "main.jsTriggerServiceStarted", true, ".", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36194,7 +36383,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerUSBGadgetConnected = $pkg.jsTriggerUSBGadgetConnected = $newType(0, $kindStruct, "main.jsTriggerUSBGadgetConnected", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
+	jsTriggerUSBGadgetConnected = $pkg.jsTriggerUSBGadgetConnected = $newType(0, $kindStruct, "main.jsTriggerUSBGadgetConnected", true, ".", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36202,7 +36391,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerUSBGadgetDisconnected = $pkg.jsTriggerUSBGadgetDisconnected = $newType(0, $kindStruct, "main.jsTriggerUSBGadgetDisconnected", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
+	jsTriggerUSBGadgetDisconnected = $pkg.jsTriggerUSBGadgetDisconnected = $newType(0, $kindStruct, "main.jsTriggerUSBGadgetDisconnected", true, ".", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36210,7 +36399,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerWifiAPStarted = $pkg.jsTriggerWifiAPStarted = $newType(0, $kindStruct, "main.jsTriggerWifiAPStarted", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
+	jsTriggerWifiAPStarted = $pkg.jsTriggerWifiAPStarted = $newType(0, $kindStruct, "main.jsTriggerWifiAPStarted", true, ".", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36218,7 +36407,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerWifiConnectedAsSta = $pkg.jsTriggerWifiConnectedAsSta = $newType(0, $kindStruct, "main.jsTriggerWifiConnectedAsSta", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
+	jsTriggerWifiConnectedAsSta = $pkg.jsTriggerWifiConnectedAsSta = $newType(0, $kindStruct, "main.jsTriggerWifiConnectedAsSta", true, ".", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36226,7 +36415,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerSSHLogin = $pkg.jsTriggerSSHLogin = $newType(0, $kindStruct, "main.jsTriggerSSHLogin", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, LoginUser_) {
+	jsTriggerSSHLogin = $pkg.jsTriggerSSHLogin = $newType(0, $kindStruct, "main.jsTriggerSSHLogin", true, ".", false, function(Object_, LoginUser_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36236,7 +36425,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Object = Object_;
 		this.LoginUser = LoginUser_;
 	});
-	jsTriggerDHCPLeaseGranted = $pkg.jsTriggerDHCPLeaseGranted = $newType(0, $kindStruct, "main.jsTriggerDHCPLeaseGranted", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
+	jsTriggerDHCPLeaseGranted = $pkg.jsTriggerDHCPLeaseGranted = $newType(0, $kindStruct, "main.jsTriggerDHCPLeaseGranted", true, ".", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36244,7 +36433,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	jsTriggerGroupReceive = $pkg.jsTriggerGroupReceive = $newType(0, $kindStruct, "main.jsTriggerGroupReceive", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, GroupName_, Value_) {
+	jsTriggerGroupReceive = $pkg.jsTriggerGroupReceive = $newType(0, $kindStruct, "main.jsTriggerGroupReceive", true, ".", false, function(Object_, GroupName_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36256,7 +36445,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.GroupName = GroupName_;
 		this.Value = Value_;
 	});
-	jsTriggerGroupReceiveMulti = $pkg.jsTriggerGroupReceiveMulti = $newType(0, $kindStruct, "main.jsTriggerGroupReceiveMulti", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, GroupName_, Type_, Values_) {
+	jsTriggerGroupReceiveMulti = $pkg.jsTriggerGroupReceiveMulti = $newType(0, $kindStruct, "main.jsTriggerGroupReceiveMulti", true, ".", false, function(Object_, GroupName_, Type_, Values_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36270,8 +36459,8 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Type = Type_;
 		this.Values = Values_;
 	});
-	GroupReceiveMultiType = $pkg.GroupReceiveMultiType = $newType(4, $kindInt, "main.GroupReceiveMultiType", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
-	jsTriggerGPIOIn = $pkg.jsTriggerGPIOIn = $newType(0, $kindStruct, "main.jsTriggerGPIOIn", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, GpioName_, PullUpDown_, Edge_, DebounceMillis_) {
+	GroupReceiveMultiType = $pkg.GroupReceiveMultiType = $newType(4, $kindInt, "main.GroupReceiveMultiType", true, ".", true, null);
+	jsTriggerGPIOIn = $pkg.jsTriggerGPIOIn = $newType(0, $kindStruct, "main.jsTriggerGPIOIn", true, ".", false, function(Object_, GpioName_, PullUpDown_, Edge_, DebounceMillis_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36287,9 +36476,9 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Edge = Edge_;
 		this.DebounceMillis = DebounceMillis_;
 	});
-	GPIOInPullUpDown = $pkg.GPIOInPullUpDown = $newType(4, $kindInt, "main.GPIOInPullUpDown", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
-	GPIOInEdge = $pkg.GPIOInEdge = $newType(4, $kindInt, "main.GPIOInEdge", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
-	jsActionStartBashScript = $pkg.jsActionStartBashScript = $newType(0, $kindStruct, "main.jsActionStartBashScript", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, ScriptName_) {
+	GPIOInPullUpDown = $pkg.GPIOInPullUpDown = $newType(4, $kindInt, "main.GPIOInPullUpDown", true, ".", true, null);
+	GPIOInEdge = $pkg.GPIOInEdge = $newType(4, $kindInt, "main.GPIOInEdge", true, ".", true, null);
+	jsActionStartBashScript = $pkg.jsActionStartBashScript = $newType(0, $kindStruct, "main.jsActionStartBashScript", true, ".", false, function(Object_, ScriptName_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36299,7 +36488,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Object = Object_;
 		this.ScriptName = ScriptName_;
 	});
-	jsActionStartHIDScript = $pkg.jsActionStartHIDScript = $newType(0, $kindStruct, "main.jsActionStartHIDScript", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, ScriptName_) {
+	jsActionStartHIDScript = $pkg.jsActionStartHIDScript = $newType(0, $kindStruct, "main.jsActionStartHIDScript", true, ".", false, function(Object_, ScriptName_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36309,7 +36498,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Object = Object_;
 		this.ScriptName = ScriptName_;
 	});
-	jsActionDeploySettingsTemplate = $pkg.jsActionDeploySettingsTemplate = $newType(0, $kindStruct, "main.jsActionDeploySettingsTemplate", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, TemplateName_, Type_) {
+	jsActionDeploySettingsTemplate = $pkg.jsActionDeploySettingsTemplate = $newType(0, $kindStruct, "main.jsActionDeploySettingsTemplate", true, ".", false, function(Object_, TemplateName_, Type_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36321,7 +36510,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.TemplateName = TemplateName_;
 		this.Type = Type_;
 	});
-	jsActionGPIOOut = $pkg.jsActionGPIOOut = $newType(0, $kindStruct, "main.jsActionGPIOOut", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, GpioName_, Value_) {
+	jsActionGPIOOut = $pkg.jsActionGPIOOut = $newType(0, $kindStruct, "main.jsActionGPIOOut", true, ".", false, function(Object_, GpioName_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36333,8 +36522,8 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.GpioName = GpioName_;
 		this.Value = Value_;
 	});
-	GPIOOutValue = $pkg.GPIOOutValue = $newType(4, $kindInt, "main.GPIOOutValue", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
-	jsActionGroupSend = $pkg.jsActionGroupSend = $newType(0, $kindStruct, "main.jsActionGroupSend", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, GroupName_, Value_) {
+	GPIOOutValue = $pkg.GPIOOutValue = $newType(4, $kindInt, "main.GPIOOutValue", true, ".", true, null);
+	jsActionGroupSend = $pkg.jsActionGroupSend = $newType(0, $kindStruct, "main.jsActionGroupSend", true, ".", false, function(Object_, GroupName_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36346,7 +36535,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.GroupName = GroupName_;
 		this.Value = Value_;
 	});
-	jsActionLog = $pkg.jsActionLog = $newType(0, $kindStruct, "main.jsActionLog", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_) {
+	jsActionLog = $pkg.jsActionLog = $newType(0, $kindStruct, "main.jsActionLog", true, ".", false, function(Object_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36354,8 +36543,8 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		}
 		this.Object = Object_;
 	});
-	TemplateType = $pkg.TemplateType = $newType(4, $kindInt, "main.TemplateType", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
-	jsTriggerActionSet = $pkg.jsTriggerActionSet = $newType(0, $kindStruct, "main.jsTriggerActionSet", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Name_, TriggerActions_) {
+	TemplateType = $pkg.TemplateType = $newType(4, $kindInt, "main.TemplateType", true, ".", true, null);
+	jsTriggerActionSet = $pkg.jsTriggerActionSet = $newType(0, $kindStruct, "main.jsTriggerActionSet", true, ".", false, function(Object_, Name_, TriggerActions_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36367,7 +36556,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Name = Name_;
 		this.TriggerActions = TriggerActions_;
 	});
-	GlobalState = $pkg.GlobalState = $newType(0, $kindStruct, "main.GlobalState", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Title_, CurrentHIDScriptSource_, CurrentGadgetSettings_, CurrentlyDeployingGadgetSettings_, CurrentlyDeployingWifiSettings_, EventProcessor_, HidJobList_, TriggerActionList_, IsModalEnabled_, IsConnected_, FailedConnectionAttempts_, InterfaceSettings_, WiFiState_, CurrentBluetoothControllerInformation_, CurrentBluetoothAgentSettings_, CurrentMasterTemplate_, CurrentStartupMasterTemplateName_, StoredWifiSettingsList_, StoredEthernetInterfaceSettingsList_, StoredTriggerActionSetsList_, StoredBashScriptsList_, StoredHIDScriptsList_, StoredUSBSettingsList_, StoredBluetoothSettingsList_, StoredMasterTemplateList_, DBBackupList_, GpioNamesList_, UmsImageListCdrom_, UmsImageListFlashdrive_, ConnectRetryCount_, EventListenerRunning_, EventListenerShouldBeRunning_, EventListenerCancelFunc_) {
+	GlobalState = $pkg.GlobalState = $newType(0, $kindStruct, "main.GlobalState", true, ".", true, function(Object_, Title_, CurrentHIDScriptSource_, CurrentGadgetSettings_, CurrentlyDeployingGadgetSettings_, CurrentlyDeployingWifiSettings_, EventProcessor_, HidJobList_, TriggerActionList_, IsModalEnabled_, IsConnected_, FailedConnectionAttempts_, InterfaceSettings_, WiFiState_, CurrentBluetoothControllerInformation_, CurrentBluetoothAgentSettings_, CurrentMasterTemplate_, CurrentStartupMasterTemplateName_, StoredWifiSettingsList_, StoredEthernetInterfaceSettingsList_, StoredTriggerActionSetsList_, StoredBashScriptsList_, StoredHIDScriptsList_, StoredUSBSettingsList_, StoredBluetoothSettingsList_, StoredMasterTemplateList_, DBBackupList_, GpioNamesList_, UmsImageListCdrom_, UmsImageListFlashdrive_, ConnectRetryCount_, EventListenerRunning_, EventListenerShouldBeRunning_, EventListenerCancelFunc_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36441,7 +36630,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.EventListenerShouldBeRunning = EventListenerShouldBeRunning_;
 		this.EventListenerCancelFunc = EventListenerCancelFunc_;
 	});
-	Promise = $pkg.Promise = $newType(0, $kindStruct, "main.Promise", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, State_) {
+	Promise = $pkg.Promise = $newType(0, $kindStruct, "main.Promise", true, ".", true, function(Object_, State_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36451,7 +36640,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Object = Object_;
 		this.State = State_;
 	});
-	Quasar = $pkg.Quasar = $newType(0, $kindStruct, "main.Quasar", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Version_, Theme_, Plugins_) {
+	Quasar = $pkg.Quasar = $newType(0, $kindStruct, "main.Quasar", true, ".", true, function(Object_, Version_, Theme_, Plugins_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36465,7 +36654,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Theme = Theme_;
 		this.Plugins = Plugins_;
 	});
-	QuasarNotification = $pkg.QuasarNotification = $newType(0, $kindStruct, "main.QuasarNotification", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Message_, Detail_, Type_, Color_, TextColor_, Icon_, Position_, Timeout_) {
+	QuasarNotification = $pkg.QuasarNotification = $newType(0, $kindStruct, "main.QuasarNotification", true, ".", true, function(Object_, Message_, Detail_, Type_, Color_, TextColor_, Icon_, Position_, Timeout_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36489,7 +36678,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Position = Position_;
 		this.Timeout = Timeout_;
 	});
-	Rpc = $pkg.Rpc = $newType(0, $kindStruct, "main.Rpc", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Mutex_, Client_, eventListeningOn_, eventListeningCtx_, eventListeningCancel_) {
+	Rpc = $pkg.Rpc = $newType(0, $kindStruct, "main.Rpc", true, ".", true, function(Mutex_, Client_, eventListeningOn_, eventListeningCtx_, eventListeningCancel_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Mutex = ptrType$95.nil;
@@ -36505,7 +36694,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.eventListeningCtx = eventListeningCtx_;
 		this.eventListeningCancel = eventListeningCancel_;
 	});
-	VueRouterConfig = $pkg.VueRouterConfig = $newType(0, $kindStruct, "main.VueRouterConfig", true, "github.com/mame82/P4wnP1_aloa/web_client", true, function(Object_, Routes_) {
+	VueRouterConfig = $pkg.VueRouterConfig = $newType(0, $kindStruct, "main.VueRouterConfig", true, ".", true, function(Object_, Routes_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36515,8 +36704,8 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Object = Object_;
 		this.Routes = Routes_;
 	});
-	VueRouterOption = $pkg.VueRouterOption = $newType(4, $kindFunc, "main.VueRouterOption", true, "github.com/mame82/P4wnP1_aloa/web_client", true, null);
-	option = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
+	VueRouterOption = $pkg.VueRouterOption = $newType(4, $kindFunc, "main.VueRouterOption", true, ".", true, null);
+	option = $newType(0, $kindStruct, "main.option", true, ".", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36528,7 +36717,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$1 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
+	option$1 = $newType(0, $kindStruct, "main.option", true, ".", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36540,7 +36729,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$2 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
+	option$2 = $newType(0, $kindStruct, "main.option", true, ".", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36552,7 +36741,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$3 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
+	option$3 = $newType(0, $kindStruct, "main.option", true, ".", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36564,7 +36753,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$4 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
+	option$4 = $newType(0, $kindStruct, "main.option", true, ".", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36576,7 +36765,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$5 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
+	option$5 = $newType(0, $kindStruct, "main.option", true, ".", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36588,7 +36777,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$6 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
+	option$6 = $newType(0, $kindStruct, "main.option", true, ".", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36600,7 +36789,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		this.Label = Label_;
 		this.Value = Value_;
 	});
-	option$7 = $newType(0, $kindStruct, "main.option", true, "github.com/mame82/P4wnP1_aloa/web_client", false, function(Object_, Label_, Value_) {
+	option$7 = $newType(0, $kindStruct, "main.option", true, ".", false, function(Object_, Label_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Object = null;
@@ -36846,7 +37035,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	InitCompEthernetAddresses2 = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("ethernet-addresses", new sliceType$10([hvue.Template("\n<div>\n\t<table>\n\t<tr>\n\t\t<td>Host MAC address</td><td><input v-bind:value=\"settings.HostAddr\" v-on:input=\"$emit('hostAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t<tr>\n\t\t<td>Device MAC address</td><td><input v-bind:value=\"settings.DevAddr\" v-on:input=\"$emit('devAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t</table>\n</div>\n"), hvue.DataFunc(newCompEthernetAddressesData2), hvue.PropObj("settings", new sliceType$9([hvue.Types(new sliceType$8([4]))]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("ethernet-addresses", new sliceType$10([hvue.Template("\n<div>\n\t<table>\n\t<tr>\n\t\t<td>\xE4\xB8\xBB\xE6\x9C\xBAMAC\xE5\x9C\xB0\xE5\x9D\x80</td><td><input v-bind:value=\"settings.HostAddr\" v-on:input=\"$emit('hostAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t<tr>\n\t\t<td>\xE8\xAE\xBE\xE5\xA4\x87MAC\xE5\x9C\xB0\xE5\x9D\x80</td><td><input v-bind:value=\"settings.DevAddr\" v-on:input=\"$emit('devAddrChange', $event.target.value)\"></td>\n\t</tr>\n\t</table>\n</div>\n"), hvue.DataFunc(newCompEthernetAddressesData2), hvue.PropObj("settings", new sliceType$9([hvue.Types(new sliceType$8([4]))]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompEthernetAddresses2 }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -36860,7 +37049,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	InitCompHIDEvents = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("hid-job-event-overview", new sliceType$10([hvue.Template("\n\t<q-card>\n<!--\t\t<div class=\"scroll\" style=\"overflow: auto;max-height: 20vh;\">\t-->\n\t\t<div>\n\t\t\t<q-table\n\t\t\t\t:data=\"events\"\n\t\t\t\t:columns=\"[{name:'timestamp', field: 'time', label: 'Time', align: 'left'}, {name:'type', field: 'evtype', label: 'Event Type', align: 'left'}, {name:'vmid', field: 'vmId', label: 'VM ID', align: 'left'}, {name:'jobid', field: 'jobId', label: 'Job ID', align: 'left'}, {name:'haserror', field: 'hasError', label: 'Has error', align: 'left'}, {name:'res', field: 'result', label: 'Result', align: 'left'}, {name:'errormsg', field: 'error', label: 'Error', align: 'left'}, {name:'msg', field: 'message', label: 'Message', align: 'left'}]\"\n\t\t\t\trow-key=\"name\"\n\t\t\t\t:pagination=\"pagination\"\n\t\t\t\thide-bottom\n\t\t\t>\n\n\t\t\t\t<q-td slot=\"body-cell-timestamp\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t{{ formatDate(props.value) }}\n\t\t\t\t</q-td>\n\n\t\t\t\t<q-td slot=\"body-cell-type\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t{{ evIdToString(props.value) }}\n\t\t\t\t</q-td>\n\t\t\t\t<q-td slot=\"body-cell-msg\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t{{ props.value.slice(0,30) }}\n\t\t\t\t\t<q-btn v-if=\"props.value.length > 30\" dense icon=\"more_horiz\">\n\t\t\t\t\t\t\n\t\t\t\t\t\t<q-popover>\n\t\t\t\t\t\t\t<div class=\"q-ma-md\" style=\"max-width: 400px; max-height: 400px;\">\n\t\t\t\t\t\t\t\t<pre>{{ props.value }}</pre>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</q-popover>\n\t\t\t\t\t</q-btn>\n\t\t\t\t</q-td>\n\t\t\t</q-table>\n\t\t</div>\n\t</q-card>\n"), hvue.DataFunc(newCompHIDEventsData), hvue.Computed("events", (function(vm) {
+		$r = hvue.NewComponent("hid-job-event-overview", new sliceType$10([hvue.Template("\n\t<q-card>\n<!--\t\t<div class=\"scroll\" style=\"overflow: auto;max-height: 20vh;\">\t-->\n\t\t<div>\n\t\t\t<q-table\n\t\t\t\t:data=\"events\"\n\t\t\t\t:columns=\"[{name:'timestamp', field: 'time', label: '\xE6\x97\xB6\xE9\x97\xB4', align: 'left'}, {name:'type', field: 'evtype', label: '\xE4\xBA\x8B\xE4\xBB\xB6\xE7\xB1\xBB\xE5\x9E\x8B', align: 'left'}, {name:'vmid', field: 'vmId', label: 'VM ID', align: 'left'}, {name:'jobid', field: 'jobId', label: '\xE4\xBB\xBB\xE5\x8A\xA1ID', align: 'left'}, {name:'haserror', field: 'hasError', label: '\xE6\x89\xA7\xE8\xA1\x8C\xE9\x94\x99\xE8\xAF\xAF', align: 'left'}, {name:'res', field: 'result', label: '\xE7\xBB\x93\xE6\x9E\x9C', align: 'left'}, {name:'errormsg', field: 'error', label: '\xE9\x94\x99\xE8\xAF\xAF', align: 'left'}, {name:'msg', field: 'message', label: '\xE6\xB6\x88\xE6\x81\xAF', align: 'left'}]\"\n\t\t\t\trow-key=\"name\"\n\t\t\t\t:pagination=\"pagination\"\n\t\t\t\thide-bottom\n\t\t\t>\n\n\t\t\t\t<q-td slot=\"body-cell-timestamp\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t{{ formatDate(props.value) }}\n\t\t\t\t</q-td>\n\n\t\t\t\t<q-td slot=\"body-cell-type\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t{{ evIdToString(props.value) }}\n\t\t\t\t</q-td>\n\t\t\t\t<q-td slot=\"body-cell-msg\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t{{ props.value.slice(0,30) }}\n\t\t\t\t\t<q-btn v-if=\"props.value.length > 30\" dense icon=\"more_horiz\">\n\t\t\t\t\t\t\n\t\t\t\t\t\t<q-popover>\n\t\t\t\t\t\t\t<div class=\"q-ma-md\" style=\"max-width: 400px; max-height: 400px;\">\n\t\t\t\t\t\t\t\t<pre>{{ props.value }}</pre>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</q-popover>\n\t\t\t\t\t</q-btn>\n\t\t\t\t</q-td>\n\t\t\t</q-table>\n\t\t</div>\n\t</q-card>\n"), hvue.DataFunc(newCompHIDEventsData), hvue.Computed("events", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.$store.state.EventProcessor.eventHidArray);
 		})), hvue.Method("formatDate", new funcType((function(vm, timestamp) {
@@ -36884,11 +37073,11 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	InitCompHIDJobs = function() {
 		var _arg, _arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _r$1, _r$2, _r$3, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _arg$4 = $f._arg$4; _arg$5 = $f._arg$5; _arg$6 = $f._arg$6; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("hid-job-overview", new sliceType$10([hvue.Template("\n\t<q-card class=\"full-height\">\n\t\t<q-list>\n\t\t\t<q-collapsible opened icon-toggle>\n\t\t\t\t<template slot=\"header\">\n\t\t\t\t\t<q-item-main label=\"Running jobs\" :sublabel=\"'(' + $store.getters.hidjobsRunning.length + ' running jobs)'\"/>\n\t\t\t\t\t<q-item-side v-if=\"$store.getters.hidjobsRunning.length > 0\" right>\n\t\t\t\t\t\t<q-btn icon=\"cancel\" color=\"red\" @click=\"$store.dispatch('cancelAllHIDJobs')\" round inverted flat>\n\t\t\t\t\t\t\t<q-tooltip>\n\t\t\t\t\t\t\t\tcancel all running HIDScript jobs\n\t\t\t\t\t\t\t</q-tooltip>\n\t\t\t\t\t\t</q-btn>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t</template>\n\t\t\t\t<hid-job-overview-item v-for=\"job in $store.getters.hidjobsRunning\" :job=\"job\" :key=\"job.id\"></hid-job-overview-item>\n\t\t\t</q-collapsible>\n\t\t</q-list>\n\n\t\t<q-list>\n\t\t\t<q-collapsible opened icon-toggle>\n\t\t\t\t<template slot=\"header\">\n\t\t\t\t\t<q-item-main label=\"Succeeded\" :sublabel=\"'(' + $store.getters.hidjobsSucceeded.length + ' successful jobs)'\"/>\n\t\t\t\t\t<q-item-side v-if=\"$store.getters.hidjobsSucceeded.length > 0\" right>\n\t\t\t\t\t\t<q-btn icon=\"delete\" color=\"red\" @click=\"$store.dispatch('removeSucceededHidJobs')\" round inverted flat>\n\t\t\t\t\t\t\t<q-tooltip>\n\t\t\t\t\t\t\t\tdelete succeeded HID jobs from list\n\t\t\t\t\t\t\t</q-tooltip>\n\t\t\t\t\t\t</q-btn>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t</template>\n\t\t\t\t<hid-job-overview-item v-for=\"job in $store.getters.hidjobsSucceeded\" :job=\"job\" :key=\"job.id\"></hid-job-overview-item>\n\t\t\t</q-collapsible>\n\t\t</q-list>\n\t\t<q-list>\n\t\t\t<q-collapsible  opened icon-toggle>\n\t\t\t\t<template slot=\"header\">\n\t\t\t\t\t<q-item-main label=\"Failed\" :sublabel=\"'(' + $store.getters.hidjobsFailed.length + ' failed jobs)'\"/>\n\t\t\t\t\t<q-item-side v-if=\"$store.getters.hidjobsFailed.length > 0\" right>\n\t\t\t\t\t\t<q-btn icon=\"delete\" color=\"red\" @click=\"$store.dispatch('removeFailedHidJobs')\" round inverted flat>\n\t\t\t\t\t\t\t<q-tooltip>\n\t\t\t\t\t\t\t\tdelete failed HID jobs from list\n\t\t\t\t\t\t\t</q-tooltip>\n\t\t\t\t\t\t</q-btn>\n\n\t\t\t\t\t</q-item-side>\n\t\t\t\t</template>\n\t\t\t\t<hid-job-overview-item v-for=\"job in $store.getters.hidjobsFailed\" :job=\"job\" :key=\"job.id\"></hid-job-overview-item>\n\t\t\t</q-collapsible>\n\t\t</q-list>\n\t</q-card>\n\n"), hvue.DataFunc(newCompHIDJobsData), hvue.Computed("jobs", (function(vm) {
+		$r = hvue.NewComponent("hid-job-overview", new sliceType$10([hvue.Template("\n\t<q-card class=\"full-height\">\n\t\t<q-list>\n\t\t\t<q-collapsible opened icon-toggle>\n\t\t\t\t<template slot=\"header\">\n\t\t\t\t\t<q-item-main label=\"\xE6\xAD\xA3\xE5\x9C\xA8\xE6\x89\xA7\xE8\xA1\x8C\xE7\x9A\x84\xE4\xBB\xBB\xE5\x8A\xA1\" :sublabel=\"'(' + $store.getters.hidjobsRunning.length + ' running jobs)'\"/>\n\t\t\t\t\t<q-item-side v-if=\"$store.getters.hidjobsRunning.length > 0\" right>\n\t\t\t\t\t\t<q-btn icon=\"cancel\" color=\"red\" @click=\"$store.dispatch('cancelAllHIDJobs')\" round inverted flat>\n\t\t\t\t\t\t\t<q-tooltip>\n\t\t\t\t\t\t\t\t\xE7\xBB\x88\xE6\xAD\xA2\xE6\x89\x80\xE6\x9C\x89\xE6\xAD\xA3\xE5\x9C\xA8\xE6\x89\xA7\xE8\xA1\x8C\xE7\x9A\x84HID\xE8\x84\x9A\xE6\x9C\xAC\xE4\xBB\xBB\xE5\x8A\xA1\n\t\t\t\t\t\t\t</q-tooltip>\n\t\t\t\t\t\t</q-btn>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t</template>\n\t\t\t\t<hid-job-overview-item v-for=\"job in $store.getters.hidjobsRunning\" :job=\"job\" :key=\"job.id\"></hid-job-overview-item>\n\t\t\t</q-collapsible>\n\t\t</q-list>\n\n\t\t<q-list>\n\t\t\t<q-collapsible opened icon-toggle>\n\t\t\t\t<template slot=\"header\">\n\t\t\t\t\t<q-item-main label=\"\xE6\x89\xA7\xE8\xA1\x8C\xE6\x88\x90\xE5\x8A\x9F\" :sublabel=\"'(' + $store.getters.hidjobsSucceeded.length + ' successful jobs)'\"/>\n\t\t\t\t\t<q-item-side v-if=\"$store.getters.hidjobsSucceeded.length > 0\" right>\n\t\t\t\t\t\t<q-btn icon=\"delete\" color=\"red\" @click=\"$store.dispatch('removeSucceededHidJobs')\" round inverted flat>\n\t\t\t\t\t\t\t<q-tooltip>\n\t\t\t\t\t\t\t\t\xE4\xBB\x8E\xE5\x88\x97\xE8\xA1\xA8\xE4\xB8\xAD\xE5\x88\xA0\xE9\x99\xA4\xE6\x88\x90\xE5\x8A\x9F\xE6\x89\xA7\xE8\xA1\x8C\xE7\x9A\x84HID\xE8\x84\x9A\xE6\x9C\xAC\xE4\xBB\xBB\xE5\x8A\xA1\n\t\t\t\t\t\t\t</q-tooltip>\n\t\t\t\t\t\t</q-btn>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t</template>\n\t\t\t\t<hid-job-overview-item v-for=\"job in $store.getters.hidjobsSucceeded\" :job=\"job\" :key=\"job.id\"></hid-job-overview-item>\n\t\t\t</q-collapsible>\n\t\t</q-list>\n\t\t<q-list>\n\t\t\t<q-collapsible  opened icon-toggle>\n\t\t\t\t<template slot=\"header\">\n\t\t\t\t\t<q-item-main label=\"\xE6\x89\xA7\xE8\xA1\x8C\xE5\xA4\xB1\xE8\xB4\xA5\" :sublabel=\"'(' + $store.getters.hidjobsFailed.length + ' failed jobs)'\"/>\n\t\t\t\t\t<q-item-side v-if=\"$store.getters.hidjobsFailed.length > 0\" right>\n\t\t\t\t\t\t<q-btn icon=\"delete\" color=\"red\" @click=\"$store.dispatch('removeFailedHidJobs')\" round inverted flat>\n\t\t\t\t\t\t\t<q-tooltip>\n\t\t\t\t\t\t\t\t\xE4\xBB\x8E\xE5\x88\x97\xE8\xA1\xA8\xE4\xB8\xAD\xE5\x88\xA0\xE9\x99\xA4\xE6\x89\xA7\xE8\xA1\x8C\xE5\xA4\xB1\xE8\xB4\xA5\xE7\x9A\x84HID\xE8\x84\x9A\xE6\x9C\xAC\xE4\xBB\xBB\xE5\x8A\xA1\n\t\t\t\t\t\t\t</q-tooltip>\n\t\t\t\t\t\t</q-btn>\n\n\t\t\t\t\t</q-item-side>\n\t\t\t\t</template>\n\t\t\t\t<hid-job-overview-item v-for=\"job in $store.getters.hidjobsFailed\" :job=\"job\" :key=\"job.id\"></hid-job-overview-item>\n\t\t\t</q-collapsible>\n\t\t</q-list>\n\t</q-card>\n\n"), hvue.DataFunc(newCompHIDJobsData), hvue.Computed("jobs", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.$store.getters.hidjobs);
 		}))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_arg = hvue.Template("\n<q-item highlight>\n\t<job-detail-modal v-model=\"ShowDetails\" :job=\"job\"></job-detail-modal>\n\n\t<q-item-side :icon=\"jobicon\" :color=\"jobcolor\" />\n\t<q-item-main>\n\t\t<q-item-tile label>Job {{ job.id }}</q-item-tile>\n\t\t<q-item-tile sublabel>State {{ jobstate }} </q-item-tile>\n\t</q-item-main>\n\n\n   \t<q-item-side right>\n\t\t<div class=\"row no-wrap\">\n\t\t\t<div v-if=\"!job.hasSucceeded && !job.hasFailed\">\n\t\t\t\t<q-btn flat round dense color=\"negative\" icon=\"cancel\" @click=\"cancel\">\n\t\t\t\t\t<q-tooltip>\n\t\t\t\t\t\tcancel HIDScript job {{ job.id }}\n\t\t\t\t\t</q-tooltip>\n\t\t\t\t</q-btn>\n\t\t\t</div>\n\t\t\t<div>\n\t\t\t\t<q-btn flat round dense icon=\"info\" @click=\"ShowDetails=true\">\n\t\t\t\t\t<q-tooltip>\n\t\t\t\t\t\tshow HIDScript job details\n\t\t\t\t\t</q-tooltip>\n\t\t\t\t</q-btn>\n\t\t\t</div>\n\t\t</div>\n\t</q-item-side>\n\n</q-item>\n");
+		_arg = hvue.Template("\n<q-item highlight>\n\t<job-detail-modal v-model=\"ShowDetails\" :job=\"job\"></job-detail-modal>\n\n\t<q-item-side :icon=\"jobicon\" :color=\"jobcolor\" />\n\t<q-item-main>\n\t\t<q-item-tile label>Job {{ job.id }}</q-item-tile>\n\t\t<q-item-tile sublabel>State {{ jobstate }} </q-item-tile>\n\t</q-item-main>\n\n\n   \t<q-item-side right>\n\t\t<div class=\"row no-wrap\">\n\t\t\t<div v-if=\"!job.hasSucceeded && !job.hasFailed\">\n\t\t\t\t<q-btn flat round dense color=\"negative\" icon=\"cancel\" @click=\"cancel\">\n\t\t\t\t\t<q-tooltip>\n\t\t\t\t\t\t\xE5\x8F\x96\xE6\xB6\x88HID\xE8\x84\x9A\xE6\x9C\xAC\xE6\x89\xA7\xE8\xA1\x8C\xE4\xBB\xBB\xE5\x8A\xA1 {{ job.id }}\n\t\t\t\t\t</q-tooltip>\n\t\t\t\t</q-btn>\n\t\t\t</div>\n\t\t\t<div>\n\t\t\t\t<q-btn flat round dense icon=\"info\" @click=\"ShowDetails=true\">\n\t\t\t\t\t<q-tooltip>\n\t\t\t\t\t\t\xE6\x98\xBE\xE7\xA4\xBAHID\xE8\x84\x9A\xE6\x9C\xAC\xE4\xBB\xBB\xE5\x8A\xA1\xE8\xAF\xA6\xE6\x83\x85\n\t\t\t\t\t</q-tooltip>\n\t\t\t\t</q-btn>\n\t\t\t</div>\n\t\t</div>\n\t</q-item-side>\n\n</q-item>\n");
 		_r$1 = hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType.ptr(O(), false);
@@ -36945,7 +37134,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		}));
 		_arg$6 = hvue.PropObj("job", new sliceType$9([hvue.Required]));
 		$r = hvue.NewComponent("hid-job-overview-item", new sliceType$10([_arg, _arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6])); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("job-detail-modal", new sliceType$10([hvue.Template("\n<q-modal v-model=\"visible\">\n\t<q-modal-layout>\n\t\t<q-toolbar slot=\"header\">\n\t\t\t<q-toolbar-title>\n\t\t\t\tHIDScript job details\n\t\t\t</q-toolbar-title>\n\t\t</q-toolbar>\n\n\t\t<div class=\"row gutter-sm\">\n\t\t\t<div class=\"col-3\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Job ID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input readonly v-model=\"job.id\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\t\t\t<div class=\"col-3\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>VM ID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input readonly v-model=\"job.vmId\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\t\t\t<div class=\"col-6\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Sate</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input readonly :color=\"jobcolor\" v-model=\"jobstate\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>HIDScript result</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input readonly :color=\"jobcolor\" v-model=\"job.textResult\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>HIDScript source</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input readonly type=\"textarea\" v-model=\"job.textSource\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\n\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-btn color=\"secondary\" v-close-overlay label=\"close\" />\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\t\t</div>\n\t</q-modal-layout>\n</q-modal>\n"), hvue.ComputedWithGetSet("visible", (function(vm) {
+		$r = hvue.NewComponent("job-detail-modal", new sliceType$10([hvue.Template("\n<q-modal v-model=\"visible\">\n\t<q-modal-layout>\n\t\t<q-toolbar slot=\"header\">\n\t\t\t<q-toolbar-title>\n\t\t\t\tHID\xE8\x84\x9A\xE6\x9C\xAC\xE4\xBB\xBB\xE5\x8A\xA1\xE8\xAF\xA6\xE6\x83\x85\n\t\t\t</q-toolbar-title>\n\t\t</q-toolbar>\n\n\t\t<div class=\"row gutter-sm\">\n\t\t\t<div class=\"col-3\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE4\xBB\xBB\xE5\x8A\xA1ID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input readonly v-model=\"job.id\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\t\t\t<div class=\"col-3\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>VM ID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input readonly v-model=\"job.vmId\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\t\t\t<div class=\"col-6\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE7\x8A\xB6\xE6\x80\x81</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input readonly :color=\"jobcolor\" v-model=\"jobstate\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>HID\xE8\x84\x9A\xE6\x9C\xAC\xE6\x89\xA7\xE8\xA1\x8C\xE7\xBB\x93\xE6\x9E\x9C</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input readonly :color=\"jobcolor\" v-model=\"job.textResult\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>HID\xE8\x84\x9A\xE6\x9C\xAC\xE6\xBA\x90\xE6\x96\x87\xE4\xBB\xB6</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input readonly type=\"textarea\" v-model=\"job.textSource\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\n\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-btn color=\"secondary\" v-close-overlay label=\"close\" />\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</div>\n\t\t</div>\n\t</q-modal-layout>\n</q-modal>\n"), hvue.ComputedWithGetSet("visible", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.value);
 		}), (function(vm, newValue) {
@@ -36996,14 +37185,14 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	InitComponentsHIDScript = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("hid-script-code-editor", new sliceType$10([hvue.Template("\n\t<q-card class=\"full-height\">\n<!--\n  \t\t<q-card-title>\n    \t\tHIDScript editor\n  \t\t</q-card-title>\n-->\n\t\t<q-card-main>\n\t\t\t<codemirror v-model=\"scriptContent\" :options=\"codemirrorOptions\"></codemirror>\n\t  \t</q-card-main>\n\t\n\t</q-card>\n"), hvue.DataFunc(newCompHIDScriptCodeEditorData), hvue.ComputedWithGetSet("scriptContent", (function(vm) {
+		$r = hvue.NewComponent("hid-script-code-editor", new sliceType$10([hvue.Template("\n\t<q-card class=\"full-height\">\n<!--\n  \t\t<q-card-title>\n    \t\tHID\xE8\x84\x9A\xE6\x9C\xAC\xE7\xBC\x96\xE8\xBE\x91\xE5\x99\xA8\n  \t\t</q-card-title>\n-->\n\t\t<q-card-main>\n\t\t\t<codemirror v-model=\"scriptContent\" :options=\"codemirrorOptions\"></codemirror>\n\t  \t</q-card-main>\n\t\n\t</q-card>\n"), hvue.DataFunc(newCompHIDScriptCodeEditorData), hvue.ComputedWithGetSet("scriptContent", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.$store.state.currentHIDScriptSource);
 		}), (function(vm, newScriptContent) {
 			var newScriptContent, vm;
 			vm.Object.$store.commit($externalize("setCurrentHIDScriptSource", $String), newScriptContent);
 		}))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("hid-script", new sliceType$10([hvue.Template("\n<q-page padding>\n\t<ransom-note v-model=\"ShowRansom\"></ransom-note>\n\n\t<modal-string-input v-model=\"ShowStoreHIDScriptModal\" title=\"Store HIDScript\" @save=\"storeHIDScript($event)\"></modal-string-input>\n\t<select-string-from-array :values=\"$store.state.StoredHIDScriptsList\" v-model=\"ShowLoadHIDScriptModal\" title=\"Load HIDScript to editor\" @load=\"loadHIDScript($event)\"></select-string-from-array>\n\t<select-string-from-array :values=\"$store.state.StoredHIDScriptsList\" v-model=\"ShowLoadHIDScriptPrependModal\" title=\"Load HIDScript to editor\" @load=\"loadHIDScriptPrepend($event)\"></select-string-from-array>\n\n\n\t<div class=\"row gutter-sm\">\n\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n  \t\t\t\t<q-card-title>\n    \t\t\t\tHIDScript editor\n  \t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\t    \t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"primary\" label=\"run\" @click=\"SendAndRun()\" icon=\"play_circle_filled\" /></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"secondary\" label=\"store\" icon=\"cloud_upload\" @click=\"ShowStoreHIDScriptModal=true\" /></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" label=\"load & replace\" icon=\"cloud_download\" @click=\"updateStoredHIDScriptsList(); ShowLoadHIDScriptModal=true\"/></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" label=\"load & prepend\" icon=\"add_to_photos\" @click=\"updateStoredHIDScriptsList(); ShowLoadHIDScriptPrependModal=true\"/></div>\n    \t\t\t\t\t<div class=\"col-12 col-sm lg\"><q-btn class=\"fit\" color=\"negative\" label=\"import DuckyScript\" icon=\"accessible\" @click=\"ShowRansom=true\"/></div>\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\n\t\t\t</q-card>\n\t\t</div>\n\n\n\t\t<div class=\"col-12 col-md-7 col-lg-8 col-xl-9\">\n\t\t\t<hid-script-code-editor></hid-script-code-editor>\n\t\t</div>\n\t\t<div class=\"col-12 col-md-5 col-lg-4 col-xl-3\">\n\t\t\t<hid-job-overview></hid-job-overview>\n\t\t</div>\n\t\t<div class=\"col-12\" style=\"overflow: auto; max-height: 40vh;\">\n\t\t\t<hid-job-event-overview></hid-job-event-overview>\n\t\t</div>\n\t</div>\n</q-page>\n"), hvue.DataFunc((function(vm) {
+		$r = hvue.NewComponent("hid-script", new sliceType$10([hvue.Template("\n<q-page padding>\n\t<ransom-note v-model=\"\xE6\x98\xBE\xE7\xA4\xBA\xE5\xB7\xB2\xE5\x8A\xAB\xE6\x8C\x81\xE7\x9A\x84\xE8\xAE\xBE\xE5\xA4\x87\"></ransom-note>\n\n\t<modal-string-input v-model=\"ShowStoreHIDScriptModal\" title=\"\xE4\xBF\x9D\xE5\xAD\x98HID\xE8\x84\x9A\xE6\x9C\xAC\" @save=\"storeHIDScript($event)\"></modal-string-input>\n\t<select-string-from-array :values=\"$store.state.StoredHIDScriptsList\" v-model=\"ShowLoadHIDScriptModal\" title=\"\xE5\x8A\xA0\xE8\xBD\xBDHID\xE8\x84\x9A\xE6\x9C\xAC\xE5\x88\xB0\xE7\xBC\x96\xE8\xBE\x91\xE5\x99\xA8\" @load=\"loadHIDScript($event)\"></select-string-from-array>\n\t<select-string-from-array :values=\"$store.state.StoredHIDScriptsList\" v-model=\"ShowLoadHIDScriptPrependModal\" title=\"\xE5\x8A\xA0\xE8\xBD\xBDHID\xE8\x84\x9A\xE6\x9C\xAC\xE5\x88\xB0\xE7\xBC\x96\xE8\xBE\x91\xE5\x99\xA8\" @load=\"loadHIDScriptPrepend($event)\"></select-string-from-array>\n\n\n\t<div class=\"row gutter-sm\">\n\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n  \t\t\t\t<q-card-title>\n    \t\t\t\tHIDScript editor\n  \t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\t    \t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"primary\" label=\"\xE8\xBF\x90\xE8\xA1\x8C\" @click=\"SendAndRun()\" icon=\"play_circle_filled\" /></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"secondary\" label=\"\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"cloud_upload\" @click=\"ShowStoreHIDScriptModal=true\" /></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" label=\"\xE5\x8A\xA0\xE8\xBD\xBD\xE5\xB9\xB6\xE6\x9B\xBF\xE6\x8D\xA2\" icon=\"cloud_download\" @click=\"updateStoredHIDScriptsList(); ShowLoadHIDScriptModal=true\"/></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" label=\"\xE5\x8A\xA0\xE8\xBD\xBD\xE5\xB9\xB6\xE6\xB7\xBB\xE5\x8A\xA0\xE5\x88\xB0\xE4\xBB\xBB\xE5\x8A\xA1\xE5\x88\x97\xE8\xA1\xA8\xE5\xBD\x93\xE4\xB8\xAD\" icon=\"add_to_photos\" @click=\"updateStoredHIDScriptsList(); ShowLoadHIDScriptPrependModal=true\"/></div>\n    \t\t\t\t\t<div class=\"col-12 col-sm lg\"><q-btn class=\"fit\" color=\"negative\" label=\"\xE5\xAF\xBC\xE5\x85\xA5Ducky\xE8\x84\x9A\xE6\x9C\xAC\" icon=\"accessible\" @click=\"ShowRansom=true\"/></div>\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\n\t\t\t</q-card>\n\t\t</div>\n\n\n\t\t<div class=\"col-12 col-md-7 col-lg-8 col-xl-9\">\n\t\t\t<hid-script-code-editor></hid-script-code-editor>\n\t\t</div>\n\t\t<div class=\"col-12 col-md-5 col-lg-4 col-xl-3\">\n\t\t\t<hid-job-overview></hid-job-overview>\n\t\t</div>\n\t\t<div class=\"col-12\" style=\"overflow: auto; max-height: 40vh;\">\n\t\t\t<hid-job-event-overview></hid-job-event-overview>\n\t\t</div>\n\t</div>\n</q-page>\n"), hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$1.ptr(O(), false, false, false, false);
 			data.Object.ShowLoadHIDScriptModal = $externalize(false, $Bool);
@@ -37063,7 +37252,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	InitCompLogger = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("logger", new sliceType$10([hvue.Template("\n<q-page padding>\n\t<q-card>\n\t\t<div>\n\t\t\t<q-table\n\t\t\t\t:data=\"logArray\"\n\t\t\t\t:columns=\"[{name:'logTime', field: 'time', label: 'Time', align: 'left'}, {name:'logSource', field: 'source', label: 'Source', align: 'left'}, {name:'logLevel', field: 'level', label: 'Level', align: 'left'}, {name:'logMessage', field: 'message', label: 'Message', align: 'left'}]\"\n\t\t\t\trow-key=\"name\"\n\t\t\t\t:pagination=\"pagination\"\n\t\t\t\thide-bottom\n\t\t\t>\n  <q-td slot=\"body-cell-logTime\" slot-scope=\"props\" :props=\"props\">\n    {{ formatDate(props.value) }}\n  </q-td>\n\t\t\t</q-table>\n\t\t</div>\n\t</q-card>\n\n<!--\n\t<div class=\"logger\">\n\t<table class=\"log-entries\">\n\t\t<tr>\n\t\t\t<th>time</th>\n\t\t\t<th>source</th>\n\t\t\t<th>level</th>\n\t\t\t<th>message</th>\n\t\t</tr>\n        <tr v-for=\"(logEntry,idx) in logArray\" :key=\"idx\" :class=\"logLevelClass(logEntry.level)\">\n\t\t\t<td class=\"log-entry-time\">{{ logEntry.time }}</td>\n\t        <td class=\"log-entry-source\">{{ logEntry.source }}</td>\n\t\t\t<td class=\"log-entry-level\">{{ logEntry.level }}</td>\n\t\t\t<td class=\"log-entry-message\">{{ logEntry.message }}</td>\n\t    </tr>\n\t</table>\n\t</div>\n-->\n</q-page>\n"), hvue.DataFunc((function(vm) {
+		$r = hvue.NewComponent("logger", new sliceType$10([hvue.Template("\n<q-page padding>\n\t<q-card>\n\t\t<div>\n\t\t\t<q-table\n\t\t\t\t:data=\"logArray\"\n\t\t\t\t:columns=\"[{name:'logTime', field: 'time', label: '\xE6\x97\xB6\xE9\x97\xB4', align: 'left'}, {name:'logSource', field: 'source', label: '\xE4\xBA\x8B\xE4\xBB\xB6\xE6\xBA\x90', align: 'left'}, {name:'logLevel', field: 'level', label: '\xE7\xBA\xA7\xE5\x88\xAB', align: 'left'}, {name:'logMessage', field: 'message', label: '\xE6\xB6\x88\xE6\x81\xAF', align: 'left'}]\"\n\t\t\t\trow-key=\"name\"\n\t\t\t\t:pagination=\"pagination\"\n\t\t\t\thide-bottom\n\t\t\t>\n  <q-td slot=\"body-cell-logTime\" slot-scope=\"props\" :props=\"props\">\n    {{ formatDate(props.value) }}\n  </q-td>\n\t\t\t</q-table>\n\t\t</div>\n\t</q-card>\n\n<!--\n\t<div class=\"logger\">\n\t<table class=\"log-entries\">\n\t\t<tr>\n\t\t\t<th>\xE6\x97\xB6\xE9\x97\xB4</th>\n\t\t\t<th>\xE4\xBA\x8B\xE4\xBB\xB6\xE6\xBA\x90</th>\n\t\t\t<th>\xE7\xBA\xA7\xE5\x88\xAB</th>\n\t\t\t<th>\xE6\xB6\x88\xE6\x81\xAF</th>\n\t\t</tr>\n        <tr v-for=\"(logEntry,idx) in logArray\" :key=\"idx\" :class=\"logLevelClass(logEntry.level)\">\n\t\t\t<td class=\"log-entry-time\">{{ logEntry.time }}</td>\n\t        <td class=\"log-entry-source\">{{ logEntry.source }}</td>\n\t\t\t<td class=\"log-entry-level\">{{ logEntry.level }}</td>\n\t\t\t<td class=\"log-entry-message\">{{ logEntry.message }}</td>\n\t    </tr>\n\t</table>\n\t</div>\n-->\n</q-page>\n"), hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$2.ptr(O(), ptrType$1.nil);
 			data.Object.pagination = $externalize(newPagination(0, 1), ptrType$1);
@@ -37129,7 +37318,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	InitCompToggleSwitch = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("toggle-switch", new sliceType$10([hvue.Template("\n<label class=\"toggle-switch\">\n   \t<input type=\"checkbox\" v-bind:checked=\"value\" v-on:change=\"$emit('input', $event.target.checked)\">\n   \t<div><span class=\"on\">On</span><span class=\"off\">Off</span></div>\n\t<span class=\"toggle-switch-slider\"></span>\n</label>\n"), hvue.DataFunc(newCompToggleSwitchData), hvue.PropObj("value", new sliceType$9([hvue.Types(new sliceType$8([2])), hvue.Required]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("toggle-switch", new sliceType$10([hvue.Template("\n<label class=\"toggle-switch\">\n   \t<input type=\"checkbox\" v-bind:checked=\"value\" v-on:change=\"$emit('input', $event.target.checked)\">\n   \t<div><span class=\"on\">\xE5\xBC\x80</span><span class=\"off\">\xE5\x85\xB3</span></div>\n\t<span class=\"toggle-switch-slider\"></span>\n</label>\n"), hvue.DataFunc(newCompToggleSwitchData), hvue.PropObj("value", new sliceType$9([hvue.Types(new sliceType$8([2])), hvue.Required]))])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$s = -1; return;
 		/* */ } return; } if ($f === undefined) { $f = { $blk: InitCompToggleSwitch }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
@@ -37149,7 +37338,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	InitCompUSBSettings = function() {
 		var _arg, _arg$1, _arg$10, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9, _r$1, _r$2, _r$3, _r$4, _r$5, _r$6, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$10 = $f._arg$10; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _arg$4 = $f._arg$4; _arg$5 = $f._arg$5; _arg$6 = $f._arg$6; _arg$7 = $f._arg$7; _arg$8 = $f._arg$8; _arg$9 = $f._arg$9; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		_arg = hvue.Template("\n<q-page padding>\n\t<ums-settings :show=\"ShowUmsModal\" @show=\"ShowUmsModal=$event\" v-model=\"currentGadgetSettings.UmsSettings\" />\n\n\t<select-string-from-array :values=\"$store.state.StoredUSBSettingsList\" v-model=\"showLoadModal\" title=\"Load USB gadget settings\" @load=\"load($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<select-string-from-array :values=\"$store.state.StoredUSBSettingsList\" v-model=\"showDeployStoredModal\" title=\"Deploy stored USB gadget settings\" @load=\"deployStored($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<modal-string-input v-model=\"showStoreModal\" title=\"Store current USB gadget Settings\" @save=\"store($event)\"></modal-string-input>\n\n\n\t<div class=\"row gutter-sm\">\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n\t\t\t\t<q-card-title>\n\t\t\t\t\tUSB Gadget Settings\n\t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" :loading=\"deploying\" color=\"primary\" @click=\"ApplyGadgetSettings\" label=\"deploy\" icon=\"launch\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"primary\" @click=\"updateStoredSettingsList(); showDeployStoredModal=true\" label=\"deploy stored\" icon=\"settings_backup_restore\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"secondary\" @click=\"UpdateFromDeployedGadgetSettings\" label=\"reset\" icon=\"autorenew\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"secondary\" @click=\"showStoreModal=true\" label=\"store\" icon=\"cloud_upload\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-12 col-sm\"><q-btn class=\"fit\" color=\"warning\" @click=\"updateStoredSettingsList(); showLoadModal=true\" label=\"load stored\" icon=\"cloud_download\"></q-btn></div>\n\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\n\n\t\t\t</q-card>\n\t\t</div>\n\n\n\t\t<div class=\"col-12 col-lg\">\n\t\t<q-card class=\"full-height\">\n\t\t\t<q-alert v-show=\"deploying\" type=\"warning\">If you're connected via Ethernet over USB, you will loose connection during deployment (deadline exceeded error)\"</q-alert>\n\t\t\t<q-list link>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Enabled\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Enabled</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Enable/Disable USB gadget (if enabled, at least one function has to be turned on)</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Vendor ID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Example: 0x1d6b</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.Vid\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Product ID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Example: 0x1337</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.Pid\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Manufacturer Name</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel></q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.Manufacturer\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Product Name</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel></q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.Product\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Serial Number</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel></q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.Serial\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</q-list>\n\t\t</q-card>\n\t\t</div>\n\t\t<div class=\"col-12 col-lg\">\n\t\t<q-card class=\"full-height\">\n\t\t\t<q-list link>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_CDC_ECM\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>CDC ECM</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Ethernet over USB for Linux, Unix and OSX</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\n\n\t\t\t\t<q-collapsible icon=\"settings_ethernet\" label=\"MAC addresses for CDC ECM\" v-show=\"currentGadgetSettings.Use_CDC_ECM\" indent>\n\t\t\t\t\t<q-item tag=\"label\" indent>\n\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t<q-item-tile label>Host Address</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile sublabel>MAC of USB adapter on remote host (format: AA:BB:CC:DD:EE:FF)</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.CdcEcmSettings.HostAddr\" inverted></q-input>\n\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t</q-item>\n\t\t\t\t\t<q-item tag=\"label\" indent>\n\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t<q-item-tile label>Device Address</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile sublabel>MAC address on P4wnP1's end (format: AA:BB:CC:DD:EE:FF)</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.CdcEcmSettings.DevAddr\" inverted></q-input>\n\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t</q-item>\n\t\t\t\t</q-collapsible>\n\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_RNDIS\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>RNDIS</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Ethernet over USB for Windows (and some Linux kernels)</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\n\t\t\t\t<q-collapsible icon=\"settings_ethernet\" label=\"MAC addresses for RNDIS\" v-show=\"currentGadgetSettings.Use_RNDIS\" indent>\n\t\t\t\t\t<q-item tag=\"label\" ident>\n\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t<q-item-tile label>Host Address</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile sublabel>MAC of USB adapter on remote host - could get overwritten by host (format: AA:BB:CC:DD:EE:FF)</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.RndisSettings.HostAddr\" inverted></q-input>\n\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t</q-item>\n\t\t\t\t\t<q-item tag=\"label\" ident>\n\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t<q-item-tile label>Device Address</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile sublabel>MAC address on P4wnP1's end (format: AA:BB:CC:DD:EE:FF)</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.RndisSettings.DevAddr\" inverted></q-input>\n\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t</q-item>\n\t\t\t\t</q-collapsible>\n\n\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_HID_KEYBOARD\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Keyboard</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>HID Keyboard functionality (needed for HID Script)</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_HID_MOUSE\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Mouse</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>HID Mouse functionality (needed for HID Script)</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_HID_RAW\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Custom HID device</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Raw HID device function, used for covert channel</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_SERIAL\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Serial Interface</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Provides a serial port over USB</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_UMS\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Mass Storage</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Emulates USB flash drive or CD-ROM</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t\t<q-item-side right v-if=\"currentGadgetSettings.Use_UMS\">\n\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" flat @click=\"ShowUmsModal=true\" /></div>\n\t\t\t\t\t</q-item-side>\n\n\t\t\t\t</q-item>\n\t\t\t</q-list>\t\n\t\t</q-card>\n\t\t</div>\n\t\n\t</div>\n</q-page>\n\n");
+		_arg = hvue.Template("\n<q-page padding>\n\t<ums-settings :show=\"ShowUmsModal\" @show=\"ShowUmsModal=$event\" v-model=\"currentGadgetSettings.UmsSettings\" />\n\n\t<select-string-from-array :values=\"$store.state.StoredUSBSettingsList\" v-model=\"showLoadModal\" title=\"\xE5\x8A\xA0\xE8\xBD\xBDUSB\xE5\xB7\xA5\xE5\x85\xB7\xE8\xAE\xBE\xE7\xBD\xAE\" @load=\"load($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<select-string-from-array :values=\"$store.state.StoredUSBSettingsList\" v-model=\"showDeployStoredModal\" title=\"\xE5\xBA\x94\xE7\x94\xA8\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\xE7\x9A\x84USB\xE5\xB7\xA5\xE5\x85\xB7\xE8\xAE\xBE\xE7\xBD\xAE\" @load=\"deployStored($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<modal-string-input v-model=\"showStoreModal\" title=\"\xE4\xBF\x9D\xE5\xAD\x98\xE5\xBD\x93\xE5\x89\x8DUSB\xE5\xB7\xA5\xE5\x85\xB7\xE8\xAE\xBE\xE7\xBD\xAE\" @save=\"store($event)\"></modal-string-input>\n\n\n\t<div class=\"row gutter-sm\">\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n\t\t\t\t<q-card-title>\n\t\t\t\t\tUSB\xE5\xB7\xA5\xE5\x85\xB7\xE8\xAE\xBE\xE7\xBD\xAE\n\t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" :loading=\"deploying\" color=\"primary\" @click=\"ApplyGadgetSettings\" label=\"\xE5\xBA\x94\xE7\x94\xA8\" icon=\"launch\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"primary\" @click=\"updateStoredSettingsList(); showDeployStoredModal=true\" label=\"\xE5\xBA\x94\xE7\x94\xA8\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"settings_backup_restore\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"secondary\" @click=\"UpdateFromDeployedGadgetSettings\" label=\"\xE9\x87\x8D\xE7\xBD\xAE\" icon=\"autorenew\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"secondary\" @click=\"showStoreModal=true\" label=\"\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"cloud_upload\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-12 col-sm\"><q-btn class=\"fit\" color=\"warning\" @click=\"updateStoredSettingsList(); showLoadModal=true\" label=\"\xE5\x8A\xA0\xE8\xBD\xBD\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"cloud_download\"></q-btn></div>\n\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\n\n\t\t\t</q-card>\n\t\t</div>\n\n\n\t\t<div class=\"col-12 col-lg\">\n\t\t<q-card class=\"full-height\">\n\t\t\t<q-alert v-show=\"deploying\" type=\"warning\">\xE5\xA6\x82\xE6\x9E\x9C\xE6\x82\xA8\xE9\x80\x9A\xE8\xBF\x87USB\xE9\x80\x9A\xE8\xBF\x87\xE4\xBB\xA5\xE5\xA4\xAA\xE7\xBD\x91\xE8\xBF\x9E\xE6\x8E\xA5\xEF\xBC\x8C\xE5\x88\x99\xE5\x9C\xA8\xE9\x83\xA8\xE7\xBD\xB2\xE6\x9C\x9F\xE9\x97\xB4\xE5\xB0\x86\xE6\x96\xAD\xE5\xBC\x80\xE8\xBF\x9E\xE6\x8E\xA5(\xE6\x88\xAA\xE6\xAD\xA2\xE6\x97\xA5\xE6\x9C\x9F\xE8\xB6\x85\xE5\x87\xBA\xE9\x94\x99\xE8\xAF\xAF)\"</q-alert>\n\t\t\t<q-list link>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Enabled\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE5\xB7\xB2\xE5\x90\xAF\xE7\x94\xA8</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE5\x90\xAF\xE7\x94\xA8/\xE7\xA6\x81\xE7\x94\xA8USB\xE5\xB0\x8F\xE5\xB7\xA5\xE5\x85\xB7(\xE5\xA6\x82\xE6\x9E\x9C\xE5\x90\xAF\xE7\x94\xA8\xEF\xBC\x8C\xE5\x88\x99\xE5\xBF\x85\xE9\xA1\xBB\xE8\x87\xB3\xE5\xB0\x91\xE6\x89\x93\xE5\xBC\x80\xE4\xB8\x80\xE4\xB8\xAA\xE5\x8A\x9F\xE8\x83\xBD)</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Vendor ID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE7\xA4\xBA\xE4\xBE\x8B: 0x1d6b</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.Vid\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Product ID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE7\xA4\xBA\xE4\xBE\x8B: 0x1337</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.Pid\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE5\x88\xB6\xE9\x80\xA0\xE5\x95\x86\xE5\x90\x8D\xE7\xA7\xB0</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel></q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.Manufacturer\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE4\xBA\xA7\xE5\x93\x81\xE5\x90\x8D\xE7\xA7\xB0</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel></q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.Product\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE5\xBA\x8F\xE5\x88\x97\xE5\x8F\xB7</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel></q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.Serial\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</q-list>\n\t\t</q-card>\n\t\t</div>\n\t\t<div class=\"col-12 col-lg\">\n\t\t<q-card class=\"full-height\">\n\t\t\t<q-list link>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_CDC_ECM\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>CDC ECM</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE9\x80\x82\xE7\x94\xA8\xE4\xBA\x8ELinux\xEF\xBC\x8CUnix\xE5\x92\x8COSX\xE7\x9A\x84USB\xE4\xBB\xA5\xE5\xA4\xAA\xE7\xBD\x91</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\n\n\t\t\t\t<q-collapsible icon=\"settings_ethernet\" label=\"MAC addresses for CDC ECM\" v-show=\"currentGadgetSettings.Use_CDC_ECM\" indent>\n\t\t\t\t\t<q-item tag=\"label\" indent>\n\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t<q-item-tile label>\xE4\xB8\xBB\xE6\x9C\xBA\xE5\x9C\xB0\xE5\x9D\x80</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile sublabel>\xE8\xBF\x9C\xE7\xA8\x8B\xE4\xB8\xBB\xE6\x9C\xBA\xE4\xB8\x8AUSB\xE9\x80\x82\xE9\x85\x8D\xE5\x99\xA8\xE7\x9A\x84MAC\xE5\x9C\xB0\xE5\x9D\x80(\xE6\xA0\xBC\xE5\xBC\x8F:AA:BB:CC:DD:EE:FF)</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.CdcEcmSettings.HostAddr\" inverted></q-input>\n\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t</q-item>\n\t\t\t\t\t<q-item tag=\"label\" indent>\n\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t<q-item-tile label>\xE8\xAE\xBE\xE5\xA4\x87\xE5\x9C\xB0\xE5\x9D\x80</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile sublabel>P4wnP1\xE7\xAB\xAF\xE7\x9A\x84MAC\xE5\x9C\xB0\xE5\x9D\x80(\xE6\xA0\xBC\xE5\xBC\x8F:AA:BB:CC:DD:EE:FF)</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.CdcEcmSettings.DevAddr\" inverted></q-input>\n\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t</q-item>\n\t\t\t\t</q-collapsible>\n\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_RNDIS\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>RNDIS</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE9\x80\x82\xE7\x94\xA8\xE4\xBA\x8EWindows\xE7\x9A\x84\xE4\xBB\xA5\xE5\xA4\xAA\xE7\xBD\x91USB(\xE4\xBB\xA5\xE5\x8F\x8A\xE4\xB8\x80\xE4\xBA\x9BLinux\xE5\x86\x85\xE6\xA0\xB8)</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\n\t\t\t\t<q-collapsible icon=\"settings_ethernet\" label=\"RNDIS\xE7\x9A\x84MAC\xE5\x9C\xB0\xE5\x9D\x80\" v-show=\"currentGadgetSettings.Use_RNDIS\" indent>\n\t\t\t\t\t<q-item tag=\"label\" ident>\n\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t<q-item-tile label>\xE4\xB8\xBB\xE6\x9C\xBA\xE5\x9C\xB0\xE5\x9D\x80</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile sublabel>\xE8\xBF\x9C\xE7\xA8\x8B\xE4\xB8\xBB\xE6\x9C\xBA\xE4\xB8\x8AUSB\xE9\x80\x82\xE9\x85\x8D\xE5\x99\xA8\xE7\x9A\x84MAC\xE5\x9C\xB0\xE5\x9D\x80-\xE5\x8F\xAF\xE8\x83\xBD\xE8\xA2\xAB\xE4\xB8\xBB\xE6\x9C\xBA\xE8\xA6\x86\xE7\x9B\x96(\xE6\xA0\xBC\xE5\xBC\x8F:AA:BB:CC:DD:EE:FF)</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.RndisSettings.HostAddr\" inverted></q-input>\n\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t</q-item>\n\t\t\t\t\t<q-item tag=\"label\" ident>\n\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t<q-item-tile label>\xE8\xAE\xBE\xE5\xA4\x87\xE5\x9C\xB0\xE5\x9D\x80</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile sublabel>P4wnP1\xE7\xAB\xAF\xE7\x9A\x84MAC\xE5\x9C\xB0\xE5\x9D\x80(\xE6\xA0\xBC\xE5\xBC\x8F:AA:BB:CC:DD:EE:FF)</q-item-tile>\n\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t<q-input v-model=\"currentGadgetSettings.RndisSettings.DevAddr\" inverted></q-input>\n\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t</q-item>\n\t\t\t\t</q-collapsible>\n\n\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_HID_KEYBOARD\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE9\x94\xAE\xE7\x9B\x98</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>HID\xE9\x94\xAE\xE7\x9B\x98\xE5\x8A\x9F\xE8\x83\xBD(HID\xE8\x84\x9A\xE6\x9C\xAC\xE9\x9C\x80\xE8\xA6\x81)</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_HID_MOUSE\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE9\xBC\xA0\xE6\xA0\x87</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>HID\xE9\xBC\xA0\xE6\xA0\x87\xE5\x8A\x9F\xE8\x83\xBD(HID\xE8\x84\x9A\xE6\x9C\xAC\xE9\x9C\x80\xE8\xA6\x81)</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_HID_RAW\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE8\x87\xAA\xE5\xAE\x9A\xE4\xB9\x89HID\xE8\xAE\xBE\xE5\xA4\x87</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE5\x8E\x9F\xE5\xA7\x8BHID\xE8\xAE\xBE\xE5\xA4\x87\xE5\x8A\x9F\xE8\x83\xBD,\xE7\x94\xA8\xE4\xBA\x8E\xE9\x9A\x90\xE8\x94\xBD\xE9\x80\x9A\xE9\x81\x93</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_SERIAL\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE4\xB8\xB2\xE8\xA1\x8C\xE6\x8E\xA5\xE5\x8F\xA3</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE9\x80\x9A\xE8\xBF\x87USB\xE6\x8F\x90\xE4\xBE\x9B\xE4\xB8\xB2\xE8\xA1\x8C\xE7\xAB\xAF\xE5\x8F\xA3</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"currentGadgetSettings.Use_UMS\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE5\xA4\xA7\xE5\xAE\xB9\xE9\x87\x8F\xE5\xAD\x98\xE5\x82\xA8</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE6\xA8\xA1\xE6\x8B\x9FUSB\xE9\x97\xAA\xE5\xAD\x98\xE9\xA9\xB1\xE5\x8A\xA8\xE5\x99\xA8\xE6\x88\x96CD-ROM</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t\t<q-item-side right v-if=\"currentGadgetSettings.Use_UMS\">\n\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" flat @click=\"ShowUmsModal=true\" /></div>\n\t\t\t\t\t</q-item-side>\n\n\t\t\t\t</q-item>\n\t\t\t</q-list>\t\n\t\t</q-card>\n\t\t</div>\n\t\n\t</div>\n</q-page>\n\n");
 		_arg$1 = hvue.DataFunc(newCompUSBSettingsData);
 		_arg$2 = hvue.MethodsOf(new CompUSBSettingsData.ptr(null, ptrType$8.nil, false, false, false, false, false, false, false));
 		_r$1 = hvue.Computed("currentGadgetSettings", (function(vm) {
@@ -37199,7 +37388,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 			vm.Object.$store.dispatch($externalize("updateStoredUSBSettingsList", $String));
 		})));
 		$r = hvue.NewComponent("usb-settings", new sliceType$10([_arg, _arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9, _arg$10])); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("ums-settings", new sliceType$10([hvue.Template("\n\t<q-modal v-model=\"visible\">\n\t\t<q-modal-layout>\n\t\t\t<q-toolbar slot=\"header\">\n\t\t\t\t<q-toolbar-title>\n\t\t\t\t\tUSB Mass Storage\n\t\t\t\t</q-toolbar-title>\n\t\t\t</q-toolbar>\n\n\t\t\t<q-list>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"value.Cdrom\" @input=\"value.File=''\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>CD-Rom</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>If enabled, a CD-ROM drive is emulated instead of a writable flashdrive</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\n\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"value.Cdrom ? $store.state.UmsImageListCdrom : $store.state.UmsImageListFlashdrive\"  v-model=\"ShowImageSelect\" title=\"Select image\" @load=\"value.File=$event\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"archive\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Image file to use</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>If not empty, the selected TriggerActions are deployed along with the master template</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"value.File\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"updateFileLists();ShowImageSelect=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"value.File.length > 0\" icon=\"clear\" color=\"primary\" @click=\"value.File=''\" flat /></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\n\t\t\t</q-list>\n\n\n\t\t\t<q-list slot=\"footer\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-btn color=\"secondary\" v-close-overlay label=\"close\" />\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</q-list>\n\n\t\t</q-modal-layout>\n\t</q-modal>\n\n"), hvue.DataFunc((function(vm) {
+		$r = hvue.NewComponent("ums-settings", new sliceType$10([hvue.Template("\n\t<q-modal v-model=\"visible\">\n\t\t<q-modal-layout>\n\t\t\t<q-toolbar slot=\"header\">\n\t\t\t\t<q-toolbar-title>\n\t\t\t\t\t\xE5\xA4\xA7\xE5\xAE\xB9\xE9\x87\x8FUSB\xE5\xAD\x98\xE5\x82\xA8\n\t\t\t\t</q-toolbar-title>\n\t\t\t</q-toolbar>\n\n\t\t\t<q-list>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"value.Cdrom\" @input=\"value.File=''\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>CD-Rom</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE5\x90\xAF\xE7\x94\xA8\xEF\xBC\x8C\xE5\x88\x99\xE6\xA8\xA1\xE6\x8B\x9FCD-ROM\xE9\xA9\xB1\xE5\x8A\xA8\xE5\x99\xA8\xE8\x80\x8C\xE4\xB8\x8D\xE6\x98\xAF\xE5\x8F\xAF\xE5\x86\x99\xE7\x9A\x84\xE9\x97\xAA\xE5\xAD\x98\xE9\xA9\xB1\xE5\x8A\xA8\xE5\x99\xA8</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\n\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"value.Cdrom ? $store.state.UmsImageListCdrom : $store.state.UmsImageListFlashdrive\"  v-model=\"ShowImageSelect\" title=\"Select image\" @load=\"value.File=$event\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"archive\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE8\xA6\x81\xE4\xBD\xBF\xE7\x94\xA8\xE7\x9A\x84\xE9\x95\x9C\xE5\x83\x8F\xE6\x96\x87\xE4\xBB\xB6</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE4\xB8\x8D\xE4\xB8\xBA\xE7\xA9\xBA\xEF\xBC\x8C\xE5\x88\x99\xE9\x80\x89\xE5\xAE\x9A\xE7\x9A\x84\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE5\x8A\xA8\xE4\xBD\x9C\xE4\xB8\x8E\xE4\xB8\xBB\xE6\xA8\xA1\xE6\x9D\xBF\xE4\xB8\x80\xE8\xB5\xB7\xE9\x83\xA8\xE7\xBD\xB2</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"value.File\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"updateFileLists();ShowImageSelect=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"value.File.length > 0\" icon=\"clear\" color=\"primary\" @click=\"value.File=''\" flat /></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\n\t\t\t</q-list>\n\n\n\t\t\t<q-list slot=\"footer\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-btn color=\"secondary\" v-close-overlay label=\"\xE5\x85\xB3\xE9\x97\xAD\" />\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</q-list>\n\n\t\t</q-modal-layout>\n\t</q-modal>\n\n"), hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$3.ptr(O(), false);
 			data.Object.ShowImageSelect = $externalize(false, $Bool);
@@ -37239,7 +37428,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	InitComponentsWiFi = function() {
 		var $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		$r = hvue.NewComponent("wifi", new sliceType$10([hvue.Template("\n<q-page padding>\n\t<select-string-from-array :values=\"$store.state.StoredWifiSettingsList\" v-model=\"showLoadModal\" title=\"Load WiFi settings\" @load=\"load($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<select-string-from-array :values=\"$store.state.StoredWifiSettingsList\" v-model=\"showDeployStoredModal\" title=\"Deploy stored WiFi settings\" @load=\"deployStored($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<modal-string-input v-model=\"showStoreModal\" title=\"Store current WiFi Settings\" @save=\"store($event)\"></modal-string-input>\n\n<div class=\"row gutter-sm\">\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n\t\t\t\t<q-card-title>\n\t\t\t\t\tWiFi settings\n\t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn :loading=\"deploying\" class=\"fit\" color=\"primary\" @click=\"deploy(settings)\" label=\"deploy\" icon=\"launch\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"primary\" @click=\"updateStoredSettingsList(); showDeployStoredModal=true\" label=\"deploy stored\" icon=\"settings_backup_restore\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"secondary\" @click=\"reset\" label=\"reset\" icon=\"autorenew\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"secondary\" @click=\"showStoreModal=true\" label=\"store\" icon=\"cloud_upload\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-12 col-sm\"><q-btn class=\"fit\" color=\"warning\" @click=\"updateStoredSettingsList(); showLoadModal=true\" label=\"load stored\" icon=\"cloud_download\"></q-btn></div>\n\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\n\n\t\t\t</q-card>\n\t\t</div>\n\n\n\t<div class=\"col-12 col-lg\">\n\t<q-card class=\"full-height\">\n\t\t<q-card-title>\n\t\t\tGeneric\n\t\t</q-card-title>\n\n\t\n\n\t\t<q-list link>\n\t\t\t<q-item-separator />\n\t\t\t<q-item>\n\t        \t<q-item-side :icon=\"wifiStateIcon\" color=\"primary\"></q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>{{ wifiStateText }}</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item-separator />\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle v-model=\"enabled\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Enabled</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Enable/Disable WiFi</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n<!--\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle v-model=\"enableNexmon\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Nexmon</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Enable/Disable modified nexmon firmware (needed for WiFi covert channel and KARMA)</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n-->\n\t\t\t<q-item tag=\"label\" disabled>\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle :value=\"true\" :disable=\"true\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Nexmon</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Enable/Disable modified nexmon firmware (needed for WiFi covert channel and KARMA)</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Regulatory domain</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Regulatory domain according to ISO/IEC 3166-1 alpha2 (example \"US\")</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"settings.reg\" inverted></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Working Mode</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Work as Access Point or Client</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"settings.mode\" :options=\"wifiModes\" color=\"secondary\" inverted></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t</q-list>\n\t</q-card>\n\t</div>\n\n\t<div class=\"col-12 col-lg\" v-if=\"settings.mode == mode_sta || settings.mode == mode_failover\">\n\t<q-card class=\"full-height\">\n\t\t<q-card-title>\n\t\t\tWiFi client settings\n\t\t</q-card-title>\n\n\t\t<q-list link>\n\t\t\t\t<q-item-separator />\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>SSID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Network name to connect</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"settings.staBssList[0].ssid\" color=\"primary\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Pre shared key</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>If empty, a network with Open Authentication is assumed (Warning: PLAIN TRANSMISSION)</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"settings.staBssList[0].psk\" type=\"password\" color=\"primary\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\n\t\t\t<template v-if=\"settings.mode == mode_failover\">\n\t\t\t\t<q-item>\n\t\t\t\t\t<q-item-main>\n\t  \t\t\t\t<q-alert type=\"warning\">\n\t\t\t\t\t\tIf the SSID provided for client mode couldn't be connected, an attempt is started to fail over to Access Point mode with the respective settings.\n\t\t\t\t\t</q-alert>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</template>\n\t\t</q-list>\n\t</q-card>\n\t</div>\n\n\t<div class=\"col-12 col-lg\" v-if=\"settings.mode == mode_ap || settings.mode == mode_failover\">\n\t<q-card class=\"full-height\">\n\t\t<q-card-title>\n\t\t\tWiFi Access Point settings\n\t\t</q-card-title>\n\n\t\t<q-list link>\n\n\n\t\t\t<template>\n\t\t\t\t<q-item-separator />\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Channel</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Must exist in regulatory domain (example 13)</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"settings.channel\" type=\"number\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Authentication Mode</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Authentication Mode for Access Point (ignored for client mode)</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-select v-model=\"settings.authMode\" :options=\"wifiAuthModes\" color=\"primary\" inverted></q-select>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>SSID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Network name (Service Set Identifier)</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"settings.apBss.ssid\" color=\"primary\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"settings.hideSsid\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Hide SSID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Access Point doesn't send beacons with its SSID</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Pre shared key</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Warning: PLAIN TRANSMISSION</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"settings.apBss.psk\" type=\"password\" color=\"primary\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</template>\n\t\t</q-list>\n\t</q-card>\n\t</div>\n\n\n</div>\n</q-page>\t\n\n"), hvue.DataFunc((function(vm) {
+		$r = hvue.NewComponent("wifi", new sliceType$10([hvue.Template("\n<q-page padding>\n\t<select-string-from-array :values=\"$store.state.StoredWifiSettingsList\" v-model=\"showLoadModal\" title=\"\xE5\x8A\xA0\xE8\xBD\xBDWiFi\xE8\xAE\xBE\xE7\xBD\xAE\" @load=\"load($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<select-string-from-array :values=\"$store.state.StoredWifiSettingsList\" v-model=\"showDeployStoredModal\" title=\"\xE5\xBA\x94\xE7\x94\xA8\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\xE7\x9A\x84WiFi\xE8\xAE\xBE\xE7\xBD\xAE\" @load=\"deployStored($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<modal-string-input v-model=\"showStoreModal\" title=\"\xE4\xBF\x9D\xE5\xAD\x98\xE5\xBD\x93\xE5\x89\x8DWiFi\xE8\xAE\xBE\xE7\xBD\xAE\" @save=\"store($event)\"></modal-string-input>\n\n<div class=\"row gutter-sm\">\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n\t\t\t\t<q-card-title>\n\t\t\t\t\tWiFi\xE8\xAE\xBE\xE7\xBD\xAE\n\t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn :loading=\"deploying\" class=\"fit\" color=\"primary\" @click=\"deploy(settings)\" label=\"\xE5\xBA\x94\xE7\x94\xA8\" icon=\"launch\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"primary\" @click=\"updateStoredSettingsList(); showDeployStoredModal=true\" label=\"\xE5\xBA\x94\xE7\x94\xA8\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"settings_backup_restore\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"secondary\" @click=\"reset\" label=\"\xE9\x87\x8D\xE7\xBD\xAE\" icon=\"autorenew\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"secondary\" @click=\"showStoreModal=true\" label=\"\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"cloud_upload\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-12 col-sm\"><q-btn class=\"fit\" color=\"warning\" @click=\"updateStoredSettingsList(); showLoadModal=true\" label=\"\xE5\x8A\xA0\xE8\xBD\xBD\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"cloud_download\"></q-btn></div>\n\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\n\n\t\t\t</q-card>\n\t\t</div>\n\n\n\t<div class=\"col-12 col-lg\">\n\t<q-card class=\"full-height\">\n\t\t<q-card-title>\n\t\t\t\xE9\x80\x9A\xE7\x94\xA8\n\t\t</q-card-title>\n\n\t\n\n\t\t<q-list link>\n\t\t\t<q-item-separator />\n\t\t\t<q-item>\n\t        \t<q-item-side :icon=\"wifiStateIcon\" color=\"primary\"></q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>{{ wifiStateText }}</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item-separator />\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle v-model=\"enabled\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE5\xB7\xB2\xE5\x90\xAF\xE7\x94\xA8</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xBC\x80\xE5\x90\xAF/\xE5\x85\xB3\xE9\x97\xADWiFi</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n<!--\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle v-model=\"enableNexmon\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Nexmon</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE5\x90\xAF\xE7\x94\xA8/\xE7\xA6\x81\xE7\x94\xA8\xE5\xB7\xB2\xE4\xBF\xAE\xE6\x94\xB9\xE7\x9A\x84nexmon\xE5\x9B\xBA\xE4\xBB\xB6(WiFi\xE9\x9A\x90\xE8\x94\xBD\xE9\x80\x9A\xE9\x81\x93\xE5\x92\x8CKARMA\xE6\x89\x80\xE9\x9C\x80)</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n-->\n\t\t\t<q-item tag=\"label\" disabled>\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle :value=\"true\" :disable=\"true\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Nexmon</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE5\x90\xAF\xE7\x94\xA8/\xE7\xA6\x81\xE7\x94\xA8\xE5\xB7\xB2\xE4\xBF\xAE\xE6\x94\xB9\xE7\x9A\x84nexmon\xE5\x9B\xBA\xE4\xBB\xB6(WiFi\xE9\x9A\x90\xE8\x94\xBD\xE9\x80\x9A\xE9\x81\x93\xE5\x92\x8CKARMA\xE6\x89\x80\xE9\x9C\x80)</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE5\x9F\x9F\xE5\x90\x8D\xE7\x9B\x91\xE7\xAE\xA1</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE6\xB3\x95\xE8\xA7\x84\xE5\x9F\x9F\xE6\xA0\xB9\xE6\x8D\xAEISO/IEC 3166-1 alpha2(\xE7\xA4\xBA\xE4\xBE\x8B\"us\")</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"settings.reg\" inverted></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE5\xB7\xA5\xE4\xBD\x9C\xE6\xA8\xA1\xE5\xBC\x8F</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE4\xBB\xA5\xE7\x83\xAD\xE7\x82\xB9\xE6\x88\x96\xE5\xAE\xA2\xE6\x88\xB7\xE7\xAB\xAF\xE6\x96\xB9\xE5\xBC\x8F\xE5\xB7\xA5\xE4\xBD\x9C</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"settings.mode\" :options=\"wifiModes\" color=\"secondary\" inverted></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t</q-list>\n\t</q-card>\n\t</div>\n\n\t<div class=\"col-12 col-lg\" v-if=\"settings.mode == mode_sta || settings.mode == mode_failover\">\n\t<q-card class=\"full-height\">\n\t\t<q-card-title>\n\t\t\tWiFi\xE5\xAE\xA2\xE6\x88\xB7\xE7\xAB\xAF\xE8\xAE\xBE\xE7\xBD\xAE\n\t\t</q-card-title>\n\n\t\t<q-list link>\n\t\t\t\t<q-item-separator />\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>SSID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE8\xA6\x81\xE8\xBF\x9E\xE6\x8E\xA5\xE7\x9A\x84\xE7\xBD\x91\xE7\xBB\x9C\xE5\x90\x8D\xE7\xA7\xB0</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"settings.staBssList[0].ssid\" color=\"primary\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE9\xA2\x84\xE5\x85\xB1\xE4\xBA\xAB\xE5\xAF\x86\xE9\x92\xA5</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE4\xB8\xBA\xE7\xA9\xBA\xEF\xBC\x8C\xE5\x88\x99\xE5\x81\x87\xE5\xAE\x9A\xE5\x85\xB7\xE6\x9C\x89\xE5\xBC\x80\xE6\x94\xBE\xE5\xBC\x8F\xE8\xBA\xAB\xE4\xBB\xBD\xE9\xAA\x8C\xE8\xAF\x81\xE7\x9A\x84\xE7\xBD\x91\xE7\xBB\x9C(\xE8\xAD\xA6\xE5\x91\x8A\xEF\xBC\x9A\xE6\x98\x8E\xE6\x96\x87\xE4\xBC\xA0\xE8\xBE\x93)</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"settings.staBssList[0].psk\" type=\"password\" color=\"primary\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\n\t\t\t<template v-if=\"settings.mode == mode_failover\">\n\t\t\t\t<q-item>\n\t\t\t\t\t<q-item-main>\n\t  \t\t\t\t<q-alert type=\"warning\">\n\t\t\t\t\t\t\xE5\xA6\x82\xE6\x9E\x9C\xE6\x97\xA0\xE6\xB3\x95\xE8\xBF\x9E\xE6\x8E\xA5\xE4\xB8\xBA\xE5\xAE\xA2\xE6\x88\xB7\xE7\xAB\xAF\xE6\xA8\xA1\xE5\xBC\x8F\xE6\x8F\x90\xE4\xBE\x9B\xE7\x9A\x84SSID\xEF\xBC\x8C\xE5\x88\x99\xE4\xBC\x9A\xE5\xB0\x9D\xE8\xAF\x95\xE4\xBD\xBF\xE7\x94\xA8\xE7\x9B\xB8\xE5\xBA\x94\xE8\xAE\xBE\xE7\xBD\xAE\xE6\x95\x85\xE9\x9A\x9C\xE8\xBD\xAC\xE7\xA7\xBB\xE5\x88\xB0\xE6\x8E\xA5\xE5\x85\xA5\xE7\x82\xB9\xE6\xA8\xA1\xE5\xBC\x8F\n\t\t\t\t\t</q-alert>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</template>\n\t\t</q-list>\n\t</q-card>\n\t</div>\n\n\t<div class=\"col-12 col-lg\" v-if=\"settings.mode == mode_ap || settings.mode == mode_failover\">\n\t<q-card class=\"full-height\">\n\t\t<q-card-title>\n\t\t\tWiFi\xE7\x83\xAD\xE7\x82\xB9\xE8\xAE\xBE\xE7\xBD\xAE\n\t\t</q-card-title>\n\n\t\t<q-list link>\n\n\n\t\t\t<template>\n\t\t\t\t<q-item-separator />\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE4\xBF\xA1\xE9\x81\x93</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE5\xBF\x85\xE9\xA1\xBB\xE5\xAD\x98\xE5\x9C\xA8\xE4\xBA\x8E\xE7\x9B\x91\xE7\xAE\xA1\xE9\xA2\x86\xE5\x9F\x9F\xEF\xBC\x88\xE4\xBE\x8B13\xEF\xBC\x89</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"settings.channel\" type=\"number\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE8\xAE\xA4\xE8\xAF\x81\xE6\xA8\xA1\xE5\xBC\x8F</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE6\x8E\xA5\xE5\x85\xA5\xE7\x82\xB9\xE7\x9A\x84\xE9\xAA\x8C\xE8\xAF\x81\xE6\xA8\xA1\xE5\xBC\x8F(\xE5\xAE\xA2\xE6\x88\xB7\xE7\xAB\xAF\xE6\xA8\xA1\xE5\xBC\x8F\xE5\xBF\xBD\xE7\x95\xA5)</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-select v-model=\"settings.authMode\" :options=\"wifiAuthModes\" color=\"primary\" inverted></q-select>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>SSID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE7\xBD\x91\xE7\xBB\x9C\xE5\x90\x8D\xE7\xA7\xB0(\xE6\x9C\x8D\xE5\x8A\xA1\xE9\x9B\x86\xE6\xA0\x87\xE8\xAF\x86\xE7\xAC\xA6)</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"settings.apBss.ssid\" color=\"primary\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-toggle v-model=\"settings.hideSsid\"></q-toggle>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE9\x9A\x90\xE8\x97\x8FSSID</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE6\x8E\xA5\xE5\x85\xA5\xE7\x82\xB9\xE4\xB8\x8D\xE4\xBC\x9A\xE5\x8F\x91\xE9\x80\x81\xE5\xB8\xA6\xE6\x9C\x89SSID\xE7\x9A\x84\xE4\xBF\xA1\xE6\xA0\x87</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE9\xA2\x84\xE5\x85\xB1\xE4\xBA\xAB\xE5\xAF\x86\xE9\x92\xA5</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE8\xAD\xA6\xE5\x91\x8A\xEF\xBC\x9A\xE6\x98\x8E\xE6\x96\x87\xE4\xBC\xA0\xE8\xBE\x93</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-input v-model=\"settings.apBss.psk\" type=\"password\" color=\"primary\" inverted></q-input>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</template>\n\t\t</q-list>\n\t</q-card>\n\t</div>\n\n\n</div>\n</q-page>\t\n\n"), hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$4.ptr(O(), false, false, false, "");
 			data.Object.showStoreModal = $externalize(false, $Bool);
@@ -37617,7 +37806,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	InitComponentsBluetooth = function() {
 		var _arg, _arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9, _r$1, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _arg$4 = $f._arg$4; _arg$5 = $f._arg$5; _arg$6 = $f._arg$6; _arg$7 = $f._arg$7; _arg$8 = $f._arg$8; _arg$9 = $f._arg$9; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		_arg = hvue.Template("\n<q-page padding>\n\n\t<select-string-from-array :values=\"$store.state.StoredBluetoothSettingsList\" v-model=\"showDeployStoredModal\" title=\"Deploy stored bluetooth settings\" @load=\"deployStored($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<modal-string-input v-model=\"showStoreModal\" title=\"Store bluetooth settings\" @save=\"store($event)\"></modal-string-input>\n\n\n\t<div class=\"row gutter-sm\">\n\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n\t\t\t\t<q-card-title>\n\t\t\t\t\tBluetooth Settings\n\t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"primary\" @click=\"updateStoredSettingsList(); showDeployStoredModal=true\" label=\"deploy stored\" icon=\"settings_backup_restore\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"secondary\" @click=\"showStoreModal=true\" label=\"store\" icon=\"cloud_upload\"></q-btn></div>\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\t\t\t</q-card>\n\t\t</div>\n\n<!--\n\t\t<div class=\"col-12\">\n\t\t\t{{ CurrentControllerInfo }}\n\t\t</div>\n-->\n\t\t<div class=\"col-12 col-lg\">\n\t\t\t<bluetooth-controller :controllerInfo=\"CurrentControllerInfo\"></bluetooth-controller>\n\t\t</div>\n\t\t<div class=\"col-12 col-lg\">\n<div class=\"row gutter-y-sm\">\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<bluetooth-controller-network-services :controllerInfo=\"CurrentControllerInfo\"></bluetooth-controller-network-services>\n\t\t\t</div>\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<bluetooth-agent :bluetoothAgent=\"CurrentBluetoothAgentSettings\"></bluetooth-agent>\n\t\t\t</div>\n</div>\n\t\t</div>\n\t</div>\n</q-page>\n");
+		_arg = hvue.Template("\n<q-page padding>\n\n\t<select-string-from-array :values=\"$store.state.StoredBluetoothSettingsList\" v-model=\"showDeployStoredModal\" title=\"\xE5\xBA\x94\xE7\x94\xA8\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\xE7\x9A\x84\xE8\x93\x9D\xE7\x89\x99\xE8\xAE\xBE\xE7\xBD\xAE\" @load=\"deployStored($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<modal-string-input v-model=\"showStoreModal\" title=\"Store bluetooth settings\" @save=\"store($event)\"></modal-string-input>\n\n\n\t<div class=\"row gutter-sm\">\n\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n\t\t\t\t<q-card-title>\n\t\t\t\t\t\xE8\x93\x9D\xE7\x89\x99\xE8\xAE\xBE\xE7\xBD\xAE\n\t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"primary\" @click=\"updateStoredSettingsList(); showDeployStoredModal=true\" label=\"\xE8\xAE\xBE\xE7\xBD\xAE\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"settings_backup_restore\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"secondary\" @click=\"showStoreModal=true\" label=\"\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"cloud_upload\"></q-btn></div>\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\t\t\t</q-card>\n\t\t</div>\n\n<!--\n\t\t<div class=\"col-12\">\n\t\t\t{{ CurrentControllerInfo }}\n\t\t</div>\n-->\n\t\t<div class=\"col-12 col-lg\">\n\t\t\t<bluetooth-controller :controllerInfo=\"CurrentControllerInfo\"></bluetooth-controller>\n\t\t</div>\n\t\t<div class=\"col-12 col-lg\">\n<div class=\"row gutter-y-sm\">\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<bluetooth-controller-network-services :controllerInfo=\"CurrentControllerInfo\"></bluetooth-controller-network-services>\n\t\t\t</div>\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<bluetooth-agent :bluetoothAgent=\"CurrentBluetoothAgentSettings\"></bluetooth-agent>\n\t\t\t</div>\n</div>\n\t\t</div>\n\t</div>\n</q-page>\n");
 		_r$1 = hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$6.ptr(O(), false, false);
@@ -37672,15 +37861,15 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 			vm.Object.$store.dispatch($externalize("updateCurrentBluetoothControllerInformation", $String));
 		}));
 		$r = hvue.NewComponent("bluetooth", new sliceType$10([_arg, _arg$1, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9])); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("bluetooth-controller", new sliceType$10([hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\tGeneric Bluetooth Controller settings\n\t</q-card-title>\n\n\t<q-list link>\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.Powered\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Enabled</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>Power on/off Bluetooth controller</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Name</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>Visible name of the bluetooth device</q-item-tile>\n\t\t\t\t<q-item-tile>\n\t\t\t\t\t<q-input :value=\"controllerInfo.Name\" @change=\"controllerInfo.Name = $event; $store.dispatch('deployCurrentBluetoothControllerInformation')\" inverted></q-input>\n\t\t\t\t</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.Connectable\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Connectable</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>Allow incoming connections</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.Discoverable\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Discoverable</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>P4wnP1 could be discovered by other devices if enabled (only if Connectable)</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.Bondable\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Bondable</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>Other devices could pair with P4wnP1</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.HighSpeed\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>High Speed</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>Use alternate data channel (802.11)</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.LowEnergy\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Low Energy</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>Enable Bluetooth LE (Bluetooth Smart)</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.SecureSimplePairing\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Secure Simple Pairing</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>If disabled, insecure PIN based pairing is used and HighSpeed isn't available</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\n\n\t</q-list>\n\n</q-card>\n"), hvue.PropObj("controllerInfo", new sliceType$9([])), hvue.Computed("CurrentControllerInfo", (function(vm) {
+		$r = hvue.NewComponent("bluetooth-controller", new sliceType$10([hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\t\xE9\x80\x9A\xE7\x94\xA8\xE8\x93\x9D\xE7\x89\x99\xE6\x8E\xA7\xE5\x88\xB6\xE5\x99\xA8\xE8\xAE\xBE\xE7\xBD\xAE\n\t</q-card-title>\n\n\t<q-list link>\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.Powered\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>\xE5\xB7\xB2\xE5\x90\xAF\xE7\x94\xA8</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE6\x89\x93\xE5\xBC\x80/\xE5\x85\xB3\xE9\x97\xAD\xE8\x93\x9D\xE7\x89\x99\xE6\x8E\xA7\xE5\x88\xB6\xE5\x99\xA8</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>\xE5\x90\x8D\xE7\xA7\xB0</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE5\x8F\xAF\xE8\xA7\x81\xE7\x9A\x84\xE8\x93\x9D\xE7\x89\x99\xE8\xAE\xBE\xE5\xA4\x87\xE5\x90\x8D</q-item-tile>\n\t\t\t\t<q-item-tile>\n\t\t\t\t\t<q-input :value=\"controllerInfo.Name\" @change=\"controllerInfo.Name = $event; $store.dispatch('deployCurrentBluetoothControllerInformation')\" inverted></q-input>\n\t\t\t\t</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.Connectable\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Connectable</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE5\x85\x81\xE8\xAE\xB8\xE7\x9A\x84\xE4\xBC\xA0\xE5\x85\xA5\xE8\xBF\x9E\xE6\x8E\xA5</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.Discoverable\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>\xE5\x8F\xAF\xE8\xA7\x81\xE7\x9A\x84</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE5\x90\xAF\xE7\x94\xA8\xE4\xBA\x86\xE8\xAF\xA5\xE9\x80\x89\xE9\xA1\xB9\xEF\xBC\x8C\xE5\x88\x99\xE5\x8F\xAF\xE4\xBB\xA5\xE9\x80\x9A\xE8\xBF\x87\xE5\x85\xB6\xE4\xBB\x96\xE8\xAE\xBE\xE5\xA4\x87\xE5\x8F\x91\xE7\x8E\xB0P4wnP1\xEF\xBC\x88\xE4\xBB\x85\xE5\xBD\x93\xE5\x8F\xAF\xE8\xBF\x9E\xE6\x8E\xA5\xE6\x97\xB6\xEF\xBC\x89</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.Bondable\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>\xE5\x85\x81\xE8\xAE\xB8\xE9\x85\x8D\xE5\xAF\xB9</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE5\x85\xB6\xE4\xBB\x96\xE8\xAE\xBE\xE5\xA4\x87\xE5\x8F\xAF\xE4\xBB\xA5\xE4\xB8\x8EP4wnP1\xE9\x85\x8D\xE5\xAF\xB9</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.HighSpeed\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>\xE9\xAB\x98\xE9\x80\x9F\xE4\xBC\xA0\xE8\xBE\x93</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE4\xBD\xBF\xE7\x94\xA8\xE5\xA4\x87\xE7\x94\xA8\xE6\x95\xB0\xE6\x8D\xAE\xE9\x80\x9A\xE9\x81\x93(802.11)</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.LowEnergy\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>\xE4\xBD\x8E\xE5\x8A\x9F\xE8\x80\x97</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE5\x90\xAF\xE7\x94\xA8\xE8\x93\x9D\xE7\x89\x99LE(\xE6\x99\xBA\xE8\x83\xBD\xE8\x93\x9D\xE7\x89\x99)</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.CurrentSettings.SecureSimplePairing\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>\xE5\xAE\x89\xE5\x85\xA8\xE7\xAE\x80\xE5\x8D\x95\xE6\x96\xB9\xE5\xBC\x8F\xE9\x85\x8D\xE5\xAF\xB9</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE7\xA6\x81\xE7\x94\xA8\xEF\xBC\x8C\xE5\x88\x99\xE4\xBD\xBF\xE7\x94\xA8\xE4\xB8\x8D\xE5\xAE\x89\xE5\x85\xA8\xE7\x9A\x84PIN\xE9\x85\x8D\xE5\xAF\xB9\xEF\xBC\x8C\xE5\xB9\xB6\xE4\xB8\x94\xE6\x97\xA0\xE6\xB3\x95\xE4\xBD\xBF\xE7\x94\xA8\xE9\xAB\x98\xE9\x80\x9F\xE6\x95\xB0\xE6\x8D\xAE\xE4\xBC\xA0\xE8\xBE\x93</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\n\n\t</q-list>\n\n</q-card>\n"), hvue.PropObj("controllerInfo", new sliceType$9([])), hvue.Computed("CurrentControllerInfo", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.$store.state.CurrentBluetoothControllerInformation);
 		}))])); /* */ $s = 9; case 9: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("bluetooth-controller-network-services", new sliceType$10([hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\tBNEP server services\n\t\t<span slot=\"subtitle\">Bluetooth Network Encapsulation Protocol services provided by the controller</span>\n\t</q-card-title>\n\n\n\t<q-list link>\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.ServiceNetworkServerNAP\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>NAP</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>Provide Network Access Point</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.ServiceNetworkServerPANU\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>PANU</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>Provide Protable Area Network Unit</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.ServiceNetworkServerGN\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>GN</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>Provide Group Ad-hoc Network</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t</q-list>\n\n\n</q-card>\n"), hvue.PropObj("controllerInfo", new sliceType$9([])), hvue.Computed("CurrentControllerInfo", (function(vm) {
+		$r = hvue.NewComponent("bluetooth-controller-network-services", new sliceType$10([hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\tBNEP\xE6\x9C\x8D\xE5\x8A\xA1\xE5\x99\xA8\xE6\x9C\x8D\xE5\x8A\xA1\n\t\t<span slot=\"subtitle\">\xE6\x8E\xA7\xE5\x88\xB6\xE5\x99\xA8\xE6\x8F\x90\xE4\xBE\x9B\xE7\x9A\x84\xE8\x93\x9D\xE7\x89\x99\xE7\xBD\x91\xE7\xBB\x9C\xE5\xB0\x81\xE8\xA3\x85\xE5\x8D\x8F\xE8\xAE\xAE\xE6\x9C\x8D\xE5\x8A\xA1</span>\n\t</q-card-title>\n\n\n\t<q-list link>\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.ServiceNetworkServerNAP\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>NAP</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE6\x8F\x90\xE4\xBE\x9B\xE7\xBD\x91\xE7\xBB\x9C\xE6\x8E\xA5\xE5\x85\xA5\xE7\x82\xB9</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.ServiceNetworkServerPANU\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>PANU</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE6\x8F\x90\xE4\xBE\x9B\xE4\xBE\xBF\xE6\x90\xBA\xE5\xBC\x8F\xE5\x8C\xBA\xE5\x9F\x9F\xE7\xBD\x91\xE7\xBB\x9C\xE5\x8D\x95\xE5\x85\x83</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"controllerInfo.ServiceNetworkServerGN\" @input=\"$store.dispatch('deployCurrentBluetoothControllerInformation')\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>GN</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE6\x8F\x90\xE4\xBE\x9B\xE7\xBB\x84Ad-hoc\xE7\xBD\x91\xE7\xBB\x9C</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t</q-list>\n\n\n</q-card>\n"), hvue.PropObj("controllerInfo", new sliceType$9([])), hvue.Computed("CurrentControllerInfo", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.$store.state.CurrentBluetoothControllerInformation);
 		}))])); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("bluetooth-agent", new sliceType$10([hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\tAuthentication Agent\n\t</q-card-title>\n\n\n\t<q-list link>\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Pin</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>PIN requested from remote devices on bonding (only if SSP is off)</q-item-tile>\n\t\t\t\t<q-item-tile>\n\t\t\t\t\t<q-input :value=\"bluetoothAgent.Pin\" @change=\"bluetoothAgent.Pin = $event; $store.dispatch('deployCurrentBluetoothAgentSettings')\" type=\"password\" inverted></q-input>\n\t\t\t\t</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t</q-list>\n\n\n</q-card>\n"), hvue.PropObj("bluetoothAgent", new sliceType$9([])), hvue.Mounted((function(vm) {
+		$r = hvue.NewComponent("bluetooth-agent", new sliceType$10([hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\t\xE4\xBB\xA3\xE7\x90\x86\xE8\xAE\xA4\xE8\xAF\x81\n\t</q-card-title>\n\n\n\t<q-list link>\n\t\t<q-item tag=\"label\">\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Pin</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE5\x9C\xA8\xE7\xBB\x91\xE5\xAE\x9A\xE6\x97\xB6\xE4\xBB\x8E\xE8\xBF\x9C\xE7\xA8\x8B\xE8\xAE\xBE\xE5\xA4\x87\xE8\xAF\xB7\xE6\xB1\x82PIN(\xE4\xBB\x85\xE5\xBD\x93SSP\xE5\x85\xB3\xE9\x97\xAD\xE6\x97\xB6)</q-item-tile>\n\t\t\t\t<q-item-tile>\n\t\t\t\t\t<q-input :value=\"bluetoothAgent.Pin\" @change=\"bluetoothAgent.Pin = $event; $store.dispatch('deployCurrentBluetoothAgentSettings')\" type=\"password\" inverted></q-input>\n\t\t\t\t</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t</q-list>\n\n\n</q-card>\n"), hvue.PropObj("bluetoothAgent", new sliceType$9([])), hvue.Mounted((function(vm) {
 			var vm;
 			vm.Object.$store.dispatch($externalize("updateCurrentBluetoothAgentSettings", $String));
 		}))])); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
@@ -37755,14 +37944,14 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		_arg$16 = hvue.PropObj("title", new sliceType$9([hvue.Types(new sliceType$8([0]))]));
 		_arg$17 = hvue.PropObj("value", new sliceType$9([hvue.Required, hvue.Types(new sliceType$8([2]))]));
 		$r = hvue.NewComponent("modal-string-input", new sliceType$10([_arg$12, _arg$13, _arg$14, _arg$15, _arg$16, _arg$17])); /* */ $s = 7; case 7: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("ransom-note", new sliceType$10([hvue.Template("\n<div>\n\t<q-modal v-model=\"visible\" content-css=\"background: red;\" no-esc-dismiss no-route-dismiss no-backdrop-dismiss>\n\t\t\t<div style=\"color: white; font-size: 1.5em; font-family: monospace; padding: 10%\">\n\t\t\t\t\nYou became victim of a VERY SILLY IDEA</br>\n\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88</br>\n</br>\nThe web page you've been viewing, provided a sophisticated experience</br>\nin terms of keyboard automation and scripting. There were LED based triggers,</br>\nthere was scriptable mouse control, there were complex control structures</br>\nlike if-else-branching and for-loops. Not to mention the capability of running</br>\nmultiple asynchronous jobs.</br>\n</br>\nIf you really need a converter for a limited, old-school language:</br>\n</br>\n1. Ask somebody else to write one.</br>\n2. Send me 10+ BTC and I'll write one'.</br>\nor</br>\n3. Write one yourself and don't send a PR'.</br>\n</br>\nIf you want your DuckyScript encrypted, please enter it elsewhere!</br>\n\t\t\t\t\n\t\t\t</div>\n\t\t</q-card>\n\t</q-modal>\n</div>\n"), hvue.ComputedWithGetSet("visible", (function(vm) {
+		$r = hvue.NewComponent("ransom-note", new sliceType$10([hvue.Template("\n<div>\n\t<q-modal v-model=\"visible\" content-css=\"background: red;\" no-esc-dismiss no-route-dismiss no-backdrop-dismiss>\n\t\t\t<div style=\"color: white; font-size: 1.5em; font-family: monospace; padding: 10%\">\n\t\t\t\t\n\xE4\xBD\xA0\xE6\x88\x90\xE4\xBA\x86\xE4\xB8\x80\xE4\xB8\xAA\xE9\x9D\x9E\xE5\xB8\xB8\xE6\x84\x9A\xE8\xA0\xA2\xE7\x9A\x84\xE6\x83\xB3\xE6\xB3\x95\xE7\x9A\x84\xE5\x8F\x97\xE5\xAE\xB3\xE8\x80\x85</br>\n\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88\xE2\x96\x88</br>\n</br>\nThe web page you've been viewing, provided a sophisticated experience</br>\nin terms of keyboard automation and scripting. There were LED based triggers,</br>\nthere was scriptable mouse control, there were complex control structures</br>\nlike if-else-branching and for-loops. Not to mention the capability of running</br>\nmultiple asynchronous jobs.</br>\n</br>\nIf you really need a converter for a limited, old-school language:</br>\n</br>\n1. Ask somebody else to write one.</br>\n2. Send me 10+ BTC and I'll write one'.</br>\nor</br>\n3. Write one yourself and don't send a PR'.</br>\n</br>\nIf you want your DuckyScript encrypted, please enter it elsewhere!</br>\n\t\t\t\t\n\t\t\t</div>\n\t\t</q-card>\n\t</q-modal>\n</div>\n"), hvue.ComputedWithGetSet("visible", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.value);
 		}), (function(vm, newValue) {
 			var newValue, vm;
 			vm.Object.$emit($externalize("input", $String), newValue);
 		})), hvue.PropObj("value", new sliceType$9([hvue.Required, hvue.Types(new sliceType$8([2]))]))])); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("disconnect-modal", new sliceType$10([hvue.Template("\n<div>\n\t<q-modal v-model=\"visible\">\n\t\t<q-modal-layout>\n\t\t\t<q-toolbar slot=\"header\">\n\t\t\t\t<q-toolbar-title>\n\t\t\t\t\tNot connection to server\n\t\t\t\t</q-toolbar-title>\n\t\t\t</q-toolbar>\n\n\t\t\t<div  class=\"layout-padding\">\n      \t\t\t<p>No connection to server</p>\n\t\t\t\t<p>Trying to reconnect ... Attempt: {{ $store.state.ConnectRetryCount }}</p>\n\t\t\t</div>\n\t\t</q-modal-layout>\n\t</q-modal>\n</div>\n"), hvue.ComputedWithGetSet("visible", (function(vm) {
+		$r = hvue.NewComponent("disconnect-modal", new sliceType$10([hvue.Template("\n<div>\n\t<q-modal v-model=\"visible\">\n\t\t<q-modal-layout>\n\t\t\t<q-toolbar slot=\"header\">\n\t\t\t\t<q-toolbar-title>\n\t\t\t\t\t\xE6\x9C\xAA\xE8\xBF\x9E\xE6\x8E\xA5\xE5\x88\xB0\xE6\x9C\x8D\xE5\x8A\xA1\xE5\x99\xA8\n\t\t\t\t</q-toolbar-title>\n\t\t\t</q-toolbar>\n\n\t\t\t<div  class=\"layout-padding\">\n      \t\t\t<p>No connection to server</p>\n\t\t\t\t<p>\xE6\xAD\xA3\xE5\x9C\xA8\xE5\xB0\x9D\xE8\xAF\x95\xE9\x87\x8D\xE6\x96\xB0\xE8\xBF\x9E\xE6\x8E\xA5 ... \xE9\x87\x8D\xE8\xAF\x95\xE6\xAC\xA1\xE6\x95\xB0: {{ $store.state.ConnectRetryCount }}</p>\n\t\t\t</div>\n\t\t</q-modal-layout>\n\t</q-modal>\n</div>\n"), hvue.ComputedWithGetSet("visible", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.value);
 		}), (function(vm, newValue) {
@@ -37777,7 +37966,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		var _arg, _arg$1, _arg$10, _arg$11, _arg$12, _arg$13, _arg$14, _arg$15, _arg$16, _arg$17, _arg$2, _arg$3, _arg$4, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9, _r$1, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$10 = $f._arg$10; _arg$11 = $f._arg$11; _arg$12 = $f._arg$12; _arg$13 = $f._arg$13; _arg$14 = $f._arg$14; _arg$15 = $f._arg$15; _arg$16 = $f._arg$16; _arg$17 = $f._arg$17; _arg$2 = $f._arg$2; _arg$3 = $f._arg$3; _arg$4 = $f._arg$4; _arg$5 = $f._arg$5; _arg$6 = $f._arg$6; _arg$7 = $f._arg$7; _arg$8 = $f._arg$8; _arg$9 = $f._arg$9; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		$r = hvue.NewComponent("generic", new sliceType$10([hvue.Template("\n<q-page padding>\n\t<div class=\"row gutter-sm\">\n\t\t<div class=\"col-12 col-xl\">\n\t\t\t<master-template v-model=\"$store.state.CurrentMasterTemplate\" />\n\t\t</div>\n\n\t\t<div class=\"col-12 col-xl\">\n\t\t<div class=\"row gutter-sm\">\n\t\t\t<div class=\"col-12 col-xl-6\">\n\t\t\t\t<system />\n\t\t\t</div>\n\n\t\t\t<div class=\"col-12 col-xl-6\">\n\t\t\t\t<database />\n\t\t\t</div>\n\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<startup-settings />\n\t\t\t</div>\n\t\t</div>\n\t\t</div>\n\t</div>\n</q-page>\n")])); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("startup-settings", new sliceType$10([hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\tStartup Settings\n\t</q-card-title>\n\n\t<q-card-main>\n\t\t<div class=\"row gutter-sm\">\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"$store.state.StoredMasterTemplateList\" v-model=\"ShowTemplateSelect\" title=\"Select Master Template used on startup\" @load=\"selectMasterTemplate($event)\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"whatshot\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Startup Master Template</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>The template which is loaded on service start</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"$store.state.CurrentStartupMasterTemplateName\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelect=true\" flat /></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t</div>\n\t</q-card-main>\n</q-card>\n"), hvue.DataFunc((function(vm) {
+		$r = hvue.NewComponent("startup-settings", new sliceType$10([hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\t\xE5\x90\xAF\xE5\x8A\xA8\xE8\xAE\xBE\xE7\xBD\xAE\n\t</q-card-title>\n\n\t<q-card-main>\n\t\t<div class=\"row gutter-sm\">\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"$store.state.StoredMasterTemplateList\" v-model=\"ShowTemplateSelect\" title=\"Select Master Template used on startup\" @load=\"selectMasterTemplate($event)\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"whatshot\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE5\x90\xAF\xE5\x8A\xA8\xE4\xB8\xBB\xE6\xA8\xA1\xE6\x9D\xBF</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE6\x9C\x8D\xE5\x8A\xA1\xE5\x90\xAF\xE5\x8A\xA8\xE6\x97\xB6\xE5\x8A\xA0\xE8\xBD\xBD\xE7\x9A\x84\xE6\xA8\xA1\xE6\x9D\xBF</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"$store.state.CurrentStartupMasterTemplateName\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelect=true\" flat /></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t</div>\n\t</q-card-main>\n</q-card>\n"), hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$9.ptr(O(), false);
 			data.Object.ShowTemplateSelect = $externalize(false, $Bool);
@@ -37790,14 +37979,14 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 				vm.Object.$store.dispatch($externalize("getStartupMasterTemplateName", $String));
 			}), funcType$7));
 		})))])); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("system", new sliceType$10([hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\tSystem\n\t</q-card-title>\n\n\t<q-card-main>\n\t\t<div class=\"row gutter-sm\">\n\t\t\t<div class=\"col\"> <q-btn class=\"fit\" color=\"warning\" label=\"reboot\" icon=\"refresh\" @click=\"reboot\" /> </div>\n\t\t\t<div class=\"col\"> <q-btn class=\"fit\" color=\"negative\" label=\"shutdown\" icon=\"power_settings_new\" @click=\"shutdown\"/> </div>\n\t\t</div>\n\t</q-card-main>\n</q-card>\n"), hvue.Method("shutdown", new funcType$2((function(vm) {
+		$r = hvue.NewComponent("system", new sliceType$10([hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\t\xE7\xB3\xBB\xE7\xBB\x9F\n\t</q-card-title>\n\n\t<q-card-main>\n\t\t<div class=\"row gutter-sm\">\n\t\t\t<div class=\"col\"> <q-btn class=\"fit\" color=\"warning\" label=\"\xE9\x87\x8D\xE5\x90\xAF\" icon=\"refresh\" @click=\"reboot\" /> </div>\n\t\t\t<div class=\"col\"> <q-btn class=\"fit\" color=\"negative\" label=\"\xE5\x85\xB3\xE6\x9C\xBA\" icon=\"power_settings_new\" @click=\"shutdown\"/> </div>\n\t\t</div>\n\t</q-card-main>\n</q-card>\n"), hvue.Method("shutdown", new funcType$2((function(vm) {
 			var vm;
 			vm.Object.$store.dispatch($externalize("shutdown", $String));
 		}))), hvue.Method("reboot", new funcType$2((function(vm) {
 			var vm;
 			vm.Object.$store.dispatch($externalize("reboot", $String));
 		})))])); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_arg = hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\tMaster Template Editor\n\t</q-card-title>\n\n<!--\t{{ $data }} -->\n\n\t<q-card-main>\n\t\t<select-string-from-array :values=\"$store.state.StoredMasterTemplateList\" v-model=\"showLoadModal\" title=\"Load stored Master Template\" @load=\"load($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t\t<select-string-from-array :values=\"$store.state.StoredMasterTemplateList\" v-model=\"showDeployStoredModal\" title=\"Deploy stored Master Template\" @load=\"deployStored($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t\t<modal-string-input v-model=\"showStoreModal\" title=\"Store current Master Template\" @save=\"store($event)\"></modal-string-input>\n\n\n\t\t<div class=\"row gutter-sm\">\n\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<div class=\"row gutter-sm\">\n\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"primary\" @click=\"deploy(MasterTemplate)\" label=\"deploy\" icon=\"launch\"></q-btn></div>\n\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"primary\" @click=\"showDeployStoredModal=true\" label=\"deploy stored\" icon=\"settings_backup_restore\"></q-btn></div>\n\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"secondary\" @click=\"showStoreModal=true\" label=\"store\" icon=\"cloud_upload\"></q-btn></div>\n\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" @click=\"showLoadModal=true\" label=\"load stored\" icon=\"cloud_download\"></q-btn></div>\n\n\t\t\t\t</div>\n\t\t\t</div>\n\n\n\t\t\t<!-- TriggerActions template -->\n\t\t\t\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"$store.state.StoredTriggerActionSetsList\"  v-model=\"ShowTemplateSelectTriggerAction\" title=\"Select TriggerActions template\" @load=\"MasterTemplate.TemplateNameTriggerActions=$event\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"whatshot\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>TriggerActions Template</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>If not empty, the selected TriggerActions are deployed along with the master template</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"MasterTemplate.TemplateNameTriggerActions\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelectTriggerAction=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"MasterTemplate.TemplateNameTriggerActions.length > 0\" icon=\"clear\" color=\"primary\" @click=\"MasterTemplate.TemplateNameTriggerActions=''\" flat /></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\t\t\t<!-- USB template -->\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"$store.state.StoredUSBSettingsList\"  v-model=\"ShowTemplateSelectUSB\" title=\"Select USB template\" @load=\"MasterTemplate.TemplateNameUSB=$event\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"usb\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>USB Template</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>If not empty, the selected USB settings are deployed along with the master template</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"MasterTemplate.TemplateNameUSB\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelectUSB=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"MasterTemplate.TemplateNameUSB.length > 0\" icon=\"clear\" color=\"primary\" @click=\"MasterTemplate.TemplateNameUSB=''\" flat /></div>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<!-- WiFi template -->\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"$store.state.StoredWifiSettingsList\"  v-model=\"ShowTemplateSelectWiFi\" title=\"Select WiFi template\" @load=\"MasterTemplate.TemplateNameWiFi=$event\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"wifi\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>WiFi Template</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>If not empty, the selected WiFi settings are deployed along with the master template</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"MasterTemplate.TemplateNameWiFi\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelectWiFi=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"MasterTemplate.TemplateNameWiFi.length > 0\" icon=\"clear\" color=\"primary\" @click=\"MasterTemplate.TemplateNameWiFi=''\" flat /></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<!-- Bluetooth template -->\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"$store.state.StoredBluetoothSettingsList\"  v-model=\"ShowTemplateSelectBluetooth\" title=\"Select Bluetooth template\" @load=\"MasterTemplate.TemplateNameBluetooth=$event\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"bluetooth\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Bluetooth Template</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>If not empty, the selected Bluetooth settings are deployed along with the master template</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"MasterTemplate.TemplateNameBluetooth\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelectBluetooth=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"MasterTemplate.TemplateNameBluetooth.length > 0\" icon=\"clear\" color=\"primary\" @click=\"MasterTemplate.TemplateNameBluetooth=''\" flat /></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-network-templates \n\t\t\t\t\t:values=\"$store.state.StoredEthernetInterfaceSettingsList\" \n\t\t\t\t\t:show=\"ShowTemplateSelectNetwork\" \n\t\t\t\t\t@show=\"ShowTemplateSelectNetwork=$event\"\n\t\t\t\t\ttitle=\"Select Network templates\" \n\t\t\t\t\tv-model=\"MasterTemplate.TemplateNamesNetwork\" \n\t\t\t\t/>\n\t\t\t\t<q-item-side icon=\"settings_ethernet\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Networks templates</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Only one template could be selected per interface.</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>If not empty, the selected network templates are deployed along with the master template. Only one template could be selected per interface.</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n<!--\n\t\t\t\t\t\t\t\t<q-chips-input v-model=\"MasterTemplate.TemplateNamesNetwork\"  color=\"primary\" inverted clearable />\n-->\n\t\t\t\t\t\t\t\t<q-chips-input v-model=\"MasterTemplate.TemplateNamesNetwork\"  color=\"primary\" inverted readonly />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelectNetwork=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"MasterTemplate.TemplateNamesNetwork.length > 0\" icon=\"clear\" color=\"primary\" @click=\"MasterTemplate.TemplateNamesNetwork=[]\" flat /></div>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t</div>\n\t</q-card-main>\n</q-card>\n");
+		_arg = hvue.Template("\n<q-card>\n\t<q-card-title>\n\t\t\xE4\xB8\xBB\xE6\xA8\xA1\xE6\x9D\xBF\xE7\xBC\x96\xE8\xBE\x91\xE5\x99\xA8\n\t</q-card-title>\n\n<!--\t{{ $data }} -->\n\n\t<q-card-main>\n\t\t<select-string-from-array :values=\"$store.state.StoredMasterTemplateList\" v-model=\"showLoadModal\" title=\"\xE5\x8A\xA0\xE8\xBD\xBD\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\xE7\x9A\x84\xE4\xB8\xBB\xE6\xA8\xA1\xE6\x9D\xBF\" @load=\"load($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t\t<select-string-from-array :values=\"$store.state.StoredMasterTemplateList\" v-model=\"showDeployStoredModal\" title=\"\xE5\xBA\x94\xE7\x94\xA8\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\xE7\x9A\x84\xE4\xB8\xBB\xE6\xA8\xA1\xE6\x9D\xBF\" @load=\"deployStored($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t\t<modal-string-input v-model=\"showStoreModal\" title=\"\xE4\xBF\x9D\xE5\xAD\x98\xE5\xBD\x93\xE5\x89\x8D\xE4\xB8\xBB\xE6\xA8\xA1\xE6\x9D\xBF\" @save=\"store($event)\"></modal-string-input>\n\n\n\t\t<div class=\"row gutter-sm\">\n\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<div class=\"row gutter-sm\">\n\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"primary\" @click=\"deploy(MasterTemplate)\" label=\"\xE5\xBA\x94\xE7\x94\xA8\" icon=\"launch\"></q-btn></div>\n\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"primary\" @click=\"showDeployStoredModal=true\" label=\"\xE5\xBA\x94\xE7\x94\xA8\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"settings_backup_restore\"></q-btn></div>\n\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"secondary\" @click=\"showStoreModal=true\" label=\"\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"cloud_upload\"></q-btn></div>\n\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" @click=\"showLoadModal=true\" label=\"load \xE5\x8A\xA0\xE8\xBD\xBD\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"cloud_download\"></q-btn></div>\n\n\t\t\t\t</div>\n\t\t\t</div>\n\n\n\t\t\t<!-- TriggerActions template -->\n\t\t\t\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"$store.state.StoredTriggerActionSetsList\"  v-model=\"ShowTemplateSelectTriggerAction\" title=\"\xE9\x80\x89\xE6\x8B\xA9\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE5\x8A\xA8\xE4\xBD\x9C\xE6\xA8\xA1\xE6\x9D\xBF\" @load=\"MasterTemplate.TemplateNameTriggerActions=$event\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"whatshot\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE5\x8A\xA8\xE4\xBD\x9C\xE6\xA8\xA1\xE6\x9D\xBF</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE4\xB8\x8D\xE4\xB8\xBA\xE7\xA9\xBA\xEF\xBC\x8C\xE5\x88\x99\xE9\x80\x89\xE5\xAE\x9A\xE7\x9A\x84\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE5\x8A\xA8\xE4\xBD\x9C\xE4\xB8\x8E\xE4\xB8\xBB\xE6\xA8\xA1\xE6\x9D\xBF\xE4\xB8\x80\xE8\xB5\xB7\xE9\x83\xA8\xE7\xBD\xB2</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"MasterTemplate.TemplateNameTriggerActions\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelectTriggerAction=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"MasterTemplate.TemplateNameTriggerActions.length > 0\" icon=\"clear\" color=\"primary\" @click=\"MasterTemplate.TemplateNameTriggerActions=''\" flat /></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\t\t\t<!-- USB template -->\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"$store.state.StoredUSBSettingsList\"  v-model=\"ShowTemplateSelectUSB\" title=\"\xE9\x80\x89\xE6\x8B\xA9USB\xE6\xA8\xA1\xE6\x9D\xBF\" @load=\"MasterTemplate.TemplateNameUSB=$event\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"usb\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>USB\xE6\xA8\xA1\xE6\x9D\xBF</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE4\xB8\x8D\xE4\xB8\xBA\xE7\xA9\xBA\xEF\xBC\x8C\xE5\x88\x99\xE4\xBC\x9A\xE5\xB0\x86\xE6\x89\x80\xE9\x80\x89USB\xE8\xAE\xBE\xE7\xBD\xAE\xE4\xB8\x8E\xE4\xB8\xBB\xE6\xA8\xA1\xE6\x9D\xBF\xE4\xB8\x80\xE8\xB5\xB7\xE9\x83\xA8\xE7\xBD\xB2</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"MasterTemplate.TemplateNameUSB\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelectUSB=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"MasterTemplate.TemplateNameUSB.length > 0\" icon=\"clear\" color=\"primary\" @click=\"MasterTemplate.TemplateNameUSB=''\" flat /></div>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<!-- WiFi template -->\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"$store.state.StoredWifiSettingsList\"  v-model=\"ShowTemplateSelectWiFi\" title=\"\xE9\x80\x89\xE6\x8B\xA9WiFi\xE6\xA8\xA1\xE6\x9D\xBF\" @load=\"MasterTemplate.TemplateNameWiFi=$event\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"wifi\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>WiFi\xE6\xA8\xA1\xE6\x9D\xBF</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE4\xB8\x8D\xE4\xB8\xBA\xE7\xA9\xBA\xEF\xBC\x8C\xE5\x88\x99\xE5\xB0\x86\xE9\x80\x89\xE6\x8B\xA9\xE7\x9A\x84WiFi\xE8\xAE\xBE\xE7\xBD\xAE\xE4\xB8\x8E\xE4\xB8\xBB\xE6\xA8\xA1\xE6\x9D\xBF\xE4\xB8\x80\xE8\xB5\xB7\xE9\x83\xA8\xE7\xBD\xB2</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"MasterTemplate.TemplateNameWiFi\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelectWiFi=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"MasterTemplate.TemplateNameWiFi.length > 0\" icon=\"clear\" color=\"primary\" @click=\"MasterTemplate.TemplateNameWiFi=''\" flat /></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<!-- Bluetooth template -->\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-string-from-array :values=\"$store.state.StoredBluetoothSettingsList\"  v-model=\"ShowTemplateSelectBluetooth\" title=\"\xE9\x80\x89\xE6\x8B\xA9\xE8\x93\x9D\xE7\x89\x99\xE6\xA8\xA1\xE6\x9D\xBF\" @load=\"MasterTemplate.TemplateNameBluetooth=$event\"></select-string-from-array>\n\t\t\t\t<q-item-side icon=\"bluetooth\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE8\x93\x9D\xE7\x89\x99\xE6\xA8\xA1\xE6\x9D\xBF</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE4\xB8\x8D\xE4\xB8\xBA\xE7\xA9\xBA\xEF\xBC\x8C\xE5\x88\x99\xE4\xBC\x9A\xE5\xB0\x86\xE9\x80\x89\xE5\xAE\x9A\xE7\x9A\x84\xE8\x93\x9D\xE7\x89\x99\xE8\xAE\xBE\xE7\xBD\xAE\xE4\xB8\x8E\xE4\xB8\xBB\xE6\xA8\xA1\xE6\x9D\xBF\xE4\xB8\x80\xE8\xB5\xB7\xE9\x83\xA8\xE7\xBD\xB2</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n\t\t\t\t\t\t\t\t<q-input v-model=\"MasterTemplate.TemplateNameBluetooth\" color=\"primary\" inverted readonly clearable></q-input>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelectBluetooth=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"MasterTemplate.TemplateNameBluetooth.length > 0\" icon=\"clear\" color=\"primary\" @click=\"MasterTemplate.TemplateNameBluetooth=''\" flat /></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"div\" class=\"col-12\">\n\t\t\t\t<select-network-templates \n\t\t\t\t\t:values=\"$store.state.StoredEthernetInterfaceSettingsList\" \n\t\t\t\t\t:show=\"ShowTemplateSelectNetwork\" \n\t\t\t\t\t@show=\"ShowTemplateSelectNetwork=$event\"\n\t\t\t\t\ttitle=\"\xE9\x80\x89\xE6\x8B\xA9\xE7\xBD\x91\xE7\xBB\x9C\xE6\xA8\xA1\xE6\x9D\xBF\" \n\t\t\t\t\tv-model=\"MasterTemplate.TemplateNamesNetwork\" \n\t\t\t\t/>\n\t\t\t\t<q-item-side icon=\"settings_ethernet\" color primary />\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE7\xBD\x91\xE7\xBB\x9C\xE6\xA8\xA1\xE6\x9D\xBF</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE6\xAF\x8F\xE4\xB8\xAA\xE6\x8E\xA5\xE5\x8F\xA3\xE5\x8F\xAA\xE8\x83\xBD\xE9\x80\x89\xE6\x8B\xA9\xE4\xB8\x80\xE4\xB8\xAA\xE6\xA8\xA1\xE6\x9D\xBF</q-item-tile>\n<!--\n\t\t\t\t\t<q-item-tile sublabel>If not empty, the selected network templates are deployed along with the master template. Only one template could be selected per interface.</q-item-tile>\n-->\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<div class=\"row no-wrap\">\n\t\t\t\t\t\t\t<div class=\"fit\">\n<!--\n\t\t\t\t\t\t\t\t<q-chips-input v-model=\"MasterTemplate.TemplateNamesNetwork\"  color=\"primary\" inverted clearable />\n-->\n\t\t\t\t\t\t\t\t<q-chips-input v-model=\"MasterTemplate.TemplateNamesNetwork\"  color=\"primary\" inverted readonly />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div><q-btn icon=\"more\" color=\"primary\" @click=\"ShowTemplateSelectNetwork=true\" flat /></div>\n\t\t\t\t\t\t\t<div><q-btn v-if=\"MasterTemplate.TemplateNamesNetwork.length > 0\" icon=\"clear\" color=\"primary\" @click=\"MasterTemplate.TemplateNamesNetwork=[]\" flat /></div>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t</div>\n\t</q-card-main>\n</q-card>\n");
 		_r$1 = hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$10.ptr(O(), false, false, false, false, false, false, false, false);
@@ -37865,7 +38054,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 			vm.Object.$store.dispatch($externalize("updateStoredMasterTemplateList", $String));
 		}));
 		$r = hvue.NewComponent("master-template", new sliceType$10([_arg, _arg$1, _arg$2, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9, _arg$10, _arg$11, _arg$12])); /* */ $s = 11; case 11: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_arg$13 = hvue.Template("\n<q-card>\n\n\t<select-string-from-array v-model=\"ShowLoad\" :values=\"$store.state.DBBackupList\" title=\"Select DB backup\" @load=\"load($event)\"></select-string-from-array>\n\t<modal-string-input v-model=\"ShowStore\" title=\"Store current Master Template\" @save=\"store($event)\"></modal-string-input>\n\n\t<q-card-title>\n\t\tDatabase\n\t</q-card-title>\n\n\t<q-card-main>\n\t\t<div class=\"row gutter-sm\">\n\t\t\t<div class=\"col\"> <q-btn class=\"fit\" color=\"primary\" label=\"backup\" icon=\"cloud_upload\" @click=\"ShowStore=true\" /> </div>\n\t\t\t<div class=\"col\"> <q-btn class=\"fit\" color=\"negative\" label=\"restore\" icon=\"cloud_download\" @click=\"updateList();ShowLoad=true\" /> </div>\n\t\t</div>\n\t</q-card-main>\n</q-card>\n");
+		_arg$13 = hvue.Template("\n<q-card>\n\n\t<select-string-from-array v-model=\"ShowLoad\" :values=\"$store.state.DBBackupList\" title=\"\xE9\x80\x89\xE6\x8B\xA9\xE6\x95\xB0\xE6\x8D\xAE\xE5\xBA\x93\xE5\xA4\x87\xE4\xBB\xBD\" @load=\"load($event)\"></select-string-from-array>\n\t<modal-string-input v-model=\"ShowStore\" title=\"\xE4\xBF\x9D\xE5\xAD\x98\xE5\xBD\x93\xE5\x89\x8D\xE4\xB8\xBB\xE6\xA8\xA1\xE6\x9D\xBF\" @save=\"store($event)\"></modal-string-input>\n\n\t<q-card-title>\n\t\t\xE6\x95\xB0\xE6\x8D\xAE\xE5\xBA\x93\n\t</q-card-title>\n\n\t<q-card-main>\n\t\t<div class=\"row gutter-sm\">\n\t\t\t<div class=\"col\"> <q-btn class=\"fit\" color=\"primary\" label=\"\xE5\xA4\x87\xE4\xBB\xBD\" icon=\"cloud_upload\" @click=\"ShowStore=true\" /> </div>\n\t\t\t<div class=\"col\"> <q-btn class=\"fit\" color=\"negative\" label=\"\xE8\xBF\x98\xE5\x8E\x9F\" icon=\"cloud_download\" @click=\"updateList();ShowLoad=true\" /> </div>\n\t\t</div>\n\t</q-card-main>\n</q-card>\n");
 		_r$8 = hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$11.ptr(O(), false, false);
@@ -37888,7 +38077,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 			vm.Object.$store.dispatch($externalize("updateStoredDBBackupList", $String));
 		})));
 		$r = hvue.NewComponent("database", new sliceType$10([_arg$13, _arg$14, _arg$15, _arg$16, _arg$17])); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("select-network-templates", new sliceType$10([hvue.Template("\n\t<q-modal v-model=\"visible\">\n\t\t<q-modal-layout>\n\t\t\t<q-toolbar slot=\"header\">\n\t\t\t\t<q-toolbar-title>\n\t\t\t\t\t{{ title }}\n    \t\t\t\t<span slot=\"subtitle\">\n      \t\t\t\t\tOnly one template could be selected per interface\n    \t\t\t\t</span>\n\t\t\t\t</q-toolbar-title>\n\t\t\t</q-toolbar>\n\n\t\t\t<q-list>\n\n\t\t\t\t<q-item link tag=\"label\" v-for=\"name in available\" :key=\"name\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-checkbox v-model=\"selection\" :val=\"name\"/>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>{{ name }}</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t\t<q-item-side v-if=\"withDelete\" right>\n\t\t\t\t\t\t<q-btn icon=\"delete\" color=\"negative\" @click=\"onDeletePressed(name)\" round flat />\n\t\t\t\t\t</q-item-side>\n\t\t\t\t</q-item>\n\n\n\t\t\t</q-list>\n\n\t\t\t<q-list slot=\"footer\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile>\n<!--\n\t\t\t\t\t\t\t<q-btn color=\"primary\" v-show=\"CurrentSelection != undefined\" label=\"ok\" @click=\"onLoadPressed(); visible=false\"/>\t\t\t\t\t\t\t\n-->\n\t\t\t\t\t\t\t<q-btn color=\"secondary\" v-close-overlay label=\"close\" />\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</q-list>\n\n\t\t</q-modal-layout>\n\t</q-modal>\n"), hvue.DataFunc((function(vm) {
+		$r = hvue.NewComponent("select-network-templates", new sliceType$10([hvue.Template("\n\t<q-modal v-model=\"visible\">\n\t\t<q-modal-layout>\n\t\t\t<q-toolbar slot=\"header\">\n\t\t\t\t<q-toolbar-title>\n\t\t\t\t\t{{ title }}\n    \t\t\t\t<span slot=\"subtitle\">\n      \t\t\t\t\t\xE6\xAF\x8F\xE4\xB8\xAA\xE6\x8E\xA5\xE5\x8F\xA3\xE5\x8F\xAA\xE8\x83\xBD\xE9\x80\x89\xE6\x8B\xA9\xE4\xB8\x80\xE4\xB8\xAA\xE6\xA8\xA1\xE6\x9D\xBF\n    \t\t\t\t</span>\n\t\t\t\t</q-toolbar-title>\n\t\t\t</q-toolbar>\n\n\t\t\t<q-list>\n\n\t\t\t\t<q-item link tag=\"label\" v-for=\"name in available\" :key=\"name\">\n\t\t\t\t\t<q-item-side>\n\t\t\t\t\t\t<q-checkbox v-model=\"selection\" :val=\"name\"/>\n\t\t\t\t\t</q-item-side>\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>{{ name }}</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t\t<q-item-side v-if=\"withDelete\" right>\n\t\t\t\t\t\t<q-btn icon=\"delete\" color=\"negative\" @click=\"onDeletePressed(name)\" round flat />\n\t\t\t\t\t</q-item-side>\n\t\t\t\t</q-item>\n\n\n\t\t\t</q-list>\n\n\t\t\t<q-list slot=\"footer\">\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile>\n<!--\n\t\t\t\t\t\t\t<q-btn color=\"primary\" v-show=\"CurrentSelection != undefined\" label=\"ok\" @click=\"onLoadPressed(); visible=false\"/>\t\t\t\t\t\t\t\n-->\n\t\t\t\t\t\t\t<q-btn color=\"secondary\" v-close-overlay label=\"close\" />\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</q-list>\n\n\t\t</q-modal-layout>\n\t</q-modal>\n"), hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$12.ptr(O(), sliceType$12.nil);
 			data.Object.CurrentSelection = $externalize(new sliceType$12([]), sliceType$12);
@@ -37981,7 +38170,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	InitComponentsNetwork = function() {
 		var _arg, _arg$1, _arg$10, _arg$11, _arg$12, _arg$13, _arg$14, _arg$15, _arg$16, _arg$17, _arg$18, _arg$19, _arg$2, _arg$20, _arg$21, _arg$22, _arg$23, _arg$24, _arg$25, _arg$26, _arg$27, _arg$28, _arg$29, _arg$3, _arg$30, _arg$31, _arg$32, _arg$4, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9, _r$1, _r$10, _r$11, _r$12, _r$13, _r$14, _r$15, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$10 = $f._arg$10; _arg$11 = $f._arg$11; _arg$12 = $f._arg$12; _arg$13 = $f._arg$13; _arg$14 = $f._arg$14; _arg$15 = $f._arg$15; _arg$16 = $f._arg$16; _arg$17 = $f._arg$17; _arg$18 = $f._arg$18; _arg$19 = $f._arg$19; _arg$2 = $f._arg$2; _arg$20 = $f._arg$20; _arg$21 = $f._arg$21; _arg$22 = $f._arg$22; _arg$23 = $f._arg$23; _arg$24 = $f._arg$24; _arg$25 = $f._arg$25; _arg$26 = $f._arg$26; _arg$27 = $f._arg$27; _arg$28 = $f._arg$28; _arg$29 = $f._arg$29; _arg$3 = $f._arg$3; _arg$30 = $f._arg$30; _arg$31 = $f._arg$31; _arg$32 = $f._arg$32; _arg$4 = $f._arg$4; _arg$5 = $f._arg$5; _arg$6 = $f._arg$6; _arg$7 = $f._arg$7; _arg$8 = $f._arg$8; _arg$9 = $f._arg$9; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$15 = $f._r$15; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		_arg = hvue.Template("\n<q-page padding>\n\t<select-string-from-array :values=\"$store.state.StoredEthernetInterfaceSettingsList\" v-model=\"showLoadModal\" title=\"Load ethernet interface settings\" @load=\"load($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<select-string-from-array :values=\"$store.state.StoredEthernetInterfaceSettingsList\" v-model=\"showDeployStoredModal\" title=\"Deploy stored ethernet interface settings\" @load=\"deployStored($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<modal-string-input v-model=\"showStoreModal\" title=\"Store current ethernet interface Settings\" @save=\"store($event)\"></modal-string-input>\n\n\t<div class=\"row gutter-sm\">\n\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n\t\t\t\t<q-card-title>\n\t\t\t\t\tNetwork Interface Settings\n\t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"primary\" @click=\"deploy(current)\" label=\"deploy\" icon=\"launch\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"primary\" @click=\"updateStoredSettingsList(); showDeployStoredModal=true\" label=\"deploy stored\" icon=\"settings_backup_restore\"></q-btn></div>\n<!--\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"secondary\" @click=\"UpdateFromDeployedGadgetSettings\" label=\"reset\" icon=\"autorenew\"></q-btn></div>\n-->\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"secondary\" @click=\"showStoreModal=true\" label=\"store\" icon=\"cloud_upload\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" @click=\"updateStoredSettingsList(); showLoadModal=true\" label=\"load stored\" icon=\"cloud_download\"></q-btn></div>\n\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\n\n\t\t\t</q-card>\n\t\t</div>\n\n\n\t\t<div class=\"col-12 col-xl-3\">\n\t\t<q-card class=\"full-height\">\n\t\t\t<q-card-title>\n\t\t    \tGeneric\n\t\t\t</q-card-title>\n\n\t\t\t<q-list link>\n\t\t\t\t<q-item-separator />\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>Interface</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>Select which interface to configure</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-select v-model=\"currentIdx\" :options=\"selectOptionsInterface\" color=\"secondary\" inverted></q-select>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</q-list>\n\n\t\t\t<network-interface-settings v-if=\"current\" :interface=\"current\"></network-interface-settings>\n\t\t</q-card>\n\t\t</div>\n\n\t\t<div class=\"col-12 col-xl-9\" v-if=\"currentWithDhcp\">\n\t\t\t<dhcp-config :interface=\"current\"></dhcp-config>\n\t\t</div>\n\t</div>\n</q-page>\n\n");
+		_arg = hvue.Template("\n<q-page padding>\n\t<select-string-from-array :values=\"$store.state.StoredEthernetInterfaceSettingsList\" v-model=\"showLoadModal\" title=\"\xE5\x8A\xA0\xE8\xBD\xBD\xE4\xBB\xA5\xE5\xA4\xAA\xE7\xBD\x91\xE6\x8E\xA5\xE5\x8F\xA3\xE8\xAE\xBE\xE7\xBD\xAE\" @load=\"load($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<select-string-from-array :values=\"$store.state.StoredEthernetInterfaceSettingsList\" v-model=\"showDeployStoredModal\" title=\"\xE5\xBA\x94\xE7\x94\xA8\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\xE7\x9A\x84\xE4\xBB\xA5\xE5\xA4\xAA\xE7\xBD\x91\xE6\x8E\xA5\xE5\x8F\xA3\xE8\xAE\xBE\xE7\xBD\xAE\" @load=\"deployStored($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<modal-string-input v-model=\"showStoreModal\" title=\"\xE4\xBF\x9D\xE5\xAD\x98\xE5\xBD\x93\xE5\x89\x8D\xE7\x9A\x84\xE4\xBB\xA5\xE5\xA4\xAA\xE7\xBD\x91\xE6\x8E\xA5\xE5\x8F\xA3\xE8\xAE\xBE\xE7\xBD\xAE\" @save=\"store($event)\"></modal-string-input>\n\n\t<div class=\"row gutter-sm\">\n\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n\t\t\t\t<q-card-title>\n\t\t\t\t\t\xE7\xBD\x91\xE7\xBB\x9C\xE6\x8E\xA5\xE5\x8F\xA3\xE8\xAE\xBE\xE7\xBD\xAE\n\t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"primary\" @click=\"deploy(current)\" label=\"\xE5\xBA\x94\xE7\x94\xA8\" icon=\"launch\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"primary\" @click=\"updateStoredSettingsList(); showDeployStoredModal=true\" label=\"\xE5\xBA\x94\xE7\x94\xA8\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"settings_backup_restore\"></q-btn></div>\n<!--\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"secondary\" @click=\"UpdateFromDeployedGadgetSettings\" label=\"\xE9\x87\x8D\xE7\xBD\xAE\" icon=\"autorenew\"></q-btn></div>\n-->\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"\"><q-btn class=\"fit\" color=\"secondary\" @click=\"showStoreModal=true\" label=\"\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"cloud_upload\"></q-btn></div>\n\t\t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" @click=\"updateStoredSettingsList(); showLoadModal=true\" label=\"\xE5\x8A\xA0\xE8\xBD\xBD\xE5\xB7\xB2\xE4\xBF\x9D\xE5\xAD\x98\" icon=\"cloud_download\"></q-btn></div>\n\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\n\n\t\t\t</q-card>\n\t\t</div>\n\n\n\t\t<div class=\"col-12 col-xl-3\">\n\t\t<q-card class=\"full-height\">\n\t\t\t<q-card-title>\n\t\t    \t\xE9\x80\x9A\xE7\x94\xA8\xE8\xAE\xBE\xE7\xBD\xAE\n\t\t\t</q-card-title>\n\n\t\t\t<q-list link>\n\t\t\t\t<q-item-separator />\n\t\t\t\t<q-item tag=\"label\">\n\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t<q-item-tile label>\xE6\x8E\xA5\xE5\x8F\xA3</q-item-tile>\n\t\t\t\t\t\t<q-item-tile sublabel>\xE9\x80\x89\xE6\x8B\xA9\xE4\xB8\x80\xE4\xB8\xAA\xE6\x8E\xA5\xE5\x8F\xA3\xE4\xBB\xA5\xE9\x85\x8D\xE7\xBD\xAE</q-item-tile>\n\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t<q-select v-model=\"currentIdx\" :options=\"selectOptionsInterface\" color=\"secondary\" inverted></q-select>\n\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t</q-item-main>\n\t\t\t\t</q-item>\n\t\t\t</q-list>\n\n\t\t\t<network-interface-settings v-if=\"current\" :interface=\"current\"></network-interface-settings>\n\t\t</q-card>\n\t\t</div>\n\n\t\t<div class=\"col-12 col-xl-9\" v-if=\"currentWithDhcp\">\n\t\t\t<dhcp-config :interface=\"current\"></dhcp-config>\n\t\t</div>\n\t</div>\n</q-page>\n\n");
 		_r$1 = hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$14.ptr(O(), 0, false, false, false);
@@ -38135,7 +38324,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		})));
 		$r = hvue.NewComponent("network-interface-settings", new sliceType$10([_arg$13, _arg$14, _arg$15, _arg$16, _arg$17, _arg$18])); /* */ $s = 14; case 14: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		_arg$19 = hvue.Props(new sliceType$12(["interface"]));
-		_arg$20 = hvue.Template("\n<q-card>\n\t<q-card-title>\n    \tDHCP Server settings for {{ interface.name }}\n\t</q-card-title>\n\n\n\t<q-list>\n\t\t<q-item-separator />\n\t\t<q-item tag=\"label\" link>\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"authoritative\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Authoritative</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>If disabled, the DHCP Server isn't authoritative</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\t\t<q-item tag=\"label\" disabled link>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>Path to lease file</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>{{ config.leaseFile }}</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-list-header>DHCP ranges</q-list-header>\n\t\t<dhcp-ranges :config=\"config\"></dhcp-ranges>\n\n\t\t<q-list-header>DHCP options</q-list-header>\n\t\t<dhcp-options :config=\"config\"></dhcp-options>\n\n\t\t<q-list-header>DHCP static hosts</q-list-header>\n\t\t<dhcp-static-hosts :config=\"config\"></dhcp-static-hosts>\n\t</q-list>\n</q-card>\n");
+		_arg$20 = hvue.Template("\n<q-card>\n\t<q-card-title>\n    \t\xE4\xB8\xBA {{ interface.name }} \xE8\xAE\xBE\xE7\xBD\xAEDHCP\xE6\x9C\x8D\xE5\x8A\xA1\xE5\x99\xA8\n\t</q-card-title>\n\n\n\t<q-list>\n\t\t<q-item-separator />\n\t\t<q-item tag=\"label\" link>\n\t\t\t<q-item-side>\n\t\t\t\t<q-toggle v-model=\"authoritative\"></q-toggle>\n\t\t\t</q-item-side>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>\xE5\x8F\xAF\xE4\xBF\xA1\xE7\x9A\x84</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE7\xA6\x81\xE7\x94\xA8\xEF\xBC\x8C\xE5\x88\x99DHCP\xE6\x9C\x8D\xE5\x8A\xA1\xE5\x99\xA8\xE4\xB8\x8D\xE5\x85\xB7\xE6\x9C\x89\xE6\x9D\x83\xE5\xA8\x81\xE6\x80\xA7</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\t\t<q-item tag=\"label\" disabled link>\n\t\t\t<q-item-main>\n\t\t\t\t<q-item-tile label>\xE5\x87\xAD\xE6\x8D\xAE\xE6\x96\x87\xE4\xBB\xB6\xE7\x9A\x84\xE8\xB7\xAF\xE5\xBE\x84</q-item-tile>\n\t\t\t\t<q-item-tile sublabel>{{ config.leaseFile }}</q-item-tile>\n\t\t\t</q-item-main>\n\t\t</q-item>\n\n\t\t<q-list-header>DHCP\xE8\x8C\x83\xE5\x9B\xB4</q-list-header>\n\t\t<dhcp-ranges :config=\"config\"></dhcp-ranges>\n\n\t\t<q-list-header>DHCP\xE9\x80\x89\xE9\xA1\xB9</q-list-header>\n\t\t<dhcp-options :config=\"config\"></dhcp-options>\n\n\t\t<q-list-header>DHCP\xE9\x9D\x99\xE6\x80\x81\xE4\xB8\xBB\xE6\x9C\xBA</q-list-header>\n\t\t<dhcp-static-hosts :config=\"config\"></dhcp-static-hosts>\n\t</q-list>\n</q-card>\n");
 		_r$13 = hvue.Computed("config", (function(vm) {
 			var iface, vm;
 			if (vm.Object.interface.dhcpServerSettings === undefined) {
@@ -38153,7 +38342,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 			vm.Object.config.nonAuthoritative = $externalize(!!!(newValue), $Bool);
 		}));
 		$r = hvue.NewComponent("dhcp-config", new sliceType$10([_arg$19, _arg$20, _arg$21, _arg$22])); /* */ $s = 16; case 16: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_arg$23 = hvue.Template("\n<q-item :link=\"false\">\n\t<q-item-main>\n\t\t<q-item-tile>\n\t\t\t<q-table\n\t\t\t\t:data=\"config.ranges\"\n\t\t\t\t:columns=\"[{name:'lower', field: 'rangeLower', label: 'Lower IP', align: 'left'}, {name:'upper', field: 'rangeUpper', label: 'Upper IP', align: 'left'}, {name:'lease', field: 'leaseTime', label: 'Lease Time', align: 'left'}, {name:'remove', label: 'Delete range', align: 'left'}]\"\n\t\t\t\trow-key=\"name\"\n\t\t\t\t:pagination.sync=\"pagination\"\n\t\t\t\tv-if=\"$q.platform.is.desktop\"\n\t\t\t>\n\t\t\t\t<q-tr slot=\"header\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t<q-th :key=\"props.cols[0].name\" :props=\"props\"> {{ props.cols[0].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[1].name\" :props=\"props\"> {{ props.cols[1].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[2].name\" :props=\"props\"> {{ props.cols[2].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[3].name\" :props=\"props\">\n\t\t\t\t\t<q-btn @click=\"addRange()\">add</q-btn>\n\t\t\t\t\t</q-th>\n\t\t\t\t</q-tr>\n\t\t\t\t\n\t\t\t\t<q-tr slot=\"body\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t<q-td key=\"lower\" :props=\"props\">\n\t\t\t\t\t\t<q-input v-model=\"props.row.rangeLower\" inverted></q-input>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"upper\" :props=\"props\">\n\t\t\t\t\t\t<q-input v-model=\"props.row.rangeUpper\" inverted></q-input>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"lease\" :props=\"props\">\n\t\t\t\t\t\t<q-input v-model=\"props.row.leaseTime\" inverted></q-input>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"remove\" :props=\"props\">\n\t\t\t\t\t\t<q-btn @click=\"removeRange(props.row)\">del</q-btn>\n\t\t\t\t\t</q-td>\t\n\t\t\t\t</q-tr>\n\t\t\t</q-table>\n\n<!--\n\t\t\t<q-table\n\t\t\t\t:data=\"config.ranges\"\n\t\t\t\t:columns=\"[{name:'lower', field: 'rangeLower', label: 'Lower IP', align: 'left'}, {name:'upper', field: 'rangeUpper', label: 'Upper IP', align: 'left'}, {name:'lease', field: 'leaseTime', label: 'Lease Time', align: 'left'}, {name:'remove', label: 'Delete range', align: 'left'}]\"\n\t\t\t\trow-key=\"name\"\n\t\t\t\t:pagination.sync=\"pagination\"\n\t\t\t\t\n\t\t\t>\n\n\t\t\t\t<q-tr slot=\"header\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t<q-th :key=\"props.cols[0].name\" :props=\"props\"> {{ props.cols[0].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[1].name\" :props=\"props\"> {{ props.cols[1].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[2].name\" :props=\"props\"> {{ props.cols[2].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[3].name\" :props=\"props\">\n\t\t\t\t\t<q-btn @click=\"addRange()\">add</q-btn>\n\t\t\t\t\t</q-th>\n\t\t\t\t</q-tr>\n\t\t\t\t\n\t\t\t\t<q-tr slot=\"body\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t<q-td key=\"lower\" :props=\"props\">\n\t\t\t\t\t\t{{ props.row.rangeLower }}\n\t\t\t\t\t\t<q-popup-edit v-model=\"props.row.rangeLower\" title=\"Set lower IP\" persistent buttons>\n\t\t\t\t\t\t\t<q-input v-model=\"props.row.rangeLower\" inverted></q-input>\n\t\t\t\t\t\t</q-popup-edit>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"upper\" :props=\"props\">\n\t\t\t\t\t\t{{ props.row.rangeUpper }}\n\t\t\t\t\t\t<q-popup-edit v-model=\"props.row.rangeUpper\" title=\"Set upper IP\">\n\t\t\t\t\t\t\t<q-input v-model=\"props.row.rangeUpper\" inverted></q-input>\n\t\t\t\t\t\t</q-popup-edit>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"lease\" :props=\"props\">\n\t\t\t\t\t\t{{ props.row.leaseTime }}\n\t\t\t\t\t\t<q-popup-edit v-model=\"props.row.leaseTime\" title=\"Set lease time\">\n\t\t\t\t\t\t\t<q-input v-model=\"props.row.leaseTime\" inverted></q-input>\n\t\t\t\t\t\t</q-popup-edit>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"remove\" :props=\"props\">\n\t\t\t\t\t\t<q-btn @click=\"removeRange(props.row)\">del</q-btn>\n\t\t\t\t\t</q-td>\t\n\t\t\t\t</q-tr>\n\t\t\t</q-table>\n-->\n\n\t\t\t<q-card v-else>\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<q-table\n\t\t\t\t\t\t:data=\"config.ranges\"\n\t\t\t\t\t\t:columns=\"[{name:'lower', field: 'rangeLower', label: 'Lower IP', align: 'left'}, {name:'upper', field: 'rangeUpper', label: 'Upper IP', align: 'left'}, {name:'lease', field: 'leaseTime', label: 'Lease Time', align: 'left'}, {name:'remove', label: 'Delete range', align: 'left'}]\"\n\t\t\t\t\t\trow-key=\"name\"\n\t\t\t\t\t\thide-header\n\t\t\t\t\t\t:pagination.sync=\"pagination\"\n\t\t\t\t\t\tgrid\n\t\t\t\t\t>\n\t\t\t\t\t\t<template slot=\"top-right\" slot-scope=\"props\" class=\"q-mr-sm\">\n\t\t\t\t\t\t\t<q-btn @click=\"addRange()\" color=\"primary\">add range</q-btn>\n\t\t\t\t\t\t</template>\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tslot=\"item\"\n\t\t\t\t\t\t\tslot-scope=\"props\"\n\t\t\t\t\t\t\tclass=\"col-lg-6\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<q-card-separator />\n\t\t\t\t\t\t\t<q-list link no-border>\n\t\t\t\t\t\t\t\t<q-item tag=\"label\" :key=\"remove\">\n\t\t\t\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t\t\t\t<q-btn @click=\"removeRange(props.row)\" color=\"secondary\">delete range {{ props.row.__index + 1 }}</q-btn>\n\t\t\t\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t\t\t\t</q-item>\n\t\t\t\t\t\t\t\t<q-item tag=\"label\" :key=\"props.colsMap.lower.name\">\n\t\t\t\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile label>\n\t\t\t\t\t\t\t\t\t\t\t{{ props.colsMap.lower.label }}\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t\t\t\t<q-input v-model=\"props.row.rangeLower\" inverted></q-input>\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t\t\t\t</q-item>\n\t\t\t\t\t\t\t\t<q-item tag=\"label\" :key=\"props.colsMap.upper.name\">\n\t\t\t\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile label>\n\t\t\t\t\t\t\t\t\t\t\t{{ props.colsMap.upper.label }}\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t\t\t\t<q-input v-model=\"props.row.rangeUpper\" inverted></q-input>\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t\t\t\t</q-item>\n\t\t\t\t\t\t\t\t<q-item tag=\"label\" :key=\"props.colsMap.lease.name\">\n\t\t\t\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile label>\n\t\t\t\t\t\t\t\t\t\t\t{{ props.colsMap.lease.label }}\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t\t\t\t<q-input v-model=\"props.row.leaseTime\" inverted></q-input>\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t\t\t\t</q-item>\n\t\t\t\t\t\t\t</q-list>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-table>\n\t\t\t\t</q-card-main>\n\t\t\t</q-card>\n\n\t\t</q-item-tile>\n\t</q-item-main>\n</q-item>\n");
+		_arg$23 = hvue.Template("\n<q-item :link=\"false\">\n\t<q-item-main>\n\t\t<q-item-tile>\n\t\t\t<q-table\n\t\t\t\t:data=\"config.ranges\"\n\t\t\t\t:columns=\"[{name:'lower', field: 'rangeLower', label: '\xE8\xB5\xB7\xE5\xA7\x8BIP', align: 'left'}, {name:'upper', field: 'rangeUpper', label: '\xE7\xBB\x93\xE6\x9D\x9FIP', align: 'left'}, {name:'lease', field: 'leaseTime', label: '\xE7\xA7\x9F\xE6\x9C\x9F', align: 'left'}, {name:'remove', label: '\xE5\x88\xA0\xE9\x99\xA4\xE8\x8C\x83\xE5\x9B\xB4', align: 'left'}]\"\n\t\t\t\trow-key=\"name\"\n\t\t\t\t:pagination.sync=\"pagination\"\n\t\t\t\tv-if=\"$q.platform.is.desktop\"\n\t\t\t>\n\t\t\t\t<q-tr slot=\"header\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t<q-th :key=\"props.cols[0].name\" :props=\"props\"> {{ props.cols[0].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[1].name\" :props=\"props\"> {{ props.cols[1].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[2].name\" :props=\"props\"> {{ props.cols[2].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[3].name\" :props=\"props\">\n\t\t\t\t\t<q-btn @click=\"addRange()\">\xE6\xB7\xBB\xE5\x8A\xA0</q-btn>\n\t\t\t\t\t</q-th>\n\t\t\t\t</q-tr>\n\t\t\t\t\n\t\t\t\t<q-tr slot=\"body\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t<q-td key=\"lower\" :props=\"props\">\n\t\t\t\t\t\t<q-input v-model=\"props.row.rangeLower\" inverted></q-input>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"upper\" :props=\"props\">\n\t\t\t\t\t\t<q-input v-model=\"props.row.rangeUpper\" inverted></q-input>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"lease\" :props=\"props\">\n\t\t\t\t\t\t<q-input v-model=\"props.row.leaseTime\" inverted></q-input>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"remove\" :props=\"props\">\n\t\t\t\t\t\t<q-btn @click=\"removeRange(props.row)\">del</q-btn>\n\t\t\t\t\t</q-td>\t\n\t\t\t\t</q-tr>\n\t\t\t</q-table>\n\n<!--\n\t\t\t<q-table\n\t\t\t\t:data=\"config.ranges\"\n\t\t\t\t:columns=\"[{name:'lower', field: 'rangeLower', label: 'Lower IP', align: 'left'}, {name:'upper', field: 'rangeUpper', label: 'Upper IP', align: 'left'}, {name:'lease', field: 'leaseTime', label: 'Lease Time', align: 'left'}, {name:'remove', label: 'Delete range', align: 'left'}]\"\n\t\t\t\trow-key=\"name\"\n\t\t\t\t:pagination.sync=\"pagination\"\n\t\t\t\t\n\t\t\t>\n\n\t\t\t\t<q-tr slot=\"header\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t<q-th :key=\"props.cols[0].name\" :props=\"props\"> {{ props.cols[0].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[1].name\" :props=\"props\"> {{ props.cols[1].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[2].name\" :props=\"props\"> {{ props.cols[2].label }} </q-th>\n\t\t\t\t\t<q-th :key=\"props.cols[3].name\" :props=\"props\">\n\t\t\t\t\t<q-btn @click=\"addRange()\">add</q-btn>\n\t\t\t\t\t</q-th>\n\t\t\t\t</q-tr>\n\t\t\t\t\n\t\t\t\t<q-tr slot=\"body\" slot-scope=\"props\" :props=\"props\">\n\t\t\t\t\t<q-td key=\"lower\" :props=\"props\">\n\t\t\t\t\t\t{{ props.row.rangeLower }}\n\t\t\t\t\t\t<q-popup-edit v-model=\"props.row.rangeLower\" title=\"Set lower IP\" persistent buttons>\n\t\t\t\t\t\t\t<q-input v-model=\"props.row.rangeLower\" inverted></q-input>\n\t\t\t\t\t\t</q-popup-edit>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"upper\" :props=\"props\">\n\t\t\t\t\t\t{{ props.row.rangeUpper }}\n\t\t\t\t\t\t<q-popup-edit v-model=\"props.row.rangeUpper\" title=\"Set upper IP\">\n\t\t\t\t\t\t\t<q-input v-model=\"props.row.rangeUpper\" inverted></q-input>\n\t\t\t\t\t\t</q-popup-edit>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"lease\" :props=\"props\">\n\t\t\t\t\t\t{{ props.row.leaseTime }}\n\t\t\t\t\t\t<q-popup-edit v-model=\"props.row.leaseTime\" title=\"Set lease time\">\n\t\t\t\t\t\t\t<q-input v-model=\"props.row.leaseTime\" inverted></q-input>\n\t\t\t\t\t\t</q-popup-edit>\n\t\t\t\t\t</q-td>\n\t\t\t\t\t<q-td key=\"remove\" :props=\"props\">\n\t\t\t\t\t\t<q-btn @click=\"removeRange(props.row)\">del</q-btn>\n\t\t\t\t\t</q-td>\t\n\t\t\t\t</q-tr>\n\t\t\t</q-table>\n-->\n\n\t\t\t<q-card v-else>\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<q-table\n\t\t\t\t\t\t:data=\"config.ranges\"\n\t\t\t\t\t\t:columns=\"[{name:'lower', field: 'rangeLower', label: '\xE8\xB5\xB7\xE5\xA7\x8BIP', align: 'left'}, {name:'upper', field: 'rangeUpper', label: '\xE7\xBB\x93\xE6\x9D\x9FIP', align: 'left'}, {name:'lease', field: 'leaseTime', label: '\xE7\xA7\x9F\xE6\x9C\x9F', align: 'left'}, {name:'remove', label: '\xE5\x88\xA0\xE9\x99\xA4\xE8\x8C\x83\xE5\x9B\xB4', align: 'left'}]\"\n\t\t\t\t\t\trow-key=\"name\"\n\t\t\t\t\t\thide-header\n\t\t\t\t\t\t:pagination.sync=\"pagination\"\n\t\t\t\t\t\tgrid\n\t\t\t\t\t>\n\t\t\t\t\t\t<template slot=\"top-right\" slot-scope=\"props\" class=\"q-mr-sm\">\n\t\t\t\t\t\t\t<q-btn @click=\"addRange()\" color=\"primary\">\xE6\xB7\xBB\xE5\x8A\xA0\xE8\x8C\x83\xE5\x9B\xB4</q-btn>\n\t\t\t\t\t\t</template>\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tslot=\"item\"\n\t\t\t\t\t\t\tslot-scope=\"props\"\n\t\t\t\t\t\t\tclass=\"col-lg-6\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<q-card-separator />\n\t\t\t\t\t\t\t<q-list link no-border>\n\t\t\t\t\t\t\t\t<q-item tag=\"label\" :key=\"remove\">\n\t\t\t\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t\t\t\t<q-btn @click=\"removeRange(props.row)\" color=\"secondary\">\xE5\x88\xA0\xE9\x99\xA4\xE8\x8C\x83\xE5\x9B\xB4 {{ props.row.__index + 1 }}</q-btn>\n\t\t\t\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t\t\t\t</q-item>\n\t\t\t\t\t\t\t\t<q-item tag=\"label\" :key=\"props.colsMap.lower.name\">\n\t\t\t\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile label>\n\t\t\t\t\t\t\t\t\t\t\t{{ props.colsMap.lower.label }}\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t\t\t\t<q-input v-model=\"props.row.rangeLower\" inverted></q-input>\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t\t\t\t</q-item>\n\t\t\t\t\t\t\t\t<q-item tag=\"label\" :key=\"props.colsMap.upper.name\">\n\t\t\t\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile label>\n\t\t\t\t\t\t\t\t\t\t\t{{ props.colsMap.upper.label }}\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t\t\t\t<q-input v-model=\"props.row.rangeUpper\" inverted></q-input>\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t\t\t\t</q-item>\n\t\t\t\t\t\t\t\t<q-item tag=\"label\" :key=\"props.colsMap.lease.name\">\n\t\t\t\t\t\t\t\t\t<q-item-main>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile label>\n\t\t\t\t\t\t\t\t\t\t\t{{ props.colsMap.lease.label }}\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t\t\t\t\t\t<q-input v-model=\"props.row.leaseTime\" inverted></q-input>\n\t\t\t\t\t\t\t\t\t\t</q-item-tile>\n\t\t\t\t\t\t\t\t\t</q-item-main>\n\t\t\t\t\t\t\t\t</q-item>\n\t\t\t\t\t\t\t</q-list>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</q-table>\n\t\t\t\t</q-card-main>\n\t\t\t</q-card>\n\n\t\t</q-item-tile>\n\t</q-item-main>\n</q-item>\n");
 		_arg$24 = hvue.Props(new sliceType$12(["config"]));
 		_r$14 = hvue.Method("addRange", new funcType$2((function(vm) {
 			var r, s, vm;
@@ -38359,7 +38548,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	InitComponentsTriggerActions = function() {
 		var _arg, _arg$1, _arg$10, _arg$11, _arg$12, _arg$13, _arg$14, _arg$15, _arg$16, _arg$17, _arg$18, _arg$19, _arg$2, _arg$20, _arg$21, _arg$22, _arg$23, _arg$24, _arg$25, _arg$26, _arg$27, _arg$28, _arg$29, _arg$3, _arg$30, _arg$31, _arg$32, _arg$33, _arg$34, _arg$35, _arg$36, _arg$37, _arg$38, _arg$39, _arg$4, _arg$40, _arg$41, _arg$42, _arg$43, _arg$44, _arg$5, _arg$6, _arg$7, _arg$8, _arg$9, _r$1, _r$10, _r$11, _r$12, _r$13, _r$14, _r$15, _r$16, _r$17, _r$18, _r$19, _r$2, _r$20, _r$21, _r$22, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, $s, $r;
 		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _arg$1 = $f._arg$1; _arg$10 = $f._arg$10; _arg$11 = $f._arg$11; _arg$12 = $f._arg$12; _arg$13 = $f._arg$13; _arg$14 = $f._arg$14; _arg$15 = $f._arg$15; _arg$16 = $f._arg$16; _arg$17 = $f._arg$17; _arg$18 = $f._arg$18; _arg$19 = $f._arg$19; _arg$2 = $f._arg$2; _arg$20 = $f._arg$20; _arg$21 = $f._arg$21; _arg$22 = $f._arg$22; _arg$23 = $f._arg$23; _arg$24 = $f._arg$24; _arg$25 = $f._arg$25; _arg$26 = $f._arg$26; _arg$27 = $f._arg$27; _arg$28 = $f._arg$28; _arg$29 = $f._arg$29; _arg$3 = $f._arg$3; _arg$30 = $f._arg$30; _arg$31 = $f._arg$31; _arg$32 = $f._arg$32; _arg$33 = $f._arg$33; _arg$34 = $f._arg$34; _arg$35 = $f._arg$35; _arg$36 = $f._arg$36; _arg$37 = $f._arg$37; _arg$38 = $f._arg$38; _arg$39 = $f._arg$39; _arg$4 = $f._arg$4; _arg$40 = $f._arg$40; _arg$41 = $f._arg$41; _arg$42 = $f._arg$42; _arg$43 = $f._arg$43; _arg$44 = $f._arg$44; _arg$5 = $f._arg$5; _arg$6 = $f._arg$6; _arg$7 = $f._arg$7; _arg$8 = $f._arg$8; _arg$9 = $f._arg$9; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$15 = $f._r$15; _r$16 = $f._r$16; _r$17 = $f._r$17; _r$18 = $f._r$18; _r$19 = $f._r$19; _r$2 = $f._r$2; _r$20 = $f._r$20; _r$21 = $f._r$21; _r$22 = $f._r$22; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		_arg = hvue.Template("\n<q-page padding>\n\t<modal-string-input v-model=\"showStoreTASModal\" title=\"Store selected TriggerActions\" @save=\"storeTAS($event)\"></modal-string-input>\n\t<select-string-from-array :values=\"$store.state.StoredTriggerActionSetsList\" v-model=\"showReplaceTASModal\" title=\"Replace current Trigger Actions with stored set\" @load=\"replaceCurrentTAS($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<select-string-from-array :values=\"$store.state.StoredTriggerActionSetsList\" v-model=\"showAddTASModal\" title=\"Add stored set to current Trigger Actions\" @load=\"addToCurrentTAS($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\n\t<div class=\"row gutter-sm\">\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n\t\t\t\t<q-card-title>\n\t\t\t\t\tTriggerAction Manager\n\t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\t    \t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"primary\" label=\"add one\" @click=\"addTA\" icon=\"add_box\" /></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"secondary\" label=\"store\" @click=\"showStoreTASModal=true\" icon=\"cloud_upload\" /></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" label=\"load & replace\" @click=\"updateStoredTriggerActionSetsList(); showReplaceTASModal=true\" icon=\"cloud_download\" /></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" label=\"load & add\" @click=\"updateStoredTriggerActionSetsList(); showAddTASModal=true\" icon=\"add_to_photos\" /></div>\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\n\n\t\t\t</q-card>\n\t\t</div>\n\n\t\t<div class=\"col-12 col-lg-6\" v-for=\"ta in $store.getters.triggerActions\"> \n\t\t\t<TriggerAction :ref=\"ta.Id\" :key=\"ta.Id\" :ta=\"ta\" :edit=\"false\"></TriggerAction>\n\t\t</div>\n\t</div>\n</q-page>\t\n\n");
+		_arg = hvue.Template("\n<q-page padding>\n\t<modal-string-input v-model=\"showStoreTASModal\" title=\"Store selected TriggerActions\" @save=\"storeTAS($event)\"></modal-string-input>\n\t<select-string-from-array :values=\"$store.state.StoredTriggerActionSetsList\" v-model=\"showReplaceTASModal\" title=\"Replace current Trigger Actions with stored set\" @load=\"replaceCurrentTAS($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\t<select-string-from-array :values=\"$store.state.StoredTriggerActionSetsList\" v-model=\"showAddTASModal\" title=\"Add stored set to current Trigger Actions\" @load=\"addToCurrentTAS($event)\" @delete=\"deleteStored($event)\" with-delete></select-string-from-array>\n\n\t<div class=\"row gutter-sm\">\n\t\t<div class=\"col-12\">\n\t\t\t<q-card>\n\t\t\t\t<q-card-title>\n\t\t\t\t\t\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE5\x8A\xA8\xE4\xBD\x9C\xE7\xAE\xA1\xE7\x90\x86\xE5\x99\xA8\n\t\t\t\t</q-card-title>\n\n\t\t\t\t<q-card-main>\n\t\t\t\t\t<div class=\"row gutter-sm\">\n\t    \t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"primary\" label=\"\xE6\xB7\xBB\xE5\x8A\xA0\xE4\xB8\x80\xE4\xB8\xAA\" @click=\"addTA\" icon=\"add_box\" /></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"secondary\" label=\"\xE4\xBF\x9D\xE5\xAD\x98\" @click=\"showStoreTASModal=true\" icon=\"cloud_upload\" /></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" label=\"\xE5\x8A\xA0\xE8\xBD\xBD\xE5\xB9\xB6\xE6\x9B\xBF\xE6\x8D\xA2\" @click=\"updateStoredTriggerActionSetsList(); showReplaceTASModal=true\" icon=\"cloud_download\" /></div>\n    \t\t\t\t\t<div class=\"col-6 col-sm\"><q-btn class=\"fit\" color=\"warning\" label=\"\xE5\x8A\xA0\xE8\xBD\xBD\xE5\xB9\xB6\xE6\xB7\xBB\xE5\x8A\xA0\" @click=\"updateStoredTriggerActionSetsList(); showAddTASModal=true\" icon=\"add_to_photos\" /></div>\n\t\t\t\t\t</div>\n  \t\t\t\t</q-card-main>\n\n\n\t\t\t</q-card>\n\t\t</div>\n\n\t\t<div class=\"col-12 col-lg-6\" v-for=\"ta in $store.getters.triggerActions\"> \n\t\t\t<TriggerAction :ref=\"ta.Id\" :key=\"ta.Id\" :ta=\"ta\" :edit=\"false\"></TriggerAction>\n\t\t</div>\n\t</div>\n</q-page>\t\n\n");
 		_r$1 = hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$16.ptr(O(), false, false, false, "");
@@ -38453,7 +38642,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 			vm.Set("Edit", new $jsObjectPtr(vm.Object.edit));
 		}));
 		$r = hvue.NewComponent("TriggerAction", new sliceType$10([_arg$10, _arg$11, _arg$12, _arg$13, _arg$14, _arg$15])); /* */ $s = 10; case 10: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_arg$16 = hvue.Template("\n<div>\n<q-modal v-model=\"EditMode\" no-route-dismiss no-esc-dismiss no-backdrop-dismiss>\n\t<TriggerActionEdit :ta=\"ta\">\n\t\t<span slot=\"actions\">\n\t\t\t<q-btn color=\"primary\" @click=\"updateTA(); EditMode=false\" label=\"update\" />\n\t\t\t<q-btn color=\"secondary\" @click=\"cancelUpdateTA(); EditMode=false\" label=\"cancel\" />\n\t\t</span>\n\t</TriggerActionEdit>\n\t\n</q-modal>\n\n<q-card tag=\"label\" :color=\"computedColor\" :text-color=\"ta.IsActive ? '': 'light'\" :disabled=\"ta.Immutable\" :dark=\"ta.Immutable\">\n\t<q-card-title>\n\t\t{{ ta.Immutable ? \"immutable, \" : \"\" }}\n\t\t{{ ta.IsActive ? \"enabled\" : \"disabled\" }}\n\t\tTriggerAction (ID {{ ta.Id }})\n\t\n\t\t<span slot=\"subtitle\">\n\t\t\t<q-icon name=\"input\"></q-icon> \n\t\t\t{{ strTrigger }}\n\t\t\t<br><q-icon name=\"launch\"></q-icon>\n\t\t\t{{ strAction }}{{ta.OneShot ? \" only once\" : \"\" }}\t\n\t\t</span>\n\n\t\t<div slot=\"right\" v-if=\"!ta.Immutable\">\n\t\t\t<q-btn color=\"primary\" icon=\"edit\" @click=\"EditMode=true\" flat></q-btn>\n\t\t\t<q-btn color=\"negative\" icon=\"delete\" @click=\"deleteTA\" flat></q-btn>\n\t\t</div>\n\t</q-card-title>\n</q-card>\n</div>\n");
+		_arg$16 = hvue.Template("\n<div>\n<q-modal v-model=\"EditMode\" no-route-dismiss no-esc-dismiss no-backdrop-dismiss>\n\t<TriggerActionEdit :ta=\"ta\">\n\t\t<span slot=\"actions\">\n\t\t\t<q-btn color=\"primary\" @click=\"updateTA(); EditMode=false\" label=\"\xE6\x9B\xB4\xE6\x96\xB0\" />\n\t\t\t<q-btn color=\"secondary\" @click=\"cancelUpdateTA(); EditMode=false\" label=\"\xE5\x8F\x96\xE6\xB6\x88\" />\n\t\t</span>\n\t</TriggerActionEdit>\n\t\n</q-modal>\n\n<q-card tag=\"label\" :color=\"computedColor\" :text-color=\"ta.IsActive ? '': 'light'\" :disabled=\"ta.Immutable\" :dark=\"ta.Immutable\">\n\t<q-card-title>\n\t\t{{ ta.Immutable ? \"immutable, \" : \"\" }}\n\t\t{{ ta.IsActive ? \"enabled\" : \"disabled\" }}\n\t\t\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE5\x8A\xA8\xE4\xBD\x9C (ID {{ ta.Id }})\n\t\n\t\t<span slot=\"subtitle\">\n\t\t\t<q-icon name=\"input\"></q-icon> \n\t\t\t{{ strTrigger }}\n\t\t\t<br><q-icon name=\"launch\"></q-icon>\n\t\t\t{{ strAction }}{{ta.OneShot ? \" \xE4\xBB\x85\xE8\xBF\x90\xE8\xA1\x8C\xE4\xB8\x80\xE6\xAC\xA1\" : \"\" }}\t\n\t\t</span>\n\n\t\t<div slot=\"right\" v-if=\"!ta.Immutable\">\n\t\t\t<q-btn color=\"primary\" icon=\"edit\" @click=\"EditMode=true\" flat></q-btn>\n\t\t\t<q-btn color=\"negative\" icon=\"delete\" @click=\"deleteTA\" flat></q-btn>\n\t\t</div>\n\t</q-card-title>\n</q-card>\n</div>\n");
 		_arg$17 = hvue.PropObj("ta", new sliceType$9([]));
 		_arg$18 = hvue.PropObj("edit", new sliceType$9([hvue.Types(new sliceType$8([2]))]));
 		_arg$19 = (function(vm) {
@@ -38586,9 +38775,9 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 			vm.Object.$store.dispatch($externalize("removeTriggerActions", $String), $externalize(delTas, ptrType$32));
 		})));
 		$r = hvue.NewComponent("TriggerActionOverview", new sliceType$10([_arg$16, _arg$17, _arg$18, _arg$21, _arg$22, _arg$23, _arg$24, _arg$25, _arg$26, _arg$27])); /* */ $s = 16; case 16: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("TriggerActionEdit", new sliceType$10([hvue.Template("\n<q-card class=\"fit\">\n\t<q-card-title>\n\t\tTriggerAction\n\t\t<span slot=\"subtitle\">ID {{ ta.Id }}</span>\n\t\t<!-- <q-btn slot=\"right\" icon=\"more_vert\" flat></q-btn> -->\n\t</q-card-title>\n\t<q-list>\n\t\t\t<q-item tag=\"label\" link>\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle v-model=\"ta.IsActive\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Enabled</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>If not enabled, the triggered action is ignored</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" link :disabled=\"!ta.IsActive\">\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle v-model=\"ta.OneShot\" :disable=\"!ta.IsActive\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>One shot</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>The trigger fires every time the respective event occurs. If \"one shot\" is enabled it fires only once.</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t</q-list>\n\n\t<div class=\"row items-stretch\">\n\t\t<div class=\"col-12 col-md-6\"\">\n\t\t\t<trigger :ta=\"ta\"></trigger>\n\t\t</div>\n\t\n\t\t<div class=\"col-12 col-md-6\">\n\t\t\t<action :ta=\"ta\"></action>\n\t\t</div>\n\t</div>\n\n\t<q-card-actions>\n\t\t<slot name=\"actions\"></slot>\n\t</q-card-actions>\n</q-card>\n"), hvue.PropObj("ta", new sliceType$9([]))])); /* */ $s = 17; case 17: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = hvue.NewComponent("TriggerActionEdit", new sliceType$10([hvue.Template("\n<q-card class=\"fit\">\n\t<q-card-title>\n\t\t\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE5\x8A\xA8\xE4\xBD\x9C\n\t\t<span slot=\"subtitle\">ID {{ ta.Id }}</span>\n\t\t<!-- <q-btn slot=\"right\" icon=\"more_vert\" flat></q-btn> -->\n\t</q-card-title>\n\t<q-list>\n\t\t\t<q-item tag=\"label\" link>\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle v-model=\"ta.IsActive\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE5\xB7\xB2\xE5\x90\xAF\xE7\x94\xA8</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE6\x9C\xAA\xE5\x90\xAF\xE7\x94\xA8, \xE5\x88\x99\xE5\xBF\xBD\xE7\x95\xA5\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE5\x8A\xA8\xE4\xBD\x9C</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" link :disabled=\"!ta.IsActive\">\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle v-model=\"ta.OneShot\" :disable=\"!ta.IsActive\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE4\xBB\x85\xE6\x89\xA7\xE8\xA1\x8C\xE4\xB8\x80\xE6\xAC\xA1</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE6\xAF\x8F\xE6\xAC\xA1\xE5\x8F\x91\xE7\x94\x9F\xE7\x9B\xB8\xE5\xBA\x94\xE4\xBA\x8B\xE4\xBB\xB6\xE6\x97\xB6\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE9\x83\xBD\xE4\xBC\x9A\xE8\xA7\xA6\xE5\x8F\x91\xEF\xBC\x8C \xE5\xA6\x82\xE6\x9E\x9C\xE5\x90\xAF\xE7\x94\xA8\"\xE4\xB8\x80\xE6\xAC\xA1\xE6\x80\xA7\"\xEF\xBC\x8C\xE5\x88\x99\xE4\xBB\x85\xE8\xA7\xA6\xE5\x8F\x91\xE4\xB8\x80\xE6\xAC\xA1</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t</q-list>\n\n\t<div class=\"row items-stretch\">\n\t\t<div class=\"col-12 col-md-6\"\">\n\t\t\t<trigger :ta=\"ta\"></trigger>\n\t\t</div>\n\t\n\t\t<div class=\"col-12 col-md-6\">\n\t\t\t<action :ta=\"ta\"></action>\n\t\t</div>\n\t</div>\n\n\t<q-card-actions>\n\t\t<slot name=\"actions\"></slot>\n\t</q-card-actions>\n</q-card>\n"), hvue.PropObj("ta", new sliceType$9([]))])); /* */ $s = 17; case 17: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		_arg$28 = hvue.Props(new sliceType$12(["ta"]));
-		_arg$29 = hvue.Template("\n\t\t<q-list class=\"fit\" no-border link :disabled=\"!ta.IsActive\">\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Trigger</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Chose the event which has to occur to start the selected action</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"triggerType\" :options=\"triggertypes\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGroupReceive || isTriggerGroupReceiveMulti\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Group name</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Only values send for this group name are regarded</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"ta.TriggerData.GroupName\" inverted :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGroupReceive\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Value</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>The numeric value which has to be received to activate the trigger</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"ta.TriggerData.Value\" type=\"number\" inverted :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGroupReceiveMulti\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Values</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>The numeric values which has to be received to activate the trigger</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-chips-input v-model=\"TriggerGroupReceiveMultiValues\" @duplicate=\"TriggerGroupReceiveMultiAddValue($event)\" type=\"number\" decimals=\"0\" inverted :disable=\"!ta.IsActive\"></q-chips-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n<!--\n\t\t\t<q-item tag=\"label\" link :disabled=\"!ta.IsActive\" v-if=\"isTriggerGroupReceiveMulti\">\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle v-model=\"ta.TriggerData.IgnoreOutOfOrder\" :disable=\"!ta.IsActive\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Ignore out-of-order values</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>If enabled the sequence may be interrupted by other values. If disabled they have to arrive in exact order.</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n-->\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGroupReceiveMulti\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Type</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Chose how values should be checked (logical OR, logical AND, sequence or exact sequence</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.TriggerData.Type\" :options=\"groupReceiveMultiSelect\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGPIOIn\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>GPIO Number</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>The number of the GPIO to monitor</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.TriggerData.GpioName\" :options=\"gpioname\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGPIOIn\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Pull resistor</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Chose if internal Pull-up/down resistor should be used</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.TriggerData.PullUpDown\" :options=\"pullupdown\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGPIOIn\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Edge</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>What edge (level change) has to occur to fire the trigger</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.TriggerData.Edge\" :options=\"edge\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGPIOIn\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Debounce duration</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Successive edge events in this duration are ignored</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"ta.TriggerData.DebounceMillis\" type=\"number\" suffix=\"ms\" inverted :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t</q-list>\n");
+		_arg$29 = hvue.Template("\n\t\t<q-list class=\"fit\" no-border link :disabled=\"!ta.IsActive\">\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE9\x80\x89\xE6\x8B\xA9\xE5\xBF\x85\xE9\xA1\xBB\xE5\x8F\x91\xE7\x94\x9F\xE7\x9A\x84\xE4\xBA\x8B\xE4\xBB\xB6\xE4\xBB\xA5\xE5\x90\xAF\xE5\x8A\xA8\xE6\x89\x80\xE9\x80\x89\xE6\x93\x8D\xE4\xBD\x9C</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"triggerType\" :options=\"triggertypes\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGroupReceive || isTriggerGroupReceiveMulti\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE7\xBB\x84\xE5\x90\x8D\xE7\xA7\xB0</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE4\xBB\x85\xE8\x80\x83\xE8\x99\x91\xE4\xB8\xBA\xE6\xAD\xA4\xE7\xBB\x84\xE5\x90\x8D\xE5\x8F\x91\xE9\x80\x81\xE7\x9A\x84\xE5\x80\xBC</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"ta.TriggerData.GroupName\" inverted :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGroupReceive\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE8\xA7\xA6\xE5\x8F\x91\xE5\x80\xBC</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xBF\x85\xE9\xA1\xBB\xE6\x8E\xA5\xE6\x94\xB6\xE4\xBB\xA5\xE6\xBF\x80\xE6\xB4\xBB\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE7\x9A\x84\xE6\x95\xB0\xE5\x80\xBC</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"ta.TriggerData.Value\" type=\"number\" inverted :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGroupReceiveMulti\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE8\xA7\xA6\xE5\x8F\x91\xE5\x80\xBC</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xBF\x85\xE9\xA1\xBB\xE6\x8E\xA5\xE6\x94\xB6\xE7\x9A\x84\xE6\x95\xB0\xE5\x80\xBC\xE6\x89\x8D\xE8\x83\xBD\xE6\xBF\x80\xE6\xB4\xBB\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-chips-input v-model=\"TriggerGroupReceiveMultiValues\" @duplicate=\"TriggerGroupReceiveMultiAddValue($event)\" type=\"number\" decimals=\"0\" inverted :disable=\"!ta.IsActive\"></q-chips-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n<!--\n\t\t\t<q-item tag=\"label\" link :disabled=\"!ta.IsActive\" v-if=\"isTriggerGroupReceiveMulti\">\n\t\t\t\t<q-item-side>\n\t\t\t\t\t<q-toggle v-model=\"ta.TriggerData.IgnoreOutOfOrder\" :disable=\"!ta.IsActive\"></q-toggle>\n\t\t\t\t</q-item-side>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE5\xBF\xBD\xE7\x95\xA5\xE6\x97\xA0\xE5\xBA\x8F\xE5\x80\xBC</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xA6\x82\xE6\x9E\x9C\xE5\x90\xAF\xE7\x94\xA8\xEF\xBC\x8C\xE5\xBA\x8F\xE5\x88\x97\xE5\x8F\xAF\xE8\x83\xBD\xE4\xBC\x9A\xE8\xA2\xAB\xE5\x85\xB6\xE4\xBB\x96\xE5\x80\xBC\xE4\xB8\xAD\xE6\x96\xAD\xEF\xBC\x8C\xE5\xA6\x82\xE6\x9E\x9C\xE7\xA6\x81\xE7\x94\xA8\xEF\xBC\x8C\xE4\xBB\x96\xE4\xBB\xAC\xE5\xBF\x85\xE9\xA1\xBB\xE5\x87\x86\xE7\xA1\xAE\xE5\x88\xB0\xE8\xBE\xBE</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n-->\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGroupReceiveMulti\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE7\xB1\xBB\xE5\x9E\x8B</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE9\x80\x89\xE6\x8B\xA9\xE5\xBA\x94\xE5\xA6\x82\xE4\xBD\x95\xE6\xA3\x80\xE6\x9F\xA5\xE5\x80\xBC(\xE9\x80\xBB\xE8\xBE\x91OR\xEF\xBC\x8C\xE9\x80\xBB\xE8\xBE\x91AND\xEF\xBC\x8C\xE5\xBA\x8F\xE5\x88\x97\xE6\x88\x96\xE7\xB2\xBE\xE7\xA1\xAE\xE5\xBA\x8F\xE5\x88\x97)</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.TriggerData.Type\" :options=\"groupReceiveMultiSelect\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGPIOIn\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>GPIO\xE7\xBC\x96\xE5\x8F\xB7</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE8\xA6\x81\xE7\x9B\x91\xE5\x90\xAC\xE7\x9A\x84GPIO\xE7\x9A\x84\xE7\xBC\x96\xE5\x8F\xB7</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.TriggerData.GpioName\" :options=\"gpioname\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGPIOIn\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE7\x94\xB5\xE9\x98\xBB</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE9\x80\x89\xE6\x8B\xA9\xE6\x98\xAF\xE5\x90\xA6\xE5\xBA\x94\xE4\xBD\xBF\xE7\x94\xA8\xE5\x86\x85\xE9\x83\xA8\xE4\xB8\x8A\xE6\x8B\x89/\xE4\xB8\x8B\xE6\x8B\x89\xE7\x94\xB5\xE9\x98\xBB</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.TriggerData.PullUpDown\" :options=\"pullupdown\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGPIOIn\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE9\x98\x88\xE5\x80\xBC</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE8\xA7\xA6\xE5\x8F\x91\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE5\xBF\x85\xE9\xA1\xBB\xE5\x8F\x91\xE7\x94\x9F\xE4\xBB\x80\xE4\xB9\x88\xE7\x94\xB5\xE5\xB9\xB3\xE5\x8F\x98\xE5\x8C\x96</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.TriggerData.Edge\" :options=\"edge\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isTriggerGPIOIn\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE5\x8E\xBB\xE6\x8A\x96\xE6\x8C\x81\xE7\xBB\xAD\xE6\x97\xB6\xE9\x97\xB4</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE6\xAD\xA4\xE6\x8C\x81\xE7\xBB\xAD\xE6\x97\xB6\xE9\x97\xB4\xE4\xB8\xAD\xE7\x9A\x84\xE8\xBF\x9E\xE7\xBB\xAD\xE8\xBE\xB9\xE7\xBC\x98\xE4\xBA\x8B\xE4\xBB\xB6\xE5\xB0\x86\xE8\xA2\xAB\xE5\xBF\xBD\xE7\x95\xA5</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"ta.TriggerData.DebounceMillis\" type=\"number\" suffix=\"ms\" inverted :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t</q-list>\n");
 		_r$14 = hvue.Computed("triggertypes", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(generateSelectOptionsTrigger());
@@ -38699,7 +38888,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 			return new $Bool((new jsTriggerAction.ptr(vm.Object.ta, 0, false, false, false, 0, 0, null, null)).IsTriggerGroupReceiveMulti());
 		}));
 		$r = hvue.NewComponent("trigger", new sliceType$10([_arg$28, _arg$29, _arg$30, _arg$31, _arg$32, _arg$33, _arg$34, _arg$37, _arg$38, _arg$41, _arg$42, _arg$43, _arg$44])); /* */ $s = 27; case 27: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = hvue.NewComponent("action", new sliceType$10([hvue.Props(new sliceType$12(["ta"])), hvue.Template("\n\t\t<q-list class=\"fit\" no-border link :disabled=\"!ta.IsActive\">\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Action</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Chose the action which should be started when the trigger fired</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"actionType\" :options=\"actiontypes\" color=\"secondary\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionBashScript\">\n<select-string-from-array :values=\"$store.state.StoredBashScriptsList\" v-model=\"ShowSelectBashScriptModal\" title=\"Select BASH script\" @load=\"ta.ActionData.ScriptName=$event\"></select-string-from-array>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Script path</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Path to the BashScript which should be issued</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n<q-input @click=\"updateStoredBashScriptsList();ShowSelectBashScriptModal=true\" v-model=\"ta.ActionData.ScriptName\" color=\"secondary\" inverted readonly :after=\"[{icon: 'more_horiz', handler(){}}]\" :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionHidScript\">\n<select-string-from-array :values=\"$store.state.StoredHIDScriptsList\" v-model=\"ShowSelectHIDScriptModal\" title=\"Select HIDScript\" @load=\"ta.ActionData.ScriptName=$event\"></select-string-from-array>\n\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Script name</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Name of a stored HIDScript</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n<q-input @click=\"updateStoredHIDScriptsList();ShowSelectHIDScriptModal=true\" v-model=\"ta.ActionData.ScriptName\" color=\"secondary\" inverted readonly :after=\"[{icon: 'more_horiz', handler(){}}]\" :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t\t\n\t\t\t\t\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionGPIOOut\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>GPIO Number</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>The number of the GPIO to output on</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.ActionData.GpioName\" :options=\"gpioname\" color=\"secondary\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isActionGPIOOut\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Output</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Output low/high on the given GPIO or toggle the output</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.ActionData.Value\" :options=\"gpiooutvalues\" color=\"secondary\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionGroupSend\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Group name</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>The name of the group to send to (has to match respective listeners)</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"ta.ActionData.GroupName\" color=\"secondary\" inverted :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isActionGroupSend\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Value</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>The numeric value which is sent to the group channel</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"ta.ActionData.Value\" color=\"secondary\"  type=\"number\" inverted :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionDeploySettingsTemplate\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Type</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Select the type of the template to load</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.ActionData.Type\" :options=\"templatetypes\" color=\"secondary\" @input=\"ta.ActionData.TemplateName=''\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionDeploySettingsTemplate\">\n<select-string-from-array :values=\"typedTemplateList\" v-model=\"ShowSelectTemplateModal\" title=\"Select template\" @load=\"ta.ActionData.TemplateName=$event\"></select-string-from-array>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>Template name</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>Name of the stored settings template to load</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n<q-input @click=\"actionTemplateTypeUpdate(); ShowSelectTemplateModal=true\" v-model=\"ta.ActionData.TemplateName\" color=\"secondary\" inverted readonly :after=\"[{icon: 'more_horiz', handler(){}}]\" :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\t\t</q-list>\n"), hvue.DataFunc((function(vm) {
+		$r = hvue.NewComponent("action", new sliceType$10([hvue.Props(new sliceType$12(["ta"])), hvue.Template("\n\t\t<q-list class=\"fit\" no-border link :disabled=\"!ta.IsActive\">\n\t\t\t<q-item tag=\"label\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE5\x8A\xA8\xE4\xBD\x9C</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE9\x80\x89\xE6\x8B\xA9\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE8\xA7\xA6\xE5\x8F\x91\xE6\x97\xB6\xE5\xBA\x94\xE8\xAF\xA5\xE5\x90\xAF\xE5\x8A\xA8\xE7\x9A\x84\xE5\x8A\xA8\xE4\xBD\x9C</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"actionType\" :options=\"actiontypes\" color=\"secondary\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionBashScript\">\n<select-string-from-array :values=\"$store.state.StoredBashScriptsList\" v-model=\"ShowSelectBashScriptModal\" title=\"Select BASH script\" @load=\"ta.ActionData.ScriptName=$event\"></select-string-from-array>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE8\x84\x9A\xE6\x9C\xAC\xE8\xB7\xAF\xE5\xBE\x84</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xBA\x94\xE8\xAF\xA5\xE5\x8F\x91\xE5\xB8\x83\xE7\x9A\x84Bash\xE8\x84\x9A\xE6\x9C\xAC\xE7\x9A\x84\xE8\xB7\xAF\xE5\xBE\x84</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n<q-input @click=\"updateStoredBashScriptsList();ShowSelectBashScriptModal=true\" v-model=\"ta.ActionData.ScriptName\" color=\"secondary\" inverted readonly :after=\"[{icon: 'more_horiz', handler(){}}]\" :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionHidScript\">\n<select-string-from-array :values=\"$store.state.StoredHIDScriptsList\" v-model=\"ShowSelectHIDScriptModal\" title=\"Select HIDScript\" @load=\"ta.ActionData.ScriptName=$event\"></select-string-from-array>\n\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE8\x84\x9A\xE6\x9C\xAC\xE5\x90\x8D\xE7\xA7\xB0</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE5\xAD\x98\xE5\x82\xA8\xE7\x9A\x84HID\xE8\x84\x9A\xE6\x9C\xAC\xE7\x9A\x84\xE5\x90\x8D\xE7\xA7\xB0</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n<q-input @click=\"updateStoredHIDScriptsList();ShowSelectHIDScriptModal=true\" v-model=\"ta.ActionData.ScriptName\" color=\"secondary\" inverted readonly :after=\"[{icon: 'more_horiz', handler(){}}]\" :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t\t\n\t\t\t\t\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionGPIOOut\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>GPIO\xE7\xBC\x96\xE5\x8F\xB7</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE8\xA6\x81\xE8\xBE\x93\xE5\x87\xBA\xE7\x9A\x84GPIO\xE7\x9A\x84\xE7\xBC\x96\xE5\x8F\xB7</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.ActionData.GpioName\" :options=\"gpioname\" color=\"secondary\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isActionGPIOOut\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE8\xBE\x93\xE5\x87\xBA</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE5\x9C\xA8\xE7\xBB\x99\xE5\xAE\x9A\xE7\x9A\x84GPIO\xE4\xB8\x8A\xE8\xBE\x93\xE5\x87\xBA\xE4\xBD\x8E/\xE9\xAB\x98\xE6\x88\x96\xE5\x88\x87\xE6\x8D\xA2\xE8\xBE\x93\xE5\x87\xBA</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.ActionData.Value\" :options=\"gpiooutvalues\" color=\"secondary\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionGroupSend\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE7\xBB\x84\xE5\x90\x8D</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE8\xA6\x81\xE5\x8F\x91\xE9\x80\x81\xE5\x88\xB0\xE7\x9A\x84\xE7\xBB\x84\xE7\x9A\x84\xE5\x90\x8D\xE7\xA7\xB0(\xE5\xBF\x85\xE9\xA1\xBB\xE5\x8C\xB9\xE9\x85\x8D\xE7\x9B\xB8\xE5\xBA\x94\xE7\x9A\x84\xE4\xBE\xA6\xE5\x90\xAC\xE5\x99\xA8)</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"ta.ActionData.GroupName\" color=\"secondary\" inverted :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\t\t\t<q-item tag=\"label\" v-if=\"isActionGroupSend\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE9\x80\x9A\xE9\x81\x93\xE5\x80\xBC</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE5\x8F\x91\xE9\x80\x81\xE5\x88\xB0\xE7\xBB\x84\xE9\x80\x9A\xE9\x81\x93\xE7\x9A\x84\xE6\x95\xB0\xE5\x80\xBC</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-input v-model=\"ta.ActionData.Value\" color=\"secondary\"  type=\"number\" inverted :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionDeploySettingsTemplate\">\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE6\xA8\xA1\xE6\x9D\xBF\xE7\xB1\xBB\xE5\x9E\x8B</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE9\x80\x89\xE6\x8B\xA9\xE8\xA6\x81\xE5\x8A\xA0\xE8\xBD\xBD\xE7\x9A\x84\xE6\xA8\xA1\xE6\x9D\xBF\xE7\xB1\xBB\xE5\x9E\x8B</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n\t\t\t\t\t\t<q-select v-model=\"ta.ActionData.Type\" :options=\"templatetypes\" color=\"secondary\" @input=\"ta.ActionData.TemplateName=''\" inverted :disable=\"!ta.IsActive\"></q-select>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\t\t\t<q-item tag=\"label\" v-if=\"isActionDeploySettingsTemplate\">\n<select-string-from-array :values=\"typedTemplateList\" v-model=\"ShowSelectTemplateModal\" title=\"Select template\" @load=\"ta.ActionData.TemplateName=$event\"></select-string-from-array>\n\t\t\t\t<q-item-main>\n\t\t\t\t\t<q-item-tile label>\xE6\xA8\xA1\xE6\x9D\xBF\xE5\x90\x8D</q-item-tile>\n\t\t\t\t\t<q-item-tile sublabel>\xE8\xA6\x81\xE5\x8A\xA0\xE8\xBD\xBD\xE7\x9A\x84\xE5\xAD\x98\xE5\x82\xA8\xE8\xAE\xBE\xE7\xBD\xAE\xE6\xA8\xA1\xE6\x9D\xBF\xE7\x9A\x84\xE5\x90\x8D\xE7\xA7\xB0</q-item-tile>\n\t\t\t\t\t<q-item-tile>\n<q-input @click=\"actionTemplateTypeUpdate(); ShowSelectTemplateModal=true\" v-model=\"ta.ActionData.TemplateName\" color=\"secondary\" inverted readonly :after=\"[{icon: 'more_horiz', handler(){}}]\" :disable=\"!ta.IsActive\"></q-input>\n\t\t\t\t\t</q-item-tile>\n\t\t\t\t</q-item-main>\n\t\t\t</q-item>\n\n\n\t\t</q-list>\n"), hvue.DataFunc((function(vm) {
 			var data, vm;
 			data = new structType$18.ptr(O(), false, false, false);
 			data.Object.ShowSelectHIDScriptModal = $externalize(false, $Bool);
@@ -40207,7 +40396,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 		$r = InitComponentsTriggerActions(); /* */ $s = 24; case 24: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = InitComponentsBluetooth(); /* */ $s = 25; case 25: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = InitComponentsGeneric(); /* */ $s = 26; case 26: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		_r$12 = hvue.NewVM(new sliceType$10([hvue.El("#app"), hvue.Template("\n    <q-layout view=\"lHh Lpr fFf\">\n        <q-layout-header :reveal=\"!$q.platform.is.desktop\">\n            <q-toolbar>\n                <q-toolbar-title>\n                    P4wnP1 A.L.O.A.\n\t\t\t\t\t<span slot=\"subtitle\" class=\"mobile-only\">v0.1.0-alpha2 by MaMe82</span>\n                </q-toolbar-title>\n            </q-toolbar>\n            <q-tabs>\n                <q-route-tab default slot=\"title\" to=\"usb\" name=\"tab-usb\" icon=\"usb\" label=\"USB Settings\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"wifi\" name=\"tab-wifi\" icon=\"wifi\" label=\"WiFi settings\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"bluetooth\" name=\"tab-bluetooth\" icon=\"bluetooth\" label=\"Bluetooth\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"network\" name=\"tab-network\" icon=\"settings_ethernet\" label=\"Network settings\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"triggeractions\" name=\"tab-triggeraction\" icon=\"whatshot\" label=\"Trigger Actions\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"hid\" name=\"tab-hid-script\" icon=\"keyboard\" label=\"HIDScript\"></q-route-tab>\n <!--               <q-route-tab slot=\"title\" to=\"hidjobs\" name=\"tab-hid-jobs\" icon=\"schedule\" label=\"HID Events\"></q-route-tab> -->\n                <q-route-tab slot=\"title\" to=\"logger\" name=\"tab-logger\" icon=\"message\" label=\"Event Log\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"generic\" name=\"tab-generic\" icon=\"settings\" label=\"Generic settings\"></q-route-tab>\n            </q-tabs>\n        </q-layout-header>\n\n\n        <q-layout-footer class=\"desktop-only\">\n            <q-toolbar>\n                <q-toolbar-title>\n                    <div slot=\"subtitle\">v0.1.0-alpha2 by MaMe82</div>\n                </q-toolbar-title>\n            </q-toolbar>\n        </q-layout-footer>\n\n        <q-page-container>\n            <router-view></router-view>\n\n\t\t\t<disconnect-modal :value=\"!$store.getters.isConnected\"></disconnect-modal>\n        </q-page-container>\n\n\n    </q-layout>\n"), hvue.Computed("state", (function(vm) {
+		_r$12 = hvue.NewVM(new sliceType$10([hvue.El("#app"), hvue.Template("\n    <q-layout view=\"lHh Lpr fFf\">\n        <q-layout-header :reveal=\"!$q.platform.is.desktop\">\n            <q-toolbar>\n                <q-toolbar-title>\n                    P4wnP1 A.L.O.A.\n\t\t\t\t\t<span slot=\"subtitle\" class=\"mobile-only\">v0.1.0-alpha2 by MaMe82</span>\n                </q-toolbar-title>\n            </q-toolbar>\n            <q-tabs>\n                <q-route-tab default slot=\"title\" to=\"usb\" name=\"tab-usb\" icon=\"usb\" label=\"USB\xE8\xAE\xBE\xE7\xBD\xAE\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"wifi\" name=\"tab-wifi\" icon=\"wifi\" label=\"WiFi\xE8\xAE\xBE\xE7\xBD\xAE\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"bluetooth\" name=\"tab-bluetooth\" icon=\"bluetooth\" label=\"\xE8\x93\x9D\xE7\x89\x99\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"network\" name=\"tab-network\" icon=\"settings_ethernet\" label=\"\xE7\xBD\x91\xE7\xBB\x9C\xE8\xAE\xBE\xE7\xBD\xAE\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"triggeractions\" name=\"tab-triggeraction\" icon=\"whatshot\" label=\"\xE8\xA7\xA6\xE5\x8F\x91\xE5\x99\xA8\xE8\xAE\xBE\xE7\xBD\xAE\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"hid\" name=\"tab-hid-script\" icon=\"keyboard\" label=\"HID\xE8\x84\x9A\xE6\x9C\xAC\"></q-route-tab>\n <!--               <q-route-tab slot=\"title\" to=\"hidjobs\" name=\"tab-hid-jobs\" icon=\"schedule\" label=\"HID\xE4\xBA\x8B\xE4\xBB\xB6\"></q-route-tab> -->\n                <q-route-tab slot=\"title\" to=\"logger\" name=\"tab-logger\" icon=\"message\" label=\"\xE4\xBA\x8B\xE4\xBB\xB6\xE6\x97\xA5\xE5\xBF\x97\"></q-route-tab>\n                <q-route-tab slot=\"title\" to=\"generic\" name=\"tab-generic\" icon=\"settings\" label=\"\xE9\x80\x9A\xE7\x94\xA8\xE8\xAE\xBE\xE7\xBD\xAE\"></q-route-tab>\n            </q-tabs>\n        </q-layout-header>\n\n\n        <q-layout-footer class=\"desktop-only\">\n            <q-toolbar>\n                <q-toolbar-title>\n                    <div slot=\"subtitle\">v0.1.0-alpha2 by MaMe82</div>\n                </q-toolbar-title>\n            </q-toolbar>\n        </q-layout-footer>\n\n        <q-page-container>\n            <router-view></router-view>\n\n\t\t\t<disconnect-modal :value=\"!$store.getters.isConnected\"></disconnect-modal>\n        </q-page-container>\n\n\n    </q-layout>\n"), hvue.Computed("state", (function(vm) {
 			var vm;
 			return new $jsObjectPtr(vm.Object.$store.state);
 		})), hvue.BeforeMount((function(vm) {
@@ -43885,32 +44074,32 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	};
 	$pkg.NewVueRouter = NewVueRouter;
 	ptrType$102.methods = [{prop: "UpdateFromDeployedGadgetSettings", name: "UpdateFromDeployedGadgetSettings", pkg: "", typ: $funcType([ptrType$2], [], false)}, {prop: "ApplyGadgetSettings", name: "ApplyGadgetSettings", pkg: "", typ: $funcType([ptrType$2], [], false)}];
-	ptrType$17.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$103], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$103], [], false)}];
-	ptrType$16.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$15], [], false)}, {prop: "fromASandCI", name: "fromASandCI", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$18, ptrType$19], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$15], false)}];
-	ptrType$18.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$21], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$21], false)}];
-	ptrType$23.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$22], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$22], false)}];
-	ptrType$19.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$20], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$20], [], false)}];
-	ptrType$24.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$33], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$33], false)}];
-	ptrType$25.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$104], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$104], [], false)}];
-	ptrType$14.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$105], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$105], [], false)}];
-	ptrType$11.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$106], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$106], [], false)}];
-	jsGadgetSettings.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$35], false)}];
-	ptrType$8.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$35], [], false)}];
-	ptrType$38.methods = [{prop: "toLogEvent", name: "toLogEvent", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$42, $error], false)}, {prop: "toHidEvent", name: "toHidEvent", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$43, $error], false)}];
+	ptrType$17.methods = [{prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$103], false)}, {prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$103], [], false)}];
+	ptrType$16.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$15], [], false)}, {prop: "fromASandCI", name: "fromASandCI", pkg: ".", typ: $funcType([ptrType$18, ptrType$19], [], false)}, {prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$15], false)}];
+	ptrType$18.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$21], [], false)}, {prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$21], false)}];
+	ptrType$23.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$22], [], false)}, {prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$22], false)}];
+	ptrType$19.methods = [{prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$20], false)}, {prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$20], [], false)}];
+	ptrType$24.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$33], [], false)}, {prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$33], false)}];
+	ptrType$25.methods = [{prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$104], false)}, {prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$104], [], false)}];
+	ptrType$14.methods = [{prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$105], false)}, {prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$105], [], false)}];
+	ptrType$11.methods = [{prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$106], false)}, {prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$106], [], false)}];
+	jsGadgetSettings.methods = [{prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$35], false)}];
+	ptrType$8.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$35], [], false)}];
+	ptrType$38.methods = [{prop: "toLogEvent", name: "toLogEvent", pkg: ".", typ: $funcType([], [ptrType$42, $error], false)}, {prop: "toHidEvent", name: "toHidEvent", pkg: ".", typ: $funcType([], [ptrType$43, $error], false)}];
 	ptrType$52.methods = [{prop: "UpdateEntry", name: "UpdateEntry", pkg: "", typ: $funcType([$Int64, $Int64, $Bool, $Bool, $String, $String, $Int64, $String], [], false)}, {prop: "Clear", name: "Clear", pkg: "", typ: $funcType([], [], false)}, {prop: "DeleteEntry", name: "DeleteEntry", pkg: "", typ: $funcType([$Int64], [], false)}];
 	jsWiFiState.methods = [{prop: "ModeString", name: "ModeString", pkg: "", typ: $funcType([], [$String], false)}];
-	ptrType$90.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$45], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$45], false)}];
-	ptrType$12.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$34], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$34], [], false)}];
-	ptrType$28.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$107], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$107], [], false)}];
-	ptrType$48.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$108], [], false)}, {prop: "updateSingleInterface", name: "updateSingleInterface", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$27], [], false)}];
-	ptrType$27.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$47], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$47], false)}, {prop: "CreateDhcpSettingsForInterface", name: "CreateDhcpSettingsForInterface", pkg: "", typ: $funcType([], [], false)}];
-	ptrType$26.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$49], false)}, {prop: "AddRange", name: "AddRange", pkg: "", typ: $funcType([ptrType$29], [], false)}, {prop: "RemoveRange", name: "RemoveRange", pkg: "", typ: $funcType([ptrType$29], [], false)}, {prop: "AddOption", name: "AddOption", pkg: "", typ: $funcType([ptrType$30], [], false)}, {prop: "RemoveOption", name: "RemoveOption", pkg: "", typ: $funcType([ptrType$30], [], false)}, {prop: "AddStaticHost", name: "AddStaticHost", pkg: "", typ: $funcType([ptrType$31], [], false)}, {prop: "RemoveStaticHost", name: "RemoveStaticHost", pkg: "", typ: $funcType([ptrType$31], [], false)}, {prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$49], [], false)}];
-	ptrType$29.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$50], [], false)}];
-	ptrType$30.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([$Uint32, $String], [], false)}];
-	ptrType$31.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$51], [], false)}];
-	ptrType$89.methods = [{prop: "handleHidEvent", name: "handleHidEvent", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$43], [], false)}, {prop: "HandleEvent", name: "HandleEvent", pkg: "", typ: $funcType([ptrType$109], [], false)}];
-	ptrType$86.methods = [{prop: "fromGo", name: "fromGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([ptrType$69], [], false)}, {prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$69], false)}, {prop: "ChangeActionType", name: "ChangeActionType", pkg: "", typ: $funcType([actionType], [], false)}, {prop: "IsActionLog", name: "IsActionLog", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionBashScript", name: "IsActionBashScript", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionHidScript", name: "IsActionHidScript", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionDeploySettingsTemplate", name: "IsActionDeploySettingsTemplate", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionGroupSend", name: "IsActionGroupSend", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionGPIOOut", name: "IsActionGPIOOut", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "ChangeTriggerType", name: "ChangeTriggerType", pkg: "", typ: $funcType([triggerType], [], false)}, {prop: "IsTriggerServiceStarted", name: "IsTriggerServiceStarted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerSshLogin", name: "IsTriggerSshLogin", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerDhcpLeaseGranted", name: "IsTriggerDhcpLeaseGranted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerWifiAPStarted", name: "IsTriggerWifiAPStarted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerWifiConnectedAsSta", name: "IsTriggerWifiConnectedAsSta", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerUsbGadgetConnected", name: "IsTriggerUsbGadgetConnected", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerUsbGadgetDisconnected", name: "IsTriggerUsbGadgetDisconnected", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGPIOIn", name: "IsTriggerGPIOIn", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGroupReceive", name: "IsTriggerGroupReceive", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGroupReceiveMulti", name: "IsTriggerGroupReceiveMulti", pkg: "", typ: $funcType([], [$Bool], false)}];
-	jsTriggerActionSet.methods = [{prop: "toGo", name: "toGo", pkg: "github.com/mame82/P4wnP1_aloa/web_client", typ: $funcType([], [ptrType$87], false)}];
+	ptrType$90.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$45], [], false)}, {prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$45], false)}];
+	ptrType$12.methods = [{prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$34], false)}, {prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$34], [], false)}];
+	ptrType$28.methods = [{prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$107], false)}, {prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$107], [], false)}];
+	ptrType$48.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$108], [], false)}, {prop: "updateSingleInterface", name: "updateSingleInterface", pkg: ".", typ: $funcType([ptrType$27], [], false)}];
+	ptrType$27.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$47], [], false)}, {prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$47], false)}, {prop: "CreateDhcpSettingsForInterface", name: "CreateDhcpSettingsForInterface", pkg: "", typ: $funcType([], [], false)}];
+	ptrType$26.methods = [{prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$49], false)}, {prop: "AddRange", name: "AddRange", pkg: "", typ: $funcType([ptrType$29], [], false)}, {prop: "RemoveRange", name: "RemoveRange", pkg: "", typ: $funcType([ptrType$29], [], false)}, {prop: "AddOption", name: "AddOption", pkg: "", typ: $funcType([ptrType$30], [], false)}, {prop: "RemoveOption", name: "RemoveOption", pkg: "", typ: $funcType([ptrType$30], [], false)}, {prop: "AddStaticHost", name: "AddStaticHost", pkg: "", typ: $funcType([ptrType$31], [], false)}, {prop: "RemoveStaticHost", name: "RemoveStaticHost", pkg: "", typ: $funcType([ptrType$31], [], false)}, {prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$49], [], false)}];
+	ptrType$29.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$50], [], false)}];
+	ptrType$30.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([$Uint32, $String], [], false)}];
+	ptrType$31.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$51], [], false)}];
+	ptrType$89.methods = [{prop: "handleHidEvent", name: "handleHidEvent", pkg: ".", typ: $funcType([ptrType$43], [], false)}, {prop: "HandleEvent", name: "HandleEvent", pkg: "", typ: $funcType([ptrType$109], [], false)}];
+	ptrType$86.methods = [{prop: "fromGo", name: "fromGo", pkg: ".", typ: $funcType([ptrType$69], [], false)}, {prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$69], false)}, {prop: "ChangeActionType", name: "ChangeActionType", pkg: "", typ: $funcType([actionType], [], false)}, {prop: "IsActionLog", name: "IsActionLog", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionBashScript", name: "IsActionBashScript", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionHidScript", name: "IsActionHidScript", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionDeploySettingsTemplate", name: "IsActionDeploySettingsTemplate", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionGroupSend", name: "IsActionGroupSend", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsActionGPIOOut", name: "IsActionGPIOOut", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "ChangeTriggerType", name: "ChangeTriggerType", pkg: "", typ: $funcType([triggerType], [], false)}, {prop: "IsTriggerServiceStarted", name: "IsTriggerServiceStarted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerSshLogin", name: "IsTriggerSshLogin", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerDhcpLeaseGranted", name: "IsTriggerDhcpLeaseGranted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerWifiAPStarted", name: "IsTriggerWifiAPStarted", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerWifiConnectedAsSta", name: "IsTriggerWifiConnectedAsSta", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerUsbGadgetConnected", name: "IsTriggerUsbGadgetConnected", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerUsbGadgetDisconnected", name: "IsTriggerUsbGadgetDisconnected", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGPIOIn", name: "IsTriggerGPIOIn", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGroupReceive", name: "IsTriggerGroupReceive", pkg: "", typ: $funcType([], [$Bool], false)}, {prop: "IsTriggerGroupReceiveMulti", name: "IsTriggerGroupReceiveMulti", pkg: "", typ: $funcType([], [$Bool], false)}];
+	jsTriggerActionSet.methods = [{prop: "toGo", name: "toGo", pkg: ".", typ: $funcType([], [ptrType$87], false)}];
 	ptrType$32.methods = [{prop: "UpdateEntry", name: "UpdateEntry", pkg: "", typ: $funcType([ptrType$86], [], false)}, {prop: "DeleteEntry", name: "DeleteEntry", pkg: "", typ: $funcType([$Uint32], [], false)}, {prop: "Flush", name: "Flush", pkg: "", typ: $funcType([], [], false)}];
 	ptrType$111.methods = [{prop: "GetUmsImageFlashdriveList", name: "GetUmsImageFlashdriveList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "GetUmsImageCdromList", name: "GetUmsImageCdromList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "GetStoredDBBackupList", name: "GetStoredDBBackupList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "DBBackup", name: "DBBackup", pkg: "", typ: $funcType([time.Duration, $String], [$error], false)}, {prop: "DBRestore", name: "DBRestore", pkg: "", typ: $funcType([time.Duration, $String], [$error], false)}, {prop: "GetStartupMasterTemplate", name: "GetStartupMasterTemplate", pkg: "", typ: $funcType([time.Duration], [$String, $error], false)}, {prop: "SetStartupMasterTemplate", name: "SetStartupMasterTemplate", pkg: "", typ: $funcType([time.Duration, $String], [$error], false)}, {prop: "Shutdown", name: "Shutdown", pkg: "", typ: $funcType([time.Duration], [$error], false)}, {prop: "Reboot", name: "Reboot", pkg: "", typ: $funcType([time.Duration], [$error], false)}, {prop: "GetGpioNamesList", name: "GetGpioNamesList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "DeployMasterTemplate", name: "DeployMasterTemplate", pkg: "", typ: $funcType([time.Duration, ptrType$33], [$error], false)}, {prop: "GetStoredMasterTemplateList", name: "GetStoredMasterTemplateList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "StoreMasterTemplate", name: "StoreMasterTemplate", pkg: "", typ: $funcType([time.Duration, ptrType$104], [$error], false)}, {prop: "GetStoredMasterTemplate", name: "GetStoredMasterTemplate", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$33, $error], false)}, {prop: "DeployStoredMasterTemplate", name: "DeployStoredMasterTemplate", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$33, $error], false)}, {prop: "DeleteStoredMasterTemplate", name: "DeleteStoredMasterTemplate", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "UploadContentToTempFile", name: "UploadContentToTempFile", pkg: "", typ: $funcType([time.Duration, sliceType$7], [$String, $error], false)}, {prop: "RunHIDScriptJob", name: "RunHIDScriptJob", pkg: "", typ: $funcType([time.Duration, $String], [ptrType$97, $error], false)}, {prop: "CancelHIDScriptJob", name: "CancelHIDScriptJob", pkg: "", typ: $funcType([time.Duration, $Uint32], [$error], false)}, {prop: "CancelAllHIDScriptJobs", name: "CancelAllHIDScriptJobs", pkg: "", typ: $funcType([time.Duration], [$error], false)}, {prop: "GetStoredBluetoothSettingsList", name: "GetStoredBluetoothSettingsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "StoreBluetoothSettings", name: "StoreBluetoothSettings", pkg: "", typ: $funcType([time.Duration, ptrType$103], [$error], false)}, {prop: "GetStoredBluetoothSettings", name: "GetStoredBluetoothSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$15, $error], false)}, {prop: "DeployStoredBluetoothSettings", name: "DeployStoredBluetoothSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$15, $error], false)}, {prop: "DeleteStoredBluetoothSettings", name: "DeleteStoredBluetoothSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "DeleteStoredUSBSettings", name: "DeleteStoredUSBSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "DeleteStoredWifiSettings", name: "DeleteStoredWifiSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "DeleteStoredEthernetInterfaceSettings", name: "DeleteStoredEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "DeleteStoredTriggerActionsSet", name: "DeleteStoredTriggerActionsSet", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "GetBluetoothAgentSettings", name: "GetBluetoothAgentSettings", pkg: "", typ: $funcType([time.Duration], [ptrType$18, $error], false)}, {prop: "DeployBluetoothAgentSettings", name: "DeployBluetoothAgentSettings", pkg: "", typ: $funcType([time.Duration, ptrType$18], [ptrType$18, $error], false)}, {prop: "GetBluetoothControllerInformation", name: "GetBluetoothControllerInformation", pkg: "", typ: $funcType([time.Duration], [ptrType$19, $error], false)}, {prop: "DeployBluetoothControllerInformation", name: "DeployBluetoothControllerInformation", pkg: "", typ: $funcType([time.Duration, ptrType$19], [ptrType$19, $error], false)}, {prop: "GetStoredUSBSettingsList", name: "GetStoredUSBSettingsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "StoreUSBSettings", name: "StoreUSBSettings", pkg: "", typ: $funcType([time.Duration, ptrType$106], [$error], false)}, {prop: "GetStoredUSBSettings", name: "GetStoredUSBSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$35, $error], false)}, {prop: "DeployStoredUSBSettings", name: "DeployStoredUSBSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$35, $error], false)}, {prop: "UploadBytesToFile", name: "UploadBytesToFile", pkg: "", typ: $funcType([time.Duration, $String, P4wnP1_grpc.AccessibleFolder, sliceType$7, $Bool], [$error], false)}, {prop: "DownloadFileToBytes", name: "DownloadFileToBytes", pkg: "", typ: $funcType([time.Duration, $String, P4wnP1_grpc.AccessibleFolder], [sliceType$7, $error], false)}, {prop: "GetStoredEthernetInterfaceSettingsList", name: "GetStoredEthernetInterfaceSettingsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "GetStoredBashScriptsList", name: "GetStoredBashScriptsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "GetStoredHIDScriptsList", name: "GetStoredHIDScriptsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "DeployedEthernetInterfaceSettings", name: "DeployedEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration, ptrType$47], [$error], false)}, {prop: "GetStoredWifiSettingsList", name: "GetStoredWifiSettingsList", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "DeployWifiSettings", name: "DeployWifiSettings", pkg: "", typ: $funcType([time.Duration, ptrType$34], [ptrType$45, $error], false)}, {prop: "StoreWifiSettings", name: "StoreWifiSettings", pkg: "", typ: $funcType([time.Duration, ptrType$105], [$error], false)}, {prop: "GetStoredWifiSettings", name: "GetStoredWifiSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$34, $error], false)}, {prop: "DeployStoredWifiSettings", name: "DeployStoredWifiSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$45, $error], false)}, {prop: "GetWifiState", name: "GetWifiState", pkg: "", typ: $funcType([time.Duration], [ptrType$90, $error], false)}, {prop: "GetAllDeployedEthernetInterfaceSettings", name: "GetAllDeployedEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration], [ptrType$48, $error], false)}, {prop: "StoreEthernetInterfaceSettings", name: "StoreEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration, ptrType$107], [$error], false)}, {prop: "GetStoredEthernetInterfaceSettings", name: "GetStoredEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$47, $error], false)}, {prop: "DeployStoredEthernetInterfaceSettings", name: "DeployStoredEthernetInterfaceSettings", pkg: "", typ: $funcType([time.Duration, ptrType$110], [$error], false)}, {prop: "GetRunningHidJobStates", name: "GetRunningHidJobStates", pkg: "", typ: $funcType([time.Duration], [sliceType$22, $error], false)}, {prop: "ListStoredTriggerActionSets", name: "ListStoredTriggerActionSets", pkg: "", typ: $funcType([time.Duration], [sliceType$12, $error], false)}, {prop: "StoreTriggerActionSet", name: "StoreTriggerActionSet", pkg: "", typ: $funcType([time.Duration, ptrType$87], [$error], false)}, {prop: "GetDeployedTriggerActionSet", name: "GetDeployedTriggerActionSet", pkg: "", typ: $funcType([time.Duration], [ptrType$87, $error], false)}, {prop: "DeployTriggerActionsSetReplace", name: "DeployTriggerActionsSetReplace", pkg: "", typ: $funcType([time.Duration, ptrType$87], [ptrType$87, $error], false)}, {prop: "DeployTriggerActionsSetRemove", name: "DeployTriggerActionsSetRemove", pkg: "", typ: $funcType([time.Duration, ptrType$87], [ptrType$87, $error], false)}, {prop: "DeployTriggerActionsSetUpdate", name: "DeployTriggerActionsSetUpdate", pkg: "", typ: $funcType([time.Duration, ptrType$87], [ptrType$87, $error], false)}, {prop: "DeployTriggerActionsSetAdd", name: "DeployTriggerActionsSetAdd", pkg: "", typ: $funcType([time.Duration, ptrType$87], [ptrType$87, $error], false)}, {prop: "DeployStoredTriggerActionsSetReplace", name: "DeployStoredTriggerActionsSetReplace", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$87, $error], false)}, {prop: "DeployStoredTriggerActionsSetAdd", name: "DeployStoredTriggerActionsSetAdd", pkg: "", typ: $funcType([time.Duration, ptrType$110], [ptrType$87, $error], false)}, {prop: "GetDeployedGadgetSettings", name: "GetDeployedGadgetSettings", pkg: "", typ: $funcType([time.Duration], [ptrType$35, $error], false)}, {prop: "DeployRemoteGadgetSettings", name: "DeployRemoteGadgetSettings", pkg: "", typ: $funcType([time.Duration, ptrType$35], [ptrType$35, $error], false)}, {prop: "ConnectionTest", name: "ConnectionTest", pkg: "", typ: $funcType([time.Duration], [$error], false)}, {prop: "StartEventListening", name: "StartEventListening", pkg: "", typ: $funcType([time.Duration], [P4wnP1_grpc.P4WNP1_EventListenClient, context.CancelFunc, $error], false)}];
 	CompEthernetAddressesData2.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}]);
@@ -43974,7 +44163,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	Promise.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "State", name: "State", embedded: false, exported: true, typ: $String, tag: "js:\"state\""}]);
 	Quasar.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Version", name: "Version", embedded: false, exported: true, typ: $String, tag: "js:\"version\""}, {prop: "Theme", name: "Theme", embedded: false, exported: true, typ: $String, tag: "js:\"theme\""}, {prop: "Plugins", name: "Plugins", embedded: false, exported: true, typ: mapType, tag: "js:\"plugins\""}]);
 	QuasarNotification.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Message", name: "Message", embedded: false, exported: true, typ: $String, tag: "js:\"message\""}, {prop: "Detail", name: "Detail", embedded: false, exported: true, typ: $String, tag: "js:\"detail\""}, {prop: "Type", name: "Type", embedded: false, exported: true, typ: $String, tag: "js:\"type\""}, {prop: "Color", name: "Color", embedded: false, exported: true, typ: $String, tag: "js:\"color\""}, {prop: "TextColor", name: "TextColor", embedded: false, exported: true, typ: $String, tag: "js:\"textColor\""}, {prop: "Icon", name: "Icon", embedded: false, exported: true, typ: $String, tag: "js:\"icon\""}, {prop: "Position", name: "Position", embedded: false, exported: true, typ: $String, tag: "js:\"position\""}, {prop: "Timeout", name: "Timeout", embedded: false, exported: true, typ: $Uint, tag: "js:\"timeout\""}]);
-	Rpc.init("github.com/mame82/P4wnP1_aloa/web_client", [{prop: "Mutex", name: "Mutex", embedded: true, exported: true, typ: ptrType$95, tag: ""}, {prop: "Client", name: "Client", embedded: false, exported: true, typ: P4wnP1_grpc.P4WNP1Client, tag: ""}, {prop: "eventListeningOn", name: "eventListeningOn", embedded: false, exported: false, typ: $Bool, tag: ""}, {prop: "eventListeningCtx", name: "eventListeningCtx", embedded: false, exported: false, typ: ptrType$96, tag: ""}, {prop: "eventListeningCancel", name: "eventListeningCancel", embedded: false, exported: false, typ: context.CancelFunc, tag: ""}]);
+	Rpc.init(".", [{prop: "Mutex", name: "Mutex", embedded: true, exported: true, typ: ptrType$95, tag: ""}, {prop: "Client", name: "Client", embedded: false, exported: true, typ: P4wnP1_grpc.P4WNP1Client, tag: ""}, {prop: "eventListeningOn", name: "eventListeningOn", embedded: false, exported: false, typ: $Bool, tag: ""}, {prop: "eventListeningCtx", name: "eventListeningCtx", embedded: false, exported: false, typ: ptrType$96, tag: ""}, {prop: "eventListeningCancel", name: "eventListeningCancel", embedded: false, exported: false, typ: context.CancelFunc, tag: ""}]);
 	VueRouterConfig.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Routes", name: "Routes", embedded: false, exported: true, typ: ptrType$3, tag: "js:\"routes\""}]);
 	VueRouterOption.init([ptrType$101], [], false);
 	option.init("", [{prop: "Object", name: "Object", embedded: true, exported: true, typ: ptrType$3, tag: ""}, {prop: "Label", name: "Label", embedded: false, exported: true, typ: $String, tag: "js:\"label\""}, {prop: "Value", name: "Value", embedded: false, exported: true, typ: triggerType, tag: "js:\"value\""}]);
@@ -44037,7 +44226,7 @@ $packages["github.com/mame82/P4wnP1_aloa/web_client"] = (function() {
 	return $pkg;
 })();
 $synthesizeMethods();
-var $mainPkg = $packages["github.com/mame82/P4wnP1_aloa/web_client"];
+var $mainPkg = $packages["."];
 $packages["runtime"].$init();
 $go($mainPkg.$init, []);
 $flushConsole();

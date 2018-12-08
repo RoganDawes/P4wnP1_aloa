@@ -45,10 +45,10 @@ const (
 <div>
 	<table>
 	<tr>
-		<td>Host MAC address</td><td><input v-bind:value="settings.HostAddr" v-on:input="$emit('hostAddrChange', $event.target.value)"></td>
+		<td>主机MAC地址</td><td><input v-bind:value="settings.HostAddr" v-on:input="$emit('hostAddrChange', $event.target.value)"></td>
 	</tr>
 	<tr>
-		<td>Device MAC address</td><td><input v-bind:value="settings.DevAddr" v-on:input="$emit('devAddrChange', $event.target.value)"></td>
+		<td>设备MAC地址</td><td><input v-bind:value="settings.DevAddr" v-on:input="$emit('devAddrChange', $event.target.value)"></td>
 	</tr>
 	</table>
 </div>
