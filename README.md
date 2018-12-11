@@ -97,7 +97,7 @@ So if you want to use a a batch file running on a remote Windows host to configu
 
 ### Configuration and Control via web client
 
-Although it wasn't planned initially, P4wnP1 A.L.O.A. could be configured using a webclient.
+Although it wasn't planned initially, P4wnP1 A.L.O.A. can be configured using a webclient.
 Even though the client wasn't planned, it evolved to a nice piece of software. In fact it ended up as the main 
 configuration tool for P4wnP1 A.L.O.A.
 The webclient has capabilities, which couldn't be accessed from the CLI (templates storage, creation of 
@@ -149,7 +149,7 @@ P4wnP1 A.L.O.A. is meant to be as flexible as possible, to allow using it in all
 I couldn't think of while creating P4wnP1 A.L.O.A.).
 
 But there are some basic concepts, I'd like to walk through in this section. As it is hard to explain everything without
-creating a proper (video) documentation, I visit some some common use cases and examples in order to explain what needs
+creating a proper (video) documentation, I visit some common use cases and examples in order to explain what needs
 to be explained.
 
 Nevertheless, it is unlikely that I'll have the time to provide a full-fledged documentation. **So I encourage everyone
