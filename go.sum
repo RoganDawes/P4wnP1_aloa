@@ -24,6 +24,8 @@ github.com/improbable-eng/grpc-web v0.0.0-20181111131931-77784bdb46c6/go.mod h1:
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/mame82/mblue-toolz v0.1.0-alpha h1:We4TUn+EjLJBMe++1Ym630E5PLpfpWafegSPCrogJNo=
 github.com/mame82/mblue-toolz v0.1.0-alpha/go.mod h1:b7HQ2SWrrYqdxXKzabGkj+eG2OeT+8MvuAObGFrdcPQ=
+github.com/mame82/mblue-toolz v0.1.1 h1:0GCHauAnaqo31L3ZNxyDMEq85lZpyZs3I+uSIZpiUSc=
+github.com/mame82/mblue-toolz v0.1.1/go.mod h1:b7HQ2SWrrYqdxXKzabGkj+eG2OeT+8MvuAObGFrdcPQ=
 github.com/pkg/errors v0.8.0 h1:WdK/asTD0HN+q6hsWO3/vpuAkAr+tw6aNJNDFFf0+qw=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/robertkrimen/otto v0.0.0-20180617131154-15f95af6e78d h1:1VUlQbCfkoSGv7qP7Y+ro3ap1P1pPZxgdGVqiTVy5C4=

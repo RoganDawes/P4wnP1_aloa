@@ -9,7 +9,7 @@ require (
 	github.com/golang/protobuf v1.2.0
 	github.com/gorilla/websocket v1.4.0 // indirect
 	github.com/improbable-eng/grpc-web v0.0.0-20181111131931-77784bdb46c6
-	github.com/mame82/mblue-toolz v0.1.0-alpha
+	github.com/mame82/mblue-toolz v0.1.1
 	github.com/pkg/errors v0.8.0 // indirect
 	github.com/robertkrimen/otto v0.0.0-20180617131154-15f95af6e78d
 	github.com/rs/cors v1.6.0 // indirect
