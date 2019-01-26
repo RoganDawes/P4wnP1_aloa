@@ -120,7 +120,6 @@
 
             "@": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_Q"]}],
             "ł": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_W"]}],
-            "e": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_E"]}],
             "¶": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_R"]}],
             "ŧ": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_T"]}],
             "←": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_Y"]}],
