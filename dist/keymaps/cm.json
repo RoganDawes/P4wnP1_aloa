@@ -44,6 +44,7 @@
             "BRK": [{"Modifiers": [], "Keys": ["KEY_PAUSE"]}],
 
 
+            "`": [{"Modifiers": ["MOD_RIGHT_ALT"], "Keys": ["KEY_LEFTBRACE"]}],
             "1": [{"Modifiers": [],	"Keys": ["KEY_1"]}],
             "2": [{"Modifiers": [],	"Keys": ["KEY_2"]}],
             "3": [{"Modifiers": [],	"Keys": ["KEY_3"]}],
