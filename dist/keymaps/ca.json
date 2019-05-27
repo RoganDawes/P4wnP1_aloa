@@ -1,6 +1,6 @@
 {
 	"Name": "Candian Keyboard Layout",
-	"Description": "Candian Keyboard Layout by TheMMcOfficial pas fait encore",
+	"Description": "Candian Keyboard Layout by TheMMcOfficial",
 	"Mapping": {
 
             "CTRL": [{"Modifiers": ["MOD_LEFT_CONTROL"], "Keys": []}],
