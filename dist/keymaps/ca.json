@@ -60,7 +60,7 @@
 
             "~": [{"Modifiers": ["MOD_RIGHT_ALT"], "Keys": ["KEY_RIGHTBRACE"]}],
             "!": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_1"]}],
-            "@": [{"Modifiers": ["MOD_LEFT_SHIFT"], "Keys": ["KEY_2"]}],
+            "@": [{"Modifiers": ["MOD_LEFT_SHIFT"],     "Keys": ["KEY_2"]}],
             "#": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_3"]}],
             "$": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_4"]}],
             "%": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_5"]}],
