@@ -157,8 +157,8 @@
             "B": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_B"]}],
             "N": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_N"]}],
             "M": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_M"]}],
-            "<": [{"Modifiers": [""],			"Keys": ["KEY_SEMICOLON"]}],
-            ">": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_SEMICOLON"]}],
+            "<": [{"Modifiers": [""],			"Keys": ["KEY_BACKSLASH"]}],
+            ">": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_BACKSLASH"]}],
             "?": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_6"]}],
 
 
