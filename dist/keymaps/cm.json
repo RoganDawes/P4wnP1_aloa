@@ -1,6 +1,6 @@
 {
 	"Name": "CM",
-	"Description": "Candian Multilangual Keyboard Layout by TheMMcOfficial",
+	"Description": "Canadian Multilangual Keyboard Layout by TheMMcOfficial",
 	"Mapping": {
 
             "CTRL": [{"Modifiers": ["MOD_LEFT_CONTROL"], "Keys": []}],
