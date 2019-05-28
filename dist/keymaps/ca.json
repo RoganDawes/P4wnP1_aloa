@@ -171,7 +171,7 @@
 	    "ç": [{"Modifiers": [],			"Keys": ["KEY_RIGHTBRACE"]}],
 	    "Ç": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_RIGHTBRACE"]}],
 	    "à": [{"Modifiers": [""],			"Keys": ["KEY_102ND"]}],
-	    "À": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_102ND]}],
+	    "À": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_102ND"]}],
 
 
             "INSERT": [{"Modifiers": [], "Keys": ["KEY_INSERT"]}],
