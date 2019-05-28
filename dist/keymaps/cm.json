@@ -64,7 +64,7 @@
             "#": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_3"]}],
             "$": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_4"]}],
             "%": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_5"]}],
-            "^": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_LEFTBRACE"]}],
+            "^": [{"Modifiers": [""],			"Keys": ["KEY_LEFTBRACE"]}],
             "&": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_7"]}],
             "*": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_8"]}],
             "(": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_9"]}],
@@ -133,7 +133,7 @@
             "L": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_L"]}],
             ":": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_SEMICOLON"]}],
             "\"": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_DOT"]}],
-            "|": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_SLASH"]}],
+            "|": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_GRAVE"]}],
 
 
 
@@ -147,8 +147,8 @@
             "m": [{"Modifiers": [],	"Keys": ["KEY_M"]}],
             ",": [{"Modifiers": [],	"Keys": ["KEY_COMMA"]}],
             ".": [{"Modifiers": [],	"Keys": ["KEY_DOT"]}],
-            "/": [{"Modifiers": [],	"Keys": ["KEY_SLASH"]}],
-            "\\": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_SLASH"]}],
+            "/": [{"Modifiers": [],	"Keys": ["KEY_GRAVE"]}],
+            "\\": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_GRAVE"]}],
 
 
             "Z": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_Z"]}],
