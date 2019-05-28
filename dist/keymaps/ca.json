@@ -166,12 +166,8 @@
             "SPACE": [{"Modifiers": [], "Keys": ["KEY_SPACE"]}],
             "SPACEBAR": [{"Modifiers": [], "Keys": ["KEY_SPACE"]}],
 
-	    "ù": [{"Modifiers": [],			"Keys": ["KEY_SLASH"]}],
-	    "Ù": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_SLASH"]}],
-	    "ç": [{"Modifiers": [],			"Keys": ["KEY_RIGHTBRACE"]}],
-	    "Ç": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_RIGHTBRACE"]}],
-	    "à": [{"Modifiers": [""],			"Keys": ["KEY_102ND"]}],
-	    "À": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_102ND"]}],
+	    "ç": [{"Modifiers": [],			"Keys": ["KEY_RIGHTBRACE"]}, {"Modifiers": [],	"Keys": ["KEY_C"]}],
+	    "Ç": [{"Modifiers": [],	"Keys": ["KEY_RIGHTBRACE"]}, {"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_C"]}],
 
 
             "INSERT": [{"Modifiers": [], "Keys": ["KEY_INSERT"]}],
