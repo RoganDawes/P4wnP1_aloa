@@ -1527,7 +1527,7 @@ Again, navigate to the "Generic Settings" tab and select a Startup Master Templa
 
 At this point you should be ready to reboot. 
 
-### non of the above helped
+### none of the above helped
 
 Sorry, seems you have to recreate your P4wnP1 A.L.O.A. SD crad from a clean image.
 
