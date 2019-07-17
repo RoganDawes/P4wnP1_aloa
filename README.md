@@ -8,7 +8,7 @@ pentesting, red teaming and physical engagements ... or into "A Little Offensive
 The latest image could be found under release tab.
 
 The easiest way to access a fresh P4wnP1 A.L.O.A. installation is to use the web client via the spawned WiFi (the PSK
-is `MaMe82-P4wnP1`, the URL `http://172.24.0.1:8000`) or SSH (default password `toor`).
+is `MaMe82-P4wnP1`, the URL `http://172.16.0.1:8000`) or SSH (default password `toor`).
 
 ## 1. Features
 
