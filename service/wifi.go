@@ -503,7 +503,8 @@ type hostapdOutMonitor struct {
 func (m *hostapdOutMonitor) Write(p []byte) (n int, err error) {
 	// if result already received, the write could exit (early out)
 	if m.resultReceived.IsSet() {
-		return n, nil
+		// fix endless loop of writing 'CTRL-EVENT-TERMINATING'
+		return len(p), nil
 	}
 
 	// check if buffer contains relevant strings (assume write is called line wise by the hosted process
@@ -557,7 +558,7 @@ type wpaSupplicantOutMonitor struct {
 func (m *wpaSupplicantOutMonitor) Write(p []byte) (n int, err error) {
 	// if result already received, the write could exit (early out)
 	if m.resultReceived.IsSet() {
-		return n, nil
+		return len(p), nil
 	}
 
 	// check if buffer contains relevant strings (assume write is called line wise by the hosted process
