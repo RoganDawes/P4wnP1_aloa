@@ -668,19 +668,22 @@ func (s *server) EventListen(eReq *pb.EventRequest, eStream pb.P4WNP1_EventListe
 
 func (s *server) FSWriteFile(ctx context.Context, req *pb.WriteFileRequest) (empty *pb.Empty, err error) {
 	filePath := "/" + req.Filename
+	perm := os.ModePerm
 	switch req.Folder {
 	case pb.AccessibleFolder_TMP:
 		filePath = "/tmp" + filePath
 	case pb.AccessibleFolder_BASH_SCRIPTS:
 		filePath = common.PATH_BASH_SCRIPTS + filePath
+		perm = 0700
 	case pb.AccessibleFolder_HID_SCRIPTS:
 		filePath = common.PATH_HID_SCRIPTS + filePath
+		perm = 0600
 	default:
 		err = errors.New("Unknown folder")
 		return
 	}
 
-	return &pb.Empty{}, common.WriteFile(filePath, req.MustNotExist, req.Append, req.Data)
+	return &pb.Empty{}, common.WriteFile(filePath, req.MustNotExist, req.Append, req.Data, perm)
 
 }
 
@@ -688,20 +691,23 @@ func (s *server) FSReadFile(ctx context.Context, req *pb.ReadFileRequest) (resp 
 	//ToDo: check filename for path traversal attempts (don't care for security, currently - hey, we allow executing bash scripts as root - so what)
 
 	filePath := "/" + req.Filename
+	perm := os.ModePerm
 	switch req.Folder {
 	case pb.AccessibleFolder_TMP:
 		filePath = "/tmp" + filePath
 	case pb.AccessibleFolder_BASH_SCRIPTS:
 		filePath = common.PATH_BASH_SCRIPTS + filePath
+		perm = 0700
 	case pb.AccessibleFolder_HID_SCRIPTS:
 		filePath = common.PATH_HID_SCRIPTS + filePath
+		perm = 0600
 	default:
 		err = errors.New("Unknown folder")
 		return
 	}
 
 	chunk := make([]byte, req.Len)
-	n,err := common.ReadFile(filePath, req.Start, chunk)
+	n,err := common.ReadFile(filePath, req.Start, chunk, perm)
 	if err == io.EOF { err = nil } //we ignore eof error, as eof is indicated by n = 0
 	if err != nil {	return nil,err	}
 	resp = &pb.ReadFileResponse{ReadCount: int64(n), Data: chunk[:n]}
