@@ -101,9 +101,6 @@
             "i": [{"Modifiers": [],	"Keys": ["KEY_I"]}],
             "o": [{"Modifiers": [],	"Keys": ["KEY_O"]}],
             "p": [{"Modifiers": [],	"Keys": ["KEY_P"]}],
-            "[": [{"Modifiers": [],	"Keys": ["KEY_LEFTBRACE"]}],
-            "]": [{"Modifiers": [],	"Keys": ["KEY_RIGHTBRACE"]}],
-
 
             "Q": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_Q"]}],
             "W": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_W"]}],
@@ -115,12 +112,8 @@
             "I": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_I"]}],
             "O": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_O"]}],
             "P": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_P"]}],
-            "{": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_LEFTBRACE"]}],
-            "}": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_RIGHTBRACE"]}],
 
             "@": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_Q"]}],
-            "ł": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_W"]}],
-            "e": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_E"]}],
             "¶": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_R"]}],
             "ŧ": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_T"]}],
             "←": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_Y"]}],
@@ -129,7 +122,6 @@
             "ø": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_O"]}],
             "þ": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_P"]}],
             
-            "~": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_RIGHTBRACE"]}, {"Modifiers": [], "Keys": ["KEY_SPACE"]}],
             "ENTER": [{"Modifiers": [], "Keys": ["KEY_ENTER"]}],
             "RETURN": [{"Modifiers": [], "Keys": ["KEY_ENTER"]}],
             "\n": [{"Modifiers": [], "Keys": ["KEY_ENTER"]}],
@@ -160,7 +152,6 @@
             "K": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_K"]}],
             "L": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_L"]}],
             ":": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_SEMICOLON"]}],
-            "@": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_APOSTROPHE"]}],
             "~": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_BACKSLASH"]}],
 
             "æ": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_A"]}],
@@ -172,14 +163,7 @@
             
             "ĸ": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_K"]}],
             "ł": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_L"]}],
-            "'": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_SEMICOLON"]}, {"Modifiers": [], "Keys": ["KEY_SPACE"]}],
-            "^": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_APOSTROPHE"]}, {"Modifiers": [], "Keys": ["KEY_SPACE"]}],
-            "`": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_BACKSLASH"]}, {"Modifiers": [], "Keys": ["KEY_SPACE"]}],
 
-
-
-            "\\": [{"Modifiers": [], "Keys": ["KEY_102ND"]}],
-            "|": [{"Modifiers": ["MOD_LEFT_SHIFT"], "Keys": ["KEY_102ND"]}],
             "z": [{"Modifiers": [],	"Keys": ["KEY_Z"]}],
             "x": [{"Modifiers": [],	"Keys": ["KEY_X"]}],
             "c": [{"Modifiers": [],	"Keys": ["KEY_C"]}],
@@ -208,7 +192,6 @@
             "¢": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_C"]}],
             "“": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_V"]}],
             "”": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_B"]}],
-            "n": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_N"]}],
             "µ": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_M"]}],
 
             "·": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_DOT"]}],
