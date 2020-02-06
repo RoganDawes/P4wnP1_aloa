@@ -82,7 +82,7 @@ Not much to say here, P4wnP1 A.L.O.A. is backed by KALI Linux, so everything sho
 installed using apt)
 
 ### Configuration and Control via CLI, remotely if needed
-- all features mentioned so far, could be configured using a CLI client
+- all features mentioned so far, can be configured using a CLI client
 - the P4wnP1 core service is a single binary, running as systemd unit which preserves runtime state
 - the CLI client interfaces with this service via RPC (gRPC to be specific) to change the state of the core
 - as the CLI uses a RPC approach, it could be used for **remote configuration**, too
@@ -97,7 +97,7 @@ So if you want to use a a batch file running on a remote Windows host to configu
 
 ### Configuration and Control via web client
 
-Although it wasn't planned initially, P4wnP1 A.L.O.A. could be configured using a webclient.
+Although it wasn't planned initially, P4wnP1 A.L.O.A. can be configured using a webclient.
 Even though the client wasn't planned, it evolved to a nice piece of software. In fact it ended up as the main 
 configuration tool for P4wnP1 A.L.O.A.
 The webclient has capabilities, which couldn't be accessed from the CLI (templates storage, creation of 
@@ -149,7 +149,7 @@ P4wnP1 A.L.O.A. is meant to be as flexible as possible, to allow using it in all
 I couldn't think of while creating P4wnP1 A.L.O.A.).
 
 But there are some basic concepts, I'd like to walk through in this section. As it is hard to explain everything without
-creating a proper (video) documentation, I visit some some common use cases and examples in order to explain what needs
+creating a proper (video) documentation, I visit some common use cases and examples in order to explain what needs
 to be explained.
 
 Nevertheless, it is unlikely that I'll have the time to provide a full-fledged documentation. **So I encourage everyone
@@ -1527,7 +1527,7 @@ Again, navigate to the "Generic Settings" tab and select a Startup Master Templa
 
 At this point you should be ready to reboot. 
 
-### non of the above helped
+### none of the above helped
 
 Sorry, seems you have to recreate your P4wnP1 A.L.O.A. SD crad from a clean image.
 
