@@ -293,3 +293,25 @@ The steps to compile P4wnP1 A.L.O.A. (with modifications):
 5. Run the build script
 
 Note: I haven't tested this myself for over a year, now.
+
+# depending repositories for which ownership has to be handed over
+
+## P4wnP1_service
+
+- github.com/mame82/mblue-toolz (BLUEZ stack bindings, replacement of BLUEZ tools)
+
+## P4wnP1 webclient
+
+- github.com/mame82/hvue (Vue bindings)
+- github.com/mame82/mvuex (Vuex bindings)
+
+## image build 
+
+- https://github.com/mame82/P4wnP1_nexmon_additions (includes command line tools to interact with modified WiFi firmware
+ e.g. KARMA)
+- https://github.com/mame82/nexmon_wifi_covert_channel (modded bcm43430a1 WiFi firmware and driver for P4wnP1 created with Nexmon 
+framework, targets Kernel 4.14.y)
+
+## other dependencies
+
+- https://github.com/mame82/kali-arm-build-scripts (contains build script to build a Kali based P4wnP1 ALOA image)
