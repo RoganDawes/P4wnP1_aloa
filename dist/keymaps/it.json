@@ -79,6 +79,7 @@
             "¼": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_4"]}],
             "½": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_5"]}],
             "{": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_7"]}],
+            "}": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_0"]}],
             "`": [{"Modifiers": ["MOD_RIGHT_ALT"],	"Keys": ["KEY_MINUS"]}],
             "~": [{"Modifiers": ["MOD_RIGHT_ALT"], "Keys": ["KEY_EQUAL"]}],
             "BACKSPACE": [{"Modifiers": [], "Keys": ["KEY_BACKSPACE"]}],
