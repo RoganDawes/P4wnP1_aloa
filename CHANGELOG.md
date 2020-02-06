@@ -8,4 +8,5 @@
 - fix: French layout `fr`
 - fix #38: file permission
 - added Finnish `fi` and Swedish `sv` layout (same)
-
+- added German(Switzerland) layout `ch`
+- added French(Belgian) layout `be`
