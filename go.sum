@@ -19,7 +19,7 @@ github.com/golang/protobuf v1.2.0 h1:P3YflyNX/ehuJFLhxviNdFxQPkGK5cDcApsge1SqnvM
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/gorilla/websocket v1.4.0 h1:WDFjx/TMzVgy9VdMMQi2K2Emtwi2QcUQsztZ/zLaH/Q=
 github.com/gorilla/websocket v1.4.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
-github.com/improbable-eng/grpc-web v0.0.0-20181111131931-77784bdb46c6 h1:62pqiJkWpdLe3AS+u1a10WPbjfd893gnPe/K75zpBY4=
+github.com/improbable-eng/grpc-web v0.0.0-20181111131931-77784bdb46c6 h1:fiInNAWlGa8pfal31Ecx9XtI9VACwqsLLU1W3/X9nH8=
 github.com/improbable-eng/grpc-web v0.0.0-20181111131931-77784bdb46c6/go.mod h1:6hRR09jOEG81ADP5wCQju1z71g6OL4eEvELdran/3cs=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/mame82/mblue-toolz v0.1.0-alpha h1:We4TUn+EjLJBMe++1Ym630E5PLpfpWafegSPCrogJNo=

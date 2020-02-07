@@ -21,3 +21,5 @@ require (
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	periph.io/x/periph v3.3.0+incompatible
 )
+
+go 1.13
