@@ -464,7 +464,7 @@ P4wnP1_cli hid run -c 'waitLED(NUM); type("A huge amount of characters\n")'
 
 If you tested the command above, typing should only start if NUM LOCK is pressed on the USB host's hardware keyboard, 
 but you might encounter cases where the keystrokes immediately are issued, even if NUM LOCK wasn't pressed (and the 
-keyboard LED hasn't hacnged).
+keyboard LED hasn't changed).
 
 This is intended behavior and the reason for this is another use case for the `waitLED` command:
  
