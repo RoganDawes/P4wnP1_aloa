@@ -44,7 +44,7 @@
             "BRK": [{"Modifiers": [], "Keys": ["KEY_PAUSE"]}],
 
 
-            "§": [{"Modifiers": [], "Keys": ["KEY_GRAVE"]}],
+            "½": [{"Modifiers": [], "Keys": ["KEY_GRAVE"]}],
             "1": [{"Modifiers": [],	"Keys": ["KEY_1"]}],
             "2": [{"Modifiers": [],	"Keys": ["KEY_2"]}],
             "3": [{"Modifiers": [],	"Keys": ["KEY_3"]}],
@@ -58,7 +58,7 @@
             "+": [{"Modifiers": [],	"Keys": ["KEY_MINUS"]}],
             "´": [{"Modifiers": [], "Keys": ["KEY_EQUAL"]}],
 
-            "½": [{"Modifiers": ["MOD_LEFT_SHIFT"], "Keys": ["KEY_GRAVE"]}],
+            "§": [{"Modifiers": ["MOD_LEFT_SHIFT"], "Keys": ["KEY_GRAVE"]}],
             "!": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_1"]}],
             "\"": [{"Modifiers": ["MOD_LEFT_SHIFT"], "Keys": ["KEY_2"]}],
             "#": [{"Modifiers": ["MOD_LEFT_SHIFT"],	"Keys": ["KEY_3"]}],
