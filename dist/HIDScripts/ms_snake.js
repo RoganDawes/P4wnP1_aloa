@@ -7,7 +7,7 @@ layout("US"); //language layout
 waitLEDRepeat(NUM);
 press("GUI R");
 delay(500);
-type("mspaint\n"); //no need to press ENTEr, encoded in '\n'
+type("mspaint\n"); //no need to press ENTER, encoded in '\n'
 delay(1000);
 //Maximize paint
 press("GUI UP"); 

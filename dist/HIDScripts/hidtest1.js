@@ -21,7 +21,7 @@ for (var i = 0; i<10; i++) {
     delay(500); //wait a half a second
 }
 
-//Do some relative mouse movement, but devide it into 1 DPI substeps (pixel perfect mouse move, but slow)
+//Do some relative mouse movement, but divide it into 1 DPI substeps (pixel perfect mouse move, but slow)
 for (var i = 0; i<10; i++) {
     x = Math.random() * 256 - 128; //x, scaled between -128 and 127
     y = Math.random() * 256 - 128; //y, scaled between -128 and 127

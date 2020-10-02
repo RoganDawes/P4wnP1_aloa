@@ -4,7 +4,7 @@
 // Meant to run as background job
 // With extrem settings, it could be use to prank users
 
-scale = 2.0; //if not stepped, 127 is vali max
+scale = 2.0; //if not stepped, 127 is valid max
 sleeptime = 3000;
 stepped = true;
 while (true) {
