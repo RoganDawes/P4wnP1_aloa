@@ -27,7 +27,7 @@ dep:
 	cp /etc/resolv.conf /tmp/backup_resolv.conf
 	sudo apt-get -y install dnsmasq
 	sudo /bin/bash -c 'cat /tmp/backup_resolv.conf > /etc/resolv.conf'
-    	sudo apt-get -y dhcpcd5
+    	sudo apt-get install -y dhcpcd5
 
 	# python dependencies for HIDbackdoor
 	sudo pip install pycrypto # already present on stretch
