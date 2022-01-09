@@ -27,13 +27,13 @@ dep:
 	cp /etc/resolv.conf /tmp/backup_resolv.conf
 	sudo apt-get -y install dnsmasq
 	sudo /bin/bash -c 'cat /tmp/backup_resolv.conf > /etc/resolv.conf'
-    	#
-	sudo apt-get install -y dhcpcd5
+    	
+	sudo apt-get -y install dhcpcd5
 
 	# python dependencies for HIDbackdoor
 	sudo pip install pycrypto # already present on stretch
 	#sudo pip install pydispatcher #already present
-	
+
 	sudo apt-get install golang-go
 
 	# put into ~/.profile
@@ -147,4 +147,3 @@ remove:
 	systemctl daemon-reload
 
 	#sudo update-rc.d dhcpcd enable
-
