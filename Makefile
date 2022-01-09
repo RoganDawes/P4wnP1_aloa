@@ -34,7 +34,7 @@ dep:
 	sudo pip install pycrypto # already present on stretch
 	#sudo pip install pydispatcher #already present
 
-	sudo apt-get install golang-go
+	sudo apt-get -y install golang-go
 
 	# put into ~/.profile
 	# ToDo: check if already present
