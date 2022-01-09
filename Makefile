@@ -10,7 +10,7 @@ test:
 
 # make dep runs without sudo
 # stay in $HOME/P4wnP1
-# ONLY RUN -------- make dep / make compile / make installkali
+# ONLY RUN -------- make dep / make compile / sudo make installkali
 dep:
 	#Disable GUI Login
 	sudo systemctl set-default multi-user.target
