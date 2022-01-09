@@ -1,5 +1,6 @@
 # P4wnP1 A.L.O.A.
 ---------------EDIT------------
+ALL CREDITS GO TO @MaMe82 and all developers involved. 
 
 Setup wireless, "kalipi-config"
 
