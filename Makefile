@@ -10,8 +10,14 @@ test:
 
 # make dep runs without sudo
 # stay in $HOME/P4wnP1
-# RUN make dep / make compile / make installkali
+# ONLY RUN -------- make dep / make compile / make installkali
 dep:
+	#Disable GUI Login
+	sudo systemctl set-default multi-user.target
+	##Disabling ipv6 for me makes repos work faster
+	echo -e "net.ipv6.conf.all.disable_ipv6 = 1\nnet.ipv6.conf.default.disable_ipv6 = 1" | sudo tee -a /etc/sysctl.conf
+	sudo sysctl -p
+	sudo apt-get update
 	sudo apt-get -y install git screen hostapd autossh bluez bluez-tools bridge-utils policykit-1 genisoimage iodine haveged tcpdump
 
 	#sudo apt-get -y install python-pip python-dev
@@ -21,17 +27,12 @@ dep:
 	cp /etc/resolv.conf /tmp/backup_resolv.conf
 	sudo apt-get -y install dnsmasq
 	sudo /bin/bash -c 'cat /tmp/backup_resolv.conf > /etc/resolv.conf'
-    sudo apt-get -y dhcpcd5
+    	sudo apt-get -y dhcpcd5
 
 	# python dependencies for HIDbackdoor
 	sudo pip install pycrypto # already present on stretch
-	#sudo pip install pydispatcher
-
-	# install go
-	#wget https://storage.googleapis.com/golang/go1.10.linux-armv6l.tar.gz
-	#sudo tar -C /usr/local -xzf go1.10.linux-armv6l.tar.gz
-
-	#export PATH="$$PATH:/usr/local/go/bin"
+	#sudo pip install pydispatcher #already present
+	
 	sudo apt-get install golang-go
 
 	# put into ~/.profile
@@ -51,7 +52,7 @@ dep:
 
 compile:
 	go get -u github.com/mame82/P4wnP1_aloa/... # partially downloads again, but we need the library packages in go path to build
-    go get -d github.com/mame82/P4wnP1_aloa/...
+    	go get -d github.com/mame82/P4wnP1_aloa/...
 	# <--- second compilation, maybe -d flag on go get above is better
 	env GOBIN=$(pwd)/build go install ./cmd/... # compile all main packages to the build folder
 
