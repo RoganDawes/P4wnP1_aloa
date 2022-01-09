@@ -1,4 +1,11 @@
 # P4wnP1 A.L.O.A.
+---------------EDIT------------
+cd P4wnP1
+run "make dep / make compile / make installkali"
+check if access gets created and web interface works. 
+Try conneting via OTG to windows PC, and check ethernet show up
+
+--------------------------------------------------------------------------
 
 P4wnP1 A.L.O.A. by MaMe82 is a framework which turns a Rapsberry Pi Zero W into a flexible, low-cost platform for 
 pentesting, red teaming and physical engagements ... or into "A Little Offensive Appliance".
