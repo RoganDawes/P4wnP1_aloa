@@ -2,10 +2,15 @@
 ---------------EDIT------------
 
 Setup wireless, "kalipi-config"
+
 install git "apt-get update && apt-get install git"
+
 git clone https://github.com/lgeekj/P4wnP1
+
 cd P4wnP1
 run "make dep / make compile / sudo make installkali"
+(make compile probably will give error but just continue)
+
 check if access gets created and web interface works. 
 Try conneting via OTG to windows PC, and check ethernet show up
 
