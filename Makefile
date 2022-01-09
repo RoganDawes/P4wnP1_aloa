@@ -89,8 +89,9 @@ installkali:
 	cp -R dist/ums /usr/local/P4wnP1/
 	cp -R dist/legacy /usr/local/P4wnP1/
 	#cp build/webapp.js /usr/local/P4wnP1/www
-    cp webapp.js /usr/local/P4wnP1/www
+    	cp webapp.js /usr/local/P4wnP1/www
 	cp build/webapp.js.map /usr/local/P4wnP1/www
+	echo "dtoverlay=dwc2" | sudo tee -a /boot/config.txt
 
 	# careful testing
 	#sudo update-rc.d dhcpcd disable
