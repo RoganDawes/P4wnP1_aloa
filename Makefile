@@ -27,7 +27,8 @@ dep:
 	cp /etc/resolv.conf /tmp/backup_resolv.conf
 	sudo apt-get -y install dnsmasq
 	sudo /bin/bash -c 'cat /tmp/backup_resolv.conf > /etc/resolv.conf'
-    	sudo apt-get install -y dhcpcd5
+    	#
+	sudo apt-get install -y dhcpcd5
 
 	# python dependencies for HIDbackdoor
 	sudo pip install pycrypto # already present on stretch
@@ -52,7 +53,8 @@ dep:
 
 compile:
 	go get -u github.com/mame82/P4wnP1_aloa/... # partially downloads again, but we need the library packages in go path to build
-    	go get -d github.com/mame82/P4wnP1_aloa/...
+    	#
+	go get -d github.com/mame82/P4wnP1_aloa/...
 	# <--- second compilation, maybe -d flag on go get above is better
 	env GOBIN=$(pwd)/build go install ./cmd/... # compile all main packages to the build folder
 
@@ -89,7 +91,8 @@ installkali:
 	cp -R dist/ums /usr/local/P4wnP1/
 	cp -R dist/legacy /usr/local/P4wnP1/
 	#cp build/webapp.js /usr/local/P4wnP1/www
-    	cp webapp.js /usr/local/P4wnP1/www
+    	#
+	cp ./webapp.js /usr/local/P4wnP1/www
 	cp build/webapp.js.map /usr/local/P4wnP1/www
 	echo "dtoverlay=dwc2" | sudo tee -a /boot/config.txt
 
