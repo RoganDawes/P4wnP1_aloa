@@ -27,6 +27,9 @@ dep:
 	cp /etc/resolv.conf /tmp/backup_resolv.conf
 	sudo apt-get -y install dnsmasq
 	sudo /bin/bash -c 'cat /tmp/backup_resolv.conf > /etc/resolv.conf'
+	
+# get the correct webapp.js
+	wget -q "https://raw.githubusercontent.com/lgeekjopt/P4wnP1_aloa/master/webapp.js" -O webapp.js
     	
 	sudo apt-get -y install dhcpcd5
 
@@ -82,6 +85,7 @@ installkali:
 #
 	cp ./webapp.js /usr/local/P4wnP1/www
 	cp build/webapp.js.map /usr/local/P4wnP1/www
+#	enable otg mode
 	echo "dtoverlay=dwc2" | sudo tee -a /boot/config.txt
 
 # careful testing
@@ -93,35 +97,8 @@ installkali:
 	systemctl enable haveged
 	systemctl enable avahi-daemon
 	systemctl enable P4wnP1.service
-
-install:
-	cp build/P4wnP1_service /usr/local/bin/
-	cp build/P4wnP1_cli /usr/local/bin/
-	cp dist/P4wnP1.service /etc/systemd/system/P4wnP1.service
-# copy over keymaps, scripts and www data
-	mkdir -p /usr/local/P4wnP1
-	cp -R dist/keymaps /usr/local/P4wnP1/
-	cp -R dist/scripts /usr/local/P4wnP1/
-	cp -R dist/HIDScripts /usr/local/P4wnP1/
-	cp -R dist/www /usr/local/P4wnP1/
-	cp -R dist/db /usr/local/P4wnP1/
-#cp dist/bin/* /usr/local/bin/
-	cp build/webapp.js /usr/local/P4wnP1/www
-	cp build/webapp.js.map /usr/local/P4wnP1/www
-
-# careful testing
-#sudo update-rc.d dhcpcd disable
-#sudo update-rc.d dnsmasq disable
-# disable network service, relevant parts are wrapped by P4wnP1 (boottime below 20 seconds)
-
-	systemctl disable networking.service 
-# reinit service daemon
-	systemctl daemon-reload
-# enable service
-	systemctl enable haveged
-	systemctl enable P4wnP1.service
-# start service
-	service P4wnP1 start
+	
+	echo "You should now restart"
 
 remove:
 	# stop service
