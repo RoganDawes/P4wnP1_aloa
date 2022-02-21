@@ -1,4 +1,22 @@
 # P4wnP1 A.L.O.A.
+---------------EDIT------------
+ALL CREDITS GO TO @MaMe82 and all developers involved. 
+
+Setup wireless, "kalipi-config"
+
+install git "apt-get update && apt-get install git"
+
+git clone https://github.com/lgeekj/P4wnP1
+
+cd P4wnP1
+
+run "make dep / make compile / sudo make installkali"
+(make compile probably will give error but just continue)
+
+check if access gets created and web interface works. 
+Try conneting via OTG to windows PC, and check ethernet show up
+
+--------------------------------------------------------------------------
 
 P4wnP1 A.L.O.A. by MaMe82 is a framework which turns a Rapsberry Pi Zero W into a flexible, low-cost platform for 
 pentesting, red teaming and physical engagements ... or into "A Little Offensive Appliance".
