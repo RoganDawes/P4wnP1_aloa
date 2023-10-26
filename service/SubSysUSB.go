@@ -310,24 +310,41 @@ func pollForUSBEthernet(timeout time.Duration) error {
 
 //depends on `lsmod` binary
 func CheckLibComposite() error {
-	log.Printf("Checking for libcomposite...")
+	log.Println("Checking for libcomposite...")
 	out, err := exec.Command("lsmod").Output()
 	if err != nil {
-		log.Fatal(err)
+		log.Println("lsmod failed")
+		log.Panic(err)
+		return err
 	}
 
 	if strings.Contains(string(out), "libcomposite") {
-		log.Printf("... libcomposite loaded")
+		log.Println("... libcomposite loaded")
 		return nil
 	}
 
-	//if here, libcomposite isn't loaded ... try to load
-	log.Printf("Libcomposite not loaded, trying to fix ...")
-	err = exec.Command("modprobe", "libcomposite").Run()
-	if err == nil {
-		log.Printf("... libcomposite loaded")
+	out, err = exec.Command("rmmod", "libcomposite").CombinedOutput()
+	if err != nil {
+		log.Println("rmmod failed")
 	}
 
+	if strings.Contains(string(out), "builtin") {
+		log.Println("... libcomposite available as builtin")
+		return nil
+	} else {
+		log.Println("... libcomposite is NOT a builtin?")
+		log.Println(out)
+	}
+
+	//if here, libcomposite isn't loaded ... try to load
+	log.Println("Libcomposite not loaded, trying to fix ...")
+	err = exec.Command("modprobe", "libcomposite").Run()
+	if err == nil {
+		log.Println("... libcomposite loaded")
+	}
+
+	log.Println(err)
+	log.Panic(err)
 	return err
 }
 
