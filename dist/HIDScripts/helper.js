@@ -23,7 +23,7 @@ function startPS() {
 	type("powershell\n")
 }
 
-// Hide an already opened PowerShell console, but keep input focus, to gon on typing
+// Hide an already opened PowerShell console, but keep input focus, to go on typing
 function hidePS() {
 	type('$h=(Get-Process -Id $pid).MainWindowHandle;$ios=[Runtime.InteropServices.HandleRef];$hw=New-Object $ios (1,$h);$i=New-Object $ios(2,0);(([reflection.assembly]::LoadWithPartialName("WindowsBase")).GetType("MS.Win32.UnsafeNativeMethods"))::SetWindowPos($hw,$i,0,0,100,100,16512)')
   	press("ENTER");

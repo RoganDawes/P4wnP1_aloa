@@ -6,7 +6,7 @@ This isn't a stand-alone HIDScript. It is meant to be used as part of the Master
 in order to met all the dependencies.
 
 Two options could be changed in this script:
-1) The keyboard language to type out the iniial stage
+1) The keyboard language to type out the initial stage
 2) The hide option. If disabled the powershell window on the target host isn't hidden, to allow
 easy debugging.
 
@@ -22,7 +22,7 @@ Dependencies:
     - condition b) gets satisfied by a bash script (wifi_covert_channel.sh) bashscript, which 
     starts the stager and additionally the "WiFi covert channel C2 server"
     - the aforementioned bash script is started by a second trigger action, which is part
-    TriggerActio templated named "wifi_covert_channel", too
+    TriggerAction templated named "wifi_covert_channel", too
     - so two conditions are assured by TriggerActions (starting HID stager+WiFi covert channel server
     and running this HIDScript against the target host), but the remaining condition (deploy proper USB
     gadget settings, once) has to be met, too.
@@ -38,7 +38,7 @@ Controlling the server:
 language="us";
 hide=false; // set to true to hide the console window on the target
 
-// Hide an already opened PowerShell console, but keep input focus, to gon on typing
+// Hide an already opened PowerShell console, but keep input focus, to go on typing
 function hidePS() {
 	type('$h=(Get-Process -Id $pid).MainWindowHandle;$ios=[Runtime.InteropServices.HandleRef];$hw=New-Object $ios (1,$h);$i=New-Object $ios(2,0);(([reflection.assembly]::LoadWithPartialName("WindowsBase")).GetType("MS.Win32.UnsafeNativeMethods"))::SetWindowPos($hw,$i,0,0,100,100,16512)')
   	press("ENTER");
